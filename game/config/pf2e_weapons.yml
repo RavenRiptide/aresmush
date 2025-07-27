@@ -111,7 +111,7 @@ pf2e_weapons:
     reload: 0
     bulk: 0.1
     group: Sling
-  Clan Dagger:
+  Khazadi Dagger:
     wp_type: melee
     category: simple
     traits:
