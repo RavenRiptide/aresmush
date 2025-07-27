@@ -3335,7 +3335,7 @@ pf2e_background:
     - Performance
     - Academia Lore
     feat:
-    - Experienced Professional
+    - Assurance (Performance)
     special: []
     action: []
     reaction: []
@@ -3347,7 +3347,7 @@ pf2e_background:
     - Society
     - Academia Lore
     feat:
-    - Experienced Professional
+    - Assurance (Society)
     special: []
     action: []
     reaction: []
