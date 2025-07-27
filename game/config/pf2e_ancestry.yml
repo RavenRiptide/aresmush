@@ -8,7 +8,7 @@ pf2e_ancestry:
     - open
     - open
     languages:
-    - Tradespeak
+    - Kamin
     - Yrch
     traits:
     - arvek
@@ -54,7 +54,7 @@ pf2e_ancestry:
     - open
     - open
     languages:
-    - Tradespeak
+    - Kamin
     - Bassini
     traits:
     - bassin
@@ -110,8 +110,8 @@ pf2e_ancestry:
     - open
     - open
     languages:
-    - Tradespeak
-    - Draconic
+    - Kamin
+    - Am'sheran Draconic
     traits:
     - ciith
     - humanoid
@@ -162,7 +162,7 @@ pf2e_ancestry:
     - open
     - open
     languages:
-    - Tradespeak
+    - Kamin
     - Egalrin
     traits:
     - egalrin
@@ -216,7 +216,7 @@ pf2e_ancestry:
     - open
     - open
     languages:
-    - Tradespeak
+    - Kamin
     - Yrch
     traits:
     - goblin
@@ -271,7 +271,7 @@ pf2e_ancestry:
     - open
     - open
     languages:
-    - Tradespeak
+    - Kamin
     - Gnomish
     - Sylvan
     traits:
@@ -328,7 +328,7 @@ pf2e_ancestry:
     - open
     - open
     languages:
-    - Tradespeak
+    - Kamin
     traits:
     - human
     - humanoid
@@ -375,7 +375,7 @@ pf2e_ancestry:
     - open
     - open
     languages:
-    - Tradespeak
+    - Kamin
     - Kaillin
     traits:
     - humanoid
@@ -422,7 +422,7 @@ pf2e_ancestry:
     - open
     languages:
     - Khazdul
-    - Tradespeak
+    - Kamin
     traits:
     - khazad
     - humanoid
@@ -475,7 +475,7 @@ pf2e_ancestry:
     - open
     - open
     languages:
-    - Tradespeak
+    - Kamin
     - Yrch
     traits:
     - oruch
@@ -527,7 +527,7 @@ pf2e_ancestry:
     - open
     - open
     languages:
-    - Tradespeak
+    - Kamin
     - Silya
     traits:
     - sildanyar
