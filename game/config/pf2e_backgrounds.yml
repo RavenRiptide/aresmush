@@ -315,18 +315,18 @@ pf2e_background:
     rare: true
     action: []
     reaction: []
-#  Blessed (Animusian): SPOILER
-#    abl_boosts:
-#    - [ Wisdom, Charisma ]
-#    - open
-#    skills:
-#    - Animusian Lore
-#    feat: []
-#    special:
-#    - Blessed
-#    rare: true
-#    action: []
-#    reaction: []
+  Blessed (Animusian):
+    abl_boosts:
+    - [ Wisdom, Charisma ]
+    - open
+    skills:
+    - Animusian Lore
+    feat: []
+    special:
+    - Blessed
+    rare: true
+    action: []
+    reaction: []
   Blessed (Caracorothan):
     abl_boosts:
     - [ Wisdom, Charisma ]
@@ -973,18 +973,18 @@ pf2e_background:
     special: []
     action: []
     reaction: []
-#  Cultist (Animusian): SPOILER
-#    abl_boosts:
-#    - [ Intelligence, Charisma ]
-#    - open
-#    skills:
-#    - Occultism
-#    - Animusian Lore
-#    feat:
-#    - Schooled In Secrets
-#    special: []
-#    action: []
-#    reaction: []
+  Cultist (Animusian):
+    abl_boosts:
+    - [ Intelligence, Charisma ]
+    - open
+    skills:
+    - Occultism
+    - Animusian Lore
+    feat:
+    - Schooled In Secrets
+    special: []
+    action: []
+    reaction: []
   Cultist (Caracorothan):
     abl_boosts:
     - [ Intelligence, Charisma ]
@@ -1701,6 +1701,222 @@ pf2e_background:
     special: []
     action: []
     reaction: []
+  Hermit (Nature/Aquatic Terrain):
+    abl_boosts:
+    - [ Constitution, Intelligence ]
+    - open
+    skills:
+    - Nature
+    - Aquatic Terrain Lore
+    feat:
+    - Dubious Knowledge
+    special: []
+    action: []
+    reaction: []
+  Hermit (Nature/Arctic Terrain):
+    abl_boosts:
+    - [ Constitution, Intelligence ]
+    - open
+    skills:
+    - Nature
+    - Arctic Terrain Lore
+    feat:
+    - Dubious Knowledge
+    special: []
+    action: []
+    reaction: []
+  Hermit (Nature/Desert Terrain):
+    abl_boosts:
+    - [ Constitution, Intelligence ]
+    - open
+    skills:
+    - Nature
+    - Desert Terrain Lore
+    feat:
+    - Dubious Knowledge
+    special: []
+    action: []
+    reaction: []
+  Hermit (Nature/Forest Terrain):
+    abl_boosts:
+    - [ Constitution, Intelligence ]
+    - open
+    skills:
+    - Nature
+    - Forest Terrain Lore
+    feat:
+    - Dubious Knowledge
+    special: []
+    action: []
+    reaction: []
+  Hermit (Nature/Mountain Terrain):
+    abl_boosts:
+    - [ Constitution, Intelligence ]
+    - open
+    skills:
+    - Nature
+    - Mountain Terrain Lore
+    feat:
+    - Dubious Knowledge
+    special: []
+    action: []
+    reaction: []
+  Hermit (Nature/Plains Terrain):
+    abl_boosts:
+    - [ Constitution, Intelligence ]
+    - open
+    skills:
+    - Nature
+    - Plains Terrain Lore
+    feat:
+    - Dubious Knowledge
+    special: []
+    action: []
+    reaction: []
+  Hermit (Nature/Sky Terrain):
+    abl_boosts:
+    - [ Constitution, Intelligence ]
+    - open
+    skills:
+    - Nature
+    - Sky Terrain Lore
+    feat:
+    - Dubious Knowledge
+    special: []
+    action: []
+    reaction: []
+  Hermit (Nature/Swamp Terrain):
+    abl_boosts:
+    - [ Constitution, Intelligence ]
+    - open
+    skills:
+    - Nature
+    - Swamp Terrain Lore
+    feat:
+    - Dubious Knowledge
+    special: []
+    action: []
+    reaction: []
+  Hermit (Nature/Underground Terrain):
+    abl_boosts:
+    - [ Constitution, Intelligence ]
+    - open
+    skills:
+    - Nature
+    - Underground Terrain Lore
+    feat:
+    - Dubious Knowledge
+    special: []
+    action: []
+    reaction: []
+  Hermit (Occultism/Aquatic Terrain):
+    abl_boosts:
+    - [ Constitution, Intelligence ]
+    - open
+    skills:
+    - Occultism
+    - Aquatic Terrain Lore
+    feat:
+    - Dubious Knowledge
+    special: []
+    action: []
+    reaction: []
+  Hermit (Occultism/Arctic Terrain):
+    abl_boosts:
+    - [ Constitution, Intelligence ]
+    - open
+    skills:
+    - Occultism
+    - Arctic Terrain Lore
+    feat:
+    - Dubious Knowledge
+    special: []
+    action: []
+    reaction: []
+  Hermit (Occultism/Desert Terrain):
+    abl_boosts:
+    - [ Constitution, Intelligence ]
+    - open
+    skills:
+    - Occultism
+    - Desert Terrain Lore
+    feat:
+    - Dubious Knowledge
+    special: []
+    action: []
+    reaction: []
+  Hermit (Occultism/Forest Terrain):
+    abl_boosts:
+    - [ Constitution, Intelligence ]
+    - open
+    skills:
+    - Occultism
+    - Forest Terrain Lore
+    feat:
+    - Dubious Knowledge
+    special: []
+    action: []
+    reaction: []
+  Hermit (Occultism/Mountain Terrain):
+    abl_boosts:
+    - [ Constitution, Intelligence ]
+    - open
+    skills:
+    - Occultism
+    - Mountain Terrain Lore
+    feat:
+    - Dubious Knowledge
+    special: []
+    action: []
+    reaction: []
+  Hermit (Occultism/Plains Terrain):
+    abl_boosts:
+    - [ Constitution, Intelligence ]
+    - open
+    skills:
+    - Occultism
+    - Plains Terrain Lore
+    feat:
+    - Dubious Knowledge
+    special: []
+    action: []
+    reaction: []
+  Hermit (Occultism/Sky Terrain):
+    abl_boosts:
+    - [ Constitution, Intelligence ]
+    - open
+    skills:
+    - Occultism
+    - Sky Terrain Lore
+    feat:
+    - Dubious Knowledge
+    special: []
+    action: []
+    reaction: []
+  Hermit (Occultism/Swamp Terrain):
+    abl_boosts:
+    - [ Constitution, Intelligence ]
+    - open
+    skills:
+    - Occultism
+    - Swamp Terrain Lore
+    feat:
+    - Dubious Knowledge
+    special: []
+    action: []
+    reaction: []
+  Hermit (Occultism/Underground Terrain):
+    abl_boosts:
+    - [ Constitution, Intelligence ]
+    - open
+    skills:
+    - Occultism
+    - Underground Terrain Lore
+    feat:
+    - Dubious Knowledge
+    special: []
+    action: []
+    reaction: []
   Hunter:
     abl_boosts:
     - [ Dexterity, Wisdom ]
@@ -1957,20 +2173,20 @@ pf2e_background:
     special: []
     action: []
     reaction: []
-#  Pilgrim (Animusian): SPOILER
-#    abl_boosts:
-#    - [ Wisdom, Charisma ]
-#    - open
-#    skills:
-#    - Religion
-#    - Animusian Lore
-#    lores:
-#    - deity
-#    feat:
-#    - "Pilgrim's Token"
-#    special: []
-#    action: []
-#    reaction: []
+  Pilgrim (Animusian):
+    abl_boosts:
+    - [ Wisdom, Charisma ]
+    - open
+    skills:
+    - Religion
+    - Animusian Lore
+    lores:
+    - deity
+    feat:
+    - "Pilgrim's Token"
+    special: []
+    action: []
+    reaction: []
   Pilgrim (Caracorothan):
     abl_boosts:
     - [ Wisdom, Charisma ]
