@@ -1644,18 +1644,6 @@ pf2e_feats:
     prereq:
       level: 7
       skill: Stealth/master
-  Impeccable Crafting:
-    feat_type: 
-    - Skill
-    - General
-    assoc_skill: Crafting
-    traits: []
-    shortdesc: You craft flawless creations with great efficiency. Whenever you roll a success at a Crafting check to make an item of the type you chose with Specialty Crafting, you get a critical success instead.
-    prereq:
-      level: 7
-      skill: Crafting/master
-      feat:
-      - Specialty Crafting
   Influence Nature:
     feat_type: 
     - Skill
