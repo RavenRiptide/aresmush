@@ -39,11 +39,16 @@ module AresMUSH
 
         # Do it. 
 
-        options = Pf2e.get_feat_options(enactor, self.search_type)
+        EventMachine.defer(
+          proc {
+            options = Pf2e.get_feat_options(enactor, self.search_type)
+            options
+          },
 
-        client.emit t('pf2e.feat_available_options', :options => options.sort.join(", "))
-        
-
+          proc { |options|
+            client.emit t('pf2e.feat_available_options', :options => options.sort.join(", "))
+          }
+        )
       end
 
 

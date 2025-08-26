@@ -284,6 +284,7 @@ module AresMUSH
           feats.merge_yaml!(conf_path + 'pf2e_feat_class.yml')
         when "General"
           feats.merge_yaml!(conf_path + 'pf2e_feat_general.yml')
+          feats.merge_yaml!(conf_path + 'pf2e_feat_skill.yml')
         when "Skill"
           feats.merge_yaml!(conf_path + 'pf2e_feat_skill.yml')
         end
