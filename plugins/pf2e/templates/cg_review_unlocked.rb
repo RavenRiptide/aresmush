@@ -170,10 +170,6 @@ module AresMUSH
 
       end
 
-      def ancestry_flaw
-        @ancestry_info["abl_flaw"] ? @ancestry_info["abl_flaw"] : "None."
-      end
-
       def bg_boosts
         list = @background_info["abl_boosts"] ? @background_info["abl_boosts"] : []
 

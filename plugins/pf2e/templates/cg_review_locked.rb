@@ -166,10 +166,6 @@ module AresMUSH
         list.sort.join(", ")
       end
 
-      def ancestry_flaw
-        @ancestry_info["abl_flaw"] ? @ancestry_info["abl_flaw"] : "None."
-      end
-
       def bg_boosts
         list = @boosts['background']
         if list.is_a?(Array)
