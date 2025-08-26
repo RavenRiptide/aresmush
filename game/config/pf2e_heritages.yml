@@ -394,7 +394,8 @@ pf2e_heritage:
     special: []
     traits: []
   Versatile:
-    feat:
+    feat: []
+    choose_feat:
     - general
     action: []
     attack: {}
