@@ -1698,7 +1698,8 @@ pf2e_feats:
     shortdesc: Earthen barriers no longer impede your progress. You gain _passwall_ as a 7th-level divine innate spell that you can cast once per day. Unlike the spell, however, this ability can be used only to open passages through barriers of earth or stone.
     prereq:
       level: 17
-      feat: Stonewalker
+      feat: 
+      - Stonewalker
 # Oruch Ancestry Feats
   Beast Trainer:
     feat_type: 
@@ -1850,7 +1851,8 @@ pf2e_feats:
     shortdesc: You steep yourself in superstition and practice ancient oruch mental exercises for shrugging off the effects of magic. You gain a +1 circumstance bonus to saving throws against spells and magical effects at all times.
     prereq:
       level: 9
-      feat: Oruch Superstition
+      feat: 
+      - Oruch Superstition
   Undying Ferocity:
     feat_type: 
     - Ancestry
@@ -3962,6 +3964,25 @@ pf2e_feats:
         spell_trad: divine
     shortdesc: You can call forth a blasphemous word from the fiendish realms to punish your foes. Once per day, you can cast divine decree as a 7th-level divine innate spell.
   Relentless Wings:
+    feat_type: 
+    - Ancestry
+    assoc_ancestry: 
+    - Arvek
+    - Bassin
+    - Ciith 
+    - Egalrin
+    - Goblin
+    - Gnome
+    - Human
+    - Kailli
+    - Khazad
+    - Oruch
+    - Sildanyar
+    traits:
+    - divine
+    - niasa
+    - morph
+    - transmutation
     prereq:
       level: 17
       feat:

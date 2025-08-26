@@ -67,7 +67,7 @@ module AresMUSH
 
       # This will come back as a string if the feat name is bad or not unique.
       return false if find_feat.is_a? String
-
+      
       details = find_feat[1]
 
       if !details
@@ -81,6 +81,7 @@ module AresMUSH
       feat_type = details['feat_type']
 
       # Lineage feats are explicitly for select heritages and can only be taken at level 1.
+      
       if feat_type.include? 'Lineage'
 
         heritage = cinfo['heritage'].downcase
@@ -182,6 +183,7 @@ module AresMUSH
         when "feat"
           feats = char.pf2_feats.values.flatten.map { |word| word.upcase }
           req = required.map { |word| word.upcase }
+          
 
           msg << "feat" unless req.all? { |f| feats.include? f }
         when "heritage"

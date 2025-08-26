@@ -44,11 +44,6 @@ demographics:
       subjective_pronoun: they
       objective_pronoun: them
       noun: person
-    Robot:
-      possessive_pronoun: their
-      subjective_pronoun: they
-      objective_pronoun: them
-      noun: robot
   groups:
     Region:
       desc: What region does your character call home?

@@ -2775,8 +2775,7 @@ pf2e_feats:
     feat_type:
       - Charclass
     prereq:
-      specialize:
-        - animal instinct
+      specialize: animal instinct
       level: 6
     shortdesc: Your proficiency in unarmored defense increases to expert. When you are raging and unarmored, your skin transforms into a thick hide. You gain a +2 item bonus to AC (+3 if you have the greater juggernaut class feature). The thickness of your hide gives you a Dexterity modifier cap to your AC of +3. This item bonus to AC is cumulative with _armor potency runes_ on your explorer's clothing, _mage armor_, and _bracers of armor_.
     traits:
@@ -3189,26 +3188,27 @@ pf2e_feats:
         - Mercy
     shortdesc: Your divine touch rejuvenates the weak and tired. When you use Mercy, you can instead attempt a counteract check to remove the clumsy or enfeebled conditions, using the source of that condition to determine the counteract level and DC. If the condition was caused by an ongoing effect and you don't remove that effect, the condition returns at the end of your next turn.
     traits: []
-  Ki Blast: #Area #Cast #Saving Throw
-  assoc_charclass:
-    - Monk
-  feat_type:
-    - Charclass
-  prereq:
-    level: 6
-    orfeat:
-      - Ki Rush
-      - Ki Strike
-      - Wholeness of Body
-      - Abundant Step
-      - Clinging Shadows Initiate
-      - Wild Winds Initiate
-      - Wind Jump
-      - Shadow's Web
-      - Medusa's Wrath
-      - Quivering Palm
-      - Empty Body
-      - Ki Form
+  #Area #Cast #Saving Throw
+  Ki Blast: 
+    assoc_charclass:
+      - Monk
+    feat_type:
+      - Charclass
+    prereq:
+      level: 6
+      orfeat:
+        - Ki Rush
+        - Ki Strike
+        - Wholeness of Body
+        - Abundant Step
+        - Clinging Shadows Initiate
+        - Wild Winds Initiate
+        - Wind Jump
+        - Shadow's Web
+        - Medusa's Wrath
+        - Quivering Palm
+        - Empty Body
+        - Ki Form
     shortdesc: You unleash your ki as a powerful blast of force that deals 2d6 force damage. If you use 2 actions to cast ki blast, increase the size of the cone to 30 feet and the damage to 3d6. If you use 3 actions to cast ki blast, increase the size of the cone to 60 feet and the damage to 4d6. Each creature in the area must attempt a Fortitude saving throw.%r%r**Critical Success** The creature is unaffected.%r**Success** The creature takes half damage.%r**Failure** The creature takes full damage and is pushed 5 feet.%r**Critical Failure** The creature takes double damage and is pushed 10 feet.%r%r**Heightened (+1)** The damage increases by 1d6, or by 2d6 if you use 2 or 3 actions.
     traits: []
   Light Step:
@@ -5905,6 +5905,10 @@ pf2e_feats:
     shortdesc: Your flexible mind can quickly shift spells. If you add a spell to your repertoire during your daily preparations using Esoteric Polymath, when you prepare again, you can choose to keep the new spell from Esoteric Polymath in your repertoire and instead lose access to another spell of the same level in your repertoire.
     traits: []
   Emblazon Antimagic:
+    assoc_charclass:
+      - Cleric
+    feat_type:
+      - Charclass
     prereq:
       level: 12
       feat:
@@ -8034,6 +8038,10 @@ pf2e_feats:
       - concentrate
       - metamagic
   Empty Body: # Focus Points
+    assoc_charclass:
+      - Monk
+    feat_type:
+      - Charclass
     prereq:
       level: 18
       orfeat:
@@ -9005,6 +9013,10 @@ pf2e_feats:
     traits:
       - concentrate
   Ultimate Flexibility:
+    assoc_charclass:
+      - Fighter
+    feat_type:
+      - Charclass
     prereq:
       level: 20
       feat:
