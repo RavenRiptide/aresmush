@@ -327,6 +327,9 @@ pf2e_skills:
   Desolation Lore:
     key_abil: Intelligence
     recall_knowledge: true
+  Heartlands Lore:
+    key_abil: Intelligence
+    recall_knowledge: true
   Jade Islands Lore:
     key_abil: Intelligence
     recall_knowledge: true
@@ -346,9 +349,6 @@ pf2e_skills:
     key_abil: Intelligence
     recall_knowledge: true
   Skyhaldborg Lore:
-    key_abil: Intelligence
-    recall_knowledge: true
-  The Heartlands Lore:
     key_abil: Intelligence
     recall_knowledge: true
   Tysmycha Lore:
