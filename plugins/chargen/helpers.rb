@@ -175,10 +175,10 @@ module AresMUSH
           welcome_message_args = Chargen.welcome_message_args(model)
           post_body = welcome_message % welcome_message_args
 
-          Forum.system_post(
-            arrivals_category,
-            t('chargen.approval_post_subject', :name => model.name), 
-            post_body)
+          # Forum.system_post(
+          #   arrivals_category,
+          #   t('chargen.approval_post_subject', :name => model.name), 
+          #   post_body)
         end
       end
       

@@ -31,6 +31,11 @@ module AresMUSH
         when "prp"
           return PF2AwardPRPCmd
         end
+      when "selfaward"
+        case cmd.switch
+        when "xp"
+          return PF2AwardXPCmd
+        end
       when "cg"
         case cmd.switch
         when "set"
