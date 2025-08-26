@@ -370,6 +370,31 @@ div.wiki-info strong {
     font-size: 1.5rem;
 }
 
+div.wiki-lore-info {
+    margin: auto;
+    color: #CBC0AD;
+    width: 90%;
+    font-size: 100%;
+    padding: 15px;
+    background-color: #00000082;
+    border: 2px solid #CBC0AD;
+    border-image: linear-gradient(to bottom right, #CBC0AD, #CBC0AD1A, #CBC0AD) 1;
+    margin-top: 15px;
+    margin-bottom: 15px;    
+}
+
+div.wiki-lore-info p {
+    margin-bottom: 0px;
+    padding-top: .2rem;
+    padding-bottom: .2rem;
+    padding-left: .5rem;
+    padding-right: .5rem;
+}
+
+div.wiki-lore-info strong {
+    color: #df8f84;
+}
+
 /* Wiki navbox */
 
 details.navbox-container {
@@ -404,57 +429,55 @@ ul.navbox-list li::before {
 
 div.navbox-container {
     width: 100%;
-    margin: auto;
     border: 1px black solid;
+    display: grid;
+    grid-template-columns: auto auto auto;
+    column-gap: 0px;
+    align-items: center;
 }
 
-div.navbox-container.navbox-header-2-col {
-    width: 100%;
+div.navbox-2col-item {
+    background: #302727;
+    grid-column: 2 / span 2;
+    border: 1px solid black;
+    padding: 10px;
+}
+
+div.navbox-header-item {
     background: #4b2b31;
-    text-align: center;
-    padding: 5px;
-    font-weight: bold;
     color: #CBC0AD;
-}
-
-div.navbox-container.navbox-cell-2-col-center {
-    width: 100%;
-    background: #302727;
+    font-weight: bold;
     text-align: center;
-    padding: 5px;
+    padding: 10px;
+    border: 1px solid black;
+    height: 100%;
 }
 
-div.navbox-container.navbox-cell-2-col {
-    width: 100%;
-    background: #302727;
-    padding: 5px;
-}
-
-div.navbox-container.navbox-flex-2col {
-    width: 100%;
-    display: flex;
-}
-
-div.navbox-container.navbox-header-cell {
-    width: 20%;
+div.navbox-3col-header {
     background: #4b2b31;
-    padding: 5px;
     color: #CBC0AD;
-    text-align: center;
+    grid-column: 1 / span 3;
     font-weight: bold;
-}
-
-div.navbox-container.navbox-regular-cell {
-    width: 80%;
-    background: #302727;
-    padding: 5px;
-}
-
-div.navbox-container.navbox-regular-cell-center {
-    width: 80%;
-    background: #302727;
-    padding: 5px;
     text-align: center;
+    padding: 5px;
+    border: 1px solid black;
+}
+
+div.navbox-3col-item {
+    background: #302727;
+    grid-column: 1 / span 3;
+    padding: 5px;
+    border: 1px solid black;
+}
+
+div.navbox-wiki-back {
+    background: #151515;
+    color: #CBC0AD;
+    grid-column: 1 / span 3;
+    font-weight: bold;
+    text-align: center;
+    padding: 5px;
+    border: 1px solid black;  
 }
 
 /* Wiki Header Left */
@@ -1020,6 +1043,20 @@ div.creature-statblock ul li::marker {
     color: #CBC0AD;
 }
 
+/* Spot art styling */
+
+div.spot-art {
+    position: absolute;
+    top: 27%;
+    left: 42%;
+}
+
+@media (max-width: 1499px) {
+    div.spot-art {
+        display: none;
+    }
+}
+
 /* Letter styling */
 
 div.letter-style-1 {
@@ -1113,22 +1150,23 @@ div.letter-style-3 {
   cursor: pointer;
   transition: .5s;
 }
-.timeline ul li span {
+.timeline ul li .content span {
   display: inline-block;
+  color: #CBC0AD;
   background-color: #466671;
-  border-radius: 25px;
-  padding: 2px 5px;
-  font-size: 15px;
+  border: 1px solid #CBC0AD;
+  border-image: linear-gradient(to bottom right, #CBC0AD, #CBC0AD52, #CBC0AD) 1;
+  padding: 3px 5px;
   text-align: center;
+  margin-top: .5em;
 }
-.timeline ul li .content h3 {
-  color: #34ace0;
-  font-size: 17px;
-  padding-top: 5px;
+.timeline ul li .content h2 {
+  color: #74a7bb;
+  margin-top: 10px;
+  margin-bottom: 5px;
 }
 .timeline ul li .content p {
   padding: 5px 0px 15px 0px;
-  font-size: 15px;
 }
 .timeline ul li:before {
   position: absolute;
@@ -1152,9 +1190,5 @@ div.letter-style-3 {
   .timeline{
     width: 100%;
     padding: 30px 5px 30px 10px;
-  }
-  .timeline ul li .content h3{
-    color: #34ace0;
-    font-size: 15px;
   }
 }

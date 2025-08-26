@@ -11,6 +11,7 @@ website:
   auto_wiki_export: true
   character_gallery_group: Region
   character_gallery_subgroup: ''
+  hide_searchbox: true
   left_sidebar: false
   max_folder_size_kb: 2000
   max_upload_size_kb: 300
@@ -20,7 +21,15 @@ website:
   restricted_pages:
   - home
   - policy:*
+  - theme:*
+  - mechanics:*
+  - plots:*
+  - organization:*
+  - resource:*
   - rules:*
+  shortcuts:
+    wiki: website
+    website/archive: website/export
   sitemap_update_cron:
     hour:
     - 2
@@ -74,31 +83,52 @@ website:
     - divider: true
     - title: Files
       route: files
-#  - title: The World of Ea
-#    menu:
-#    - title: World Map
-#      route: wiki-page
-#      id: theme:world_map
-#    - title: Ea's History
-#      route: wiki-page
-#      id: theme:world_history
-#    - title: Timeline
-#      route: wiki-page
-#      id: theme:timeline
-#    - title: Languages of Ea
-#      route: wiki-page
-#      id: theme:languages
-#    - title: Deities
-#      route: wiki-page
-#      id: theme:deities
-#    - title: Regions
-#      route: wiki-page
-#      id: theme:regions
-  - title: System
+  - title: Mechanics
     menu:
     - title: Playtest Overview
       route: wiki-page
-      id: rules:playtest-overview
+      id: playtest-overview
+    - divider: true
+    - title: Mechanics & Player Options
+      route: wiki-page
+      id: mechanics
+    - title: Ancestries
+      route: wiki-page
+      id: mechanics:ancestry
+    - title: Limited Heritages
+      route: wiki-page
+      id: mechanics:limited-heritages
+    - title: Versatile Heritages
+      route: wiki-page
+      id: mechanics:versatile-heritages
+    - title: Backgrounds
+      route: wiki-page
+      id: mechanics:backgrounds
+    - title: Classes
+      route: wiki-page
+      id: mechanics:classes
+    - title: Feats
+      route: wiki-page
+      id: mechanics:feats
+    - title: Skills
+      route: wiki-page
+      id: mechanics:skills
+    - title: Equipment
+      route: wiki-page
+      id: mechanics:equipment
+    - title: Spells
+      route: wiki-page
+      id: mechanics:spells
+    - divider: true
+    - title: Roleplay Perks & Points (RPPs)
+      route: wiki-page
+      id: mechanics:rpp
+    - title: World Bestiary
+      route: wiki-page
+      id: mechanics:world-bestiary
+    - title: House Rules & Clarifications
+      route: wiki-page
+      id: mechanics:house-rules
     - divider: true
     - target: blank
       title: AON PRD <i class="fa fa-external-link-alt" aria-hidden="true">
@@ -107,6 +137,24 @@ website:
     menu:
     - title: Home
       route: wiki
+    - title: Policies & Expectations
+      route: wiki-page
+      id: policy
+    - title: Theme
+      route: wiki-page
+      id: theme
+    - title: Mechanics & Player Options
+      route: wiki-page
+      id: mechanics
+    - title: Organizations
+      route: wiki-page
+      id: organization
+    - title: Plots & Events
+      route: wiki-page
+      id: plots
+    - title: Resources
+      route: wiki-page
+      id: resource
     - divider: true
     - title: Create New Page
       route: wiki-create
@@ -165,18 +213,6 @@ website:
       route: roles
     - title: Server
       route: server-info
-  - title: Code
-    roles:
-    - coder
-    menu:
-    - title: Tinker
-      route: tinker
-    - title: Custom Code
-      route: custom-code
-  - title: Theme
-    roles:
-    - admin
-    menu:
     - title: Theme Colors
       route: setup-colors
     - title: Custom Styles
@@ -191,6 +227,14 @@ website:
       ids:
       - text
       - website.txt
+  - title: Code
+    roles:
+    - coder
+    menu:
+    - title: Tinker
+      route: tinker
+    - title: Custom Code
+      route: custom-code
   - title: "<i class='fas fa-magnifying-glass'/>"
     menu:
     - title: Search Characters
@@ -220,7 +264,3 @@ website:
     - 3
     minute:
     - 37
-  shortcuts:
-    wiki: website
-    website/archive: website/export
-  hide_searchbox: true
