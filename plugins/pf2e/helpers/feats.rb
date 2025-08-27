@@ -10,14 +10,25 @@ module AresMUSH
 
       keys = feats.keys
 
+      name = ""
+
       # Give me an array of all the feats that match the term.
       match = keys.select { |f| f.upcase.match? term.upcase }
 
+      Global.logger.debug match
       return 'no_match' if match.empty?
-      return 'ambiguous' if match.size > 1
 
-      # Pull the unique feat name out of the array so it can be used as a key to get the feat deets.
-      name = match.first
+      if match.size > 1
+        # Look for an exact match, allows 'Familiar' to be taken when 'Leshy Familiar' is in the list.
+        match.each do |item|
+          if item.upcase == term.upcase
+            name = item
+          end
+        end
+      else
+        # Pull the unique feat name out of the array so it can be used as a key to get the feat deets.
+          name = match.first
+      end
 
       # First is the name of the feat matched, the second is the details for the feat.
       return [ name, feats[name] ]
