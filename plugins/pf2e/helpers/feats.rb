@@ -272,7 +272,6 @@ module AresMUSH
     end
 
     def self.get_feat_options(char, type)
-      # feats = Global.read_config('pf2e_feats')
       feats = {}
       ftype = type.capitalize
       conf_path = 'game/config/'
@@ -280,15 +279,27 @@ module AresMUSH
       case ftype
         when "Ancestry"
           feats.merge_yaml!(conf_path + "pf2e_feat_ancestry.yml")
+          feats = feats["pf2e_feats"]
+        when "Archetype"
+          feats.merge_yaml!(conf_path + "pf2e_feat_dedication.yml")
+          feats = feats["pf2e_feats"]
         when "Charclass"
           feats.merge_yaml!(conf_path + 'pf2e_feat_class.yml')
+          feats = feats["pf2e_feats"]
+        when "Dedication"
+          feats.merge_yaml!(conf_path + "pf2e_feat_dedication.yml")
+          feats = feats["pf2e_feats"]
         when "General"
           feats.merge_yaml!(conf_path + 'pf2e_feat_general.yml')
           feats.merge_yaml!(conf_path + 'pf2e_feat_skill.yml')
+          feats = feats["pf2e_feats"]
         when "Skill"
           feats.merge_yaml!(conf_path + 'pf2e_feat_skill.yml')
+          feats = feats["pf2e_feats"]
+        else
+          feats = Global.read_config('pf2e_feats')
         end
-      feats = feats["pf2e_feats"]
+  
       list = []
 
       feats.each_pair do |name, details|

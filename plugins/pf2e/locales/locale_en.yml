@@ -157,6 +157,7 @@ en:
     no_cginfo_available: "The option you chose for %{prereq} does not have options for %{element}."
     no_double_mojo: "%xrYour base options include too many restricted elements. See wiki for details.%xr"
     no_duplicate_boosts: "The boosts for a given category must all be assigned to different stats."
+    no_feat_option_special: "Listing options for special feats is not currently supported."
     no_free: "No free %{element} left to assign."
     no_lineages: "That heritage does not have lineages associated to it."
     no_sheet_yet: "This command cannot be used until the character has committed their base options."

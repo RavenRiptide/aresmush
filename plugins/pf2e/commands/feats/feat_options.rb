@@ -16,6 +16,14 @@ module AresMUSH
         [ self.search_type ]
       end
 
+      def check_is_special_feat
+        if self.search_type == "Special"
+          return t('pf2e.no_feat_option_special')
+        else
+          return nil
+        end
+      end
+
       def check_chargen_or_advancement
         if enactor.chargen_locked && !enactor.advancing || enactor.is_admin?
           return t('pf2e.only_in_chargen')
@@ -27,7 +35,7 @@ module AresMUSH
       end
 
       def handle
-
+        Global.logger.debug self.search_type
         to_assign = enactor.pf2_to_assign
 
         # Does the character need to assign this feat? 
