@@ -55,9 +55,6 @@ module AresMUSH
           end
           day = $2.to_i
           year = $3.to_i
-        else
-          client.emit_failure t('demographics.invalid_date_format')
-          return
         end
 
         # Format the constituents into a standard string
