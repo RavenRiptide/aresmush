@@ -48,10 +48,11 @@ module AresMUSH
           day = $2.to_i
           year = $3.to_i
         elsif self.date_str.match(/([a-zA-Z]+) (\d+),? (\d+)/)
-          Global.logger.debug $1
-          Global.logger.debug $2
-          Global.logger.debug $3
-          month = $1
+          if ic_months.include?($1)
+            month = $1
+          elsif rl_months.include?($1)
+            month = ic_months[rl_months.index($1)]
+          end
           day = $2.to_i
           year = $3.to_i
         else
