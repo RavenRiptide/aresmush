@@ -35,7 +35,7 @@ module AresMUSH
       end
 
       def handle
-        Global.logger.debug self.search_type
+        
         to_assign = enactor.pf2_to_assign
 
         # Does the character need to assign this feat? 

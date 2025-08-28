@@ -15,7 +15,6 @@ module AresMUSH
       # Give me an array of all the feats that match the term.
       match = keys.select { |f| f.upcase.match? term.upcase }
 
-      Global.logger.debug match
       return 'no_match' if match.empty?
 
       if match.size > 1
