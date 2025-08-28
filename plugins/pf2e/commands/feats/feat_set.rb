@@ -144,9 +144,19 @@ module AresMUSH
           to_assign[key] = fname
         end
 
+        # If they used their last special feat, remove that key.
+
+        if to_assign.key?('special feat') && to_assign['special feat'].empty?
+          to_assign.delete('special feat')
+        end
+
+        # Save the changes
+
         enactor.update(pf2_to_assign: to_assign)
 
         enactor.update(pf2_feats: feat_list)
+
+
 
         client.emit_success t('pf2e.feat_set_ok', :name => fname, :type => self.feat_type)
 
