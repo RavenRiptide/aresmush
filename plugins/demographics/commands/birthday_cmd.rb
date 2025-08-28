@@ -37,8 +37,33 @@ module AresMUSH
       end
       
       def handle
+        rl_months = Date::MONTHNAMES
+        ic_months = [ nil ] + Global.read_config("ictime",)["month_names"]
+        formatted_date_str = ""
+
+        # Determine which date_str format is used and normalize to "Month Day, Year"
+        # Find format
+        if self.date_str.match(/(\d+)\/(\d+)\/(\d+)/)
+          month = ic_months[$1.to_i]
+          day = $2.to_i
+          year = $3.to_i
+        elsif self.date_str.match(/([a-zA-Z]+) (\d+),? (\d+)/)
+          Global.logger.debug $1
+          Global.logger.debug $2
+          Global.logger.debug $3
+          month = $1
+          day = $2.to_i
+          year = $3.to_i
+        else
+          client.emit_failure t('demographics.invalid_date_format')
+          return
+        end
+
+        # Format the constituents into a standard string
+        formatted_date_str = "#{rl_months[ic_months.index(month)]} #{day}, #{year}"
+
         ClassTargetFinder.with_a_character(self.name, client, enactor) do |model|
-          results = Demographics.set_birthday(model, self.date_str)
+          results = Demographics.set_birthday(model, formatted_date_str)
 
           if (results[:error])
             client.emit_failure results[:error]
