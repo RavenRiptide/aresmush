@@ -123,7 +123,7 @@ module AresMUSH
 
         allowed_ancestry = details['assoc_ancestry']
 
-        msg << 'ancestry' unless allowed_ancestry.intersect? ancestry
+        msg << 'ancestry' unless !allowed_ancestry.intersection(ancestry).empty?
       end
 
       # Prereq check, prerequisites includes level
