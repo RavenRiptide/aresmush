@@ -137,7 +137,7 @@ en:
 
     knownfor_set_ok: "Known For %{blurb} set on sheet for %{name}."
 
-    lock_info_first: "This command cannot be used until your base chargen options are committed."
+    lock_info_first: "This command cannot be used until you you have set all Basic Information. Please check 'cg/review' and run 'commit info' after making any remaining selections. Basic Information includes Ancestry, Heritage, Background, Class, Specialty, and a Specialty Detail (if one is available for your chosen specialty)."
     lock_abil_first: "This command cannot be used until you have set and committed your ability scores."
     lock_skills_first: "This command cannot be used until you have set and committed your skills."
 
