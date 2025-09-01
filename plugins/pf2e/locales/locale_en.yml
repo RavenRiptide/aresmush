@@ -57,6 +57,7 @@ en:
     boost_bad_type: "Boost type %{type} cannot be changed with this command."
     boost_not_assigned: "%{value} has not yet been assigned to that boost type."
     boost_not_unique: "%xrYour %{type} boosts must all be assigned to different stats.%xn"
+    boost_not_working: "%xrboost/unset is currently unavailable. To restart your boost assignments, use 'cg/restore info' followed by 'commit info' to return to this section.%xn"
 
     cannot_assign_type: "You don't have that type of %{element} to assign."
     cannot_cast_charclass: "That character class does not have a spell proficiency."
