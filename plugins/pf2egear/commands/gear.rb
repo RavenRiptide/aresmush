@@ -21,6 +21,11 @@ module AresMUSH
 
         char = Pf2e.get_character(self.target, enactor)
 
+        if char.is_admin?
+          client.emit_failure t('pf2e.admin_use_inv_look')
+          return
+        end
+
         if !char
           client.emit_failure t('pf2e.not_found')
           return

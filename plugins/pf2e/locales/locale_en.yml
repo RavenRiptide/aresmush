@@ -7,6 +7,7 @@ en:
     ability_too_high: "%xrAt least one of your ability scores is too high. Too high: %{score}%xn"
     add_ok: "You add %{item} to your %{list}."
     admin_reset_ok: "You reset %{name}'s character sheet."
+    admin_use_inv_look: "Administators should use inv/look to view a player's inventory."
     advance_init: "%{round} Current initiative: %xh%xc%{init}%xn %rCurrent turn: %x172%{current}%xn Next turn: %xc%{next}%xn"
     advance_no_messages: "%xgEverything is selected. Look over your choices and type 'advance/done' to finalize.%xn"
     advance_started: "You start advancement to level %{level} as a %{charclass}."
