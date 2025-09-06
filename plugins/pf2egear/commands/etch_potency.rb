@@ -6,7 +6,7 @@ module AresMUSH
       attr_accessor :target, :category, :item_index, :rune_lvl
 
       def parse_args
-          if (args = cmd.args.match(/(.*)=(.*)\/(\d+)\/(\d+)/))
+          if (args = cmd.args.match(/([^\s=]+)=(\w+)\/(\d+)\/(\d+)/))
             self.target = args[1]
             self.category = args[2]
             @item_index = args[3].to_i
