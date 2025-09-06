@@ -23,10 +23,6 @@ Clerics have the divine font class feature. Some deities provide a choice betwee
 
 `dfont <input>`: Selects your divine font. <input> can be `heal` or `harm`.
 
-Once you are done selecting spells, you will have to input `rest` to see your spells on the magic section of your sheet. You cannot `rest` until your character is approved.
-
-`spell/search` provides a robust search function to help you find spells for your character to learn. For more information on searching through spells, see the `help spell` file. 
-
 **Once you are done selecting spells**, you will have to input `rest` to see your spells on the magic section of your sheet. You cannot `rest` until your character is approved.
 
 `spell/search` provides a robust search function to help you find spells for your character to learn. For more information on searching through spells, see the `help spell` file. 
