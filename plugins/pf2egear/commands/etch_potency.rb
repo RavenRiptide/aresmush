@@ -65,9 +65,10 @@ module AresMUSH
         # Assign the value to the item.
         
         runes = @item.runes
+        old_rune_lvl = runes["fundamental"]["potency"]
         runes["fundamental"]["potency"] = self.rune_lvl.to_i
         @item.update(runes: runes)
-        client.emit_success t('pf2egear.rune_potency_set', :rune => "Potency", :char => @char.name, :item_name => @item.nickname, :rune_lvl => self.rune_lvl)
+        client.emit_success t('pf2egear.rune_potency_set', :rune => "Potency", :char => @char.name, :item_name => @item.nickname, :old_rune_lvl => old_rune_lvl, :rune_lvl => self.rune_lvl)
       end
     end
   end
