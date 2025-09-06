@@ -68,6 +68,10 @@ module AresMUSH
         case cmd.switch
           when"potency"
             return PF2EtchPotencyCmd
+          when "striking"
+            return PF2EtchPowerCmd
+          when "resilient"
+            return PF2EtchPowerCmd
           end
       end
     end
