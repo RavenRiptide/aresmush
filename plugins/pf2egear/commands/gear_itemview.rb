@@ -66,8 +66,7 @@ module AresMUSH
         end
 
         if !item
-          client.emit_failure t('pf2egear.not_found')
-          return
+          return t('pf2egear.not_found')
         end
 
         template = Pf2eDisplayItemTemplate.new(enactor, item, self.category, client)
