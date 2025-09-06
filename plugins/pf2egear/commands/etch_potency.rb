@@ -12,7 +12,7 @@ module AresMUSH
             @item_index = args[3].to_i
             self.rune_lvl = args[4].to_i
           else
-            client.emit_failure t('pf2egear.rune_potency_cmd_fail')
+            client.emit_failure t('pf2egear.rune_cmd_fail', :rune_type => "potency")
             return
           end
       end
@@ -55,7 +55,7 @@ module AresMUSH
 
       def check_rune_level
         if (self.rune_lvl < 0 || self.rune_lvl > 3)
-          return t('pf2egear.rune_potency_out_of_range')
+          return t('pf2egear.rune_out_of_range', )
           return nil
         end
       end

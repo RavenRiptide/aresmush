@@ -48,8 +48,8 @@ en:
     quantity_one_only: "You can only buy one of this type of item at a time. Creating one item..."
 
     rune_no_admin: "You do not have permission to etch runes."
-    rune_potency_cmd_fail: "Invalid command format. Use etch/potency target=category/item_index/rune_level"
-    rune_potency_out_of_range: "Invalid rune level. Fundamental rune levels are between 0 and 3."
+    rune_cmd_fail: "Invalid command format. Use etch/%{rune_type} target=category/item_index/rune_level"
+    rune_out_of_range: "Invalid rune level. Fundamental rune levels are between 0 and 3."
     rune_potency_set: "%{rune} rune on %{char}'s %{item_name} set to %{rune_lvl}."
     
 
