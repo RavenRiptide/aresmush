@@ -99,7 +99,7 @@ module AresMUSH
       mod = Pf2e.get_linked_attr_mod(char, save)
       mod = 0 if !mod
 
-      item = Pf2egear.get_rune_value(Pf2eCombat.get_equipped_armor(char), 'fundamental', 'resilient')
+      item = Pf2egear.get_rune_value(Pf2eCombat.get_equipped_armor(char), 'fundamental', 'power')
       item_bonus = item ? item : 0
 
       prof_bonus + mod + item_bonus
@@ -277,7 +277,7 @@ module AresMUSH
       abil_mod = use_dex_for_dmg ? abilmod_with_finesse(char) :
         Pf2eAbilities.abilmod(Pf2eAbilities.get_score(char, "Strength"))
 
-      striking_rune = weapon ? weapon.runes['fundamental']['striking'] : false
+      striking_rune = weapon ? weapon.runes['fundamental']['power'] : false
       striking_rune = 0 if !striking_rune
 
       number_of_dice = 1 + striking_rune

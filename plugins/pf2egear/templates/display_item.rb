@@ -137,7 +137,7 @@ module AresMUSH
           unformatted_property_runes = @item.runes["property"].nil? ? {} : @item.runes["property"]
 
           talismans = format_talismans(unformatted_talismans)
-          fund_runes = format_fund_runes(unformatted_fundamental_runes)
+          fund_runes = format_fund_runes(unformatted_fundamental_runes, @item.category.downcase)
           prop_runes = format_prop_runes(unformatted_property_runes)
 
           list << talismans
@@ -155,13 +155,13 @@ module AresMUSH
         "%b%b#{item_color}Talismans:%xn #{talismans.sort.join(", ")}"
       end
 
-      def format_fund_runes(runes)
+      def format_fund_runes(runes, category)
 
         return "%t%xh%xwFundamental:%xn None." if runes.empty?
 
         striking_rune_names = ["None", "Standard", "Greater", "Major"]
         # "%b%b%xh%xwFundamental:%xn #{runes}"
-        "%b%b%xh%xwFundamental:%xn Potency: +#{runes['potency']}, Striking: #{striking_rune_names[runes['striking'].nil? ? 0 : runes['striking']]}"
+        "%b%b%xh%xwFundamental:%xn Potency: +#{runes['potency']}, #{category == "armor" ? "Resilient" : "Striking"}: #{striking_rune_names[runes['striking'].nil? ? 0 : runes['power']]}"
       end
 
       def format_prop_runes(runes)
