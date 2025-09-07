@@ -15,7 +15,7 @@ module AresMUSH
           # Self version
         else
           self.name = enactor.name
-          self.date_str = cmd.args
+          self.date_str = cmd.args.capitalize # capitalize input so that it takes lowercase months
         end
       end
       
