@@ -78,7 +78,7 @@ demographics:
     hair: "%xchair <hair color>%xn"
     eyes: "%xceyes <eye color>%xn"
     skin: "%xcskin <complexion>%xn"
-    birthdate: "%xcbirthdate <ic_month> <day> <year>%xn%r%t%xcbirthdate <rl_month> <day> <year>%xn%r%t%xcbirthday <MM>/<DD>/<YYYY>%xc%r%tor %xcage <years>%cn, - Set your character's birthday or age. %xn"
+    birthdate: "%xcbirthdate <ea_month> <day> <year>%xn%r%t%xcbirthdate <rl_month> <day> <year>%xn%r%t%xcbirthday <MM>/<DD>/<YYYY>%xc%r%tor %xcage <years>%cn, - Set your character's birthday or age. See the Calendar of Ea page on the wiki for the Ea months.%xn"
     full name: "%xcfullname <name>%xn - Your character's full name."
   max_age: 1000
   min_age: 18
