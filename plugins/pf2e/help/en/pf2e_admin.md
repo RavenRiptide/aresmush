@@ -41,3 +41,12 @@ For divine font: `heal|harm`
 
 `admin/respec <character>`: Resets the character sheet, sets them to unapproved, forces them back through chargen, but preserves level / XP / money / inventory. 
 
+For gear runes:
+
+`etch/potency <Character>=<Category>/<Item Number>/<Potency Level>`
+`etch/striking <Character>=weapons/<Item Number>/<Striking Level>`
+`etch/resilient <Character>=armor/<Item Number>/<Resilient Level>`
+`etch/property <Character>=<Category>/<Item Number>/<Rune Name`
+
+The first three have valid values of 0 to 3, while the third takes any string as a rune name (for now) and acts as a toggle, meaning repeating the command will set it or remove it.
+
