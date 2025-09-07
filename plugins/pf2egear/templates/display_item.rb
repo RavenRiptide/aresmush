@@ -165,9 +165,9 @@ module AresMUSH
 
       def format_prop_runes(runes)
 
-        return "%t%xh%xwProperty:%xn None." if runes["list"].empty? 
+        return "%t%xh%xwProperty:%xn None." if runes.empty? 
 
-        "%b%b%xh%xwProperty:%xn #{runes["list"].sort.join(", ")}"
+        "%b%b%xh%xwProperty:%xn #{runes.sort.join(", ")}"
       end
 
     end

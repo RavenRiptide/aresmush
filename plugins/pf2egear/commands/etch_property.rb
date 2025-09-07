@@ -67,7 +67,7 @@ module AresMUSH
           operation = "set"
         end
         @item.update(runes: runes)
-        client.emit_success t('pf2egear.rune_property_set', :rune_name => self.rune_name.titlecase, :operation => operation, :char => self.target.titlecase, :item_name => @item.nickname.empty? ? @item.name : @item.nickname)
+        client.emit_success t('pf2egear.rune_property_set', :rune_name => self.rune_name.titlecase, :operation => operation, :char => self.target.titlecase, :item_name => @item.nickname.nil? ? @item.name : @item.nickname)
       end
     end
   end

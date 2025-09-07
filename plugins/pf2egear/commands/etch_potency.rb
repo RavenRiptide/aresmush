@@ -58,6 +58,10 @@ module AresMUSH
           return t('pf2egear.rune_out_of_range', )
           return nil
         end
+        if (self.rune_lvl < @item.runes["fundamental"]["power"])
+          return t('pf2egear.rune_potency_gt_power')
+          return nil
+        end
       end
 
       def handle
@@ -68,7 +72,7 @@ module AresMUSH
         old_rune_lvl = runes["fundamental"]["potency"]
         runes["fundamental"]["potency"] = self.rune_lvl.to_i
         @item.update(runes: runes)
-        client.emit_success t('pf2egear.rune_potency_set', :rune => "Potency", :char => @char.name, :item_name => @item.nickname.empty? ? @item.name : @item.nickname, :old_rune_lvl => old_rune_lvl, :rune_lvl => self.rune_lvl)
+        client.emit_success t('pf2egear.rune_potency_set', :rune => "Potency", :char => @char.name, :item_name => @item.nickname.nil? ? @item.name : @item.nickname, :old_rune_lvl => old_rune_lvl, :rune_lvl => self.rune_lvl)
       end
     end
   end
