@@ -11,11 +11,11 @@ aliases:
 
 In this step, you will choose your free skills. Your choice of ancestry, heritage, character class, and background have already given you a set of skills, but depending on your Intelligence score modifier, you may get more skills to assign. Here are some helpful tips to keep in mind:
 
-1. Some backgrounds offer a skill choice instead of a fixed skill. If you chose a background with a skill choice, you may want to make this selection before you assign your free skills, so that you do not duplicate or double-up on skills.
+- **Some backgrounds offer a skill choice instead of a fixed skill.** If you chose a background with a skill choice, you may want to make this selection before you assign your free skills, so that you do not duplicate or double-up on skills.
 
-2. If you get the same skill from multiple sources, such as from your background and your class, you must pick another skill.
+- If you get the same skill from multiple sources, such as from your background and your class, you must pick another skill.
 
-3. Lore skills count as skills.
+- Lore skills count as skills.
 
 
 ## Commands
@@ -32,4 +32,4 @@ When you are satisfied with what you have, input `commit skills`. This locks you
 
 ## Lore Skills
 
-See `help lore` for a list of Lore skills.
+See the [Lore skill page](/wiki/mechanics:lore) for a list of all lore skills in the game.
