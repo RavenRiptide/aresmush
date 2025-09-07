@@ -834,7 +834,8 @@ div.calendar-wrapper {
 
 div.calendar-rows {
     display: grid;
-    grid-template-columns: fit-content(20%) fit-content(20%) fit-content(20%) fit-content(20%) fit-content(20%) fit-content(20%) fit-content(20%);
+    grid-template-columns: minmax(min-content,30%) minmax(min-content,30%) minmax(min-content,30%) minmax(min-content,30%) minmax(min-content,30%) minmax(min-content,30%) minmax(min-content,30%);
+    width: 100%;
 }
 
 div.calendar-header {
