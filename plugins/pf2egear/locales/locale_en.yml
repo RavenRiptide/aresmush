@@ -50,8 +50,10 @@ en:
     rune_bad_operation_for_type: "%{operation} runes are invalid for category type %{category}."
     rune_no_admin: "You do not have permission to etch runes."
     rune_cmd_fail: "Invalid command format. Use etch/%{rune_type} target=category/item_index/rune_level"
+    rune_property_cmd_fail: "Invalid command format. Use etch/property target=category/item_index/rune_name"  
     rune_out_of_range: "Invalid rune level. Fundamental rune levels are between 0 and 3."
     rune_potency_set: "%{rune} rune on %{char}'s %{item_name} changed from %{old_rune_lvl} to %{rune_lvl}."
+    rune_property_set: "%{rune_name} %{operation} on %{char}'s %{item_name}."
     
 
     shields_dont_have_magic: "%xh%xmShields do not have magical properties.%xn"

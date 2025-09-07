@@ -1,18 +1,18 @@
 module AresMUSH
   module Pf2egear
-    class PF2EtchPropertyCommand
+    class PF2EtchPropertyCmd
       include CommandHandler
 
-      attr_accessor :target, :category, :item_index, :rune_lvl
+      attr_accessor :target, :category, :item_index, :rune_name
 
       def parse_args
-          if (args = cmd.args.match(/([^\s=]+)=(\w+)\/(\d+)\/(\d+)/))
+          if (args = cmd.args.match(/([^\s=]+)=(\w+)\/(\d+)\/(.*)/))
             self.target = args[1]
             self.category = args[2]
             @item_index = args[3].to_i
-            self.rune_lvl = args[4].to_i
+            self.rune_name = args[4]
           else
-            client.emit_failure t('pf2egear.rune_cmd_fail', :rune_type => "potency")
+            client.emit_failure t('pf2egear.rune_property_cmd_fail')
             return
           end
       end
@@ -31,14 +31,6 @@ module AresMUSH
           return nil
         end
       end
-
-      def check_item_category
-        # Validate the category we are editing
-        if !["weapon", "weapons", "armor"].include?(self.category.downcase)
-          return t('pf2egear.bad_category')
-          return nil
-        end
-      end
       
       def check_item_exists
         case category
@@ -53,21 +45,29 @@ module AresMUSH
         end
       end
 
-      def check_rune_level
-        if (self.rune_lvl < 0 || self.rune_lvl > 3)
-          return t('pf2egear.rune_out_of_range', )
-          return nil
-        end
-      end
       def handle
         # All validation checks have passed
-        # Assign the value to the item.
-        
+        # Property Runes are a toggle, essentially. The list will have it or not.
         runes = @item.runes
-        old_rune_lvl = runes["fundamental"]["potency"]
-        runes["fundamental"]["potency"] = self.rune_lvl.to_i
+        old_rune_list = runes["property"]
+        
+        # If runes["property"] does not exist, create it
+        if runes["property"]["list"].nil?
+          runes["property"] = { "list" => [] }
+        end
+        
+        # Remove it if it's there, add it if it's not
+        if runes["property"]["list"].include? self.rune_name
+          # Has it, so remove it
+          runes["property"]["list"].delete(self.rune_name)
+          operation = "unset"
+        else
+          # Doesn't have it, add it and sort the list
+          runes["property"]["list"].append(self.rune_name).sort
+          operation = "set"
+        end
         @item.update(runes: runes)
-        client.emit_success t('pf2egear.rune_potency_set', :rune => "Potency", :char => @char.name, :item_name => @item.nickname, :old_rune_lvl => old_rune_lvl, :rune_lvl => self.rune_lvl)
+        client.emit_success t('pf2egear.rune_property_set', :rune_name => self.rune_name.titlecase, :operation => operation, :char => self.target.titlecase, :item_name => @item.name)
       end
     end
   end

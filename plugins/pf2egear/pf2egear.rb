@@ -72,6 +72,8 @@ module AresMUSH
             return PF2EtchPowerCmd
           when "resilient"
             return PF2EtchPowerCmd
+          when "property"
+            return PF2EtchPropertyCmd
           end
       end
     end
