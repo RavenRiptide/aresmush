@@ -3,7 +3,6 @@ toc: 3 - Creating a Character
 summary: Viewing and setting character prologues.
 aliases:
 - bio
-- bg
 - prologue
 ---
 # Prologues
