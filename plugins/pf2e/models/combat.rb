@@ -190,9 +190,10 @@ module AresMUSH
       ancestry_list = wp_info['ancestry']
 
       if ancestry_list
-        char_ancestry = char.pf2_base_info['ancestry']
-        anc_wp_feat = ["sildanyar","khazad"].include? char_ancestry ? char_ancestry + "i Weapon Familiarity" : char_ancestry + " Weapon Familiarity"
-
+        char_ancestry = char.pf2_base_info['ancestry'].downcase
+        Global.logger.debug "Char Ancestry - #{char_ancestry}"
+        anc_wp_feat = (["sildanyar","khazad"].include? char_ancestry) ? char_ancestry + "i Weapon Familiarity" : char_ancestry + " Weapon Familiarity"
+        Global.logger.debug "anc_wp_feat - #{anc_wp_feat}"
         if (Pf2e.has_feat?(char, anc_wp_feat) && ancestry_list.include?(char_ancestry))
           prof_list << char_wp_prof['ancestry']
         end
