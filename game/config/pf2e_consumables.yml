@@ -2001,7 +2001,6 @@ pf2e_consumables:
     - poison
     - splash
   Blightburn Resin:
-  Blight Bomb (Greater):
     bulk: 0.1
     level: 11
     price: 22500
