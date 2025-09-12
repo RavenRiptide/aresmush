@@ -307,7 +307,8 @@ pf2e_specialty:
         - Bardic Lore
         magic_stats:
           addrepertoire:
-            1: True Strike
+            1: 
+            - True Strike
     Maestro:
       chargen:
         action: []
@@ -317,7 +318,8 @@ pf2e_specialty:
         - Lingering Composition
         magic_stats:
           addrepertoire:
-            1: Soothe
+            1: 
+            - Soothe
     Polymath:
       chargen:
         action: []
@@ -327,7 +329,8 @@ pf2e_specialty:
         - Versatile Performance
         magic_stats:
           addrepertoire:
-            1: Unseen Servant
+            1:
+            - Unseen Servant
     Warrior:
       chargen:
         action: []
@@ -337,7 +340,8 @@ pf2e_specialty:
         - Martial Performance
         magic_stats:
           addrepertoire:
-            1: Fear
+            1: 
+            - Fear
   Champion:
     Paladin:
       allowed_alignments:
