@@ -544,7 +544,7 @@ module AresMUSH
       other_mtypes = heritage_info.has_key?('movement')
 
       if other_mtypes
-        other_mtypes.each do |k,v|
+        heritage_info["movement"].each do |k,v|
           movement[k] = v
         end
       end
