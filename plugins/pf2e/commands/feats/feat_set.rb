@@ -95,7 +95,12 @@ module AresMUSH
           end
 
           # Does that option exist in the list?
-          has_gate_option = gate_options.map(&:downcase).include? self.gate
+          Global.logger.debug "#{gate_options}"
+          if !gate_options.nil?
+            has_gate_option = gate_options.map(&:downcase).include? self.gate
+          else
+            has_gate_option = false
+          end
 
           unless has_gate_option
             client.emit_failure t('pf2e.no_such_gate', :gate => self.gate)
@@ -133,7 +138,8 @@ module AresMUSH
 
           feat_list[use_ftype] = sublist
 
-          new_gated_list = gate_options - [ self.gate.titleize ]
+          new_gated_list = gate_options - [ self.gate.downcase ]
+  
           to_assign[key] = new_gated_list
         else
           sublist = feat_list[self.feat_type] || []
