@@ -588,6 +588,9 @@ pf2e_feats:
     prereq:
       level: 1
       skill: Society/trained
+    grants:
+      language: open
+      language: open
   Natural Medicine:
     feat_type: 
     - Skill
