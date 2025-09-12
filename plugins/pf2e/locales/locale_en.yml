@@ -163,6 +163,7 @@ en:
     no_free: "No free %{element} left to assign."
     no_lineages: "That heritage does not have lineages associated to it."
     no_sheet_yet: "This command cannot be used until the character has committed their base options."
+    no_such_gate: "Invalid option for special feat %{gate}"
     not_approved: "You must be approved for play to use this command."
     not_advancing: "You are not currently advancing. Type 'help advance' for help."
     not_caster: "You are not a spellcaster."
