@@ -511,7 +511,7 @@ module AresMUSH
           end
         when "combat_stats"
           # The value of the combat_stats subkey should always be a hash.
-          Pf2eCombat.modify_combat_stats(char, value)
+          Pf2eCombat.update_combat_stats(char, value)
           return_msg << "This feat modifies your combat proficiencies."
         else
           return_msg << "Unknown key '#{key}' in do_feat_grants. Please inform code staff."

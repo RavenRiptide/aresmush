@@ -191,7 +191,7 @@ module AresMUSH
 
       if ancestry_list
         char_ancestry = char.pf2_base_info['ancestry']
-        anc_wp_feat = char_ancestry + " Weapon Familiarity"
+        anc_wp_feat = ["sildanyar","khazad"].include? char_ancestry ? char_ancestry + "i Weapon Familiarity" : char_ancestry + " Weapon Familiarity"
 
         if (Pf2e.has_feat?(char, anc_wp_feat) && ancestry_list.include?(char_ancestry))
           prof_list << char_wp_prof['ancestry']

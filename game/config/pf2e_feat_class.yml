@@ -4735,7 +4735,7 @@ pf2e_feats:
       level: 10
       feat:
         - Cobra Stance; 
-      combat stats:
+      combat_stats:
         weapon_prof:
           unarmed: expert
     shortdesc: You lash out with devious intent and the power to envenom your foe. Make a cobra fang Strike. Your reach with this Strike is 5 feet greater than normal. If this Strike hits, the target takes 1d4 persistent poison damage per weapon damage die.%r%r**Special** If you have this feat, the circumstance bonus to Fortitude saves and Fortitude DC granted by Cobra Stance increases from +1 to +2.

@@ -31,7 +31,7 @@ pf2e_feats:
     - Arvek
     traits: []
     grants:
-      combat stats:
+      combat_stats:
         weapon_prof:
           ancestry: trained
     shortdesc: "You are trained with composite longbows, composite shortbows, glaives, longbows, longswords, and shortbows. In addition, you gain access to all uncommon arvek weapons. For the purpose of determining your proficiency, martial arvek weapons are simple weapons and advanced arvek weapons are martial weapons."
@@ -120,7 +120,7 @@ pf2e_feats:
     - Arvek
     traits: []
     grants:
-      combat stats:
+      combat_stats:
         weapon_prof:
           ancestry: expert
     shortdesc: "You increase your training in battlefield weapons. Whenever you gain a class feature that grants you expert or greater proficiency in certain weapons, you also gain that proficiency rank in all weapons you are trained in from the Arvek Weapon Familiarity feat.%r%rSTAFF NOTE: Please send in a request if and when your weapon proficiency advances beyond Expert, so staff can adjust your Arvek Weapon Familiarity weapon proficiencies accordingly."
@@ -171,7 +171,7 @@ pf2e_feats:
     - Bassin
     traits: []
     grants:
-      combat stats:
+      combat_stats:
         weapon_prof:
           ancestry: trained
     shortdesc: "You favor traditional bassin weapons, so you've learned how to use them more effectively. You have the trained proficiency with the sling, bassin sling staff, and shortsword. You gain access to all uncommon bassin weapons. For the purpose of determining your proficiency, martial bassin weapons are simple weapons and advanced bassin weapons are martial weapons."
@@ -341,7 +341,7 @@ pf2e_feats:
     - Bassin
     traits: []
     grants:
-      combat stats:
+      combat_stats:
         weapon_prof:
           ancestry: expert
     shortdesc: "Your bassin affinity blends with your class training, granting you great skill with bassin weapons. Whenever you gain a class feature that grants you expert or greater proficiency in a given weapon or weapons, you also gain that proficiency in the sling, bassin sling staff, shortsword, and all bassin weapons in which you are trained.%r%rSTAFF NOTE: Please send in a request if and when your weapon proficiency advances beyond Expert, so staff can adjust your Bassin Weapon Familiarity weapon proficiencies accordingly."
@@ -536,7 +536,7 @@ pf2e_feats:
     - Egalrin
     traits: []
     grants:
-      combat stats:
+      combat_stats:
         weapon_prof:
           ancestry: trained
     shortdesc: "You've trained with a blade and other egalrin weapons ever since you hatched. You gain access to khakkaras. Additionally, choose two weapons from the sword group. You can choose from among all common martial swords, plus the katana, temple sword, and wakizashi. For the purpose of determining your proficiency, that weapon is a simple weapon, and if the weapon isn't common, you gain access to it. If you are trained in all martial weapons, you add common advanced swords to the swords you can choose from.%r%rYou also gain access to all uncommon egalrin weapons. For the purpose of determining your proficiency, martial egalrin weapons are simple weapons, and advanced egalrin weapons are martial weapons."
@@ -648,7 +648,7 @@ pf2e_feats:
     - Egalrin
     traits: []
     grants:
-      combat stats:
+      combat_stats:
         weapon_prof:
           ancestry: expert
     shortdesc: "Study has made you an expert with egalrin weapons. Whenever you gain a class feature that grants you expert or greater proficiency in a given weapon or weapons, you also gain that proficiency for the weapons from your Egalrin Weapon Familiarity feat.%r%rSTAFF NOTE: Please send in a request if and when your weapon proficiency advances beyond Expert, so staff can adjust your Egalrin Weapon Familiarity weapon proficiencies accordingly."
@@ -740,7 +740,7 @@ pf2e_feats:
     - Gnome
     traits: []
     grants:
-      combat stats:
+      combat_stats:
         weapon_prof:
           ancestry: trained
     shortdesc: You favor unusual weapons tied to your people, such as blades with curved and peculiar shapes. You are trained with the glaive and kukri.%r%rIn addition, you gain access to kukris and all uncommon gnome weapons. For the purpose of determining your proficiency, martial gnome weapons are simple weapons and advanced gnome weapons are martial weapons.
@@ -861,7 +861,7 @@ pf2e_feats:
     - Gnome
     traits: []
     grants:
-      combat stats:
+      combat_stats:
         weapon_prof:
           ancestry: expert
     shortdesc: "Your gnome affinity blends with your class training, granting you great skill with gnome weapons. Whenever you gain a class feature that grants you expert or greater proficiency in a given weapon or weapons, you also gain that proficiency in the glaive, kukri, and all gnome weapons in which you are trained.%r%rSTAFF NOTE: Please send in a request if and when your weapon proficiency advances beyond Expert, so staff can adjust your Gnome Weapon Familiarity weapon proficiencies accordingly."
@@ -966,7 +966,7 @@ pf2e_feats:
     - Goblin
     traits: []
     grants:
-      combat stats:
+      combat_stats:
         weapon_prof:
           ancestry: trained
     shortdesc: Others might look upon them with disdain, but you know that the weapons of your people are as effective as they are sharp. You are trained with the dogslicer and horsechopper. In addition, you gain access to all uncommon goblin weapons. For the purpose of determining your proficiency, martial goblin weapons are simple weapons and advanced goblin weapons are martial weapons. 
@@ -1090,7 +1090,7 @@ pf2e_feats:
     - Goblin
     traits: []
     grants:
-      combat stats:
+      combat_stats:
         weapon_prof:
           ancestry: expert
     shortdesc: "Your goblin affinity blends with your class training, granting you great skill with goblin weapons. Whenever you gain a class feature that grants you expert or greater proficiency in a given weapon or weapons, you also gain that proficiency in the dogslicer, horsechopper, and all goblin weapons in which you are trained.%r%rSTAFF NOTE: Please send in a request if and when your weapon proficiency advances beyond Expert, so staff can adjust your Goblin Weapon Familiarity weapon proficiencies accordingly."
@@ -1521,7 +1521,7 @@ pf2e_feats:
     - Khazad
     traits: []
     grants:
-      combat stats:
+      combat_stats:
         weapon_prof:
           ancestry: trained
     shortdesc: Your kin have instilled in you an affinity for hard-hitting weapons, and you prefer these to more elegant arms. You are trained with the battle axe, pick, and warhammer.%r%rYou also gain access to all uncommon khazad weapons. For the purpose of determining your proficiency, martial khazad weapons are simple weapons and advanced khazad weapons are martial weapons. 
@@ -1666,7 +1666,7 @@ pf2e_feats:
     - Khazad
     traits: []
     grants:
-      combat stats:
+      combat_stats:
         weapon_prof:
           ancestry: expert
     shortdesc: "Your khazadi affinity blends with your training, granting you great skill with khazadi weapons. Whenever you gain a class feature that grants you expert or greater proficiency in certain weapons, you also gain that proficiency for battle axes, picks, warhammers, and all khazadi weapons in which you are trained. %r%rSTAFF NOTE: Please send in a request if and when your weapon proficiency advances beyond Expert, so staff can adjust your Khazadi Weapon Familiarity weapon proficiencies accordingly."
@@ -1769,7 +1769,7 @@ pf2e_feats:
     - Oruch
     traits: []
     grants:
-      combat stats:
+      combat_stats:
         weapon_prof:
           ancestry: trained
     shortdesc: In combat, you favor the brutal weapons that are traditional for your oruch ancestors. You are trained with the falchion and greataxe. In addition, you gain access to all uncommon oruch weapons. For the purpose of determining your proficiency, martial oruch weapons are simple weapons and advanced oruch weapons are martial weapons.
@@ -2013,7 +2013,7 @@ pf2e_feats:
     - Sildanyar
     traits: []
     grants:
-      combat stats:
+      combat_stats:
         weapon_prof:
           ancestry: trained
     shortdesc: You favor bows and other elegant weapons. You are trained with longbows, composite longbows, longswords, rapiers, shortbows, and composite shortbows.%r%rIn addition, you gain access to all uncommon sildanyar weapons. For the purpose of determining your proficiency, martial sildanyar weapons are simple weapons and advanced sildanyar weapons are martial weapons.
