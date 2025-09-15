@@ -598,6 +598,35 @@ pf2e_spells:
     actions: 2
     duration: 8 hours
     effect: A disk of magical force materializes adjacent to you. This disk is 2 feet in diameter and follows 5 feet behind you, floating just above the ground. It holds up to 5 Bulk of objects (though they must be able to fit and balance on its surface). Any objects atop the disk fall to the ground when the spell ends.%r%rThe spell ends if a creature tries to ride atop the disk, if the disk is overloaded, if anyone tries to lift or force the disk higher above the ground, or if you move more than 30 feet away from the disk.
+  Flurry of Claws:
+    base_level: 1
+    school: Transmutation
+    traits:
+    - uncommon
+    - attack
+    - concentrate
+    - focus
+    - manipulate
+    - sorcerer
+    tradition:
+    - arcane
+    - divine
+    - occult
+    - primal
+    actions: 2
+    range: 30 feet
+    target: 2 creatures no more than 10 feet from each other
+    effect: "Vicious dragon claws appear and slash at two nearby foes. Make a spell attack roll against each creature. This counts as two attacks for your multiple attack penalty, but the penalty doesn't increase until you've made both attacks. On a hit, the creatures takes 1d8 slashing plus 1d4 additional damage of a type determined by the magical tradition related to the dragon that influenced your bloodline: **arcane** force, **divine** positive, **occult** mental, or **primal** fire."
+    heighten:
+    - The initial damage increases by 1d8 and the additional damage increases by 1d4.
+    - The initial damage increases by 2d8 and the additional damage increases by 2d4.
+    - The initial damage increases by 3d8 and the additional damage increases by 3d4.
+    - The initial damage increases by 4d8 and the additional damage increases by 4d4.
+    - The initial damage increases by 5d8 and the additional damage increases by 5d4.
+    - The initial damage increases by 6d8 and the additional damage increases by 6d4.
+    - The initial damage increases by 7d8 and the additional damage increases by 7d4.
+    - The initial damage increases by 8d8 and the additional damage increases by 8d4.
+    - The initial damage increases by 9d8 and the additional damage increases by 9d4.
   Fly:
     base_level: 4
     school: Transmutation

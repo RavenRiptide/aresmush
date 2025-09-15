@@ -948,6 +948,30 @@ pf2e_spells:
     - uncommon
     damage: 80
     damage_type: untyped
+  Rainbow Fumarole:
+    actions: 3
+    base_level: 8
+    cast:
+      - somatic
+      - verbal
+    effect: Multi-hued flames break through cracks in the ground, reaching high into the sky and giving off dangerous fumes. When you cast the spell, roll 1d8 on the Rainbow Fumarole table (see wiki or Archives of Nethys) to determine the effects of the fumarole.%r%rAny creature caught inside the area of rainbow fumarole when you cast it takes the indicated damage with a basic Reflex save and, on a failure, takes any added effect listed. Creatures must also attempt a saving throw when they move through the spell's area or end their turn in it. Squares within the area of the rainbow fumarole are difficult terrain.
+    area: 20-foot radius, 60-foot-tall cylinder
+    duration: 1 minute
+    damage: varies
+    damage_type: varies
+    range: 500 feet
+    save: basic Reflex
+    school: Evocation
+    tradition:
+      - arcane
+      - primal
+    traits:
+      - concentrate
+      - evocation
+      - fire
+      - incapacitation
+      - light
+      - manipulate
   Raise Dead:
     actions: 10 minutes
     cast:

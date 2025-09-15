@@ -1034,6 +1034,28 @@ pf2e_spells:
     duration: 10 minutes
     save: Will
     effect: A flowing cloak of utter darkness drapes over you, filled with pinpricks of light like distant stars. It imparts the stillness of the cosmos to you, granting you a +2 status bonus to Stealth checks to Hide and Sneak. While outside under a starry night sky, you're also invisible as long as you remain still. When moving under a starry night sky, you are concealed instead.%r%rGazing too closely into the stars is disorienting. Any creature that ends its turn adjacent to you must attempt a Will save; this is a mental, visual effect.%r%r**Success** The creature is unaffected.%r**Failure** The creature is dazzled until the end of its next turn.%r**Critical Failure** The creature is confused and dazzled until the end of its next turn.
+  Blazing Fissure:
+    base_level: 5
+    school: Evocation
+    traits:
+      - earth
+      - evocation
+      - fire
+    tradition:
+      - arcane
+      - primal
+    cast:
+      - somatic
+      - verbal
+    area: 120-foot line
+    save: Reflex
+    effect: "A thin crack rips through the earth, erupting with magma, then swiftly seals up. Each creature along the line and on solid ground takes 4d6 bludgeoning damage and 6d6 fire damage with a Reflex save.%r%r**Critical Success** The creature is unaffected.%r**Success** The creature takes half damage.%r**Failure** The creature takes full damage, and it falls prone.%r**Critical Failure** The target takes double damage, and it falls prone."
+    heighten:
+      - The damage increases by 1d6 bludgeoning and 1d6 fire.
+      - The damage increases by 2d6 bludgeoning and 2d6 fire.
+      - The damage increases by 3d6 bludgeoning and 3d6 fire.
+      - The damage increases by 4d6 bludgeoning and 4d6 fire.
+      - The damage increases by 4d6 bludgeoning and 4d6 fire.
   Bless:
     base_level: 1
     school: Enchantment
@@ -3494,11 +3516,11 @@ pf2e_spells:
     - somatic
     - verbal
     actions: 2
-    area: 30-foot cone or 60-foot line originating from you or 10 ft. burst within 30 ft.
+    area: 30-foot cone
     damage: 5d6
     damage_type: varies
-    save: basic Reflex or Fortitude
-    effect: You spew energy from your mouth, dealing 5d6 damage. The area, damage type, and save depend on the dragon type in your bloodline. See the Dragon Breath table on Archives of Nethys for more information.
+    save: basic Reflex 
+    effect: "You spew energy from your mouth, dealing 5d6 damage with a basic Reflex save. The damage type depends on the magical tradition related to the dragon that influenced your bloodline: **arcane** force, **divine** spirit, **occult** mental, or **primal** fire."
     heighten:
     - The damage increases to a total of 7d6.
     - The damage increases to a total of 9d6.
@@ -3507,26 +3529,6 @@ pf2e_spells:
     - The damage increases to a total of 15d6.
     - The damage increases to a total of 17d6.
     - The damage increases to a total of 19d6.
-  Dragon Claws:
-    base_level: 1
-    school: Transmutation
-    traits:
-    - morph
-    - sorcerer
-    - transmutation
-    - uncommon
-    bloodline:
-    - draconic
-    cast:
-    - verbal
-    actions: 1
-    duration: 1 minute
-    damage: 1d4 plus 1d6
-    damage_type: slashing plus bloodline type
-    effect: Vicious claws grow from your fingers. They are finesse unarmed attacks that deal 1d4 slashing damage and 1d6 extra damage of a type determined by the dragon in your bloodline. See the Dragon Claws table on Archives of Nethys for more information. Your scales from blood magic glow with faint energy, giving you resistance 5 to the same damage type.
-    heighten:
-      5: The extra damage increases to 2d6, and the resistance increases to 10.
-      9: The extra damage increases to 3d6, and the resistance increases to 15.
   Dragon Form:
     base_level: 6
     school: Transmutation
@@ -3561,7 +3563,7 @@ pf2e_spells:
     - verbal
     actions: 2
     duration: 1 minute
-    effect: Leathery wings sprout from your back, giving you a fly Speed of 60 feet or your Speed, whichever is faster. When this spell's duration would end, if you're still flying, you float to the ground, as *feather fall*. You can increase the Focus Point cost by 1 to gain the effects of *dragon claws* as long as the wings last.
+    effect: Leathery wings sprout from your back, giving you a fly Speed of 60 feet or your Speed, whichever is faster. If you're still flying when this spell's duration would end, you float to the ground, with the effects of _feather fall_.
     heighten:
       8: The duration increases to 10 minutes.
   Drain Life:
