@@ -137,9 +137,6 @@ pf2e_specialty:
                 traits:
                 - trip
                 - unarmed
-      anathema:
-      - "Show flagrant disrespect to an animal of its chosen kind."
-      - "Use weapons while raging."
       instinct_ability: Bestial Rage
       rage_ability:
         Ape:
@@ -241,24 +238,25 @@ pf2e_specialty:
         feat: []
         magic_stats: {}
       choose:
-        choice_name: "Dragon Color"
-        choice_description: "Color dragon this instinct applies to."
+        choice_name: "Dragon Instinct"
+        choice_description: "The type of dragon this instinct is derived from."
         choice_type: subclass_info
         options:
-          Black:
-          Blue:
-          Green:
-          Red:
-          White:
-          Brass:
-          Bronze:
-          Copper:
-          Silver:
-          Gold:
-      anathema:
-      - "Cannot let a personal insult slide."
-      - "If character respects their dragon type, they may not defy one."
-      - "If character abhors their dragon type, they may not fail to defeat one they come across."
+          Avarice:
+          Bestial:
+          Brine:
+          Cloud:
+          Crystal:
+          Diabolic:
+          Empyreal:
+          Forest:
+          Fortune:
+          Madness:
+          Magma:
+          Mirage:
+          Ossuary:
+          Terra:
+          Umbral:
       instinct_ability: Draconic Rage
       rage_resistance:
         damage_type: [ "P" ]
@@ -290,9 +288,6 @@ pf2e_specialty:
               resistance:
                 fire: 1
     Spirit:
-      anathema:
-        - "Defile or show disrespect to corpses or spirits."
-        - "Defend themselves against undead."
       instinct_ability: Spirit Rage
       rage_resistance:
         damage_type: negative
@@ -1282,23 +1277,27 @@ pf2e_specialty:
               divine: legendary
     Draconic:
       choose:
-        choice_name: Dragon Type
+        choice_name: Dragon Exemplar
         choice_description: Choose the dragon type to which you are linked.
         options:
-          Brass:
-          Bronze:
-          Copper:
-          Silver:
-          Gold:
-          Black:
-          Blue:
-          Green:
-          Red:
-          White:
+          Avarice:
+          Bestial:
+          Brine:
+          Cloud:
+          Crystal:
+          Diabolic:
+          Empyreal:
+          Forest:
+          Fortune:
+          Madness:
+          Magma:
+          Mirage:
+          Ossuary:
+          Terra:
+          Umbral:
       chargen:
         magic_stats:
-          tradition:
-            arcane: trained
+          tradition: []
           addrepertoire:
             cantrip:
             - Shield
@@ -1306,10 +1305,8 @@ pf2e_specialty:
             - True Strike
           focus_spell:
             bloodline:
-            - Dragon Claws
-        skills:
-        - Arcana
-        - Intimidation
+            - Flurry of Claws
+        skills: []
         action: []
         reaction: []
         feat: []
@@ -1318,7 +1315,7 @@ pf2e_specialty:
           magic_stats:
             addrepertoire:
               2:
-              - Resist Energy
+              - Fear
         5:
           magic_stats:
             addrepertoire:
@@ -1328,14 +1325,9 @@ pf2e_specialty:
           magic_stats:
             addrepertoire:
               4:
-              - Spell Immunity
+              - Fly
             tradition:
               arcane: expert
-        9:
-          magic_stats:
-            addrepertoire:
-              5:
-              - Chromatic Wall
         11:
           magic_stats:
             addrepertoire:
@@ -1346,22 +1338,11 @@ pf2e_specialty:
             addrepertoire:
               7:
               - Mask of Terror
-        15:
-          magic_stats:
-            addrepertoire:
-              8:
-              - Prismatic Wall
-            tradition:
-              arcane: master
         17:
           magic_stats:
             addrepertoire:
               9:
               - Overwhelming Presence
-        19:
-          magic_stats:
-            tradition:
-              arcane: legendary
     Elemental:
       choose:
         choice_name: Elemental Affinity

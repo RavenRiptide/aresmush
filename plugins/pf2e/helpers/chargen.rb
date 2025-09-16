@@ -225,6 +225,13 @@ module AresMUSH
         skills << divine_skill
       end
 
+      if enactor.pf2_base_info["charclass"] == "Sorcerer" && enactor.pf2_base_info["specialize_info"]
+        draconic_skill = Global.read_config('pf2e_subclass', 'Dragon Exemplar',  enactor.pf2_base_info["specialize_info"])["chargen"]["skills"]
+        draconic_skill.each do |s|
+          skills << s
+        end
+      end
+
       defined_skills = skills.difference([ "open" ])
 
       unique_skills = defined_skills.uniq
@@ -478,6 +485,9 @@ module AresMUSH
         school_mstats = wizard_school&.fetch('magic_stats')
 
         class_mstats = class_mstats.merge(school_mstats) if school_mstats
+      elsif charclass == 'Sorcerer' && enactor.pf2_base_info["specialize_info"]
+        draconic_mstat = Global.read_config('pf2e_subclass', 'Dragon Exemplar', enactor.pf2_base_info["specialize_info"])["chargen"]["magic_stats"]
+        class_mstats = class_mstats.merge(draconic_mstat)
       end
 
       if class_mstats.empty?

@@ -21,36 +21,428 @@ pf2e_subclass:
       2: Glitterdust
       5: Wall of Stone
       8: Earthquake
+  get_dragon_spell:
+    Avarice:
+      2: Paranoia
+      5: Synaptic Pulse
+      8: Unrelenting Observation
+    Bestial:
+      2: Tree Shape
+      5: Cloudkill
+      8: Horrid Wilting
+    Brine:
+      2: Obscuring Mist
+      5: Mariner's Curse
+      8: Wind Walk
+    Cloud:
+      2: Obscuring Mist
+      5: Lightning Storm
+      8: Punishing Winds
+    Crystal:
+      2: Glitterdust
+      5: Chameleon Coat
+      8: Earthquake
+    Diabolic:
+      2: Blood Vendetta
+      5: Flame Strike
+      8: Canticle of Everlasting Grief
+    Empyreal:
+      2: Shield Other
+      5: Breath of Life
+      8: Divine Inspiration
+    Forest:
+      2: Entangle
+      5: Transmute Rock and Mud
+      8: Earthquake
+    Fortune:
+      2: Invisibility
+      5: Cone of Cold
+      8: Uncontrollable Dance
+    Madness:
+      2: Paranoia
+      5: Crushing Despair
+      8: Maze
+    Magma:
+      2: Flaming Sphere
+      5: Blazing Fissure
+      8: Rainbow Fumarole
+    Mirage:
+      2: See Invisibility
+      5: Hallucination
+      8: Disappearance
+    Ossuary:
+      2: Ghoulish Cravings
+      5: Wall of Flesh
+      8: Spiritual Epidemic
+    Terra:
+      2: Shatter
+      5: Impaling Spike
+      8: Earthquake
+    Umbral:
+      2: Darkness
+      5: Shadow Blast
+      8: Disappearance
+  Dragon Exemplar:
+    Avarice:
+      chargen:
+        magic_stats:
+          tradition:
+            occult: trained
+        skills:
+          - Intimidation
+          - Occultism
+      advance:
+        7:
+          magic_stats:
+            tradition:
+              occult: expert
+        15:
+          magic_stats:
+            tradition:
+              occult: master
+        19:
+          magic_stats:
+            tradition:
+              occult: legendary
+    Bestial:
+      chargen:
+        magic_stats:
+          tradition:
+            primal: trained
+        skills:
+          - Intimidation
+          - Nature
+      advance:
+        7:
+          magic_stats:
+            tradition:
+              primal: expert
+        15:
+          magic_stats:
+            tradition:
+              primal: master
+        19:
+          magic_stats:
+            tradition:
+              primal: legendary
+    Brine:
+      chargen:
+        magic_stats:
+          tradition:
+            primal: trained
+        skills:
+          - Intimidation
+          - Nature
+      advance:
+        7:
+          magic_stats:
+            tradition:
+              primal: expert
+        15:
+          magic_stats:
+            tradition:
+              primal: master
+        19:
+          magic_stats:
+            tradition:
+              primal: legendary
+    Cloud:
+      chargen:
+        magic_stats:
+          tradition:
+            primal: trained
+        skills:
+          - Intimidation
+          - Nature
+      advance:
+        7:
+          magic_stats:
+            tradition:
+              primal: expert
+        15:
+          magic_stats:
+            tradition:
+              primal: master
+        19:
+          magic_stats:
+            tradition:
+              primal: legendary
+    Crystal:
+      chargen:
+        magic_stats:
+          tradition:
+            primal: trained
+        skills:
+          - Intimidation
+          - Nature
+      advance:
+        7:
+          magic_stats:
+            tradition:
+              primal: expert
+        15:
+          magic_stats:
+            tradition:
+              primal: master
+        19:
+          magic_stats:
+            tradition:
+              primal: legendary
+    Diabolic:
+      chargen:
+        magic_stats:
+          tradition:
+            divine: trained
+        skills:
+          - Intimidation
+          - Religion
+      advance:
+        7:
+          magic_stats:
+            tradition:
+              divine: expert
+        15:
+          magic_stats:
+            tradition:
+              divine: master
+        19:
+          magic_stats:
+            tradition:
+              divine: legendary
+    Empyreal:
+      chargen:
+        magic_stats:
+          tradition:
+            divine: trained
+        skills:
+          - Intimidation
+          - Religion
+      advance:
+        7:
+          magic_stats:
+            tradition:
+              divine: expert
+        15:
+          magic_stats:
+            tradition:
+              divine: master
+        19:
+          magic_stats:
+            tradition:
+              divine: legendary
+    Forest:
+      chargen:
+        magic_stats:
+          tradition:
+            primal: trained
+        skills:
+          - Intimidation
+          - Nature
+      advance:
+        7:
+          magic_stats:
+            tradition:
+              primal: expert
+        15:
+          magic_stats:
+            tradition:
+              primal: master
+        19:
+          magic_stats:
+            tradition:
+              primal: legendary
+    Fortune:
+      chargen:
+        magic_stats:
+          tradition:
+            arcane: trained
+        skills:
+          - Intimidation
+          - Arcana
+      advance:
+        7:
+          magic_stats:
+            tradition:
+              arcane: expert
+        15:
+          magic_stats:
+            tradition:
+              arcane: master
+        19:
+          magic_stats:
+            tradition:
+              arcane: legendary
+    Madness:
+      chargen:
+        magic_stats:
+          tradition:
+            occult: trained
+        skills:
+          - Intimidation
+          - Occultism
+      advance:
+        7:
+          magic_stats:
+            tradition:
+              occult: expert
+        15:
+          magic_stats:
+            tradition:
+              occult: master
+        19:
+          magic_stats:
+            tradition:
+              occult: legendary
+    Magma:
+      chargen:
+        magic_stats:
+          tradition:
+            primal: trained
+        skills:
+          - Intimidation
+          - Nature
+      advance:
+        7:
+          magic_stats:
+            tradition:
+              primal: expert
+        15:
+          magic_stats:
+            tradition:
+              primal: master
+        19:
+          magic_stats:
+            tradition:
+              primal: legendary
+    Mirage:
+      chargen:
+        magic_stats:
+          tradition:
+            arcane: trained
+        skills:
+          - Intimidation
+          - Arcana
+      advance:
+        7:
+          magic_stats:
+            tradition:
+              arcane: expert
+        15:
+          magic_stats:
+            tradition:
+              arcane: master
+        19:
+          magic_stats:
+            tradition:
+              arcane: legendary
+    Ossuary:
+      chargen:
+        magic_stats:
+          tradition:
+            divine: trained
+        skills:
+          - Intimidation
+          - Religion
+      advance:
+        7:
+          magic_stats:
+            tradition:
+              divine: expert
+        15:
+          magic_stats:
+            tradition:
+              divine: master
+        19:
+          magic_stats:
+            tradition:
+              divine: legendary
+    Terra:
+      chargen:
+        magic_stats:
+          tradition:
+            primal: trained
+        skills:
+          - Intimidation
+          - Nature
+      advance:
+        7:
+          magic_stats:
+            tradition:
+              primal: expert
+        15:
+          magic_stats:
+            tradition:
+              primal: master
+        19:
+          magic_stats:
+            tradition:
+              primal: legendary
+    Umbral:
+      chargen:
+        magic_stats:
+          tradition:
+            occult: trained
+        skills:
+          - Intimidation
+          - Occultism
+      advance:
+        7:
+          magic_stats:
+            tradition:
+              occult: expert
+        15:
+          magic_stats:
+            tradition:
+              occult: master
+        19:
+          magic_stats:
+            tradition:
+              occult: legendary
   Dragon Types:
-    Black:
-      element: acid
-      shape: line
-    Blue:
-      element: electricity
-      shape: line
-    Green:
+    Avarice:
       element: poison
       shape: cone
-    Red:
-      element: fire
+    Bestial:
+      element: poison
       shape: cone
-    White:
-      element: cold
-      shape: cone
-    Brass:
-      element: fire
-      shape: line
-    Bronze:
-      element: electricity
-      shape: line
-    Copper:
+    Brine:
       element: acid
-      shape: line
-    Gold:
+      shape: cone
+    Cloud:
+      element: electricity
+      shape: cone
+    Crystal:
+      element: piercing
+      shape: cone
+    Diabolic:
       element: fire
       shape: cone
-    Silver:
-      element: cold
+    Empyreal:
+      element: positive
+      shape: cone
+    Forest:
+      element: piercing
+      shape: cone
+    Fortune:
+      element: force
+      shape: cone
+    Madness:
+      element: mental
+      shape: cone
+    Magma:
+      element: fire
+      shape: cone
+    Mirage:
+      element: mental
+      shape: cone
+    Ossuary:
+      element: negative
+      shape: cone
+    Terra:
+      element: bludgeoning
+      shape: cone
+    Umbral:
+      element: negative
       shape: cone
   wizard_school_spells:
     Abjuration:

@@ -181,6 +181,33 @@ module AresMUSH
           repertoire[charclass] = rep_for_class
 
           magic.repertoire = repertoire
+        when "get_dragon_repertoire"
+          # Value of this key is an integer that corresponds to the level of the spell.
+          # It works like repertoire, but what this bloodline gets depends on their dragon ancestry.
+
+          draconic = char.pf2_base_info['specialize_info']
+          spells = Global.read_config('pf2e_subclass', 'get_dragon_spell', draconic)
+
+          # Do nothing if draconic not found.
+          next unless spells
+
+          # Grab the spell corresponding to value.
+          spell = spells[value]
+
+          next unless spell
+
+          repertoire = magic.repertoire
+          rep_for_class = repertoire[charclass]
+
+          rep_at_level = rep_for_class[value] || []
+
+          rep_at_level << spell
+
+          rep_for_class[value] = rep_at_level
+
+          repertoire[charclass] = rep_for_class
+
+          magic.repertoire = repertoire
         when "focus_spell", "domain_focus_spell"
           # focus spell structure: { "devotion" => [spell, spell, spell], "revelation" => [spell] }
 
