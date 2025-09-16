@@ -616,7 +616,7 @@ pf2e_spells:
     actions: 2
     range: 30 feet
     target: 2 creatures no more than 10 feet from each other
-    effect: "Vicious dragon claws appear and slash at two nearby foes. Make a spell attack roll against each creature. This counts as two attacks for your multiple attack penalty, but the penalty doesn't increase until you've made both attacks. On a hit, the creatures takes 1d8 slashing plus 1d4 additional damage of a type determined by the magical tradition related to the dragon that influenced your bloodline: **arcane** force, **divine** positive, **occult** mental, or **primal** fire."
+    effect: "Vicious dragon claws appear and slash at two nearby foes. Make a spell attack roll against each creature. This counts as two attacks for your multiple attack penalty, but the penalty doesn't increase until you've made both attacks. On a hit, the creatures takes 1d8 slashing plus 1d4 additional damage of a type determined by the magical tradition related to the dragon that influenced your bloodline: **arcane** force, **divine** good/evil, **occult** mental, or **primal** fire."
     heighten:
     - The initial damage increases by 1d8 and the additional damage increases by 1d4.
     - The initial damage increases by 2d8 and the additional damage increases by 2d4.
