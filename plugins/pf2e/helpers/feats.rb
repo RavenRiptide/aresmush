@@ -13,7 +13,7 @@ module AresMUSH
       name = ""
 
       # Give me an array of all the feats that match the term.
-      match = keys.select { |f| f.upcase.match? term.upcase }
+      match = keys.select { |f| f.upcase.match? Regexp.escape(term.upcase) }
 
       return 'no_match' if match.empty?
 
@@ -135,6 +135,7 @@ module AresMUSH
         cl = 2 if Global.read_config('pf2e','basic_mc_feats').include? feat
         cl = cl/2 if Global.read_config('pf2e','adv_mc_feats').include? feat
         cl = cl + 1 if char.advancing
+        #cl = cl + 1 if !char.is_approved? || !char.chargen_locked # Allows for level 1 feats in cg
 
         meets_prereqs = Pf2e.meets_prereqs?(char, prereqs, cl)
       else
