@@ -56,6 +56,7 @@ chargen:
     help making changes and resubmitting, and contact the person handling your 
     application if you have any questions.
   shortcuts:
+    adv: advance
     chargen: cg
     cg/back: cg/prev
     cg/previous: cg/prev
