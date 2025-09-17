@@ -4,7 +4,7 @@ pf2e_weapons:
     wp_type: ranged
     category: martial
     charclass:
-    - Alchemist
+      - Alchemist
     traits: []
     level: 0
     price: 0
@@ -19,10 +19,10 @@ pf2e_weapons:
     wp_type: ranged
     category: martial
     traits:
-    - Bassin
-    - Propulsive
+      - Bassin
+      - Propulsive
     ancestry:
-    - Bassin
+      - Bassin
     level: 0
     price: 500
     wp_damage: d10
@@ -36,7 +36,7 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Two-Handed
+      - Two-Handed
     level: 0
     price: 400
     wp_damage: d8
@@ -51,9 +51,9 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Sweep
+      - Sweep
     ancestry:
-    - Khazad
+      - Khazad
     level: 0
     price: 100
     wp_damage: d8
@@ -67,8 +67,8 @@ pf2e_weapons:
     wp_type: ranged
     category: simple
     traits:
-    - Agile
-    - Nonlethal
+      - Agile
+      - Nonlethal
     level: 0
     price: 10
     wp_damage: 1
@@ -82,10 +82,10 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Monk
-    - Parry
-    - Reach
-    - Trip
+      - Monk
+      - Parry
+      - Reach
+      - Trip
     level: 0
     price: 20
     wp_damage: d8
@@ -99,9 +99,9 @@ pf2e_weapons:
     wp_type: ranged
     category: martial
     traits:
-    - Nonlethal
-    - Ranged Trip
-    - Thrown
+      - Nonlethal
+      - Ranged Trip
+      - Thrown
     level: 0
     price: 50
     wp_damage: d6
@@ -115,10 +115,10 @@ pf2e_weapons:
     wp_type: melee
     category: simple
     traits:
-    - Agile
-    - Khazad
-    - Parry
-    - Versatile (B)
+      - Agile
+      - Khazad
+      - Parry
+      - Versatile (B)
     level: 0
     price: 200
     wp_damage: d4
@@ -132,12 +132,11 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Agile
-    - Deadly (d8)
-    - Disarm
-    - Finesse
-    - Oruch
-    - Versatile (P)
+      - Agile
+      - Deadly (d8)
+      - Disarm
+      - Finesse
+      - Versatile (P)
     level: 0
     price: 200
     wp_damage: d4
@@ -151,9 +150,9 @@ pf2e_weapons:
     wp_type: melee
     category: simple
     charclass:
-    - Wizard
+      - Wizard
     traits:
-    - Thrown
+      - Thrown
     level: 0
     price: 0
     wp_damage: d6
@@ -167,12 +166,12 @@ pf2e_weapons:
     wp_type: ranged
     category: martial
     traits:
-    - Deadly (d10)
-    - Propulsive
-    - Volley (30)
+      - Deadly (d10)
+      - Propulsive
+      - Volley (30)
     ancestry:
-    - Arvek
-    - Sildanyar
+      - Arvek
+      - Sildanyar
     level: 0
     price: 2000
     wp_damage: d8
@@ -186,11 +185,11 @@ pf2e_weapons:
     wp_type: ranged
     category: martial
     traits:
-    - Deadly (d10)
-    - Propulsive
+      - Deadly (d10)
+      - Propulsive
     ancestry:
-    - Arvek
-    - Sildanyar
+      - Arvek
+      - Sildanyar
     level: 0
     price: 1400
     wp_damage: d6
@@ -204,7 +203,7 @@ pf2e_weapons:
     wp_type: ranged
     category: simple
     charclass:
-    - Wizard
+      - Wizard
     traits: []
     level: 0
     price: 300
@@ -219,12 +218,12 @@ pf2e_weapons:
     wp_type: melee
     category: simple
     charclass:
-    - Wizard
+      - Wizard
     traits:
-    - Agile
-    - Finesse
-    - Thrown
-    - Versatile (S)
+      - Agile
+      - Finesse
+      - Thrown
+      - Versatile (S)
     level: 0
     price: 20
     wp_damage: d4
@@ -251,8 +250,8 @@ pf2e_weapons:
     wp_type: ranged
     category: simple
     traits:
-    - Agile
-    - Thrown
+      - Agile
+      - Thrown
     level: 0
     price: 1
     wp_damage: d4
@@ -266,12 +265,12 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Agile
-    - Backstabber
-    - Finesse
-    - Goblin
+      - Agile
+      - Backstabber
+      - Finesse
+      - Goblin
     ancestry:
-    - Goblin
+      - Goblin
     level: 0
     price: 10
     wp_damage: d6
@@ -285,9 +284,9 @@ pf2e_weapons:
     wp_type: melee
     category: advanced
     traits:
-    - Khazad
-    - Sweep
-    - Two-Handed
+      - Khazad
+      - Sweep
+      - Two-Handed
     level: 0
     price: 300
     wp_damage: d8
@@ -298,28 +297,12 @@ pf2e_weapons:
     reload: 0
     bulk: 2
     group: Axe
-  Curve Blade:
-    wp_type: melee
-    category: martial
-    traits:
-    - Finesse
-    - Forceful
-    - Sildanyar
-    level: 0
-    price: 400
-    wp_damage: d8
-    wp_damage_type: S
-    hands: 2
-    range: 0
-    reload: 0
-    bulk: 2
-    group: Sword
   Falchion:
     wp_type: melee
     category: martial
     traits:
-    - Forceful
-    - Sweep
+      - Forceful
+      - Sweep
     level: 0
     price: 300
     wp_damage: d10
@@ -333,12 +316,12 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Agile
-    - Backstabber
-    - Deadly (d6)
-    - Finesse
-    - Bassin
-    - Thrown
+      - Agile
+      - Backstabber
+      - Deadly (d6)
+      - Finesse
+      - Bassin
+      - Thrown
     level: 0
     price: 100
     wp_damage: d4
@@ -352,9 +335,9 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Disarm
-    - Sweep
-    - Trip
+      - Disarm
+      - Sweep
+      - Trip
     level: 0
     price: 80
     wp_damage: d6
@@ -368,10 +351,10 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Agile
-    - Disarm
-    - Egalrin
-    - Finesse
+      - Agile
+      - Disarm
+      - Egalrin
+      - Finesse
     level: 0
     price: 400
     wp_damage: d6
@@ -385,8 +368,8 @@ pf2e_weapons:
     wp_type: melee
     category: simple
     traits:
-    - Agile
-    - Free Hand
+      - Agile
+      - Free Hand
     level: 0
     price: 20
     wp_damage: d4
@@ -400,12 +383,12 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Deadly (d8)
-    - Forceful
-    - Reach
+      - Deadly (d8)
+      - Forceful
+      - Reach
     ancestry:
-    - Arvek
-    - Gnome
+      - Arvek
+      - Gnome
     level: 0
     price: 300
     wp_damage: d8
@@ -419,8 +402,8 @@ pf2e_weapons:
     wp_type: melee
     category: advanced
     traits:
-    - Gnome
-    - Reach
+      - Gnome
+      - Reach
     level: 0
     price: 300
     wp_damage: d8
@@ -434,10 +417,10 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Gnome
-    - Trip
-    - Two-Handed
-    - Versatile (P)
+      - Gnome
+      - Trip
+      - Two-Handed
+      - Versatile (P)
     level: 0
     price: 200
     wp_damage: d6
@@ -452,7 +435,7 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Sweep
+      - Sweep
     level: 0
     price: 200
     wp_damage: d12
@@ -466,8 +449,8 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Backswing
-    - Shove
+      - Backswing
+      - Shove
     level: 0
     price: 100
     wp_damage: d10
@@ -481,7 +464,7 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Fatal (d12)
+      - Fatal (d12)
     level: 0
     price: 200
     wp_damage: d10
@@ -495,7 +478,7 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Versatile (P)
+      - Versatile (P)
     level: 0
     price: 200
     wp_damage: d12
@@ -509,8 +492,8 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Reach
-    - Trip
+      - Reach
+      - Trip
     level: 0
     price: 200
     wp_damage: d10
@@ -524,8 +507,8 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Reach
-    - Versatile (S)
+      - Reach
+      - Versatile (S)
     level: 0
     price: 200
     wp_damage: d10
@@ -542,9 +525,9 @@ pf2e_weapons:
     group: Brawling
     bulk: 0.1
     traits: 
-    - invested
-    - magical
-    - transmutation
+      - invested
+      - magical
+      - transmutation
     hands: 0
     range: 0
     reload: 0
@@ -557,9 +540,9 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Agile
-    - Sweep
-    - Thrown
+      - Agile
+      - Sweep
+      - Thrown
     level: 0
     price: 40
     wp_damage: d6
@@ -586,7 +569,7 @@ pf2e_weapons:
     wp_type: ranged
     category: simple
     charclass:
-    - Wizard
+      - Wizard
     traits: []
     level: 0
     price: 400
@@ -601,12 +584,12 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Goblin
-    - Reach
-    - Trip
-    - Versatile (P)
+      - Goblin
+      - Reach
+      - Trip
+      - Versatile (P)
     ancestry:
-    - Goblin
+      - Goblin
     level: 0
     price: 90
     wp_damage: d8
@@ -620,7 +603,7 @@ pf2e_weapons:
     wp_type: ranged
     category: simple
     traits:
-    - Thrown
+      - Thrown
     level: 0
     price: 10
     wp_damage: d6
@@ -634,9 +617,9 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Agile
-    - Monk
-    - Trip
+      - Agile
+      - Monk
+      - Trip
     level: 0
     price: 100
     wp_damage: d6
@@ -650,9 +633,9 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Deadly (d8)
-    - Two-Handed
-    - Versatile (P)
+      - Deadly (d8)
+      - Two-Handed
+      - Versatile (P)
     level: 0
     price: 200
     wp_damage: d8
@@ -667,9 +650,9 @@ pf2e_weapons:
     wp_type: melee
     category: simple
     traits:
-    - Agile
-    - Deadly (d6)
-    - Monk
+      - Agile
+      - Deadly (d6)
+      - Monk
     level: 0
     price: 30
     wp_damage: d4
@@ -683,9 +666,9 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Shove
-    - Two-Handed
-    - Versatile (P)
+      - Shove
+      - Two-Handed
+      - Versatile (P)
     level: 0
     price: 200
     wp_damage: d6
@@ -696,20 +679,35 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+  Khopesh:
+    wp_type: melee
+    category: martial
+    traits:
+      - Uncommon
+      - Trip
+    level: 0
+    price: 200
+    wp_damage: d8
+    wp_damage_type: S
+    hands: 1
+    range: 0
+    reload: 0
+    bulk: 1
+    group: Sword
   Kukri:
     wp_type: melee
     category: martial
     traits:
-    - Agile
-    - Finesse
-    - Trip
+      - Agile
+      - Finesse
+      - Trip
+      - Uncommon
     ancestry:
-    - Gnome
+      - Gnome
     level: 0
     price: 60
     wp_damage: d6
     wp_damage_type: S
-    wp_damage_2h: d10
     hands: 1
     range: 0
     reload: 0
@@ -719,9 +717,9 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Deadly (d8)
-    - Jousting (d6)
-    - Reach
+      - Deadly (d8)
+      - Jousting (d6)
+      - Reach
     level: 0
     price: 100
     wp_damage: d8
@@ -735,8 +733,8 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Agile
-    - Thrown
+      - Agile
+      - Thrown
     level: 0
     price: 30
     wp_damage: d6
@@ -750,9 +748,9 @@ pf2e_weapons:
     wp_type: melee
     category: simple
     traits:
-    - Agile
-    - Finesse
-    - Shove
+      - Agile
+      - Finesse
+      - Shove
     level: 0
     price: 40
     wp_damage: d4
@@ -766,8 +764,8 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Agile
-    - Fatal (d8)
+      - Agile
+      - Fatal (d8)
     level: 0
     price: 40
     wp_damage: d4
@@ -781,11 +779,11 @@ pf2e_weapons:
     wp_type: ranged
     category: martial
     traits:
-    - Deadly (d10)
-    - Volley (30)
+      - Deadly (d10)
+      - Volley (30)
     ancestry:
-    - Arvek
-    - Sildanyar
+      - Arvek
+      - Sildanyar
     level: 0
     price: 600
     wp_damage: d8
@@ -799,7 +797,7 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Reach
+      - Reach
     level: 0
     price: 50
     wp_damage: d8
@@ -813,12 +811,12 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     charclass:
-    - Bard
+      - Bard
     traits:
-    - Versatile (P)
+      - Versatile (P)
     ancestry:
-    - Arvek
-    - Sildanyar
+      - Arvek
+      - Sildanyar
     level: 0
     price: 100
     wp_damage: d8
@@ -832,7 +830,7 @@ pf2e_weapons:
     wp_type: melee
     category: simple
     traits:
-    - Shove
+      - Shove
     level: 0
     price: 100
     wp_damage: d6
@@ -846,11 +844,11 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Agile
-    - Disarm
-    - Finesse
-    - Parry
-    - Versatile (S)
+      - Agile
+      - Disarm
+      - Finesse
+      - Parry
+      - Versatile (S)
     level: 0
     price: 50
     wp_damage: d4
@@ -864,7 +862,7 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Shove
+      - Shove
     level: 0
     price: 300
     wp_damage: d12
@@ -878,7 +876,7 @@ pf2e_weapons:
     wp_type: melee
     category: simple
     traits:
-    - Versatile (P)
+      - Versatile (P)
     level: 0
     price: 100
     wp_damage: d6
@@ -892,10 +890,10 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Backswing
-    - Disarm
-    - Finesse
-    - Monk
+      - Backswing
+      - Disarm
+      - Finesse
+      - Monk
     level: 0
     price: 20
     wp_damage: d6
@@ -909,9 +907,9 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Agile
-    - Disarm
-    - Oruch
+      - Agile
+      - Disarm
+      - Oruch
     level: 0
     price: 70
     wp_damage: d6
@@ -925,9 +923,9 @@ pf2e_weapons:
     wp_type: melee
     category: advanced
     traits:
-    - Forceful
-    - Oruch
-    - Sweep
+      - Forceful
+      - Oruch
+      - Sweep
     level: 0
     price: 200
     wp_damage: d8
@@ -942,9 +940,9 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Fatal (d10)
+      - Fatal (d10)
     ancestry:
-    - Khazad
+      - Khazad
     level: 0
     price: 70
     wp_damage: d6
@@ -959,8 +957,8 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Disarm
-    - Reach
+      - Disarm
+      - Reach
     level: 0
     price: 200
     wp_damage: d10
@@ -974,14 +972,14 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     charclass:
-    - Bard
-    - Rogue
+      - Bard
+      - Rogue
     traits:
-    - Deadly (d8)
-    - Disarm
-    - Finesse
+      - Deadly (d8)
+      - Disarm
+      - Finesse
     ancestry:
-    - Sildanyar
+      - Sildanyar
     level: 0
     price: 200
     wp_damage: d6
@@ -995,11 +993,11 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Agile
-    - Disarm
-    - Finesse
-    - Monk
-    - Versatile (B)
+      - Agile
+      - Disarm
+      - Finesse
+      - Monk
+      - Versatile (B)
     level: 0
     price: 60
     wp_damage: d8
@@ -1014,11 +1012,11 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     charclass:
-    - Bard
-    - Rogue
+      - Bard
+      - Rogue
     traits:
-    - Agile
-    - Nonlethal
+      - Agile
+      - Nonlethal
     level: 0
     price: 10
     wp_damage: d6
@@ -1032,9 +1030,9 @@ pf2e_weapons:
     wp_type: melee
     category: advanced
     traits:
-    - Agile
-    - Finesse
-    - Twin
+      - Agile
+      - Finesse
+      - Twin
     level: 0
     price: 500
     wp_damage: d6
@@ -1048,8 +1046,8 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Forceful
-    - Sweep
+      - Forceful
+      - Sweep
     level: 0
     price: 100
     wp_damage: d6
@@ -1063,8 +1061,8 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Deadly (d10)
-    - Trip
+      - Deadly (d10)
+      - Trip
     level: 0
     price: 200
     wp_damage: d10
@@ -1106,13 +1104,13 @@ pf2e_weapons:
     wp_type: ranged
     category: martial
     charclass:
-    - Bard
-    - Rogue
+      - Bard
+      - Rogue
     traits:
-    - Deadly (d10)
+      - Deadly (d10)
     ancestry:
-    - Arvek
-    - Sildanyar
+      - Arvek
+      - Sildanyar
     level: 0
     price: 300
     wp_damage: d6
@@ -1126,14 +1124,14 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     charclass:
-    - Bard
-    - Rogue
+      - Bard
+      - Rogue
     traits:
-    - Agile
-    - Finesse
-    - Versatile (S)
+      - Agile
+      - Finesse
+      - Versatile (S)
     ancestry:
-    - Bassin
+      - Bassin
     level: 0
     price: 90
     wp_damage: d6
@@ -1147,9 +1145,9 @@ pf2e_weapons:
     wp_type: ranged
     category: martial
     traits:
-    - Agile
-    - Monk
-    - Thrown
+      - Agile
+      - Monk
+      - Thrown
     level: 0
     price: 1
     wp_damage: d4
@@ -1163,9 +1161,9 @@ pf2e_weapons:
     wp_type: melee
     category: simple
     traits:
-    - Agile
-    - Finesse
-    - Trip
+      - Agile
+      - Finesse
+      - Trip
     level: 0
     price: 20
     wp_damage: d4
@@ -1175,13 +1173,29 @@ pf2e_weapons:
     reload: 0
     bulk: 0.1
     group: Knife
+  Sildanyari Curve Blade:
+    wp_type: melee
+    category: martial
+    traits:
+      - Finesse
+      - Forceful
+      - Sildanyar
+    level: 0
+    price: 400
+    wp_damage: d8
+    wp_damage_type: S
+    hands: 2
+    range: 0
+    reload: 0
+    bulk: 2
+    group: Sword
   Sling:
     wp_type: ranged
     category: simple
     traits:
-    - Propulsive
+      - Propulsive
     ancestry:
-    - Bassin
+      - Bassin
     level: 0
     price: 0
     wp_damage: d6
@@ -1195,7 +1209,7 @@ pf2e_weapons:
     wp_type: melee
     category: simple
     traits:
-    - Thrown
+      - Thrown
     level: 0
     price: 10
     wp_damage: d6
@@ -1209,9 +1223,9 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Disarm
-    - Finesse
-    - Trip
+      - Disarm
+      - Finesse
+      - Trip
     level: 0
     price: 300
     wp_damage: d8
@@ -1225,8 +1239,8 @@ pf2e_weapons:
     wp_type: melee
     category: simple
     traits:
-    - Agile
-    - Free Hand
+      - Agile
+      - Free Hand
     level: 0
     price: 30
     wp_damage: d4
@@ -1240,9 +1254,9 @@ pf2e_weapons:
     wp_type: melee
     category: simple
     charclass:
-    - Wizard
+      - Wizard
     traits:
-    - Two-Handed
+      - Two-Handed
     level: 0
     price: 0
     wp_damage: d4
@@ -1257,11 +1271,11 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Agile
-    - Deadly (d6)
-    - Finesse
-    - Thrown
-    - Versatile (S)
+      - Agile
+      - Deadly (d6)
+      - Finesse
+      - Thrown
+      - Versatile (S)
     level: 0
     price: 200
     wp_damage: d4
@@ -1275,9 +1289,9 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Agile
-    - concealable
-    - Finesse
+      - Agile
+      - concealable
+      - Finesse
     level: 0
     price: 500
     wp_damage: d6
@@ -1291,8 +1305,8 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Monk
-    - Trip
+      - Monk
+      - Trip
     level: 0
     price: 200
     wp_damage: d8
@@ -1306,7 +1320,7 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Thrown
+      - Thrown
     level: 0
     price: 100
     wp_damage: d4
@@ -1320,10 +1334,10 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Agile
-    - Deadly (d8)
-    - Finesse
-    - Versatile (P)
+      - Agile
+      - Deadly (d8)
+      - Finesse
+      - Versatile (P)
     level: 0
     price: 100
     wp_damage: d4
@@ -1337,9 +1351,9 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Disarm
-    - Sweep
-    - Trip
+      - Disarm
+      - Sweep
+      - Trip
     level: 0
     price: 200
     wp_damage: d10
@@ -1353,9 +1367,9 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     traits:
-    - Shove
+      - Shove
     ancestry:
-    - Khazad
+      - Khazad
     level: 0
     price: 100
     wp_damage: d8
@@ -1369,13 +1383,13 @@ pf2e_weapons:
     wp_type: melee
     category: martial
     charclass:
-    - Bard
+      - Bard
     traits:
-    - Disarm
-    - Finesse
-    - Nonlethal
-    - Reach
-    - Trip
+      - Disarm
+      - Finesse
+      - Nonlethal
+      - Reach
+      - Trip
     level: 0
     price: 10
     wp_damage: d4
@@ -1392,9 +1406,9 @@ pf2e_weapons:
     group: Brawling
     bulk: 0.1
     traits: 
-    - invested
-    - magical
-    - transmutation
+      - invested
+      - magical
+      - transmutation
     hands: 0
     range: 0
     reload: 0

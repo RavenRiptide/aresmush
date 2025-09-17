@@ -76,7 +76,7 @@ pf2e_deities:
       - harm
     divine_ability: Wisdom
     divine_skill: Arcana
-    fav_weapon: quarterstaff
+    fav_weapon: staff
     domains:
     - Magic
     - Glyph
