@@ -87,6 +87,9 @@ module AresMUSH
       # Did they do this already?
       return t('pf2e.cg_locked', :cp => 'base options') if enactor.pf2_baseinfo_locked
 
+      # Take a snapshot prior to calculations for a later restore
+      Pf2e.record_checkpoint(enactor, 'info')
+
       # Gather information.
       base_info = enactor.pf2_base_info
       ancestry = base_info['ancestry']
@@ -592,8 +595,6 @@ module AresMUSH
       enactor.pf2_baseinfo_locked = true
 
       enactor.save
-
-      Pf2e.record_checkpoint(enactor, 'info')
 
       return nil
     end
