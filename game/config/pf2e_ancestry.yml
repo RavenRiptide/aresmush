@@ -164,7 +164,7 @@ pf2e_ancestry:
     - open
     languages:
     - Kamin
-    - Egalrin
+    - Kaminean
     traits:
     - egalrin
     - humanoid
@@ -274,7 +274,7 @@ pf2e_ancestry:
     languages:
     - Kamin
     - Gnomish
-    - Sylvan
+    - Sylhart
     traits:
     - gnome
     - humanoid
