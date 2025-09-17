@@ -226,7 +226,7 @@ module AresMUSH
       end
 
       advancement = char.pf2_adv_assigned || {}
-      advancement[level] = to_process
+      advancement["level"] = to_process
 
       # Deduct the XP.
       xp = char.pf2_xp
