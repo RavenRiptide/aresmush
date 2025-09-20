@@ -436,13 +436,13 @@ module AresMUSH
             to_assign_subitem = to_assign[item] ? to_assign[item] : []
             to_assign_subitem << 'open'
             to_assign[item] = to_assign_subitem
-
-            return_msg << t('pf2e.feat_grants_addl', :element => assign_key)
+            
+            return_msg << t('pf2e.feat_grants_addl', :element => item)
           end
 
           char.update(pf2_to_assign: to_assign)
         when 'feat'
-          feats = char.pf2_feats
+                    feats = char.pf2_feats
           
           value.each do |item|
             feat_info = get_feat_details(item)
@@ -514,14 +514,7 @@ module AresMUSH
           # The value of the combat_stats subkey should always be a hash.
           Pf2eCombat.update_combat_stats(char, value)
           return_msg << "This feat modifies your combat proficiencies."
-        when "language"
-          # For feats like Multilinguage that adds languages to the character.
-          to_assign = char.pf2_to_assign
-          if !to_assign["open languages"].nil?
-            to_assign["open languages"].append(value)
-          else
-            to_assign["open languages"] = [ value ]
-          end
+        
           char.update(pf2_to_assign: to_assign)
         else
           return_msg << "Unknown key '#{key}' in do_feat_grants. Please inform code staff."

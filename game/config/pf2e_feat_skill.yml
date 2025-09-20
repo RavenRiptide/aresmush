@@ -589,8 +589,9 @@ pf2e_feats:
       level: 1
       skill: Society/trained
     grants:
-      language: open
-      language: open
+      assign:
+      - open languages
+      - open languages
   Natural Medicine:
     feat_type: 
     - Skill
