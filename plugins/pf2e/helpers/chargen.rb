@@ -531,7 +531,7 @@ module AresMUSH
       unique_lang = languages.uniq
 
       enactor.pf2_lang = languages.uniq
-
+      
       # PC may choose another language to replace a duplicate.
 
       if (languages.count != unique_lang.count)
@@ -539,7 +539,11 @@ module AresMUSH
 
         ary = []
         open_languages = ary.fill("open", nil, extra_lang)
-        to_assign['open languages'] = open_languages
+        if to_assign['open languages'].nil?
+          to_assign['open languages'] = open_languages
+        else
+          to_assign['open languages'] = to_assign['open languages'] + open_languages
+        end
       end
 
       # Traits, Size, Movement, Misc Info
@@ -595,6 +599,8 @@ module AresMUSH
       enactor.pf2_baseinfo_locked = true
 
       enactor.save
+
+      Global.logger.debug "pf2_to_assign after lock: #{enactor.pf2_to_assign}"
 
       return nil
     end

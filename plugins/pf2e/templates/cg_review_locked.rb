@@ -203,7 +203,7 @@ module AresMUSH
       end
 
       def languages
-        @char.pf2_lang.sort.join(", ")
+        @char.pf2_lang.uniq.sort.join(", ")
       end
 
       def existing_skills

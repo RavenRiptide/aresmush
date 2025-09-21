@@ -225,7 +225,7 @@ module AresMUSH
       end
 
       def languages
-        @ancestry_info['languages'] ? @ancestry_info['languages'].sort.join(", ") : "Kamin"
+        @ancestry_info['languages'] ? @ancestry_info['languages'].uniq.sort.join(", ") : "Kamin"
       end
 
       def charclass_skills
