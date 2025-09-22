@@ -29,7 +29,7 @@ If this is true of your background, it is legal to choose one of the score optio
 
 In the following commands, you must replace the <ability> value with one of the following options: Strength, Dexterity, Constitution, Intelligence, Wisdom, or Charisma.
 
-`boost/set <input>=<ability>`: A <input> can be an `ancestry`, `background`, `charclass`, or `free`. Assigns a type of boost to <ability>.
+`boost/set <input>=<ability>`: A `<input>` can be an `ancestry`, `background`, `charclass`, or `free`. Assigns a type of boost to `<ability>`.
 **IMPORTANT**: Setting a `<charclass>` boost, if one is available to you depending on your character's class, determines the Key Ability of the class, which is the ability that your class uses to calculate class and spellcasting DC. Choose your `<charclass>` boost carefully.
 
 `boost/unset <input>=<ability>`: Unassigns that ability for that boost type only. Does not affect other boosts you may have assigned.
