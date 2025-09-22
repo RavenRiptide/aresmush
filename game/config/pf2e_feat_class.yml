@@ -348,7 +348,7 @@ pf2e_feats:
     feat_type:
       - Charclass
     prereq:
-      alignment:
+      oralign:
         - LG
         - NG
         - CG
@@ -1522,6 +1522,8 @@ pf2e_feats:
         - LG
         - CG
         - NG
+    edicts:
+      - End the existence of undead you encounter as long as you have a reasonable chance of success.
     shortdesc: "You've sworn an oath to put the undead to rest. You gain the following edict: “You must end the existence of undead you encounter as long as you have a reasonable chance of success; in the unlikely event you find an undead that isn't unholy, you can try to work out a more peaceful way to help it recover from its undead state rather than destroying it in combat, such as helping it complete its unfinished business and find peace.%r%rYour Retributive Strike gains a +4 circumstance bonus to damage against an undead, or +6 if you have master proficiency with the weapon you used. Your Glimpse of Redemption's resistance against damage from an undead is 7 + your level. If you use Liberating Step triggered by an undead, your ally gains a +4 circumstance bonus to checks granted by your Liberating Step, and the ally can Step twice afterward.%r%rYou don't consider undead to be legitimate authorities, even in nations ruled by undead."
     traits:
       - oath
@@ -2352,7 +2354,7 @@ pf2e_feats:
     prereq:
       divine_font: heal
       level: 4
-      oralignment:
+      oralign:
         - LG
         - CG
         - NG
@@ -4444,7 +4446,7 @@ pf2e_feats:
       oralign:
         - LG
         - NG
-        - CN
+        - CG
     shortdesc: You sense evil as a queasy or foreboding feeling. You detect unholy creatures as a vague sense, similar to humans' sense of smell. An unholy creature using a disguise or otherwise trying to hide its presence attempts a Deception check against your Perception DC to hide its unholiness from you. If the creature succeeds at its Deception check, it is then temporarily immune to your Sense Evil for 1 day.
     traits: []
   Share Rage: # Grants Action # Requirements

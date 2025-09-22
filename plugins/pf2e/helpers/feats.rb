@@ -228,6 +228,10 @@ module AresMUSH
           end
 
           msg << "combat_stats" unless passes_check
+        when "oralign"
+          alignment = char.pf2_faith["alignment"]
+          
+          msg << "alignment" unless required.include? alignment
         when "orfeat"
           feats = char.pf2_feats.values.flatten.map { |word| word.upcase }
           req = required.map { |word| word.upcase }
