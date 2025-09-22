@@ -2152,7 +2152,7 @@ pf2e_feats:
       level: 17
 # Heritage and Versatile Heritage Feats
 # Aesa Ancestry Feats
-  Angelkin: # Flavor to discuss with staff
+  Angelkin:
     feat_type: 
     - Ancestry
     - Lineage
@@ -2175,10 +2175,10 @@ pf2e_feats:
       skill:
       - Society
       language:
-      - Celestial
+      - Aesyian
       feat:
       - Multilingual
-    shortdesc: You descend from an angel—a winged messenger from the Dome of Heaven—which gives you a knack for cultures and languages. You gain the trained proficiency rank in Society. If you would automatically become trained in Society (from your background or class, for example), you instead become trained in a skill of your choice. You know the Celestial language, and you gain the Multilingual skill feat.
+    shortdesc: You descend from an angel—a winged messenger from the Dome of Heaven—which gives you a knack for cultures and languages. You gain the trained proficiency rank in Society. If you would automatically become trained in Society (from your background or class, for example), you instead become trained in a skill of your choice. You know the Aesyian language, and you gain the Multilingual skill feat.
     prereq:
       level: 1
       heritage: Aesa
@@ -2203,7 +2203,7 @@ pf2e_feats:
     prereq:
       level: 1
       heritage: Aesa
-  Celestial Lore: # Lore skill to discuss with staff
+  Celestial Lore:
     feat_type: 
     - Ancestry
     assoc_ancestry: 
@@ -2225,7 +2225,7 @@ pf2e_feats:
       - Diplomacy
       - Religion
       - Dome of Heaven Lore
-    shortdesc: You were raised with an aasimar or celestial relative, or you've devoted yourself to researching the secrets of the celestial realms. You gain the trained proficiency rank in Diplomacy and Religion. If you would automatically become trained in one of those skills (from your background or class, for example), you instead become trained in a skill of your choice. You also become trained in Dome of Heaven Lore.
+    shortdesc: You were raised with an aesa or celestial relative, or you've devoted yourself to researching the secrets of the celestial realms. You gain the trained proficiency rank in Diplomacy and Religion. If you would automatically become trained in one of those skills (from your background or class, for example), you instead become trained in a skill of your choice. You also become trained in Dome of Heaven Lore.
     prereq:
       level: 1
       heritage: Aesa
@@ -2562,7 +2562,7 @@ pf2e_feats:
     - Sildanyar
     traits:
     - aesa
-    shortdesc: Your connection to good arms all your attacks against forces of evil. All your weapon and unarmed Strikes deal 1 additional good damage and have the good and magical traits.
+    shortdesc: You have a connection to the celestial realms, allowing you to summon a celestial ally. Once per day, you can cast summon celestial as a 5th-rank divine innate spell, but the celestial summoned must be from the same category as your own lineage, such as a creature with the angel trait if you are angelkin.
     prereq:
       level: 13
       heritage: Aesa
@@ -2632,6 +2632,11 @@ pf2e_feats:
     - Sildanyar
     traits:
     - ashen one
+    grants:
+      skill:
+      - Medicine
+      - Religion
+      - Gray Halls Lore
     shortdesc: You either found another ashen one who taught you the secrets of your kind, or you managed to research your unusual heritage. You gain the trained proficiency rank in Medicine and Religion. If you would automatically become trained in one of those skills (from your background or class, for example), you instead become trained in a skill of your choice. You also become trained in Gray Halls Lore.
     prereq:
       level: 1
@@ -2908,6 +2913,11 @@ pf2e_feats:
     - Sildanyar
     traits:
     - changeling
+    grants:
+      skill:
+      - Deception
+      - Occultism
+      - Hag Lore
     shortdesc: All too aware of your true nature, you've studied hags and their powers. You gain the trained proficiency rank in Deception and Occultism. If you would automatically become trained in one of those skills (from your background or class, for example), you instead become trained in a skill of your choice. You also become trained in Hag Lore.
     prereq:
       level: 1
@@ -3212,6 +3222,11 @@ pf2e_feats:
     - Sildanyar
     traits:
     - dar
+    grants:
+      skill:
+      - Religion
+      - Society
+      - Vampire Lore
     shortdesc: You were raised by your vampiric parent, or you've invested substantial time and energy researching the secrets of your undead progenitors. You gain the trained proficiency rank in Religion and Society. If you would automatically become trained in one of those skills (from your background or class, for example), you instead become trained in a skill of your choice. You also become trained in Vampire Lore.
     prereq:
       level: 1
@@ -3583,7 +3598,11 @@ pf2e_feats:
       skill:
       - Intimidation
       - Religion
-    shortdesc: You were raised by a tiefling or a fiendish relative, or you've devoted yourself to researching the secrets of the fiendish realms. You gain the trained proficiency rank in Intimidation and Religion. If you would automatically become trained in one of those skills (from your background or class, for example), you instead become trained in a skill of your choice. You also become trained in a Lore skill related to the fiendish plane from which you trace your lineage (usually Abaddon Lore, Abyss Lore, or Hell Lore).
+      orskill:
+      - The Null Lore
+      - The Abyss Lore
+      - Iron Hells Lore
+    shortdesc: You were raised by a tiefling or a fiendish relative, or you've devoted yourself to researching the secrets of the fiendish realms. You gain the trained proficiency rank in Intimidation and Religion. If you would automatically become trained in one of those skills (from your background or class, for example), you instead become trained in a skill of your choice. You also become trained in a Lore skill related to the fiendish plane from which you trace your lineage (usually The Null Lore, The Abyss Lore, or Iron Hells Lore).
     prereq:
       level: 1
       heritage: Niasa

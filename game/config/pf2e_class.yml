@@ -1303,181 +1303,181 @@ pf2e_class:
       - Shield Block
       action: []
     advance:
-    2:
-      choose_feat:
-      - charclass
-      - skill
-    3:
-      choose_feat:
-      - general
-      raise:
-      - skill
-      charclass:
-      - Bravery
-      combat_stats:
-        saves:
-          will: expert
-    4:
-      choose_feat:
-      - charclass
-      - skill
-    5:
-      raise:
-      - ability
-      - skill
-      choose_feat:
-      - ancestry
-      charclass:
-      choose:
-        choice_name: Weapon Mastery
-        choice_description: "Choose a weapon group for your weapon mastery."
-        choice_type: charclass_option
-        options:
-        - Club
-        - Knife
-        - Brawling
-        - Spear
-        - Sword
-        - Axe
-        - Flail
-        - Polearm
-        - Hammer
-    6:
-      choose_feat:
-      - charclass
-      - skill
-    7:
-      combat_stats:
-        perception: master
-      charclass:
-      - Battlefield Surveyor
-      - Weapon Specialization
-      choose_feat:
-      - general
-      raise:
-      - skill
-    8:
-      choose_feat:
-      - charclass
-      - skill
-    9:
-      combat_stats:
-        saves:
-          fortitude: master
-      charclass:
-      - Juggernaut
-      - Combat Flexibility
-      choose_feat:
-      - ancestry
-      raise:
-      - skill
-    10:
-      raise:
-      - ability
-      choose_feat:
-      - charclass
-      - skill
-    11:
-      choose_feat:
-      - general
-      raise:
-      - skill
-      combat_stats:
-        armor_prof:
-          light: expert
-          medium: expert
-          heavy: expert
-          unarmored: expert
-        class_dc: expert
-      charclass:
-      - Armor Expertise
-      - Fighter Expertise
-    12:
-      choose_feat:
-      - charclass
-      - skill
-    13:
-      choose_feat:
-      - ancestry
-      raise:
-      - skill
-      combat_stats:
-        weapon_prof:
-          simple: master
-          martial: master
-          advanced: expert
-          unarmed: master
-      choose:
-        choice_name: Weapon Legend
-        choice_description: "Choose a weapon group for your weapon legend feat."
-        choice_type: charclass_option
-        options:
-        - Club
-        - Knife
-        - Brawling
-        - Spear
-        - Sword
-        - Axe
-        - Flail
-        - Polearm
-        - Hammer
-    14:
-      choose_feat:
-      - charclass
-      - skill
-    15:
-      raise:
-      - ability
-      - skill
-      choose_feat:
-      - general
-      charclass:
-      - Evasion
-      - Greater Weapon Specialization
-      - Improved Flexibility
-      combat_stats:
-        saves:
-          reflex: master
-    16:
-      choose_feat:
-      - charclass
-      - skill
-    17:
-      choose_feat:
-      - ancestry
-      raise:
-      - skill
-      combat_stats:
-        armor_prof:
-          light: master
-          medium: master
-          heavy: master
-          unarmored: master
-      charclass:
-      - Armor Mastery
-    18:
-      choose_feat:
-      - charclass
-      - skill
-    19:
-      choose_feat:
-      - general
-      raise:
-      - skill
-      charclass:
-      - Versatile Legend
-      combat_stats:
-        weapon_prof:
-          simple: legendary
-          martial: legendary
-          advanced: master
-          unarmed: legendary
-    20:
-      raise:
-      - ability
-      choose_feat:
-      - charclass
-      - skill
+      2:
+        choose_feat:
+        - charclass
+        - skill
+      3:
+        choose_feat:
+        - general
+        raise:
+        - skill
+        charclass:
+        - Bravery
+        combat_stats:
+          saves:
+            will: expert
+      4:
+        choose_feat:
+        - charclass
+        - skill
+      5:
+        raise:
+        - ability
+        - skill
+        choose_feat:
+        - ancestry
+        charclass:
+        choose:
+          choice_name: Weapon Mastery
+          choice_description: "Choose a weapon group for your weapon mastery."
+          choice_type: charclass_option
+          options:
+          - Club
+          - Knife
+          - Brawling
+          - Spear
+          - Sword
+          - Axe
+          - Flail
+          - Polearm
+          - Hammer
+      6:
+        choose_feat:
+        - charclass
+        - skill
+      7:
+        combat_stats:
+          perception: master
+        charclass:
+        - Battlefield Surveyor
+        - Weapon Specialization
+        choose_feat:
+        - general
+        raise:
+        - skill
+      8:
+        choose_feat:
+        - charclass
+        - skill
+      9:
+        combat_stats:
+          saves:
+            fortitude: master
+        charclass:
+        - Juggernaut
+        - Combat Flexibility
+        choose_feat:
+        - ancestry
+        raise:
+        - skill
+      10:
+        raise:
+        - ability
+        choose_feat:
+        - charclass
+        - skill
+      11:
+        choose_feat:
+        - general
+        raise:
+        - skill
+        combat_stats:
+          armor_prof:
+            light: expert
+            medium: expert
+            heavy: expert
+            unarmored: expert
+          class_dc: expert
+        charclass:
+        - Armor Expertise
+        - Fighter Expertise
+      12:
+        choose_feat:
+        - charclass
+        - skill
+      13:
+        choose_feat:
+        - ancestry
+        raise:
+        - skill
+        combat_stats:
+          weapon_prof:
+            simple: master
+            martial: master
+            advanced: expert
+            unarmed: master
+        choose:
+          choice_name: Weapon Legend
+          choice_description: "Choose a weapon group for your weapon legend feat."
+          choice_type: charclass_option
+          options:
+          - Club
+          - Knife
+          - Brawling
+          - Spear
+          - Sword
+          - Axe
+          - Flail
+          - Polearm
+          - Hammer
+      14:
+        choose_feat:
+        - charclass
+        - skill
+      15:
+        raise:
+        - ability
+        - skill
+        choose_feat:
+        - general
+        charclass:
+        - Evasion
+        - Greater Weapon Specialization
+        - Improved Flexibility
+        combat_stats:
+          saves:
+            reflex: master
+      16:
+        choose_feat:
+        - charclass
+        - skill
+      17:
+        choose_feat:
+        - ancestry
+        raise:
+        - skill
+        combat_stats:
+          armor_prof:
+            light: master
+            medium: master
+            heavy: master
+            unarmored: master
+        charclass:
+        - Armor Mastery
+      18:
+        choose_feat:
+        - charclass
+        - skill
+      19:
+        choose_feat:
+        - general
+        raise:
+        - skill
+        charclass:
+        - Versatile Legend
+        combat_stats:
+          weapon_prof:
+            simple: legendary
+            martial: legendary
+            advanced: master
+            unarmed: legendary
+      20:
+        raise:
+        - ability
+        choose_feat:
+        - charclass
+        - skill
   Investigator:
     key_abil:
     - Intelligence
