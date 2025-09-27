@@ -6834,7 +6834,7 @@ pf2e_feats:
     traits: []
   Mountain Quake:
     assoc_charclass:
-      - Champion
+      - Monk
     feat_type:
       - Charclass
     prereq:
