@@ -4846,7 +4846,7 @@ pf2e_feats:
     traits: []
   Elemental Shape:
     assoc_charclass:
-      - Alchemist
+      - Druid
     feat_type:
       - Charclass
     prereq:
