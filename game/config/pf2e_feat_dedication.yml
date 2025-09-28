@@ -203,7 +203,7 @@ pf2e_feats:
       - multiclass
   Wizard Dedication: # Special Feat
     assoc_charclass:
-      - Witch
+      - Wizard
     feat_type: 
       - Dedication
     prereq:
