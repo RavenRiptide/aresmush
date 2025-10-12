@@ -8008,7 +8008,7 @@ pf2e_feats:
     traits: []
   Domain Wellspring: # Focus Points
     assoc_charclass:
-      - Oracle
+      - Cleric
     feat_type:
       - Charclass
     prereq:
