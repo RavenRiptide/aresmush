@@ -373,6 +373,7 @@ pf2e_ancestry:
   Kailli:
     HP: 6
     Size: S
+    Speed: 25
     abl_boosts:
     - open
     - open
