@@ -65,13 +65,20 @@ demographics:
         Tysmycha: The ancestral home of the kailli, known for great forests and hygienic protocols.
         Veyshan: Home of the desert nomads, the city-states of the One-Hundred and Four, and the Wolfrot Marshes.
     Faith:
-      desc: World faith your character ascribes to.
+      desc: World faith your character ascribes to first and foremost. (They may acknowledge and engage in other forms of faith.)
       wiki: theme:deity
       values:
-        Holy Order of Ea: The teachings of the descendant faiths of the Aiglosian Empire's religion.
-        Ten-Thousand Gods: An animist belief from Bludgun that honors great spirits, ancient legends, and ancestors alike.
+        Adomism: The veneration of the strictures of Adom, the legendary hero of Bludgun.
+        Black Iron Way: The harsh and strict faith of Charn, descended from the Holy Order of Ea.
+        Caminara Toponi: The ancestral Kaitoi veneration of the volcano spirit Toponi and associated Kaitoi traditions.
         Green Word: The emerging faith of the Green Word, an environmental faith.
-        Other: You have your own ideas on the world and how it works.
+        Holy Order of Ea: The teachings of the descendant faiths of the Aiglosian Empire's religion.
+        Holy Assembly: The Myrrish state temple, descended from the Holy Order of Ea.
+        Skyhaldan Ancestor Worship: The veneration of ancestors in the Skyhaldan tradition.
+        Ten-Thousand Gods: An animist belief from Bludgun that honors great spirits, ancient legends, and ancestors alike.
+        Three Siblings: The Tysmychan veneration of the Three Siblings who founded Tysmycha.
+        Zilvarel Union: The new faith rising in the Kingdom of Llyranost, claiming to resurrect an ancestral worship of Daeus as Eli.
+        Other: You have your own ideas on the world and how it works, or you are a member of a more esoteric (and possibly secret) tradition or smaller tradition.
   help_text:
     physique: "%xcphysique <build/body type>%xn - athletic, wiry, slim, pudgy, etc."
     gender: "%xcgender <male/female/other>%xn"
