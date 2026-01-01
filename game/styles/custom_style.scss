@@ -39,7 +39,7 @@ Warning alert: Bistre Brown #8c7225
 
 Update as needed. */
 
-/* Dropdown menus coloration */
+/* Dropdown menus styling */
 
 button,
 .ember-power-select-search,
@@ -55,12 +55,41 @@ ul.dropdown-menu {
     background-color: #302727; /* Dark Pine */
 }
 
+.dropdown-menu {
+    border: 1px solid #E1B07E9E;;
+    border-radius: 0px;
+}
+
 .dropdown-item:hover {
     background-color: #b37066; /* Copper Penny */
 }
 
 .header-wrap nav {
     background-color: rgba(0, 0, 0, 0.55); /* transparent black */
+}
+
+/* Play screen styling */
+
+.play-selector {
+    border-bottom: 1px solid #74a7bb;
+    border-image: linear-gradient(to right, #74a7bb, transparent) 1;
+}
+
+.play-selector-active {
+    background-color: transparent;
+    font-weight: bold;
+    border: 2px solid #E1B07E;
+    border-left-width: 5px;
+    border-image: linear-gradient(to right, #E1B07E, transparent) 1;
+}
+
+.play-hint {
+    font-size: .9em;
+    padding-top: .2em;
+}
+
+#chat-window {
+    padding: 0px;
 }
 
 /* Float-end user-bar drop-shadow */
@@ -236,7 +265,16 @@ h4, .h4 {
     background-color: transparent;
     border-color: #89d2e1; /* Sky Blue */
     background-image: linear-gradient(to right,#43676f,transparent); /* Deep Space Sparkle 2 */
-} 
+    padding-top: .5em;
+}
+
+.relationship-icon-container {
+    border: 1px solid #E1B07E;
+    border-image: linear-gradient(to bottom right, #E1B07E, #4666712e, #E1B07E) 1;
+    border-radius: 0px;
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+}
 
 /* Collapsible Button styling */
 button.btn-default.btn-collapse {
@@ -410,6 +448,15 @@ details.navbox-container summary {
     color: #74a7bb;
 }
 
+details.navbox-container[open] summary ~ * {
+  animation: sweep .2s ease-in-out;
+}
+
+@keyframes sweep {
+  0%    {opacity: 1; margin-top: -10px}
+  100%  {opacity: 1; margin-top: 0px}
+}
+
 ul.navbox-list {
     text-align: center;
     margin-bottom: 0px;
@@ -480,6 +527,80 @@ div.navbox-wiki-back {
     border: 1px solid black;  
 }
 
+/* Lore navbox */
+
+div.lorebox {
+    background: #00000082;
+    padding: 10px;
+    border: 2px solid white;
+    border-image: linear-gradient(to bottom right, #CBC0AD, #CBC0AD30, #CBC0AD) 1;
+    width: 70%;
+    margin: auto;
+}
+
+div.lorebox h4 {
+    text-align: center;
+    color: #df8f84;
+    font-size: 18px;
+}
+
+div.lorebox img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 130px;
+    padding: .2rem 0px .2rem 0px;
+}
+
+details.lorebox-container {
+    padding: .1rem 0 .1rem 0;
+}
+
+details.lorebox-container summary {
+    color: #74a7bb;
+    border: 1px solid #74a7bb;
+    border-left: none;
+    border-top: none;
+    border-right: none;
+    border-image: linear-gradient(to right, #74a7bb, transparent) 1;
+}
+
+details.lorebox-container[open] summary ~ * {
+  animation: sweep .2s ease-in-out;
+}
+
+@keyframes sweep {
+  0%    {opacity: 1; margin-top: -10px}
+  100%  {opacity: 1; margin-top: 0px}
+}
+
+div.lorebox-entry {
+    background: #4b2b3170;
+    padding: .5rem;
+}
+
+div.lorebox-entry p {
+    margin-bottom: 0px;
+    padding: .1rem;
+}
+
+div.lorebox-entry h4 {
+    text-align: left;
+    margin-bottom: 0px;
+    font-size: 16px;
+    border: 1px solid #df8f84;
+    border-top: none;
+    border-right: none;
+    border-left: none;
+    border-image: linear-gradient(to right, #df8f84, transparent) 1;
+}
+
+/* Emoji */
+
+.emoji {
+    font-size: 1em;
+}
+
 /* Wiki Header Left */
 wiki-header-left {
     background-color: transparent;
@@ -520,31 +641,71 @@ wiki-header-right {
 
 /* Scene component styling */
 
-.live-scene-log {
-    background: rgba(0, 0, 0, 0.34); /* Black (semi-transparent) */
-    border-image: radial-gradient(ellipse farthest-corner at top left, #E1B07E 40%, transparent 100%) 1; /* Tumbleweed */
+#live-scene-log {
+/*    background: rgba(0, 0, 0, 0.34); /* Black (semi-transparent) */
+/*    border-image: radial-gradient(ellipse farthest-corner at top left, #E1B07E 40%, transparent 100%) 1; /* Tumbleweed */
+    margin: 0px;
+    padding: 0px;
 }
 
 .scene-log {
     border: 1px solid #dbb0b0; /* Pale Chestnut */
     border-image: radial-gradient(ellipse farthest-corner at top left, #E1B07E 40%, transparent 100%) 1; /* Tumbleweed */
+    padding: 0px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 .scene-pose-header {
-    border-top: 1px dashed rgba(221, 207, 193, 0.63); /* Eerie Black */
-    background-image: linear-gradient(to right, #000000ba, transparent); /* Solid Black (semi-transparent) */
-    padding-bottom: 10px;
+    border-top: 1px solid rgba(221, 207, 193, 0.63); /* Eerie Black */
+    background-image: linear-gradient(to right, #00000082 80%, transparent); /* Solid Black (semi-transparent) */
+    padding-top: 5px;
+    padding-bottom: 5px;
     padding-left: 10px;
+    border-image: linear-gradient(to right, #CBC0AD 80%, transparent) 1;
+    margin-bottom: 0px;
+    font-size: 1em;
 }
 
-.hint.float-end {
-    margin-top: 10px;
-    margin-right: 5px;
+.scene-pose {
+    margin: 0px;
+    padding-top: 4px;
 }
 
 .scene-ooc-pose {
     background-color: #4b2b3178; /* Brown Coffee (semi-transparent) */
-    margin-bottom: 20px;
+    margin-bottom: 0px;
+    margin-left: 0px;
+}
+
+.scene-ooc-pose p, .scene-pose p {
+    margin: 0px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.scene-ooc-pose span.badge.rounded-pill.bg-primary {
+    margin-bottom: 10px;
+}
+
+.scene-system-pose {
+    margin-left: 0px;
+    border: 1px solid #df8f84;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-image: linear-gradient(to bottom right, #df8f84, #df8f8429, #df8f84) 1;
+    font-style: normal;
+}
+
+.scene-system-pose p {
+    margin-bottom: 0px;
+    padding-top: 5px
+}
+
+.timestamp-tip {
+    font-style: italic;
+    font-weight: lighter;
+    padding-right: 10px;
 }
 
 .scene-controls-box {
@@ -553,12 +714,52 @@ wiki-header-right {
     border-image: radial-gradient(ellipse farthest-corner at top left, #E1B07E 40%, transparent 100%) 1; /* Tumbleweed */
 }
 
+img.small-profile-icon {
+    width: 40px;
+    height: 40px;
+}
+
+.hint.float-end {
+    margin-top: 10px;
+    margin-right: 5px;
+}
+
+.pose-divider {
+    border-image: linear-gradient(to right, transparent, #E1B07E, transparent) 1;
+}
+
 /* Jobs styling */
 
 div.admin-only-reply,
 div.card.card-default.markdown-editor,
 div.card-body.markdown-editor {
     background-color: transparent;
+}
+
+.markdown-editor textarea {
+    margin-top: .2em;
+}
+
+.markdown-preview {
+    width: 100%;
+    padding: 0px;
+    margin: 5px 10px 10px 10px;
+}
+
+.markdown-control-toggle {
+    margin-left: 0px;
+    margin-right: 0px;
+    padding: 10px 10px 10px 10px;
+    border: 1px solid #302727;
+    border-bottom: none;
+}
+
+.markdown-control-toggle.active {
+    background-color: rgba(0, 0, 0, 0.6);
+    border: 0px;
+    margin: 0px;
+    border: 1px solid #302727;
+    border-bottom: none;
 }
 
 /* Action button styling (seen on wikis and jobs) */
@@ -643,7 +844,6 @@ a.nav-link.active {
 /* Wiki content styling */
 
 .tab-content {
-    padding-top: 0px;
     border-image: linear-gradient(to bottom right, #466671, #4666712e, #466671) 1; /* Moonstone Blue */
 }
 
@@ -1044,18 +1244,44 @@ div.creature-statblock ul li::marker {
     color: #CBC0AD;
 }
 
-/* Spot art styling */
-
-div.spot-art {
-    position: absolute;
-    top: 27%;
-    left: 42%;
+div.creature-statblock h4 {
+    font-size: 1.3em;
+    border: 2px solid #df8f84;
+    border-image: linear-gradient(to right, #df8f84, transparent) 1;
+    border-top: none;
+    border-left: none;
+    color: #df8f84;
+    padding-bottom: .3rem;
 }
 
-@media (max-width: 1499px) {
-    div.spot-art {
-        display: none;
-    }
+/* Spot art styling */
+
+div.spot-art-right {
+    overflow: hidden;
+}
+
+div.spot-art-right p {
+    width: 50%;
+    float: left;
+}
+
+div.spot-art-right img {
+    width: 50%;
+    float: right;
+}
+
+div.spot-art-left {
+    overflow: hidden;
+}
+
+div.spot-art-left p {
+    width: 50%;
+    float: right;
+}
+
+div.spot-art-left img {
+    width: 50%;
+    float: left;
 }
 
 /* Letter styling */
@@ -1138,58 +1364,58 @@ div.letter-style-3 {
 /* TIMELINE STUFF */
 
 .timeline{
-  padding: 30px 20px;
+    padding: 30px 20px;
 }
 .timeline ul {
-  list-style-type: none;
-  border-left: 2px solid #094a68;
-  padding: 10px 5px;
+    list-style-type: none;
+    border-left: 2px solid #094a68;
+    padding: 10px 5px;
 }
 .timeline ul li {
-  padding: 0px 20px;
-  position: relative;
-  cursor: pointer;
-  transition: .5s;
+    padding: 0px 20px;
+    position: relative;
+    cursor: pointer;
+    transition: .5s;
 }
 .timeline ul li .content span {
-  display: inline-block;
-  color: #CBC0AD;
-  background-color: #466671;
-  border: 1px solid #CBC0AD;
-  border-image: linear-gradient(to bottom right, #CBC0AD, #CBC0AD52, #CBC0AD) 1;
-  padding: 3px 5px;
-  text-align: center;
-  margin-top: .5em;
+    display: inline-block;
+    color: #CBC0AD;
+    background-color: #466671;
+    border: 1px solid #CBC0AD;
+    border-image: linear-gradient(to bottom right, #CBC0AD, #CBC0AD52, #CBC0AD) 1;
+    padding: 3px 5px;
+    text-align: center;
+    margin-top: .5em;
 }
 .timeline ul li .content h2 {
-  color: #74a7bb;
-  margin-top: 10px;
-  margin-bottom: 5px;
+    color: #74a7bb;
+    margin-top: 10px;
+    margin-bottom: 5px;
 }
 .timeline ul li .content p {
-  padding: 5px 0px 15px 0px;
+    padding: 5px 0px 15px 0px;
 }
 .timeline ul li:before {
-  position: absolute;
-  content: '';
-  width: 10px;
-  height: 10px;
-  background-color: #466671;
-  border-radius: 50%;
-  left: -11px;
-  top: 28px;
-  transition: .5s;
+    position: absolute;
+    content: '';
+    width: 10px;
+    height: 10px;
+    background-color: #466671;
+    border-radius: 50%;
+    left: -11px;
+    top: 28px;
+    transition: .5s;
 }
 .timeline ul li:hover {
-  background-color: #071f2a;
+    background-color: #071f2a;
 }
 .timeline ul li:hover:before {
-  background-color: #df8f84;
-  box-shadow: 0px 0px 10px 2px #df8f84;
+    background-color: #df8f84;
+    box-shadow: 0px 0px 10px 2px #df8f84;
 }
 @media (max-width:300px) {
-  .timeline{
-    width: 100%;
-    padding: 30px 5px 30px 10px;
-  }
+    .timeline {
+        width: 100%;
+        padding: 30px 5px 30px 10px;
+    }
 }

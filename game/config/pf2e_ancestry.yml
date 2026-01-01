@@ -214,29 +214,29 @@ pf2e_ancestry:
     Size: S
     Speed: 25
     abl_boosts:
-    - open
-    - open
+      - open
+      - open
     languages:
-    - Kamin
-    - Goblin
+      - Kamin
+      - Goblin
     traits:
-    - goblin
-    - humanoid
+      - goblin
+      - humanoid
     special:
-    - darkvision
+      - darkvision
     heritages:
-    - Aesa
-    - Ashen One
-    - Changeling
-    - Charhide
-    - Dar
-    - Ghaluch
-    - Irongut
-    - Niasa
-    - Razortooth
-    - Silyara
-    - Snow
-    - Unbreakable
+      - Aesa
+      - Ashen One
+      - Changeling
+      - Charhide
+      - Dar
+      - Ghaluch
+      - Irongut
+      - Niasa
+      - Razortooth
+      - Silyara
+      - Snow
+      - Unbreakable
     feats:
       1:
       - Burn It!
@@ -269,32 +269,32 @@ pf2e_ancestry:
     Size: S
     Speed: 25
     abl_boosts:
-    - open
-    - open
+      - open
+      - open
     languages:
-    - Kamin
-    - Gnomish
-    - Sylhart
+      - Kamin
+      - Gnomish
+      - Sylhart
     traits:
-    - gnome
-    - humanoid
+      - gnome
+      - humanoid
     special:
-    - Low-Light Vision
+      - Low-Light Vision
     heritages:
-    - Aesa
-    - Ashen One
-    - Chameleon
-    - Changeling
-    - Dar
-    - Fey-Touched
-    - Ghaluch
-    - Niasa
-    - Sensate
-    - Silyara
-    - Umbral
-    - Wellspring (Arcane)
-    - Wellspring (Divine)
-    - Wellspring (Occult)
+      - Aesa
+      - Ashen One
+      - Chameleon
+      - Changeling
+      - Dar
+      - Fey-Touched
+      - Ghaluch
+      - Niasa
+      - Sensate
+      - Silyara
+      - Umbral
+      - Wellspring (Arcane)
+      - Wellspring (Divine)
+      - Wellspring (Occult)
     feats:
       1:
       - Animal Accomplice
@@ -326,24 +326,24 @@ pf2e_ancestry:
     Size: M
     Speed: 25
     abl_boosts:
-    - open
-    - open
+      - open
+      - open
     languages:
-    - Kamin
-    - Kamin
+      - Kamin
+      - Kamin
     traits:
-    - human
-    - humanoid
+      - human
+      - humanoid
     heritages:
-    - Aesa
-    - Ashen One
-    - Changeling
-    - Dar
-    - Ghaluch
-    - Niasa
-    - Silyara
-    - Skilled
-    - Versatile
+      - Aesa
+      - Ashen One
+      - Changeling
+      - Dar
+      - Ghaluch
+      - Niasa
+      - Silyara
+      - Skilled
+      - Versatile
     feats:
       1:
       - Adapted Cantrip
@@ -375,27 +375,35 @@ pf2e_ancestry:
     Size: S
     Speed: 25
     abl_boosts:
-    - open
-    - open
+      - open
+      - open
     languages:
-    - Kamin
-    - Kaillin
+      - Kamin
+      - Kaillin
     traits:
-    - humanoid
-    - kailli
+      - humanoid
+      - kailli
     special:
-    - Low-Light Vision
+      - Low-Light Vision
+    attack:
+      Jaws:
+        damage: d4
+        damage_type: P
+        group: brawling
+        traits:
+        - agile
+        - finesse
     heritages:
-    - Aesa
-    - Ashen One
-    - Changeling
-    - Dar
-    - Deep Kailli
-    - Desert
-    - Longsnout
-    - Niasa
-    - Sewer
-    - Shadow
+      - Aesa
+      - Ashen One
+      - Changeling
+      - Dar
+      - Deep Kailli
+      - Desert
+      - Longsnout
+      - Niasa
+      - Sewer
+      - Shadow
     feats:
       1:
       - Cheek Pouches
@@ -421,29 +429,29 @@ pf2e_ancestry:
     Size: M
     Speed: 20
     abl_boosts:
-    - open
-    - open
+      - open
+      - open
     languages:
-    - Khazdul
-    - Kamin
+      - Khazdul
+      - Kamin
     traits:
-    - khazad
-    - humanoid
+      - khazad
+      - humanoid
     special:
-    - Darkvision
+      - Darkvision
     heritages:
-    - Aesa
-    - Ancient-Blooded
-    - Ashen One
-    - Changeling
-    - Dar
-    - Death Warden
-    - Forge
-    - Ghaluch
-    - Niasa
-    - Rock
-    - Silyara
-    - Strong-Blooded
+      - Aesa
+      - Ancient-Blooded
+      - Ashen One
+      - Changeling
+      - Dar
+      - Death Warden
+      - Forge
+      - Ghaluch
+      - Niasa
+      - Rock
+      - Silyara
+      - Strong-Blooded
     feats:
       1:
       - Eye For Treasure
@@ -475,27 +483,27 @@ pf2e_ancestry:
     Size: M
     Speed: 25
     abl_boosts:
-    - open
-    - open
+      - open
+      - open
     languages:
-    - Kamin
-    - Yrch
+      - Kamin
+      - Yrch
     traits:
-    - oruch
-    - humanoid
+      - oruch
+      - humanoid
     special:
-    - darkvision
+      - darkvision
     heritages:
-    - Aesa
-    - Ashen One
-    - Badlands
-    - Changeling
-    - Dar
-    - Deep Oruch
-    - Hold-Scarred
-    - Niasa
-    - Silyara
-    - Rainfall
+      - Aesa
+      - Ashen One
+      - Badlands
+      - Changeling
+      - Dar
+      - Deep Oruch
+      - Hold-Scarred
+      - Niasa
+      - Silyara
+      - Rainfall
     feats:
       1:
       - Beast Trainer
@@ -527,28 +535,28 @@ pf2e_ancestry:
     Size: M
     Speed: 30
     abl_boosts:
-    - open
-    - open
+      - open
+      - open
     languages:
-    - Kamin
-    - Silya
+      - Kamin
+      - Silya
     traits:
-    - sildanyar
-    - humanoid
+      - sildanyar
+      - humanoid
     special:
-    - Low-Light Vision
+      - Low-Light Vision
     heritages:
-    - Aesa
-    - Ashen One
-    - Arctic
-    - Cavern
-    - Changeling
-    - Dar
-    - Ghaluch
-    - Niasa
-    - Seer
-    - Whisper
-    - Woodland
+      - Aesa
+      - Ashen One
+      - Arctic
+      - Cavern
+      - Changeling
+      - Dar
+      - Ghaluch
+      - Niasa
+      - Seer
+      - Whisper
+      - Woodland
     feats:
       1:
       - Ancestral Linguistics

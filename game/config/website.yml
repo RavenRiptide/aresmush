@@ -107,6 +107,9 @@ website:
     - title: Classes
       route: wiki-page
       id: mechanics:classes
+    - title: Archetypes & Dedications
+      route: wiki-page
+      id: mechanics:archetypes-dedications
     - title: Feats
       route: wiki-page
       id: mechanics:feats
@@ -133,6 +136,30 @@ website:
     - target: blank
       title: AON PRD <i class="fa fa-external-link-alt" aria-hidden="true">
       url: https://2e.aonprd.com/
+  - title: Plots & Events
+    menu:
+    - title: Plots & Events Overview
+      route: wiki-page
+      id: plots
+    - divider: true
+    - title: Standard PRPs
+      route: wiki-page
+      id: plots:standard-prps
+    - title: Death Consent PRPs
+      route: wiki-page
+      id: plots:dc-prps
+    - title: Meetups
+      route: wiki-page
+      id: plots:meetups
+    - title: Personal Story Plots
+      route: wiki-page
+      id: plots:personalstories
+    - title: Plotmaster PRPs
+      route: wiki-page
+      id: plots:plotmaster-prps
+    - title: Staffer Plots
+      route: wiki-page
+      id: plots:staffer-plots
   - title: Wiki
     menu:
     - title: Home
@@ -220,8 +247,6 @@ website:
       ids:
       - style
       - custom_style.scss
-    - title: Files
-      route: files
     - title: Home Page Text
       route: textfile
       ids:
