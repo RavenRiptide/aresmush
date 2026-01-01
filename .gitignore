@@ -45,3 +45,7 @@ killares
 # -----------------------------
 /game/uploads
 /theme_archive
+
+# Emblem of Ea Specific Files
+# -----------------------------
+/plugins/tinker/commands/tinker_cmd.rb
