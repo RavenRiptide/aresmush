@@ -13,7 +13,7 @@ pf2e_background:
     action: []
     reaction: []
   Acrobat:
-    req_abl_boosts:
+    abl_boosts:
     - [ Strength, Dexterity ]
     - open
     skills:
