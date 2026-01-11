@@ -190,19 +190,22 @@ module AresMUSH
 
       # If specified, level must be at least the base level of the spell. Level is an integer here.
       return t('pf2emagic.invalid_level') if splevel < base
-
+      
       splevel = splevel.zero? ? 'cantrip' : splevel.to_s
-
+      
       # Got a spell open at that level?
       cc_spells = magic.spells_today
       cc_spells_2day = cc_spells[charclass]
       return t('pf2emagic.no_available_slots') unless cc_spells_2day
 
-      slots = cc_spells_2day[splevel]
-      return t('pf2emagic.no_available_slots') unless slots
+      # Slots are not neccessary for cantrips.
+      if splevel != 'cantrip'
+        slots = cc_spells_2day[splevel]
+        return t('pf2emagic.no_available_slots') unless slots
 
-      available = (slots > 0)
-      return t('pf2emagic.no_available_slots') unless available
+        available = (slots > 0)
+        return t('pf2emagic.no_available_slots') unless available
+      end
 
       # Do the cast and return a caster hash. Cantrip recalculates level for auto-heightening.
 

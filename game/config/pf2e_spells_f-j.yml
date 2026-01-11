@@ -1303,6 +1303,7 @@ pf2e_spells:
     actions: 3
     bloodline:
     - undead
+    cast: []
     damage: 1d8
     damage_type: negative
     save: basic Fortitude
@@ -1348,10 +1349,10 @@ pf2e_spells:
     traits:
     - transmutation
   Heal:
-    actions: 3
+    actions: varies
     bloodline:
     - angelic
-    - psychopomp
+    cast: []
     damage: 1d8
     damage_type: positive
     save: basic Fortitude
@@ -1367,6 +1368,7 @@ pf2e_spells:
     - The amount of healing or damage increases to 9d8, and the extra healing for the 2-action version increases to 72.
     - The amount of healing or damage increases to 10d8, and the extra healing for the 2-action version increases to 80.
     base_level: 1
+    range: varies
     school: Necromancy
     target: 1 willing living creature or 1 undead
     tradition:
