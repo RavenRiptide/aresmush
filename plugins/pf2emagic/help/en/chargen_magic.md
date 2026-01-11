@@ -14,15 +14,17 @@ Many classes and ancestries do not have access to magic and magic casting, but m
 
 `addspell <class>/<level> = <spell name>`: Chooses a spell for that character class and level. 
 `addspell <class>/<level> = <old spell>/<new spell>`: Swaps `<old spell>` for `<new spell>` in that class and level.
+`spellbook`: Shows all the spells you know.
 
 The `addspell` command can take selection switches to process some character options. `cg/review` or `advance/review` will tell you what switch to use if you need one.
 
-All spells selected in character generation or advancement must be common spells. (In other words, a spell must not have the Uncommon or Rare tags.) Uncommon and rare spells require a `request` to staff. (See `help requests` for more information.)
+**All spells selected in character generation or advancement must be common spells.** A spell must not have the Uncommon or Rare traits. Uncommon and Rare spells can only be learned after chargen with RPP spends.
+
+## Divine Fonts
 
 Clerics have the divine font class feature. Some deities provide a choice between a Heal divine font or a Harm divine font. `cg/review` will tell you if you need to choose.
 
-`dfont <input>`: Selects your divine font. <input> can be `heal` or `harm`.
+`dfont <input>`: Selects your divine font. `<input>` can be `heal` or `harm`.
 
 **Once you are done selecting spells**, you will have to input `rest` to see your spells on the magic section of your sheet. You cannot `rest` until your character is approved.
 
-`spell/search` provides a robust search function to help you find spells for your character to learn. For more information on searching through spells, see the `help spell` file. 
