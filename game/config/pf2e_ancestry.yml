@@ -127,15 +127,15 @@ pf2e_ancestry:
     - Breath Control
     heritages:
     - Aesa
+    - Ahcan
     - Ashen One
     - Changeling
-    - Cliffscale
     - Dar
-    - Frilled
     - Makar
     - Niasa
-    - Sandstrider
-    - Unseen
+    - Paeezh
+    - Pantli
+    - Xalli
     feats:
       1:
       - Ciith Lore

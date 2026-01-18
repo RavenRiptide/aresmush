@@ -6807,7 +6807,7 @@ pf2e_feats:
     prereq:
       level: 14
       feat:
-        - ironblood stance
+        - Ironblood Stance
     shortdesc: You steel yourself, preparing to resist oncoming attacks and using your muscles to absorb the impact. You gain the benefits of your iron sweep's parry trait (a +1 circumstance bonus to AC until the start of your next turn) and your resistance from Ironblood Stance increases to your Strength modifier (if it's higher) for the same duration.
     traits: []
   Leave an Opening:
@@ -7814,6 +7814,7 @@ pf2e_feats:
     prereq:
       level: 16
     shortdesc: The force of your considered blow shatters objects and defenses alike. Make an unarmed Strike. It bypasses the target's resistances. If the target has Hardness, the Strike treats the Hardness as if it were half its value.
+    traits: []
   Shield of Grace:
     assoc_charclass:
       - Champion
@@ -8060,8 +8061,10 @@ pf2e_feats:
         - Quivering Palm
         - Ki Form
     shortdesc: You transmute your body into an ethereal form. You gain the empty body ki spell. Increase the number of Focus Points in your focus pool by 1.
-    assoc_charclass:
-      - Monk
+    traits:
+      - uncommon
+      - conjuration
+      - teleportation
   Eternal Composition:
     assoc_charclass:
       - Bard
@@ -8219,7 +8222,7 @@ pf2e_feats:
         - Empty Body
         - Ki Form
       feat:
-        - Master of many styles
+        - Master of Many Styles
     shortdesc: You center yourself with the universe and draw upon its vast power. You cast a single action ki spell with the stance trait, without spending a Focus Point.
     traits: []
   Ki Form:

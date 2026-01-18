@@ -68,7 +68,7 @@ pf2e_class:
           saves:
             will: expert
         charclass:
-        -  Perpetual Infusions
+        - Perpetual Infusions
         choose_feat:
         - general
         raise:
@@ -2337,6 +2337,8 @@ pf2e_class:
         raise:
         - ability
   Rogue:
+    key_abil:
+    - Dexterity
     HP: 8
     chargen:
       skills:
