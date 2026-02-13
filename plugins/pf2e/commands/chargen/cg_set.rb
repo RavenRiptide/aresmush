@@ -120,6 +120,27 @@ module AresMUSH
           elsif selected_element == "charclass"
             base_info['specialize'] = ""
             base_info['specialize_info'] = ""
+            
+            # Add charclass features to pf2_features
+            class_config = Global.read_config('pf2e_class', selected_option)
+            charclass_features = class_config['chargen']['charclass_feature'] || []
+            if charclass_features.any?
+              features = enactor.pf2_features
+              features.concat(charclass_features).uniq!
+              enactor.update(pf2_features: features)
+            end
+            
+            # Also add specialty features if specialty is already selected
+            specialty = base_info['specialize']
+            if !specialty.blank?
+              specialty_config = Global.read_config('pf2e_specialty', selected_option, specialty)
+              specialty_features = specialty_config['chargen']['charclass_feature'] || []
+              if specialty_features.any?
+                features = enactor.pf2_features
+                features.concat(specialty_features).uniq!
+                enactor.update(pf2_features: features)
+              end
+            end
           elsif selected_element == "specialize"
             base_info['specialize_info'] = ""
           end

@@ -35,6 +35,19 @@ module AresMUSH
         return nil
       end
 
+      def check_skill_in_checkpoint
+        # Can't change skills set before feats grant additional skills, represented by
+        # skill being contained in the skill checkpoint.
+
+        if enactor.pf2_checkpoint == 'skills' # Enactor is selecting feats now.
+          if enactor.pf2_cg_assigned["skills"]["pf2_to_assign"]["open skills"].include?(self.value)
+            return t('pf2e.invalid_skill_change')
+          end
+        else
+          return nil
+        end
+      end
+
       def handle
         ##### VALIDATION SECTION #####
 

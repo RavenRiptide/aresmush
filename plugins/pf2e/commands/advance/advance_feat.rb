@@ -62,6 +62,22 @@ module AresMUSH
         fname = feat[0]
         fdetails = feat[1]
 
+        # Check prerequisites
+        prereqs = fdetails["prereq"]
+
+        if prereqs
+          # Account for character level during advancement
+          cl = enactor.pf2_level
+          cl = cl + 1  # Already advancing, so +1 to level for prereq purposes
+
+          meets_prereqs = Pf2e.meets_prereqs?(enactor, prereqs, cl)
+
+          unless meets_prereqs
+            client.emit_failure t('pf2e.feat_fails_prereq')
+            return
+          end
+        end
+
         # Do the thing.
 
         # Assignment hash.
@@ -77,6 +93,25 @@ module AresMUSH
 
         feats_to_do[key] = type_feats_to_do
         advancement['feats'] = feats_to_do
+
+        if fdetails['feat_type']&.include?('Dedication')
+          # They picked a dedication feat, so automatically assign the associated archetype.
+          assoc_archetypes = fdetails['assoc_archetype']
+          if assoc_archetypes && !assoc_archetypes.empty? && !to_assign['archetype']
+            # Automatically assign the archetype
+            archetype = assoc_archetypes.first
+            to_assign['archetype'] = archetype
+            
+            # Check if the archetype has specialties to choose from.
+            archetype_specialties = Global.read_config('pf2e_archetype_specialty', archetype)
+            
+            if archetype_specialties && !archetype_specialties.empty?
+              to_assign['archetype_specialty'] = 'open'
+              archetype_specialty_list = archetype_specialties.keys.sort.join(", ")
+              client.emit_ooc t('pf2e.adv_archetype_specialty_select', :archetype => archetype, :options => archetype_specialty_list)
+            end
+          end
+        end
 
         # Check the new feat for any grants.
         has_grants = fdetails['grants']
@@ -103,6 +138,13 @@ module AresMUSH
 
         client.emit_success t('pf2e.adv_feat_selected', :feat => fname, :type => key)
 
+        # Display notification about archetype if the user selects a Dedication feat.
+        if fdetails['feat_type']&.include?('Dedication')
+          assoc_archetypes = fdetails['assoc_archetype']
+          if assoc_archetypes && !assoc_archetypes.empty?
+            client.emit_ooc t('pf2e.adv_archetype_assigned', :archetype => assoc_archetypes.first)
+          end
+        end
       end
 
     end

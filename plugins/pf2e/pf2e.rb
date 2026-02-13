@@ -161,6 +161,8 @@ module AresMUSH
           return PF2AdvanceSpellCmd
         when "option"
           return PF2AdvanceOptionCmd
+        when "archetype"
+          return PF2AdvanceArchetypeCmd
         when "done"
           return PF2AdvanceFinishCmd
         end

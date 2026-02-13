@@ -64,6 +64,8 @@ module AresMUSH
       when 'classlevel'
         feats_by_class = feat_info.select { |k,v| v['assoc_charclass']&.include? operator.capitalize }
         match = feats_by_class.select { |k,v| v['prereq']['level'] == term.to_i }
+      when 'archetype'
+        match = feat_info.select { |k,v| v['assoc_archetype']&.include? term.capitalize }
       end
 
       match
@@ -100,11 +102,6 @@ module AresMUSH
         msg << 'lineage' unless traits.include?(heritage) && (char.pf2_level == 1)
       end
 
-      # No double-dipping on base class / dedication, per Paizo RAW.
-      if feat_type.include? 'Dedication'
-        msg << 'dedication' if feat.downcase.include? cinfo['charclass'].downcase
-      end
-
       if feat_type.include? 'Charclass'
         charclass = cinfo['charclass']
         allowed_charclasses = details['assoc_charclass']
@@ -116,14 +113,19 @@ module AresMUSH
         ancestry << cinfo['ancestry']
         ancestry << cinfo['adopted ancestry'] if cinfo['adopted ancestry']
 
-        # # Add allowances for Half-Sil and Half-Oruch
-        ancestry << "Sildanyar" if cinfo['heritage'].include? "Half-Sil"
-        ancestry << "Oruch" if cinfo['heritage'].include? "Half-Oruch"
+        # # Add allowances for Silyara and Ghaluch
+        ancestry << "Sildanyar" if cinfo['heritage'] == "Silyara"
+        ancestry << "Oruch" if cinfo['heritage'].include? "Ghaluch"
 
         allowed_ancestry = details['assoc_ancestry']
 
         msg << 'ancestry' unless !allowed_ancestry.intersection(ancestry).empty?
       end
+
+      # No double-dipping on base class / dedication, per Paizo RAW.
+      #if feat_type.include? 'Dedication'
+      # msg << 'dedication' if feat.downcase.include? cinfo['charclass'].downcase
+      #end
 
       # Prereq check, prerequisites includes level
 
@@ -341,26 +343,54 @@ module AresMUSH
       # Depending on feat type, this may be different keys with different formats.
 
       if details.has_key? 'assoc_charclass'
-        associated = "%x229Associated To:%xn #{details['assoc_charclass'].sort.join(", ")}"
+        associated = "%x229Associated Classes:%xn #{details['assoc_charclass'].sort.join(", ")}"
+      elsif details.has_key? 'assoc_archetype'
+        associated = "%x229Associated Archetypes:%xn #{details['assoc_archetype'].sort.join(", ")}"
       elsif details.has_key? 'assoc_ancestry'
-        associated = "%x229Associated To:%xn #{details['assoc_ancestry'].sort.join(", ")}"
+        associated = "%x229Associated Ancestries:%xn #{details['assoc_ancestry'].sort.join(", ")}"
       elsif details.has_key? 'assoc_skill'
-        associated = "%x229Associated To:%xn #{details['assoc_skill']}"
+        associated = "%x229Associated Skills:%xn #{details['assoc_skill']}"
       else
-        associated = "%x229Associated To:%xn Any"
+        associated = "%x229Associated With:%xn Any"
       end
 
-      traits = "%x229Traits:%xn #{details['traits'].sort.join(", ")}"
+      if details.has_key?('traits') && !details['traits'].empty?
+        traits = "%x229Traits:%xn #{details['traits'].sort.map(&:capitalize).join(", ")}"
+      else
+        traits = "%x229Traits:%xn None"
+      end
 
       # Prerequisites needs its own level of formatting.
 
       prereq_list = []
 
-      details['prereq'].each_pair do |k,v|
-        prereq_list << "%r%t%xh%xw#{k.capitalize}:%xn #{v}"
+      if details['prereq'].is_a?(Hash)
+        details['prereq'].each_pair do |k,v|
+          key_display = k.capitalize
+
+          if k == 'orfeat'
+            key_display = 'One of the following feat'
+          elsif k == 'orskill'
+            key_display = 'One of the following skill'
+          elsif k == 'oralign'
+            key_display = 'One of the following alignment'
+          end
+          
+          if v.is_a?(Array)
+            key_display = key_display + "s" if v.length > 1
+            # Array: key(s): followed by bulleted items
+            prereq_list << "%r%t%xh%xw#{key_display}:%xn"
+            v.each do |item|
+              prereq_list << "%r%t  - #{item}"
+            end
+          else
+            # Single value: key: value on same line
+            prereq_list << "%r%t%xh%xw#{key_display}:%xn #{v}"
+          end
+        end
       end
 
-      prereqs = "%x229Prerequisites:%xn #{prereq_list.join()}"
+      prereqs = "%x229Prerequisites:%xn" + prereq_list.join()
 
       desc = "%x229Description:%xn #{details['shortdesc']}"
 
@@ -422,11 +452,13 @@ module AresMUSH
         case key
         when 'magic_stats'
           return_msg << "This feat grants magic."
+          Global.logger.debug "MERP THIS IS A LOGGER MESSAGE Processing magic_stats grant from feat."
           update = PF2Magic.update_magic(char, charclass, value, client)
-          return_msg << update if update.is_a? String
+          # Use core classes explicitly to avoid any constant shadowing.
+          return_msg << update if update.is_a?(::String)
 
           # Update_magic returns a hash intended to be stuffed into pf2_to_assign. Do that.
-          if update.is_a? Hash && !(update.empty?)
+          if update.is_a?(::Hash) && !(update.empty?)
             return_msg << t('pf2e.feat_grants_addl', :element => 'magic')
             to_assign = char.pf2_to_assign.merge(update)
 
@@ -500,7 +532,8 @@ module AresMUSH
                 open_skills << 'open'
                 to_assign['open skills'] = open_skills
                 char.update(pf2_to_assign: to_assign)
-                return_msg << "You already had a skill granted by this feat, so you have another free skill to assign."
+                return_msg << "You already had a skill granted by this feat, so you have another free skill to assign. Your skills have been unlocked. Please assign skills using 'skill/set free=<skill>' and then 'commit skills' when done. You may add other feats that grant skills before 'commit featskills'."
+                char.update(pf2_skills_locked: false)
               else
                 return_msg << "#{char.name} needs to choose a free skill."
               end
@@ -530,18 +563,21 @@ module AresMUSH
     end
 
     def self.can_take_gated_feat?(char, feat, gate)
+      Global.logger.debug "#{feat} - #{gate}"
       # This function is called whenever the gated_feat key is present. It is used for any
       # feat that has specific limits on what can be taken.
-
-      qualifies = can_take_feat?(char, feat)
-
-      # If you don't meet the prereqs for the feat, don't bother processing the gate.
-      return false unless qualifies
 
       find_feat = Pf2e.get_feat_details(feat)
 
       fdeets = find_feat[1]
 
+
+      qualifies = fdeets["feat_type"]
+
+      # If you don't meet the prereqs for the feat, don't bother processing the gate.
+      return false unless qualifies 
+
+      
       case gate.downcase
       when 'universalist'
         # This key is for the extra wizard feat universalists get at first level.
@@ -577,7 +613,13 @@ module AresMUSH
         end
 
       when "charclass", "ancestry", "general", "skill"
-        passes_gate = fdeets['feat_type']&.include? gate.capitalize
+        if fdeets['feat_type']&.include?('Dedication')
+          passes_gate = true
+        else
+          passes_gate = false
+        end
+        passes_gate = fdeets['feat_type']&.include?(gate.titleize)
+        Global.logger.debug "#{passes_gate}"
       else
         # If it doesn't recognize the key for the gate, fail it.
         passes_gate = false

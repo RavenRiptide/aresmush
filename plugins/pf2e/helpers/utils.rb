@@ -287,7 +287,8 @@ module AresMUSH
       char.pf2_abilities_locked = false
       char.pf2_reset = false
 
-      char.pf2_base_info = { 'ancestry'=>"", 'heritage'=>"", 'background'=>"", 'charclass'=>"", "specialize"=>"" }
+      char.pf2_base_info = { 'ancestry'=>"", 'heritage'=>"", 'background'=>"", 'charclass'=>"", "specialize"=>"", 'archetype'=>"", 'archetype_specialty'=>"" }
+      char.pf2_archetypes = {}
       char.pf2_conditions = {}
       char.pf2_features = []
       char.pf2_traits = []
@@ -344,7 +345,8 @@ module AresMUSH
       char.pf2_checkpoint = 'start'
       char.pf2_reset = false
 
-      char.pf2_base_info = { 'ancestry'=>"", 'heritage'=>"", 'background'=>"", 'charclass'=>"", "specialize"=>"" }
+      char.pf2_base_info = { 'ancestry'=>"", 'heritage'=>"", 'background'=>"", 'charclass'=>"", "specialize"=>"", 'archetype'=>"", 'archetypespecialty'=>"" }
+      char.pf2_archetypes = {}
       char.pf2_xp = 0
       char.pf2_conditions = {}
       char.pf2_features = []
@@ -390,7 +392,7 @@ module AresMUSH
     end
 
     def self.get_character(name, enactor)
-      # Because Faraday can go fuck a cactus if she thinks I'm typing this ten thousand times.
+      # To keep from doing this repeatedly.
 
       return enactor unless name
 
@@ -420,18 +422,18 @@ module AresMUSH
 
     end
 
-    def self.treat_as_charclass?(char, charclass, dedication_gets=true)
-      # Determine whether a class' features apply to this character.
+    def self.treat_as_charclass?(char, charclass)
+    #  # Determine whether a class' features apply to this character.
       charclass = charclass.upcase
-
+    
       return true if char.pf2_base_info['charclass'].upcase == charclass
-
-      if dedication_gets
-        dedication_feat = charclass + "Dedication"
-
-        return true if Pf2e.has_feat?(char, dedication_feat)
-      end
-
+    #
+    #  if dedication_gets
+    #    dedication_feat = charclass + "Dedication"
+    #
+    #    return true if Pf2e.has_feat?(char, dedication_feat)
+    #  end
+    #
       return false
     end
 

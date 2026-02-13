@@ -107,7 +107,7 @@ module AresMUSH
           list << format_innate_spells(@char, name, values, prof)
         end
 
-        list.join("%r")
+        list
       end
 
       def revelation_locked
@@ -184,7 +184,8 @@ module AresMUSH
 
       def format_innate_spells(char, name, values, prof)
         pbonus = Pf2e.get_prof_bonus(char, prof)
-        p_short = prof.slice[0].upcase
+        # Grab the first letter of the proficiency label safely.
+        p_short = prof.to_s.slice(0).to_s.upcase
 
         level = values['level']
         name = Pf2e.pretty_string(name)

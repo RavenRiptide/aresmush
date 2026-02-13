@@ -62,8 +62,49 @@ module AresMUSH
                   "/" + @base_info['specialize_info']
       end
 
+      def archetype
+        archetypes = []
+        
+        # Add archetypes from base_info
+        if @base_info['archetype'].is_a?(Array)
+          archetypes.concat(@base_info['archetype'])
+        elsif @base_info['archetype'].is_a?(String) && !@base_info['archetype'].empty?
+          archetypes << @base_info['archetype']
+        end
+        
+        # Add archetypes from advancement assignments
+        adv_assigned = @char.pf2_adv_assigned || {}
+        adv_archetype = nil
+        if adv_assigned['archetype'].is_a?(Array)
+          archetypes.concat(adv_assigned['archetype'])
+          adv_archetype = adv_assigned['archetype'].last
+        elsif adv_assigned['archetype'].is_a?(String) && !adv_assigned['archetype'].empty?
+          archetypes << adv_assigned['archetype']
+          adv_archetype = adv_assigned['archetype']
+        end
+        
+        return "None" unless archetypes.any?
+        
+        # Remove " Archetype" from the end of each name
+        archetypes = archetypes.map { |a| a.sub(/ Archetype$/, '') }
+        
+        # Check if the advancement archetype has a specialty
+        specialty = adv_assigned['archetype_specialty']
+        if specialty && !specialty.empty? && adv_archetype
+          # Find the archetype in the config to see if it has this specialty
+          archetype_config = Global.read_config('pf2e_archetype_specialty', adv_archetype)
+          if archetype_config && archetype_config.key?(specialty)
+            # This specialty belongs to the advancement archetype
+            # Replace the last archetype with the specialty appended
+            archetypes[-1] = "#{archetypes[-1]} (#{specialty})"
+          end
+        end
+        
+        archetypes.uniq.join(", ")
+      end
+
       def traits
-        @char.pf2_traits.sort.join(", ")
+        @char.pf2_traits.map(&:capitalize).sort.join(", ")
       end
 
       def level

@@ -73,7 +73,7 @@ module AresMUSH
           to_choose = to_assign['class option'] || {}
           to_choose[name] = value['options']
 
-          return_msg << t('pf2e_adv_item_choose', :name => name, :options =>  options.sort.join(", "))
+          return_msg << t('pf2e.adv_item_choose', :name => name, :options =>  options.sort.join(", "))
 
           to_assign['class option'] = to_choose
         else
@@ -101,7 +101,7 @@ module AresMUSH
       to_process = char.pf2_advancement
       to_process.each_pair do |key, value|
         case key
-        when "charclass"
+        when "charclass_feature"
           features = char.pf2_features
 
           value.each { |f| features << f }
@@ -137,28 +137,19 @@ module AresMUSH
             Pf2eAbilities.update_base_score(char, ability)
           end
         when "raise skill"
-          new_prof = Pf2eSkills.get_next_prof(char, value)
+          skill = Pf2eSkills.find_skill(value, char)
+          return nil if !skill
 
+          new_prof = Pf2eSkills.get_next_prof(char, value)
           skill.update(prof_level: new_prof)
         when "feats"
           char_feats = char.pf2_feats
           value.each_pair do |type, feat_list|
-
-            # Account for the classification of a dedication feat.
-            list = char_feats[type]
-            dedication_list = char_feats['dedication']
-
-            feat_list.each do |feat|
-              if feat.match? 'Dedication'
-                dedication_list << feat
-              else
-                list << feat
-              end
-            end
+            char_feats[type] ||= []
+            char_feats[type].concat(feat_list)
           end
-
           char.pf2_feats = char_feats
-        when "charclass option"
+        when "charclass_feature option"
           value.each_pair do |feature, option|
             case feature
             when "Path to Perfection"
@@ -228,6 +219,15 @@ module AresMUSH
       advancement = char.pf2_adv_assigned || {}
       advancement["level"] = to_process
 
+      # Record archetype and specialty if they were selected
+      to_assign = char.pf2_to_assign
+      if to_assign['archetype']
+        advancement['archetype'] = to_assign['archetype']
+      end
+      if to_assign['archetype_specialty']
+        advancement['archetype_specialty'] = to_assign['archetype_specialty']
+      end
+
       # Deduct the XP.
       xp = char.pf2_xp
       xp = xp - 1000
@@ -269,7 +269,17 @@ module AresMUSH
         when "spellbook", "repertoire"
           msg << t('pf2e.adv_item_magic', :options => item) if info.include? "open"
         when "signature"
-          msg << t('pf2e.adv_item_magic', :options => item) unless info.values.first.zero?
+          needs_signature = false
+          if info.is_a?(Hash)
+            needs_signature = info.values.any? do |v|
+              v.is_a?(Array) ? v.include?("open") : v.to_i > 0
+            end
+          end
+          msg << t('pf2e.adv_item_magic', :options => item) if needs_signature
+        when "archetype_specialty"
+          msg << t('pf2e.adv_item_archetype_specialty') if info == "open"
+        when "special feat"
+          msg << t('pf2e.unassigned_gated_feat', :options => info.sort.join(", "))
         when "grants"
           info.keys.each do |feat|
             msg << t('pf2e.adv_item_grants', :options => feat)

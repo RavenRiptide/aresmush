@@ -28,11 +28,12 @@ module AresMUSH
           'ancestry', 
           'skill',
           'description',
-          'desc'
+          'desc',
+          'archetype'
         ]
 
         return nil if valid_types.include? self.search_type
-        return t('pf2e.bad_option', :options => valid_types.sort.join, :element => "search type")
+        return t('pf2e.bad_option', :options => valid_types.sort.join(', '), :element => "search type")
       end
 
       def handle

@@ -93,6 +93,23 @@ module AresMUSH
       return nil
     end
 
+    def self.cg_lock_featskills(enactor)
+      # Did they do this already?
+      return t('pf2e.cg_locked', :cp => 'featskills') if enactor.pf2_skills_locked
+
+      # Any errors that would stop them from locking?
+      errors = Pf2eSkills.skills_messages(enactor)
+
+      # Take the key and lock 'em up ./~
+      return t('pf2e.skill_issues') if errors
+
+      enactor.update(pf2_skills_locked: true)
+
+      # No need to record a checkpoint due to feats being the last step.
+      # Pf2e.record_checkpoint(enactor, "skills")
+      return nil
+    end
+
     def self.get_next_prof(char, value)
       progression = Global.read_config('pf2e', 'prof_progression')
 

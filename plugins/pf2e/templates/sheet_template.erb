@@ -9,6 +9,7 @@
 <%= left("#{item_color}XP%xn: #{xp}", 39) %>
 <%= left("#{item_color}Class/Level%xn: #{charclass} #{level}", 39) -%>
 <%= left("#{item_color}#{subclass_name}%xn: #{subclass}#{subclass_option}", 39) %>
+<%= left("#{item_color}Archetype(s)%xn: #{archetype}", 39) %>
 <%= left("#{item_color}Faith%xn: #{faith}", 39) -%>
 <%= left("#{item_color}Region%xn: #{region}", 39) %>
 <%= left("#{item_color}Deity%xn: #{deity}", 39) -%>
@@ -58,6 +59,12 @@
 
 <%= section_line("Languages") %>
 <%= languages %>
+<% if section == "all" %>
+<%= section_line("Class & Archetype Features") %>
+<% end %>
+<% if section == "features" || "all" %>
+<%= "#{item_color}Class Feature(s)%xn: #{features}" %>
+<% end %>
 <% if section == "all" %>
 <%= section_line("Feats") %>
 <% end %>

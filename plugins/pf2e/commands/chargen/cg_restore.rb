@@ -13,7 +13,7 @@ module AresMUSH
       end
 
       def check_in_chargen
-        stages = { "skills" => 6, "abilities" => 5, "info" => 4 }
+        stages = { "featskills" => 7, "skills" => 6, "abilities" => 5, "info" => 4 }
         if enactor.is_approved? || enactor.chargen_locked
           return t('pf2e.only_in_chargen')
         elsif !enactor.chargen_stage
