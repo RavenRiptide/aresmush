@@ -4736,7 +4736,7 @@ pf2e_feats:
     prereq:
       level: 10
       feat:
-        - Cobra Stance; 
+        - Cobra Stance
       combat_stats:
         weapon_prof:
           unarmed: expert
