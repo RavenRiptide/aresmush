@@ -58,14 +58,17 @@ module AresMUSH
       when 'ancestry'
         match = feat_info.select { |k,v| v['assoc_ancestry']&.include? term.capitalize }
       when 'skill'
-        match = feat_info.select { |k,v| v['assoc_skill']&.include? term.capitalize }
+        match = feat_info.select do |k, v|
+          skills = Array(v['assoc_skill']).compact
+          skills.any? { |s| s.downcase.include?(term.downcase) }
+        end
       when 'description', 'desc'
         match = feat_info.select { |k,v| v['shortdesc'].upcase.match? term.upcase }
       when 'classlevel'
         feats_by_class = feat_info.select { |k,v| v['assoc_charclass']&.include? operator.capitalize }
         match = feats_by_class.select { |k,v| v['prereq']['level'] == term.to_i }
       when 'archetype'
-        match = feat_info.select { |k,v| v['assoc_archetype']&.include? term.capitalize }
+        match = feat_info.select { |k,v| v['assoc_archetype']&.any? { |a| a.downcase.include?(term.downcase) } }
       end
 
       match
@@ -349,7 +352,7 @@ module AresMUSH
       elsif details.has_key? 'assoc_ancestry'
         associated = "%x229Associated Ancestries:%xn #{details['assoc_ancestry'].sort.join(", ")}"
       elsif details.has_key? 'assoc_skill'
-        associated = "%x229Associated Skills:%xn #{details['assoc_skill']}"
+        associated = "%x229Associated Skills:%xn #{details['assoc_skill'].sort.join(", ")}"
       else
         associated = "%x229Associated With:%xn Any"
       end

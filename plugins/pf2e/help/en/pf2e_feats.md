@@ -20,9 +20,11 @@ These commands can be used to review the feats you have or determine which ones 
 
 ## Searching for feats
 Search through the feats in the database with the following command:
-`feat/search <search type> = <search term>`: Searches the feat database for feats matching specific parameters. Valid search term types: `name`, `traits`, `feat_type`, `level`, `class`, `classlevel`, `ancestry`, `skill`, `description` OR `desc`. 
+`feat/search <search type> = <search term>`: Searches the feat database for feats matching specific parameters. Valid search term types: `name`, `traits`, `feat_type`, `level`, `class`, `classlevel`, `ancestry`, `skill`, `description` (or `desc`), and `archetype`.
 
 Feat search is paginated. To access pages beyond the first page, add the page number after `feat/search`. For example, `feat/search2 name=familiar`.
+
+When searching by `skill` or `archetype`, we recommend searching with the first word or two of the skill or archetype in question. For example, `feat/search skill=Cooking` will return results with Cooking Lore, and `feat/search archetype=Fighter` will return results with the Fighter Archetype.
 
 **NOTE**: If you search by `classlevel`, you may specify a class followed by a level. For example, `feat/search classlevel = Fighter 2`.
 
