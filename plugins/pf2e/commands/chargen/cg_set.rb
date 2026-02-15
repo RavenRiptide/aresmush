@@ -126,8 +126,9 @@ module AresMUSH
             charclass_features = class_config['chargen']['charclass_feature'] || []
             if charclass_features.any?
               features = enactor.pf2_features
-              features.concat(charclass_features).uniq!
-              enactor.update(pf2_features: features)
+              features['charclass_features'] ||= []
+              features['charclass_features'].concat(charclass_features).uniq!
+              enactor.pf2_features = features
             end
             
             # Also add specialty features if specialty is already selected
@@ -137,8 +138,9 @@ module AresMUSH
               specialty_features = specialty_config['chargen']['charclass_feature'] || []
               if specialty_features.any?
                 features = enactor.pf2_features
-                features.concat(specialty_features).uniq!
-                enactor.update(pf2_features: features)
+                features['charclass_features'] ||= []
+                features['charclass_features'].concat(specialty_features).uniq!
+                enactor.pf2_features = features
               end
             end
           elsif selected_element == "specialize"

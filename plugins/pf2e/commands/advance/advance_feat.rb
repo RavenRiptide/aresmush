@@ -98,14 +98,26 @@ module AresMUSH
           # They picked a dedication feat, so automatically assign the associated archetype.
           assoc_archetypes = fdetails['assoc_archetype']
           if assoc_archetypes && !assoc_archetypes.empty? && !to_assign['archetype']
-            # Automatically assign the archetype
+            # Automatically assign the archetype to advancement assignment and to an open archetype slot on the character.
             archetype = assoc_archetypes.first
             to_assign['archetype'] = archetype
+            archetype_slot = enactor.pf2_archetypeinfo || {}
+            if !archetype_slot['archetype1'] || archetype_slot['archetype1'].empty?
+              archetype_slot['archetype1'] = archetype
+            elsif !archetype_slot['archetype1'].empty? && (!archetype_slot['archetype2'] || archetype_slot['archetype2'].empty?)
+              archetype_slot['archetype2'] = archetype
+            elsif !archetype_slot['archetype1'].empty? && !archetype_slot['archetype2'].empty? && (!archetype_slot['archetype3'] || archetype_slot['archetype3'].empty?)
+              archetype_slot['archetype3'] = archetype
+            elsif !archetype_slot['archetype1'].empty? && !archetype_slot['archetype2'].empty? && !archetype_slot['archetype3'].empty? && (!archetype_slot['archetype4'] || archetype_slot['archetype4'].empty?)
+              archetype_slot['archetype4'] = archetype
+            end
+            enactor.pf2_archetypeinfo = archetype_slot
             
             # Check if the archetype has specialties to choose from.
             archetype_specialties = Global.read_config('pf2e_archetype_specialty', archetype)
             
             if archetype_specialties && !archetype_specialties.empty?
+              # If so, opens up archetype specialty selection in advancement assignment.
               to_assign['archetype_specialty'] = 'open'
               archetype_specialty_list = archetype_specialties.keys.sort.join(", ")
               client.emit_ooc t('pf2e.adv_archetype_specialty_select', :archetype => archetype, :options => archetype_specialty_list)

@@ -15,9 +15,9 @@ module AresMUSH
     attribute :pf2_level, :type => DataType::Integer, :default => 1
     attribute :pf2_xp, :type => DataType::Integer, :default => 0
     attribute :pf2_advancement, :type => DataType::Hash, :default => {}
-    attribute :pf2_archetypes, :type => DataType::Hash, :default => {}
+    attribute :pf2_archetypeinfo, :type => DataType::Hash, :default => { 'archetype1'=>"", 'archetype2'=>"", 'archetype3'=>"", 'archetype4'=>"", 'archetype_specialty1'=>"", 'archetype_specialty2'=>"", 'archetype_specialty3'=>"", 'archetype_specialty4'=>"" }
     attribute :pf2_conditions, :type => DataType::Hash, :default => {}
-    attribute :pf2_features, :type => DataType::Array, :default => []
+    attribute :pf2_features, :type => DataType::Hash, :default => { 'charclass_features'=>[], 'archetype_features'=>[] }
     attribute :pf2_traits, :type => DataType::Array, :default => []
     attribute :pf2_feats, :type => DataType::Hash, :default => { "ancestry"=>[], "charclass"=>[], "skill"=>[], "general"=>[], "archetype" => [], "dedication" => [] }
     attribute :pf2_faith, :type => DataType::Hash, :default => { 'deity'=>"", 'alignment'=>"" }

@@ -18,7 +18,7 @@ module AresMUSH
         def handle
             to_assign = enactor.pf2_to_assign
             
-            # Get the archetype that was auto-assigned from the dedication feat
+            # Get the archetype that was auto-assigned from the dedication feat.
             archetype = to_assign['archetype']
             
             unless archetype
@@ -31,17 +31,35 @@ module AresMUSH
               return
             end
 
-            # Validate the specialty choice
+            # Validate the specialty choice.
             valid_specialties = Global.read_config('pf2e_archetype_specialty', archetype)
             
             unless valid_specialties && valid_specialties.key?(self.specialty.capitalize)
               valid_list = valid_specialties&.keys&.sort&.join(", ") || "none"
-              client.emit_failure t('pf2e.adv_invalid_archetype_specialty', :options => valid_list)
+              client.emit_failure t('pf2e.adv_invalid_archetype_specialty', :archetype => archetype, :options => valid_list)
               return
             end
             
-            # Assign the specialty
+            # Assign the specialty.
             to_assign['archetype_specialty'] = self.specialty.capitalize
+            chosen_specialty = self.specialty.capitalize
+            
+            # Get the archetype info.
+            archetype_info = enactor.pf2_archetypeinfo
+            
+            # Assign the archetype specialty to the slot matching the archetype slot.
+            if archetype == archetype_info["archetype1"]
+              archetype_info["archetype_specialty1"] = chosen_specialty
+            elsif archetype == archetype_info["archetype2"]
+              archetype_info["archetype_specialty2"] = chosen_specialty
+            elsif archetype == archetype_info["archetype3"]
+              archetype_info["archetype_specialty3"] = chosen_specialty
+            elsif archetype == archetype_info["archetype4"]
+              archetype_info["archetype_specialty4"] = chosen_specialty
+            end
+            
+            # Reassign the hashes so they can be saved.
+            enactor.pf2_archetypeinfo = archetype_info
             enactor.pf2_to_assign = to_assign
             enactor.save
             
