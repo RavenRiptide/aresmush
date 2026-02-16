@@ -429,6 +429,7 @@ module AresMUSH
     end
 
     def self.assess_feat_grants(info)
+      hash = {}
       assign = {}
       advance = {}
 
@@ -437,7 +438,7 @@ module AresMUSH
         when "assign", "gated_feat"
           assign[k] = v
         else
-          advance[k] = value
+          advance[k] = v
         end
       end
 

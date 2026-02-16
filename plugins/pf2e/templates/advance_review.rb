@@ -41,14 +41,37 @@ module AresMUSH
           elsif value.is_a? Hash
             sublist = []
             value.each_pair do |subkey, subvalue|
-              subheading = subkey.gsub("charclass", "class").split("_").map {|word| word.capitalize}.join(" ")
+              subheading = subkey.gsub("charclass", "class").split(/[_\s]+/).map {|word| word.capitalize}.join(" ")
               if subvalue.is_a? Array
                 sublist << "%r%b%b#{item_color}#{subheading}:%xn #{subvalue.sort.join(", ")}"
               elsif subvalue.is_a? Hash
                 subsublist = []
                 subvalue.each_pair do |subsubkey, subsubvalue|
-                  subsubheading = subsubkey.capitalize
-                  subsublist << "%r%b%b%b%b%xh#{subsubheading}:%xn #{subsubvalue}"
+                  subsubheading = subsubkey.gsub("_", " ").split.map {|word| word.capitalize}.join(" ")
+                  
+                  if subsubvalue.is_a? Hash
+                    # Go one level deeper for nested hashes
+                    subsubsublist = []
+                    subsubvalue.each_pair do |subsubsubkey, subsubsubvalue|
+                      subsubsubheading = subsubsubkey.gsub("_", " ").split.map {|word| word.capitalize}.join(" ")
+
+                      if subsubsubvalue.is_a? Hash
+                        # Display the properties of this hash
+                        final_list = []
+                        subsubsubvalue.each_pair do |final_key, final_value|
+                          final_heading = final_key.gsub("_", " ").split.map {|word| word.capitalize}.join(" ")
+                          formatted_value = final_value.is_a?(String) ? final_value.titleize : final_value
+                          final_list << "%r%b%b%b%b%b%b%b%b%xh#{final_heading}:%xn #{formatted_value}"
+                        end
+                        subsubsublist << "%r%b%b%b%b%b%b%xh#{subsubsubheading}:%xn#{final_list.join}"
+                      else
+                        subsubsublist << "%r%b%b%b%b%b%b%xh#{subsubsubheading}:%xn #{subsubsubvalue}"
+                      end
+                    end
+                    subsublist << "%r%b%b%b%b%xh#{subsubheading}:%xn#{subsubsublist.join}"
+                  else
+                    subsublist << "%r%b%b%b%b%xh#{subsubheading}:%xn #{subsubvalue}"
+                  end
                 end
 
                 sublist << "%r%b%b#{item_color}#{subheading}:%xn #{subsublist.join}"
