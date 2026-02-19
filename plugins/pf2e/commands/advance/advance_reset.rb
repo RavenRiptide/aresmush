@@ -38,7 +38,7 @@ module AresMUSH
                     end
                     enactor.pf2_archetypeinfo = archetype_slot
                   end
-                  if !to_assign['archetype_specialty'].empty?
+                  if to_assign['archetype_specialty'] && !to_assign['archetype_specialty'].empty?
                     # If the archetype has a specialty, remove it as well.
                     archetype_specialty_slot = enactor.pf2_archetypeinfo || {}
                     archetype_specialty = to_assign['archetype_specialty']

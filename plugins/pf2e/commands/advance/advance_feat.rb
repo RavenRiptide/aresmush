@@ -94,6 +94,7 @@ module AresMUSH
         feats_to_do[key] = type_feats_to_do
         advancement['feats'] = feats_to_do
 
+        # Archetype and dedication handling begins here.
         if fdetails['feat_type']&.include?('Dedication')
           # They picked a dedication feat, so automatically assign the associated archetype.
           assoc_archetypes = fdetails['assoc_archetype']
