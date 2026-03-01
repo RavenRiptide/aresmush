@@ -204,6 +204,15 @@ module AresMUSH
               client.emit_ooc t('pf2e.adv_archetype_combat_stats_assigned')
               end
             end
+            # Handle archetype features, if present.
+            archetype_features = Array(archetype_features_info['archetype_feature']).compact.map { |f| f.to_s.strip }.reject(&:empty?)
+            if !archetype_features.empty?
+              features = enactor.pf2_features
+              features['archetype_features'] ||= []
+              features['archetype_features'].concat(archetype_features).uniq!
+              enactor.pf2_features = features
+              client.emit_ooc t('pf2e.adv_archetype_features_assigned', :features => archetype_features.join(", "))
+            end
 
             # Check if the archetype has specialties to choose from.
             archetype_specialties = Global.read_config('pf2e_archetype_specialty', archetype)

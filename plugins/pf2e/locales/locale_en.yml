@@ -26,6 +26,7 @@ en:
     adv_archetypespecialty_skills_assigned: "You have been granted the following skill(s) from your archetype specialty: %{skills}"
     adv_archetype_open_skill_feat_assigned: "You have an open skill feat choice from your archetype to assign."
     adv_archetype_combat_stats_assigned: "You have been granted combat proficiencies from your archetype."
+    adv_archetype_features_assigned: "You have been granted the following feature(s) from your archetype: %{features}"
     adv_item_archetype_key_ability: "You need to choose an archetype key ability."
     adv_archetype_key_ability_select: "You need to choose a key ability for %{archetype}. Options: %{options}"
     adv_no_archetype_key_ability_needed: "You do not need to assign an archetype key ability."

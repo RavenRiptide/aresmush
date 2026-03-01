@@ -107,10 +107,14 @@ module AresMUSH
         case key
         when "charclass_feature"
           features = char.pf2_features
-
-          value.each { |f| features << f }
-
-          char.pf2_features = features.uniq.sort
+          features['charclass_features'] ||= []
+          features['charclass_features'].concat(Array(value)).uniq!
+          char.pf2_features = features
+        when "archetype_feature"
+          features = char.pf2_features
+          features['archetype_features'] ||= []
+          features['archetype_features'].concat(Array(value)).uniq!
+          char.pf2_features = features
         when "combat_stats"
           Pf2eCombat.update_combat_stats(char, value)
         when "magic_stats"
