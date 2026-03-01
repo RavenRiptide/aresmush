@@ -287,7 +287,7 @@ module AresMUSH
       char.pf2_abilities_locked = false
       char.pf2_reset = false
 
-      char.pf2_base_info = { 'ancestry'=>"", 'heritage'=>"", 'background'=>"", 'charclass'=>"", "specialize"=>"", 'archetype'=>"", 'archetype_specialty'=>"" }
+      char.pf2_base_info = { 'ancestry'=>"", 'heritage'=>"", 'background'=>"", 'charclass'=>"", "specialize"=>"" }
       char.pf2_archetypeinfo = { 'archetype1'=>"", 'archetype2'=>"", 'archetype3'=>"", 'archetype4'=>"", 'archetype_specialty1'=>"", 'archetype_specialty2'=>"", 'archetype_specialty3'=>"", 'archetype_specialty4'=>"" }
       char.pf2_conditions = {}
       char.pf2_features = { 'charclass_features'=>[], 'archetype_features'=>[] }
@@ -345,7 +345,7 @@ module AresMUSH
       char.pf2_checkpoint = 'start'
       char.pf2_reset = false
 
-      char.pf2_base_info = { 'ancestry'=>"", 'heritage'=>"", 'background'=>"", 'charclass'=>"", "specialize"=>"", 'archetype'=>"", 'archetypespecialty'=>"" }
+      char.pf2_base_info = { 'ancestry'=>"", 'heritage'=>"", 'background'=>"", 'charclass'=>"", "specialize"=>"" }
       char.pf2_archetypeinfo = { 'archetype1'=>"", 'archetype2'=>"", 'archetype3'=>"", 'archetype4'=>"", 'archetype_specialty1'=>"", 'archetype_specialty2'=>"", 'archetype_specialty3'=>"", 'archetype_specialty4'=>"" }
       char.pf2_xp = 0
       char.pf2_conditions = {}

@@ -114,6 +114,61 @@ module AresMUSH
             end
             enactor.pf2_archetypeinfo = archetype_slot
             
+            archetype_info = Global.read_config('pf2e_archetype', archetype) || {}
+            archetype_features_info = archetype_info['initial_dedication'] || {}
+            # Handle automatic skill increases from archetype, if present, and merge them with any other pending skill increases.
+            archetype_skills = Array(archetype_features_info['skills']).compact.map { |s| s.to_s.strip }.reject(&:empty?)
+            if !archetype_skills.empty?
+              pending_skills = Array(to_assign['raise skill'])
+
+              pending_skills += archetype_skills
+              pending_skills = pending_skills.compact.map { |s| s.to_s.strip }.reject(&:empty?).uniq
+
+              to_assign['raise skill'] = pending_skills
+
+              pending_adv_skills = Array(advancement['raise skill'])
+              pending_adv_skills += archetype_skills
+              pending_adv_skills = pending_adv_skills.compact.map { |s| s.to_s.strip }.reject(&:empty?).uniq
+
+              advancement['raise skill'] = pending_adv_skills
+              client.emit_ooc t('pf2e.adv_archetype_skills_assigned', :skills => archetype_skills.join(", "))
+            end
+            # Handle automatic feat additions from archetype, if present, and merge them with any other pending feat additions.
+            archetype_feats = Array(archetype_features_info['feat']).compact.map { |f| f.to_s.strip }.reject(&:empty?)
+            if !archetype_feats.empty?
+              to_assign['feats'] ||= {}
+              pending_feats = Array(to_assign['feats']['general'])
+
+              pending_feats += archetype_feats
+              pending_feats = pending_feats.compact.map { |f| f.to_s.strip }.reject(&:empty?).uniq
+
+              to_assign['feats']['general'] = pending_feats
+
+              feats_to_do = advancement['feats'] || {}
+              general_feats_to_do = Array(feats_to_do['general'])
+              general_feats_to_do += archetype_feats
+              general_feats_to_do = general_feats_to_do.compact.map { |f| f.to_s.strip }.reject(&:empty?).uniq
+
+              feats_to_do['general'] = general_feats_to_do
+              advancement['feats'] = feats_to_do
+              client.emit_ooc t('pf2e.adv_archetype_feats_assigned', :feats => archetype_feats.join(", "))
+            end
+            # Handle open feat choices from archetype, if present, and merge them with any other pending feat choices.
+            archetype_choose_feats = Array(archetype_features_info['choose_feat']).compact.map { |f| f.to_s.strip }.reject(&:empty?)
+            if !archetype_choose_feats.empty?
+              to_assign['feats'] ||= {}
+
+              archetype_choose_feats.each do |feat_type|
+                feat_slots = Array(to_assign['feats'][feat_type])
+                feat_slots << "open"
+                to_assign['feats'][feat_type] = feat_slots
+              end
+
+              if archetype_choose_feats.include?('skill')
+                client.emit_ooc t('pf2e.adv_archetype_open_skill_feat_assigned')
+              end
+            end
+
             # Check if the archetype has specialties to choose from.
             archetype_specialties = Global.read_config('pf2e_archetype_specialty', archetype)
             

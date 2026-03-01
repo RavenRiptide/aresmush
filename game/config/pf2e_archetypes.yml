@@ -26,8 +26,6 @@ pf2e_archetype:
         class_dc: trained
       skills:
         - Athletics
-      feat:
-        - Raging Intimidation
       action: []
       reaction: []
   Bard Archetype:
@@ -127,7 +125,7 @@ pf2e_archetype:
           simple: trained
           martial: trained
         class_dc: trained
-      orskills:
+      skill choice:
         - Acrobatics
         - Athletics
   Investigator Archetype:
@@ -150,7 +148,7 @@ pf2e_archetype:
       - Strength
       - Dexterity
     initial_dedication:
-      orskills:
+      skill choice:
         - Acrobatics
         - Athletics
       combat_stats:
@@ -178,7 +176,7 @@ pf2e_archetype:
     initial_dedication:
       skills:
         - open
-      orskills:
+      skill choice:
         - Stealth
         - Thievery
       choose_feat:

@@ -97,6 +97,10 @@ module AresMUSH
       # As with commit info, char.update is not used here generally because it would mean many separate writes, quickly.
       # Kinder to the database to make a whole bunch of changes and write the lot in one go at the end.
       charclass = char.pf2_base_info['charclass']
+      archetype1 = char.pf2_archetypeinfo['archetype1'] && char.pf2_archetypeinfo['archetype_specialty1'] || []
+      archetype2 = char.pf2_archetypeinfo['archetype2'] && char.pf2_archetypeinfo['archetype_specialty2'] || []
+      archetype3 = char.pf2_archetypeinfo['archetype3'] && char.pf2_archetypeinfo['archetype_specialty3'] || []
+      archetype4 = char.pf2_archetypeinfo['archetype4'] && char.pf2_archetypeinfo['archetype_specialty4'] || []
 
       to_process = char.pf2_advancement
       to_process.each_pair do |key, value|
@@ -137,11 +141,16 @@ module AresMUSH
             Pf2eAbilities.update_base_score(char, ability)
           end
         when "raise skill"
-          skill = Pf2eSkills.find_skill(value, char)
-          return nil if !skill
+          Array(value).each do |skill_name|
+            next if skill_name.to_s.strip.empty?
+            next if skill_name.to_s.downcase == 'open'
 
-          new_prof = Pf2eSkills.get_next_prof(char, value)
-          skill.update(prof_level: new_prof)
+            skill = Pf2eSkills.find_skill(skill_name, char)
+            return nil if !skill
+
+            new_prof = Pf2eSkills.get_next_prof(char, skill_name)
+            skill.update(prof_level: new_prof)
+          end
         when "feats"
           char_feats = char.pf2_feats
           value.each_pair do |type, feat_list|
@@ -263,7 +272,13 @@ module AresMUSH
           type = item.delete_prefix "raise "
 
           # Info is blank if the item has not yet been selected.
-          if info == "open"
+          has_open = if info.is_a?(Array)
+            info.include?("open")
+          else
+            info == "open"
+          end
+
+          if has_open
             msg << t('pf2e.adv_item_raise', :item => type)
           end
         when "spellbook", "repertoire"

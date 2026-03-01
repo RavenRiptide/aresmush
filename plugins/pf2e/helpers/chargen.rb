@@ -99,8 +99,6 @@ module AresMUSH
       subclass = base_info['specialize']
       subclass_option = base_info['specialize_info']
       faith_info = enactor.pf2_faith
-      archetype = base_info['archetype'] || []
-      archetype_specialty = base_info['archetype_specialty'] || []
 
       cg_errors = Pf2e.chargen_messages(ancestry, heritage, background, charclass, subclass, faith_info, subclass_option)
 
@@ -134,12 +132,9 @@ module AresMUSH
       class_features_info = charclass_info["chargen"]
       subclass_features_info = subclass_info ? subclass_info["chargen"] : {}
       subclassopt_features_info = subclass_option_info ? subclass_option_info['chargen'] : {}
-      archetype_info = Global.read_config('pf2e_archetype', archetype)
-      archetype_subclass_info = Global.read_config('pf2e_archetype_specialty', archetype, archetype_specialty)
 
       # Moved from above to here to allow subclass_features_info to assign properly
       subclass_info = {} unless subclass_info
-      archetype_info = {} unless archetype_info
 
       to_assign = enactor.pf2_to_assign
 
