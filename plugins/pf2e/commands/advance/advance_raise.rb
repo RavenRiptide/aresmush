@@ -37,12 +37,6 @@ module AresMUSH
 
         index = exists.index "open"
 
-        # Do they have an open one to assign?
-        unless index
-          client.emit_failure t('pf2e.no_free', :element => 'ability boosts')
-          return
-        end
-
         advancement = enactor.pf2_advancement
 
         # Validate the value given.
@@ -55,6 +49,12 @@ module AresMUSH
             :element => 'ability',
             :options => abilities.map {|a| a.name}.join(", ")
             )
+            return
+          end
+
+          # Do they have an open one to assign?
+          unless index
+            client.emit_failure t('pf2e.no_free', :element => 'ability boosts')
             return
           end
 
@@ -88,6 +88,30 @@ module AresMUSH
           # Minimum level check for higher proficiencies.
           min_level = Pf2eSkills.min_level_for_prof(Pf2eSkills.get_next_prof(enactor, item))
 
+          char_level = enactor.pf2_level + 1
+
+          if char_level < min_level
+            client.emit_failure t('pf2e.not_minimum_level', :level => min_level)
+            return
+          end
+
+          to_assign[key] = item
+          advancement[key] = item
+        elsif self.type == 'skill choice'
+          allowed_skills = Array(to_assign[key])
+          allowed_skills_up = allowed_skills.map(&:upcase)
+
+          index = allowed_skills_up.index self.value
+
+          unless index
+            client.emit_failure t('pf2e.bad_skill_choice', :options => allowed_skills.join(", "))
+            return
+          end
+
+          item = allowed_skills[index]
+
+          # Minimum level check for higher proficiencies.
+          min_level = Pf2eSkills.min_level_for_prof(Pf2eSkills.get_next_prof(enactor, item))
           char_level = enactor.pf2_level + 1
 
           if char_level < min_level

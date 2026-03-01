@@ -151,6 +151,17 @@ module AresMUSH
             new_prof = Pf2eSkills.get_next_prof(char, skill_name)
             skill.update(prof_level: new_prof)
           end
+        when "raise skill choice"
+          Array(value).each do |skill_name|
+            next if skill_name.to_s.strip.empty?
+            next if skill_name.to_s.downcase == 'open'
+
+            skill = Pf2eSkills.find_skill(skill_name, char)
+            return nil if !skill
+
+            new_prof = Pf2eSkills.get_next_prof(char, skill_name)
+            skill.update(prof_level: new_prof)
+          end
         when "feats"
           char_feats = char.pf2_feats
           value.each_pair do |type, feat_list|
@@ -281,6 +292,14 @@ module AresMUSH
           if has_open
             msg << t('pf2e.adv_item_raise', :item => type)
           end
+        when "raise skill choice"
+          needs_choice = if info.is_a?(Array)
+            !info.empty?
+          else
+            info.to_s.downcase == 'open'
+          end
+
+          msg << t('pf2e.adv_item_skill_choice') if needs_choice
         when "spellbook", "repertoire"
           msg << t('pf2e.adv_item_magic', :options => item) if info.include? "open"
         when "signature"

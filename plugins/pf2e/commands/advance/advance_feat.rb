@@ -133,6 +133,13 @@ module AresMUSH
               advancement['raise skill'] = pending_adv_skills
               client.emit_ooc t('pf2e.adv_archetype_skills_assigned', :skills => archetype_skills.join(", "))
             end
+            archetype_skill_choices = Array(archetype_features_info['skill choice']).compact.map { |s| s.to_s.strip }.reject(&:empty?)
+            if !archetype_skill_choices.empty?
+              to_assign['raise skill choice'] ||= []
+              to_assign['raise skill choice'] += archetype_skill_choices
+              to_assign['raise skill choice'].uniq!
+              client.emit_ooc t('pf2e.adv_archetype_open_skill_assigned', :skills => archetype_skill_choices.join(", "))
+            end
             # Handle automatic feat additions from archetype, if present, and merge them with any other pending feat additions.
             archetype_feats = Array(archetype_features_info['feat']).compact.map { |f| f.to_s.strip }.reject(&:empty?)
             if !archetype_feats.empty?
