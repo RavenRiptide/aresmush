@@ -4,15 +4,16 @@ module AresMUSH
     class PF2AdvanceArchetypeCmd
         include CommandHandler
 
-        attr_accessor :specialty
+    attr_accessor :type, :value
 
         def parse_args
             args = cmd.parse_args(ArgParser.arg1_equals_arg2)
-            self.specialty = downcase_arg(args.arg2)
+      self.type = downcase_arg(args.arg1)
+      self.value = downcase_arg(args.arg2)
         end
 
         def required_args
-            [ self.specialty ]
+      [ self.type, self.value ]
         end
 
         def handle
@@ -25,45 +26,84 @@ module AresMUSH
               client.emit_failure "No archetype has been assigned."
               return
             end
-            
-            unless to_assign['archetype_specialty']&.include?('open')
-              client.emit_failure "You don't need to assign an archetype specialty."
-              return
-            end
 
-            # Validate the specialty choice.
-            valid_specialties = Global.read_config('pf2e_archetype_specialty', archetype)
-            
-            unless valid_specialties && valid_specialties.key?(self.specialty.capitalize)
-              valid_list = valid_specialties&.keys&.sort&.join(", ") || "none"
-              client.emit_failure t('pf2e.adv_invalid_archetype_specialty', :archetype => archetype, :options => valid_list)
+            case self.type
+            when 'specialty'
+              unless to_assign['archetype_specialty']&.include?('open')
+                client.emit_failure "You don't need to assign an archetype specialty."
+                return
+              end
+
+              # Validate the specialty choice.
+              valid_specialties = Global.read_config('pf2e_archetype_specialty', archetype)
+
+              unless valid_specialties && valid_specialties.key?(self.value.capitalize)
+                valid_list = valid_specialties&.keys&.sort&.join(", ") || "none"
+                client.emit_failure t('pf2e.adv_invalid_archetype_specialty', :archetype => archetype, :options => valid_list)
+                return
+              end
+
+              # Assign the specialty.
+              to_assign['archetype_specialty'] = self.value.capitalize
+              chosen_specialty = self.value.capitalize
+
+              # Get the archetype info.
+              archetype_info = enactor.pf2_archetypeinfo
+
+              # Assign the archetype specialty to the slot matching the archetype slot.
+              if archetype == archetype_info["archetype1"]
+                archetype_info["archetype_specialty1"] = chosen_specialty
+              elsif archetype == archetype_info["archetype2"]
+                archetype_info["archetype_specialty2"] = chosen_specialty
+              elsif archetype == archetype_info["archetype3"]
+                archetype_info["archetype_specialty3"] = chosen_specialty
+              elsif archetype == archetype_info["archetype4"]
+                archetype_info["archetype_specialty4"] = chosen_specialty
+              end
+
+              # Reassign the hashes so they can be saved.
+              enactor.pf2_archetypeinfo = archetype_info
+              enactor.pf2_to_assign = to_assign
+              enactor.save
+
+              client.emit_success t('pf2e.adv_archetype_specialty_assigned', :specialty => self.value.capitalize)
+            when 'key ability'
+              valid_abilities = Array(to_assign['archetype key ability'])
+
+              if valid_abilities.empty?
+                client.emit_failure t('pf2e.adv_no_archetype_key_ability_needed')
+                return
+              end
+
+              chosen_ability = valid_abilities.find { |ability| ability.upcase == self.value.upcase }
+
+              unless chosen_ability
+                client.emit_failure t('pf2e.adv_invalid_archetype_key_ability', :archetype => archetype, :options => valid_abilities.join(", "))
+                return
+              end
+
+              to_assign['archetype key ability'] = chosen_ability
+
+              advancement = enactor.pf2_advancement || {}
+              advancement['combat_stats'] ||= {}
+              advancement['combat_stats']['archetype_class_dcs'] ||= {}
+              advancement['combat_stats']['archetype_class_dcs'][archetype] ||= {}
+              advancement['combat_stats']['archetype_class_dcs'][archetype]['key_abil'] = chosen_ability
+
+              if !advancement['combat_stats']['archetype_class_dcs'][archetype]['prof']
+                prof = Global.read_config('pf2e_archetype', archetype, 'initial_dedication', 'combat_stats', 'class_dc')
+                advancement['combat_stats']['archetype_class_dcs'][archetype]['prof'] = prof if prof
+              end
+
+              enactor.pf2_advancement = advancement
+              enactor.pf2_to_assign = to_assign
+              enactor.save
+
+              client.emit_success t('pf2e.adv_archetype_key_ability_assigned', :ability => chosen_ability, :archetype => archetype)
+            else
+              client.emit_failure t('pf2e.bad_option', :element => 'archetype assignment', :options => 'specialty, key ability')
               return
             end
-            
-            # Assign the specialty.
-            to_assign['archetype_specialty'] = self.specialty.capitalize
-            chosen_specialty = self.specialty.capitalize
-            
-            # Get the archetype info.
-            archetype_info = enactor.pf2_archetypeinfo
-            
-            # Assign the archetype specialty to the slot matching the archetype slot.
-            if archetype == archetype_info["archetype1"]
-              archetype_info["archetype_specialty1"] = chosen_specialty
-            elsif archetype == archetype_info["archetype2"]
-              archetype_info["archetype_specialty2"] = chosen_specialty
-            elsif archetype == archetype_info["archetype3"]
-              archetype_info["archetype_specialty3"] = chosen_specialty
-            elsif archetype == archetype_info["archetype4"]
-              archetype_info["archetype_specialty4"] = chosen_specialty
-            end
-            
-            # Reassign the hashes so they can be saved.
-            enactor.pf2_archetypeinfo = archetype_info
-            enactor.pf2_to_assign = to_assign
-            enactor.save
-            
-            client.emit_success t('pf2e.adv_archetype_specialty_assigned', :specialty => self.specialty.capitalize)
         end
 
     end

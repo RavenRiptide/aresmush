@@ -7,7 +7,7 @@ pf2e_archetype:
       archetype_feature:
         - Infused Reagents
       combat_stats:
-        class_dc: trained
+        archetype_class_dc: trained
       skills:
         - Crafting
       feat:
@@ -23,7 +23,7 @@ pf2e_archetype:
       archetype_feature:
         - Rage
       combat_stats:
-        class_dc: trained
+        archetype_class_dc: trained
       skills:
         - Athletics
       action: []
@@ -71,7 +71,7 @@ pf2e_archetype:
           medium: trained
           heavy: trained
           unarmored: trained
-        class_dc: trained
+        archetype_class_dc: trained
       magic_stats:
         tradition:
           divine: trained
@@ -124,7 +124,7 @@ pf2e_archetype:
         weapon_prof:
           simple: trained
           martial: trained
-        class_dc: trained
+        archetype_class_dc: trained
       skill choice:
         - Acrobatics
         - Athletics
@@ -138,7 +138,7 @@ pf2e_archetype:
       archetype_feature:
         - On the Case
       combat_stats:
-        class_dc: trained
+        archetype_class_dc: trained
       action:
         - Pursue A Lead
       reaction:
@@ -154,7 +154,7 @@ pf2e_archetype:
       combat_stats:
         weapon_prof:
           unarmed: trained
-        class_dc: trained
+        archetype_class_dc: trained
       action:
         - Powerful Fist
       reaction: []
@@ -166,7 +166,7 @@ pf2e_archetype:
       skills:
         - Survival
       combat_stats:
-        class_dc: trained
+        archetype_class_dc: trained
       action:
         - Hunt Prey
       reaction: []
@@ -186,7 +186,7 @@ pf2e_archetype:
       combat_stats:
         armor_prof:
           light: trained
-        class_dc: trained
+        archetype_class_dc: trained
       action: []
       reaction: []
   Sorcerer Archetype:

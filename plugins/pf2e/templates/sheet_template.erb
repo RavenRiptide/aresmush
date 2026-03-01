@@ -32,6 +32,9 @@
 <%= left("#{item_color}Temp HP%xn: #{temp_hp}",39) %>
 <%= left("#{item_color}Class DC%xn: #{class_dc}",39) -%>
 <%= left("#{item_color}Perception%xn: #{perception}",39) %>
+<% if has_archetypes? %>
+<%= left("#{item_color}Archetype Class DC(s)%xn: #{archetype_class_dcs}", 78) %>
+<% end %>
 <%= left("#{item_color}Size%xn: #{size}", 39) -%>
 <%= left("#{item_color}Base Speed%xn: #{base_speed}", 39) %>
 <%= "#{item_color}Other Movement%xn: #{movement}"%>

@@ -6,6 +6,7 @@ module AresMUSH
 
     attribute :perception, :default => 'untrained'
     attribute :class_dc, :default => 'untrained'
+    attribute :archetype_class_dcs, :type => DataType::Hash, :default => {}
     attribute :key_abil
 
     attribute :armor_prof, :type => DataType::Hash, :default => {}
@@ -73,6 +74,21 @@ module AresMUSH
           combat.update("#{key}": value)
         when 'class_dc'
           combat.update("#{key}": value)
+        when 'archetype_class_dcs'
+          existing = combat.archetype_class_dcs || {}
+
+          value.each_pair do |name, info|
+            existing[name] ||= {}
+            normalized_info = {}
+
+            (info || {}).each_pair do |info_key, info_value|
+              normalized_info[info_key.to_s] = info_value
+            end
+
+            existing[name].merge!(normalized_info)
+          end
+
+          combat.update(archetype_class_dcs: existing)
         when 'weapon_prof'
           profs = combat.weapon_prof
           value.each_pair do |type, new_prof|
@@ -116,6 +132,43 @@ module AresMUSH
       abil_mod = Pf2eAbilities.abilmod(Pf2eAbilities.get_score(char, key_ability))
 
       10 + prof_bonus + abil_mod
+    end
+
+    def self.get_archetype_class_dcs(char)
+      combat_stats = char.combat
+
+      return {} if !combat_stats
+
+      archetype_dcs = combat_stats.archetype_class_dcs || {}
+      return {} if archetype_dcs.empty?
+
+      dc_hash = {}
+
+      archetype_dcs.each_pair do |archetype, info|
+        next if !info.is_a?(Hash)
+
+        prof = info['prof'] || info[:prof]
+        key_ability = info['key_abil'] || info[:key_abil]
+
+        if key_ability.to_s.strip.empty?
+          configured_key_abilities = Array(Global.read_config('pf2e_archetype', archetype, 'key_abil')).compact.map { |a| a.to_s.strip }.reject(&:empty?).uniq
+          key_ability = configured_key_abilities.first if configured_key_abilities.size == 1
+        end
+
+        next if prof.to_s.strip.empty?
+        next if key_ability.to_s.strip.empty?
+
+        prof_bonus = Pf2e.get_prof_bonus(char, prof)
+        abil_mod = Pf2eAbilities.abilmod(Pf2eAbilities.get_score(char, key_ability))
+
+        dc_hash[archetype] = {
+          'dc' => 10 + prof_bonus + abil_mod,
+          'prof' => prof,
+          'key_abil' => key_ability
+        }
+      end
+
+      dc_hash
     end
 
     def self.calculate_ac(char)
@@ -296,6 +349,7 @@ module AresMUSH
       combat.saves = {}
       combat.perception = 'untrained'
       combat.class_dc = 'untrained'
+      combat.archetype_class_dcs = {}
       combat.key_abil = nil
 
       combat.armor_prof = {}

@@ -116,6 +116,7 @@ module AresMUSH
             
             archetype_info = Global.read_config('pf2e_archetype', archetype) || {}
             archetype_features_info = archetype_info['initial_dedication'] || {}
+            archetype_key_abilities = Array(archetype_info['key_abil']).compact.map { |a| a.to_s.strip }.reject(&:empty?).uniq
             # Handle automatic skill increases from archetype, if present, and merge them with any other pending skill increases.
             archetype_skills = Array(archetype_features_info['skills']).compact.map { |s| s.to_s.strip }.reject(&:empty?)
             if !archetype_skills.empty?
@@ -173,6 +174,34 @@ module AresMUSH
 
               if archetype_choose_feats.include?('skill')
                 client.emit_ooc t('pf2e.adv_archetype_open_skill_feat_assigned')
+              end
+            end
+            # Handle combat_stats from archetype, if present.
+            archetype_combat = (archetype_features_info['combat_stats'] || {}).dup
+            if !archetype_combat.empty?
+              archetype_class_dc_prof = archetype_combat.delete('archetype_class_dc')
+
+              if archetype_class_dc_prof
+                advancement['combat_stats'] ||= {}
+                advancement['combat_stats']['archetype_class_dcs'] ||= {}
+                advancement['combat_stats']['archetype_class_dcs'][archetype] ||= {}
+                advancement['combat_stats']['archetype_class_dcs'][archetype]['prof'] = archetype_class_dc_prof
+
+                if archetype_key_abilities.size > 1
+                  to_assign['archetype key ability'] = archetype_key_abilities
+                  client.emit_ooc t('pf2e.adv_archetype_key_ability_select', :archetype => archetype, :options => archetype_key_abilities.join(", "))
+                else
+                  selected_key_ability = archetype_key_abilities.first || enactor.combat&.key_abil
+                  if selected_key_ability
+                    advancement['combat_stats']['archetype_class_dcs'][archetype]['key_abil'] = selected_key_ability
+                  end
+                end
+              end
+
+              if !archetype_combat.empty?
+              advancement['combat_stats'] ||= {}
+              advancement['combat_stats'] = Pf2e.merge_combat_stats(advancement['combat_stats'], archetype_combat)
+              client.emit_ooc t('pf2e.adv_archetype_combat_stats_assigned')
               end
             end
 

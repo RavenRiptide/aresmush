@@ -169,6 +169,35 @@ module AresMUSH
         "#{dc} (#{prof})"
       end
 
+      def archetype_class_dcs
+        return "--" if !combat_stats
+
+        dcs = Pf2eCombat.get_archetype_class_dcs(@char)
+        return "--" if dcs.empty?
+
+        dcs.keys.sort.map do |archetype|
+          info = dcs[archetype]
+          name = archetype.sub(/ Archetype$/, '')
+          prof = info['prof'].to_s[0]&.upcase
+          key_abil = info['key_abil'].to_s
+          key_abil_short = key_abil.empty? ? "---" : key_abil[0..2].upcase
+
+          "%xh#{name}%xn: #{info['dc']} (#{prof}, #{key_abil_short})"
+        end.join(", ")
+      end
+
+      def has_archetypes?
+        archetype_info = @char.pf2_archetypeinfo || {}
+        archetypes = [
+          archetype_info['archetype1'],
+          archetype_info['archetype2'],
+          archetype_info['archetype3'],
+          archetype_info['archetype4']
+        ].compact.map { |a| a.to_s.strip }.reject(&:empty?)
+
+        !archetypes.empty?
+      end
+
       def perception
         return "--" if !combat_stats
         bonus = Pf2eCombat.get_perception(@char)

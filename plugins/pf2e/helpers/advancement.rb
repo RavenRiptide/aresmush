@@ -312,6 +312,14 @@ module AresMUSH
           msg << t('pf2e.adv_item_magic', :options => item) if needs_signature
         when "archetype_specialty"
           msg << t('pf2e.adv_item_archetype_specialty') if info == "open"
+        when "archetype key ability"
+          needs_choice = if info.is_a?(Array)
+            !info.empty?
+          else
+            info.to_s.downcase == 'open'
+          end
+
+          msg << t('pf2e.adv_item_archetype_key_ability') if needs_choice
         when "special feat"
           msg << t('pf2e.unassigned_gated_feat', :options => info.sort.join(", "))
         when "grants"
@@ -324,6 +332,53 @@ module AresMUSH
 
       return nil if msg.empty?
       return msg
+    end
+
+    def self.merge_combat_stats(existing_stats, added_stats)
+      existing = existing_stats || {}
+      added = added_stats || {}
+
+      merged = {}
+
+      (existing.keys | added.keys).each do |key|
+        existing_value = existing[key]
+        added_value = added[key]
+
+        merged[key] =
+          if existing_value.is_a?(Hash) && added_value.is_a?(Hash)
+            merge_combat_stats(existing_value, added_value)
+          elsif prof_rank(existing_value) || prof_rank(added_value)
+            higher_prof(existing_value, added_value)
+          elsif added_value.nil?
+            existing_value
+          else
+            added_value
+          end
+      end
+
+      merged
+    end
+
+    def self.prof_rank(value)
+      return nil if value.nil?
+
+      {
+        'untrained' => 0,
+        'trained' => 1,
+        'expert' => 2,
+        'master' => 3,
+        'legendary' => 4
+      }[value.to_s.downcase]
+    end
+
+    def self.higher_prof(left, right)
+      left_rank = prof_rank(left)
+      right_rank = prof_rank(right)
+
+      return right if left_rank.nil?
+      return left if right_rank.nil?
+
+      left_rank >= right_rank ? left.to_s.downcase : right.to_s.downcase
     end
 
     def self.valid_class_option?(char, feature, option)
