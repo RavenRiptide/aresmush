@@ -41,25 +41,52 @@ module AresMUSH
           elsif value.is_a? Hash
             sublist = []
             value.each_pair do |subkey, subvalue|
-              subheading = subkey.gsub("charclass", "class").split(/[_\s]+/).map {|word| word.capitalize}.join(" ")
+              subheading = subkey.to_s
+                .gsub("charclass", "class")
+                .gsub("spells_per_day", "spell_slots_per_day")
+                .gsub("1", "1st-level")
+                .gsub("2", "2nd-level")
+                .gsub("3", "3rd-level")
+                .gsub("4", "4th-level")
+                .gsub("5", "5th-level")
+                .gsub("6", "6th-level")
+                .gsub("7", "7th-level")
+                .gsub("8", "8th-level")
+                .gsub("9", "9th-level")
+                .gsub("10", "10th-level")
+                .split(/[_\s]+/)
+                .map {|word| word.capitalize}
+                .join(" ")
               if subvalue.is_a? Array
                 sublist << "%r%b%b#{item_color}#{subheading}:%xn #{subvalue.sort.join(", ")}"
               elsif subvalue.is_a? Hash
                 subsublist = []
                 subvalue.each_pair do |subsubkey, subsubvalue|
-                  subsubheading = subsubkey.gsub("_", " ").split.map {|word| word.capitalize}.join(" ")
-                  
+                  subsubheading = subsubkey.to_s
+                    .gsub("1", "1st-level")
+                    .gsub("2", "2nd-level")
+                    .gsub("3", "3rd-level")
+                    .gsub("4", "4th-level")
+                    .gsub("5", "5th-level")
+                    .gsub("6", "6th-level")
+                    .gsub("7", "7th-level")
+                    .gsub("8", "8th-level")
+                    .gsub("9", "9th-level")
+                    .gsub("10", "10th-level")
+                    .split(/[_\s]+/)
+                    .map {|word| word.capitalize}
+                    .join(" ")
                   if subsubvalue.is_a? Hash
                     # Go one level deeper for nested hashes
                     subsubsublist = []
                     subsubvalue.each_pair do |subsubsubkey, subsubsubvalue|
-                      subsubsubheading = subsubsubkey.gsub("_", " ").split.map {|word| word.capitalize}.join(" ")
+                      subsubsubheading = subsubsubkey.to_s.gsub("_", " ").split.map {|word| word.capitalize}.join(" ")
 
                       if subsubsubvalue.is_a? Hash
                         # Display the properties of this hash
                         final_list = []
                         subsubsubvalue.each_pair do |final_key, final_value|
-                          final_heading = final_key.gsub("_", " ").split.map {|word| word.capitalize}.join(" ")
+                          final_heading = final_key.to_s.gsub("_", " ").split.map {|word| word.capitalize}.join(" ")
                           formatted_value = final_value.is_a?(String) ? final_value.titleize : final_value
                           final_list << "%r%b%b%b%b%b%b%b%b%xh#{final_heading}:%xn #{formatted_value}"
                         end
@@ -99,20 +126,35 @@ module AresMUSH
 
         @to_assign.each_pair do |key, value|
           # Process according to the data type of the key.
-          heading = key.gsub("charclass", "class").split("_").map {|word| word.capitalize}.join(" ")
+          heading = key.gsub("charclass", "class feat").gsub("skill", "skill feat(s)").split("_").map {|word| word.capitalize}.join(" ")
 
           if value.is_a? Array
             list << "#{item_color}#{heading}:%xn #{value.sort.join(", ")}" unless value.empty?
           elsif value.is_a? Hash
             sublist = []
             value.each_pair do |subkey, subvalue|
-              subheading = subkey.gsub("charclass", "class").split.map {|word| word.capitalize}.join(" ")
+              subheading = subkey.to_s
+                .gsub("charclass", "class feat(s)")
+                .gsub("skill", "skill feat(s)")
+                .gsub("1", "1st-level spell(s)")
+                .gsub("2", "2nd-level spell(s)")
+                .gsub("3", "3rd-level spell(s)")
+                .gsub("4", "4th-level spell(s)")
+                .gsub("5", "5th-level spell(s)")
+                .gsub("6", "6th-level spell(s)")
+                .gsub("7", "7th-level spell(s)")
+                .gsub("8", "8th-level spell(s)")
+                .gsub("9", "9th-level spell(s)")
+                .gsub("10", "10th-level spell(s)")
+                .split
+                .map {|word| word.capitalize}
+                .join(" ")
               if subvalue.is_a? Array
                 sublist << "#{item_color}#{subheading}:%xn #{subvalue.sort.join(", ")}"
               elsif subvalue.is_a? Hash
                 subsublist = []
                 subvalue.each_pair do |subsubkey, subsubvalue|
-                  subsubheading = subsubkey.capitalize
+                  subsubheading = subsubkey.to_s.capitalize
                   subsublist << "%r%b%b%xh#{subsubheading}:%xn #{subsubvalue}"
                 end
 
@@ -136,6 +178,12 @@ module AresMUSH
 
         return msg.join("%r") if msg
         return t('pf2e.advance_no_messages')
+      end
+
+      def help_instructions
+        advance_help = t('pf2e.advance_help')
+        advance_review_help = t('pf2e.advance_review_help')
+        return "%xc#{advance_help}%xn%r%xc#{advance_review_help}%xn"
       end
 
     end

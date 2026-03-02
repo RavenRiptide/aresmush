@@ -58,7 +58,7 @@ module AresMUSH
             magic_options.each_pair do |k,v|
               to_assign[k] = v
             end
-            return_msg << t('pf2e.adv_item_magic', :options => magic_options.keys.sort.join(", "))
+            return_msg << t('pf2e.adv_item_magic', :options => magic_options.keys.sort.join(" and "))
           end
         when "raise"
           # Value is an array of all the things you can choose to raise.
@@ -305,7 +305,17 @@ module AresMUSH
 
           msg << t('pf2e.adv_item_skill_choice') if needs_choice
         when "spellbook", "repertoire"
-          msg << t('pf2e.adv_item_magic', :options => item) if info.include? "open"
+          needs_spell_choice = if info.is_a?(Hash)
+            info.values.any? do |value|
+              value.is_a?(Array) ? value.include?("open") : value.to_s.downcase == 'open'
+            end
+          elsif info.is_a?(Array)
+            info.include?("open")
+          else
+            info.to_s.downcase == 'open'
+          end
+
+          msg << t('pf2e.adv_item_spells', :options => item) if needs_spell_choice
         when "signature"
           needs_signature = false
           if info.is_a?(Hash)
@@ -313,7 +323,7 @@ module AresMUSH
               v.is_a?(Array) ? v.include?("open") : v.to_i > 0
             end
           end
-          msg << t('pf2e.adv_item_magic', :options => item) if needs_signature
+          msg << t('pf2e.adv_item_signaturespells') if needs_signature
         when "archetype_specialty"
           msg << t('pf2e.adv_item_archetype_specialty') if info == "open"
         when "archetype key ability"

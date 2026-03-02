@@ -21,8 +21,10 @@ Note that you cannot `advance` if you are in an active encounter. Scenes are fin
 `listxp`: View a history of your XP rewards and spends.
 `advance`: Begins the advancement process. No modification to your sheet is made until you enter `advance/done`.
 `advance/review`: Your guidebook for what you get and the options you need to select. (Alternative alias: `adv/review`)
-`advance/raise <ability or skill> = <ability or skill to raise>`: If `advance/review` indicates that you have an ability or skill to raise, use this command. It will automatically take the current value up one step, so no value specification is necessary, only the skill or ability.
-`advance/feat <type> = <feat>`: If advance/review indicates a feat to select, use this. Dedication feats are selected with class (charclass) feats. Type options: `general`, `skill`, `dedication`, `charclass`, or `ancestry`.
+`advance/raise ability = <ability>`: Raises an ability score to the next step. For example, `advance/raise ability=Strength` raises Strength.
+`advance/raise skill = <skill>`: Raises a skill to the next step of proficiency. For example, `advance/raise skill=Nature` raises the Nature skill.
+`advance/raise skill choice = <skill>`: If you have a skill training choice, such as from a Dedication feat, this command raises the chosen skill to the next step of proficiency. For example, if given the choice of Stealth or Thievery, input `advance/raise skill choice=Stealth` to raise the Stealth skill.
+`advance/feat <type> = <feat>`: If advance/review indicates a feat to select, use this. Dedication feats are selected with class (charclass) feats. Type options: `general`, `skill`, `charclass`, or `ancestry`. Dedication and Archetype feats are `charclass` feats.
 `advance/option <item> = <option>`: Some feats or class features require you to choose something else. Use this command to select those.
 `advance/spell <type>/<level> = [<old spell>]/<spell>`: Selects a new spell. Type is either 'repertoire' or 'spellbook'. Note that you must either specify the spell to replace or have an open slot.
 `advance/signature <spell>`: If `advance/review` indicates that this is needed, set a signature spell. 

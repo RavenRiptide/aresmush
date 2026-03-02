@@ -249,7 +249,7 @@ module AresMUSH
         enactor.pf2_to_assign = to_assign
         enactor.save
 
-        client.emit_success t('pf2e.adv_feat_selected', :feat => fname, :type => key)
+        client.emit_success t('pf2e.adv_feat_selected', :feat => fname, :type => key.gsub("charclass", "class"))
 
         # Display notification about archetype if the user selects a Dedication feat.
         if fdetails['feat_type']&.include?('Dedication')

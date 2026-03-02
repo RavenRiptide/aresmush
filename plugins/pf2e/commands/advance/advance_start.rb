@@ -44,6 +44,8 @@ module AresMUSH
 
         client.emit_ooc msg.join("%r%%%b")
         client.emit_success t('pf2e.advance_started', :level => level, :charclass => charclass)
+        template = Pf2e::PF2AdvanceReviewTemplate.new(enactor, client)
+        client.emit template.render
       end
 
     end
