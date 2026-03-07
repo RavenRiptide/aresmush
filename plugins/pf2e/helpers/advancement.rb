@@ -198,7 +198,7 @@ module AresMUSH
 
           csb = magic.spellbook
 
-          class_csb = csb[charclass]
+          class_csb = csb[charclass] || {}
 
 
           value.each do |spell|
@@ -219,10 +219,10 @@ module AresMUSH
           magic = char.magic
           repertoire = magic.repertoire
 
-          class_rep = repertoire[charclass]
+          class_rep = repertoire[charclass] || {}
 
           value.each_pair do |level, spells|
-            splist = (class_rep[level] + spells).sort
+            splist = (Array(class_rep[level]) + Array(spells)).sort
 
             class_rep[level] = splist
           end
