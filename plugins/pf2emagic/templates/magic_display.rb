@@ -130,7 +130,8 @@ module AresMUSH
         list = []
 
         spell_list.each_pair do |level, splist|
-          list << "%b%b%xh#{level}%xn: #{splist.sort.join(", ")}"
+          display_level = spell_level_label(level)
+          list << "%b%b%xh#{display_level}%xn: #{splist.sort.join(", ")}"
         end
 
         "#{trad_string}#{list.join("%r")}"
@@ -152,14 +153,16 @@ module AresMUSH
         today_list = spells_today[charclass] || {}
 
         today_list.each_pair do |level, amt|
-          remaining << "%b%b%xh#{level}:%xn #{amt}"
+          display_level = spell_level_label(level)
+          remaining << "%b%b%xh#{display_level}:%xn #{amt}"
         end
 
         # Spell List Block
         splist_displ = []
 
         spell_list.each_pair do |level, splist|
-          splist_displ << "#{item_color}#{level.capitalize}:%xn #{splist.sort.join(", ")}"
+          display_level = spell_level_label(level)
+          splist_displ << "#{item_color}#{display_level}:%xn #{splist.sort.join(", ")}"
         end
 
         "#{trad_string}#{remaining_msg} #{remaining.join("%b%b")}%r%r%b%b#{splist_displ.join("%r%b%b")}"
@@ -196,6 +199,28 @@ module AresMUSH
         atk_bonus = amod + pbonus
 
         "%b%b#{item_color}#{name}%xn: %xhLevel%xn: #{level} %xhTradition%xn: #{trad} (#{p_short}) %xhBonus%xn: #{atk_bonus}"
+      end
+
+      def spell_level_label(level)
+        level_str = level.to_s
+        return 'Cantrip' if level_str.downcase == 'cantrip'
+
+        level_num = level_str.to_i
+        "#{ordinal(level_num)}-level"
+      end
+
+      def ordinal(number)
+        abs_num = number.to_i.abs
+        return "#{number}th" if (11..13).include?(abs_num % 100)
+
+        suffix = case abs_num % 10
+                 when 1 then 'st'
+                 when 2 then 'nd'
+                 when 3 then 'rd'
+                 else 'th'
+                 end
+
+        "#{number}#{suffix}"
       end
 
 

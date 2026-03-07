@@ -637,12 +637,9 @@ pf2e_feats:
       magic_stats:
         innate_spell:
           level: 4
-          name: Freedom of Movement
-          tradition: primal
-          cast_stat: Charisma
-        innate_spell:
-          level: 4
-          name: Stoneskin
+          name: 
+            - Freedom of Movement
+            - Stoneskin
           tradition: primal
           cast_stat: Charisma
     shortdesc: "You tap into the unstoppable, primeval strength of your ancient kin. You gain _freedom of movement_ and _stoneskin_ as 4th-level primal innate spells that you can cast once per day. As a 3-action activity, you can Cast a Spell twice to cast both of these innate spells, as long as they are both still available for the day."
@@ -965,12 +962,9 @@ pf2e_feats:
       magic_stats:
         innate_spell:
           level: 2
-          name: Faerie Fire
-          tradition: primal
-          cast_stat: Charisma
-        innate_spell:
-          level: 2
-          name: Invisibility
+          name: 
+            - Faerie Fire
+            - Invisibility
           tradition: primal
           cast_stat: Charisma
     shortdesc: Over time your fey magic has grown stronger. You gain faerie fire and invisibility as 2nd-level primal innate spells. You can cast each of these primal innate spells once per day.
@@ -2542,12 +2536,9 @@ pf2e_feats:
       magic_stats:
         innate_spell:
           level: 2
-          name: Humanoid Form
-          tradition: divine
-          cast_stat: Charisma
-        innate_spell:
-          level: 2
-          name: Remove Fear
+          name: 
+            - Humanoid Form
+            - Remove Fear
           tradition: divine
           cast_stat: Charisma
     shortdesc: You can tap into the magic of angels that runs through your blood. You can cast _humanoid form_ and _remove fear_ each once per day as 2nd-level divine innate spells.
@@ -2577,12 +2568,9 @@ pf2e_feats:
       magic_stats:
         innate_spell:
           level: 2
-          name: Continual Flame
-          tradition: divine
-          cast_stat: Charisma
-        innate_spell:
-          level: 2
-          name: Shield Other
+          name: 
+            - Continual Flame
+            - Shield Other
           tradition: divine
           cast_stat: Charisma
     shortdesc: You can tap into the heavenly magic that is your birthright. You can cast _continual flame_ and _shield other_ each once per day as 2nd-level divine innate spells.
@@ -2612,12 +2600,9 @@ pf2e_feats:
       magic_stats:
         innate_spell:
           level: 2
-          name: Glitterdust
-          tradition: divine
-          cast_stat: Charisma
-        innate_spell:
-          level: 2
-          name: Remove Paralysis
+          name: 
+            - Glitterdust
+            - Remove Paralysis
           tradition: divine
           cast_stat: Charisma
     shortdesc: Your lineage traces back to the azata, and you can harness their magic using this connection. You can cast glitterdust and remove paralysis each once per day as 2nd-level divine innate spells.
@@ -2688,24 +2673,16 @@ pf2e_feats:
       - Sildanyar
     traits:
       - aesa
-    magic:
-      grants:
-        magic_stats:
-          innate_spell:
-            level: 4
-            name: Neutralize Poison
-            tradition: divine
-            cast_stat: Charisma
-          innate_spell:
-            level: 4
-            name: Remove Curse
-            tradition: divine
-            cast_stat: Charisma
-          innate_spell:
-            level: 4
-            name: Remove Disease
-            tradition: divine
-            cast_stat: Charisma
+    grants:
+      magic_stats:
+        innate_spell:
+          level: 4
+          name: 
+            - Neutralize Poison
+            - Remove Curse
+            - Remove Disease
+          tradition: divine
+          cast_stat: Charisma
     shortdesc: "Your celestial powers allow you to remove lesser afflictions with ease. Each day, you can cast two 4th-level divine innate spells. You can choose from the following spells each time you cast: remove curse, remove disease, and neutralize poison."
     prereq:
       level: 13
@@ -3570,12 +3547,9 @@ pf2e_feats:
       magic_stats:
         innate_spell:
           level: 2
-          name: Animal Form
-          tradition: divine
-          cast_stat: Charisma
-        innate_spell:
-          level: 2
-          name: Obscuring Mist
+          name: 
+            - Animal Form
+            - Obscuring Mist
           tradition: divine
           cast_stat: Charisma
     shortdesc: You can tap into the magic that runs through your blood. You gain animal form (wolf only, using the statistics for a canine) and obscuring mist as 2nd-level divine innate spells. You can cast each of these spells once per day.
@@ -4042,7 +4016,9 @@ pf2e_feats:
       magic_stats:
         innate_spell:
           level: 2
-          name: Death Knell
+          name: 
+            - Death Knell
+            - False Life
           tradition: divine
           cast_stat: Charisma
     shortdesc: The magic of Abaddon runs through your blood, and you can wield that power. You can cast _death knell_ and _false life_ each once per day as 2nd-level divine innate spells.
@@ -4070,12 +4046,9 @@ pf2e_feats:
       magic_stats:
         innate_spell:
           level: 2
-          name: Paranoia
-          tradition: divine
-          cast_stat: Charisma
-        innate_spell:
-          level: 2
-          name: Shatter
+          name: 
+            - Paranoia
+            - Shatter
           tradition: divine
           cast_stat: Charisma
     shortdesc: You can channel the power of the Abyss through your heritage, producing terrible tangible effects. You can cast _paranoia_ and _shatter_ each once per day as 2nd-level divine innate spells.
@@ -4103,12 +4076,9 @@ pf2e_feats:
       magic_stats:
         innate_spell:
           level: 2
-          name: Invisibility
-          tradition: divine
-          cast_stat: Charisma
-        innate_spell:
-          level: 2
-          name: Misdirection
+          name: 
+            - Invisibility
+            - Misdirection
           tradition: divine
           cast_stat: Charisma
     shortdesc: Drawing on the infernal power of your sinister forbears, you mislead your foes with magical deception. You can cast _invisibility_ and _misdirection_ each once per day as 2nd-level divine innate spells.

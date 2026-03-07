@@ -280,9 +280,14 @@ module AresMUSH
           # Structure of innate spells: {spell name => { 'level' => <level>, 'tradition' => tradition, 'cast_stat' => cast_stat}}
 
           ilist = magic.innate_spells
-          key = value.delete('name')
+          names = Array(value['name'])
+          spell_data = value.reject { |k, _| k == 'name' }
 
-          ilist[key] = value
+          names.each do |spell_name|
+            next if spell_name.nil? || spell_name.empty?
+
+            ilist[spell_name] = spell_data
+          end
 
           magic.innate_spells = ilist
         when "divine_font"

@@ -455,8 +455,7 @@ module AresMUSH
       info.each_pair do |key, value|
         case key
         when 'magic_stats'
-          return_msg << "This feat grants magic."
-          Global.logger.debug "MERP THIS IS A LOGGER MESSAGE Processing magic_stats grant from feat."
+          return_msg << t('pf2e.feat_grants_magic')
           update = PF2Magic.update_magic(char, charclass, value, client)
           # Use core classes explicitly to avoid any constant shadowing.
           return_msg << update if update.is_a?(::String)
