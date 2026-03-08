@@ -125,6 +125,8 @@ module AresMUSH
         list = []
 
         @to_assign.each_pair do |key, value|
+          next if key == "signature"
+
           # Process according to the data type of the key.
           heading = key.gsub("charclass", "class feat").gsub("skill", "skill feat(s)").split("_").map {|word| word.capitalize}.join(" ")
 

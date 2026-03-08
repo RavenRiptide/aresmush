@@ -231,6 +231,19 @@ module AresMUSH
 
           magic.update(repertoire: repertoire)
         when "signature"
+          magic = char.magic
+          signatures = magic.signature_spells || {}
+          class_sigs = signatures[charclass] || {}
+
+          value.each_pair do |level, spells|
+            chosen = Array(spells).reject { |s| s.to_s.strip.empty? || s.to_s.downcase == 'open' }
+            next if chosen.empty?
+
+            class_sigs[level] = chosen
+          end
+
+          signatures[charclass] = class_sigs
+          magic.update(signature_spells: signatures)
         when "grants"
           value.each_pair do |feat, info|
             do_feat_grants(char, info, charclass, client)

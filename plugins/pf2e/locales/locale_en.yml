@@ -40,7 +40,7 @@ en:
     adv_item_feat: "You have a %{value} feat to select."
     adv_item_magic: "You need to make magic choices for your %{options}."
     adv_item_spells: "You need to choose spells for your %{options}."
-    adv_item_signaturespells: "You need to choose a signature spell."
+    adv_item_signaturespells: "You need to choose signature spell(s)."
     adv_item_grants: "Feat %{feat} grants something else that you need to choose."
     adv_item_other: "You have missed something that needs to be selected. Check 'advance/review'."
     adv_raise_selected: "You select %{name} to raise."

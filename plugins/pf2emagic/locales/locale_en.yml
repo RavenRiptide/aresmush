@@ -68,5 +68,7 @@ en:
     spellbook_title: "Spellbook for %{name}"
     repertoire_no_spells_at_level: "No spells at that level for this repertoire. Options: %{options}"
     repertoire_title: "Repertoire for %{name}"
+    signature_not_in_repertoire: "That spell is not in your repertoire at level %{level}."
+    signature_autoheighten_no_slots: "You have exhausted all %{level} spell slots for signature spell auto-heightening."
     repertoire_help: "See '%xhrepertoire%xn' for your repertoire spells."
     spellbook_help: "See '%xhspellbook%xn' for your spellbook spells."

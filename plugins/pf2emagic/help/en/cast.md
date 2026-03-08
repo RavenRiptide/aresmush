@@ -31,6 +31,15 @@ Focus spells: `cast/focus <casting class> = <spell name>/<target>`
 `<spell name>`: The spell name associated with the spell.
 `<target>`: The target(s) of the spell. This switch is optional.
 
+## Casting Signature Spells
+**Commands:**
+`cast/signature <casting class>/<level> = <spell name>/<target>`
+
+`<casting class>`: The character class associated with the spell.
+`<level>`: The level associated with the spell. This switch is optional, although omitting the switch will default to casting the signature spell at your highest available spell slot.
+`<spell name>`: The spell name associated with the spell.
+`<target>`: The target(s) of the spell. This switch is optional.
+
 ## Casting Innate Spells and Cantrips
 **Commands:**
 `cast/innate <tradition>/<level>=<spell name>/<target>`

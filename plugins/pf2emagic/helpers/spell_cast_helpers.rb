@@ -92,34 +92,97 @@ module AresMUSH
 
       base = spdeets['base_level'].to_i
 
-      splevel = level ? level : base
-
-      # If specified, level must be at least the base level of the spell. Level is an integer here.
-      return t('pf2emagic.invalid_level') if splevel < base
-
-      splevel = 'cantrip' if splevel.zero?
-
-      # Signature means that you can cast that spell at the level you know it at, at its base level, or any
-      # level in between.
       cc_spells = magic.spells_today
       cc_spells_2day = cc_spells[charclass]
       return t('pf2emagic.no_available_slots') unless cc_spells_2day
 
-      slots = cc_spells_2day[splevel]
-      return t('pf2emagic.no_available_slots') unless slots
+      auto_heighten = level.nil? && base > 0
 
-      signature_spells = magic.signature_spells[charclass]
-      lvceil = signature_spells.invert[spell_name]
+      if auto_heighten
+        castable_slot_levels = cc_spells_2day.keys
+                                          .map { |lv| lv.to_s.downcase == 'cantrip' ? 0 : lv.to_i }
+                                          .reject(&:zero?)
 
-      available = lvceil && splevel.to_i.between?(base, lvceil) && (slots > 0)
+        return t('pf2emagic.no_available_slots') if castable_slot_levels.empty?
+
+        highest_level = castable_slot_levels.max
+        highest_key = if cc_spells_2day.key?(highest_level.to_s)
+                        highest_level.to_s
+                      elsif cc_spells_2day.key?(highest_level)
+                        highest_level
+                      end
+
+        highest_slots = highest_key ? cc_spells_2day[highest_key].to_i : 0
+        if highest_slots <= 0
+          abs_level = highest_level.to_i.abs
+          suffix =  case abs_level % 10
+                    when 1 then 'st'
+                    when 2 then 'nd'
+                    when 3 then 'rd'
+                    else 'th'
+                   end
+          level_label = "#{highest_level}#{suffix}-level"
+
+          return t('pf2emagic.signature_autoheighten_no_slots', :level => level_label)
+        end
+
+        splevel = highest_level.to_s
+      else
+        splevel = level ? level.to_i : base
+
+        # If specified, level must be at least the base level of the spell. Level is an integer here.
+        return t('pf2emagic.invalid_level') if splevel < base
+
+        splevel = splevel.zero? ? 'cantrip' : splevel.to_s
+      end
+
+      # Signature means that you can cast that spell at the level you know it at, at its base level, or any
+      # level in between.
+      castable_levels = cc_spells_2day.keys
+                                 .map { |lv| lv.to_s.downcase == 'cantrip' ? 0 : lv.to_i }
+      max_castable_level = castable_levels.max || 0
+
+      signature_spells = magic.signature_spells[charclass] || {}
+
+      known_signature_levels = signature_spells.select do |_sig_level, sig_spells|
+        Array(sig_spells).include?(spname)
+      end.keys
+
+      is_signature_spell = !known_signature_levels.empty?
+
+      available = if splevel == 'cantrip'
+                    is_signature_spell && base.zero?
+                  else
+                    slot_key = if cc_spells_2day.key?(splevel)
+                                 splevel
+                               elsif cc_spells_2day.key?(splevel.to_i)
+                                 splevel.to_i
+                               end
+                    slots = slot_key ? cc_spells_2day[slot_key] : nil
+                    !slots.nil? && is_signature_spell && splevel.to_i.between?(base, max_castable_level) && (slots > 0)
+                  end
+
       return t('pf2emagic.invalid_signature_level') unless available
 
       # Do the cast and return a caster hash.
 
-      slots = slots - 1
-      cc_spells_2day[splevel] = slots
-      cc_spells[charclass] = cc_spells_2day
-      magic.update(spells_today: cc_spells)
+      if splevel == 'cantrip'
+        hlevel = get_auto_heighten_level(char).to_s
+        splevel = "cantrip/#{hlevel}"
+      else
+        slot_key = if cc_spells_2day.key?(splevel)
+                     splevel
+                   elsif cc_spells_2day.key?(splevel.to_i)
+                     splevel.to_i
+                   end
+        slots = slot_key ? cc_spells_2day[slot_key] : nil
+        return t('pf2emagic.no_available_slots') if slots.nil?
+
+        slots = slots - 1
+        cc_spells_2day[slot_key] = slots
+        cc_spells[charclass] = cc_spells_2day
+        magic.update(spells_today: cc_spells)
+      end
 
       caster_stats['spell level'] = splevel
       caster_stats['spell type'] = 'signature'
@@ -201,15 +264,46 @@ module AresMUSH
       return t('pf2emagic.invalid_level') if splevel < base
       
       splevel = splevel.zero? ? 'cantrip' : splevel.to_s
-      
-      # Got a spell open at that level?
+
+      # Spontaneous casters can cast a spell at a given level only if either:
+      # 1) They know that spell at that specific level in their repertoire, or
+      # 2) It is one of their signature spells and the requested level is valid.
       cc_spells = magic.spells_today
       cc_spells_2day = cc_spells[charclass]
       return t('pf2emagic.no_available_slots') unless cc_spells_2day
 
+      castable_levels = cc_spells_2day.keys
+                 .map { |lv| lv.to_s.downcase == 'cantrip' ? 0 : lv.to_i }
+      max_castable_level = castable_levels.max || 0
+
+      repertoire = magic.repertoire[charclass] || {}
+      known_at_level = Array(repertoire[splevel]).include?(spname) ||
+                       Array(repertoire[splevel.to_i]).include?(spname)
+
+      signature_spells = magic.signature_spells[charclass] || {}
+      known_signature_levels = signature_spells.select do |_sig_level, sig_spells|
+        Array(sig_spells).include?(spname)
+      end.keys
+
+      is_signature_spell = !known_signature_levels.empty?
+
+      valid_signature_level = if splevel == 'cantrip'
+                                is_signature_spell && base.zero?
+                              else
+                                is_signature_spell && splevel.to_i.between?(base, max_castable_level)
+                              end
+
+      can_cast_at_level = known_at_level || valid_signature_level
+      return t('pf2emagic.not_in_list') unless can_cast_at_level
+      
       # Slots are not neccessary for cantrips.
       if splevel != 'cantrip'
-        slots = cc_spells_2day[splevel]
+        slot_key = if cc_spells_2day.key?(splevel)
+                     splevel
+                   elsif cc_spells_2day.key?(splevel.to_i)
+                     splevel.to_i
+                   end
+        slots = slot_key ? cc_spells_2day[slot_key] : nil
         return t('pf2emagic.no_available_slots') unless slots
 
         available = (slots > 0)
@@ -223,7 +317,7 @@ module AresMUSH
         splevel = splevel + "/#{hlevel}"
       else
         slots = slots - 1
-        cc_spells_2day[splevel] = slots
+        cc_spells_2day[slot_key] = slots
         cc_spells[charclass] = cc_spells_2day
         magic.update(spells_today: cc_spells)
       end

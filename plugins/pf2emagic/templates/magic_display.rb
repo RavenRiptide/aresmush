@@ -87,11 +87,51 @@ module AresMUSH
       end
 
       def has_signature_spells
-        !(@magic.signature_spells.empty?)
+        signatures = @magic.signature_spells || {}
+
+        signatures.any? do |charclass, levels|
+          Pf2emagic.get_caster_type(charclass) == 'spontaneous' &&
+            levels.is_a?(Hash) &&
+            levels.values.any? { |spells| !Array(spells).empty? }
+        end
       end
 
       def signature_spells
+        signatures = @magic.signature_spells || {}
+        tradition = @magic.tradition || {}
+        list = []
 
+        signatures.keys.sort.each do |charclass|
+          next unless Pf2emagic.get_caster_type(charclass) == 'spontaneous'
+
+          sig_levels = signatures[charclass]
+          next unless sig_levels.is_a?(Hash)
+
+          sorted = Pf2emagic.sort_level_spell_list(sig_levels)
+          next if sorted.empty?
+
+          trad_info = tradition[charclass]
+          next unless trad_info
+
+          trad = Pf2e.pretty_string(trad_info[0])
+          prof = Pf2e.pretty_string(trad_info[1].slice(0).upcase)
+          atk = PF2Magic.get_spell_attack_bonus(@char, charclass)
+
+          sublist = []
+          sorted.each_pair do |level, spells|
+            next if Array(spells).empty?
+
+            display_level = spell_level_label(level)
+            sublist << "%b%b#{item_color}#{display_level}:%xn #{Array(spells).sort.join(", ")}"
+          end
+
+          next if sublist.empty?
+
+          header = "#{title_color}#{charclass}%xn: #{trad} (#{prof})%b%b%bBonus: #{atk}%r"
+          list << "#{header}#{sublist.join("%r")}"
+        end
+
+        list
       end
 
       def has_innate_spells

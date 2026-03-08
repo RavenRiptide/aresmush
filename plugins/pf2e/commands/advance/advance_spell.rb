@@ -79,6 +79,17 @@ module AresMUSH
 
         spell = choice[0]
 
+        if self.type == "signature"
+          repertoire = Pf2e.preview_repertoire(enactor)
+          rep_for_class = repertoire[charclass] || {}
+          rep_spells_at_level = Array(rep_for_class[level])
+
+          unless rep_spells_at_level.include?(spell)
+            client.emit_failure t('pf2emagic.signature_not_in_repertoire', :level => level)
+            return
+          end
+        end
+
         advancement = enactor.pf2_advancement
 
         # because Ruby is stupid and doesn't let you replace at an index directly.
@@ -90,7 +101,7 @@ module AresMUSH
         if self.type == "spellbook"
           to_assign[self.type] = list
           advancement[self.type] = list
-        elsif self.type == "repertoire"
+        elsif self.type == "repertoire" || self.type == "signature"
           type_option[level] = list
 
           to_assign[self.type] = type_option

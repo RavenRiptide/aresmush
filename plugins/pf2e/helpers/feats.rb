@@ -178,7 +178,8 @@ module AresMUSH
             msg << "ability#{i}" if char_score < minimum.to_i
           end
         when "skill"
-          char_prof = Pf2e.get_prof_bonus(char, Pf2eSkills.get_skill_prof(char, factor))
+          skill_prof = char.advancing ? Pf2e.preview_skill_prof(char, factor) : Pf2eSkills.get_skill_prof(char, factor)
+          char_prof = Pf2e.get_prof_bonus(char, skill_prof)
           min_prof = Pf2e.get_prof_bonus(char, minimum)
 
           msg << "skill" if char_prof < min_prof
@@ -197,7 +198,7 @@ module AresMUSH
           pool = magic.focus_pool['max']
           msg << "focus_pool" if pool.zero?
         when "feat"
-          feats = char.pf2_feats.values.flatten.map { |word| word.upcase }
+          feats = char.advancing ? Pf2e.preview_feat_names(char) : char.pf2_feats.values.flatten.map { |word| word.upcase }
           req = required.map { |word| word.upcase }
           
 
@@ -238,7 +239,7 @@ module AresMUSH
           
           msg << "alignment" unless required.include? alignment
         when "orfeat"
-          feats = char.pf2_feats.values.flatten.map { |word| word.upcase }
+          feats = char.advancing ? Pf2e.preview_feat_names(char) : char.pf2_feats.values.flatten.map { |word| word.upcase }
           req = required.map { |word| word.upcase }
 
           msg << "feat" unless req.any? { |f| feats.include? f }
@@ -254,7 +255,8 @@ module AresMUSH
           factor = string[0]
           minimum = string[1]
 
-          char_prof = Pf2e.get_prof_bonus(char, Pf2eSkills.get_skill_prof(char, factor))
+          skill_prof = char.advancing ? Pf2e.preview_skill_prof(char, factor) : Pf2eSkills.get_skill_prof(char, factor)
+          char_prof = Pf2e.get_prof_bonus(char, skill_prof)
           min_prof = Pf2e.get_prof_bonus(char, minimum)
 
           check << char_prof - min_prof

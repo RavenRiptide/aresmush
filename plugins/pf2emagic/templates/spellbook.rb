@@ -33,6 +33,7 @@ module AresMUSH
 
       def format_spell_list_block(key, value)
         charclass = value.is_a?(Array) ? @charclass : key
+        selected_level = value.is_a?(Array) ? key : nil
 
         section = []
         section << section_title(charclass)
@@ -46,6 +47,14 @@ module AresMUSH
 
         section << section_title("#{charclass} Spells Known")
         section << known_spells_block(key, value)
+
+        if show_signature_spells?(charclass)
+          signature_block = signature_spells_block(charclass, selected_level)
+          unless signature_block.empty?
+            section << section_title("#{charclass} Signature Spells")
+            section << signature_block
+          end
+        end
 
         section.join("%r")
       end
@@ -104,6 +113,30 @@ module AresMUSH
           spells = Array(spell_list).sort.join(", ")
           lines << "#{item_color}#{spellbook_level_label(level)}:%xn"
           lines << "%b%b#{spells}"
+        end
+
+        lines.join("%r")
+      end
+
+      def show_signature_spells?(charclass)
+        @title_key == 'pf2emagic.repertoire_title' && Pf2emagic.get_caster_type(charclass) == 'spontaneous'
+      end
+
+      def signature_spells_block(charclass, selected_level=nil)
+        signatures = @char.magic.signature_spells || {}
+        class_signatures = signatures[charclass] || {}
+
+        return '' unless class_signatures.is_a?(Hash)
+
+        sorted = Pf2emagic.sort_level_spell_list(class_signatures)
+        lines = []
+
+        sorted.each_pair do |level, spells|
+          next if selected_level && level.to_s != selected_level.to_s
+          next if Array(spells).empty?
+
+          lines << "#{item_color}#{spellbook_level_label(level)}:%xn"
+          lines << "%b%b#{Array(spells).sort.join(", ")}"
         end
 
         lines.join("%r")

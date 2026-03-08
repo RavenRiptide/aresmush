@@ -12,6 +12,12 @@
 <%= spell %>
 <% end -%>
 <% end %>
+<% if has_signature_spells %>
+<%= textline("Signature Spells") %>
+<% signature_spells.each do |spell| -%>
+<%= spell %>
+<% end -%>
+<% end %>
 <% if has_innate_spells %>
 <%= textline("Innate Spells") %>
 <% innate_spells.each do |spell| -%>

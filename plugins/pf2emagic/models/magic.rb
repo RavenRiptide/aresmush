@@ -58,10 +58,12 @@ module AresMUSH
           ary = Array.new(value, "open")
 
           magic_options["spellbook"] = ary
-        when "signature_spell"
+        when "signature_spell", "signature_spells"
           # This key means that the character needs to pick a spell from their repertoire as a signature spell.
           # Structure of value: { level to pick from => number of spells to add }
           # Use to_assign["signature"]
+
+          magic_stats["signature_spells"] = value
 
           assignment_list = {}
           value.each_pair do |level, num|
@@ -276,7 +278,7 @@ module AresMUSH
 
           spellbook[charclass] = csb
           magic.spellbook = spellbook
-        when "signature_spell"
+        when "signature_spell", "signature_spells"
           # This key means that the character needs to pick a spell from their repertoire as a signature spell.
           # Structure of value: { level to pick from => number of spells to add }
           # Use to_assign["signature"]
