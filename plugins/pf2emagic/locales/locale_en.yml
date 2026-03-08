@@ -4,8 +4,8 @@ en:
     cant_cast_as_class: "Cannot cast magic as the specified class."
     cant_prepare_trad: "Cannot prepare that spell as a %{cc}."
     cant_prepare_level: "The base level of the spell is higher than the level you specified."
-    cant_refocus_pool: "Your current focus pool must be empty to refocus."
-    cant_refocus_time: "You last refocused at %{time} and can only refocus once per hour. Wait longer."
+    cant_refocus_pool: "Your current focus pool must be less than its maximum number of focus points to refocus."
+    cant_refocus_time: "You last refocused at %{time} (local time) and can only refocus once per hour. Wait longer."
     cg_magic_ok: "%xgNo issues seen with magic options.%xn"
     cg_rep_spells: "%xcYou have repertoire spells. Left to choose: %{rcount}%xn"
     cg_spell_select_ok: "Spell added successfully."
@@ -47,7 +47,8 @@ en:
     not_spellbook_eligible: "This spell is a focus or class spell and cannot be added to a spellbook or repertoire."
 
     prepared_spells_title: "Spells Prepared for %{name}"
-    refocus_ok: "You refocus yourself and refresh your focus pool."
+    refocus_ok_one: "You refocus yourself and restore %{points} Focus Point."
+    refocus_ok_many: "You refocus yourself and restore %{points} Focus Points."
     revelation_locked: "%xrYour revelation spells are currently locked by your curse.%xn"
 
     specify_level: "You have that spell prepared at more than one level. Specify which level to replace."

@@ -36,7 +36,10 @@ module AresMUSH
 
           if caster_type == 'prepared'
             # Can be blank prior to first rest.
-            spell_list = spells_today[charclass] || {}
+            prepared_spells = @magic.spells_prepared || {}
+            spell_list = spells_today[charclass]
+            spell_list = prepared_spells[charclass] if spell_list.nil? || spell_list.empty?
+            spell_list ||= {}
 
             spell_list = Pf2emagic.sort_level_spell_list(spell_list) unless spell_list.empty?
 
@@ -60,7 +63,7 @@ module AresMUSH
         focus_spells = @magic.focus_spells
         focus_cantrips = @magic.focus_cantrips
 
-        !((focus_spells.keys + focus_cantrips.keys).empty?)
+        (focus_spells.values + focus_cantrips.values).any? { |list| !Array(list).empty? }
       end
 
       def focus_spells
@@ -72,6 +75,9 @@ module AresMUSH
         focus_cantrips = @magic.focus_cantrips
 
         fs = (focus_spells.keys + focus_cantrips.keys).uniq.sort
+        fs = fs.select do |focus_type|
+          !Array(focus_spells[focus_type]).empty? || !Array(focus_cantrips[focus_type]).empty?
+        end
 
         list = []
         fs.each do |fs|
@@ -123,18 +129,21 @@ module AresMUSH
         trad = Pf2e.pretty_string(trad_info[0])
         prof = Pf2e.pretty_string(trad_info[1].slice(0).upcase)
         atk = PF2Magic.get_spell_attack_bonus(char, charclass)
+        focus_pool = format_focus_pool(charclass)
+        stat_block_break = focus_pool.empty? ? "%r%r" : "%r"
 
-        trad_string = "#{title_color}#{charclass}%xn: #{trad} (#{prof})%b%b%bBonus: #{atk}%r%r"
+        trad_string = "#{title_color}#{charclass}%xn: #{trad} (#{prof})%b%b%bBonus: #{atk}#{stat_block_break}"
 
         # Spell List Block
         list = []
+        prepared_msg = "#{item_color}Prepared Spells Remaining:%xn"
 
         spell_list.each_pair do |level, splist|
           display_level = spell_level_label(level)
-          list << "%b%b%xh#{display_level}%xn: #{splist.sort.join(", ")}"
+          list << "%b%b#{item_color}#{display_level}:%xn #{splist.sort.join(", ")}"
         end
 
-        "#{trad_string}#{list.join("%r")}"
+        "#{trad_string}#{focus_pool}#{prepared_msg}%r#{list.join("%r")}"
       end
 
       def format_spont_spells(char, charclass, spell_list, spells_today, trad_info)
@@ -142,12 +151,14 @@ module AresMUSH
         trad = Pf2e.pretty_string(trad_info[0])
         prof = Pf2e.pretty_string(trad_info[1].slice(0).upcase)
         atk = PF2Magic.get_spell_attack_bonus(char, charclass)
+        focus_pool = format_focus_pool(charclass)
+        stat_block_break = focus_pool.empty? ? "%r%r" : "%r"
 
-        trad_string = "#{title_color}#{charclass}%xn: #{trad} (#{prof})%b%b%bBonus: #{atk}%r%r"
+        trad_string = "#{title_color}#{charclass}%xn: #{trad} (#{prof})%b%b%bBonus: #{atk}#{stat_block_break}"
 
         # Spells Remaining Block
         remaining = []
-        remaining_msg = "#{item_color}Remaining Today:%xn"
+        remaining_msg = "#{item_color}Remaining Spell Slots Today:%xn"
 
         # Spells_today can be an empty hash prior to first rest / approval.
         today_list = spells_today[charclass] || {}
@@ -165,7 +176,26 @@ module AresMUSH
           splist_displ << "#{item_color}#{display_level}:%xn #{splist.sort.join(", ")}"
         end
 
-        "#{trad_string}#{remaining_msg} #{remaining.join("%b%b")}%r%r%b%b#{splist_displ.join("%r%b%b")}"
+        "#{trad_string}#{focus_pool}#{remaining_msg} #{remaining.join("%b%b")}%r%r%b%b#{splist_displ.join("%r%b%b")}"
+      end
+
+      def format_focus_pool(charclass)
+        focus_type = Global.read_config('pf2e_magic', 'focus_type_by_class', charclass)
+        return '' unless focus_type
+
+        focus_spells = @magic.focus_spells || {}
+        focus_cantrips = @magic.focus_cantrips || {}
+        has_focus_magic = !Array(focus_spells[focus_type]).empty? || !Array(focus_cantrips[focus_type]).empty?
+
+        return '' unless has_focus_magic
+
+        focus_pool = @magic.focus_pool || {}
+        max = focus_pool['max'].to_i
+        current = focus_pool['current'].to_i
+
+        return '' if max.zero? && current.zero?
+
+        "#{item_color}Focus Points:%xn #{max}%r%r#{item_color}Remaining Focus Points:%xn #{current}%r"
       end
 
       def format_focus_spells(char, charclass, fstype, trad_info, spell_list=nil, cantrip_list=nil)
@@ -178,9 +208,9 @@ module AresMUSH
 
         # Spell List Block
 
-        cantrips = cantrip_list ? "%b%b#{item_color}Cantrips (#{fstype.capitalize}):%xn #{cantrip_list.sort.join(", ")}%r" : ""
+        cantrips = !Array(cantrip_list).empty? ? "%b%b#{item_color}Cantrips (#{fstype.capitalize}):%xn #{cantrip_list.sort.join(", ")}%r" : ""
 
-        spells = spell_list ? "%b%b#{item_color}Focus Spells (#{fstype.capitalize}):%xn #{spell_list.sort.join(", ")}" : ""
+        spells = !Array(spell_list).empty? ? "%b%b#{item_color}Focus Spells (#{fstype.capitalize}):%xn #{spell_list.sort.join(", ")}" : ""
 
         "#{trad_string}#{cantrips}#{spells}"
       end

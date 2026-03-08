@@ -135,8 +135,21 @@ module AresMUSH
         when "focus_pool"
           pool = magic.focus_pool
 
+          old_max_pool = pool["max"].to_i
+          old_current_pool = pool["current"].to_i
+
           new_max_pool = Pf2emagic.get_max_focus_pool(char, value)
           pool["max"] = new_max_pool
+
+          new_current_pool = if old_max_pool.zero? && old_current_pool.zero?
+                               new_max_pool
+                             elsif old_current_pool == old_max_pool
+                               new_max_pool
+                             else
+                               [ old_current_pool, new_max_pool ].min
+                             end
+
+          pool["current"] = new_current_pool
           magic.focus_pool = pool
         when "addrepertoire"
           # This key is called for spells added to the repertoire by bloodlines, mysteries, etc.

@@ -20,6 +20,10 @@ module AresMUSH
       return t('pf2e.multiple_matches', :element => 'spell') if spname.size > 1
 
       spname = spname.first
+      spdeets = Global.read_config('pf2e_spells', spname)
+      base = spdeets ? spdeets['base_level'].to_i : 0
+      hlevel = get_auto_heighten_level(char)
+      splevel = [ base, hlevel ].max.to_s
 
       # Do they have any focus points left in their pool?
       fpool = magic.focus_pool
@@ -35,6 +39,7 @@ module AresMUSH
       magic.update(focus_pool: fpool)
 
       caster_stats['focus type'] = focus_type
+      caster_stats['spell level'] = splevel
       caster_stats['spell type'] = 'focus'
       caster_stats['targets'] = target_list unless target_list.empty?
       caster_stats['spell name'] = spname
@@ -58,7 +63,11 @@ module AresMUSH
 
       spname = spname.first
 
+      hlevel = get_auto_heighten_level(char).to_s
+      splevel = "cantrip/#{hlevel}"
+
       caster_stats['focus type'] = focus_type
+      caster_stats['spell level'] = splevel
       caster_stats['spell type'] = 'focus cantrip'
       caster_stats['targets'] = target_list unless target_list.empty?
       caster_stats['spell name'] = spname
@@ -265,7 +274,13 @@ module AresMUSH
 
       # Spell type is either specified in the switch or determined by character class.
       # Note: This function assumes and expects that charclass is passed as titlecase.
-      spell_type = switch ? switch : Pf2emagic.get_caster_type(charclass)
+      spell_type = if switch
+                     switch
+                   elsif charclass.to_s.downcase == 'innate'
+                     'innate'
+                   else
+                     Pf2emagic.get_caster_type(charclass)
+                   end
 
       return t('pf2emagic.not_casting_class', :cc => charclass) unless spell_type
 
