@@ -41,6 +41,12 @@ module AresMUSH
       level = level.to_s
       level = 'cantrip' if level.downcase == 'cantrip' || level.to_i.zero?
 
+      is_cantrip_spell = spell_level.to_i.zero?
+      is_cantrip_level = (level == 'cantrip')
+
+      return t('pf2emagic.cant_prepare_cantrip_slot') if is_cantrip_spell && !is_cantrip_level
+      return t('pf2emagic.cant_prepare_level') if !is_cantrip_spell && is_cantrip_level
+
       return t('pf2emagic.cant_prepare_level') if (spell_level.to_i > level.to_i)
 
       needs_spellbook = spell_details['traits'].intersect?(['rare', 'uncommon', 'unique'])
