@@ -371,6 +371,7 @@ pf2e_class:
         - open
         - open
       magic_stats:
+        spell_abil: Charisma
         tradition:
           occult: trained
         spells_per_day:
