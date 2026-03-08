@@ -87,9 +87,6 @@ module AresMUSH
       # Did they do this already?
       return t('pf2e.cg_locked', :cp => 'base options') if enactor.pf2_baseinfo_locked
 
-      # Take a snapshot prior to calculations for a later restore
-      Pf2e.record_checkpoint(enactor, 'info')
-
       # Gather information.
       base_info = enactor.pf2_base_info
       ancestry = base_info['ancestry']
@@ -103,6 +100,10 @@ module AresMUSH
       cg_errors = Pf2e.chargen_messages(ancestry, heritage, background, charclass, subclass, faith_info, subclass_option)
 
       return t('pf2e.cg_issues') if cg_errors
+
+      # Take a snapshot prior to calculations for a later restore.
+      # This must happen after validation so failed commit attempts don't advance checkpoints.
+      Pf2e.record_checkpoint(enactor, 'info')
 
       # Create abilities. Might already exist if the character reset, so check for that.
 
