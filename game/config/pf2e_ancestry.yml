@@ -5,210 +5,210 @@ pf2e_ancestry:
     Size: M
     Speed: 25
     abl_boosts:
-    - open
-    - open
+      - open
+      - open
     languages:
-    - Kamin
-    - Yrch
+      - Kamin
+      - Yrch
     traits:
-    - arvek
-    - humanoid
+      - arvek
+      - humanoid
     special:
-    - darkvision
+      - darkvision
     heritages:
-    - Aesa
-    - Ashen One
-    - Changeling
-    - Dar
-    - Elfbane
-    - Ghaluch
-    - Niasa
-    - Runtboss
-    - Silyara
-    - Smokeworker
-    - Warmarch
-    - Warrenbred
+      - Aesa
+      - Ashen One
+      - Changeling
+      - Dar
+      - Elfbane
+      - Ghaluch
+      - Niasa
+      - Runtboss
+      - Silyara
+      - Smokeworker
+      - Warmarch
+      - Warrenbred
     feats:
       1:
-      - Alchemical Scholar
-      - Arvek Lore
-      - Arvek Weapon Familiarity
-      - Leech-Clipper
-      - Remorseless Lash
-      - Vigorous Health
+        - Alchemical Scholar
+        - Arvek Lore
+        - Arvek Weapon Familiarity
+        - Leech-Clipper
+        - Remorseless Lash
+        - Vigorous Health
       5:
-      - Agonizing Rebuke
-      - Arvek Weapon Discipline
-      - Expert Drill Sergeant
-      - Formation Training
+        - Agonizing Rebuke
+        - Arvek Weapon Discipline
+        - Expert Drill Sergeant
+        - Formation Training
       9:
-      - Pride In Arms
+        - Pride In Arms
       13:
-      - Arvek Weapon Expertise
-      - Formation Master
+        - Arvek Weapon Expertise
+        - Formation Master
   Bassin:
     HP: 6
     Size: S
     Speed: 25
     abl_boosts:
-    - open
-    - open
+      - open
+      - open
     languages:
-    - Kamin
-    - Bassini
+      - Kamin
+      - Bassini
     traits:
-    - bassin
-    - humanoid
+      - bassin
+      - humanoid
     special:
-    - keen eyes
+      - keen eyes
     heritages:
-    - Aesa
-    - Ashen One
-    - Changeling
-    - Dar
-    - Ghaluch
-    - Gutsy
-    - Hillock
-    - Jinxed-bassin
-    - Niasa
-    - Nomadic
-    - Silyara
-    - Twilight
-    - Wildwood
+      - Aesa
+      - Ashen One
+      - Changeling
+      - Dar
+      - Ghaluch
+      - Gutsy
+      - Hillock
+      - Jinxed-bassin
+      - Niasa
+      - Nomadic
+      - Silyara
+      - Twilight
+      - Wildwood
     feats:
       1:
-      - Bassin Lore
-      - Bassin Luck
-      - Bassin Weapon Familiarity
-      - Distracting Shadows
-      - Folksy Patter
-      - Prairie Rider
-      - Sure Feet
-      - Titan Slinger
-      - Unfettered Bassin
-      - Watchful Bassin
+        - Bassin Lore
+        - Bassin Luck
+        - Bassin Weapon Familiarity
+        - Distracting Shadows
+        - Folksy Patter
+        - Prairie Rider
+        - Sure Feet
+        - Titan Slinger
+        - Unfettered Bassin
+        - Watchful Bassin
       5:
-      - Bassin Weapon Trickster
-      - Cultural Adaptability
-      - Step Lively
+        - Bassin Weapon Trickster
+        - Cultural Adaptability
+        - Step Lively
       9:
-      - Dance Underfoot
-      - Guiding Luck
-      - Irrepressible
-      - Unhampered Passage
+        - Dance Underfoot
+        - Guiding Luck
+        - Irrepressible
+        - Unhampered Passage
       13:
-      - Ceaseless Shadows
-      - Bassin Weapon Expertise
-      - Toppling Dance
+        - Ceaseless Shadows
+        - Bassin Weapon Expertise
+        - Toppling Dance
       17:
-      - Shadow Self
+        - Shadow Self
   Ciith:
     HP: 8
     Size: M
     Speed: 25
     abl_boosts:
-    - open
-    - open
+      - open
+      - open
     languages:
-    - Kamin
-    - Am'sheran Draconic
+      - Kamin
+      - Am'sheran Draconic
     traits:
-    - ciith
-    - humanoid
+      - ciith
+      - humanoid
     attack:
       Claws:
         damage: d4
         damage_type: S
         traits:
-        - agile
-        - finesse
-        - unarmed
+          - agile
+          - finesse
+          - unarmed
     bonus_feats:
-    - Breath Control
+      - Breath Control
     heritages:
-    - Aesa
-    - Ahcan
-    - Ashen One
-    - Changeling
-    - Dar
-    - Makar
-    - Niasa
-    - Paeezh
-    - Pantli
-    - Xalli
+      - Aesa
+      - Ahcan
+      - Ashen One
+      - Changeling
+      - Dar
+      - Makar
+      - Niasa
+      - Paeezh
+      - Pantli
+      - Xalli
     feats:
       1:
-      - Ciith Lore
-      - Marsh Runner
-      - Parthenogenic Hatchling
-      - Razor Claws
-      - Reptile Speaker
-      - Sharp Fangs
-      - Tail Whip
+        - Ciith Lore
+        - Marsh Runner
+        - Parthenogenic Hatchling
+        - Razor Claws
+        - Reptile Speaker
+        - Sharp Fangs
+        - Tail Whip
       5:
-      - Ciith Unarmed Cunning
-      - Envenom Fangs
-      - Gecko's Grip
-      - Shed Tail
-      - Swift Swimmer
+        - Ciith Unarmed Cunning
+        - Envenom Fangs
+        - Gecko's Grip
+        - Shed Tail
+        - Swift Swimmer
       9:
-      - Terrain Advantage
+        - Terrain Advantage
       13:
-      - Primal Rampage
+        - Primal Rampage
   Egalrin:
     HP: 6
     Size: M
     Speed: 25
     abl_boosts:
-    - open
-    - open
+      - open
+      - open
     languages:
-    - Kamin
-    - Kaminean
+      - Kamin
+      - Kaminean
     traits:
-    - egalrin
-    - humanoid
+      - egalrin
+      - humanoid
     special:
-    - Low-Light Vision
+      - Low-Light Vision
     attack:
       Beak:
         damage: d6
         damage_type: P
         group: brawling
         traits:
-        - finesse
-        - unarmed
+          - finesse
+          - unarmed
     heritages:
-    - Aesa
-    - Ashen One
-    - Changeling
-    - Dar
-    - Jinxed-egalrin
-    - Mountainkeeper
-    - Niasa    
-    - Skyborn
-    - Stormtossed
-    - Taloned
+      - Aesa
+      - Ashen One
+      - Changeling
+      - Dar
+      - Jinxed-egalrin
+      - Mountainkeeper
+      - Niasa    
+      - Skyborn
+      - Stormtossed
+      - Taloned
     feats:
       1:
-      - Egalrin Lore
-      - Egalrin Weapon Familiarity
-      - Scavenger's Search
-      - Squawk!
-      - Storm's Lash
+        - Egalrin Lore
+        - Egalrin Weapon Familiarity
+        - Scavenger's Search
+        - Squawk!
+        - Storm's Lash
       5:
-      - Eat Fortune
-      - Egalrin Weapon Study
-      - Long-Nosed Form
-      - Magpie Snatch
-      - One-Toed Hop
+        - Eat Fortune
+        - Egalrin Weapon Study
+        - Long-Nosed Form
+        - Magpie Snatch
+        - One-Toed Hop
       9:
-      - Eclectic Sword Training
-      - Soaring Flight
+        - Eclectic Sword Training
+        - Soaring Flight
       13:
-      - Egalrin Weapon Expertise
+        - Egalrin Weapon Expertise
       17:
-      - Great Egalrin Form
+        - Great Egalrin Form
   Goblin:
     HP: 6
     Size: S
@@ -239,31 +239,31 @@ pf2e_ancestry:
       - Unbreakable
     feats:
       1:
-      - Burn It!
-      - City Scavenger
-      - Extra Squishy
-      - Goblin Lore
-      - Goblin Scuttle
-      - Goblin Song
-      - Goblin Weapon Familiarity
-      - Junk Tinker
-      - Rough Rider
-      - Twitchy
-      - Very Sneaky
+        - Burn It!
+        - City Scavenger
+        - Extra Squishy
+        - Goblin Lore
+        - Goblin Scuttle
+        - Goblin Song
+        - Goblin Weapon Familiarity
+        - Junk Tinker
+        - Rough Rider
+        - Twitchy
+        - Very Sneaky
       5:
-      - Goblin Weapon Frenzy
-      - Kneecap
-      - Loud Singer
-      - Vandal
+        - Goblin Weapon Frenzy
+        - Kneecap
+        - Loud Singer
+        - Vandal
       9:
-      - Cave Climber
-      - Cling
-      - Skittering Scuttle
+        - Cave Climber
+        - Cling
+        - Skittering Scuttle
       13:
-      - Goblin Weapon Expertise
-      - Very, Very Sneaky
+        - Goblin Weapon Expertise
+        - Very, Very Sneaky
       17:
-      - Reckless Abandon (Goblin)
+        - Reckless Abandon (Goblin)
   Gnome:
     HP: 8
     Size: S
@@ -297,30 +297,30 @@ pf2e_ancestry:
       - Wellspring (Occult)
     feats:
       1:
-      - Animal Accomplice
-      - Burrow Elocutionist
-      - Empathetic Plea
-      - Fey Fellowship
-      - First World Magic
-      - Gnome Obsession
-      - Gnome Weapon Familiarity
-      - Illusion Sense
-      - Razzle-Dazzle
+        - Animal Accomplice
+        - Burrow Elocutionist
+        - Empathetic Plea
+        - Fey Fellowship
+        - First World Magic
+        - Gnome Obsession
+        - Gnome Weapon Familiarity
+        - Illusion Sense
+        - Razzle-Dazzle
       5:
-      - Animal Elocutionist
-      - Energized Font
-      - Gnome Weapon Innovator
-      - Project Persona
+        - Animal Elocutionist
+        - Energized Font
+        - Gnome Weapon Innovator
+        - Project Persona
       9:
-      - Cautious Curiosity
-      - First World Adept
-      - Life Leap
-      - Vivacious Conduit
+        - Cautious Curiosity
+        - First World Adept
+        - Life Leap
+        - Vivacious Conduit
       13:
-      - Gnome Weapon Expertise
-      - Instinctive Obfuscation
+        - Gnome Weapon Expertise
+        - Instinctive Obfuscation
       17:
-      - Homeward Bound
+        - Homeward Bound
   Human:
     HP: 8
     Size: M
@@ -346,30 +346,30 @@ pf2e_ancestry:
       - Versatile
     feats:
       1:
-      - Adapted Cantrip
-      - Cooperative Nature
-      - General Training
-      - Haughty Obstinacy
-      - Natural Ambition
-      - Natural Skill
-      - Unconventional Weaponry
+        - Adapted Cantrip
+        - Cooperative Nature
+        - General Training
+        - Haughty Obstinacy
+        - Natural Ambition
+        - Natural Skill
+        - Unconventional Weaponry
       5:
-      - Adaptive Adept
-      - Clever Improviser
-      - Sense Allies
+        - Adaptive Adept
+        - Clever Improviser
+        - Sense Allies
       9:
-      - Cooperative Soul
-      - Group Aid
-      - Hardy Traveler
-      - Incredible Improvisation
-      - Multitalented
+        - Cooperative Soul
+        - Group Aid
+        - Hardy Traveler
+        - Incredible Improvisation
+        - Multitalented
       13:
-      - Advanced General Training
-      - Bounce Back
-      - Stubborn Persistence
-      - Unconventional Expertise
+        - Advanced General Training
+        - Bounce Back
+        - Stubborn Persistence
+        - Unconventional Expertise
       17:
-      - Heroic Presence
+        - Heroic Presence
   Kailli:
     HP: 6
     Size: S
@@ -391,8 +391,8 @@ pf2e_ancestry:
         damage_type: P
         group: brawling
         traits:
-        - agile
-        - finesse
+          - agile
+          - finesse
     heritages:
       - Aesa
       - Ashen One
@@ -406,24 +406,24 @@ pf2e_ancestry:
       - Shadow
     feats:
       1:
-      - Cheek Pouches
-      - Pack Rat
-      - Rat Familiar
-      - Kailli Lore
-      - Ratspeak
-      - Tinkering Fingers
-      - Vicious Incisors
-      - Warren Navigator
+        - Cheek Pouches
+        - Pack Rat
+        - Rat Familiar
+        - Kailli Lore
+        - Ratspeak
+        - Tinkering Fingers
+        - Vicious Incisors
+        - Warren Navigator
       5:
-      - Lab Rat
-      - Quick Stow (Kailli)
-      - Rat Magic
+        - Lab Rat
+        - Quick Stow (Kailli)
+        - Rat Magic
       9:
-      - Big Mouth
-      - Overcrowd
-      - Rat Form
+        - Big Mouth
+        - Overcrowd
+        - Rat Form
       13:
-      - Warren Digger
+        - Warren Digger
   Khazad:
     HP: 10
     Size: M
@@ -454,30 +454,30 @@ pf2e_ancestry:
       - Strong-Blooded
     feats:
       1:
-      - Eye For Treasure
-      - Khazadi Doughtiness
-      - Khazadi Lore
-      - Khazadi Weapon Familiarity
-      - Rock Runner
-      - Stonecunning
-      - Unburdened Iron
+        - Eye For Treasure
+        - Khazadi Doughtiness
+        - Khazadi Lore
+        - Khazadi Weapon Familiarity
+        - Rock Runner
+        - Stonecunning
+        - Unburdened Iron
       5:
-      - Boulder Roll
-      - Defy the Darkness
-      - Khazadi Reinforcement
-      - Khazadi Weapon Cunning
-      - Sheltering Slab
+        - Boulder Roll
+        - Defy the Darkness
+        - Khazadi Reinforcement
+        - Khazadi Weapon Cunning
+        - Sheltering Slab
       9:
-      - Echoes in Stone
-      - Mountain's Stoutness
-      - Returning Throw
-      - Stone Bones
-      - Stonewalker
+        - Echoes in Stone
+        - Mountain's Stoutness
+        - Returning Throw
+        - Stone Bones
+        - Stonewalker
       13:
-      - Khazadi Weapon Expertise
-      - Telluric Power
+        - Khazadi Weapon Expertise
+        - Telluric Power
       17:
-      - Stonegate
+        - Stonegate
   Oruch:
     HP: 10
     Size: M
@@ -506,30 +506,30 @@ pf2e_ancestry:
       - Rainfall
     feats:
       1:
-      - Beast Trainer
-      - Iron Fists
-      - Oruch Ferocity
-      - Oruch Lore
-      - Oruch Superstition
-      - Oruch Weapon Familiarity
-      - Tusks
+        - Beast Trainer
+        - Iron Fists
+        - Oruch Ferocity
+        - Oruch Lore
+        - Oruch Superstition
+        - Oruch Weapon Familiarity
+        - Tusks
       5:
-      - Athletic Might
-      - Bloody Blows
-      - Hold Mark
-      - Oruch Weapon Carnage
-      - Victorious Vigor
+        - Athletic Might
+        - Bloody Blows
+        - Hold Mark
+        - Oruch Weapon Carnage
+        - Victorious Vigor
       9:
-      - "Death's Drums"
-      - Pervasive Superstition
-      - Undying Ferocity
+        - "Death's Drums"
+        - Pervasive Superstition
+        - Undying Ferocity
       13:
-      - Ferocious Beasts
-      - Incredible Ferocity
-      - Oruch Weapon Expertise
-      - Spell Devourer
+        - Ferocious Beasts
+        - Incredible Ferocity
+        - Oruch Weapon Expertise
+        - Spell Devourer
       17:
-      - Rampaging Ferocity
+        - Rampaging Ferocity
   Sildanyar:
     HP: 6
     Size: M
@@ -559,29 +559,29 @@ pf2e_ancestry:
       - Woodland
     feats:
       1:
-      - Ancestral Linguistics
-      - Ancestral Longevity
-      - Forlorn
-      - Know Your Own
-      - Nimble Sil
-      - Otherworldly Magic
-      - Sildanyari Aloofness
-      - Sildanyari Lore
-      - Sildanyari Weapon Familiarity
-      - Unwavering Mien
+        - Ancestral Linguistics
+        - Ancestral Longevity
+        - Forlorn
+        - Know Your Own
+        - Nimble Sil
+        - Otherworldly Magic
+        - Sildanyari Aloofness
+        - Sildanyari Lore
+        - Sildanyari Weapon Familiarity
+        - Unwavering Mien
       5:
-      - Ageless Patience
-      - Ancestral Suspicion
-      - Martial Experience
-      - Sildanyari Weapon Elegance
+        - Ageless Patience
+        - Ancestral Suspicion
+        - Martial Experience
+        - Sildanyari Weapon Elegance
       9:
-      - Expert Longevity
-      - Otherworldly Acumen
-      - Sildanyar Step
-      - Tree Climber (Sildanyar)
+        - Expert Longevity
+        - Otherworldly Acumen
+        - Sildanyar Step
+        - Tree Climber (Sildanyar)
       13:
-      - Avenge Ally
-      - Sildanyari Weapon Expertise
-      - Universal Longevity
+        - Avenge Ally
+        - Sildanyari Weapon Expertise
+        - Universal Longevity
       17:
-      - Magic Rider
+        - Magic Rider
