@@ -14,7 +14,7 @@ Some classes record spells and cantrips in a spellbook, or otherwise 'prepare' s
 **Important!** After preparing spells, input `rest` to refresh your spells and make them available for casting. See `help rest` for more information.
 
 **Commands**:
-`prepare <caster class>/<level> = <spell name>`: Prepares `<spell name>` at the defined level, optionally at a higher `<level>` than its default level. Preparing at a higher level than a spell's base level heightens the spell to that level. (You can't prepare a spell lower than its default level.)
+`prepare <caster class>/<level> = <spell name>`: Prepares `<spell name>` at the defined level, optionally at a higher `<level>` than its default level. Preparing at a higher level than a spell's base level heightens the spell to that level. (You can't prepare a spell lower than its default level.) Omitting the `<level>` switch will prepare the spell at its base level.
 `unprepare <caster class>/<level> = <spell name>`: Removes `<spell name>` at the defined `<level>` from your prepared list.
 `prepare <caster class>/<cantrip> = <spell name>`: Prepares the cantrip `<spell name>`.
 `unprepare <caster class>/<cantrip> = <spell name>`: Removes the cantrip `<spell name>` from your prepared list.

@@ -258,6 +258,23 @@ module AresMUSH
 
       # Innate spells are structured a little differently and may overwrite base caster stats.
       spinfo = innate_spells[spname]
+
+      level = spinfo['level'].to_s
+      if level.downcase != 'cantrip' && level.to_i > 0
+        cc_spells = magic.spells_today || {}
+        innate_today = cc_spells['innate'] || {}
+        level_uses = innate_today[level] || []
+
+        use_index = level_uses.index(spname)
+        return t('pf2emagic.no_available_slots') unless use_index
+
+        level_uses.delete_at(use_index)
+        innate_today[level] = level_uses
+        cc_spells['innate'] = innate_today
+
+        magic.update(spells_today: cc_spells)
+      end
+
       caster_stats['tradition'] = spinfo['tradition']
       caster_stats['spell level'] = spinfo['level']
       caster_stats['spell type'] = 'innate'

@@ -116,6 +116,27 @@ module AresMUSH
         list
       end
 
+      def innate_remaining_spells_today
+        spells_today = @magic.spells_today || {}
+        innate_today = spells_today['innate'] || {}
+
+        return "%r#{item_color}Remaining Innate Spells Today:%xn None" if innate_today.empty?
+
+        grouped = Pf2emagic.sort_level_spell_list(innate_today)
+        list = []
+
+        grouped.each_pair do |level, spells|
+          next if Array(spells).empty?
+
+          display_level = spell_level_label(level)
+          list << "%b%b#{item_color}#{display_level}:%xn #{Array(spells).sort.join(", ")}"
+        end
+
+        return "%r#{item_color}Remaining Innate Spells Today:%xn None" if list.empty?
+
+        "%r#{item_color}Remaining Innate Spells Today:%xn%r#{list.join("%r")}" 
+      end
+
       def revelation_locked
         @magic.revelation_locked
       end
@@ -139,9 +160,13 @@ module AresMUSH
         prepared_msg = "#{item_color}Prepared Spells Remaining:%xn"
 
         spell_list.each_pair do |level, splist|
+          next if Array(splist).empty?
+
           display_level = spell_level_label(level)
           list << "%b%b#{item_color}#{display_level}:%xn #{splist.sort.join(", ")}"
         end
+
+        return "#{trad_string}#{focus_pool}#{prepared_msg} None." if list.empty?
 
         "#{trad_string}#{focus_pool}#{prepared_msg}%r#{list.join("%r")}"
       end
