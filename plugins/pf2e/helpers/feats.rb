@@ -554,8 +554,6 @@ module AresMUSH
           # The value of the combat_stats subkey should always be a hash.
           Pf2eCombat.update_combat_stats(char, value)
           return_msg << "This feat modifies your combat proficiencies."
-        
-          char.update(pf2_to_assign: to_assign)
         else
           return_msg << "Unknown key '#{key}' in do_feat_grants. Please inform code staff."
         end
