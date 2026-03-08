@@ -10,11 +10,11 @@ aliases:
 
 Many classes and ancestries do not have access to magic and magic casting, but many characters either start with magic or gain access to it later depending on what character options are made. `cg/review` will inform you if you need to add any spells to your character sheet.
 
-# Commands
-
+**Commands**:
 `addspell <class>/<level> = <spell name>`: Chooses a spell for that character class and level. 
 `addspell <class>/<level> = <old spell>/<new spell>`: Swaps `<old spell>` for `<new spell>` in that class and level.
-`spellbook`: Shows all the spells you know.
+`spellbook`: Shows all the spells you know if you're a prepared caster.
+`repertoire`: Shows all the spells you know if you're a spontaneous caster.
 
 The `addspell` command can take selection switches to process some character options. `cg/review` or `advance/review` will tell you what switch to use if you need one.
 

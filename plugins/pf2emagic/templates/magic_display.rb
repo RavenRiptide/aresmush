@@ -45,12 +45,7 @@ module AresMUSH
 
             list << format_prepared_spells(@char, charclass, spell_list, trad_info)
           elsif caster_type == 'spontaneous'
-            repertoire = @magic.repertoire
-            spell_list = repertoire[charclass] || {}
-
-            spell_list = Pf2emagic.sort_level_spell_list(spell_list) unless spell_list.empty?
-
-            list << format_spont_spells(@char, charclass, spell_list, spells_today, trad_info)
+            list << format_spont_spells(@char, charclass, spells_today, trad_info)
           else next
           end
         end
@@ -171,7 +166,7 @@ module AresMUSH
         "#{trad_string}#{focus_pool}#{prepared_msg}%r#{list.join("%r")}"
       end
 
-      def format_spont_spells(char, charclass, spell_list, spells_today, trad_info)
+      def format_spont_spells(char, charclass, spells_today, trad_info)
         # Stat Block
         trad = Pf2e.pretty_string(trad_info[0])
         prof = Pf2e.pretty_string(trad_info[1].slice(0).upcase)
@@ -193,15 +188,13 @@ module AresMUSH
           remaining << "%b%b%xh#{display_level}:%xn #{amt}"
         end
 
-        # Spell List Block
-        splist_displ = []
+        remaining_data = if remaining.empty?
+                           " None."
+                         else
+                           "%r#{remaining.join("%r")}"
+                         end
 
-        spell_list.each_pair do |level, splist|
-          display_level = spell_level_label(level)
-          splist_displ << "#{item_color}#{display_level}:%xn #{splist.sort.join(", ")}"
-        end
-
-        "#{trad_string}#{focus_pool}#{remaining_msg} #{remaining.join("%b%b")}%r%r%b%b#{splist_displ.join("%r%b%b")}"
+        "#{trad_string}#{focus_pool}#{remaining_msg}#{remaining_data}"
       end
 
       def format_focus_pool(charclass)
@@ -278,6 +271,20 @@ module AresMUSH
         "#{number}#{suffix}"
       end
 
+      def help_text
+        tradition = @magic.tradition || {}
+        charclasses = tradition.keys - ['innate', 'innate ']
+
+        caster_types = charclasses.map { |cc| Pf2emagic.get_caster_type(cc) }
+                                 .select { |type| ['prepared', 'spontaneous'].include?(type) }
+                                 .uniq
+
+        return '' if caster_types.empty?
+        return t('pf2emagic.spellbook_help') if caster_types == ['prepared']
+        return t('pf2emagic.repertoire_help') if caster_types == ['spontaneous']
+
+        "#{t('pf2emagic.spellbook_help')} %b%b#{t('pf2emagic.repertoire_help')}"
+      end
 
     end
   end

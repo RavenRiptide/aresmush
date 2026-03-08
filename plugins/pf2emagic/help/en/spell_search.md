@@ -28,7 +28,7 @@ An attribute can be any of the following words: `name`, `traits`, `level`, `trad
 
 For most terms, you input a string, such as 'electric' for `name` (resulting in `spell/search name=electric`). However, the 'level' term is unique: it requires a number input (ranging from 0 to 10), and you can specify an optional operator, '<' or '>', to limit it to spells whose base level is lower than that number ('<') or higher than that number ('>'). **NOTE**: The search will behave in unexpected ways if there is no space between the operator and the number on the level command, i.e. level=> 1 is correct, but level=>1 will not give you the results you expect.
 
-The search function is a Boolean AND, meaning that a spell must meet all of your specified criteria to be included in the list. 
+The search function is a Boolean `AND`, meaning that a spell must meet all of your specified criteria to be included in the list. 
 
 ## Examples 
 

@@ -6,17 +6,18 @@ module AresMUSH
 
       attr_accessor :char, :spellbook, :client
 
-      def initialize(char, charclass, spellbook, client)
+      def initialize(char, charclass, spellbook, client, title_key='pf2emagic.spellbook_title')
         @char = char
         @charclass = charclass
         @spellbook = spellbook
         @client = client
+        @title_key = title_key
 
         super File.dirname(__FILE__) + "/spellbook.erb"
       end
 
       def title
-        t('pf2emagic.spellbook_title', :name => @char.name)
+        t(@title_key, :name => @char.name)
       end
 
       def spellbook_list
