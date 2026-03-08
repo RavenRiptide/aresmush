@@ -128,7 +128,11 @@ module AresMUSH
           next if key == "signature"
 
           # Process according to the data type of the key.
-          heading = key.gsub("charclass", "class feat").gsub("skill", "skill feat(s)").split("_").map {|word| word.capitalize}.join(" ")
+          heading = key.gsub("charclass", "class feat")
+                       .gsub(/(?<!raise )skill/, "skill feat(s)")
+                       .split("_")
+                       .map {|word| word.capitalize}
+                       .join(" ")
 
           if value.is_a? Array
             list << "#{item_color}#{heading}:%xn #{value.sort.join(", ")}" unless value.empty?
@@ -137,7 +141,7 @@ module AresMUSH
             value.each_pair do |subkey, subvalue|
               subheading = subkey.to_s
                 .gsub("charclass", "class feat(s)")
-                .gsub("skill", "skill feat(s)")
+                .gsub(/(?<!raise )skill/, "skill feat(s)")
                 .gsub("1", "1st-level spell(s)")
                 .gsub("2", "2nd-level spell(s)")
                 .gsub("3", "3rd-level spell(s)")
@@ -152,7 +156,8 @@ module AresMUSH
                 .map {|word| word.capitalize}
                 .join(" ")
               if subvalue.is_a? Array
-                sublist << "#{item_color}#{subheading}:%xn #{subvalue.sort.join(", ")}"
+                display_subheading = subheading == "General" ? "General feat" : subheading
+                sublist << "#{item_color}#{display_subheading}:%xn #{subvalue.sort.join(", ")}"
               elsif subvalue.is_a? Hash
                 subsublist = []
                 subvalue.each_pair do |subsubkey, subsubvalue|

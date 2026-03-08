@@ -3,7 +3,7 @@ en:
   pf2e:
     abil_lock_ok: "%xgYour abilities are completed and locked.%xn"
     abil_options_ok: "%xgNo issues detected with your abilities.%xn"
-    abil_issues: "Your abilities are not yet complete. Use %x172cg/review%xn to see what is missing."
+    abil_issues: "Your abilities are not yet complete. Use '%xwcg/review%xn%xr' to see what is missing."
     ability_too_high: "%xrAt least one of your ability scores is too high. Too high: %{score}%xn"
     add_ok: "You add %{item} to your %{list}."
     admin_reset_ok: "You reset %{name}'s character sheet."
