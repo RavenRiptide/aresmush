@@ -36,18 +36,39 @@ module AresMUSH
             value = Pf2emagic.sort_level_spell_list(value)
 
             value.each_pair do |level, spell_list|
-              header = "#{item_color}#{level}:%xn"
+              header = "#{item_color}#{spellbook_level_label(level)}:%xn"
               data = "#{spell_list.sort.join(", ")}"
 
               sublist << "#{header} #{data}"
             end
 
-            list << "#{title_color}#{key}:%xn%r#{sublist.sort.join("%r")}"
+            list << "#{title_color}#{key}:%xn%r#{sublist.join("%r")}"
           end
 
         end
 
         list
+      end
+
+      def spellbook_level_label(level)
+        level_str = level.to_s
+        return 'Cantrips' if level_str.downcase == 'cantrip'
+
+        level_num = level_str.to_i
+        "#{ordinal(level_num)}-level"
+      end
+
+      def ordinal(number)
+        abs_num = number.to_i.abs
+
+        suffix = case abs_num % 10
+                 when 1 then 'st'
+                 when 2 then 'nd'
+                 when 3 then 'rd'
+                 else 'th'
+                 end
+
+        "#{number}#{suffix}"
       end
 
     end
