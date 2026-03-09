@@ -2,6 +2,9 @@
 en:
   pf2emagic: 
     cant_cast_as_class: "Cannot cast magic as the specified class."
+    cant_learn_wrong_class: "You are not a %{wrong_class}. Try again with your actual caster class, which is %{correct_class}."
+    cant_learn_cantrip_slot: "You cannot learn a cantrip as a higher level spell."
+    cant_learn_spell_cantrip: "You cannot learn a non-cantrip spell as a cantrip."
     cant_prepare_trad: "Cannot prepare that spell as a %{cc}."
     cant_prepare_level: "The base level of the spell is higher than the level you specified."
     cant_prepare_cantrip_slot: "You can't prepare a cantrip in a spell slot."

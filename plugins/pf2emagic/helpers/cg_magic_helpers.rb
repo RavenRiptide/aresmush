@@ -52,6 +52,11 @@ module AresMUSH
       # Can they take the spell at the level specified?
 
       spbl = deets["base_level"].to_i
+      level_is_cantrip = (level.to_s.downcase == 'cantrip' || level.to_i.zero?)
+      spell_is_cantrip = spbl.zero?
+
+      return t('pf2emagic.cant_learn_cantrip_slot') if spell_is_cantrip && !level_is_cantrip
+      return t('pf2emagic.cant_learn_spell_cantrip') if !spell_is_cantrip && level_is_cantrip
       return t('pf2emagic.cant_prepare_level') if spbl > level.to_i
 
       [ spell, deets ]
@@ -195,8 +200,12 @@ module AresMUSH
       # OR in the character's personal list.
 
       spbl = deets["base_level"].to_i
+      level_is_cantrip = (level.to_s.downcase == 'cantrip' || level.to_i.zero?)
+      spell_is_cantrip = spbl.zero?
       new_spells_for_level = new_spells_to_assign[level]
 
+      return t('pf2emagic.cant_learn_cantrip_slot') if spell_is_cantrip && !level_is_cantrip
+      return t('pf2emagic.cant_learn_spell_cantrip') if !spell_is_cantrip && level_is_cantrip
       return t('pf2emagic.cant_prepare_level') if spbl > level.to_i
 
       return t('pf2emagic.no_new_spells_at_level') unless new_spells_for_level
@@ -317,6 +326,11 @@ module AresMUSH
 
       # Can the character take that spell at that level?
       base_level = spdeets['base_level'].to_i
+      level_is_cantrip = (level.to_s.downcase == 'cantrip' || level.to_i.zero?)
+      spell_is_cantrip = base_level.zero?
+
+      return false if spell_is_cantrip && !level_is_cantrip
+      return false if !spell_is_cantrip && level_is_cantrip
 
       return false unless level.to_i >= base_level
 

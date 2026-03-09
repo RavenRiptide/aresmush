@@ -47,6 +47,15 @@ module AresMUSH
         return t('pf2e.lock_info_first')
       end
 
+      def check_correct_class
+        correct_class = enactor.pf2_base_info['charclass']
+
+        return nil unless correct_class
+        return nil if self.caster_class&.casecmp?(correct_class)
+
+        t('pf2emagic.cant_learn_wrong_class', :wrong_class => self.caster_class, :correct_class => correct_class)
+      end
+
       def handle
 
         level = self.spell_level.zero? ? 'cantrip' : self.spell_level.to_s
