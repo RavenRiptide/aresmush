@@ -157,6 +157,13 @@ module AresMUSH
 
         client.emit_success t('pf2e.option_set', :element => selected_element, :option => selected_option)
 
+        # Set messages here for special cases where we want to prompt the user to make another selection based on what they just chose, as a user-friendly experience.
+        if selected_element == "specialize_info" &&
+           base_info['charclass']&.casecmp?('Wizard') &&
+           !selected_option.casecmp?('Universalist')
+          client.emit_ooc t('pf2e.cg_wizard_school_spell', :wizard_school => selected_option.downcase)
+        end
+
       end
 
     end

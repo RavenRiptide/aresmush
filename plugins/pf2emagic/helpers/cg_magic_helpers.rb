@@ -310,7 +310,8 @@ module AresMUSH
       has_school_spell = to_assign['school spell']
 
       if has_school_spell
-        msg << t('pf2emagic.choose_school_spell') if has_school_spell == 'school'
+        specialize_info = magic&.character&.pf2_base_info&.[]('specialize_info')
+        msg << t('pf2emagic.choose_school_spell', :wizard_school => specialize_info) if has_school_spell == 'school'
       end
 
     end
