@@ -6,25 +6,37 @@ aliases:
 - dfont
 ---
 
-# Managing and Customizing Magic in Character Generation or Advancement
+# Managing and Customizing Magic in Character Generation
 
 Many classes and ancestries do not have access to magic and magic casting, but many characters either start with magic or gain access to it later depending on what character options are made. `cg/review` will inform you if you need to add any spells to your character sheet.
+
+After finishing chargen, see `help magic` for more information on using, preparing, and casting spells.
+
+## Adding Spells
+The following commands are applicable for adding and reviewing spells.
 
 **Commands**:
 `addspell <class>/<level> = <spell name>`: Chooses a spell for that character class and level. 
 `addspell <class>/<level> = <old spell>/<new spell>`: Swaps `<old spell>` for `<new spell>` in that class and level.
 `spellbook`: Shows all the spells you know if you're a prepared caster.
 `repertoire`: Shows all the spells you know if you're a spontaneous caster.
+`spell/search`: Searches spells in the spell database. (See `help spell search` for more information.)
 
 The `addspell` command can take selection switches to process some character options. `cg/review` or `advance/review` will tell you what switch to use if you need one.
 
-**All spells selected in character generation or advancement must be common spells.** A spell must not have the Uncommon or Rare traits. Uncommon and Rare spells can only be learned after chargen with RPP spends.
+**Note: All spells selected in character generation must be common spells.** A spell must not have the Uncommon or Rare traits. Uncommon and Rare spells can only be learned after chargen with RPP spends.
 
-## Divine Fonts
+%xrImportant!%xn Once you are done selecting spells, you will have to input `rest` to see your spells on the magic section of your sheet. You cannot `rest` until your character is approved.
+
+## Special Spell Cases
+Some class specialties or choices grant you extra spells that must be resolved with different syntax. These cases are indicated in the cg/review screen and can be resolved with the following commands:
+
+**Commands**:
+`addspell/school wizard/<level> = <spell name>`: For non-universalist wizards, adds a 1st-level spell from the arcane tradition associated with your school of magic. For example, necromancy wizards can add a 1st-level arcane spell with the Necromancy trait with this command.
+
+## Adding Divine Fonts
 
 Clerics have the divine font class feature. Some deities provide a choice between a Heal divine font or a Harm divine font. `cg/review` will tell you if you need to choose.
 
+**Commands**:
 `dfont <input>`: Selects your divine font. `<input>` can be `heal` or `harm`.
-
-**Once you are done selecting spells**, you will have to input `rest` to see your spells on the magic section of your sheet. You cannot `rest` until your character is approved.
-

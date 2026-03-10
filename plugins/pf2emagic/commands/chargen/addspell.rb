@@ -49,11 +49,17 @@ module AresMUSH
 
       def check_correct_class
         correct_class = enactor.pf2_base_info['charclass']
+        entered_class = self.caster_class
+        prepared_classes = Global.read_config('pf2e_magic', 'prepared_casters') || []
+        spontaneous_classes = Global.read_config('pf2e_magic', 'spontaneous_casters') || []
+        all_caster_classes = (prepared_classes + spontaneous_classes).map { |cc| cc.downcase }
 
         return nil unless correct_class
-        return nil if self.caster_class&.casecmp?(correct_class)
+        return nil unless entered_class
+        return nil unless all_caster_classes.include?(entered_class.downcase)
+        return nil if entered_class.casecmp?(correct_class)
 
-        t('pf2emagic.cant_learn_wrong_class', :wrong_class => self.caster_class, :correct_class => correct_class)
+        t('pf2emagic.cant_learn_wrong_class', :wrong_class => entered_class, :correct_class => correct_class)
       end
 
       def handle
