@@ -303,7 +303,8 @@ module AresMUSH
           if rep
             rlist = []
             rep.each_pair do |k,v|
-              rlist << "#{k}: #{v.count("open")}"
+              level_label = k.to_s == '1' ? '1st-level' : k
+              rlist << "#{level_label}: #{v.count("open")}" 
             end
             rcount = rlist.join(", ")
 
@@ -317,7 +318,8 @@ module AresMUSH
           if sbook
             slist = []
             sbook.each_pair do |k,v|
-              slist << "#{k}: #{v.count("open")}"
+              level_label = k.to_s == '1' ? '1st-level' : k
+              slist << "#{level_label}: #{v.count("open")}" 
             end
             scount = slist.join(", ")
 
