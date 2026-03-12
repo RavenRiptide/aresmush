@@ -21,6 +21,8 @@ module AresMUSH
         error = dalign.include?(align) ?
                 nil :
                 t('pf2e.class_deity_mismatch')
+      elsif align.blank?
+        error = t('pf2e.alignment_missing')
       else
         error = alignments.include?(align) ? nil : t('pf2e.class_mismatch')
       end

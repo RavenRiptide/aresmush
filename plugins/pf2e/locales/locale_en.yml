@@ -117,6 +117,7 @@ en:
     class_deity_mismatch: "%xrYour alignment is not valid for your deity and class.%xn"
     class_mismatch: "%xrYour alignment is not valid for your class.%xn"
     class_requires_deity: "%xrYour class requires a deity, but none is set.%xn"
+    alignment_missing: "%xrYou haven't set an alignment yet.%xn"
     cnotes_title: "Character Notes For %{char}"
     cnote_added: "Cnote %{name} added to character %{char}."
     cnote_removed: "Cnote %{name} removed from character %{char}."
