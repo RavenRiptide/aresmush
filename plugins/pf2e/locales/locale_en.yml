@@ -93,6 +93,7 @@ en:
     cannot_find_cginfo: "You must choose %{prereq} before you can see options for %{element}."
     cannot_rest_time: "You can rest again at %{next}."
     cannot_view_sheet: "That character has not granted you permission to view their sheet."
+    cg_restore_help: "That is not a valid stage to restore to. See %xuhelp restore%xU for stages."
     cg_cant_restore_to_stage_you_dont_have: "You can't restore to the %{checkpoint} stage of chargen. No checkpoint created."
     cg_cant_restore_to_stage_youre_in: "You are already in the %{checkpoint} stage of chargen"
     cg_commit_failed: "Commit %{option} failed. Message: %{msg}"
