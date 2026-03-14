@@ -666,46 +666,24 @@ pf2e_feats:
     prereq:
       level: 1
       skill: Intimidation/trained
-  Quick Identification (Arcane):
+  Quick Identification:
     feat_type: 
     - Skill
     - General
-    assoc_skill: Arcana
+    assoc_skill: 
+      - Arcana
+      - Religion
+      - Occultism
+      - Nature
     traits: []
     shortdesc: You can Identify Magic swiftly. You take only 1 minute when using Identify Magic to determine the properties of an item, ongoing effect, or location, rather than 10 minutes. If you're a master, it takes a 3-action activity, and if you're legendary, it takes 1 action.
     prereq:
       level: 1
-      skill: Arcana/trained
-  Quick Identification (Divine):
-    feat_type: 
-    - Skill
-    - General
-    assoc_skill: Religion
-    traits: []
-    shortdesc: You can Identify Magic swiftly. You take only 1 minute when using Identify Magic to determine the properties of an item, ongoing effect, or location, rather than 10 minutes. If you're a master, it takes a 3-action activity, and if you're legendary, it takes 1 action.
-    prereq:
-      level: 1
-      skill: Religion/trained
-  Quick Identification (Occult):
-    feat_type: 
-    - Skill
-    - General
-    assoc_skill: Occultism
-    traits: []
-    shortdesc: You can Identify Magic swiftly. You take only 1 minute when using Identify Magic to determine the properties of an item, ongoing effect, or location, rather than 10 minutes. If you're a master, it takes a 3-action activity, and if you're legendary, it takes 1 action.
-    prereq:
-      level: 1
-      skill: Occultism/trained
-  Quick Identification (Primal):
-    feat_type: 
-    - Skill
-    - General
-    assoc_skill: Nature
-    traits: []
-    shortdesc: You can Identify Magic swiftly. You take only 1 minute when using Identify Magic to determine the properties of an item, ongoing effect, or location, rather than 10 minutes. If you're a master, it takes a 3-action activity, and if you're legendary, it takes 1 action.
-    prereq:
-      level: 1
-      skill: Nature/trained
+      orskill: 
+        - Arcana/trained
+        - Religion/trained
+        - Occultism/trained
+        - Nature/trained
   Quick Jump:
     feat_type: 
     - Skill
@@ -746,47 +724,24 @@ pf2e_feats:
     prereq:
       level: 1
       skill: Society/trained  
-  Recognize Spell (Arcane):
+  Recognize Spell:
     feat_type: 
     - Skill
     - General
-    assoc_skill: Arcana
+    assoc_skill: 
+      - Arcana
+      - Divine
+      - Occultism
+      - Nature
     traits: []
     shortdesc: If you are trained in the appropriate skill for the spell's tradition and it's a common spell of 2nd level or lower, you automatically identify it (you still roll to attempt to get a critical success, but can't get a worse result than success). The highest level of spell you automatically identify increases to 4 if you're an expert, 6 if you're a master, and 10 if you're legendary. The GM rolls a secret Arcana, Nature, Occultism, or Religion check, whichever corresponds to the tradition of the spell being cast. If you're not trained in the skill, you can't get a result better than failure.%r%r**Critical Success** You correctly recognize the spell and gain a +1 circumstance bonus to your saving throw or your AC against it.%r**Success** You correctly recognize the spell.%r**Failure** You fail to recognize the spell.%r**Critical Failure** You misidentify the spell as another spell entirely, of the GM's choice.
     prereq:
       level: 1
-      skill: Arcana/trained
-  Recognize Spell (Divine):
-    feat_type: 
-    - Skill
-    - General
-    assoc_skill: Religion
-    traits: []
-    shortdesc: If you are trained in the appropriate skill for the spell's tradition and it's a common spell of 2nd level or lower, you automatically identify it (you still roll to attempt to get a critical success, but can't get a worse result than success). The highest level of spell you automatically identify increases to 4 if you're an expert, 6 if you're a master, and 10 if you're legendary. The GM rolls a secret Arcana, Nature, Occultism, or Religion check, whichever corresponds to the tradition of the spell being cast. If you're not trained in the skill, you can't get a result better than failure.%r%r**Critical Success** You correctly recognize the spell and gain a +1 circumstance bonus to your saving throw or your AC against it.%r**Success** You correctly recognize the spell.%r**Failure** You fail to recognize the spell.%r**Critical Failure** You misidentify the spell as another spell entirely, of the GM's choice.
-    prereq:
-      level: 1
-      skill: Religion/trained
-  Recognize Spell (Occult):
-    feat_type: 
-    - Skill
-    - General
-    assoc_skill: Occultism
-    traits: []
-    shortdesc: If you are trained in the appropriate skill for the spell's tradition and it's a common spell of 2nd level or lower, you automatically identify it (you still roll to attempt to get a critical success, but can't get a worse result than success). The highest level of spell you automatically identify increases to 4 if you're an expert, 6 if you're a master, and 10 if you're legendary. The GM rolls a secret Arcana, Nature, Occultism, or Religion check, whichever corresponds to the tradition of the spell being cast. If you're not trained in the skill, you can't get a result better than failure.%r%r**Critical Success** You correctly recognize the spell and gain a +1 circumstance bonus to your saving throw or your AC against it.%r**Success** You correctly recognize the spell.%r**Failure** You fail to recognize the spell.%r**Critical Failure** You misidentify the spell as another spell entirely, of the GM's choice.
-    prereq:
-      level: 1
-      skill: Occultism/trained
-  Recognize Spell (Primal):
-    feat_type: 
-    - Skill
-    - General
-    assoc_skill: Nature
-    traits:
-    - secret
-    shortdesc: If you are trained in the appropriate skill for the spell's tradition and it's a common spell of 2nd level or lower, you automatically identify it (you still roll to attempt to get a critical success, but can't get a worse result than success). The highest level of spell you automatically identify increases to 4 if you're an expert, 6 if you're a master, and 10 if you're legendary. The GM rolls a secret Arcana, Nature, Occultism, or Religion check, whichever corresponds to the tradition of the spell being cast. If you're not trained in the skill, you can't get a result better than failure.%r%r**Critical Success** You correctly recognize the spell and gain a +1 circumstance bonus to your saving throw or your AC against it.%r**Success** You correctly recognize the spell.%r**Failure** You fail to recognize the spell.%r**Critical Failure** You misidentify the spell as another spell entirely, of the GM's choice.
-    prereq:
-      level: 1
-      skill: Nature/trained
+      orskill:
+        - Arcana/trained
+        - Nature/trained
+        - Occultism/trained
+        - Religion/trained
   Risky Surgery:
     feat_type: 
     - Skill
@@ -1035,50 +990,25 @@ pf2e_feats:
     prereq:
       level: 1
       skill: Nature/trained  
-  Trick Magic Item (Arcane):
+  Trick Magic Item:
     feat_type: 
     - Skill
     - General
-    assoc_skill: Arcana
+    assoc_skill: 
+      - Arcana
+      - Religion
+      - Occultism
+      - Nature
     traits:
     - manipulate
     shortdesc: You examine a magic item you normally couldn't use in an effort to fool it and activate it temporarily. For example, this might allow a fighter to cast a spell from a wand or allow a wizard to cast a spell that's not on the arcane list using a scroll. You must know what activating the item does, or you can't attempt to trick it.%r%rAttempt a check using the skill matching the item's magic tradition, or matching a tradition that has the spell on its list, if you're trying to cast a spell from the item. The relevant skills are Arcana for arcane, Nature for primal, Occultism for occult, Religion for divine, or any of the four for an item that has the magical trait and not a tradition trait. The GM determines the DC based on the item's level (possibly adjusted depending on the item or situation).%r%rIf you activate a magic item that requires a spell attack roll or spell DC and you don't have the ability to cast spells of the relevant tradition, use your level as your proficiency bonus and the highest of your Intelligence, Wisdom, or Charisma modifiers. If you're a master in the appropriate skill for the item's tradition, you instead use the trained proficiency bonus, and if you're legendary, you instead use the expert proficiency bonus.%r%r**Success** For the rest of the current turn, you can spend actions to activate the item as if you could normally use it.%r**Failure** You can't use the item or try to trick it again this turn, but you can try again on subsequent turns.%r**Critical Failure** You can't use the item, and you can't try to trick it again until your next daily preparations.
     prereq:
       level: 1
-      skill: Arcana/trained
-  Trick Magic Item (Divine):
-    feat_type: 
-    - Skill
-    - General
-    assoc_skill: Religion
-    traits:
-    - manipulate
-    shortdesc: You examine a magic item you normally couldn't use in an effort to fool it and activate it temporarily. For example, this might allow a fighter to cast a spell from a wand or allow a wizard to cast a spell that's not on the arcane list using a scroll. You must know what activating the item does, or you can't attempt to trick it.%r%rAttempt a check using the skill matching the item's magic tradition, or matching a tradition that has the spell on its list, if you're trying to cast a spell from the item. The relevant skills are Arcana for arcane, Nature for primal, Occultism for occult, Religion for divine, or any of the four for an item that has the magical trait and not a tradition trait. The GM determines the DC based on the item's level (possibly adjusted depending on the item or situation).%r%rIf you activate a magic item that requires a spell attack roll or spell DC and you don't have the ability to cast spells of the relevant tradition, use your level as your proficiency bonus and the highest of your Intelligence, Wisdom, or Charisma modifiers. If you're a master in the appropriate skill for the item's tradition, you instead use the trained proficiency bonus, and if you're legendary, you instead use the expert proficiency bonus.%r%r**Success** For the rest of the current turn, you can spend actions to activate the item as if you could normally use it.%r**Failure** You can't use the item or try to trick it again this turn, but you can try again on subsequent turns.%r**Critical Failure** You can't use the item, and you can't try to trick it again until your next daily preparations.
-    prereq:
-      level: 1
-      skill: Religion/trained
-  Trick Magic Item (Occult):
-    feat_type: 
-    - Skill
-    - General
-    assoc_skill: Occutltism
-    traits:
-    - manipulate
-    shortdesc: You examine a magic item you normally couldn't use in an effort to fool it and activate it temporarily. For example, this might allow a fighter to cast a spell from a wand or allow a wizard to cast a spell that's not on the arcane list using a scroll. You must know what activating the item does, or you can't attempt to trick it.%r%rAttempt a check using the skill matching the item's magic tradition, or matching a tradition that has the spell on its list, if you're trying to cast a spell from the item. The relevant skills are Arcana for arcane, Nature for primal, Occultism for occult, Religion for divine, or any of the four for an item that has the magical trait and not a tradition trait. The GM determines the DC based on the item's level (possibly adjusted depending on the item or situation).%r%rIf you activate a magic item that requires a spell attack roll or spell DC and you don't have the ability to cast spells of the relevant tradition, use your level as your proficiency bonus and the highest of your Intelligence, Wisdom, or Charisma modifiers. If you're a master in the appropriate skill for the item's tradition, you instead use the trained proficiency bonus, and if you're legendary, you instead use the expert proficiency bonus.%r%r**Success** For the rest of the current turn, you can spend actions to activate the item as if you could normally use it.%r**Failure** You can't use the item or try to trick it again this turn, but you can try again on subsequent turns.%r**Critical Failure** You can't use the item, and you can't try to trick it again until your next daily preparations.
-    prereq:
-      level: 1
-      skill: Occultism/trained
-  Trick Magic Item (Primal):
-    feat_type: 
-    - Skill
-    - General
-    assoc_skill: Nature
-    traits:
-    - manipulate
-    shortdesc: You examine a magic item you normally couldn't use in an effort to fool it and activate it temporarily. For example, this might allow a fighter to cast a spell from a wand or allow a wizard to cast a spell that's not on the arcane list using a scroll. You must know what activating the item does, or you can't attempt to trick it.%r%rAttempt a check using the skill matching the item's magic tradition, or matching a tradition that has the spell on its list, if you're trying to cast a spell from the item. The relevant skills are Arcana for arcane, Nature for primal, Occultism for occult, Religion for divine, or any of the four for an item that has the magical trait and not a tradition trait. The GM determines the DC based on the item's level (possibly adjusted depending on the item or situation).%r%rIf you activate a magic item that requires a spell attack roll or spell DC and you don't have the ability to cast spells of the relevant tradition, use your level as your proficiency bonus and the highest of your Intelligence, Wisdom, or Charisma modifiers. If you're a master in the appropriate skill for the item's tradition, you instead use the trained proficiency bonus, and if you're legendary, you instead use the expert proficiency bonus.%r%r**Success** For the rest of the current turn, you can spend actions to activate the item as if you could normally use it.%r**Failure** You can't use the item or try to trick it again this turn, but you can try again on subsequent turns.%r**Critical Failure** You can't use the item, and you can't try to trick it again until your next daily preparations.
-    prereq:
-      level: 1
-      skill: Nature/trained
+      orskill: 
+        - Arcana/trained
+        - Religion/trained
+        - Occultism/trained
+        - Nature/trained
   Underwater Marauder:
     feat_type: 
     - Skill
@@ -1700,19 +1630,7 @@ pf2e_feats:
     prereq:
       level: 7
       skill: Athletics/master
-  Quick Recognition (Arcana):
-    feat_type: 
-    - Skill
-    - General
-    assoc_skill: Arcana
-    traits: []
-    shortdesc: You Recognize Spells swiftly. Once per round, you can Recognize a Spell using a skill in which you're a master as a free action.
-    prereq:
-      level: 7
-      skill: Arcana/master
-      feat:
-      - Recognize Spell
-  Quick Recognition (Nature):
+  Quick Recognition:
     feat_type: 
     - Skill
     - General
@@ -1721,31 +1639,11 @@ pf2e_feats:
     shortdesc: You Recognize Spells swiftly. Once per round, you can Recognize a Spell using a skill in which you're a master as a free action.
     prereq:
       level: 7
-      skill: Nature/master
-      feat:
-      - Recognize Spell
-  Quick Recognition (Occultism):
-    feat_type: 
-    - Skill
-    - General
-    assoc_skill: Occultism
-    traits: []
-    shortdesc: You Recognize Spells swiftly. Once per round, you can Recognize a Spell using a skill in which you're a master as a free action.
-    prereq:
-      level: 7
-      skill: Occultism/master
-      feat:
-      - Recognize Spell
-  Quick Recognition (Religion):
-    feat_type: 
-    - Skill
-    - General
-    assoc_skill: Religion
-    traits: []
-    shortdesc: You Recognize Spells swiftly. Once per round, you can Recognize a Spell using a skill in which you're a master as a free action.
-    prereq:
-      level: 7
-      skill: Religion/master
+      orskill: 
+        - Arcana/master
+        - Nature/master
+        - Occultism/master
+        - Religion/master
       feat:
       - Recognize Spell
   Quick Swim:
