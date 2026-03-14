@@ -8,9 +8,15 @@ module AresMUSH
       def parse_args
         args = cmd.parse_args(ArgParser.arg1_equals_arg2)
 
-        find_gate = args.arg1.split("/")
-        self.feat_type = downcase_arg(find_gate[0])
-        self.gate = downcase_arg(find_gate[1])
+        if args.arg1
+          find_gate = args.arg1.split("/")
+          self.feat_type = downcase_arg(find_gate[0])
+          self.gate = downcase_arg(find_gate[1])
+        else
+          self.feat_type = nil
+          self.gate = nil
+        end
+
         self.feat_name = upcase_arg(args.arg2)
       end
 
@@ -34,6 +40,12 @@ module AresMUSH
         return nil if feat_types.include?(self.feat_type)
 
         return t('pf2e.bad_feat_type', :type => self.feat_type, :keys => feat_types.sort.join(", "))
+      end
+
+      def check_feat_type_present
+        return nil if self.feat_type
+
+        return t('pf2e.feat_type_missing')
       end
 
       def check_skill_lock
@@ -61,7 +73,7 @@ module AresMUSH
         feat_type_list = fdeets['feat_type'].map { |f| f.downcase }
 
         # If feat_type is special, the feat_name specified will not be of that type, so skip this check.
-        unless feat_type_list.include? self.feat_type or feat_type.include? "special"
+        unless feat_type_list.include? self.feat_type or self.feat_type.include? "special"
           client.emit_failure t('pf2e.bad_feat_type', :type => self.feat_type, :keys => feat_type_list.sort.join(", "))
           return
         end

@@ -12,8 +12,34 @@ module AresMUSH
       end
 
       def handle
-        # Remove an archetype added during this advancement.
         advancement = enactor.pf2_advancement
+
+        # Remove a spell swap done during this advancement.
+        if advancement['repertoire_swap']
+          swap = advancement['repertoire_swap']
+          magic = enactor.magic
+          charclass = enactor.pf2_base_info['charclass']
+
+          if magic && charclass
+            level = swap['level']
+            old_spell = swap['old']
+            new_spell = swap['new']
+
+            repertoire = magic.repertoire || {}
+            class_rep = repertoire[charclass] || {}
+            level_list = Array(class_rep[level])
+
+            index = level_list.index { |s| s.to_s.casecmp?(new_spell.to_s) }
+            if index
+              level_list[index] = old_spell
+              class_rep[level] = level_list
+              repertoire[charclass] = class_rep
+              magic.update(repertoire: repertoire)
+            end
+          end
+        end
+
+        # Remove an archetype added during this advancement.
         if advancement['feats']
           advancement['feats'].each do |feat_type, feat_list|
             feat_list.each do |feat_name|
