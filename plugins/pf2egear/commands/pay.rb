@@ -123,6 +123,7 @@ module AresMUSH
           )
 
         Pf2egear.record_money_history(payee, payer.name, actual_value, "Payment from #{payer.name}")
+        Pf2egear.record_money_history(payer, payee.name, -actual_value, "Payment to #{payee.name}")
 
         Login.notify(target_char, :pf2_money, recipient_msg, actual_value)
 
