@@ -169,6 +169,8 @@ pf2e_feats:
     shortdesc: You embody an aspect of your deity. Choose one of your deity's domains. You gain the domain's initial domain spell as a devotion spell.
     traits: []
     init_magic: true
+    grants:
+      gated_feat: Deity's Domain
   Desperate Prayer: # Frequency # Trigger
     assoc_charclass:
       - Champion

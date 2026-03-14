@@ -571,11 +571,19 @@ module AresMUSH
       # This function is called whenever the gated_feat key is present. It is used for any
       # feat that has specific limits on what can be taken.
 
+      if gate.downcase == "deity's domain"
+        deity = char.pf2_faith['deity']
+        deity_info = Global.read_config('pf2e_deities')[deity]
+        return false unless deity_info
+
+        deity_domains = Array(deity_info['domains']).compact
+        return deity_domains.any? { |d| d.casecmp?(feat) }
+      end
+
       find_feat = Pf2e.get_feat_details(feat)
+      return false if find_feat.is_a?(String) || !find_feat[1]
 
       fdeets = find_feat[1]
-
-
       qualifies = fdeets["feat_type"]
 
       # If you don't meet the prereqs for the feat, don't bother processing the gate.

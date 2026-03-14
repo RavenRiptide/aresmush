@@ -55,6 +55,11 @@ module AresMUSH
 
       def handle
 
+        if self.feat_type == 'special' && self.gate == "deity's domain"
+          handle_deity_domain
+          return
+        end
+
         ##### VALIDATION SECTION START #####
         # Is this actually a feat?
 
@@ -178,6 +183,17 @@ module AresMUSH
 
         client.emit_success t('pf2e.feat_set_ok', :name => fname, :type => self.feat_type)
 
+        # Feat-specific messages.
+        if fname == "Deity's Domain"
+          deity = enactor.pf2_faith['deity']
+          deity_info = Global.read_config('pf2e_deities')[deity]
+          domains = Array(deity_info ? deity_info['domains'] : []).compact
+
+          if deity && !domains.empty?
+            client.emit_ooc t('pf2e.deity_domain_select', :deity => deity, :domains => domains.sort.join(", "))
+          end
+        end
+
         # Some feats grant other things. Handle those here.
 
         granted_by_feat = fdeets['grants']
@@ -189,6 +205,64 @@ module AresMUSH
           grant_message.each {|msg| client.emit_ooc msg }
         end
 
+      end
+
+      def handle_deity_domain
+        to_assign = enactor.pf2_to_assign
+        gate_options = to_assign['special feat'] || []
+
+        unless self.gate && gate_options.map { |g| g.downcase }.include?(self.gate)
+          client.emit_failure t('pf2e.no_such_gate', :gate => self.gate)
+          return
+        end
+
+        deity = enactor.pf2_faith['deity']
+        deity_info = Global.read_config('pf2e_deities')[deity]
+
+        unless deity_info
+          client.emit_failure "Your deity is not configured with domains."
+          return
+        end
+
+        deity_domains = Array(deity_info['domains']).compact
+        domain = deity_domains.find { |d| d.casecmp?(self.feat_name) }
+
+        unless domain
+          client.emit_failure "That is not one of your deity's domains."
+          return
+        end
+
+        domains = Global.read_config('pf2e_magic')['domains']
+        domain_info = domains[domain]
+
+        unless domain_info && domain_info['initial']
+          client.emit_failure "That domain is missing its initial domain spell."
+          return
+        end
+
+        focus_type_by_class = Global.read_config('pf2e_magic')['focus_type_by_class']
+        focus_type = focus_type_by_class[enactor.pf2_base_info['charclass']] || 'devotion'
+
+        magic = PF2Magic.get_create_magic_obj(enactor)
+        focus_spells = magic.focus_spells
+        focus_list = focus_spells[focus_type] || []
+
+        if focus_list.any? { |s| s && s.casecmp?(domain_info['initial']) }
+          client.emit_failure "You already have that domain spell."
+          return
+        end
+
+        focus_list << domain_info['initial']
+        focus_spells[focus_type] = focus_list
+        magic.update(focus_spells: focus_spells)
+
+        new_gated_list = gate_options.reject { |g| g.casecmp?(self.gate) }
+        to_assign['special feat'] = new_gated_list
+        to_assign.delete('special feat') if to_assign['special feat'].empty?
+
+        enactor.update(pf2_to_assign: to_assign)
+
+        client.emit_success "Domain selected: #{domain}."
       end
 
     end

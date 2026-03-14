@@ -109,7 +109,7 @@ pf2e_deities:
     - Ambition
     - Destruction
     - Indulgence
-    - Nightmares
+    - Nightmare
     cleric_spells:
     - Magic Fang
     - Moon Frenzy
@@ -198,7 +198,7 @@ pf2e_deities:
     domains:
     - Earth
     - Nature
-    - Wood
+    - Air
     - Swarm
     cleric_spells:
     - Pummeling Rubble
@@ -484,7 +484,7 @@ pf2e_deities:
     domains:
     - Cities
     - Creation
-    - Ambition
+    - Perfection
     - Toil
     cleric_spells:
     - Telekinetic Projectile
