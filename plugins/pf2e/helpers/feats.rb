@@ -354,7 +354,8 @@ module AresMUSH
       elsif details.has_key? 'assoc_ancestry'
         associated = "%x229Associated Ancestries:%xn #{details['assoc_ancestry'].sort.join(", ")}"
       elsif details.has_key? 'assoc_skill'
-        associated = "%x229Associated Skills:%xn #{details['assoc_skill'].sort.join(", ")}"
+        skills = Array(details['assoc_skill']).compact
+        associated = "%x229Associated Skills:%xn #{skills.sort.join(", ")}"
       else
         associated = "%x229Associated With:%xn Any"
       end
