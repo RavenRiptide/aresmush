@@ -518,8 +518,9 @@ pf2e_weapons:
     reload: 0
     bulk: 2
     group: Polearm
-  Handwraps of Mighty Blows:
+  Handwraps of Mighty Blows (+1):
     level: 3
+    price: 3500
     wp_type: melee
     category: simple
     group: Brawling
@@ -1401,6 +1402,7 @@ pf2e_weapons:
     group: Flail
   Handwraps of Mighty Blows (+1 Striking):
     level: 4
+    price: 10000
     wp_type: melee
     category: simple
     group: Brawling
@@ -1418,3 +1420,83 @@ pf2e_weapons:
       fundamental:
         potency: 1
         power: 1
+  Handwraps of Mighty Blows (+2 Striking):
+    level: 10
+    price: 100000
+    wp_type: melee
+    category: simple
+    group: Brawling
+    bulk: 0.1
+    traits: 
+      - invested
+      - magical
+      - transmutation
+    hands: 0
+    range: 0
+    reload: 0
+    wp_damage: 1d4
+    wp_damage_type: B
+    runes:
+      fundamental:
+        potency: 2
+        power: 1
+  Handwraps of Mighty Blows (+2 Greater Striking):
+    level: 12
+    price: 200000
+    wp_type: melee
+    category: simple
+    group: Brawling
+    bulk: 0.1
+    traits: 
+      - invested
+      - magical
+      - transmutation
+    hands: 0
+    range: 0
+    reload: 0
+    wp_damage: 1d4
+    wp_damage_type: B
+    runes:
+      fundamental:
+        potency: 2
+        power: 2
+  Handwraps of Mighty Blows (+3 Greater Striking):
+    level: 16
+    price: 1000000
+    wp_type: melee
+    category: simple
+    group: Brawling
+    bulk: 0.1
+    traits: 
+      - invested
+      - magical
+      - transmutation
+    hands: 0
+    range: 0
+    reload: 0
+    wp_damage: 1d4
+    wp_damage_type: B
+    runes:
+      fundamental:
+        potency: 3
+        power: 2
+  Handwraps of Mighty Blows (+3 Major Striking):
+    level: 19
+    price: 4000000
+    wp_type: melee
+    category: simple
+    group: Brawling
+    bulk: 0.1
+    traits: 
+      - invested
+      - magical
+      - transmutation
+    hands: 0
+    range: 0
+    reload: 0
+    wp_damage: 1d4
+    wp_damage_type: B
+    runes:
+      fundamental:
+        potency: 3
+        power: 3
