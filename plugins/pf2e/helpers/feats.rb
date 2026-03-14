@@ -21,7 +21,7 @@ module AresMUSH
         # Look for an exact match, allows 'Familiar' to be taken when 'Leshy Familiar' is in the list.
         match.each do |item|
           if item.upcase == term.upcase
-            name = item
+            name = match.find { |item| item.casecmp?(term) } || name
           end
         end
       else
