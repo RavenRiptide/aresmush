@@ -171,6 +171,13 @@ module AresMUSH
           value.each_pair do |type, feat_list|
             char_feats[type] ||= []
             char_feats[type].concat(feat_list)
+
+            feat_list.each do |feat_name|
+              feat_info = Pf2e.get_feat_details(feat_name)
+              next if feat_info.is_a?(String)
+
+              Pf2e.apply_init_magic_feat(char, feat_info[0], feat_info[1], client)
+            end
           end
           char.pf2_feats = char_feats
         when "charclass_feature option"
@@ -286,6 +293,7 @@ module AresMUSH
     end
 
     def self.advancement_messages(char)
+      # Handles messages related to advancement choices in the Messages section of the advance/review screen.
       msg = []
 
       to_assign = char.pf2_to_assign
@@ -351,7 +359,21 @@ module AresMUSH
           msg << t('pf2e.unassigned_gated_feat', :options => info.sort.join(", "))
         when "grants"
           info.keys.each do |feat|
-            msg << t('pf2e.adv_item_grants', :options => feat)
+            grant_info = info[feat]
+            if grant_info.is_a?(Hash) && grant_info['gated_feat']
+              gate = grant_info['gated_feat']
+              summary = Pf2e.gated_feat_summary(gate)
+              msg << t('pf2e.adv_item_gated_feat_summary', :gate => gate, :summary => summary, :gate_underscore => gate.downcase.gsub(" ", "_"))
+            else
+              msg << t('pf2e.adv_item_grants', :feat => feat)
+            end
+          end
+        else
+          if info.is_a?(String) && info.downcase == 'open'
+            options = Pf2e.get_gated_feat_options(char, item)
+            if options && !options.empty?
+              msg << t('pf2e.adv_item_gated_feat', :gate => item, :options => options.sort.join(', '))
+            end
           end
         end
 

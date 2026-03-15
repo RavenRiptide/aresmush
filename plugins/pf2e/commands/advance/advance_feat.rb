@@ -4,12 +4,20 @@ module AresMUSH
     class PF2AdvanceFeatCmd
       include CommandHandler
 
-      attr_accessor :type, :value
+      attr_accessor :type, :value, :gate
 
       def parse_args
         args = cmd.parse_args(ArgParser.arg1_equals_arg2)
 
-        self.type = downcase_arg(args.arg1)
+        if args.arg1
+          find_gate = args.arg1.split("/")
+          self.type = downcase_arg(find_gate[0])
+          self.gate = downcase_arg(find_gate[1])
+        else
+          self.type = nil
+          self.gate = nil
+        end
+
         self.value = downcase_arg(args.arg2)
       end
 
@@ -23,6 +31,11 @@ module AresMUSH
       end
 
       def handle
+        if self.type == 'special'
+          handle_gated_feat
+          return
+        end
+
         # Do they have one of that feat type to select?
         to_assign = enactor.pf2_to_assign
         feats_to_assign = to_assign['feats']
@@ -230,7 +243,7 @@ module AresMUSH
         has_grants = fdetails['grants']
 
         if has_grants
-          client.emit_ooc t('pf2e.feat_grants_addl', :element => 'item. Check advance/review for details')
+          client.emit_ooc t('pf2e.feat_grants_addl', :element => 'item. See %xUadvance/review%xU for more information.')
           grants = to_assign['grants']  || {}
           adv_grants = advancement['grants'] || {}
 
@@ -241,7 +254,7 @@ module AresMUSH
           grants[fname] = feat_grants if feat_grants
           adv_grants[fname] = feat_adv_grants if feat_adv_grants
 
-          to_assign['grants'] = grants unless adv_grants.empty?
+          to_assign['grants'] = grants unless grants.empty?
           advancement['grants'] = adv_grants unless adv_grants.empty?
         end
 
@@ -258,6 +271,95 @@ module AresMUSH
             client.emit_ooc t('pf2e.adv_archetype_assigned', :archetype => assoc_archetypes.first)
           end
         end
+      end
+
+      def handle_gated_feat
+        to_assign = enactor.pf2_to_assign
+        grants = to_assign['grants'] || {}
+
+        gate_options = grants.values.filter_map do |grant_info|
+          grant_info.is_a?(Hash) ? grant_info['gated_feat'] : nil
+        end
+
+        if gate_options.empty?
+          client.emit_failure t('pf2e.adv_not_an_option')
+          return
+        end
+
+        unless self.gate
+          client.emit_failure t('pf2e.must_specify_gate', :options => gate_options.sort.join(", "))
+          return
+        end
+
+        unless gate_options.any? { |g| g.to_s.casecmp?(self.gate) }
+          client.emit_failure t('pf2e.no_such_gate', :gate => self.gate)
+          return
+        end
+
+        feat = Pf2e.get_feat_details(self.value)
+
+        if feat.is_a?(String)
+          msg = feat == 'ambiguous' ? t('pf2e.multiple_matches', :element => 'feat') : t('pf2e.bad_feat_name', :name => self.value)
+          client.emit_failure msg
+          return
+        end
+
+        fname = feat[0]
+        fdetails = feat[1]
+
+        qualifies = Pf2e.can_take_gated_feat?(enactor, fname, self.gate)
+
+        unless qualifies
+          client.emit_failure t('pf2e.feat_fails_gate')
+          return
+        end
+
+        prereqs = fdetails['prereq']
+        if prereqs
+          cl = enactor.pf2_level + 1
+          meets_prereqs = Pf2e.meets_prereqs?(enactor, prereqs, cl)
+          unless meets_prereqs
+            client.emit_failure t('pf2e.feat_fails_prereq')
+            return
+          end
+        end
+
+        advancement = enactor.pf2_advancement
+        feats_to_do = advancement['feats'] || {}
+        type_key = fdetails['feat_type']&.first&.downcase || 'general'
+        type_feats_to_do = feats_to_do[type_key] || []
+        type_feats_to_do << fname
+        feats_to_do[type_key] = type_feats_to_do
+        advancement['feats'] = feats_to_do
+
+        grants.each_pair do |grant_feat, grant_info|
+          next unless grant_info.is_a?(Hash)
+          next unless grant_info['gated_feat']&.casecmp?(self.gate)
+
+          grant_info.delete('gated_feat')
+          if grant_info.empty?
+            grants.delete(grant_feat)
+          end
+          break
+        end
+
+        if grants.empty?
+          to_assign.delete('grants')
+        else
+          to_assign['grants'] = grants
+        end
+
+        if to_assign['gated_feat_options']
+          matched_gate = to_assign['gated_feat_options'].keys.find { |g| g.to_s.casecmp?(self.gate) }
+          to_assign['gated_feat_options'].delete(matched_gate) if matched_gate
+          to_assign.delete('gated_feat_options') if to_assign['gated_feat_options'].empty?
+        end
+
+        enactor.pf2_advancement = advancement
+        enactor.pf2_to_assign = to_assign
+        enactor.save
+
+        client.emit_success t('pf2e.adv_feat_selected', :feat => fname, :type => type_key)
       end
 
     end

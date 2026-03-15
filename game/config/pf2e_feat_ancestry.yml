@@ -839,10 +839,10 @@ pf2e_feats:
     assoc_ancestry: 
       - Gnome
     traits: []
-    shortdesc: "Your enhanced fey connection affords you a warmer reception from creatures of the First World as well as tools to foil their tricks. You gain a +2 circumstance bonus to both Perception checks and saving throws against fey.%r%rIn addition, whenever you meet a fey creature in a social situation, you can immediately attempt a Diplomacy check to Make an Impression on that creature rather than needing to converse for 1 minute. You take a –5 penalty to the check. If you fail, you can engage in 1 minute of conversation and attempt a new check at the end of that time rather than accepting the failure or critical failure result.%r%r**Special** If you have the Glad-Hand skill feat, you don't take the penalty on your immediate Diplomacy check if the target is a fey."
+    shortdesc: "Your enhanced fey connection affords you a warmer reception from creatures of Quelynos as well as tools to foil their tricks. You gain a +2 circumstance bonus to both Perception checks and saving throws against fey.%r%rIn addition, whenever you meet a fey creature in a social situation, you can immediately attempt a Diplomacy check to Make an Impression on that creature rather than needing to converse for 1 minute. You take a –5 penalty to the check. If you fail, you can engage in 1 minute of conversation and attempt a new check at the end of that time rather than accepting the failure or critical failure result.%r%r**Special** If you have the Glad-Hand skill feat, you don't take the penalty on your immediate Diplomacy check if the target is a fey."
     prereq:
       level: 1
-  First World Magic: # Ask Blue about this later
+  Quelynos Magic:
     feat_type: 
       - Ancestry
     assoc_ancestry: 
@@ -855,7 +855,7 @@ pf2e_feats:
           name: open
           tradition: primal
           cast_stat: Charisma
-    shortdesc: Your connection to the First World grants you a primal innate spell, much like those of the fey. Choose one cantrip from the primal spell list. You can cast this spell as a primal innate spell at will. A cantrip is heightened to a spell level equal to half your level rounded up.
+    shortdesc: Your connection to Quelynos grants you a primal innate spell, much like those of the fey. Choose one cantrip from the primal spell list. You can cast this spell as a primal innate spell at will. A cantrip is heightened to a spell level equal to half your level rounded up.
     prereq:
       level: 1
   Gnome Obsession: # Ask Blue about this later # Skill proficiency
@@ -918,7 +918,6 @@ pf2e_feats:
     shortdesc: The magic within you provides increased energy you can use to focus. You regain 1 Focus Point, up to your usual maximum.
     prereq:
       level: 5
-    init_magic: true
   Gnome Weapon Innovator:
     feat_type: 
       - Ancestry
@@ -952,7 +951,7 @@ pf2e_feats:
     shortdesc: You've learned a few magical techniques for getting yourself both into and out of trouble unnoticed. You gain misdirection and silence as 2nd-level arcane or occult innate spells. The tradition of these spells must match the tradition you use for your gnome ancestry options. You can cast each spell once per day and can target only yourself.
     prereq:
       level: 9
-  First World Adept: # Ask Blue about this later # weird magic prereqs
+  Quelynos Adept:
     feat_type: 
       - Ancestry
     assoc_ancestry: 
@@ -988,7 +987,7 @@ pf2e_feats:
     assoc_ancestry: 
       - Gnome
     traits: []
-    shortdesc: Your connection to the First World has grown, and its positive energy flows into you rapidly. If you rest for 10 minutes, you gain Hit Points equal to your Constitution modifier × half your level. This is cumulative with any healing you receive from Treat Wounds.
+    shortdesc: Your connection to Quelynos has grown, and its positive energy flows into you rapidly. If you rest for 10 minutes, you gain Hit Points equal to your Constitution modifier × half your level. This is cumulative with any healing you receive from Treat Wounds.
     prereq:
       level: 9
   Gnome Weapon Expertise:
@@ -1031,7 +1030,7 @@ pf2e_feats:
           name: Plane Shift
           tradition: primal
           cast_stat: Charisma
-    shortdesc: "The connection between you and the First World resonates within your body stronger than it does for most gnomes, allowing you to cross the threshold between the Material Plane and the First World. You gain plane shift as a primal innate spell. You can cast it twice per week. This can be used only to travel back and forth between the First World and the Material Plane. Due to your body's natural resonance, you can act as the spell focus, and you don't require a tuning fork."
+    shortdesc: "The connection between you and Quelynos resonates within your body stronger than it does for most gnomes, allowing you to cross the threshold between the Material Plane and Quelynos. You gain plane shift as a primal innate spell. You can cast it twice per week. This can be used only to travel back and forth between Quelynos and the Material Plane. Due to your body's natural resonance, you can act as the spell focus, and you don't require a tuning fork."
     prereq:
       level: 17
 # Goblin Ancestry Feats
@@ -1268,7 +1267,6 @@ pf2e_feats:
     shortdesc: "Through study of multiple magical traditions, you've altered a spell to suit your spellcasting style. Choose one cantrip from a magical tradition other than your own. If you have a spell repertoire or a spellbook, replace one of the cantrips you know or have in your spellbook with the chosen spell. If you prepare spells without a spellbook (if you're a cleric or druid, for example), one of your cantrips must always be the chosen spell, and you prepare the rest normally. You can cast this cantrip as a spell of your class's tradition.%r%rIf you swap or retrain this cantrip later, you can choose its replacement from the same alternate tradition or a different one."
     prereq:
       level: 1
-    init_magic: true
   Cooperative Nature:
     feat_type: 
       - Ancestry
@@ -1284,6 +1282,8 @@ pf2e_feats:
     assoc_ancestry: 
       - Human
     traits: []
+    grants:
+      gated_feat: General Training
     shortdesc: "Your adaptability manifests in your mastery of a range of useful abilities. You gain a 1st-level general feat. You must meet the feat's prerequisites, but if you select this feat during character creation, you can select the feat later in the process in order to determine which prerequisites you meet.%r%r**Special** You can select this feat multiple times, choosing a different feat each time."
     prereq:
       level: 1
@@ -1574,7 +1574,6 @@ pf2e_feats:
     shortdesc: There always seems to be a little rat around to carry messages for you. You can cast _animal messenger_ once per day as a primal innate spell. When you do, the animal that responds is always a rat. If there are no rats within range, the spell is lost.
     prereq:
       level: 5
-    init_magic: true
   Big Mouth:
     feat_type: 
       - Ancestry
@@ -3710,7 +3709,6 @@ pf2e_feats:
     prereq:
       level: 9
       heritage: Silyara
-    init_magic: true
 # Ghaluch Ancestry Feats
   Monstrous Peacemaker:
     feat_type: 

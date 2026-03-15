@@ -169,6 +169,8 @@ pf2e_feats:
       - General
     traits: []
     shortdesc: Whether through instinct, study, or magic, you feel a deeper connection to your ancestry. You gain a 1st-level ancestry feat.
+    grants:
+      gated_feat: Ancestral Paragon
     prereq:
       level: 3
   Hireling Manager: # Talk about in staff meeting

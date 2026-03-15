@@ -205,6 +205,8 @@ module AresMUSH
           grant_message.each {|msg| client.emit_ooc msg }
         end
 
+        Pf2e.apply_init_magic_feat(enactor, fname, fdeets, client)
+
       end
 
       def handle_deity_domain

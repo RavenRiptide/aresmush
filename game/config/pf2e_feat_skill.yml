@@ -46,7 +46,6 @@ pf2e_feats:
     prereq:
       level: 1
       skill: Arcana/trained
-    init_magic: true
   Armor Assist:
     feat_type: 
       - Skill

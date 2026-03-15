@@ -566,6 +566,22 @@ module AresMUSH
       return_msg
     end
 
+    def self.apply_init_magic_feat(char, feat_name, feat_details, client)
+      return unless feat_details && feat_details['init_magic']
+
+      spell_result = Pf2emagic.get_spell_details(feat_name)
+      return if spell_result.is_a?(String)
+
+      spell_name, spell_details = spell_result
+      focus_type_by_class = Global.read_config('pf2e_magic', 'focus_type_by_class')
+      focus_type = focus_type_by_class[char.pf2_base_info['charclass']] || 'devotion'
+
+      key = spell_details['base_level'].to_i.zero? ? 'focus_cantrip' : 'focus_spell'
+      spell_info = { key => { focus_type => [ spell_name ] } }
+
+      PF2Magic.update_magic(char, char.pf2_base_info['charclass'], spell_info, client)
+    end
+
     def self.can_take_gated_feat?(char, feat, gate)
       Global.logger.debug "#{feat} - #{gate}"
       # This function is called whenever the gated_feat key is present. It is used for any
@@ -612,6 +628,24 @@ module AresMUSH
         feat_charclass = fdeets['assoc_charclass']&.include? char_base_class
 
         passes_gate = level && feat_type && feat_charclass
+      when "ancestral paragon"
+        feat_type = fdeets['feat_type']&.include?('Ancestry')
+        prereq_level = fdeets.dig('prereq', 'level')
+        level_ok = !prereq_level.nil? && prereq_level.to_i <= 1
+
+        passes_gate = feat_type && level_ok && Pf2e.can_take_feat?(char, feat)
+      when "general training"
+        feat_type = fdeets['feat_type']&.include?('General')
+        prereq_level = fdeets.dig('prereq', 'level')
+        level_ok = !prereq_level.nil? && prereq_level.to_i <= 1
+
+        passes_gate = feat_type && level_ok && Pf2e.can_take_feat?(char, feat)
+      when "advanced general training"
+        feat_type = fdeets['feat_type']&.include?('General')
+        prereq_level = fdeets.dig('prereq', 'level')
+        level_ok = !prereq_level.nil? && prereq_level.to_i <= 7
+
+        passes_gate = feat_type && level_ok && Pf2e.can_take_feat?(char, feat)
       when "skillful lesson"
         skills_hash = Global.read_config('pf2e_skills')
         needed_key_abil = %w(Intelligence Wisdom Charisma)
@@ -658,6 +692,24 @@ module AresMUSH
       end
 
       list.sort
+    end
+
+    def self.gated_feat_summary(gate)
+      # Summaries for the advance/review screen when a gated feat is pending assignment.
+      return "eligible feat" if gate.nil?
+
+      summaries = {
+        "ancestral paragon" => "1st-level ancestry feat",
+        "general training" => "1st-level general feat",
+        "advanced general training" => "7th-level or lower general feat",
+        "natural ambition" => "1st-level class feat",
+        "metamagic" => "metamagic feat",
+        "universalist" => "wizard feat",
+        "skillful lesson" => "skill with an Intelligence, Wisdom, or Charisma key ability",
+        "deity's domain" => "deity domain"
+      }
+
+      summaries[gate.to_s.downcase] || "eligible feat"
     end
 
   end
