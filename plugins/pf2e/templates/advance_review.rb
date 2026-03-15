@@ -125,7 +125,20 @@ module AresMUSH
         list = []
 
         @to_assign.each_pair do |key, value|
-          next if key == "signature"
+          next if key == "signature" || key == "gated_feat_options"
+
+          if key == "grants" && value.is_a?(Hash)
+            value.each_pair do |feat, grant_info|
+              if grant_info.is_a?(Hash) && grant_info['gated_feat']
+                gate = grant_info['gated_feat']
+                summary = Pf2e.gated_feat_summary(gate)
+                list << "#{item_color}#{feat}:%xn #{summary}"
+              else
+                list << "#{item_color}#{feat}:%xn #{grant_info}"
+              end
+            end
+            next
+          end
 
           # Process according to the data type of the key.
           heading = key.gsub("charclass", "class feat")
