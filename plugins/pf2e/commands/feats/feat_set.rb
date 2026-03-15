@@ -228,7 +228,8 @@ module AresMUSH
         domain = deity_domains.find { |d| d.casecmp?(self.feat_name) }
 
         unless domain
-          client.emit_failure "That is not one of your deity's domains."
+          options = deity_domains.sort.join(", ")
+          client.emit_failure "That is not one of your deity's domains. Domain options: #{options}."
           return
         end
 
