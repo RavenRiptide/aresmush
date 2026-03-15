@@ -255,8 +255,9 @@ module AresMUSH
       # Does character get a proficiency in that particular weapon from their deity?
       if char_wp_prof['deity']
         deity_weapon = Global.read_config('pf2e_deities', char.pf2_faith['deity'], 'fav_weapon')
-
-        prof_list << char_wp_prof['deity'] if name == deity_weapon
+        if deity_weapon && name.to_s.downcase == deity_weapon.to_s.downcase
+          prof_list << char_wp_prof['deity']
+        end
       end
 
       prof_list = prof_list.compact
