@@ -16,13 +16,12 @@ After finishing chargen, see `help magic` for more information on using, prepari
 The following commands are applicable for adding and reviewing spells.
 
 **Commands**:
-`addspell <class>/<level> = <spell name>`: Chooses a spell for that character class and level. 
-`addspell <class>/<level> = <old spell>/<new spell>`: Swaps `<old spell>` for `<new spell>` in that class and level.
+`addspell <class>/<level> = <spell name>`: Chooses a spell (by `<spell name>`). `<class>` is your character class, and `<level>` is the spell's level. 
+`addspell <class>/<level> = <old spell>/<new spell>`: Swaps `<old spell>` for `<new spell>` in the specified character class (`<class>`) and spell level (`<level>`).
 `spellbook`: Shows all the spells you know if you're a prepared caster.
 `repertoire`: Shows all the spells you know if you're a spontaneous caster.
+`magic`: Shows your magic casting stats, including focus spells and innate spells (if you know any).
 `spell/search`: Searches spells in the spell database. (See `help spell search` for more information.)
-
-The `addspell` command can take selection switches to process some character options. `cg/review` or `advance/review` will tell you what switch to use if you need one.
 
 **Note: All spells selected in character generation must be common spells.** A spell must not have the Uncommon or Rare traits. Uncommon and Rare spells can only be learned after chargen with RPP spends.
 
@@ -33,6 +32,7 @@ Some class specialties or choices grant you extra spells that must be resolved w
 
 **Commands**:
 `addspell/school wizard/<level> = <spell name>`: For non-universalist wizards, adds a 1st-level spell from the arcane tradition associated with your school of magic. For example, necromancy wizards can add a 1st-level arcane spell with the Necromancy trait with this command.
+`addspell innate/<level> = <spell name>`: Chooses an open innate spell, if you've been given one by a feat.
 
 ## Adding Divine Fonts
 

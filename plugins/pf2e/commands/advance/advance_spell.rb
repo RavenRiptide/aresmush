@@ -50,6 +50,26 @@ module AresMUSH
 
         list = self.type == "spellbook" ? type_option : type_option[level]
 
+        if self.type == "innate"
+          unless list.is_a?(Array)
+            client.emit_failure t('pf2emagic.innate_no_new_spells')
+            return
+          end
+
+          result = check_innate_spell(level, self.value, list)
+          if result.is_a?(String)
+            client.emit_failure result
+            return
+          end
+
+          spell = result
+
+          update_innate_advancement(spell, list, type_option, level)
+
+          client.emit_success t('pf2e.add_ok', :item => spell, :list => self.type)
+          return
+        end
+
 
         # Now we have to figure out if we have an open slot.
         open_slot = list.index "open"
@@ -114,6 +134,101 @@ module AresMUSH
         enactor.save
 
         client.emit_success t('pf2e.add_ok', :item => spell, :list => self.type)
+      end
+
+      def check_innate_spell(level, value, list)
+        advancement = enactor.pf2_advancement || {}
+        magic_stats = advancement['magic_stats'] || {}
+        pending = magic_stats['innate_spell']
+
+        return t('pf2emagic.innate_no_new_spells') unless pending
+
+        names = Array(pending['name'])
+
+        if self.old_value
+          return t('pf2emagic.innate_spell_to_delete_not_found') unless names.any? { |n| n.to_s.casecmp?(self.old_value) }
+        else
+          return t('pf2emagic.innate_no_new_spells') unless names.any? { |n| n.to_s.downcase == 'open' }
+        end
+
+        open_slot = list.index "open"
+        old = if open_slot
+          "open"
+        elsif self.old_value
+          list.select { |s| s.to_s.downcase.match? self.old_value.downcase }.first
+        else
+          nil
+        end
+
+        return t('pf2emagic.innate_spell_to_delete_not_found') unless old
+
+        hash = Pf2emagic.find_common_spells
+        match = hash.keys.select { |s| s.downcase == value.downcase }
+
+        return t('pf2emagic.innate_no_such_spell') if match.empty?
+        return t('pf2emagic.innate_multiple_matches', :item => 'spell') if (match.size > 1)
+
+        to_add = match.first
+        return t('pf2emagic.innate_spell_already_on_list_to_assign') if list.any? { |s| s.to_s.casecmp?(to_add) }
+
+        deets = hash[to_add]
+
+        return t('pf2emagic.innate_not_spell_eligible') unless deets['tradition']
+
+        tradition = pending['tradition']
+        return t('pf2emagic.innate_tradition_mismatch') unless deets['tradition'].include?(tradition)
+
+        spbl = deets['base_level'].to_i
+        level_is_cantrip = (level.to_s.downcase == 'cantrip' || level.to_i.zero?)
+        spell_is_cantrip = spbl.zero?
+
+        return t('pf2emagic.innate_cant_learn_cantrip_slot') if spell_is_cantrip && !level_is_cantrip
+        return t('pf2emagic.innate_cant_learn_spell_cantrip') if !spell_is_cantrip && level_is_cantrip
+        return t('pf2emagic.innate_cant_prepare_level') if spbl > level.to_i
+
+        slot_level = pending['level']
+        slot_is_cantrip = (slot_level.to_s.downcase == 'cantrip' || slot_level.to_i.zero?)
+        return t('pf2emagic.innate_cant_prepare_level') if slot_is_cantrip != level_is_cantrip
+        return t('pf2emagic.innate_cant_prepare_level') if !slot_is_cantrip && slot_level.to_i != level.to_i
+
+        to_add
+      end
+
+      def update_innate_advancement(spell, list, type_option, level)
+        advancement = enactor.pf2_advancement || {}
+        magic_stats = advancement['magic_stats'] || {}
+        pending = magic_stats['innate_spell'] || {}
+
+        names = Array(pending['name'])
+        replace_index = if self.old_value
+          names.index { |n| n.to_s.casecmp?(self.old_value) }
+        else
+          names.index { |n| n.to_s.downcase == 'open' }
+        end
+
+        return unless replace_index
+
+        names[replace_index] = spell
+        pending['name'] = names.size == 1 ? names.first : names
+        magic_stats['innate_spell'] = pending
+        advancement['magic_stats'] = magic_stats
+
+        open_slot = list.index("open")
+        open_slot = list.index { |s| s.to_s.casecmp?(self.old_value) } if open_slot.nil? && self.old_value
+
+        if open_slot
+          list.delete_at open_slot
+          list << spell
+        end
+
+        type_option[level] = list
+        to_assign = enactor.pf2_to_assign
+        to_assign[self.type] = type_option
+        advancement[self.type] = type_option
+
+        enactor.pf2_advancement = advancement
+        enactor.pf2_to_assign = to_assign
+        enactor.save
       end
     end
   end

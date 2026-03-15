@@ -66,6 +66,18 @@ module AresMUSH
 
         level = self.spell_level.zero? ? 'cantrip' : self.spell_level.to_s
 
+        if self.caster_class&.casecmp?('innate')
+          msg = Pf2emagic.select_innate_spell(enactor, level, self.old_spell, self.new_spell, true)
+
+          if msg
+            client.emit_failure msg
+            return
+          end
+
+          client.emit_success t('pf2emagic.cg_spell_select_ok')
+          return
+        end
+
         # A switch on this command indicates a gate on the spell. Divert to different processing.
         if cmd.switch
           msg = Pf2emagic.select_gated_spell(enactor, self.caster_class, level, self.old_spell, self.new_spell, cmd.switch, false, true)

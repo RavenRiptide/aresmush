@@ -45,6 +45,18 @@ module AresMUSH
 
       info.each_pair do |key, value|
         case key
+        when "innate_spell"
+          names = Array(value['name'])
+          open_count = names.count { |n| n.to_s.downcase == 'open' }
+
+          if open_count > 0
+            level_key = value['level'].to_i.zero? || value['level'].to_s.downcase == 'cantrip' ? 'cantrip' : value['level'].to_s
+            assignment_list = magic_options['innate'] || {}
+            list = assignment_list[level_key] || []
+            list.concat(Array.new(open_count, 'open'))
+            assignment_list[level_key] = list
+            magic_options['innate'] = assignment_list
+          end
         when "repertoire"
 
           assignment_list = {}

@@ -283,6 +283,66 @@ module AresMUSH
       return nil
     end
 
+    def self.select_innate_spell(char, level, old_spell, new_spell, common_only=false)
+      magic = char.magic
+      innate_spells = magic.innate_spells || {}
+
+      return t('pf2emagic.innate_no_new_spells') if innate_spells.empty?
+
+      old_spname = nil
+
+      if !(old_spell.blank?)
+        old_spname = get_spells_by_name(old_spell).first
+        return t('pf2emagic.innate_spell_to_delete_not_found') unless old_spname
+
+        source_info = innate_spells[old_spname]
+        return t('pf2emagic.innate_spell_to_delete_not_found') unless source_info
+      else
+        source_info = innate_spells['open']
+        return t('pf2emagic.innate_no_new_spells') unless source_info
+      end
+
+      hash = common_only ? find_common_spells : Global.read_config('pf2e_spells')
+      match = hash.keys.select { |s| s.downcase == new_spell.downcase }
+
+      return t('pf2emagic.innate_no_such_spell') if match.empty?
+      return t('pf2emagic.innate_multiple_matches', :item => 'spell') if (match.size > 1)
+
+      to_add = match.first
+      return t('pf2emagic.innate_spell_already_on_list_to_assign') if innate_spells.key?(to_add)
+
+      deets = hash[to_add]
+
+      return t('pf2emagic.innate_not_spell_eligible') unless deets['tradition']
+
+      tradition = source_info['tradition']
+      return t('pf2emagic.innate_tradition_mismatch') unless deets['tradition'].include?(tradition)
+
+      spbl = deets['base_level'].to_i
+      level_is_cantrip = (level.to_s.downcase == 'cantrip' || level.to_i.zero?)
+      spell_is_cantrip = spbl.zero?
+
+      return t('pf2emagic.innate_cant_learn_cantrip_slot') if spell_is_cantrip && !level_is_cantrip
+      return t('pf2emagic.innate_cant_learn_spell_cantrip') if !spell_is_cantrip && level_is_cantrip
+      return t('pf2emagic.innate_cant_prepare_level') if spbl > level.to_i
+
+      slot_level = source_info['level']
+      slot_is_cantrip = (slot_level.to_s.downcase == 'cantrip' || slot_level.to_i.zero?)
+      return t('pf2emagic.innate_cant_prepare_level') if slot_is_cantrip != level_is_cantrip
+      return t('pf2emagic.innate_cant_prepare_level') if !slot_is_cantrip && slot_level.to_i != level.to_i
+
+      if old_spname
+        innate_spells.delete(old_spname)
+      else
+        innate_spells.delete('open')
+      end
+
+      innate_spells[to_add] = source_info
+      magic.update(innate_spells: innate_spells)
+
+      nil
+    end
+
     def self.find_common_spells
       Global.read_config('pf2e_spells').select { |k,v| !v['traits'].include? 'uncommon' or !v['traits'].include? 'rare' or !v['traits'].include? 'unique' }
     end

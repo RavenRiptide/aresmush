@@ -46,5 +46,6 @@ Most levels have you selecting some type of feat. Some class features gained in 
 Repertoire spellcasters learn a handful of spells through advancement and can replace old spells with new ones. Some repertoire spellcasters also gain access to signature spells and can set the spells they know in their repertoire as signature spells.
 
 `advance/spell <type>/<level> = <spell name>`: Selects a new spell (by its `<spell name>`). `<level>` is the level for which you want to learn the spell. `<type>` is either `repertoire` or `spellbook`, depending on what type of caster you are. You must have an open slot to learn a new spell.
+`advance/spell innate/<level> = <spell name>`: Selects an open innate spell (by its `<spell name>`), if you have one from a feat. `<level>` is the level for which you want to learn the spell.
 `advance/swapspell repertoire/<level> = <old spell>/<spell name>`: Swaps a known repertoire spell for a new spell at the same level. You can do this once per advancement. Bloodline or class-granted spells cannot be swapped. Cantrips can be swapped.
 `advance/spell signature/<level>=<spell name>`: Designates a spell (by its `<spell name>`) as a signature spell. `<level>` is the spell's original (base) level.

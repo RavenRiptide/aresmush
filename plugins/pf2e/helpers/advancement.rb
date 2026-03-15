@@ -325,7 +325,7 @@ module AresMUSH
           end
 
           msg << t('pf2e.adv_item_skill_choice') if needs_choice
-        when "spellbook", "repertoire"
+        when "spellbook", "repertoire", "innate"
           needs_spell_choice = if info.is_a?(Hash)
             info.values.any? do |value|
               value.is_a?(Array) ? value.include?("open") : value.to_s.downcase == 'open'
