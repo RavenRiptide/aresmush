@@ -2,4926 +2,4926 @@
 pf2e_background:
   Acolyte:
     abl_boosts:
-    - [ Intelligence, Wisdom ]
-    - open
+      - [ Intelligence, Wisdom ]
+      - open
     skills:
-    - Religion
-    - Scribing Lore
+      - Religion
+      - Scribing Lore
     feat:
-    - Student of the Canon
+      - Student of the Canon
     special: []
     action: []
     reaction: []
   Acrobat:
     abl_boosts:
-    - [ Strength, Dexterity ]
-    - open
+      - [ Strength, Dexterity ]
+      - open
     skills:
-    - Acrobatics
-    - Circus Lore
+      - Acrobatics
+      - Circus Lore
     feat:
-    - Steady Balance
+      - Steady Balance
     special: []
     action: []
     reaction: []
   Animal Whisperer (Aquatic Terrain):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Nature
-    - Aquatic Terrain Lore
+      - Nature
+      - Aquatic Terrain Lore
     feat:
-    - Train Animal
+      - Train Animal
     action: []
     reaction: []
   Animal Whisperer (Arctic Terrain):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Nature
-    - Aquatic Terrain Lore
+      - Nature
+      - Aquatic Terrain Lore
     feat:
-    - Train Animal
+      - Train Animal
     action: []
     reaction: []
   Animal Whisperer (Desert Terrain):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Nature
-    - Desert Terrain Lore
+      - Nature
+      - Desert Terrain Lore
     feat:
-    - Train Animal
+      - Train Animal
     action: []
     reaction: []
   Animal Whisperer (Forest Terrain):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Nature
-    - Forest Terrain Lore
+      - Nature
+      - Forest Terrain Lore
     feat:
-    - Train Animal
+      - Train Animal
     action: []
     reaction: []
   Animal Whisperer (Mountain Terrain):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Nature
-    - Mountain Terrain Lore
+      - Nature
+      - Mountain Terrain Lore
     feat:
-    - Train Animal
+      - Train Animal
     action: []
     reaction: []
   Animal Whisperer (Plains Terrain):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Nature
-    - Plains Terrain Lore
+      - Nature
+      - Plains Terrain Lore
     feat:
-    - Train Animal
+      - Train Animal
     action: []
     reaction: []
   Animal Whisperer (Sky Terrain):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Nature
-    - Sky Terrain Lore
+      - Nature
+      - Sky Terrain Lore
     feat:
-    - Train Animal
+      - Train Animal
     action: []
     reaction: []
   Animal Whisperer (Swamp Terrain):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Nature
-    - Swamp Terrain Lore
+      - Nature
+      - Swamp Terrain Lore
     feat:
-    - Train Animal
+      - Train Animal
     action: []
     reaction: []
   Animal Whisperer (Underground Terrain):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Nature
-    - Underground Terrain Lore
+      - Nature
+      - Underground Terrain Lore
     feat:
-    - Train Animal
+      - Train Animal
     action: []
     reaction: []
   Artisan:
     abl_boosts:
-    - [ Strength, Intelligence ]
-    - open
+      - [ Strength, Intelligence ]
+      - open
     skills:
-    - Crafting
-    - Guild Lore
+      - Crafting
+      - Guild Lore
     feat:
-    - Specialty Crafting
+      - Specialty Crafting
     special: []
     action: []
     reaction: []
   Artist:
     abl_boosts:
-    - [ Dexterity, Charisma ]
-    - open
+      - [ Dexterity, Charisma ]
+      - open
     skills:
-    - Crafting
-    - Art Lore
+      - Crafting
+      - Art Lore
     feat:
-    - Specialty Crafting
+      - Specialty Crafting
     special: []
     action: []
     reaction: []
   Bandit (Aquatic Terrain):
     abl_boosts:
-    - [ Dexterity, Charisma ]
-    - open
+      - [ Dexterity, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Aquatic Terrain Lore
+      - Intimidation
+      - Aquatic Terrain Lore
     feat:
-    - Group Coercion
+      - Group Coercion
     special: []
     action: []
     reaction: []
   Bandit (Arctic Terrain):
     abl_boosts:
-    - [ Dexterity, Charisma ]
-    - open
+      - [ Dexterity, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Arctic Terrain Lore
+      - Intimidation
+      - Arctic Terrain Lore
     feat:
-    - Group Coercion
+      - Group Coercion
     special: []
     action: []
     reaction: []
   Bandit (Desert Terrain):
     abl_boosts:
-    - [ Dexterity, Charisma ]
-    - open
+      - [ Dexterity, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Desert Terrain Lore
+      - Intimidation
+      - Desert Terrain Lore
     feat:
-    - Group Coercion
+      - Group Coercion
     special: []
     action: []
     reaction: []
   Bandit (Forest Terrain):
     abl_boosts:
-    - [ Dexterity, Charisma ]
-    - open
+      - [ Dexterity, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Forest Terrain Lore
+      - Intimidation
+      - Forest Terrain Lore
     feat:
-    - Group Coercion
+      - Group Coercion
     special: []
     action: []
     reaction: []
   Bandit (Mountain Terrain):
     abl_boosts:
-    - [ Dexterity, Charisma ]
-    - open
+      - [ Dexterity, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Mountain Terrain Lore
+      - Intimidation
+      - Mountain Terrain Lore
     feat:
-    - Group Coercion
+      - Group Coercion
     special: []
     action: []
     reaction: []
   Bandit (Plains Terrain):
     abl_boosts:
-    - [ Dexterity, Charisma ]
-    - open
+      - [ Dexterity, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Plains Terrain Lore
+      - Intimidation
+      - Plains Terrain Lore
     feat:
-    - Group Coercion
+      - Group Coercion
     special: []
     action: []
     reaction: []
   Bandit (Sky Terrain):
     abl_boosts:
-    - [ Dexterity, Charisma ]
-    - open
+      - [ Dexterity, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Sky Terrain Lore
+      - Intimidation
+      - Sky Terrain Lore
     feat:
-    - Group Coercion
+      - Group Coercion
     special: []
     action: []
     reaction: []
   Bandit (Swamp Terrain):
     abl_boosts:
-    - [ Dexterity, Charisma ]
-    - open
+      - [ Dexterity, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Swamp Terrain Lore
+      - Intimidation
+      - Swamp Terrain Lore
     feat:
-    - Group Coercion
+      - Group Coercion
     special: []
     action: []
     reaction: []
   Bandit (Underground Terrain):
     abl_boosts:
-    - [ Dexterity, Charisma ]
-    - open
+      - [ Dexterity, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Underground Terrain Lore
+      - Intimidation
+      - Underground Terrain Lore
     feat:
-    - Group Coercion
+      - Group Coercion
     special: []
     action: []
     reaction: []
   Barber:
     abl_boosts:
-    - [ Dexterity, Wisdom ]
-    - open
+      - [ Dexterity, Wisdom ]
+      - open
     skills:
-    - Medicine
-    - Surgery Lore
+      - Medicine
+      - Surgery Lore
     feat:
-    - Risky Surgery
+      - Risky Surgery
     special: []
     action: []
     reaction: []
   Barkeep:
     abl_boosts:
-    - [ Constitution, Charisma ]
-    - open
+      - [ Constitution, Charisma ]
+      - open
     skills:
-    - Diplomacy
-    - Alcohol Lore
+      - Diplomacy
+      - Alcohol Lore
     feat:
-    - Hobnobber
+      - Hobnobber
     special: []
     action: []
     reaction: []
   Barrister:
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Diplomacy
-    - Legal Lore
+      - Diplomacy
+      - Legal Lore
     feat:
-    - Group Impression
+      - Group Impression
     special: []
     action: []
     reaction: []
   Blessed (Althean):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Althean Lore
+      - Althean Lore
     feat: []
     special:
-    - Blessed
+      - Blessed
     rare: true
     action: []
     reaction: []
   Blessed (Angorite):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Angorite Lore
+      - Angorite Lore
     feat: []
     special:
-    - Blessed
+      - Blessed
     rare: true
     action: []
     reaction: []
   Blessed (Animusian):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Animusian Lore
+      - Animusian Lore
     feat: []
     special:
-    - Blessed
+      - Blessed
     rare: true
     action: []
     reaction: []
   Blessed (Caracorothan):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Caracorothan Lore
+      - Caracorothan Lore
     feat: []
     special:
-    - Blessed
+      - Blessed
     rare: true
     action: []
     reaction: []
   Blessed (Ceinaran):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Ceinaran Lore
+      - Ceinaran Lore
     feat: []
     special:
-    - Blessed
+      - Blessed
     rare: true
     action: []
     reaction: []
   Blessed (Daeusite):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Daeusite Lore
+      - Daeusite Lore
     feat: []
     special:
-    - Blessed
+      - Blessed
     rare: true
     action: []
     reaction: []
   Blessed (Danan):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Danan Lore
+      - Danan Lore
     feat: []
     special:
-    - Blessed
+      - Blessed
     rare: true
     action: []
     reaction: []
   Blessed (Deimosian):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Deimosian Lore
+      - Deimosian Lore
     feat: []
     special:
-    - Blessed
+      - Blessed
     rare: true
     action: []
     reaction: []
   Blessed (Elunan):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Elunan Lore
+      - Elunan Lore
     feat: []
     special:
-    - Blessed
+      - Blessed
     rare: true
     action: []
     reaction: []
   Blessed (Gileadean):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Gileadean Lore
+      - Gileadean Lore
     feat: []
     special:
-    - Blessed
+      - Blessed
     rare: true
     action: []
     reaction: []
   Blessed (Gunakharan):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Gunakharan Lore
+      - Gunakharan Lore
     feat: []
     special:
-    - Blessed
+      - Blessed
     rare: true
     action: []
     reaction: []
   Blessed (Illothan):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Illothan Lore
+      - Illothan Lore
     feat: []
     special:
-    - Blessed
+      - Blessed
     rare: true
     action: []
     reaction: []
   Blessed (Korite):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Korite Lore
+      - Korite Lore
     feat: []
     special:
-    - Blessed
+      - Blessed
     rare: true
     action: []
     reaction: []
   Blessed (Maugrimite):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Maugrimite Lore
+      - Maugrimite Lore
     feat: []
     special:
-    - Blessed
+      - Blessed
     rare: true
     action: []
     reaction: []
   Blessed (Navosian):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Navosian Lore
+      - Navosian Lore
     feat: []
     special:
-    - Blessed
+      - Blessed
     rare: true
     action: []
     reaction: []
   Blessed (Radan):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Radan Lore
+      - Radan Lore
     feat: []
     special:
-    - Blessed
+      - Blessed
     rare: true
     action: []
     reaction: []
   Blessed (Reosian):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Reosian Lore
+      - Reosian Lore
     feat: []
     special:
-    - Blessed
+      - Blessed
     rare: true
     action: []
     reaction: []
   Blessed (Serrielite):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Serrielite Lore
+      - Serrielite Lore
     feat: []
     special:
-    - Blessed
+      - Blessed
     rare: true
     action: []
     reaction: []
   Blessed (Taaran):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Taaran Lore
+      - Taaran Lore
     feat: []
     special:
-    - Blessed
+      - Blessed
     rare: true
     action: []
     reaction: []
   Blessed (Tarienite):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Tarienite Lore
+      - Tarienite Lore
     feat: []
     special:
-    - Blessed
+      - Blessed
     rare: true
     action: []
     reaction: []
   Blessed (Thulite):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Thulite Lore
+      - Thulite Lore
     feat: []
     special:
-    - Blessed
+      - Blessed
     rare: true
     action: []
     reaction: []
   Blessed (Vardaman):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Vardaman Lore
+      - Vardaman Lore
     feat: []
     special:
-    - Blessed
+      - Blessed
     rare: true
     action: []
     reaction: []
   Bookkeeper:
     abl_boosts:
-    - [ Intelligence, Wisdom ]
-    - open
+      - [ Intelligence, Wisdom ]
+      - open
     skills:
-    - Society
-    - Accounting Lore
+      - Society
+      - Accounting Lore
     feat:
-    - Eye For Numbers
+      - Eye For Numbers
     special: []
     action: []
     reaction: []
   Bounty Hunter:
     abl_boosts:
-    - [ Strength, Wisdom ]
-    - open
+      - [ Strength, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Legal Lore
+      - Survival
+      - Legal Lore
     feat:
-    - Experienced Tracker
+      - Experienced Tracker
     special: []
   Charlatan:
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Deception
-    - Underworld Lore
+      - Deception
+      - Underworld Lore
     feat:
-    - Charming Liar
+      - Charming Liar
     special: []
     action: []
     reaction: []
   Cook:
     abl_boosts:
-    - [ Constitution, Intelligence ]
-    - open
+      - [ Constitution, Intelligence ]
+      - open
     skills:
-    - Survival
-    - Cooking Lore
+      - Survival
+      - Cooking Lore
     feat:
-    - Seasoned
+      - Seasoned
     special: []
     action: []
     reaction: []
   Courier (Nicantlaca):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Nicantlaca Lore
+      - Society
+      - Nicantlaca Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Coaedhanaya):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Coaedhanaya Lore
+      - Society
+      - Coaedhanaya Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Cahua):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Cahua Lore
+      - Society
+      - Cahua Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Matewa):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Matewa Lore
+      - Society
+      - Matewa Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Promise):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Promise Lore
+      - Society
+      - Promise Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Uniki Io):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Uniki Io Lore
+      - Society
+      - Uniki Io Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Awaets):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Awaets Lore
+      - Society
+      - Awaets Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Raharuri):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Raharuri Lore
+      - Society
+      - Raharuri Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (New Hextus):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - New Hextus Lore
+      - Society
+      - New Hextus Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Sepultura):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Sepultura Lore
+      - Society
+      - Sepultura Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Chiuin Chathair):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Chiuin Chathair Lore
+      - Society
+      - Chiuin Chathair Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Serenza):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Serenza Lore
+      - Society
+      - Serenza Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Vandalheim):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Vandalheim Lore
+      - Society
+      - Vandalheim Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Khotea):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Khotea Lore
+      - Society
+      - Khotea Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Skald):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Skald Lore
+      - Society
+      - Skald Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Cloudhold):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Cloudhold Lore
+      - Society
+      - Cloudhold Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Keykavous):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Keykavous Lore
+      - Society
+      - Keykavous Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Mohebi):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Mohebi Lore
+      - Society
+      - Mohebi Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Mosta'An):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Mosta'An Lore
+      - Society
+      - Mosta'An Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Nouzari):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Nouzari Lore
+      - Society
+      - Nouzari Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Alexandria):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Alexandria Lore
+      - Society
+      - Alexandria Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Pyrna):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Pyrna Lore
+      - Society
+      - Pyrna Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Setidor):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Setidor Lore
+      - Society
+      - Setidor Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Oriaver):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Oriaver Lore
+      - Society
+      - Oriaver Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Marniar'nir):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Marniar'nir Lore
+      - Society
+      - Marniar'nir Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Ylvaliel):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Ylvaliel Lore
+      - Society
+      - Ylvaliel Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Tamatou):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Tamatou Lore
+      - Society
+      - Tamatou Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Ala'i):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Ala'i Lore
+      - Society
+      - Ala'i Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Taeao):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Taeao Lore
+      - Society
+      - Taeao Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Tava'esia):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Tava'esia Lore
+      - Society
+      - Tava'esia Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Dun Mordren):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Dun Mordren Lore
+      - Society
+      - Dun Mordren Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Dun Astiaf):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Dun Astiaf Lore
+      - Society
+      - Dun Astiaf Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Enrai):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Enrai Lore
+      - Society
+      - Enrai Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Palitzsch):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Palitzsch Lore
+      - Society
+      - Palitzsch Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Phedar):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Phedar Lore
+      - Society
+      - Phedar Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Sedhla Mil):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Sedhla Mil Lore
+      - Society
+      - Sedhla Mil Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Cleydine):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Cleydine Lore
+      - Society
+      - Cleydine Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Joilada):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Joilada Lore
+      - Society
+      - Joilada Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Kaasall):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Kaasall Lore
+      - Society
+      - Kaasall Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Pramont):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Pramont Lore
+      - Society
+      - Pramont Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Oriaphen):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Oriaphen Lore
+      - Society
+      - Oriaphen Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Rouhull):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Rouhull Lore
+      - Society
+      - Rouhull Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Amity):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Amity Lore
+      - Society
+      - Amity Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Bryn Myridorn):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Bryn Myridorn Lore
+      - Society
+      - Bryn Myridorn Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Fiore di Mar):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Fiore di Mar Lore
+      - Society
+      - Fiore di Mar Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Heavenward):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Heavenward Lore
+      - Society
+      - Heavenward Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Solm):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Solm Lore
+      - Society
+      - Solm Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Qutamo):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Qutamo Lore
+      - Society
+      - Qutamo Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Temirkan):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Temirkan Lore
+      - Society
+      - Temirkan Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (O'rondessa):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - O'rondessa Lore
+      - Society
+      - O'rondessa Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Duama):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Duama Lore
+      - Society
+      - Duama Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Flehzya):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Flehzya Lore
+      - Society
+      - Flehzya Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Orist):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Orist Lore
+      - Society
+      - Orist Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Sarzana):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Sarzana Lore
+      - Society
+      - Sarzana Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Rune):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Rune Lore
+      - Society
+      - Rune Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Volstengrad):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Volstengrad Lore
+      - Society
+      - Volstengrad Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Fellantz):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Fellantz Lore
+      - Society
+      - Fellantz Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Orimari):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Orimari Lore
+      - Society
+      - Orimari Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Norreir):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Norreir Lore
+      - Society
+      - Norreir Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Erecid):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Erecid Lore
+      - Society
+      - Erecid Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Mulinn):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Mulinn Lore
+      - Society
+      - Mulinn Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Tashraan):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Tashraan Lore
+      - Society
+      - Tashraan Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Azraq):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Azraq Lore
+      - Society
+      - Azraq Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Courier (Shamshir):
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Society
-    - Shamshir Lore
+      - Society
+      - Shamshir Lore
     feat:
-    - Glean Contents
+      - Glean Contents
     special: []
     action: []
     reaction: []
   Criminal:
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Stealth
-    - Underworld Lore
+      - Stealth
+      - Underworld Lore
     feat:
-    - Experienced Smuggler
+      - Experienced Smuggler
     special: []
     action: []
     reaction: []
   Cultist (Althean):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Occultism
-    - Althean Lore
+      - Occultism
+      - Althean Lore
     feat:
-    - Schooled In Secrets
+      - Schooled In Secrets
     special: []
     action: []
     reaction: []
   Cultist (Angorite):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Occultism
-    - Angorite Lore
+      - Occultism
+      - Angorite Lore
     feat:
-    - Schooled In Secrets
+      - Schooled In Secrets
     special: []
     action: []
     reaction: []
   Cultist (Animusian):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Occultism
-    - Animusian Lore
+      - Occultism
+      - Animusian Lore
     feat:
-    - Schooled In Secrets
+      - Schooled In Secrets
     special: []
     action: []
     reaction: []
   Cultist (Caracorothan):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Occultism
-    - Caracorothan Lore
+      - Occultism
+      - Caracorothan Lore
     feat:
-    - Schooled In Secrets
+      - Schooled In Secrets
     special: []
     action: []
     reaction: []
   Cultist (Ceinaran):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Occultism
-    - Ceinaran Lore
+      - Occultism
+      - Ceinaran Lore
     feat:
-    - Schooled In Secrets
+      - Schooled In Secrets
     special: []
     action: []
     reaction: []
   Cultist (Daeusite):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Occultism
-    - Daeusite Lore
+      - Occultism
+      - Daeusite Lore
     feat:
-    - Schooled In Secrets
+      - Schooled In Secrets
     special: []
     action: []
     reaction: []
   Cultist (Danan):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Occultism
-    - Danan Lore
+      - Occultism
+      - Danan Lore
     feat:
-    - Schooled In Secrets
+      - Schooled In Secrets
     special: []
     action: []
     reaction: []
   Cultist (Deimosian):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Occultism
-    - Deimosian Lore
+      - Occultism
+      - Deimosian Lore
     feat:
-    - Schooled In Secrets
+      - Schooled In Secrets
     special: []
     action: []
     reaction: []
   Cultist (Elunan):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Occultism
-    - Elunan Lore
+      - Occultism
+      - Elunan Lore
     feat:
-    - Schooled In Secrets
+      - Schooled In Secrets
     special: []
     action: []
     reaction: []
   Cultist (Gileadean):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Occultism
-    - Gileadean Lore
+      - Occultism
+      - Gileadean Lore
     feat:
-    - Schooled In Secrets
+      - Schooled In Secrets
     special: []
     action: []
     reaction: []
   Cultist (Gunakharan):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Occultism
-    - Gunakharan Lore
+      - Occultism
+      - Gunakharan Lore
     feat:
-    - Schooled In Secrets
+      - Schooled In Secrets
     special: []
     action: []
     reaction: []
   Cultist (Illothan):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Occultism
-    - Illothan Lore
+      - Occultism
+      - Illothan Lore
     feat:
-    - Schooled In Secrets
+      - Schooled In Secrets
     special: []
     action: []
     reaction: []
   Cultist (Korite):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Occultism
-    - Korite Lore
+      - Occultism
+      - Korite Lore
     feat:
-    - Schooled In Secrets
+      - Schooled In Secrets
     special: []
     action: []
     reaction: []
   Cultist (Maugrimite):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Occultism
-    - Maugrimite Lore
+      - Occultism
+      - Maugrimite Lore
     feat:
-    - Schooled In Secrets
+      - Schooled In Secrets
     special: []
     action: []
     reaction: []
   Cultist (Navosian):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Occultism
-    - Navosian Lore
+      - Occultism
+      - Navosian Lore
     feat:
-    - Schooled In Secrets
+      - Schooled In Secrets
     special: []
     action: []
     reaction: []
   Cultist (Radan):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Occultism
-    - Radan Lore
+      - Occultism
+      - Radan Lore
     feat:
-    - Schooled In Secrets
+      - Schooled In Secrets
     special: []
     action: []
     reaction: []
   Cultist (Reosian):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Occultism
-    - Reosian Lore
+      - Occultism
+      - Reosian Lore
     feat:
-    - Schooled In Secrets
+      - Schooled In Secrets
     special: []
     action: []
     reaction: []
   Cultist (Serrielite):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Occultism
-    - Serrielite Lore
+      - Occultism
+      - Serrielite Lore
     feat:
-    - Schooled In Secrets
+      - Schooled In Secrets
     special: []
     action: []
     reaction: []
   Cultist (Taaran):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Occultism
-    - Taaran Lore
+      - Occultism
+      - Taaran Lore
     feat:
-    - Schooled In Secrets
+      - Schooled In Secrets
     special: []
     action: []
     reaction: []
   Cultist (Tarienite):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Occultism
-    - Tarienite Lore
+      - Occultism
+      - Tarienite Lore
     feat:
-    - Schooled In Secrets
+      - Schooled In Secrets
     special: []
     action: []
     reaction: []
   Cultist (Thulite):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Occultism
-    - Thulite Lore
+      - Occultism
+      - Thulite Lore
     feat:
-    - Schooled In Secrets
+      - Schooled In Secrets
     special: []
     action: []
     reaction: []
   Cultist (Vardaman):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Occultism
-    - Vardaman Lore
+      - Occultism
+      - Vardaman Lore
     feat:
-    - Schooled In Secrets
+      - Schooled In Secrets
     special: []
     action: []
     reaction: []
   Cursed:
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Occultism
-    - Curse Lore
+      - Occultism
+      - Curse Lore
     feat: []
     reaction:
-    - Warding Sign
+      - Warding Sign
     rare: true
     action: []
   Detective:
     abl_boosts:
-    - [ Intelligence, Wisdom ]
-    - open
+      - [ Intelligence, Wisdom ]
+      - open
     skills:
-    - Society
-    - Underworld Lore
+      - Society
+      - Underworld Lore
     feat:
-    - Streetwise
+      - Streetwise
     special: []
     action: []
     reaction: []
   Emissary (Nicantlaca):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Nicantlaca Lore
+      - Society
+      - Nicantlaca Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Coaedhanaya):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Coaedhanaya Lore
+      - Society
+      - Coaedhanaya Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Cahua):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Cahua Lore
+      - Society
+      - Cahua Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Matewa):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Matewa Lore
+      - Society
+      - Matewa Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Promise):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Promise Lore
+      - Society
+      - Promise Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Uniki Io):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Uniki Io Lore
+      - Society
+      - Uniki Io Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Awaets):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Awaets Lore
+      - Society
+      - Awaets Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Raharuri):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Raharuri Lore
+      - Society
+      - Raharuri Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (New Hextus):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - New Hextus Lore
+      - Society
+      - New Hextus Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Sepultura):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Sepultura Lore
+      - Society
+      - Sepultura Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Chiuin Chathair):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Chiuin Chathair Lore
+      - Society
+      - Chiuin Chathair Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Serenza):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Serenza Lore
+      - Society
+      - Serenza Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Vandalheim):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Vandalheim Lore
+      - Society
+      - Vandalheim Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Khotea):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Khotea Lore
+      - Society
+      - Khotea Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Skald):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Skald Lore
+      - Society
+      - Skald Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Cloudhold):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Cloudhold Lore
+      - Society
+      - Cloudhold Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Keykavous):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Keykavous Lore
+      - Society
+      - Keykavous Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Mohebi):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Mohebi Lore
+      - Society
+      - Mohebi Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Mosta'An):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Mosta'An Lore
+      - Society
+      - Mosta'An Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Nouzari):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Nouzari Lore
+      - Society
+      - Nouzari Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Alexandria):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Alexandria Lore
+      - Society
+      - Alexandria Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Pyrna):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Pyrna Lore
+      - Society
+      - Pyrna Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Setidor):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Setidor Lore
+      - Society
+      - Setidor Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Oriaver):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Oriaver Lore
+      - Society
+      - Oriaver Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Marniar'nir):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Marniar'nir Lore
+      - Society
+      - Marniar'nir Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Ylvaliel):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Ylvaliel Lore
+      - Society
+      - Ylvaliel Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Tamatou):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Tamatou Lore
+      - Society
+      - Tamatou Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Ala'i):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Ala'i Lore
+      - Society
+      - Ala'i Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Taeao):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Taeao Lore
+      - Society
+      - Taeao Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Tava'esia):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Tava'esia Lore
+      - Society
+      - Tava'esia Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Dun Mordren):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Dun Mordren Lore
+      - Society
+      - Dun Mordren Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Dun Astiaf):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Dun Astiaf Lore
+      - Society
+      - Dun Astiaf Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Enrai):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Enrai Lore
+      - Society
+      - Enrai Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Palitzsch):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Palitzsch Lore
+      - Society
+      - Palitzsch Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Phedar):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Phedar Lore
+      - Society
+      - Phedar Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Sedhla Mil):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Sedhla Mil Lore
+      - Society
+      - Sedhla Mil Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Cleydine):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Cleydine Lore
+      - Society
+      - Cleydine Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Joilada):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Joilada Lore
+      - Society
+      - Joilada Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Kaasall):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Kaasall Lore
+      - Society
+      - Kaasall Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Pramont):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Pramont Lore
+      - Society
+      - Pramont Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Oriaphen):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Oriaphen Lore
+      - Society
+      - Oriaphen Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Rouhull):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Rouhull Lore
+      - Society
+      - Rouhull Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Amity):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Amity Lore
+      - Society
+      - Amity Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Bryn Myridorn):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Bryn Myridorn Lore
+      - Society
+      - Bryn Myridorn Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Fiore di Mar):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Fiore di Mar Lore
+      - Society
+      - Fiore di Mar Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Heavenward):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Heavenward Lore
+      - Society
+      - Heavenward Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Solm):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Solm Lore
+      - Society
+      - Solm Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Qutamo):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Qutamo Lore
+      - Society
+      - Qutamo Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Temirkan):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Temirkan Lore
+      - Society
+      - Temirkan Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (O'rondessa):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - O'rondessa Lore
+      - Society
+      - O'rondessa Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Duama):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Duama Lore
+      - Society
+      - Duama Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Flehzya):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Flehzya Lore
+      - Society
+      - Flehzya Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Orist):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Orist Lore
+      - Society
+      - Orist Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Sarzana):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Sarzana Lore
+      - Society
+      - Sarzana Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Rune):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Rune Lore
+      - Society
+      - Rune Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Volstengrad):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Volstengrad Lore
+      - Society
+      - Volstengrad Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Fellantz):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Fellantz Lore
+      - Society
+      - Fellantz Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Orimari):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Orimari Lore
+      - Society
+      - Orimari Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Norreir):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Norreir Lore
+      - Society
+      - Norreir Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Erecid):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Erecid Lore
+      - Society
+      - Erecid Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Mulinn):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Mulinn Lore
+      - Society
+      - Mulinn Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Tashraan):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Tashraan Lore
+      - Society
+      - Tashraan Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Azraq):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Azraq Lore
+      - Society
+      - Azraq Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Emissary (Shamshir):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Shamshir Lore
+      - Society
+      - Shamshir Lore
     feat:
-    - Multilingual
+      - Multilingual
     special: []
     action: []
     reaction: []
   Entertainer:
     abl_boosts:
-    - [ Dexterity, Charisma ]
-    - open
+      - [ Dexterity, Charisma ]
+      - open
     skills:
-    - Performance
-    - Theater Lore
+      - Performance
+      - Theater Lore
     feat:
-    - Fascinating Performance
+      - Fascinating Performance
     special: []
     action: []
     reaction: []
   Farmhand:
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Athletics
-    - Farming Lore
+      - Athletics
+      - Farming Lore
     feat:
-    - Assurance (Athletics)
+      - Assurance (Athletics)
     special: []
     action: []
     reaction: []
   Feybound:
     abl_boosts:
-    - [ Dexterity, Charisma ]
-    - open
+      - [ Dexterity, Charisma ]
+      - open
     skills: 
-    - Fey Lore
+      - Fey Lore
     feat: []
     action:
-    - "Fey's Fortune"
+      - "Fey's Fortune"
     rare: true
     reaction: []
     special: []
   Field Medic:
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Medicine
-    - Warfare Lore
+      - Medicine
+      - Warfare Lore
     feat:
-    - Battle Medicine
+      - Battle Medicine
     special: []
     action: []
     reaction: []
   Fortune Teller:
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Occultism
-    - Fortune-Telling Lore
+      - Occultism
+      - Fortune-Telling Lore
     feat:
-    - Oddity Identification
+      - Oddity Identification
     special: []
   Gambler:
     abl_boosts:
-    - [ Dexterity, Charisma ]
-    - open
+      - [ Dexterity, Charisma ]
+      - open
     skills:
-    - Deception
-    - Games Lore
+      - Deception
+      - Games Lore
     feat:
-    - Lie To Me
+      - Lie To Me
     special: []
   Gladiator:
     abl_boosts:
-    - [ Strength, Charisma ]
-    - open
+      - [ Strength, Charisma ]
+      - open
     skills:
-    - Performance
-    - Gladiatorial Lore
+      - Performance
+      - Gladiatorial Lore
     feat:
-    - Impressive Performance
+      - Impressive Performance
     special: []
     action: []
     reaction: []
   Guard (Legal):
     abl_boosts:
-    - [ Strength, Charisma ]
-    - open
+      - [ Strength, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Legal Lore
+      - Intimidation
+      - Legal Lore
     feat:
-    - Quick Coercion
+      - Quick Coercion
     special: []
     action: []
     reaction: []
   Guard (Warfare):
     abl_boosts:
-    - [ Strength, Charisma ]
-    - open
+      - [ Strength, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Warfare Lore
+      - Intimidation
+      - Warfare Lore
     feat:
-    - Quick Coercion
+      - Quick Coercion
     special: []
     action: []
     reaction: []
   Haunted:
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Occultism
+      - Occultism
     feat: []
     special:
-    - Haunted
+      - Haunted
     rare: true
     action: []
     reaction: []
   Herbalist:
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Nature
-    - Herbalism Lore
+      - Nature
+      - Herbalism Lore
     feat:
-    - Natural Medicine
+      - Natural Medicine
     special: []
     action: []
     reaction: []
   Hermit (Nature/Aquatic Terrain):
     abl_boosts:
-    - [ Constitution, Intelligence ]
-    - open
+      - [ Constitution, Intelligence ]
+      - open
     skills:
-    - Nature
-    - Aquatic Terrain Lore
+      - Nature
+      - Aquatic Terrain Lore
     feat:
-    - Dubious Knowledge
+      - Dubious Knowledge
     special: []
     action: []
     reaction: []
   Hermit (Nature/Arctic Terrain):
     abl_boosts:
-    - [ Constitution, Intelligence ]
-    - open
+      - [ Constitution, Intelligence ]
+      - open
     skills:
-    - Nature
-    - Arctic Terrain Lore
+      - Nature
+      - Arctic Terrain Lore
     feat:
-    - Dubious Knowledge
+      - Dubious Knowledge
     special: []
     action: []
     reaction: []
   Hermit (Nature/Desert Terrain):
     abl_boosts:
-    - [ Constitution, Intelligence ]
-    - open
+      - [ Constitution, Intelligence ]
+      - open
     skills:
-    - Nature
-    - Desert Terrain Lore
+      - Nature
+      - Desert Terrain Lore
     feat:
-    - Dubious Knowledge
+      - Dubious Knowledge
     special: []
     action: []
     reaction: []
   Hermit (Nature/Forest Terrain):
     abl_boosts:
-    - [ Constitution, Intelligence ]
-    - open
+      - [ Constitution, Intelligence ]
+      - open
     skills:
-    - Nature
-    - Forest Terrain Lore
+      - Nature
+      - Forest Terrain Lore
     feat:
-    - Dubious Knowledge
+      - Dubious Knowledge
     special: []
     action: []
     reaction: []
   Hermit (Nature/Mountain Terrain):
     abl_boosts:
-    - [ Constitution, Intelligence ]
-    - open
+      - [ Constitution, Intelligence ]
+      - open
     skills:
-    - Nature
-    - Mountain Terrain Lore
+      - Nature
+      - Mountain Terrain Lore
     feat:
-    - Dubious Knowledge
+      - Dubious Knowledge
     special: []
     action: []
     reaction: []
   Hermit (Nature/Plains Terrain):
     abl_boosts:
-    - [ Constitution, Intelligence ]
-    - open
+      - [ Constitution, Intelligence ]
+      - open
     skills:
-    - Nature
-    - Plains Terrain Lore
+      - Nature
+      - Plains Terrain Lore
     feat:
-    - Dubious Knowledge
+      - Dubious Knowledge
     special: []
     action: []
     reaction: []
   Hermit (Nature/Sky Terrain):
     abl_boosts:
-    - [ Constitution, Intelligence ]
-    - open
+      - [ Constitution, Intelligence ]
+      - open
     skills:
-    - Nature
-    - Sky Terrain Lore
+      - Nature
+      - Sky Terrain Lore
     feat:
-    - Dubious Knowledge
+      - Dubious Knowledge
     special: []
     action: []
     reaction: []
   Hermit (Nature/Swamp Terrain):
     abl_boosts:
-    - [ Constitution, Intelligence ]
-    - open
+      - [ Constitution, Intelligence ]
+      - open
     skills:
-    - Nature
-    - Swamp Terrain Lore
+      - Nature
+      - Swamp Terrain Lore
     feat:
-    - Dubious Knowledge
+      - Dubious Knowledge
     special: []
     action: []
     reaction: []
   Hermit (Nature/Underground Terrain):
     abl_boosts:
-    - [ Constitution, Intelligence ]
-    - open
+      - [ Constitution, Intelligence ]
+      - open
     skills:
-    - Nature
-    - Underground Terrain Lore
+      - Nature
+      - Underground Terrain Lore
     feat:
-    - Dubious Knowledge
+      - Dubious Knowledge
     special: []
     action: []
     reaction: []
   Hermit (Occultism/Aquatic Terrain):
     abl_boosts:
-    - [ Constitution, Intelligence ]
-    - open
+      - [ Constitution, Intelligence ]
+      - open
     skills:
-    - Occultism
-    - Aquatic Terrain Lore
+      - Occultism
+      - Aquatic Terrain Lore
     feat:
-    - Dubious Knowledge
+      - Dubious Knowledge
     special: []
     action: []
     reaction: []
   Hermit (Occultism/Arctic Terrain):
     abl_boosts:
-    - [ Constitution, Intelligence ]
-    - open
+      - [ Constitution, Intelligence ]
+      - open
     skills:
-    - Occultism
-    - Arctic Terrain Lore
+      - Occultism
+      - Arctic Terrain Lore
     feat:
-    - Dubious Knowledge
+      - Dubious Knowledge
     special: []
     action: []
     reaction: []
   Hermit (Occultism/Desert Terrain):
     abl_boosts:
-    - [ Constitution, Intelligence ]
-    - open
+      - [ Constitution, Intelligence ]
+      - open
     skills:
-    - Occultism
-    - Desert Terrain Lore
+      - Occultism
+      - Desert Terrain Lore
     feat:
-    - Dubious Knowledge
+      - Dubious Knowledge
     special: []
     action: []
     reaction: []
   Hermit (Occultism/Forest Terrain):
     abl_boosts:
-    - [ Constitution, Intelligence ]
-    - open
+      - [ Constitution, Intelligence ]
+      - open
     skills:
-    - Occultism
-    - Forest Terrain Lore
+      - Occultism
+      - Forest Terrain Lore
     feat:
-    - Dubious Knowledge
+      - Dubious Knowledge
     special: []
     action: []
     reaction: []
   Hermit (Occultism/Mountain Terrain):
     abl_boosts:
-    - [ Constitution, Intelligence ]
-    - open
+      - [ Constitution, Intelligence ]
+      - open
     skills:
-    - Occultism
-    - Mountain Terrain Lore
+      - Occultism
+      - Mountain Terrain Lore
     feat:
-    - Dubious Knowledge
+      - Dubious Knowledge
     special: []
     action: []
     reaction: []
   Hermit (Occultism/Plains Terrain):
     abl_boosts:
-    - [ Constitution, Intelligence ]
-    - open
+      - [ Constitution, Intelligence ]
+      - open
     skills:
-    - Occultism
-    - Plains Terrain Lore
+      - Occultism
+      - Plains Terrain Lore
     feat:
-    - Dubious Knowledge
+      - Dubious Knowledge
     special: []
     action: []
     reaction: []
   Hermit (Occultism/Sky Terrain):
     abl_boosts:
-    - [ Constitution, Intelligence ]
-    - open
+      - [ Constitution, Intelligence ]
+      - open
     skills:
-    - Occultism
-    - Sky Terrain Lore
+      - Occultism
+      - Sky Terrain Lore
     feat:
-    - Dubious Knowledge
+      - Dubious Knowledge
     special: []
     action: []
     reaction: []
   Hermit (Occultism/Swamp Terrain):
     abl_boosts:
-    - [ Constitution, Intelligence ]
-    - open
+      - [ Constitution, Intelligence ]
+      - open
     skills:
-    - Occultism
-    - Swamp Terrain Lore
+      - Occultism
+      - Swamp Terrain Lore
     feat:
-    - Dubious Knowledge
+      - Dubious Knowledge
     special: []
     action: []
     reaction: []
   Hermit (Occultism/Underground Terrain):
     abl_boosts:
-    - [ Constitution, Intelligence ]
-    - open
+      - [ Constitution, Intelligence ]
+      - open
     skills:
-    - Occultism
-    - Underground Terrain Lore
+      - Occultism
+      - Underground Terrain Lore
     feat:
-    - Dubious Knowledge
+      - Dubious Knowledge
     special: []
     action: []
     reaction: []
   Hunter:
     abl_boosts:
-    - [ Dexterity, Wisdom ]
-    - open
+      - [ Dexterity, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Tanning Lore
+      - Survival
+      - Tanning Lore
     feat:
-    - Survey Wildlife
+      - Survey Wildlife
     special: []
     action: []
     reaction: []
   Insurgent:
     abl_boosts:
-    - [ Strength, Wisdom ]
-    - open
+      - [ Strength, Wisdom ]
+      - open
     skills:
-    - Deception
-    - Warfare Lore
+      - Deception
+      - Warfare Lore
     feat:
-    - Lengthy Diversion
+      - Lengthy Diversion
     special: []
     action: []
     reaction: []
   Laborer:
     abl_boosts:
-    - [ Strength, Constitution ]
-    - open
+      - [ Strength, Constitution ]
+      - open
     skills:
-    - Athletics
-    - Labor Lore
+      - Athletics
+      - Labor Lore
     feat:
-    - Hefty Hauler
+      - Hefty Hauler
     special: []
     action: []
     reaction: []
   Martial Disciple (Acrobatics):
     abl_boosts:
-    - [ Strength, Dexterity ]
-    - open
+      - [ Strength, Dexterity ]
+      - open
     skills:
-    - Acrobatics
-    - Warfare Lore
+      - Acrobatics
+      - Warfare Lore
     feat:
-    - Cat Fall
+      - Cat Fall
     special: []
     action: []
     reaction: []
   Martial Disciple (Athletics):
     abl_boosts:
-    - [ Strength, Dexterity ]
-    - open
+      - [ Strength, Dexterity ]
+      - open
     skills:
-    - Athletics
-    - Warfare Lore
+      - Athletics
+      - Warfare Lore
     feat:
-    - Quick Jump
+      - Quick Jump
     special: []
     action: []
     reaction: []
   Merchant:
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Diplomacy
-    - Mercantile Lore
+      - Diplomacy
+      - Mercantile Lore
     feat:
-    - Eye for Numbers
+      - Eye for Numbers
     special: []
     action: []
     reaction: []
   Miner:
     abl_boosts:
-    - [ Strength, Wisdom ]
-    - open
+      - [ Strength, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Mining Lore
+      - Survival
+      - Mining Lore
     feat:
-    - Terrain Expertise (Underground)
+      - Terrain Expertise (Underground)
     special: []
     action: []
     reaction: []
   Noble (Genealogy):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Genealogy Lore
+      - Society
+      - Genealogy Lore
     feat:
-    - Courtly Graces
+      - Courtly Graces
     special: []
     action: []
     reaction: []
   Noble (Heraldry):
     abl_boosts:
-    - [ Intelligence, Charisma ]
-    - open
+      - [ Intelligence, Charisma ]
+      - open
     skills:
-    - Society
-    - Heraldry Lore
+      - Society
+      - Heraldry Lore
     feat:
-    - Courtly Graces
+      - Courtly Graces
     special: []
     action: []
     reaction: []
   Nomad (Aquatic Terrain):
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Aquatic Terrain Lore
+      - Survival
+      - Aquatic Terrain Lore
     feat:
-    - Assurance (Survival)
+      - Assurance (Survival)
     special: []
     action: []
     reaction: []
   Nomad (Arctic Terrain):
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Arctic Terrain Lore
+      - Survival
+      - Arctic Terrain Lore
     feat:
-    - Assurance (Survival)
+      - Assurance (Survival)
     special: []
     action: []
     reaction: []
   Nomad (Desert Terrain):
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Desert Terrain Lore
+      - Survival
+      - Desert Terrain Lore
     feat:
-    - Assurance (Survival)
+      - Assurance (Survival)
     special: []
     action: []
     reaction: []
   Nomad (Forest Terrain):
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Forest Terrain Lore
+      - Survival
+      - Forest Terrain Lore
     feat:
-    - Assurance (Survival)
+      - Assurance (Survival)
     special: []
     action: []
     reaction: []
   Nomad (Mountain Terrain):
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Mountain Terrain Lore
+      - Survival
+      - Mountain Terrain Lore
     feat:
-    - Assurance (Survival)
+      - Assurance (Survival)
     special: []
     action: []
     reaction: []
   Nomad (Plains Terrain):
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Plains Terrain Lore
+      - Survival
+      - Plains Terrain Lore
     feat:
-    - Assurance (Survival)
+      - Assurance (Survival)
     special: []
     action: []
     reaction: []
   Nomad (Sky Terrain):
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Sky Terrain Lore
+      - Survival
+      - Sky Terrain Lore
     feat:
-    - Assurance (Survival)
+      - Assurance (Survival)
     special: []
     action: []
     reaction: []
   Nomad (Swamp Terrain):
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Swamp Terrain Lore
+      - Survival
+      - Swamp Terrain Lore
     feat:
-    - Assurance (Survival)
+      - Assurance (Survival)
     special: []
     action: []
     reaction: []
   Nomad (Underground Terrain):
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Underground Terrain Lore
+      - Survival
+      - Underground Terrain Lore
     feat:
-    - Assurance (Survival)
+      - Assurance (Survival)
     special: []
     action: []
     reaction: []
   Outrider:
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Nature
-    - Plains Terrain Lore
+      - Nature
+      - Plains Terrain Lore
     feat:
-    - Express Rider
+      - Express Rider
     special: []
     action: []
     reaction: []
   Pilgrim (Althean):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Religion
-    - Althean Lore
+      - Religion
+      - Althean Lore
     lores:
-    - deity
+      - deity
     feat:
-    - "Pilgrim's Token"
+      - "Pilgrim's Token"
     special: []
     action: []
     reaction: []
   Pilgrim (Angorite):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Religion
-    - Angorite Lore
+      - Religion
+      - Angorite Lore
     lores:
-    - deity
+      - deity
     feat:
-    - "Pilgrim's Token"
+      - "Pilgrim's Token"
     special: []
     action: []
     reaction: []
   Pilgrim (Animusian):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Religion
-    - Animusian Lore
+      - Religion
+      - Animusian Lore
     lores:
-    - deity
+      - deity
     feat:
-    - "Pilgrim's Token"
+      - "Pilgrim's Token"
     special: []
     action: []
     reaction: []
   Pilgrim (Caracorothan):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Religion
-    - Caracorothan Lore
+      - Religion
+      - Caracorothan Lore
     lores:
-    - deity
+      - deity
     feat:
-    - "Pilgrim's Token"
+      - "Pilgrim's Token"
     special: []
     action: []
     reaction: []
   Pilgrim (Ceinaran):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Religion
-    - Ceinaran Lore
+      - Religion
+      - Ceinaran Lore
     lores:
-    - deity
+      - deity
     feat:
-    - "Pilgrim's Token"
+      - "Pilgrim's Token"
     special: []
     action: []
     reaction: []
   Pilgrim (Daeusite):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Religion
-    - Daeusite Lore
+      - Religion
+      - Daeusite Lore
     lores:
-    - deity
+      - deity
     feat:
-    - "Pilgrim's Token"
+      - "Pilgrim's Token"
     special: []
     action: []
     reaction: []
   Pilgrim (Danan):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Religion
-    - Danan Lore
+      - Religion
+      - Danan Lore
     lores:
-    - deity
+      - deity
     feat:
-    - "Pilgrim's Token"
+      - "Pilgrim's Token"
     special: []
     action: []
     reaction: []
   Pilgrim (Deimosian):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Religion
-    - Deimosian Lore
+      - Religion
+      - Deimosian Lore
     lores:
-    - deity
+      - deity
     feat:
-    - "Pilgrim's Token"
+      - "Pilgrim's Token"
     special: []
     action: []
     reaction: []
   Pilgrim (Elunan):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Religion
-    - Elunan Lore
+      - Religion
+      - Elunan Lore
     lores:
-    - deity
+      - deity
     feat:
-    - "Pilgrim's Token"
+      - "Pilgrim's Token"
     special: []
     action: []
     reaction: []
   Pilgrim (Gileadean):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Religion
-    - Gileadean Lore
+      - Religion
+      - Gileadean Lore
     lores:
-    - deity
+      - deity
     feat:
-    - "Pilgrim's Token"
+      - "Pilgrim's Token"
     special: []
     action: []
     reaction: []
   Pilgrim (Gunakharan):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Religion
-    - Gunakharan Lore
+      - Religion
+      - Gunakharan Lore
     lores:
-    - deity
+      - deity
     feat:
-    - "Pilgrim's Token"
+      - "Pilgrim's Token"
     special: []
     action: []
     reaction: []
   Pilgrim (Illothan):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Religion
-    - Illothan Lore
+      - Religion
+      - Illothan Lore
     lores:
-    - deity
+      - deity
     feat:
-    - "Pilgrim's Token"
+      - "Pilgrim's Token"
     special: []
     action: []
     reaction: []
   Pilgrim (Korite):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Religion
-    - Korite Lore
+      - Religion
+      - Korite Lore
     lores:
-    - deity
+      - deity
     feat:
-    - "Pilgrim's Token"
+      - "Pilgrim's Token"
     special: []
     action: []
     reaction: []
   Pilgrim (Maugrimite):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Religion
-    - Maugrimite Lore
+      - Religion
+      - Maugrimite Lore
     lores:
-    - deity
+      - deity
     feat:
-    - "Pilgrim's Token"
+      - "Pilgrim's Token"
     special: []
     action: []
     reaction: []
   Pilgrim (Navosian):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Religion
-    - Navosian Lore
+      - Religion
+      - Navosian Lore
     lores:
-    - deity
+      - deity
     feat:
-    - "Pilgrim's Token"
+      - "Pilgrim's Token"
     special: []
     action: []
     reaction: []
   Pilgrim (Radan):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Religion
-    - Radan Lore
+      - Religion
+      - Radan Lore
     lores:
-    - deity
+      - deity
     feat:
-    - "Pilgrim's Token"
+      - "Pilgrim's Token"
     special: []
     action: []
     reaction: []
   Pilgrim (Reosian):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Religion
-    - Reosian Lore
+      - Religion
+      - Reosian Lore
     lores:
-    - deity
+      - deity
     feat:
-    - "Pilgrim's Token"
+      - "Pilgrim's Token"
     special: []
     action: []
     reaction: []
   Pilgrim (Serrielite):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Religion
-    - Serrielite Lore
+      - Religion
+      - Serrielite Lore
     lores:
-    - deity
+      - deity
     feat:
-    - "Pilgrim's Token"
+      - "Pilgrim's Token"
     special: []
     action: []
     reaction: []
   Pilgrim (Taaran):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Religion
-    - Taaran Lore
+      - Religion
+      - Taaran Lore
     lores:
-    - deity
+      - deity
     feat:
-    - "Pilgrim's Token"
+      - "Pilgrim's Token"
     special: []
     action: []
     reaction: []
   Pilgrim (Tarienite):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Religion
-    - Tarienite Lore
+      - Religion
+      - Tarienite Lore
     lores:
-    - deity
+      - deity
     feat:
-    - "Pilgrim's Token"
+      - "Pilgrim's Token"
     special: []
     action: []
     reaction: []
   Pilgrim (Thulite):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Religion
-    - Thulite Lore
+      - Religion
+      - Thulite Lore
     lores:
-    - deity
+      - deity
     feat:
-    - "Pilgrim's Token"
+      - "Pilgrim's Token"
     special: []
     action: []
     reaction: []
   Pilgrim (Vardaman):
     abl_boosts:
-    - [ Wisdom, Charisma ]
-    - open
+      - [ Wisdom, Charisma ]
+      - open
     skills:
-    - Religion
-    - Vardaman Lore
+      - Religion
+      - Vardaman Lore
     lores:
-    - deity
+      - deity
     feat:
-    - "Pilgrim's Token"
+      - "Pilgrim's Token"
     special: []
     action: []
     reaction: []
   Prisoner:
     abl_boosts:
-    - [ Strength, Constitution ]
-    - open
+      - [ Strength, Constitution ]
+      - open
     skills:
-    - Stealth
-    - Underworld Lore
+      - Stealth
+      - Underworld Lore
     feat:
-    - Experienced Smuggler
+      - Experienced Smuggler
     special: []
     action: []
     reaction: []
   Refugee (Am'shere):
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Society
-    - Am'shere Lore
+      - Society
+      - Am'shere Lore
     feat:
-    - Streetwise
+      - Streetwise
     special: []
     action: []
     reaction: []
   Refugee (Bludgun):
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Society
-    - Bludgun Lore
+      - Society
+      - Bludgun Lore
     feat:
-    - Streetwise
+      - Streetwise
     special: []
     action: []
     reaction: []
   Refugee (Charn):
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Society
-    - Charn Lore
+      - Society
+      - Charn Lore
     feat:
-    - Streetwise
+      - Streetwise
     special: []
     action: []
     reaction: []
   Refugee (Dran):
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Society
-    - Dran Lore
+      - Society
+      - Dran Lore
     feat:
-    - Streetwise
+      - Streetwise
     special: []
     action: []
     reaction: []
   Refugee (Desolation):
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Society
-    - Desolation Lore
+      - Society
+      - Desolation Lore
     feat:
-    - Streetwise
+      - Streetwise
     special: []
     action: []
     reaction: []
   Refugee (Heartlands):
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Society
-    - Heartlands Lore
+      - Society
+      - Heartlands Lore
     feat:
-    - Streetwise
+      - Streetwise
     special: []
     action: []
     reaction: []
   Refugee (Jade Islands):
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Society
-    - Jade Islands Lore
+      - Society
+      - Jade Islands Lore
     feat:
-    - Streetwise
+      - Streetwise
     special: []
     action: []
     reaction: []
   Refugee (Khazad Duin):
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Society
-    - Khazad Duin Lore
+      - Society
+      - Khazad Duin Lore
     feat:
-    - Streetwise
+      - Streetwise
     special: []
     action: []
     reaction: []
   Refugee (Kimitatu):
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Society
-    - Kimitatu Lore
+      - Society
+      - Kimitatu Lore
     feat:
-    - Streetwise
+      - Streetwise
     special: []
     action: []
     reaction: []
   Refugee (Myrddion):
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Society
-    - Myrddion Lore
+      - Society
+      - Myrddion Lore
     feat:
-    - Streetwise
+      - Streetwise
     special: []
     action: []
     reaction: []
   Refugee (Periantha):
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Society
-    - Periantha Lore
+      - Society
+      - Periantha Lore
     feat:
-    - Streetwise
+      - Streetwise
     special: []
     action: []
     reaction: []
   Refugee (Rune):
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Society
-    - Rune Lore
+      - Society
+      - Rune Lore
     feat:
-    - Streetwise
+      - Streetwise
     special: []
     action: []
     reaction: []
   Refugee (Skyhaldborg):
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Society
-    - Skyhaldborg Lore
+      - Society
+      - Skyhaldborg Lore
     feat:
-    - Streetwise
+      - Streetwise
     special: []
     action: []
     reaction: []
   Refugee (Tysmycha):
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Society
-    - Tysmycha Lore
+      - Society
+      - Tysmycha Lore
     feat:
-    - Streetwise
+      - Streetwise
     special: []
     action: []
     reaction: []
   Refugee (Veyshan):
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills:
-    - Society
-    - Veyshan Lore
+      - Society
+      - Veyshan Lore
     feat:
-    - Streetwise
+      - Streetwise
     special: []
     action: []
     reaction: []
   Returned:
     abl_boosts:
-    - [ Constitution, Wisdom ]
-    - open
+      - [ Constitution, Wisdom ]
+      - open
     skills: 
-    - Great Halls Lore
+      - Great Halls Lore
     feat:
-    - Diehard
+      - Diehard
     special: []
     rare: true
     action: []
     reaction: []
   Root Worker:
     abl_boosts:
-    - [ Intelligence, Wisdom ]
-    - open
+      - [ Intelligence, Wisdom ]
+      - open
     skills:
-    - Occultism
-    - Herbalism Lore
+      - Occultism
+      - Herbalism Lore
     feat:
-    - Root Magic
+      - Root Magic
     special: []
     action: []
     reaction: []
   Sailor:
     abl_boosts:
-    - [ Strength, Dexterity ]
-    - open
+      - [ Strength, Dexterity ]
+      - open
     skills:
-    - Athletics
-    - Sailing Lore
+      - Athletics
+      - Sailing Lore
     feat:
-    - Underwater Marauder
+      - Underwater Marauder
     special: []
     action: []
     reaction: []
   Scavenger (Am'shere):
     abl_boosts:
-    - [ Intelligence, Wisdom ]
-    - open
+      - [ Intelligence, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Am'shere Lore
+      - Survival
+      - Am'shere Lore
     feat:
-    - Forager
+      - Forager
     special: []
     action: []
     reaction: []
   Scavenger (Bludgun):
     abl_boosts:
-    - [ Intelligence, Wisdom ]
-    - open
+      - [ Intelligence, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Bludgun Lore
+      - Survival
+      - Bludgun Lore
     feat:
-    - Forager
+      - Forager
     special: []
     action: []
     reaction: []
   Scavenger (Charn):
     abl_boosts:
-    - [ Intelligence, Wisdom ]
-    - open
+      - [ Intelligence, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Charn Lore
+      - Survival
+      - Charn Lore
     feat:
-    - Forager
+      - Forager
     special: []
     action: []
     reaction: []
   Scavenger (Dran):
     abl_boosts:
-    - [ Intelligence, Wisdom ]
-    - open
+      - [ Intelligence, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Dran Lore
+      - Survival
+      - Dran Lore
     feat:
-    - Forager
+      - Forager
     special: []
     action: []
     reaction: []
   Scavenger (Desolation):
     abl_boosts:
-    - [ Intelligence, Wisdom ]
-    - open
+      - [ Intelligence, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Desolation Lore
+      - Survival
+      - Desolation Lore
     feat:
-    - Forager
+      - Forager
     special: []
     action: []
     reaction: []
   Scavenger (Heartlands):
     abl_boosts:
-    - [ Intelligence, Wisdom ]
-    - open
+      - [ Intelligence, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Heartlands Lore
+      - Survival
+      - Heartlands Lore
     feat:
-    - Forager
+      - Forager
     special: []
     action: []
     reaction: []
   Scavenger (Jade Islands):
     abl_boosts:
-    - [ Intelligence, Wisdom ]
-    - open
+      - [ Intelligence, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Jade Islands Lore
+      - Survival
+      - Jade Islands Lore
     feat:
-    - Forager
+      - Forager
     special: []
     action: []
     reaction: []
   Scavenger (Khazad Duin):
     abl_boosts:
-    - [ Intelligence, Wisdom ]
-    - open
+      - [ Intelligence, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Khazad Duin Lore
+      - Survival
+      - Khazad Duin Lore
     feat:
-    - Forager
+      - Forager
     special: []
     action: []
     reaction: []
   Scavenger (Kimitatu):
     abl_boosts:
-    - [ Intelligence, Wisdom ]
-    - open
+      - [ Intelligence, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Kimitatu Lore
+      - Survival
+      - Kimitatu Lore
     feat:
-    - Forager
+      - Forager
     special: []
     action: []
     reaction: []
   Scavenger (Myrddion):
     abl_boosts:
-    - [ Intelligence, Wisdom ]
-    - open
+      - [ Intelligence, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Myrddion Lore
+      - Survival
+      - Myrddion Lore
     feat:
-    - Forager
+      - Forager
     special: []
     action: []
     reaction: []
   Scavenger (Periantha):
     abl_boosts:
-    - [ Intelligence, Wisdom ]
-    - open
+      - [ Intelligence, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Periantha Lore
+      - Survival
+      - Periantha Lore
     feat:
-    - Forager
+      - Forager
     special: []
     action: []
     reaction: []
   Scavenger (Rune):
     abl_boosts:
-    - [ Intelligence, Wisdom ]
-    - open
+      - [ Intelligence, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Rune Lore
+      - Survival
+      - Rune Lore
     feat:
-    - Forager
+      - Forager
     special: []
     action: []
     reaction: []
   Scavenger (Skyhaldborg):
     abl_boosts:
-    - [ Intelligence, Wisdom ]
-    - open
+      - [ Intelligence, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Skyhaldborg Lore
+      - Survival
+      - Skyhaldborg Lore
     feat:
-    - Forager
+      - Forager
     special: []
     action: []
     reaction: []
   Scavenger (Tysmycha):
     abl_boosts:
-    - [ Intelligence, Wisdom ]
-    - open
+      - [ Intelligence, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Tysmycha Lore
+      - Survival
+      - Tysmycha Lore
     feat:
-    - Forager
+      - Forager
     special: []
     action: []
     reaction: []
   Scavenger (Veyshan):
     abl_boosts:
-    - [ Intelligence, Wisdom ]
-    - open
+      - [ Intelligence, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Veyshan Lore
+      - Survival
+      - Veyshan Lore
     feat:
-    - Forager
+      - Forager
     special: []
     action: []
     reaction: []
   Scholar (Arcana):
     abl_boosts:
-    - [ Intelligence, Wisdom ]
-    - open
+      - [ Intelligence, Wisdom ]
+      - open
     skills:
-    - Arcana
-    - Academia Lore
+      - Arcana
+      - Academia Lore
     feat:
-    - Assurance (Arcana)
+      - Assurance (Arcana)
     special: []
     action: []
     reaction: []
   Scholar (Nature):
     abl_boosts:
-    - [ Intelligence, Wisdom ]
-    - open
+      - [ Intelligence, Wisdom ]
+      - open
     skills:
-    - Nature
-    - Academia Lore
+      - Nature
+      - Academia Lore
     feat:
-    - Assurance (Nature)
+      - Assurance (Nature)
     special: []
     action: []
     reaction: []
   Scholar (Occultism):
     abl_boosts:
-    - [ Intelligence, Wisdom ]
-    - open
+      - [ Intelligence, Wisdom ]
+      - open
     skills:
-    - Occultism
-    - Academia Lore
+      - Occultism
+      - Academia Lore
     feat:
-    - Assurance (Occultism)
+      - Assurance (Occultism)
     special: []
     action: []
     reaction: []
   Scholar (Religion):
     abl_boosts:
-    - [ Intelligence, Wisdom ]
-    - open
+      - [ Intelligence, Wisdom ]
+      - open
     skills:
-    - Religion
-    - Academia Lore
+      - Religion
+      - Academia Lore
     feat:
-    - Assurance (Religion)
+      - Assurance (Religion)
     special: []
     action: []
     reaction: []
   Scout (Aquatic Terrain):
     abl_boosts:
-    - [ Dexterity, Wisdom ]
-    - open
+      - [ Dexterity, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Aquatic Terrain Lore
+      - Survival
+      - Aquatic Terrain Lore
     feat:
-    - Forager
+      - Forager
     special: []
     action: []
     reaction: []
   Scout (Arctic Terrain):
     abl_boosts:
-    - [ Dexterity, Wisdom ]
-    - open
+      - [ Dexterity, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Arctic Terrain Lore
+      - Survival
+      - Arctic Terrain Lore
     feat:
-    - Forager
+      - Forager
     special: []
     action: []
     reaction: []
   Scout (Desert Terrain):
     abl_boosts:
-    - [ Dexterity, Wisdom ]
-    - open
+      - [ Dexterity, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Desert Terrain Lore
+      - Survival
+      - Desert Terrain Lore
     feat:
-    - Forager
+      - Forager
     special: []
     action: []
     reaction: []
   Scout (Forest Terrain):
     abl_boosts:
-    - [ Dexterity, Wisdom ]
-    - open
+      - [ Dexterity, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Forest Terrain Lore
+      - Survival
+      - Forest Terrain Lore
     feat:
-    - Forager
+      - Forager
     special: []
     action: []
     reaction: []
   Scout (Mountain Terrain):
     abl_boosts:
-    - [ Dexterity, Wisdom ]
-    - open
+      - [ Dexterity, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Mountain Terrain Lore
+      - Survival
+      - Mountain Terrain Lore
     feat:
-    - Forager
+      - Forager
     special: []
     action: []
     reaction: []
   Scout (Plains Terrain):
     abl_boosts:
-    - [ Dexterity, Wisdom ]
-    - open
+      - [ Dexterity, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Plains Terrain Lore
+      - Survival
+      - Plains Terrain Lore
     feat:
-    - Forager
+      - Forager
     special: []
     action: []
     reaction: []
   Scout (Sky Terrain):
     abl_boosts:
-    - [ Dexterity, Wisdom ]
-    - open
+      - [ Dexterity, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Sky Terrain Lore
+      - Survival
+      - Sky Terrain Lore
     feat:
-    - Forager
+      - Forager
     special: []
     action: []
     reaction: []
   Scout (Swamp Terrain):
     abl_boosts:
-    - [ Dexterity, Wisdom ]
-    - open
+      - [ Dexterity, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Swamp Terrain Lore
+      - Survival
+      - Swamp Terrain Lore
     feat:
-    - Forager
+      - Forager
     special: []
     action: []
     reaction: []
   Scout (Underground Terrain):
     abl_boosts:
-    - [ Dexterity, Wisdom ]
-    - open
+      - [ Dexterity, Wisdom ]
+      - open
     skills:
-    - Survival
-    - Underground Terrain Lore
+      - Survival
+      - Underground Terrain Lore
     feat:
-    - Forager
+      - Forager
     special: []
     action: []
     reaction: []
   Servant:
     abl_boosts:
-    - [ Dexterity, Charisma ]
-    - open
+      - [ Dexterity, Charisma ]
+      - open
     skills:
-    - Society
-    - Labor Lore
+      - Society
+      - Labor Lore
     feat:
-    - Read Lips
+      - Read Lips
     special: []
     action: []
     reaction: []
   Squire (Heraldry):
     abl_boosts:
-    - [ Strength, Constitution ]
-    - open
+      - [ Strength, Constitution ]
+      - open
     skills:
-    - Athletics
-    - Heraldry Lore
+      - Athletics
+      - Heraldry Lore
     feat:
-    - Armor Assist
+      - Armor Assist
     special: []
     action: []
     reaction: []
   Squire (Warfare):
     abl_boosts:
-    - [ Strength, Constitution ]
-    - open
+      - [ Strength, Constitution ]
+      - open
     skills:
-    - Athletics
-    - Warfare Lore
+      - Athletics
+      - Warfare Lore
     feat:
-    - Armor Assist
+      - Armor Assist
     special: []
     action: []
     reaction: []
   Street Urchin (Nicantlaca):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Nicantlaca Lore
+      - Thievery
+      - Nicantlaca Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Coaedhanaya):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Coaedhanaya Lore
+      - Thievery
+      - Coaedhanaya Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Cahua):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Cahua Lore
+      - Thievery
+      - Cahua Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Matewa):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Matewa Lore
+      - Thievery
+      - Matewa Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Promise):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Promise Lore
+      - Thievery
+      - Promise Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Uniki Io):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Uniki Io Lore
+      - Thievery
+      - Uniki Io Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Awaets):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Awaets Lore
+      - Thievery
+      - Awaets Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Raharuri):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Raharuri Lore
+      - Thievery
+      - Raharuri Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (New Hextus):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - New Hextus Lore
+      - Thievery
+      - New Hextus Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Sepultura):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Sepultura Lore
+      - Thievery
+      - Sepultura Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Chiuin Chathair):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Chiuin Chathair Lore
+      - Thievery
+      - Chiuin Chathair Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Serenza):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Serenza Lore
+      - Thievery
+      - Serenza Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Vandalheim):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Vandalheim Lore
+      - Thievery
+      - Vandalheim Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Khotea):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Khotea Lore
+      - Thievery
+      - Khotea Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Skald):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Skald Lore
+      - Thievery
+      - Skald Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Cloudhold):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Cloudhold Lore
+      - Thievery
+      - Cloudhold Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Keykavous):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Keykavous Lore
+      - Thievery
+      - Keykavous Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Mohebi):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Mohebi Lore
+      - Thievery
+      - Mohebi Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Mosta'An):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Mosta'An Lore
+      - Thievery
+      - Mosta'An Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Nouzari):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Nouzari Lore
+      - Thievery
+      - Nouzari Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Alexandria):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Alexandria Lore
+      - Thievery
+      - Alexandria Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Pyrna):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Pyrna Lore
+      - Thievery
+      - Pyrna Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Setidor):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Setidor Lore
+      - Thievery
+      - Setidor Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Oriaver):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Oriaver Lore
+      - Thievery
+      - Oriaver Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Marniar'nir):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Marniar'nir Lore
+      - Thievery
+      - Marniar'nir Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Ylvaliel):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Ylvaliel Lore
+      - Thievery
+      - Ylvaliel Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Tamatou):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Tamatou Lore
+      - Thievery
+      - Tamatou Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Ala'i):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Ala'i Lore
+      - Thievery
+      - Ala'i Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Taeao):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Taeao Lore
+      - Thievery
+      - Taeao Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Tava'esia):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Tava'esia Lore
+      - Thievery
+      - Tava'esia Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Dun Mordren):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Dun Mordren Lore
+      - Thievery
+      - Dun Mordren Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Dun Astiaf):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Dun Astiaf Lore
+      - Thievery
+      - Dun Astiaf Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Enrai):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Enrai Lore
+      - Thievery
+      - Enrai Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Palitzsch):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Palitzsch Lore
+      - Thievery
+      - Palitzsch Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Phedar):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Phedar Lore
+      - Thievery
+      - Phedar Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Sedhla Mil):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Sedhla Mil Lore
+      - Thievery
+      - Sedhla Mil Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Cleydine):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Cleydine Lore
+      - Thievery
+      - Cleydine Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Joilada):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Joilada Lore
+      - Thievery
+      - Joilada Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Kaasall):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Kaasall Lore
+      - Thievery
+      - Kaasall Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Pramont):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Pramont Lore
+      - Thievery
+      - Pramont Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Oriaphen):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Oriaphen Lore
+      - Thievery
+      - Oriaphen Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Rouhull):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Rouhull Lore
+      - Thievery
+      - Rouhull Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Amity):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Amity Lore
+      - Thievery
+      - Amity Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Bryn Myridorn):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Bryn Myridorn Lore
+      - Thievery
+      - Bryn Myridorn Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Fiore di Mar):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Fiore di Mar Lore
+      - Thievery
+      - Fiore di Mar Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Heavenward):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Heavenward Lore
+      - Thievery
+      - Heavenward Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Solm):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Solm Lore
+      - Thievery
+      - Solm Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Qutamo):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Qutamo Lore
+      - Thievery
+      - Qutamo Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Temirkan):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Temirkan Lore
+      - Thievery
+      - Temirkan Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (O'rondessa):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - O'rondessa Lore
+      - Thievery
+      - O'rondessa Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Duama):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Duama Lore
+      - Thievery
+      - Duama Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Flehzya):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Flehzya Lore
+      - Thievery
+      - Flehzya Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Orist):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Orist Lore
+      - Thievery
+      - Orist Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Sarzana):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Sarzana Lore
+      - Thievery
+      - Sarzana Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Rune):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Rune Lore
+      - Thievery
+      - Rune Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Volstengrad):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Volstengrad Lore
+      - Thievery
+      - Volstengrad Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Fellantz):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Fellantz Lore
+      - Thievery
+      - Fellantz Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Orimari):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Orimari Lore
+      - Thievery
+      - Orimari Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Norreir):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Norreir Lore
+      - Thievery
+      - Norreir Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Erecid):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Erecid Lore
+      - Thievery
+      - Erecid Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Mulinn):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Mulinn Lore
+      - Thievery
+      - Mulinn Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Tashraan):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Tashraan Lore
+      - Thievery
+      - Tashraan Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Azraq):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Azraq Lore
+      - Thievery
+      - Azraq Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Street Urchin (Shamshir):
     abl_boosts:
-    - [ Dexterity, Constitution ]
-    - open
+      - [ Dexterity, Constitution ]
+      - open
     skills:
-    - Thievery
-    - Shamshir Lore
+      - Thievery
+      - Shamshir Lore
     feat:
-    - Pickpocket
+      - Pickpocket
     special: []
     action: []
     reaction: []
   Tax Collector (Am'shere):
     abl_boosts:
-    - [ Strength, Charisma ]
-    - open
+      - [ Strength, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Am'shere Lore
+      - Intimidation
+      - Am'shere Lore
     feat:
-    - Quick Coercion
+      - Quick Coercion
     special: []
     action: []
     reaction: []
   Tax Collector (Bludgun):
     abl_boosts:
-    - [ Strength, Charisma ]
-    - open
+      - [ Strength, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Bludgun Lore
+      - Intimidation
+      - Bludgun Lore
     feat:
-    - Quick Coercion
+      - Quick Coercion
     special: []
     action: []
     reaction: []
   Tax Collector (Charn):
     abl_boosts:
-    - [ Strength, Charisma ]
-    - open
+      - [ Strength, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Charn Lore
+      - Intimidation
+      - Charn Lore
     feat:
-    - Quick Coercion
+      - Quick Coercion
     special: []
     action: []
     reaction: []
   Tax Collector (Dran):
     abl_boosts:
-    - [ Strength, Charisma ]
-    - open
+      - [ Strength, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Dran Lore
+      - Intimidation
+      - Dran Lore
     feat:
-    - Quick Coercion
+      - Quick Coercion
     special: []
     action: []
     reaction: []
   Tax Collector (Desolation):
     abl_boosts:
-    - [ Strength, Charisma ]
-    - open
+      - [ Strength, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Desolation Lore
+      - Intimidation
+      - Desolation Lore
     feat:
-    - Quick Coercion
+      - Quick Coercion
     special: []
     action: []
     reaction: []
   Tax Collector (Heartlands):
     abl_boosts:
-    - [ Strength, Charisma ]
-    - open
+      - [ Strength, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Heartlands Lore
+      - Intimidation
+      - Heartlands Lore
     feat:
-    - Quick Coercion
+      - Quick Coercion
     special: []
     action: []
     reaction: []
   Tax Collector (Jade Islands):
     abl_boosts:
-    - [ Strength, Charisma ]
-    - open
+      - [ Strength, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Jade Islands Lore
+      - Intimidation
+      - Jade Islands Lore
     feat:
-    - Quick Coercion
+      - Quick Coercion
     special: []
     action: []
     reaction: []
   Tax Collector (Khazad Duin):
     abl_boosts:
-    - [ Strength, Charisma ]
-    - open
+      - [ Strength, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Khazad Duin Lore
+      - Intimidation
+      - Khazad Duin Lore
     feat:
-    - Quick Coercion
+      - Quick Coercion
     special: []
     action: []
     reaction: []
   Tax Collector (Kimitatu):
     abl_boosts:
-    - [ Strength, Charisma ]
-    - open
+      - [ Strength, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Kimitatu Lore
+      - Intimidation
+      - Kimitatu Lore
     feat:
-    - Quick Coercion
+      - Quick Coercion
     special: []
     action: []
     reaction: []
   Tax Collector (Myrddion):
     abl_boosts:
-    - [ Strength, Charisma ]
-    - open
+      - [ Strength, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Myrddion Lore
+      - Intimidation
+      - Myrddion Lore
     feat:
-    - Quick Coercion
+      - Quick Coercion
     special: []
     action: []
     reaction: []
   Tax Collector (Periantha):
     abl_boosts:
-    - [ Strength, Charisma ]
-    - open
+      - [ Strength, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Periantha Lore
+      - Intimidation
+      - Periantha Lore
     feat:
-    - Quick Coercion
+      - Quick Coercion
     special: []
     action: []
     reaction: []
   Tax Collector (Rune):
     abl_boosts:
-    - [ Strength, Charisma ]
-    - open
+      - [ Strength, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Rune Lore
+      - Intimidation
+      - Rune Lore
     feat:
-    - Quick Coercion
+      - Quick Coercion
     special: []
     action: []
     reaction: []
   Tax Collector (Skyhaldborg):
     abl_boosts:
-    - [ Strength, Charisma ]
-    - open
+      - [ Strength, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Skyhaldborg Lore
+      - Intimidation
+      - Skyhaldborg Lore
     feat:
-    - Quick Coercion
+      - Quick Coercion
     special: []
     action: []
     reaction: []
   Tax Collector (Tysmycha):
     abl_boosts:
-    - [ Strength, Charisma ]
-    - open
+      - [ Strength, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Tysmycha Lore
+      - Intimidation
+      - Tysmycha Lore
     feat:
-    - Quick Coercion
+      - Quick Coercion
     special: []
     action: []
     reaction: []
   Tax Collector (Veyshan):
     abl_boosts:
-    - [ Strength, Charisma ]
-    - open
+      - [ Strength, Charisma ]
+      - open
     skills:
-    - Intimidation
-    - Veyshan Lore
+      - Intimidation
+      - Veyshan Lore
     feat:
-    - Quick Coercion
+      - Quick Coercion
     special: []
     action: []
     reaction: []
   Teacher (Performance):
     abl_boosts:
-    - [ Intelligence, Wisdom ]
-    - open
+      - [ Intelligence, Wisdom ]
+      - open
     skills:
-    - Performance
-    - Academia Lore
+      - Performance
+      - Academia Lore
     feat:
-    - Assurance (Performance)
+      - Assurance (Performance)
     special: []
     action: []
     reaction: []
   Teacher (Society):
     abl_boosts:
-    - [ Intelligence, Wisdom ]
-    - open
+      - [ Intelligence, Wisdom ]
+      - open
     skills:
-    - Society
-    - Academia Lore
+      - Society
+      - Academia Lore
     feat:
-    - Assurance (Society)
+      - Assurance (Society)
     special: []
     action: []
     reaction: []
   Tinker:
     abl_boosts:
-    - [ Dexterity, Intelligence ]
-    - open
+      - [ Dexterity, Intelligence ]
+      - open
     skills:
-    - Crafting
-    - Engineering Lore
+      - Crafting
+      - Engineering Lore
     feat:
-    - Specialty Crafting
+      - Specialty Crafting
     special: []
     action: []
     reaction: []
   Ward:
     abl_boosts:
-    - [ Constitution, Charisma ]
-    - open
+      - [ Constitution, Charisma ]
+      - open
     skills:
-    - Performance
-    - Genealogy Lore
+      - Performance
+      - Genealogy Lore
     feat:
-    - Fascinating Performance
+      - Fascinating Performance
     special: []
     action: []
     reaction: []
   Warrior:
     abl_boosts:
-    - [ Strength, Constitution ]
-    - open
+      - [ Strength, Constitution ]
+      - open
     skills:
-    - Intimidation
-    - Warfare Lore
+      - Intimidation
+      - Warfare Lore
     feat:
-    - Intimidating Glare
+      - Intimidating Glare
     special: []
     action: []
     reaction: []

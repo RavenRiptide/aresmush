@@ -240,14 +240,14 @@ pf2e_magic:
       initial: Weapon Surge
       advanced: Zeal for Battle
   prepared_casters:
-  - Cleric
-  - Druid
-  - Witch
-  - Wizard
+    - Cleric
+    - Druid
+    - Witch
+    - Wizard
   spontaneous_casters:
-  - Bard
-  - Oracle
-  - Sorcerer
+    - Bard
+    - Oracle
+    - Sorcerer
   focus_casting_stat: 
     bloodline: Charisma
     composition: Charisma

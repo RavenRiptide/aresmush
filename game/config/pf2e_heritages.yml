@@ -1,9 +1,9 @@
 ---
 pf2e_heritage:
-# Arvek Heritages
+  # Arvek Heritages
   Manabane:
     reaction:
-    - Resist Magic
+      - Resist Magic
     action: []
     defense: {}
     feat: []
@@ -13,9 +13,9 @@ pf2e_heritage:
     attack: {}
   Runtboss:
     feat:
-    - Group Coercion
+      - Group Coercion
     special:
-    - Runtboss Arvek
+      - Runtboss Arvek
     action: []
     attack: {}
     defense: {}
@@ -27,7 +27,7 @@ pf2e_heritage:
       resistances:
         fire: 1
     special:
-    - Smokeworker Arvek
+      - Smokeworker Arvek
     action: []
     attack: {}
     feat: []
@@ -36,7 +36,7 @@ pf2e_heritage:
     traits: []
   Warmarch:
     special:
-    - Warmarch Arvek
+      - Warmarch Arvek
     action: []
     attack: {}
     feat: []
@@ -45,17 +45,17 @@ pf2e_heritage:
     traits: []
   Warrenbred:
     special:
-    - Warrenbred Arvek
+      - Warrenbred Arvek
     action: []
     attack: {}
     feat: []
     reaction: []
     skills: []
     traits: []
-# Bassin Heritages
+  # Bassin Heritages
   Gutsy:
     special:
-    - Gutsy Bassin
+      - Gutsy Bassin
     action: []
     attack: {}
     defense: {}
@@ -66,7 +66,7 @@ pf2e_heritage:
   Hillock:
     rest_HP_bonus: true
     special:
-    - Hillock Bassin
+      - Hillock Bassin
     action: []
     attack: {}
     defense: {}
@@ -76,9 +76,9 @@ pf2e_heritage:
     traits: []
   Jinxed-bassin:
     special:
-    - Jinxed Bassin
+      - Jinxed Bassin
     action:
-    - Jinx
+      - Jinx
     attack: {}
     defense: {}
     feat: []
@@ -87,8 +87,8 @@ pf2e_heritage:
     traits: []
   Nomadic:
     language:
-    - open
-    - open
+      - open
+      - open
     action: []
     attack: {}
     defense: {}
@@ -99,7 +99,7 @@ pf2e_heritage:
     traits: []
   Twilight:
     special:
-    - Low-Light Vision
+      - Low-Light Vision
     action: []
     attack: {}
     defense: {}
@@ -109,7 +109,7 @@ pf2e_heritage:
     traits: []
   Wildwood:
     special:
-    - Wildwood Bassin
+      - Wildwood Bassin
     action: []
     attack: {}
     defense: {}
@@ -117,7 +117,7 @@ pf2e_heritage:
     reaction: []
     skills: []
     traits: []
-# Ciith Heritage Feats
+  # Ciith Heritage Feats
   Ahcan:
     circumstance: true
     action: []
@@ -141,9 +141,9 @@ pf2e_heritage:
     traits: []
   Pantli:
     feat:
-    - Combat Climber
+      - Combat Climber
     special:
-    - Pantli Ciith
+      - Pantli Ciith
     traits: []
     skills: []
     defense: {}
@@ -152,9 +152,9 @@ pf2e_heritage:
     attack: {}
   Paeezh:
     special:
-    - Paeezh Ciith
+      - Paeezh Ciith
     action:
-    - Threatening Approach
+      - Threatening Approach
     attack: {}
     defense: {}
     feat: []
@@ -166,17 +166,17 @@ pf2e_heritage:
       resistances:
         fire: 1
     special:
-    - Xalli Ciith
+      - Xalli Ciith
     action: []
     attack: {}
     feat: []
     reaction: []
     skills: []
     traits: []
-# Egalrin Heritages
+  # Egalrin Heritages
   Jinxed-egalrin:
     special:
-    - Jinxed Egalrin
+      - Jinxed Egalrin
     action: []
     attack: {}
     defense: {}
@@ -188,10 +188,10 @@ pf2e_heritage:
     magic_stats:
       innate_spell:
         cantrip:
-        - Disrupt Undead
+          - Disrupt Undead
         spell_trad: primal
     special:
-    - Mountainkeeper Egalrin
+      - Mountainkeeper Egalrin
     action: []
     attack: {}
     defense: {}
@@ -201,7 +201,7 @@ pf2e_heritage:
     traits: []
   Skyborn:
     special:
-    - Skyborn Egalrin
+      - Skyborn Egalrin
     action: []
     attack: {}
     defense: {}
@@ -214,7 +214,7 @@ pf2e_heritage:
       resistances:
         electricity: 1
     special:
-    - Stormtossed Egalrin
+      - Stormtossed Egalrin
     action: []
     attack: {}
     feat: []
@@ -227,10 +227,10 @@ pf2e_heritage:
         damage: d4
         damage_type: S
         traits:
-        - agile
-        - finesse
-        - unarmed
-        - versatile_P
+          - agile
+          - finesse
+          - unarmed
+          - versatile_P
     action: []
     defense: {}
     feat: []
@@ -238,7 +238,7 @@ pf2e_heritage:
     skills: []
     special: []
     traits: []
-# Gnome Heritages
+  # Gnome Heritages
   Chameleon:
     circumstance: true
     traits: []
@@ -251,7 +251,7 @@ pf2e_heritage:
     attack: {}
   Fey-Touched:
     traits:
-    - fey
+      - fey
     magic_stats:
       gated_spell: fey gnome
     action: []
@@ -263,7 +263,7 @@ pf2e_heritage:
     special: []
   Sensate:
     special:
-    - Sensate Gnome
+      - Sensate Gnome
     circumstance: true
     action: []
     attack: {}
@@ -274,7 +274,7 @@ pf2e_heritage:
     traits: []
   Umbral:
     special:
-    - Darkvision
+      - Darkvision
     action: []
     attack: {}
     defense: {}
@@ -321,13 +321,13 @@ pf2e_heritage:
     skills: []
     special: []
     traits: []
-# Goblin Heritages
+  # Goblin Heritages
   Charhide:
     defense:
       resistances:
         fire: 1
     special:
-    - Charhide Goblin
+      - Charhide Goblin
     traits: []
     skills: []
     feat: []
@@ -336,7 +336,7 @@ pf2e_heritage:
     attack: {}
   Irongut:
     special:
-    - Irongut Goblin
+      - Irongut Goblin
     circumstance: true
     action: []
     attack: {}
@@ -351,8 +351,8 @@ pf2e_heritage:
         damage: d6
         damage_type: P
         traits:
-        - finesse
-        - unarmed
+          - finesse
+          - unarmed
     action: []
     defense: {}
     feat: []
@@ -374,7 +374,7 @@ pf2e_heritage:
   Unbreakable:
     ancestry_HP: 10
     special:
-    - Unbreakable Goblin
+      - Unbreakable Goblin
     action: []
     attack: {}
     defense: {}
@@ -382,10 +382,10 @@ pf2e_heritage:
     reaction: []
     skills: []
     traits: []
-# Human Heritages
+  # Human Heritages
   Skilled:
     skills:
-    - open
+      - open
     action: []
     attack: {}
     defense: {}
@@ -396,7 +396,7 @@ pf2e_heritage:
   Versatile:
     feat: []
     choose_feat:
-    - general
+      - general
     action: []
     attack: {}
     defense: {}
@@ -404,11 +404,11 @@ pf2e_heritage:
     skills: []
     special: []
     traits: []
-# Kailli Heritages
+  # Kailli Heritages
   Deep Kailli:
     traits: []
     special:
-    - Darkvision
+      - Darkvision
     skills: []
     defense: {}
     action: []
@@ -428,7 +428,7 @@ pf2e_heritage:
   Longsnout:
     traits: []
     special:
-    - Scent (imprecise)
+      - Scent (imprecise)
     skills: []
     feat: []
     action: []
@@ -437,9 +437,9 @@ pf2e_heritage:
   Sewer:
     traits: []
     special:
-    - Sewer Kailli
+      - Sewer Kailli
     skills:
-    - Intimidation
+      - Intimidation
     feat: []
     action: []
     reaction: []
@@ -447,13 +447,13 @@ pf2e_heritage:
   Shadow:
     traits: []
     special:
-    - Shadow Kailli
+      - Shadow Kailli
     skills: []
     feat: []
     action: []
     reaction: []
     attack: {}
-# Khazad Heritages
+  # Khazad Heritages
   Ancient-Blooded:
     reaction: 'Call On Ancient Blood'
     action: []
@@ -506,11 +506,11 @@ pf2e_heritage:
     skills: []
     special: []
     traits: []
-# Oruch Heritages
+  # Oruch Heritages
   Badlands:
     traits: []
     special:
-    - Badlands Oruch
+      - Badlands Oruch
     skills: []
     feat: []
     defense: {}
@@ -519,8 +519,8 @@ pf2e_heritage:
     attack: {}
   Deep Oruch:
     feat:
-    - Terrain Expertise/Underground
-    - Combat Climber
+      - Terrain Expertise/Underground
+      - Combat Climber
     traits: []
     special: []
     skills: []
@@ -531,7 +531,7 @@ pf2e_heritage:
   Hold-Scarred:
     ancestry_HP: 12
     feat:
-    - Diehard
+      - Diehard
     action: []
     attack: {}
     defense: {}
@@ -549,7 +549,7 @@ pf2e_heritage:
     skills: []
     special: []
     traits: []
-# Sildanyar Heritages
+  # Sildanyar Heritages
   Arctic:
     traits: []
     defense:
@@ -565,7 +565,7 @@ pf2e_heritage:
   Cavern:
     traits: []
     special:
-    - Darkvision
+      - Darkvision
     skills: []
     feat: []
     defense: {}
@@ -576,11 +576,11 @@ pf2e_heritage:
     magic:
       innate_spell:
         cantrip:
-        - Detect Magic
+          - Detect Magic
         spell_trad: arcane
     action:
-    - Identify Magic
-    - Decipher Writing
+      - Identify Magic
+      - Decipher Writing
     action_bonus: 1
     attack: {}
     defense: {}
@@ -609,13 +609,13 @@ pf2e_heritage:
     skills: []
     special: []
     traits: []
-# Limited Heritages
+  # Limited Heritages
   Ghaluch:
     traits:
-    - oruch
-    - ghaluch
+      - oruch
+      - ghaluch
     special:
-    - Low-Light Vision
+      - Low-Light Vision
     action: []
     attack: {}
     defense: {}
@@ -624,23 +624,23 @@ pf2e_heritage:
     skills: []
   Silyara:
     traits:
-    - silyara
-    - sildanyar
+      - silyara
+      - sildanyar
     special:
-    - Low-Light Vision
+      - Low-Light Vision
     action: []
     attack: {}
     defense: {}
     feat: []
     reaction: []
     skills: []
-# Versatile Heritages
+  # Versatile Heritages
   Aesa:
     rare: true
     traits:
-    - aesa
+      - aesa
     special:
-    - Low-Light Vision
+      - Low-Light Vision
     change_vision: true
     action: []
     attack: {}
@@ -651,9 +651,9 @@ pf2e_heritage:
   Ashen One:
     rare: true
     traits:
-    - ashen one
+      - ashen one
     special:
-    - Low-Light Vision
+      - Low-Light Vision
     defense: {}
     change_vision: true
     skills: []
@@ -664,9 +664,9 @@ pf2e_heritage:
   Changeling:
     rare: true
     traits:
-    - changeling
+      - changeling
     special:
-    - Low-Light Vision
+      - Low-Light Vision
     skills: []
     feat: []
     defense: {}
@@ -677,10 +677,10 @@ pf2e_heritage:
   Dar:
     rare: true
     traits:
-    - dar
+      - dar
     special:
-    - Low-Light Vision
-    - Negative Healing
+      - Low-Light Vision
+      - Negative Healing
     change_vision: true
     skills: []
     feat: []
@@ -691,9 +691,9 @@ pf2e_heritage:
   Niasa:
     rare: true
     traits:
-    - niasa
+      - niasa
     special:
-    - Low-Light Vision
+      - Low-Light Vision
     change_vision: true
     action: []
     attack: {}

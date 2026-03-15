@@ -3,7 +3,7 @@ pf2e_armor:
   Explorer's Clothing:
     category: unarmored
     traits:
-    - comfort
+      - comfort
     level: 0
     price: 10
     dex_cap: 5
@@ -16,7 +16,7 @@ pf2e_armor:
   Padded:
     category: light
     traits:
-    - comfort
+      - comfort
     level: 0
     price: 20
     ac_bonus: 1
@@ -53,8 +53,8 @@ pf2e_armor:
   Chain Shirt:
     category: light
     traits:
-    - flexible
-    - noisy
+      - flexible
+      - noisy
     level: 0
     price: 500
     ac_bonus: 2
@@ -91,8 +91,8 @@ pf2e_armor:
   Chain Mail:
     category: medium
     traits:
-    - flexible
-    - noisy
+      - flexible
+      - noisy
     level: 0
     price: 600
     ac_bonus: 4
@@ -141,7 +141,7 @@ pf2e_armor:
   Full Plate:
     category: heavy
     traits:
-    - bulwark
+      - bulwark
     level: 2
     price: 3000
     ac_bonus: 6

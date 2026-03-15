@@ -1291,7 +1291,7 @@ pf2e_weapons:
     category: martial
     traits:
       - Agile
-      - concealable
+      - Concealable
       - Finesse
     level: 0
     price: 500
@@ -1500,3 +1500,581 @@ pf2e_weapons:
       fundamental:
         potency: 3
         power: 3
+  # Specific Weapons
+  Fighter's Fork:
+    wp_type: melee
+    category: martial
+    traits:
+      - Magical
+      - Transmutation
+      - Thrown
+    level: 3
+    price: 5000
+    wp_damage: d4
+    wp_damage_type: S
+    hands: 1
+    range: 20
+    reload: 0
+    bulk: 1
+    group: Spear
+    runes:
+      fundamental:
+        potency: 1
+  Retribution Axe:
+    wp_type: melee
+    category: martial
+    traits:
+      - Sweep
+      - Enchantment
+      - Magical
+    level: 3
+    price: 6000
+    wp_damage: d12
+    wp_damage_type: S
+    hands: 2
+    range: 0
+    reload: 0
+    bulk: 2
+    group: Axe
+    runes:
+      fundamental:
+        potency: 1
+  Dagger of Venom:
+    wp_type: melee
+    category: simple
+    charclass:
+      - Wizard
+    traits:
+      - Agile
+      - Finesse
+      - Thrown
+      - Versatile (S)
+      - Poison
+      - Magical
+      - Necromancy
+    level: 5
+    price: 15000
+    wp_damage: d4
+    wp_damage_type: P
+    hands: 1
+    range: 10
+    reload: 0
+    bulk: 0.1
+    group: Knife
+    runes:
+      fundamental:
+        potency: 1
+        power: 1
+  Infiltrator's Accessory:
+    wp_type: melee
+    category: martial
+    traits:
+      - Illusion
+      - Magical
+      - Agile
+      - Concealable
+      - Finesse
+    level: 5
+    price: 15000
+    wp_damage: d6
+    wp_damage_type: P
+    hands: 1
+    range: 0
+    reload: 0
+    bulk: 1
+    group: Sword
+    runes:
+      fundamental:
+        potency: 1
+        power: 1
+  Caterwaul Sling:
+    wp_type: ranged
+    category: simple
+    traits:
+      - Propulsive
+      - Evocation
+      - Magical
+    ancestry:
+      - Bassin
+    level: 5
+    price: 15500
+    wp_damage: d6
+    wp_damage_type: B
+    hands: 1
+    range: 50
+    reload: 0
+    bulk: 0.1
+    group: Sling
+    runes:
+      fundamental:
+        potency: 1
+        power: 1
+  Bloodletting Kukri:
+    wp_type: melee
+    category: martial
+    traits:
+      - Agile
+      - Finesse
+      - Trip
+      - Uncommon
+      - Magical
+      - Necromancy
+    ancestry:
+      - Gnome
+    level: 6
+    price: 24000
+    wp_damage: d6
+    wp_damage_type: S
+    hands: 1
+    range: 0
+    reload: 0
+    bulk: 0.1
+    group: Knife
+    runes:
+      fundamental:
+        potency: 1
+        power: 1
+  Twining Staff:
+    wp_type: melee
+    category: simple
+    charclass:
+      - Wizard
+    traits:
+      - Two-Handed
+      - Magical
+      - Transmutation
+    level: 6
+    price: 25000
+    wp_damage: d4
+    wp_damage_type: B
+    wp_damage_2h: d8
+    hands: 1
+    range: 0
+    reload: 0
+    bulk: 0
+    group: Club
+    runes:
+      fundamental:
+        potency: 1
+        power: 1
+  Spellguard Blade:
+    wp_type: melee
+    category: martial
+    traits:
+      - Agile
+      - Disarm
+      - Finesse
+      - Parry
+      - Versatile (S)
+      - Abjuration
+      - Magical
+    level: 7
+    price: 32000
+    wp_damage: d4
+    wp_damage_type: P
+    hands: 1
+    range: 0
+    reload: 0
+    bulk: 0.1
+    group: Knife
+    runes:
+      fundamental:
+        potency: 1
+        power: 1
+  Spiritsight Crossbow:
+    wp_type: ranged
+    category: simple
+    charclass:
+      - Wizard
+    traits:
+      - Conjuration
+      - Magical
+      - Uncommon
+      - Teleportation
+    level: 8
+    price: 45000
+    wp_damage: d8
+    wp_damage_type: P
+    hands: 2
+    range: 120
+    reload: 1
+    bulk: 1
+    group: Bow
+    runes:
+      fundamental:
+        potency: 1
+        power: 1
+      property:
+        - Ghost Touch
+  Gloom Blade:
+    wp_type: melee
+    category: martial
+    charclass:
+      - Bard
+      - Rogue
+    traits:
+      - Agile
+      - Finesse
+      - Versatile (S)
+      - Evocation
+      - Magical
+    ancestry:
+      - Bassin
+    level: 9
+    price: 70000
+    wp_damage: d6
+    wp_damage_type: P
+    hands: 1
+    range: 0
+    reload: 0
+    bulk: 0.1
+    group: Sword
+    runes:
+      fundamental:
+        potency: 1
+  Oathbow:
+    wp_type: ranged
+    category: martial
+    traits:
+      - Deadly (d10)
+      - Propulsive
+      - Volley (30)
+      - Divination
+      - Magical
+    ancestry:
+      - Arvek
+      - Sildanyar
+    level: 11
+    price: 130000
+    wp_damage: d8
+    wp_damage_type: P
+    hands: 2
+    range: 100
+    reload: 0
+    bulk: 2
+    group: Bow
+    runes:
+      fundamental:
+        potency: 2
+        power: 1
+  Four-Ways Dogslicer:
+    wp_type: melee
+    category: martial
+    traits:
+      - Agile
+      - Backstabber
+      - Finesse
+      - Goblin
+      - Uncommon
+      - Cold
+      - Electricity
+      - Magical
+      - Fire
+      - Evocation
+    ancestry:
+      - Goblin
+    level: 12
+    price: 170000
+    wp_damage: d6
+    wp_damage_type: S
+    hands: 1
+    range: 0
+    reload: 0
+    bulk: 0.1
+    group: Sword
+    runes:
+      fundamental:
+        potency: 2
+        power: 1
+  Khazadi Thrower:
+    wp_type: melee
+    category: martial
+    traits:
+      - Shove
+      - Evocation
+      - Magical
+    ancestry:
+      - Khazad
+    level: 13
+    price: 275000
+    wp_damage: d8
+    wp_damage_type: B
+    hands: 1
+    range: 0
+    reload: 0
+    bulk: 1
+    group: Hammer
+    runes:
+      fundamental:
+        potency: 2
+        power: 1
+  Flame Tongue:
+    wp_type: melee
+    category: martial
+    charclass:
+      - Bard
+    traits:
+      - Versatile (P)
+      - Evocation
+      - Fire
+      - Magical
+    ancestry:
+      - Arvek
+      - Sildanyar
+    level: 13
+    price: 280000
+    wp_damage: d8
+    wp_damage_type: S
+    hands: 1
+    range: 0
+    reload: 0
+    bulk: 1
+    group: Sword
+    runes:
+      fundamental:
+        potency: 2
+        power: 2
+      property:
+        - Flaming
+  Holy Avenger:
+    wp_type: melee
+    category: martial
+    charclass:
+      - Bard
+    traits:
+      - Versatile (P)
+      - Uncommon
+      - Divine
+      - Evocation
+      - Good
+      - Lawful
+    ancestry:
+      - Arvek
+      - Sildanyar
+    level: 14
+    price: 450000
+    wp_damage: d8
+    wp_damage_type: S
+    hands: 1
+    range: 0
+    reload: 0
+    bulk: 1
+    group: Sword
+    runes:
+      fundamental:
+        potency: 2
+        power: 2
+      property:
+        - Holy
+  Storm Flash:
+    wp_type: melee
+    category: martial
+    charclass:
+      - Bard
+      - Rogue
+    traits:
+      - Electricity
+      - Magical
+      - Evocation
+    ancestry:
+      - Sildanyar
+    level: 14
+    price: 400000
+    wp_damage: d6
+    wp_damage_type: P
+    hands: 1
+    range: 0
+    reload: 0
+    bulk: 1
+    group: Sword
+    runes:
+      fundamental:
+        potency: 2
+        power: 2
+      property:
+        - Shock
+  Frost Brand:
+    wp_type: melee
+    category: martial
+    traits:
+      - Versatile (P)
+      - Cold
+      - Evocation
+      - Magical
+    level: 16
+    price: 1000000
+    wp_damage: d12
+    wp_damage_type: S
+    hands: 2
+    range: 0
+    reload: 0
+    bulk: 2
+    group: Sword
+    runes:
+      fundamental:
+        potency: 2
+        power: 2
+      property:
+        - Frost (Greater)
+  Flame Tongue (Greater):
+    wp_type: melee
+    category: martial
+    charclass:
+      - Bard
+    traits:
+      - Versatile (P)
+      - Evocation
+      - Fire
+      - Magical
+    ancestry:
+      - Arvek
+      - Sildanyar
+    level: 17
+    price: 1380000
+    wp_damage: d8
+    wp_damage_type: S
+    hands: 1
+    range: 0
+    reload: 0
+    bulk: 1
+    group: Sword
+    runes:
+      fundamental:
+        potency: 3
+        power: 2
+      property:
+        - Flaming (Greater)
+  Luck Blade:
+    wp_type: melee
+    category: martial
+    charclass:
+      - Bard
+      - Rogue
+    traits:
+      - Agile
+      - Finesse
+      - Versatile (S)
+      - Rare
+      - Divination
+      - Fortune
+      - Magical
+    ancestry:
+      - Bassin
+    level: 17
+    price: 1500000
+    wp_damage: d6
+    wp_damage_type: P
+    hands: 1
+    range: 0
+    reload: 0
+    bulk: 0.1
+    group: Sword
+    runes:
+      fundamental:
+        potency: 3
+        power: 2
+  Storm Flash (Greater):
+    wp_type: melee
+    category: martial
+    charclass:
+      - Bard
+      - Rogue
+    traits:
+      - Electricity
+      - Magical
+      - Evocation
+    ancestry:
+      - Sildanyar
+    level: 18
+    price: 2100000
+    wp_damage: d6
+    wp_damage_type: P
+    hands: 1
+    range: 0
+    reload: 0
+    bulk: 1
+    group: Sword
+    runes:
+      fundamental:
+        potency: 3
+        power: 2
+      property:
+        - Shock (Greater)
+  Luck Blade (Wishing):
+    wp_type: melee
+    category: martial
+    charclass:
+      - Bard
+      - Rogue
+    traits:
+      - Agile
+      - Finesse
+      - Versatile (S)
+      - Rare
+      - Divination
+      - Fortune
+      - Magical
+    ancestry:
+      - Bassin
+    level: 19
+    price: 3000000
+    wp_damage: d6
+    wp_damage_type: P
+    hands: 1
+    range: 0
+    reload: 0
+    bulk: 0.1
+    group: Sword
+    runes:
+      fundamental:
+        potency: 3
+        power: 2
+  Mattock of the Titans:
+    wp_type: melee
+    category: martial
+    traits:
+      - Fatal (d12)
+      - Uncommon
+      - Evocation
+      - Magical
+    level: 19
+    price: 3600000
+    wp_damage: d10
+    wp_damage_type: P
+    hands: 2
+    range: 0
+    reload: 0
+    bulk: 2
+    group: Pick
+    runes:
+      fundamental:
+        potency: 3
+        power: 2
+      property:
+        - Keen
+  Sky Hammer:
+    wp_type: melee
+    category: martial
+    traits:
+      - Shove
+      - Rare
+      - Evocation
+      - Magical
+    ancestry:
+      - Khazad
+    level: 20
+    price: 7000000
+    wp_damage: d8
+    wp_damage_type: B
+    hands: 1
+    range: 0
+    reload: 0
+    bulk: 1
+    group: Hammer
+    runes:
+      fundamental:
+        potency: 3
+        power: 3
+      property:
+        - Shock
+        - Flaming

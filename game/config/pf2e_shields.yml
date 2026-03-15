@@ -81,8 +81,8 @@ pf2e_shields:
     price: 3500
     speed_penalty: 0
     traits:
-    - illusion
-    - magical
+      - illusion
+      - magical
   Sturdy Shield (Minor):
     ac_bonus: 2
     bulk: 1
@@ -92,8 +92,8 @@ pf2e_shields:
     price: 10000
     speed_penalty: 0
     traits:
-    - abjuration
-    - magical
+      - abjuration
+      - magical
   Exploding Shield:
     ac_bonus: 2
     bulk: 1
@@ -103,8 +103,8 @@ pf2e_shields:
     price: 2500
     speed_penalty: 0
     traits:
-    - evocation
-    - magical
+      - evocation
+      - magical
   Lion's Shield:
     ac_bonus: 2
     bulk: 1
@@ -114,8 +114,8 @@ pf2e_shields:
     price: 24500
     speed_penalty: 0
     traits:
-    - conjuration
-    - magical
+      - conjuration
+      - magical
   Spellguard Shield:
     ac_bonus: 2
     bulk: 1
@@ -125,8 +125,8 @@ pf2e_shields:
     price: 25000
     speed_penalty: 0
     traits:
-    - abjuration
-    - magical
+      - abjuration
+      - magical
   Cold Iron Buckler (Standard-Grade):
     ac_bonus: 1
     bulk: 0.1
@@ -172,8 +172,8 @@ pf2e_shields:
     price: 36000
     speed_penalty: 0
     traits:
-    - evocation
-    - magical
+      - evocation
+      - magical
   Sturdy Shield (Lesser):
     ac_bonus: 2
     bulk: 1
@@ -183,8 +183,8 @@ pf2e_shields:
     price: 36000
     speed_penalty: 0
     traits:
-    - abjuration
-    - magical
+      - abjuration
+      - magical
   Adamantine Buckler (Standard-Grade):
     ac_bonus: 1
     bulk: 0.1
@@ -275,9 +275,9 @@ pf2e_shields:
     price: 65000
     speed_penalty: 0
     traits:
-    - evocation
-    - force
-    - magical
+      - evocation
+      - force
+      - magical
   Dragonslayer's Shield:
     ac_bonus: 2
     bulk: 1
@@ -287,8 +287,8 @@ pf2e_shields:
     price: 67000
     speed_penalty: 0
     traits:
-    - abjuration
-    - magical
+      - abjuration
+      - magical
   Forge Warden:
     ac_bonus: 2
     bulk: 1
@@ -298,8 +298,8 @@ pf2e_shields:
     price: 97500
     speed_penalty: 0
     traits:
-    - abjuration
-    - magical
+      - abjuration
+      - magical
   Sturdy Shield (Moderate):
     ac_bonus: 2
     bulk: 1
@@ -309,8 +309,8 @@ pf2e_shields:
     price: 100000
     speed_penalty: 0
     traits:
-    - abjuration
-    - magical
+      - abjuration
+      - magical
   Floating Shield:
     ac_bonus: 1
     bulk: 0.1
@@ -320,7 +320,7 @@ pf2e_shields:
     price: 125000
     speed_penalty: 0
     traits:
-    - magical
+      - magical
   Arrow-Catching Shield:
     ac_bonus: 2
     bulk: 1
@@ -330,8 +330,8 @@ pf2e_shields:
     price: 135000
     speed_penalty: 0
     traits:
-    - abjuration
-    - magical
+      - abjuration
+      - magical
   Medusa's Scream:
     ac_bonus: 2
     bulk: 1
@@ -341,8 +341,8 @@ pf2e_shields:
     price: 300000
     speed_penalty: 0
     traits:
-    - magical
-    - transmutation
+      - magical
+      - transmutation
   Sturdy Shield (Greater):
     ac_bonus: 2
     bulk: 1
@@ -352,8 +352,8 @@ pf2e_shields:
     price: 300000
     speed_penalty: 0
     traits:
-    - abjuration
-    - magical
+      - abjuration
+      - magical
   Cold Iron Buckler (High-Grade):
     ac_bonus: 1
     bulk: 0.1
@@ -471,7 +471,7 @@ pf2e_shields:
     price: 900000
     speed_penalty: 0
     traits:
-    - magical
+      - magical
   Medusa's Scream (Greater):
     ac_bonus: 2
     bulk: 1
@@ -481,8 +481,8 @@ pf2e_shields:
     price: 900000
     speed_penalty: null
     traits:
-    - magical
-    - transmutation
+      - magical
+      - transmutation
   Sturdy Shield (Major):
     ac_bonus: 2
     bulk: 1
@@ -492,8 +492,8 @@ pf2e_shields:
     price: 1000000
     speed_penalty: 0
     traits:
-    - abjuration
-    - magical
+      - abjuration
+      - magical
   Darkwood Tower Shield (High-Grade):
     ac_bonus: 2
     bulk: 3
@@ -530,8 +530,8 @@ pf2e_shields:
     price: 1800000
     speed_penalty: 0
     traits:
-    - abjuration
-    - magical
+      - abjuration
+      - magical
   Indestructible Shield:
     ac_bonus: 2
     bulk: 1
@@ -541,8 +541,8 @@ pf2e_shields:
     price: 2400000
     speed_penalty: 0
     traits:
-    - abjuration
-    - magical
+      - abjuration
+      - magical
   Sturdy Shield (Supreme):
     ac_bonus: 2
     bulk: 1
@@ -552,5 +552,5 @@ pf2e_shields:
     price: 4000000
     speed_penalty: 0
     traits:
-    - abjuration
-    - magical
+      - abjuration
+      - magical

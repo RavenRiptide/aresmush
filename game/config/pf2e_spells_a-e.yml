@@ -4,15 +4,15 @@ pf2e_spells:
     base_level: 3
     school: Enchantment
     traits:
-    - auditory
-    - enchantment
-    - mental
-    - sorcerer
-    - uncommon
+      - auditory
+      - enchantment
+      - mental
+      - sorcerer
+      - uncommon
     bloodline:
-    - aberrant
+      - aberrant
     cast:
-    - verbal
+      - verbal
     actions: 3
     area: 5-foot emanation or more
     duration: 1 round
@@ -26,12 +26,12 @@ pf2e_spells:
     base_level: 4
     school: Conjuration
     traits:
-    - conjuration
-    - monk
-    - teleportation
-    - uncommon
+      - conjuration
+      - monk
+      - teleportation
+      - uncommon
     cast:
-    - somatic
+      - somatic
     actions: 1
     range: 15 feet or more
     effect: You move so fast you blur across planar boundaries. You teleport up to a distance equal to your Speed within your line of sight.
@@ -39,18 +39,18 @@ pf2e_spells:
     base_level: 5
     school: Necromancy
     traits:
-    - chaotic
-    - disease
-    - evil
-    - necromancy
+      - chaotic
+      - disease
+      - evil
+      - necromancy
     bloodline:
-    - demonic
+      - demonic
     tradition:
-    - divine
-    - occult
+      - divine
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: touch
     target: 1 creature
@@ -60,14 +60,14 @@ pf2e_spells:
     base_level: 5
     school: Evocation
     traits:
-    - evocation
-    - sorcerer
-    - uncommon
+      - evocation
+      - sorcerer
+      - uncommon
     bloodline:
-    - demonic
+      - demonic
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 60-foot cone
     damage: 4d6
@@ -75,24 +75,24 @@ pf2e_spells:
     save: basic Reflex
     effect: You evoke the energy of an Abyssal realm. The damage types of the spell (one energy and one physical) are based on the result of rolling on the Abyssal Wrath table, which is available on the Archives of Nethys website. You deal 4d6 damage of each of the corresponding damage types to each creature in the cone (8d6 total damage).
     heighten:
-    - 5d6
-    - 6d6
-    - 7d6
-    - 8d6
-    - 9d6
+      - 5d6
+      - 6d6
+      - 7d6
+      - 8d6
+      - 9d6
   Access Lore:
     base_level: 3
     school: Divination
     traits:
-    - cursebound
-    - divination
-    - fortune
-    - oracle
-    - uncommon
+      - cursebound
+      - divination
+      - fortune
+      - oracle
+      - uncommon
     mystery:
-    - lore
+      - lore
     cast:
-    - somatic
+      - somatic
     actions: 1
     duration: 1 minute
     effect: You sift through the multiverse's divine knowledge, seeking out tidbits related to a particular subject. Choose one Lore skill. You temporarily gain the same proficiency rank in that Lore skill as your proficiency rank for your oracle spellcasting.
@@ -100,15 +100,15 @@ pf2e_spells:
     base_level: 2
     school: Evocation
     traits:
-    - acid
-    - attack
-    - evocation
+      - acid
+      - attack
+      - evocation
     tradition:
-    - arcane
-    - primal
+      - arcane
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 120 feet
     target: 1 creature
@@ -124,13 +124,13 @@ pf2e_spells:
     base_level: cantrip
     school: Evocation
     traits:
-    - acid
-    - attack
-    - cantrip
-    - evocation
+      - acid
+      - attack
+      - cantrip
+      - evocation
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 creature
@@ -143,18 +143,18 @@ pf2e_spells:
       7: The initial damage increases to 3d6 + your spellcasting ability modifier, the persistent damage increases to 4, and the splash damage increases to 3.
       9: The initial damage increases to 4d6 + your spellcasting ability modifier, the persistent damage increases to 5, and the splash damage increases to 4.
     tradition:
-    - arcane
-    - primal
+      - arcane
+      - primal
   Adapt Self:
     base_level: 1
     school: Transmutation
     traits:
-    - morph
-    - transmutation
-    - cleric
+      - morph
+      - transmutation
+      - cleric
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     duration: 1 minute
     effect: You make subtle changes to yourself to adapt to the situation. Choose one of the following options that applies to you.%r%r- If you are in water, you gain a swim Speed equal to half your Speed.%r- If you are in water, you become able to breathe water.%r- If it’s too dark for you to see, you gain darkvision.%r- If you are in an environment of severe heat or severe cold, you are protected from the effects of severe heat or severe cold, and the spell lasts 10 minutes.
@@ -162,10 +162,10 @@ pf2e_spells:
     base_level: 4
     school: Abjuration
     traits:
-    - abjuration
-    - cleric
+      - abjuration
+      - cleric
     cast:
-    - somatic
+      - somatic
     actions: reaction
     trigger: You take acid, cold, electricity, fire, or sonic damage.
     duration: 1 minute
@@ -178,14 +178,14 @@ pf2e_spells:
     base_level: 4
     school: Transmutation
     traits:
-    - polymorph
-    - transmutation
+      - polymorph
+      - transmutation
     tradition:
-    - arcane
-    - primal
+      - arcane
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     duration: 1 minute
     effect: You harness your mastery of primal forces to reshape your body into a Medium flying animal battle form. When you cast this spell, choose bat, bird, pterosaur, or wasp. You can decide the specific type of animal (such as an owl or eagle for bird), but this has no effect on the form's Size or statistics. While in this form, you gain the *Animal* trait. You can Dismiss the spell.%rYou gain the following statistics and abilities regardless of which battle form you choose:%r%r- AC = 18 + your level. Ignore your armor's check penalty and Speed reduction.%r- 5 temporary Hit Points.%r- Low-light vision.%r- One or more unarmed melee attacks specific to the battle form you choose, which are the only attacks you can Strike with. You're trained with them. Your attack modifier is +16, and your damage bonus is +5. These attacks are Dexterity based (for the purpose of the *clumsy* condition, for example). If your attack modifier for Dexterity-based unarmed attacks is higher, you can use it instead.%r- Acrobatics modifier of +16, unless your own modifier is higher.%r%rYou also gain specific abilities based on the form you choose:%r%r**Bat** Speed 20 feet, fly Speed 30 feet; precise echolocation 40 feet; Melee [one-action] fangs, Damage 2d8 piercing; Melee [one-action] wing (agile), Damage 2d6 bludgeoning.%r**Bird** Speed 10 feet, fly Speed 50 feet; Melee [one-action] beak, Damage 2d8 piercing; Melee [one-action] talon (agile), Damage 1d10 slashing.%r**Pterosaur** Speed 10 feet, fly Speed 40 feet; imprecise scent 30 feet; Melee [one-action] beak, Damage 3d6 piercing.%r**Wasp** Speed 20 feet, fly Speed 40 feet; Melee [one-action] stinger, Damage 1d8 piercing plus 1d6 persistent poison.
@@ -196,11 +196,11 @@ pf2e_spells:
     base_level: 1
     school: Transmutation
     traits:
-    - cleric
-    - transmutation
-    - uncommon
+      - cleric
+      - transmutation
+      - uncommon
     cast:
-    - somatic
+      - somatic
     actions: 1
     duration: until the end of the current turn
     effect: The blessings of your god make your feet faster and your movements more fluid. You gain a +5-foot status bonus to your Speed and ignore difficult terrain. As part of casting agile feet, you can Stride or Step; you can instead Burrow, Climb, Fly, or Swim if you have the appropriate Speed.
@@ -208,17 +208,17 @@ pf2e_spells:
     base_level: 3
     school: Enchantment
     traits:
-    - emotion
-    - enchantment
-    - fear
-    - mental
+      - emotion
+      - enchantment
+      - fear
+      - mental
     tradition:
-    - arcane
-    - divine
-    - occult
+      - arcane
+      - divine
+      - occult
     cast:
-    - verbal
-    - somatic
+      - verbal
+      - somatic
     actions: 2
     range: 60 feet
     target: 1 creature
@@ -227,25 +227,25 @@ pf2e_spells:
     save: Will
     effect: Mentally damage and frighten a creature.
     heighten:
-    - 6d6
-    - 8d6
-    - 10d6
-    - 12d6
-    - 14d6
-    - 16d6
-    - 18d6
+      - 6d6
+      - 8d6
+      - 10d6
+      - 12d6
+      - 14d6
+      - 16d6
+      - 18d6
   Air Bubble:
     base_level: 1
     school: Conjuration
     traits:
-    - air
-    - conjuration
+      - air
+      - conjuration
     tradition:
-    - arcane
-    - divine
-    - primal
+      - arcane
+      - divine
+      - primal
     cast:
-    - verbal
+      - verbal
     actions: reaction
     trigger: A creature within range enters an environment where it cannot breathe.
     range: 60 feet
@@ -256,14 +256,14 @@ pf2e_spells:
     base_level: 4
     school: Transmutation
     traits:
-    - air
-    - transmutation
+      - air
+      - transmutation
     tradition:
-    - divine
-    - primal
+      - divine
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: touch
     target: 1 creature
@@ -273,17 +273,17 @@ pf2e_spells:
     base_level: 1
     school: Abjuration
     traits:
-    - abjuration
+      - abjuration
     tradition:
-    - arcane
-    - divine
-    - occult
-    - primal
+      - arcane
+      - divine
+      - occult
+      - primal
     cast:
-    - focus (3 gp silver bell)
-    - material
-    - somatic
-    - verbal
+      - focus (3 gp silver bell)
+      - material
+      - somatic
+      - verbal
     actions: 10 minutes
     area: 20-foot burst
     range: touch
@@ -295,15 +295,15 @@ pf2e_spells:
     base_level: cantrip
     school: Enchantment
     traits:
-    - bard
-    - cantrip
-    - composition
-    - emotion
-    - enchantment
-    - mental
-    - uncommon
+      - bard
+      - cantrip
+      - composition
+      - emotion
+      - enchantment
+      - mental
+      - uncommon
     cast:
-    - verbal
+      - verbal
     actions: 1
     range: 30 feet
     target: 1 ally
@@ -313,26 +313,26 @@ pf2e_spells:
     base_level: 10
     school: Divination
     traits:
-    - divination
+      - divination
     tradition:
-    - occult
+      - occult
     cast:
-    - material
-    - somatic
-    - verbal
+      - material
+      - somatic
+      - verbal
     actions: 3
     effect: "You use your occult lore and the power of your mind to manipulate the spiritual multiverse, resulting in any of the following effects: %r%r- Duplicate any spell from the occult list of 9th level or lower to which you have access.%r- Duplicate any spell from another spell list of 7th level or lower. It must be common or you must have access.%r- Produce any effect whose power is equivalent to any occult spell 9th level or lower, or non-occult spell 7th level or lower to which you have access.%r- Reverse certain effects that refer to the *wish* spell.%r%rAt the GM’s discretion, you can try to produce greater effects, but this is dangerous and the spell may have only a partial effect."
   Anathematic Reprisal:
     base_level: 4
     school: Enchantment
     traits:
-    - enchantment
-    - mental
+      - enchantment
+      - mental
     tradition:
-    - divine
+      - divine
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: reaction
     trigger: A creature performs an act anathema to your deity.
     range: 30 feet
@@ -342,26 +342,26 @@ pf2e_spells:
     save: Will
     effect: You punish a creature that transgresses against your deity, drawing upon the anguish you feel upon seeing one of your deity’s anathema committed.%rYou can cast this spell only when a creature actively commits a unique act of anathema. For example, if creating undead were anathema to your deity, you could use *anathematic reprisal* on a necromancer who had just created undead in front of you, but not on an undead creature just for existing.%rYou deal 4d6 mental damage to the target, but a basic Will save can reduce this damage. If it fails, it is also stupefied 1 for 1 round. The creature is then temporarily immune for 1 minute.
     heighten:
-    - 5d6
-    - 6d6
-    - 7d6
-    - 8d6
-    - 9d6
-    - 10d6
+      - 5d6
+      - 6d6
+      - 7d6
+      - 8d6
+      - 9d6
+      - 10d6
   Ancestral Defense:
     base_level: 3
     school: Abjuration
     traits:
-    - abjuration
-    - cursebound
-    - fortune
-    - mental
-    - oracle
-    - uncommon
+      - abjuration
+      - cursebound
+      - fortune
+      - mental
+      - oracle
+      - uncommon
     mystery:
-    - ancestors
+      - ancestors
     cast:
-    - somatic
+      - somatic
     actions: reaction
     trigger: You are about to attempt a Will save.
     effect: Your ancestor protects you against those who would bend your will. You roll the triggering save twice and use the better result. If you're in an encounter when you cast this spell, you immediately roll to change your predominant ancestor.
@@ -369,15 +369,15 @@ pf2e_spells:
     base_level: 6
     school: Transmutation
     traits:
-    - cursebound
-    - oracle
-    - transmutation
-    - uncommon
+      - cursebound
+      - oracle
+      - transmutation
+      - uncommon
     mystery:
-    - ancestors
+      - ancestors
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     duration: 1 minute
     effect: "You take the form of your ancestral spirits, becoming invisible and quasi-corporeal. You gain resistance 10 to all damage (except force and damage from Strikes with the ghost touch property rune), and this resistance is doubled against non-magical and precision damage. You gain a fly Speed equal to your land Speed; when Flying, moving upward isn't difficult terrain for you. You can't move through solid objects, but you can float through tiny gaps. You can't Cast Spells (but you can Sustain Spells), activate items, or use actions that have the attack or manipulate trait."
@@ -388,13 +388,13 @@ pf2e_spells:
     base_level: 1
     school: Divination
     traits:
-    - divination
-    - sorcerer
-    - uncommon
+      - divination
+      - sorcerer
+      - uncommon
     bloodline:
-    - imperial
+      - imperial
     cast:
-    - verbal
+      - verbal
     actions: 1
     duration: 1 minute
     effect: "The memories of long-dead spellcasters grant you knowledge in a specific skill. Choose any non-Lore skill, or a Lore skill related to the ancient empire from which your bloodline sprang. You temporarily become trained in that skill and might gain other memories associated with an ancestor who was trained in that skill. If you attempt a task or activity that lasts beyond this spell's duration, use the lower proficiency modifier."
@@ -404,17 +404,17 @@ pf2e_spells:
     base_level: 1
     school: Enchantment
     traits:
-    - cursebound
-    - emotion
-    - enchantment
-    - fear
-    - mental
-    - oracle
-    - uncommon
+      - cursebound
+      - emotion
+      - enchantment
+      - fear
+      - mental
+      - oracle
+      - uncommon
     mystery:
-    - ancestors
+      - ancestors
     cast:
-    - somatic
+      - somatic
     actions: 1
     range: touch
     target: 1 living creature
@@ -436,15 +436,15 @@ pf2e_spells:
     base_level: 1
     school: Abjuration
     traits:
-    - abjuration
-    - aura
-    - good
-    - sorcerer
-    - uncommon
+      - abjuration
+      - aura
+      - good
+      - sorcerer
+      - uncommon
     bloodline:
-    - angelic
+      - angelic
     cast:
-    - verbal
+      - verbal
     actions: 1
     area: 15-foot emanation
     duration: 1 minute
@@ -453,15 +453,15 @@ pf2e_spells:
     base_level: 3
     school: Evocation
     traits:
-    - evocation
-    - light
-    - sorcerer
-    - uncommon
+      - evocation
+      - light
+      - sorcerer
+      - uncommon
     bloodline:
-    - angelic
+      - angelic
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     duration: 3 rounds
     effect: Wings of pure light spread out from your back, granting you a fly Speed equal to your Speed. Your wings cast bright light in a 30-foot radius. When this spell's duration would end, if you're still flying, you float to the ground, as feather fall.
@@ -471,13 +471,13 @@ pf2e_spells:
     base_level: 2
     school: Transmutation
     traits:
-    - morph
-    - ranger
-    - transmutation
-    - uncommon
+      - morph
+      - ranger
+      - transmutation
+      - uncommon
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 1
     duration: 1 minute
     effect: "Without fully transforming your body, you gain one animalistic feature, which you select from the list below each time you Cast the Spell.%r%r- **Cat Eyes** You gain low-light vision.%r- **Claws** You gain a claw attack that deals 1d6 slashing damage and has the agile, finesse, and unarmed traits.%r- **Jaws** You gain a jaws attack that deals 1d8 piercing damage and has the unarmed trait."
@@ -487,13 +487,13 @@ pf2e_spells:
     base_level: 2
     school: Transmutation
     traits:
-    - polymorph
-    - transmutation
+      - polymorph
+      - transmutation
     tradition:
-    - primal
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     duration: 1 minute
     effect: "You call upon primal energy to transform yourself into a Medium animal battle form. When you first cast this spell, choose ape, bear, bull, canine, cat, deer, frog, shark, or snake. You can decide the specific type of animal (such as lion or snow leopard for cat), but this has no effect on the form’s Size or statistics. While in this form, you gain the animal trait. You can Dismiss the spell.%rYou gain the following statistics and abilities regardless of which battle form you choose:%r%r- AC = 16 + your level. Ignore your armor’s check penalty and Speed reduction.%r- 5 temporary Hit Points.%r- Low-light vision and imprecise scent 30 feet.%r- One or more unarmed melee attacks specific to the battle form you choose, which are the only attacks you can Strike with. You’re trained with them. Your attack modifier is +9, and your damage bonus is +1. These attacks are Strength based (for the purpose of the enfeebled condition, for example). If your unarmed attack bonus is higher, you can use it instead.%r- Athletics modifier of +9, unless your own modifier is higher.%r%rYou also gain specific abilities based on the type of animal you choose:%r%r**Ape** Speed 25 feet, climb Speed 20 feet; Melee fist, Damage 2d6 bludgeoning.%r**Bear** Speed 30 feet; Melee jaws, Damage 2d8 piercing; Melee claw (agile), Damage 1d8 slashing.%r**Bull** Speed 30 feet; Melee horn, Damage 2d8 piercing.%r**Canine** Speed 40 feet; Melee jaws, Damage 2d8 piercing.%r**Cat** Speed 40 feet; Melee jaws, Damage 2d6 piercing; Melee claw (agile), Damage 1d10 slashing.%r**Deer** Speed 50 feet; Melee antler, Damage 2d6 piercing.%r**Frog** Speed 25 feet, swim Speed 25 feet; Melee jaws, Damage 2d6 bludgeoning; Melee tongue (reach 15 feet), Damage 2d4 bludgeoning.%r**Shark** swim Speed 35 feet; Melee jaws, Damage 2d8 piercing; breathe underwater but not in air.%r**Snake** Speed 20 feet, climb Speed 20 feet, swim Speed 20 feet; Melee fangs, Damage 2d4 piercing plus 1d6 poison."
@@ -505,15 +505,15 @@ pf2e_spells:
     base_level: 1
     school: Necromancy
     traits:
-    - necromancy
+      - necromancy
     tradition:
-    - arcane
-    - divine
-    - occult
+      - arcane
+      - divine
+      - occult
     cast:
-    - material
-    - somatic
-    - verbal
+      - material
+      - somatic
+      - verbal
     actions: 3
     range: 30 feet
     duration: sustained up to 1 minute
@@ -532,14 +532,14 @@ pf2e_spells:
     base_level: 2
     school: Enchantment
     traits:
-    - enchantment
-    - mental
+      - enchantment
+      - mental
     tradition:
-    - primal
+      - primal
     cast:
-    - material
-    - somatic
-    - verbal
+      - material
+      - somatic
+      - verbal
     actions: 1 minute
     range: 120 feet  
     effect: You offer food, and an ordinary Tiny animal within range approaches to eat it. You imprint the image, direction, and distance of an obvious place or landmark well known to you within the animal. You can also attach a small object or note up to light Bulk to it. The animal does its best to reach the destination; if it makes it there, it waits nearby and allows nonhostile creatures to approach and remove the attached object. The spell ends after the message is delivered or after 24 hours, whichever comes first.%r%rIf there are no Tiny wild animals in range, the spell is lost.
@@ -547,16 +547,16 @@ pf2e_spells:
     base_level: 3
     school: Divination
     traits:
-    - divination
-    - mental
+      - divination
+      - mental
     tradition:
-    - primal  
+      - primal  
     bloodline:
-    - nymph
+      - nymph
     cast:
-    - material
-    - somatic
-    - verbal
+      - material
+      - somatic
+      - verbal
     actions: 1 minute
     range: 120 feet
     target: 1 animal
@@ -566,13 +566,13 @@ pf2e_spells:
     base_level: 1
     school: Transmutation
     traits:
-    - transmutation
+      - transmutation
     tradition:
-    - arcane
-    - occult
+      - arcane
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 100 feet
     target: up to 50 feet of rope or a nonliving rope-like object
@@ -583,13 +583,13 @@ pf2e_spells:
     base_level: 2
     school: Evocation
     traits:
-    - evocation
+      - evocation
     tradition:
-    - arcane
-    - occult
+      - arcane
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 10-foot burst
     range: 120 feet
@@ -607,16 +607,16 @@ pf2e_spells:
     base_level: 8
     school: Abjuration
     traits:
-    - abjuration
-    - rare
+      - abjuration
+      - rare
     tradition:
-    - arcane
-    - divine
-    - occult
+      - arcane
+      - divine
+      - occult
     cast:
-    - material
-    - somatic
-    - verbal
+      - material
+      - somatic
+      - verbal
     actions: 3
     area: 10-foot emanation, which affects you
     duration: sustained up to 1 minute
@@ -625,13 +625,13 @@ pf2e_spells:
     base_level: 1
     school: Transmutation
     traits:
-    - transmutation
+      - transmutation
     tradition:
-    - arcane
-    - primal
+      - arcane
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: touch
     target: 1 creature
@@ -641,12 +641,12 @@ pf2e_spells:
     base_level: 1
     school: Illusion
     traits:
-    - cleric
-    - illusion
-    - uncommon
+      - cleric
+      - illusion
+      - uncommon
     cast:
-    - material
-    - verbal
+      - material
+      - verbal
     actions: 2
     area: 5-foot burst
     range: 30 feet
@@ -657,14 +657,14 @@ pf2e_spells:
     base_level: 3
     school: Conjuration
     traits:
-    - conjuration
-    - water
+      - conjuration
+      - water
     tradition:
-    - arcane
-    - primal
+      - arcane
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 60 feet
     duration: 1 minute
@@ -673,13 +673,13 @@ pf2e_spells:
     base_level: 5
     school: Abjuration
     traits:
-    - abjuration
-    - sorcerer
-    - uncommon
+      - abjuration
+      - sorcerer
+      - uncommon
     bloodline:
-    - imperial
+      - imperial
     cast:
-    - somatic
+      - somatic
     actions: reaction
     trigger: A creature within range that you can see Casts a Spell.
     range: 120 feet
@@ -689,35 +689,35 @@ pf2e_spells:
     base_level: 3
     school: Necromancy
     traits:
-    - cursebound
-    - necromancy
-    - oracle
-    - uncommon
+      - cursebound
+      - necromancy
+      - oracle
+      - uncommon
     mystery:
-    - bones
+      - bones
     cast:
-    - somatic
+      - somatic
     actions: 1
     duration: 1 minute
     effect: You ossify your physical form, mimicking the durability of bone. You gain resistance 3 to cold, electricity, fire, piercing, and slashing damage.
     heighten:
-    - Increase the resistance to 4.
-    - Increase the resistance to 5.
-    - Increase the resistance to 6.
-    - Increase the resistance to 7.
-    - Increase the resistance to 8.
-    - Increase the resistance to 9.
-    - Increase the resistance to 10.
+      - Increase the resistance to 4.
+      - Increase the resistance to 5.
+      - Increase the resistance to 6.
+      - Increase the resistance to 7.
+      - Increase the resistance to 8.
+      - Increase the resistance to 9.
+      - Increase the resistance to 10.
   Artistic Flourish:
     base_level: 4
     school: Transmutation
     traits:
-    - cleric
-    - transmutation
-    - uncommon
+      - cleric
+      - transmutation
+      - uncommon
     cast:
-    - material
-    - somatic
+      - material
+      - somatic
     actions: 2
     range: 15 feet
     target: 1 item or work of art that fits entirely within the range
@@ -730,13 +730,13 @@ pf2e_spells:
     base_level: 4
     school: Evocation
     traits:
-    - cleric
-    - evocation
-    - light
+      - cleric
+      - evocation
+      - light
     cast:
-    - material
-    - somatic
-    - verbal
+      - material
+      - somatic
+      - verbal
     actions: 3
     range: 150 feet
     duration: 1 minute
@@ -745,21 +745,21 @@ pf2e_spells:
     save: basic Reflex
     effect: Lines of burning starlight form a constellation around you. Draw five lines, one at a time; each line must anchor at you or a creature or object already connected to a previous line, and it must end at a creature or object within 30 feet of its anchor (possibly allowing the *asterism* to extend to its full 150-foot range). A creature that begins its turn in one of these lines or enters one of these lines on its turn takes 4d6 fire damage (basic Reflex save). A creature can take this damage only once per turn, even if it moves through several lines. Targets that are part of the *asterism* do not take damage from it. If the distance between two targets (or you and a target) ever exceeds 30 feet, the line of starlight between the two breaks, and any lines that now no longer have a direct path back to you also break. You can Dismiss the spell.
     heighten:
-    - 5d6
-    - 6d6
-    - 7d6
-    - 8d6
-    - 9d6
-    - 10d6
+      - 5d6
+      - 6d6
+      - 7d6
+      - 8d6
+      - 9d6
+      - 10d6
   Athletic Rush:
     base_level: 1
     school: Transmutation
     traits:
-    - cleric
-    - transmutation
-    - uncommon
+      - cleric
+      - transmutation
+      - uncommon
     cast:
-    - somatic
+      - somatic
     actions: 1
     duration: 1 round
     effect: Your body fills with physical power and skill. You gain a +10-foot status bonus to Speed and a +2 status bonus to Athletics checks. As a part of Casting this Spell, you can use a Stride, Leap, Climb, or Swim action. The spell's bonuses apply during that action.
@@ -767,26 +767,26 @@ pf2e_spells:
     base_level: 2
     school: Divination
     tradition:
-    - divine
-    - occult
+      - divine
+      - occult
     traits:
-    - divination
-    - prediction
+      - divination
+      - prediction
     cast:
-    - material
-    - somatic
-    - verbal
+      - material
+      - somatic
+      - verbal
     actions: 10 minutes
     effect: "You gain a vague glimpse of the future. During the casting of this spell, ask about the results of a particular course of action.%r%rThe spell can predict results up to 30 minutes into the future and reveals the GM’s best guess among the following outcomes:%r%r**Weal** The results will be good.%r**Woe** The results will be bad.%r**Weal and Woe** The results will be a mix of good and bad.%r**Nothing** There won’t be particularly good or bad results.%r%rThe GM rolls a secret DC 6 flat check. On a failure, the result is always “nothing.” This makes it impossible to tell whether a “nothing” result is accurate. If anyone asks about the same topic as the first casting of augury during an additional casting, the GM uses the secret roll result from the first casting. If circumstances change, though, it’s possible to get a different result."
   Augment Summoning:
     base_level: 1
     school: Conjuration
     traits:
-    - conjuration
-    - uncommon
-    - wizard
+      - conjuration
+      - uncommon
+      - wizard
     cast:
-    - verbal
+      - verbal
     actions: 1
     range: 30 feet
     target: 1 creature you summoned
@@ -795,13 +795,13 @@ pf2e_spells:
     base_level: 10
     school: Transmutation
     traits:
-    - polymorph
-    - transmutation
+      - polymorph
+      - transmutation
     tradition:
-    - divine
+      - divine
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     duration: 1 minute
     effect: "You transform into an avatar of your deity, assuming a Huge battle form. You must have space to expand or the spell is lost. You have hands in this battle form and can take manipulate actions. You can Dismiss this spell.%r%rYou gain the following statistics and abilities regardless of which deity’s battle form you assume:%r- AC = 25 + your level. Ignore your armor’s check penalty and Speed reduction.%r- 30 temporary Hit Points.%r- Darkvision.%r- One or more attacks specific to your deity’s battle form, which are the only attacks you can Strike with. You’re trained with them. Your attack modifier is +33, and you use the listed damage; Melee attacks are Strength based (for the purposes of the enfeebled condition, for example) unless they have the finesse trait, and all ranged attacks are Dexterity based. Attacks that deal positive or negative damage don’t heal creatures.%r- Athletics modifier of +35, unless your own is higher.%r%rYou also gain the specific abilities listed for your deity under the Avatar heading on your deity's wiki page."
@@ -809,14 +809,14 @@ pf2e_spells:
     base_level: 1
     school: Enchantment
     traits:
-    - enchantment
-    - mental
+      - enchantment
+      - mental
     tradition:
-    - divine
-    - occult
+      - divine
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 5-foot emanation
     duration: 1 minute
@@ -826,17 +826,17 @@ pf2e_spells:
     base_level: 6
     school: Transmutation
     traits:
-    - incapacitation
-    - polymorph
-    - transmutation
+      - incapacitation
+      - polymorph
+      - transmutation
     bloodline:
-    - hag
+      - hag
     tradition:
-    - arcane
-    - primal
+      - arcane
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 creature
@@ -846,17 +846,17 @@ pf2e_spells:
     base_level: 5
     school: Abjuration
     traits:
-    - abjuration
-    - incapacitation
+      - abjuration
+      - incapacitation
     tradition:
-    - arcane
-    - divine
-    - occult
-    - primal
-    - elemental
+      - arcane
+      - divine
+      - occult
+      - primal
+      - elemental
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 creature that isn't on its home plane
@@ -868,13 +868,13 @@ pf2e_spells:
     base_level: 2
     school: Abjuration
     traits:
-    - abjuration
-    - plant
+      - abjuration
+      - plant
     tradition:
-    - primal
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: touch
     target: 1 willing creature
@@ -890,15 +890,15 @@ pf2e_spells:
     base_level: 3
     school: Divination
     traits:
-    - cursebound
-    - divination
-    - divine
-    - oracle
-    - uncommon
+      - cursebound
+      - divination
+      - divine
+      - oracle
+      - uncommon
     mystery:
-    - battle
+      - battle
     cast:
-    - verbal
+      - verbal
     actions: reaction
     trigger: You are about to attempt a saving throw, but haven't rolled yet.
     effect: You're difficult to remove from battle. You gain a +2 status bonus to the triggering save, and if the triggering save is against an incapacitation effect, it treats you as if you were 2 levels higher.
@@ -906,16 +906,16 @@ pf2e_spells:
     base_level: 4
     school: Transmutation
     traits:
-    - curse
-    - polymorph
-    - transmutation
+      - curse
+      - polymorph
+      - transmutation
     tradition:
-    - arcane
-    - occult
-    - primal
+      - arcane
+      - occult
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: touch
     target: 1 living humanoid
@@ -925,15 +925,15 @@ pf2e_spells:
     base_level: 9
     school: Necromancy
     traits:
-    - evil
-    - necromancy
-    - uncommon
+      - evil
+      - necromancy
+      - uncommon
     tradition:
-    - divine
-    - occult
+      - divine
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 creature that died within the last minute
@@ -942,16 +942,16 @@ pf2e_spells:
     base_level: 3
     school: Necromancy
     traits:
-    - necromancy
+      - necromancy
     bloodline:
-    - undead
+      - undead
     tradition:
-    - arcane
-    - divine
-    - occult
+      - arcane
+      - divine
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 mindless undead creature with a level no greater than bind undead's spell level
@@ -961,13 +961,13 @@ pf2e_spells:
     base_level: 1
     school: Divination
     traits:
-    - cleric
-    - divination
-    - fortune
-    - uncommon
+      - cleric
+      - divination
+      - fortune
+      - uncommon
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 willing creature
@@ -977,16 +977,16 @@ pf2e_spells:
     base_level: 5
     school: Conjuration
     traits:
-    - conjuration
+      - conjuration
     bloodline:
-    - aberrant
+      - aberrant
     tradition:
-    - arcane
-    - occult  
+      - arcane
+      - occult  
     cast:
-    - material
-    - somatic
-    - verbal
+      - material
+      - somatic
+      - verbal
     actions: 3
     area: 20-foot burst adjacent to a flat surface
     range: 120 feet
@@ -998,16 +998,16 @@ pf2e_spells:
     base_level: 6
     school: Evocation
     traits:
-    - evocation
-    - force
+      - evocation
+      - force
     bloodline:
-    - angelic
+      - angelic
     tradition:
-    - divine
+      - divine
     cast:
-    - material
-    - somatic
-    - verbal
+      - material
+      - somatic
+      - verbal
     actions: 3
     range: 120 feet
     duration: 1 minute
@@ -1015,21 +1015,21 @@ pf2e_spells:
     damage_type: force
     effect: Blades of force form a churning wall. The wall is a straight line 20 feet high, 120 feet long, and 2 inches thick, and it provides cover. The wall deals 7d8 force damage to each creature that’s in the wall’s space when it is created, that attempts to pass through the wall, or that ends its turn inside the wall. A basic Reflex save reduces the damage. A creature that succeeds at this save when the wall is created is pushed to the nearest space on the side of its choice. Creatures trying to move through the wall fail to do so if they critically fail the save, ending their movement adjacent to the wall.
     heighten:
-    - 8d8
-    - 9d8
-    - 10d8
-    - 11d8
+      - 8d8
+      - 9d8
+      - 10d8
+      - 11d8
   Blanket of Stars:
     base_level: 6
     school: Illusion
     traits:
-    - illusion
+      - illusion
     tradition:
-    - occult
-    - primal
+      - occult
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     duration: 10 minutes
     save: Will
@@ -1060,14 +1060,14 @@ pf2e_spells:
     base_level: 1
     school: Enchantment
     traits:
-    - enchantment
-    - mental
+      - enchantment
+      - mental
     tradition:
-    - divine
-    - occult
+      - divine
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 5-foot emanation
     duration: 1 minute
@@ -1076,14 +1076,14 @@ pf2e_spells:
     base_level: 1
     school: Enchantment
     traits:
-    - cleric
-    - emotion
-    - enchantment
-    - mental
-    - uncommon
+      - cleric
+      - emotion
+      - enchantment
+      - mental
+      - uncommon
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 60 feet
     target: 1 creature
@@ -1094,16 +1094,16 @@ pf2e_spells:
     base_level: 3
     school: Enchantment
     traits:
-    - emotion
-    - enchantment
-    - incapacitation
-    - sorcerer
-    - uncommon
-    - visual
+      - emotion
+      - enchantment
+      - incapacitation
+      - sorcerer
+      - uncommon
+      - visual
     bloodline:
-    - nymph
+      - nymph
     cast:
-    - somatic
+      - somatic
     actions: 1
     area: 30-foot cone
     save: Will
@@ -1112,17 +1112,17 @@ pf2e_spells:
     base_level: 6
     school: Enchantment
     traits:
-    - curse
-    - emotion
-    - enchantment
-    - incapacitation
-    - mental
+      - curse
+      - emotion
+      - enchantment
+      - incapacitation
+      - mental
     tradition:
-    - divine
-    - occult
-    - primal
+      - divine
+      - occult
+      - primal
     cast:
-    - verbal
+      - verbal
     actions: reaction
     trigger: A creature damages you.
     range: 60 feet
@@ -1133,18 +1133,18 @@ pf2e_spells:
     base_level: 3
     school: Necromancy
     traits:
-    - incapacitation
-    - necromancy
+      - incapacitation
+      - necromancy
     bloodline:
-    - hag
+      - hag
     tradition:
-    - arcane
-    - divine
-    - occult
-    - primal
+      - arcane
+      - divine
+      - occult
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 creature
@@ -1154,14 +1154,14 @@ pf2e_spells:
     base_level: 4
     school: Conjuration
     traits:
-    - conjuration
-    - teleportation
+      - conjuration
+      - teleportation
     tradition:
-    - arcane
-    - occult
+      - arcane
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     duration: 1 minute
     effect: You blink quickly between the Material Plane and the Ethereal Plane. You gain resistance 5 to all damage (except force). You can Sustain the Spell to vanish and reappear 10 feet away in a random direction determined by the GM; the movement doesn't trigger reactions. At the end of your turn, you vanish and reappear as above.
@@ -1174,14 +1174,14 @@ pf2e_spells:
     base_level: 5
     school: Necromancy
     traits:
-    - necromancy
+      - necromancy
     tradition:
-    - arcane
-    - occult
-    - primal
+      - arcane
+      - occult
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 60 feet
     target: 1 creature
@@ -1191,25 +1191,25 @@ pf2e_spells:
     save: Fortitude
     effect: You point at a target in range, and its skin grows searing blisters filled with caustic fluid. The target must attempt a Fortitude save.%r**Critical Success** The target is unaffected.%r**Success** The target grows one blister. You can spend a single action, which has the concentrate trait, to pop a blister. The target and each creature in a 15-foot cone originating from the target takes 7d6 acid damage (basic Fortitude save). You choose the direction of the cone, which can't include the target. When no blisters are left, the spell ends.%r**Failure** As success, but the target grows two blisters.%r**Critical Failure** As success, but the target grows four blisters.
     heighten:
-    - 8d6
-    - 9d6
-    - 10d6
-    - 11d6
-    - 12d6
+      - 8d6
+      - 9d6
+      - 10d6
+      - 11d6
+      - 12d6
   Blistering Invective:
     base_level: 2
     school: Enchantment
     traits:
-    - auditory
-    - emotion
-    - enchantment
-    - fear
-    - mental
+      - auditory
+      - emotion
+      - enchantment
+      - fear
+      - mental
     tradition:
-    - occult
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 creature
@@ -1226,14 +1226,14 @@ pf2e_spells:
     base_level: 2
     school: Necromancy
     traits:
-    - curse
-    - necromancy
+      - curse
+      - necromancy
     tradition:
-    - arcane
-    - divine
-    - occult
+      - arcane
+      - divine
+      - occult
     cast:
-    - verbal
+      - verbal
     actions: reaction
     trigger: A creature deals piercing, slashing, or persistent bleed damage to you
     range: 30 feet
@@ -1251,12 +1251,12 @@ pf2e_spells:
     base_level: 1
     school: Abjuration
     traits:
-    - abjuration
-    - hex
-    - uncommon
-    - witch
+      - abjuration
+      - hex
+      - uncommon
+      - witch
     cast:
-    - somatic
+      - somatic
     actions: 1
     range: 30 feet
     target: 1 creature
@@ -1268,14 +1268,14 @@ pf2e_spells:
     base_level: 2
     school: Illusion
     traits:
-    - illusion
-    - visual
+      - illusion
+      - visual
     tradition:
-    - arcane
-    - occult
+      - arcane
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: touch
     target: 1 creature
@@ -1285,16 +1285,16 @@ pf2e_spells:
     base_level: 1
     school: Enchantment
     traits:
-    - cursebound
-    - enchantment
-    - mental
-    - oracle
-    - uncommon
+      - cursebound
+      - enchantment
+      - mental
+      - oracle
+      - uncommon
     mystery:
-    - lore
+      - lore
     cast:
-    - material
-    - somatic
+      - material
+      - somatic
     actions: 2
     range: 30 feet
     target: 1 creature
@@ -1303,26 +1303,26 @@ pf2e_spells:
     save: Will
     effect: You probe the target's mind to glean knowledge. This deals 1d8 mental damage with a basic Will save. If the target fails the save, you sort through the stolen memories to attempt a single check to Recall Knowledge. Choose a skill that has the Recall Knowledge action, and use the target's skill modifier for the check.
     heighten:
-    - 2d8
-    - 3d8
-    - 4d8
-    - 5d8
-    - 6d8
-    - 7d8
-    - 8d8
-    - 9d8
-    - 10d8
+      - 2d8
+      - 3d8
+      - 4d8
+      - 5d8
+      - 6d8
+      - 7d8
+      - 8d8
+      - 9d8
+      - 10d8
   Breath of Life:
     base_level: 5
     school: Necromancy
     traits:
-    - healing
-    - necromancy
-    - positive
+      - healing
+      - necromancy
+      - positive
     tradition:
-    - divine
+      - divine
     cast:
-    - verbal
+      - verbal
     actions: reaction
     trigger: A living creature within range would die.
     range: 60 feet
@@ -1332,16 +1332,16 @@ pf2e_spells:
     base_level: 1
     school: Evocation
     traits:
-    - evocation
-    - fire
+      - evocation
+      - fire
     bloodline:
-    - elemental
+      - elemental
     tradition:
-    - arcane
-    - primal
+      - arcane
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 15-foot cone
     damage: 2d6
@@ -1349,40 +1349,40 @@ pf2e_spells:
     save: Reflex
     effect: Gouts of flame rush from your hands. You deal 2d6 fire damage to creatures in the area.
     heighten:
-    - 2d6
-    - 4d6
-    - 6d6
-    - 8d6
-    - 10d6
-    - 12d6
-    - 14d6
-    - 16d6
-    - 18d6
-    - 20d6
+      - 2d6
+      - 4d6
+      - 6d6
+      - 8d6
+      - 10d6
+      - 12d6
+      - 14d6
+      - 16d6
+      - 18d6
+      - 20d6
   Cackle:
     base_level: 1
     school: Enchantment
     traits:
-    - enchantment
-    - hex
-    - uncommon
-    - witch
+      - enchantment
+      - hex
+      - uncommon
+      - witch
     cast:
-    - verbal
+      - verbal
     actions: 0
     effect: With a quick burst of laughter, you prolong a magical effect you created. You Sustain a Spell.
   Call of the Grave:
     base_level: 1
     school: Necromancy
     traits:
-    - arcane
-    - attack
-    - necromancy
-    - uncommon
-    - wizard
+      - arcane
+      - attack
+      - necromancy
+      - uncommon
+      - wizard
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 living creature
@@ -1391,17 +1391,17 @@ pf2e_spells:
     base_level: 1
     school: Enchantment
     traits:
-    - auditory
-    - cursebound
-    - emotion
-    - enchantment
-    - mental
-    - oracle
-    - uncommon
+      - auditory
+      - cursebound
+      - emotion
+      - enchantment
+      - mental
+      - oracle
+      - uncommon
     mystery:
-    - battle
+      - battle
     cast:
-    - verbal
+      - verbal
     actions: reaction
     trigger: You are about to roll for initiative.
     area: 20-foot emanation
@@ -1414,19 +1414,19 @@ pf2e_spells:
     base_level: 2
     school: Enchantment
     traits:
-    - emotion
-    - enchantment
-    - incapacitation
-    - mental
+      - emotion
+      - enchantment
+      - incapacitation
+      - mental
     bloodline:
-    - nymph
-    - psychopomp
+      - nymph
+      - psychopomp
     tradition:
-    - divine
-    - occult
+      - divine
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 10-foot burst
     range: 120 feet
@@ -1437,45 +1437,45 @@ pf2e_spells:
     base_level: 4
     school: Enchantment
     traits:
-    - cleric
-    - emotion
-    - enchantment
-    - mental
-    - uncommon
-    - visual
+      - cleric
+      - emotion
+      - enchantment
+      - mental
+      - uncommon
+      - visual
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 15-foot emanation
     duration: 1 minute
     save: Will
     effect: You become intensely entrancing, and creatures are distracted by you as long as they remain within the area. You can exclude any creatures you choose from the effects.%r%rWhen a creature enters the area for the first time, it must attempt a Will saving throw. If a creature leaves and reenters, it uses the results of its original save.%r**Critical Success** The creature is unaffected and temporarily immune for 1 hour.%r**Success** The creature is fascinated with you for its next action, then is temporarily immune for 1 hour.%r**Failure** The creature is fascinated with you.%r**Critical Failure** The creature is fascinated with you, and its attitude toward you improves by one step.
     heighten:
-    - Increase the size of the emanation to 30 feet.
-    - Increase the size of the emanation to 45 feet.
-    - Increase the size of the emanation to 60 feet.
-    - Increase the size of the emanation to 75 feet.
-    - Increase the size of the emanation to 90 feet.
-    - Increase the size of the emanation to 105 feet.
+      - Increase the size of the emanation to 30 feet.
+      - Increase the size of the emanation to 45 feet.
+      - Increase the size of the emanation to 60 feet.
+      - Increase the size of the emanation to 75 feet.
+      - Increase the size of the emanation to 90 feet.
+      - Increase the size of the emanation to 105 feet.
   Cataclysm:
     base_level: 10
     school: Evocation
     traits:
-    - acid
-    - air
-    - cold
-    - earth
-    - electricity
-    - evocation
-    - fire
-    - water
+      - acid
+      - air
+      - cold
+      - earth
+      - electricity
+      - evocation
+      - fire
+      - water
     tradition:
-    - arcane
-    - primal
+      - arcane
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 60-foot burst
     range: 1000 feet
@@ -1487,14 +1487,14 @@ pf2e_spells:
     base_level: 5
     school: Necromancy
     traits:
-    - curse
-    - necromancy
-    - sorcerer
-    - uncommon
+      - curse
+      - necromancy
+      - sorcerer
+      - uncommon
     bloodline:
-    - angelic
+      - angelic
     cast:
-    - somatic
+      - somatic
     actions: 1
     range: 30 feet
     target: 1 evil creature
@@ -1509,35 +1509,35 @@ pf2e_spells:
     base_level: 6
     school: Evocation
     traits:
-    - electricity
-    - evocation
+      - electricity
+      - evocation
     tradition:
-    - arcane
-    - primal
+      - arcane
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 500 feet
     target: 1 creature, plus any number of additional creatures
     save: Reflex
     effect: You discharge a powerful bolt of lightning at the target, dealing 8d12 electricity damage. The target must attempt a basic Reflex save. The electricity arcs to another creature within 30 feet of the first target, jumps to another creature within 30 feet of that target, and so on. You can end the chain at any point. You can't target the same creature more than once, and you must have line of effect to all targets. Roll the damage only once, and apply it to each target (halving or doubling as appropriate for its saving throw outcome). The chain ends if any one of the targets critically succeeds at its save.
     heighten:
-    - 9d12
-    - 10d12
-    - 11d12
-    - 12d12
+      - 9d12
+      - 10d12
+      - 11d12
+      - 12d12
   Chameleon Coat:
     base_level: 5
     school: Illusion
     traits:
-    - illusion
+      - illusion
     tradition:
-    - primal
+      - primal
     cast:
-    - material
-    - somatic
-    - verbal
+      - material
+      - somatic
+      - verbal
     actions: 3
     range: 15 feet
     target: up to 8 creatures
@@ -1550,11 +1550,11 @@ pf2e_spells:
     base_level: 6
     school: Abjuration
     traits:
-    - abjuration
-    - champion
-    - uncommon
+      - abjuration
+      - champion
+      - uncommon
     cast:
-    - somatic
+      - somatic
     actions: reaction
     trigger: An ally is hit by a Strike, or an ally fails a saving throw against an effect that doesn't affect you.
     range: 30 feet
@@ -1564,16 +1564,16 @@ pf2e_spells:
     base_level: 2
     school: Enchantment
     traits:
-    - enchantment
-    - incapacitation
-    - mental
+      - enchantment
+      - incapacitation
+      - mental
     tradition:
-    - arcane
-    - divine
-    - occult
+      - arcane
+      - divine
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 creature
@@ -1583,21 +1583,21 @@ pf2e_spells:
     base_level: 1
     school: Enchantment
     traits:
-    - emotion
-    - enchantment
-    - incapacitation
-    - mental
+      - emotion
+      - enchantment
+      - incapacitation
+      - mental
     bloodline:
-    - diabolic
-    - fey
-    - nymph
+      - diabolic
+      - fey
+      - nymph
     tradition:
-    - arcane
-    - occult
-    - primal
+      - arcane
+      - occult
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 creature
@@ -1611,14 +1611,14 @@ pf2e_spells:
     base_level: 1
     school: Enchantment
     traits:
-    - cleric
-    - emotion
-    - enchantment
-    - incapacitation
-    - mental
-    - uncommon
+      - cleric
+      - emotion
+      - enchantment
+      - incapacitation
+      - mental
+      - uncommon
     cast:
-    - somatic
+      - somatic
     actions: 1
     range: touch
     target: 1 creature that could find you attractive
@@ -1629,15 +1629,15 @@ pf2e_spells:
     base_level: 1
     school: Enchantment
     traits:
-    - auditory
-    - enchantment
-    - incapacitation
-    - linguistic
-    - mental
-    - uncommon
-    - wizard
+      - auditory
+      - enchantment
+      - incapacitation
+      - linguistic
+      - mental
+      - uncommon
+      - wizard
     cast:
-    - verbal
+      - verbal
     actions: 1
     range: 30 feet
     target: 1 creature
@@ -1647,21 +1647,21 @@ pf2e_spells:
     base_level: cantrip
     school: Necromancy
     traits:
-    - cantrip
-    - necromancy
-    - negative
+      - cantrip
+      - necromancy
+      - negative
     bloodline:
-    - undead
-    - shadow
+      - undead
+      - shadow
     tradition:
-    - arcane
-    - divine
-    - occult
+      - arcane
+      - divine
+      - occult
     mystery:
-    - bones
+      - bones
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: touch
     target: 1 living or undead creature
@@ -1670,32 +1670,32 @@ pf2e_spells:
     save: Fortitude
     effect: Siphoning negative energy into yourself, your hand radiates a pale darkness. Your touch weakens the living and disorients undead, possibly even causing them to flee. The effect depends on whether the target is living or undead.%r**Living Creature** The spell deals negative damage equal to 1d4 plus your spellcasting modifier. The target attempts a basic Fortitude save, but is also enfeebled 1 for 1 round on a critical failure.%r**Undead Creature** The target is flat-footed for 1 round on a failed Fortitude save. On a critical failure, the target is also fleeing for 1 round unless it succeeds at a Will save.
     heighten:
-    - 1d4
-    - 2d4
-    - 3d4
-    - 4d4
-    - 5d4
-    - 6d4
-    - 7d4
-    - 8d4
-    - 9d4
-    - 10d4
+      - 1d4
+      - 2d4
+      - 3d4
+      - 4d4
+      - 5d4
+      - 6d4
+      - 7d4
+      - 8d4
+      - 9d4
+      - 10d4
   Chilling Darkness:
     base_level: 3
     school: Evocation
     traits:
-    - attack
-    - cold
-    - darkness
-    - evil
-    - evocation
+      - attack
+      - cold
+      - darkness
+      - evil
+      - evocation
     bloodline:
-    - shadow
+      - shadow
     tradition:
-    - divine
+      - divine
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 120 feet
     target: 1 creature
@@ -1703,25 +1703,25 @@ pf2e_spells:
     damage_type: cold plus evil
     effect: You shoot an utterly cold ray of darkness tinged with unholy energy. Make a ranged spell attack against the target. You deal 5d6 cold damage, plus 5d6 evil damage if the target is a celestial.%rIf the ray passes through an area of magical light or targets a creature affected by magical light, *chilling darkness* attempts to counteract the light. If you need to determine whether the ray passes through an area of light, draw a line between yourself and the spell's target.%r**Critical Success** The target takes double damage.%r**Success** The target takes full damage.
     heighten:
-    - 7d6 cold damage plus 7d6 evil damage (celestials)
-    - 9d6 cold damage plus 9d6 evil damage (celestials)
-    - 11d6 cold damage plus 11d6 evil damage (celestials)
-    - 13d6 cold damage plus 13d6 evil damage (celestials)
-    - 15d6 cold damage plus 15d6 evil damage (celestials)
-    - 17d6 cold damage plus 17d6 evil damage (celestials)
-    - 19d6 cold damage plus 19d6 evil damage (celestials)
+      - 7d6 cold damage plus 7d6 evil damage (celestials)
+      - 9d6 cold damage plus 9d6 evil damage (celestials)
+      - 11d6 cold damage plus 11d6 evil damage (celestials)
+      - 13d6 cold damage plus 13d6 evil damage (celestials)
+      - 15d6 cold damage plus 15d6 evil damage (celestials)
+      - 17d6 cold damage plus 17d6 evil damage (celestials)
+      - 19d6 cold damage plus 19d6 evil damage (celestials)
   Chilling Spray:
     base_level: 1
     school: Evocation
     traits:
-    - cold
-    - evocation
+      - cold
+      - evocation
     tradition:
-    - arcane
-    - primal
+      - arcane
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 15-foot cone
     damage: 2d4
@@ -1729,26 +1729,26 @@ pf2e_spells:
     save: Reflex
     effect: A cone of icy shards bursts from your spread hands and coats the targets in a layer of frost. You deal 2d4 cold damage to creatures in the area; they must each attempt a Reflex save.%r%r**Critical Success** The creature is unaffected.%r**Success** The creature takes half damage.%r**Failure** The creature takes full damage and takes a –5-foot status penalty to its Speeds for 2 rounds.%r**Critical Failure** The creature takes double damage and takes a –10-foot status penalty to its Speeds for 2 rounds.
     heighten:
-    - 2d4
-    - 4d4
-    - 6d4
-    - 8d4
-    - 10d4
-    - 12d4
-    - 14d4
-    - 16d4
-    - 18d4
-    - 20d4
+      - 2d4
+      - 4d4
+      - 6d4
+      - 8d4
+      - 10d4
+      - 12d4
+      - 14d4
+      - 16d4
+      - 18d4
+      - 20d4
   Chroma Leach:
     base_level: 4
     school: Necromancy
     traits:
-    - necromancy
+      - necromancy
     tradition:
-    - occult
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: touch
     target: 1 living creature
@@ -1758,16 +1758,16 @@ pf2e_spells:
     base_level: 5
     school: Abjuration  
     traits:
-    - abjuration
+      - abjuration
     bloodline:
-    - draconic
+      - draconic
     tradition:
-    - arcane
-    - occult
+      - arcane
+      - occult
     cast:
-    - material
-    - somatic
-    - verbal
+      - material
+      - somatic
+      - verbal
     actions: 3
     range: 120 feet
     duration: 10 minutes
@@ -1780,15 +1780,15 @@ pf2e_spells:
     base_level: 3
     school: Abjuration
     traits:
-    - abjuration
-    - uncommon
+      - abjuration
+      - uncommon
     tradition:
-    - divine
-    - occult
+      - divine
+      - occult
     cast:
-    - material
-    - somatic
-    - verbal
+      - material
+      - somatic
+      - verbal
     actions: 3
     range: touch
     duration: 1 minute
@@ -1800,16 +1800,16 @@ pf2e_spells:
     base_level: 6
     school: Necromancy
     traits:
-    - cursebound
-    - incapacitation
-    - necromancy
-    - oracle
-    - uncommon
+      - cursebound
+      - incapacitation
+      - necromancy
+      - oracle
+      - uncommon
     mystery:
-    - bones
+      - bones
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 mindless undead creature
@@ -1820,15 +1820,15 @@ pf2e_spells:
     base_level: 3
     school: Divination
     traits:
-    - divination
-    - scrying
+      - divination
+      - scrying
     tradition:
-    - arcane
-    - occult
+      - arcane
+      - occult
     cast:
-    - material
-    - somatic
-    - verbal
+      - material
+      - somatic
+      - verbal
     actions: 1 minute
     range: 500 feet
     duration: 10 minutes
@@ -1837,15 +1837,15 @@ pf2e_spells:
     base_level: 4
     school: Divination
     traits:
-    - divination
-    - scrying
+      - divination
+      - scrying
     tradition:
-    - arcane
-    - occult
+      - arcane
+      - occult
     cast:
-    - material
-    - somatic
-    - verbal
+      - material
+      - somatic
+      - verbal
     actions: 1 minute
     range: 500 feet
     duration: 10 minutes
@@ -1854,14 +1854,14 @@ pf2e_spells:
     base_level: cantrip
     school: Conjuration
     traits:
-    - cantrip
-    - cold
-    - conjuration
-    - hex
-    - uncommon
-    - witch
+      - cantrip
+      - cold
+      - conjuration
+      - hex
+      - uncommon
+      - witch
     cast:
-    - somatic
+      - somatic
     actions: 1
     range: 30 feet
     target: 1 creature
@@ -1871,42 +1871,42 @@ pf2e_spells:
     save: Reflex
     effect: Freezing sleet and heavy snowfall collect on the target's feet and legs, dealing 1d4 cold damage and other effects depending on its Reflex save. Once this spell ends, the target becomes temporarily immune for 1 minute.%r**Critical Success** The target is unaffected.%r**Success** The target takes half damage.%r**Failure** The target takes full damage, and takes a –5-foot circumstance penalty to its Speeds until the spell ends.%r**Critical Failure** The target takes double damage and a –10-foot circumstance penalty to its Speeds until the spell ends.
     heighten:
-    - 2d4
-    - 3d4
-    - 4d4
-    - 5d4
-    - 6d4
-    - 7d4
-    - 8d4
-    - 9d4
-    - 10d4
+      - 2d4
+      - 3d4
+      - 4d4
+      - 5d4
+      - 6d4
+      - 7d4
+      - 8d4
+      - 9d4
+      - 10d4
   Clinging Shadows Stance:
     base_level: 4
     school: Evocation
     traits:
-    - evocation
-    - monk
-    - shadow
-    - Stance
-    - uncommon
+      - evocation
+      - monk
+      - shadow
+      - Stance
+      - uncommon
     cast:
-    - somatic
+      - somatic
     actions: 1
     effect: You adopt the stance of clinging shadows. You can make shadow grasp Strikes. These deal 1d4 negative damage; are in the brawling group; and have the agile, grapple, reach, and unarmed traits.%r%rWhile in clinging shadows stance, you gain a +2 circumstance bonus to Athletics checks to Grapple, and to the DC for creatures to Escape from you.
   Cloak of Colors:
     base_level: 5
     school: Illusion
     traits:
-    - illusion
-    - visual
+      - illusion
+      - visual
     tradition:
-    - arcane
-    - occult
+      - arcane
+      - occult
     bloodline:
-    - fey
+      - fey
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 creature
@@ -1916,13 +1916,13 @@ pf2e_spells:
     base_level: 1
     school: Evocation
     traits:
-    - cleric
-    - darkness
-    - evocation
-    - shadow
-    - uncommon
+      - cleric
+      - darkness
+      - evocation
+      - shadow
+      - uncommon
     cast:
-    - somatic
+      - somatic
     actions: 1
     range: touch
     target: 1 willing creature
@@ -1932,18 +1932,18 @@ pf2e_spells:
     base_level: 5
     school: Necromancy
     traits:
-    - death
-    - necromancy
-    - poison
+      - death
+      - necromancy
+      - poison
     bloodline:
-    - undead
+      - undead
     tradition:
-    - arcane
-    - primal
+      - arcane
+      - primal
     cast:
-    - material
-    - somatic
-    - verbal
+      - material
+      - somatic
+      - verbal
     actions: 3
     area: 20-foot burst
     range: 120 feet
@@ -1953,47 +1953,47 @@ pf2e_spells:
     save: basic Fortitude
     effect: You conjure a poisonous fog. This functions as obscuring mist, except the area moves 10 feet away from you each round. You deal 6d8 poison damage to each breathing creature that starts its turn in the spell's area. You can Dismiss the spell.
     heighten:
-    - 7d8
-    - 8d8
-    - 9d8
-    - 10d8
-    - 11d8
+      - 7d8
+      - 8d8
+      - 9d8
+      - 10d8
+      - 11d8
   Collective Transposition:
     base_level: 6
     school: Conjuration
     traits:
-    - conjuration
-    - teleportation
+      - conjuration
+      - teleportation
     tradition:
-    - arcane
-    - occult
+      - arcane
+      - occult
     bloodline:
-    - shadow
+      - shadow
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 30-foot emanation
     target: up to 2 creatures
     effect: Teleport up to two creatures to new positions near you.
     heighten:
-    - 3 targets
-    - 4 targets
-    - 5 targets
-    - 6 targets
+      - 3 targets
+      - 4 targets
+      - 5 targets
+      - 6 targets
   Color Spray:
     base_level: 1
     school: Illusion
     traits:
-    - illusion
-    - incapacitation
-    - visual
+      - illusion
+      - incapacitation
+      - visual
     tradition:
-    - arcane
-    - occult
+      - arcane
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 15-foot cone
     duration: '1 or more rounds (see text)'
@@ -2003,17 +2003,17 @@ pf2e_spells:
     base_level: 1
     school: Enchantment
     traits:
-    - auditory
-    - enchantment
-    - linguistic
-    - mental
+      - auditory
+      - enchantment
+      - linguistic
+      - mental
     tradition:
-    - arcane
-    - divine
-    - occult
+      - arcane
+      - divine
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 creature
@@ -2026,13 +2026,13 @@ pf2e_spells:
     base_level: 4
     school: Enchantment
     traits:
-    - cleric
-    - enchantment
-    - incapacitation
-    - mental
-    - uncommon
+      - cleric
+      - enchantment
+      - incapacitation
+      - mental
+      - uncommon
     cast:
-    - verbal
+      - verbal
     actions: 1
     range: 100 feet
     target: A creature you dealt damage to on your most recent action.
@@ -2042,13 +2042,13 @@ pf2e_spells:
     base_level: 4
     school: Enchantment
     traits:
-    - cleric
-    - emotion
-    - enchantment
-    - mental
-    - uncommon
+      - cleric
+      - emotion
+      - enchantment
+      - mental
+      - uncommon
     cast:
-    - verbal
+      - verbal
     actions: 1
     duration: sustained up to 1 minute
     effect: Increase the base bonus to +2 and the increased bonus after an enemy critically succeeds to +4.
@@ -2058,14 +2058,14 @@ pf2e_spells:
     base_level: 2
     school: Divination
     traits:
-    - divination
+      - divination
     tradition:
-    - arcane
-    - divine
-    - occult
+      - arcane
+      - divine
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 creature
@@ -2078,41 +2078,41 @@ pf2e_spells:
     base_level: 5
     school: Evocation
     traits:
-    - cold
-    - evocation
+      - cold
+      - evocation
     tradition:
-    - arcane
-    - primal
+      - arcane
+      - primal
     actions: 2
     area: 60-foot cone
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     damage: 12d6
     damage_type: cold
     save: basic Reflex
     effect: Icy cold rushes forth from your hands. You deal 12d6 cold damage to creatures in the area.
     heighten:
-    - 14d6
-    - 16d6
-    - 18d6
-    - 20d6
-    - 22d6
+      - 14d6
+      - 16d6
+      - 18d6
+      - 20d6
+      - 22d6
   Confusion:
     base_level: 4
     school: Enchantment
     traits:
-    - emotion
-    - enchantment
-    - mental
+      - emotion
+      - enchantment
+      - mental
     bloodline:
-    - aberrant
+      - aberrant
     tradition:
-    - arcane
-    - occult
+      - arcane
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 creature
@@ -2125,17 +2125,17 @@ pf2e_spells:
     base_level: 5
     school: Evocation
     traits:
-    - evocation
-    - shadow
-    - sorcerer
-    - uncommon
+      - evocation
+      - shadow
+      - sorcerer
+      - uncommon
     actions: 2
     area: 10-foot emanation
     bloodline:
-    - shadow
+      - shadow
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     target: enemies in the area
     duration: 1 minute
     damage: 2d6
@@ -2143,22 +2143,22 @@ pf2e_spells:
     save: Reflex
     effect: Your shadow wriggles before spreading out from you, forming a gateway of clinging, consuming shadow through which the horrors of another plane can barely be seen. The first time each turn you Sustain the Spell, the radius increases by 5 feet. Each enemy that enters the area or begins its turn in the area takes 2d6 negative damage and must attempt a Reflex save.%r**Critical Success** The creature is unaffected.%r**Success** The creature sinks partially into the shadow, taking half damage and a –5-foot circumstance penalty to its Speeds for as long it remains in the area.%r**Failure** As success, but the creature takes full damage and a –10-foot circumstance penalty.%r**Critical Failure** The creature is absorbed into the shadows, where it can be seen below the surface; it takes double damage and is immobilized for 1 round or until it Escapes.
     heighten:
-    - 3d6
-    - 4d6
-    - 5d6
-    - 6d6
-    - 7d6
+      - 3d6
+      - 4d6
+      - 5d6
+      - 6d6
+      - 7d6
   Contingency:
     base_level: 7
     school: Abjuration
     traits:
-    - abjuration
+      - abjuration
     tradition:
-    - arcane
+      - arcane
     cast:
-    - material
-    - somatic
-    - verbal
+      - material
+      - somatic
+      - verbal
     actions: 10 minutes
     effect: You prepare a spell that will trigger later. While casting *contingency*, you also cast another spell of 4th level or lower with a casting time of no more than 3 actions. This companion spell must be one that can affect you. You must make any decisions for the spell when you cast *contingency*, such as choosing a damage type for resist energy. During the casting, choose a trigger under which the spell will be cast, using the same restrictions as for the trigger of a Ready action. Once *contingency* is cast, you can cause the companion spell to come into effect as a reaction with that trigger. It affects only you, even if it would affect more creatures. If you define complicated conditions, as determined by the GM, the trigger might fail. If you cast *contingency* again, the newer casting supersedes the older.
     heighten:
@@ -2169,42 +2169,42 @@ pf2e_spells:
     base_level: 2
     school: Evocation
     traits:
-    - evocation
-    - light
+      - evocation
+      - light
     tradition:
-    - arcane
-    - divine
-    - occult
-    - primal
+      - arcane
+      - divine
+      - occult
+      - primal
     cast:
-    - material
-    - somatic
-    - verbal
+      - material
+      - somatic
+      - verbal
     actions: 3
     range: touch
     target: 1 object
     effect: A magical flame springs up from the object, as bright as a torch. It doesn't need oxygen, react to water, or generate heat.
     heighten:
-    - Cost increases to 16 gp.
-    - Cost increases to 30 gp.
-    - Cost increases to 60 gp.
-    - Cost increases to 120 gp.
-    - Cost increases to 270 gp.
-    - Cost increases to 540 gp.
-    - Cost increases to 1350 gp.
-    - Cost increases to 3350 gp.
+      - Cost increases to 16 gp.
+      - Cost increases to 30 gp.
+      - Cost increases to 60 gp.
+      - Cost increases to 120 gp.
+      - Cost increases to 270 gp.
+      - Cost increases to 540 gp.
+      - Cost increases to 1350 gp.
+      - Cost increases to 3350 gp.
   Control Water:
     base_level: 5
     school: Evocation  
     traits:
-    - evocation
-    - water
+      - evocation
+      - water
     tradition:
-    - arcane
-    - primal
+      - arcane
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 50 feet long by 50 feet wide
     range: 500 feet
@@ -2213,14 +2213,14 @@ pf2e_spells:
     base_level: 1
     school: Enchantment
     traits:
-    - bard
-    - composition
-    - enchantment
-    - fortune
-    - mental
-    - uncommon
+      - bard
+      - composition
+      - enchantment
+      - fortune
+      - mental
+      - uncommon
     cast:
-    - somatic or verbal
+      - somatic or verbal
     actions: reaction
     trigger: You or an ally within 60 feet rolls a saving throw against an auditory or visual effect.
     area: 60-foot emanation
@@ -2229,14 +2229,14 @@ pf2e_spells:
     base_level: 4
     school: Divination
     traits:
-    - divination
+      - divination
     tradition:
-    - arcane
-    - occult
-    - primal
+      - arcane
+      - occult
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: touch
     target: 1 creature
@@ -2246,14 +2246,14 @@ pf2e_spells:
     base_level: 3
     school: Conjuration
     traits:
-    - conjuration
+      - conjuration
     tradition:
-    - arcane
-    - occult
+      - arcane
+      - occult
     cast:
-    - material
-    - somatic
-    - verbal
+      - material
+      - somatic
+      - verbal
     actions: 1 minute
     range: 30 feet
     duration: 12 hours
@@ -2262,14 +2262,14 @@ pf2e_spells:
     base_level: 3
     school: Evocation
     traits:
-    - evocation
-    - water
+      - evocation
+      - water
     tradition:
-    - arcane
-    - primal
+      - arcane
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 30-foot cone
     damage: 6d6
@@ -2277,25 +2277,25 @@ pf2e_spells:
     save: basic Reflex
     effect: You summon a crashing wave that sweeps away from you. You deal 6d6 bludgeoning damage to creatures in the area. The water also extinguishes non-magical fires in the area.
     heighten:
-    - 8d6
-    - 10d6
-    - 12d6
-    - 14d6
-    - 16d6
-    - 18d6
-    - 20d6
+      - 8d6
+      - 10d6
+      - 12d6
+      - 14d6
+      - 16d6
+      - 18d6
+      - 20d6
   Create Food:
     base_level: 2
     school: Conjuration
     traits:
-    - conjuration
+      - conjuration
     tradition:
-    - arcane
-    - divine
-    - primal
+      - arcane
+      - divine
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 1 hour
     range: 30 feet
     effect: You create enough food to feed six Medium creatures for a day. This food is bland and unappealing, but it is nourishing. After 1 day, if no one has eaten the food, it decays and becomes inedible. Most Small creatures eat one-quarter as much as a Medium creature (one-sixteenth as much for most Tiny creatures), and most Large creatures eat 10 times as much (100 times as much for Huge creatures and so on).
@@ -2307,15 +2307,15 @@ pf2e_spells:
     base_level: 1
     school: Conjuration
     traits:
-    - conjuration
-    - water
+      - conjuration
+      - water
     tradition:
-    - arcane
-    - divine
-    - primal
+      - arcane
+      - divine
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 0 feet
     effect: As you cup your hands, water begins to flow forth from them. You create 2 gallons of water. If no one drinks it, it evaporates after 1 day.
@@ -2323,16 +2323,16 @@ pf2e_spells:
     base_level: 4
     school: Conjuration
     traits:
-    - conjuration
+      - conjuration
     bloodline:
-    - genie
+      - genie
     tradition:
-    - arcane
-    - primal
+      - arcane
+      - primal
     cast:
-    - material
-    - somatic
-    - verbal
+      - material
+      - somatic
+      - verbal
     actions: 1 minute
     range: touch
     duration: 1 hour
@@ -2343,13 +2343,13 @@ pf2e_spells:
     base_level: 3
     school: Enchantment
     traits:
-    - enchantment
-    - mental
+      - enchantment
+      - mental
     tradition:
-    - divine
+      - divine
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 creature
@@ -2358,26 +2358,26 @@ pf2e_spells:
     save: Will
     effect: You assault the target's faith, riddling the creature with doubt and mental turmoil that deal 6d6 mental damage, or 6d8 mental damage if it can cast divine spells. The effects are determined by its Will save.%r%r**Critical Success** The target is unaffected.%r**Success** The target takes half damage.%r**Failure** The target takes full damage; if the target can cast divine spells, it's stupefied 1 for 1 round.%r**Critical Failure** The target takes double damage, is stupefied 1 for 1 round, and can't cast divine spells for 1 round.%r%rTo many deities, casting this spell on a follower of your own deity without significant cause is anathema.
     heighten:
-    - 8d6 (or 8d8)
-    - 10d6 (or 10d8)
-    - 12d6 (or 12d8)
-    - 14d6 (or 14d8)
-    - 16d6 (or 16d8)
-    - 18d6 (or 18d8)
-    - 20d6 (or 20d8)
+      - 8d6 (or 8d8)
+      - 10d6 (or 10d8)
+      - 12d6 (or 12d8)
+      - 14d6 (or 14d8)
+      - 16d6 (or 16d8)
+      - 18d6 (or 18d8)
+      - 20d6 (or 20d8)
   Crusade:
     base_level: 9
     school: Enchantment
     traits:
-    - enchantment
-    - linguistic
-    - mental
-    - uncommon
+      - enchantment
+      - linguistic
+      - mental
+      - uncommon
     tradition:
-    - divine
+      - divine
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 60 feet
     target: up to 4 creatures
@@ -2389,18 +2389,18 @@ pf2e_spells:
     base_level: 5
     school: Enchantment
     traits:
-    - emotion
-    - enchantment
-    - mental
+      - emotion
+      - enchantment
+      - mental
     bloodline:
-    - diabolic
-    - nymph
+      - diabolic
+      - nymph
     tradition:
-    - arcane
-    - occult
+      - arcane
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 30-foot cone
     save: Will
@@ -2411,13 +2411,13 @@ pf2e_spells:
     base_level: 1
     school: Evocation
     traits:
-    - cleric
-    - evocation
-    - sonic
-    - uncommon
+      - cleric
+      - evocation
+      - sonic
+      - uncommon
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 15-foot cone
     damage: 1d8 (or 1d12)
@@ -2425,28 +2425,28 @@ pf2e_spells:
     save: basic Fortitude
     effect: Your voice booms, smashing what's in front of you. Each creature and unattended object in the area takes 1d8 sonic damage. If you already dealt damage to an enemy this turn with a Strike or spell, increase the damage dice from this spell to d12.
     heighten:
-    - 2d8 (or 2d12)
-    - 3d8 (or 3d12)
-    - 4d8 (or 4d12)
-    - 5d8 (or 5d12)
-    - 6d8 (or 6d12)
-    - 7d8 (or 7d12)
-    - 8d8 (or 8d12)
-    - 9d8 (or 9d12)
-    - 10d8 (or 10d12)
+      - 2d8 (or 2d12)
+      - 3d8 (or 3d12)
+      - 4d8 (or 4d12)
+      - 5d8 (or 5d12)
+      - 6d8 (or 6d12)
+      - 7d8 (or 7d12)
+      - 8d8 (or 8d12)
+      - 9d8 (or 9d12)
+      - 10d8 (or 10d12)
   Curse of Death:
     base_level: 5
     school: Necromancy
     traits:
-    - curse
-    - death
-    - hex
-    - necromancy
-    - uncommon
-    - witch
+      - curse
+      - death
+      - hex
+      - necromancy
+      - uncommon
+      - witch
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 creature
@@ -2454,25 +2454,25 @@ pf2e_spells:
     save: Fortitude
     effect: You focus your malevolent gaze on a target, causing their heart to seize in dread. The target must attempt a Fortitude saving throw. Regardless of the result, the target is temporarily immune to further castings of curse of death for 1 day.%r%r**Critical Success** The target is unaffected.%r**Success** The target is afflicted with the curse of death at stage 1, and the stage of the curse can't increase beyond stage 1.%r**Failure** The target is afflicted with the curse of death at stage 1.%r**Critical Failure** The target is afflicted with the curse of death at stage 2.%r%r**Curse of Death** (curse) This curse ends immediately when the spell ends; **Stage 1** 4d6 negative damage and fatigued (1 round); **Stage 2** 8d6 negative damage and fatigued (1 round); **Stage 3** 12d6 negative damage and fatigued (1 round); **Stage 4** death
     heighten:
-    - Increase the negative damage taken on a success and during the first three stages of the curse by 1d6.
-    - Increase the negative damage taken on a success and during the first three stages of the curse by 2d6.
-    - Increase the negative damage taken on a success and during the first three stages of the curse by 3d6.
-    - Increase the negative damage taken on a success and during the first three stages of the curse by 4d6.
-    - Increase the negative damage taken on a success and during the first three stages of the curse by 5d6.
+      - Increase the negative damage taken on a success and during the first three stages of the curse by 1d6.
+      - Increase the negative damage taken on a success and during the first three stages of the curse by 2d6.
+      - Increase the negative damage taken on a success and during the first three stages of the curse by 3d6.
+      - Increase the negative damage taken on a success and during the first three stages of the curse by 4d6.
+      - Increase the negative damage taken on a success and during the first three stages of the curse by 5d6.
   Curse of Lost Time:
     base_level: 3
     school: Transmutation
     traits:
-    - curse
-    - negative
-    - transmutation
+      - curse
+      - negative
+      - transmutation
     tradition:
-    - arcane
-    - occult
-    - primal
+      - arcane
+      - occult
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: touch
     target: 1 Large or smaller object, construct, or living creature
@@ -2482,28 +2482,28 @@ pf2e_spells:
     save: Fortitude
     effect: You curse the target with rapid aging or erosion. The effect depends on whether the target is an object, a construct, or a living creature. Artifacts, along with objects and constructs made of precious materials (as determined by the GM), are immune.%r%r- **Construct** The construct takes 4d6 damage (basic Fortitude save). On a failure, for 1 hour the construct is clumsy 1, is enfeebled 1, and can't be Repaired, and the curse attempts to counteract any spell that would restore the construct's Hit Points. On a critical failure, these effects have an unlimited duration.%r- **Living Creature** The living creature must attempt a Fortitude save. Ageless creatures are immune.%r**Critical Success** The living creature is unaffected.%r**Success** The living creature briefly ages, becoming clumsy 1 and enfeebled 1 for 1 round.%r**Failure** As success, with a duration of 1 hour.%r**Critical Failure** As success, with an unlimited duration.%r- **Object** If the object is attended, its bearer can attempt a Fortitude save. If the bearer fails or the object is unattended, the object immediately takes 4d6 damage (applying Hardness normally) and the item is cursed with an unlimited duration. Until the curse ends, the item becomes shoddy and can't be Repaired, and the curse attempts to counteract any spell that would restore the object's Hit Points. Remove curse can target an item affected by this spell.
     heighten:
-    - 5d6
-    - 6d6
-    - 7d6
-    - 8d6
-    - 9d6
-    - 10d6
-    - 11d6
+      - 5d6
+      - 6d6
+      - 7d6
+      - 8d6
+      - 9d6
+      - 10d6
+      - 11d6
   Dancing Lights:
     base_level: cantrip
     school: Evocation
     traits:
-    - cantrip
-    - evocation
-    - light
+      - cantrip
+      - evocation
+      - light
     tradition:
-    - arcane
-    - occult
-    - primal
+      - arcane
+      - occult
+      - primal
     mystery: cosmos
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 120 feet
     duration: sustained
@@ -2512,13 +2512,13 @@ pf2e_spells:
     base_level: 4
     school: Transmutation
     traits:
-    - cleric
-    - darkness
-    - transmutation
-    - uncommon
+      - cleric
+      - darkness
+      - transmutation
+      - uncommon
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     target: 1 creature
     range: 60 feet
@@ -2528,19 +2528,19 @@ pf2e_spells:
     base_level: 2
     school: Evocation
     traits:
-    - darkness
-    - evocation
+      - darkness
+      - evocation
     tradition:
-    - arcane
-    - divine
-    - occult
-    - primal
+      - arcane
+      - divine
+      - occult
+      - primal
     bloodline:
-    - shadow
+      - shadow
     cast:
-    - material
-    - somatic
-    - verbal
+      - material
+      - somatic
+      - verbal
     actions: 3
     area: 20-foot burst
     range: 120 feet
@@ -2552,15 +2552,15 @@ pf2e_spells:
     base_level: 2
     school: Divination
     traits:
-    - divination
+      - divination
     tradition:
-    - arcane
-    - divine
-    - occult
-    - primal
+      - arcane
+      - divine
+      - occult
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     duration: 1 hour
     effect: You grant yourself supernatural sight in areas of darkness. You gain darkvision.
@@ -2571,20 +2571,20 @@ pf2e_spells:
     base_level: cantrip
     school: Enchantment
     traits:
-    - cantrip
-    - enchantment
-    - mental
-    - nonlethal
+      - cantrip
+      - enchantment
+      - mental
+      - nonlethal
     bloodline:
-    - aberrant
-    - hag
+      - aberrant
+      - hag
     tradition:
-    - arcane
-    - divine
-    - occult
+      - arcane
+      - divine
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 60 feet
     target: 1 creature
@@ -2593,30 +2593,30 @@ pf2e_spells:
     save: Will
     effect: You cloud the target's mind and daze it with a mental jolt. The jolt deals mental damage equal to your spellcasting ability modifier; the target must attempt a basic Will save. If the target critically fails the save, it is also stunned 1.
     heighten:
-    - 0
-    - 0
-    - 1d6
-    - 1d6
-    - 2d6
-    - 2d6
-    - 3d6
-    - 3d6
-    - 4d6
-    - 4d6
-    - 5d6
-    - 5d6
+      - 0
+      - 0
+      - 1d6
+      - 1d6
+      - 2d6
+      - 2d6
+      - 3d6
+      - 3d6
+      - 4d6
+      - 4d6
+      - 5d6
+      - 5d6
   Dazzling Flash:
     base_level: 1
     school: Evocation
     traits:
-    - cleric
-    - evocation
-    - light
-    - uncommon
-    - visual
+      - cleric
+      - evocation
+      - light
+      - uncommon
+      - visual
     cast:
-    - material
-    - verbal
+      - material
+      - verbal
     actions: 2
     area: 15-foot cone
     save: Fortitude
@@ -2627,15 +2627,15 @@ pf2e_spells:
     base_level: 2
     school: Necromancy
     traits:
-    - necromancy
+      - necromancy
     tradition:
-    - arcane
-    - divine
-    - occult
-    - primal
+      - arcane
+      - divine
+      - occult
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 creature
@@ -2645,14 +2645,14 @@ pf2e_spells:
     base_level: 2
     school: Necromancy
     traits:
-    - death
-    - necromancy
+      - death
+      - necromancy
     tradition:
-    - divine
-    - occult
+      - divine
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: touch
     target: 1 living creature that has 0 HP
@@ -2662,11 +2662,11 @@ pf2e_spells:
     base_level: 1
     school: Necromancy
     traits:
-    - cleric
-    - necromancy
-    - uncommon
+      - cleric
+      - necromancy
+      - uncommon
     cast:
-    - verbal
+      - verbal
     actions: reaction
     trigger: A living creature within 20 feet of you dies, or an undead creature within 20 feet of you is destroyed.
     duration: 1 minute
@@ -2675,16 +2675,16 @@ pf2e_spells:
     base_level: 5
     school: Abjuration
     traits:
-    - abjuration
+      - abjuration
     bloodline:
-    - psychopomp
+      - psychopomp
     tradition:
-    - divine
-    - occult
-    - primal
+      - divine
+      - occult
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: touch
     target: 1 living creature touched
@@ -2694,14 +2694,14 @@ pf2e_spells:
     base_level: 4
     school: Evocation
     traits:
-    - cursebound
-    - evocation
-    - mental
-    - oracle
-    - uncommon
+      - cursebound
+      - evocation
+      - mental
+      - oracle
+      - uncommon
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 creature other than you
@@ -2710,23 +2710,23 @@ pf2e_spells:
     save: Will
     effect: You reveal a glimpse of the impossible conflicts between the divine anathema behind your curse, forcing you to reckon with another's conflicts as well. You and the target each take 9d6 mental damage with a basic Will save, and the target is stunned 1 if it critically fails its save. You get a degree of success one better than you rolled for your saving throw.
     heighten:
-    - 12d6
-    - 15d6
-    - 18d6
-    - 21d6
-    - 24d6
-    - 27d6
+      - 12d6
+      - 15d6
+      - 18d6
+      - 21d6
+      - 24d6
+      - 27d6
   Deceiver's Cloak:
     base_level: 3
     school: Illusion
     traits:
-    - hex
-    - illusion
-    - uncommon
-    - witch
+      - hex
+      - illusion
+      - uncommon
+      - witch
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     effect: You wrap yourself in a cloak of illusion, appearing as another creature of the same body shape with roughly similar height and weight as yourself. This has the effects of a 3rd-level illusory disguise.
     heighten:
@@ -2735,38 +2735,38 @@ pf2e_spells:
     base_level: 3
     school: Necromancy
     traits:
-    - cursebound
-    - healing
-    - necromancy
-    - oracle
-    - positive
-    - uncommon
+      - cursebound
+      - healing
+      - necromancy
+      - oracle
+      - positive
+      - uncommon
     mystery:
-    - life
+      - life
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 creature
     effect: With a surge of healing energy, you push back against an affliction threatening the target and grant a small amount of healing. The target recovers 3d8 Hit Points. You attempt to counteract any one affliction you are aware the target has, suspending its effects for 1 hour on a success rather than removing it. The target is then temporarily immune to *delay affliction* for 1 day. You don't need to have identified the name of the specific affliction, but you do need to be aware of it; for instance, you couldn't delay an ingested poison during its onset period unless you were aware of the poison.
     heighten:
-    - The target recovers 4d8 Hit Points and you can attempt to suspend 1 additional affliction.
-    - The target recovers 5d8 Hit Points and you can attempt to suspend 2 additional afflictions.
-    - The target recovers 6d8 Hit Points and you can attempt to suspend 3 additional afflictions.
-    - The target recovers 7d8 Hit Points and you can attempt to suspend 4 additional afflictions.
-    - The target recovers 8d8 Hit Points and you can attempt to suspend 5 additional afflictions.
-    - The target recovers 9d8 Hit Points and you can attempt to suspend 6 additional afflictions.
-    - The target recovers 10d8 Hit Points and you can attempt to suspend 7 additional afflictions.
+      - The target recovers 4d8 Hit Points and you can attempt to suspend 1 additional affliction.
+      - The target recovers 5d8 Hit Points and you can attempt to suspend 2 additional afflictions.
+      - The target recovers 6d8 Hit Points and you can attempt to suspend 3 additional afflictions.
+      - The target recovers 7d8 Hit Points and you can attempt to suspend 4 additional afflictions.
+      - The target recovers 8d8 Hit Points and you can attempt to suspend 5 additional afflictions.
+      - The target recovers 9d8 Hit Points and you can attempt to suspend 6 additional afflictions.
+      - The target recovers 10d8 Hit Points and you can attempt to suspend 7 additional afflictions.
   Delay Consequence:
     base_level: 1
     school: Abjuration
     traits:
-    - abjuration
-    - cleric
+      - abjuration
+      - cleric
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: reaction
     trigger: A creature or object within range is hit by an attack.
     range: 30 feet
@@ -2777,14 +2777,14 @@ pf2e_spells:
     base_level: 4
     school: Enchantment
     traits:
-    - cleric
-    - emotion
-    - enchantment
-    - mental
-    - uncommon
+      - cleric
+      - emotion
+      - enchantment
+      - mental
+      - uncommon
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 creature
@@ -2794,15 +2794,15 @@ pf2e_spells:
     base_level: 1
     school: Enchantment
     traits:
-    - enchantment
-    - incapacitation
-    - mental
+      - enchantment
+      - incapacitation
+      - mental
     tradition:
-    - arcane
-    - occult
+      - arcane
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 100 feet
     target: 1 creature
@@ -2813,13 +2813,13 @@ pf2e_spells:
     base_level: 4
     school: Evocation
     traits:
-    - aura
-    - cleric
-    - evocation
-    - uncommon
+      - aura
+      - cleric
+      - evocation
+      - uncommon
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 15-foot emanation
     duration: 1 minute
@@ -2832,15 +2832,15 @@ pf2e_spells:
     base_level: 1
     school: Divination
     traits:
-    - detection
-    - divination
-    - uncommon
+      - detection
+      - divination
+      - uncommon
     tradition:
-    - divine
-    - occult
+      - divine
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 30-foot emanation
     effect: Your eyes glow as you sense aligned auras. Choose chaotic, evil, good, or lawful. You detect auras of that alignment. You receive no information beyond presence or absence. You can choose not to detect creatures or effects you're aware have that alignment.%r%rOnly creatures of 6th level or higher—unless divine spellcasters, undead, or beings from the Outer Sphere—have alignment auras.%r%rThe strength of an alignment aura depends on the level of the creature, item, or spell. The auras of undead, clerics and other divine spellcasters with a patron deity, and creatures from the Outer Sphere are one step stronger than normal (faint instead of none, for example). Please see Archives of Nethys for the Alignment Aura table.
@@ -2850,20 +2850,20 @@ pf2e_spells:
     base_level: cantrip
     school: Divination
     traits:
-    - cantrip
-    - detection
-    - divination
+      - cantrip
+      - detection
+      - divination
     bloodline:
-    - imperial
-    - genie
+      - imperial
+      - genie
     tradition:
-    - arcane
-    - divine
-    - occult
-    - primal
+      - arcane
+      - divine
+      - occult
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 30 foot emanation
     effect: You send out a pulse that registers the presence of magic. You receive no information beyond the presence or absence of magic. You can choose to ignore magic you're fully aware of, such as the magic items and ongoing spells of you and your allies.%r%rYou detect illusion magic only if that magic's effect has a lower level than the level of your detect magic spell. However, items that have an illusion aura but aren't deceptive in appearance (such as an invisibility potion) typically are detected normally.
@@ -2874,15 +2874,15 @@ pf2e_spells:
     base_level: 1
     school: Divination
     traits:
-    - detection
-    - divination
-    - uncommon
+      - detection
+      - divination
+      - uncommon
     tradition:
-    - divine
-    - primal
+      - divine
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 object or creature
@@ -2893,15 +2893,15 @@ pf2e_spells:
     base_level: 4
     school: Divination
     traits:
-    - detection
-    - divination
-    - uncommon
+      - detection
+      - divination
+      - uncommon
     tradition:
-    - arcane
-    - occult
+      - arcane
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 30-foot emanation
     duration: 1 hour
@@ -2912,13 +2912,13 @@ pf2e_spells:
     base_level: 1
     school: Enchantment
     traits:
-    - enchantment
-    - sorcerer
-    - uncommon
+      - enchantment
+      - sorcerer
+      - uncommon
     bloodline:
-    - diabolic
+      - diabolic
     cast:
-    - verbal
+      - verbal
     actions: 1
     range: 30 feet
     target: 1 willing living creature
@@ -2928,12 +2928,12 @@ pf2e_spells:
     base_level: 4
     school: Evocation
     traits:
-    - cleric
-    - cold
-    - evocation
+      - cleric
+      - cold
+      - evocation
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 15 foot emanation
     duration: 1 minute
@@ -2942,23 +2942,23 @@ pf2e_spells:
     save: basic Fortitude
     effect: You supercool the nearby air, forming a cloud of dancing ice crystals in an emanation around you. A creature other than you that enters the area or ends its turn within the area takes 2d6 cold damage. A creature can take this damage only once per turn. The crystals scatter and refract light; if a light effect enters *diamond dust*'s area, any creatures that effect goes on to affect gain a +2 status bonus to AC and saves against it. While the spell persists, you can activate or deactivate this aura by using a single action, which has the concentrate trait. You can Dismiss this spell.
     heighten:
-    - 3d6
-    - 4d6
-    - 5d6
+      - 3d6
+      - 4d6
+      - 5d6
   Dimension Door:
     base_level: 4
     school: Conjuration
     traits:
-    - conjuration
-    - teleportation
+      - conjuration
+      - teleportation
     tradition:
-    - arcane
-    - occult
+      - arcane
+      - occult
     bloodline:
-    - imperial
+      - imperial
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 120 feet
     effect: Teleport yourself up to 120 feet.
@@ -2968,16 +2968,16 @@ pf2e_spells:
     base_level: 4
     school: Abjuration
     traits:
-    - abjuration
+      - abjuration
     bloodline:
-    - psychopomp
+      - psychopomp
     tradition:
-    - arcane
-    - divine
-    - occult
+      - arcane
+      - divine
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 creature
@@ -2987,15 +2987,15 @@ pf2e_spells:
     base_level: 7
     school: Abjuration
     traits:
-    - abjuration
-    - uncommon
+      - abjuration
+      - uncommon
     tradition:
-    - arcane
-    - divine
-    - occult
+      - arcane
+      - divine
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 60-foot burst
     range: 120 feet
@@ -3004,34 +3004,34 @@ pf2e_spells:
     base_level: 4
     school: Conjuration
     traits:
-    - conjuration
-    - teleportation
-    - uncommon
-    - wizard
+      - conjuration
+      - teleportation
+      - uncommon
+      - wizard
     cast:
-    - somatic
+      - somatic
     actions: 1
     range: 20 feet
     effect: You teleport to a location up to 20 feet away within your line of sight.
     heighten:
-    - You can teleport to a total of 25 feet.
-    - You can teleport to a total of 30 feet.
-    - You can teleport to a total of 35 feet.
-    - You can teleport to a total of 40 feet.
-    - You can teleport to a total of 45 feet.
-    - You can teleport to a total of 50 feet.
+      - You can teleport to a total of 25 feet.
+      - You can teleport to a total of 30 feet.
+      - You can teleport to a total of 35 feet.
+      - You can teleport to a total of 40 feet.
+      - You can teleport to a total of 45 feet.
+      - You can teleport to a total of 50 feet.
   Dim the Light:
     base_level: 1
     school: Evocation
     traits:
-    - darkness
-    - evocation
-    - sorcerer
-    - uncommon
+      - darkness
+      - evocation
+      - sorcerer
+      - uncommon
     bloodline:
-    - shadow
+      - shadow
     cast:
-    - somatic
+      - somatic
     actions: reaction
     trigger: You cast a darkness or shadow spell.
     effect: You magnify the darkness from the triggering effect, causing the ambient light level to flicker briefly so you can slip from sight. You can immediately attempt a Stealth check to Hide, and you can become hidden to a creature even if you don't have cover and aren't otherwise concealed from that creature. You cease being hidden at the end of your turn unless you move into cover or become concealed before then.
@@ -3039,13 +3039,13 @@ pf2e_spells:
     school: Transmutation
     base_level: 4
     traits:
-    - polymorph
-    - transmutation
+      - polymorph
+      - transmutation
     tradition:
-    - primal
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     duration: 1 minute
     effect: "You channel the primal forces of nature to transform into a Large animal battle form, specifically that of a powerful and terrifying dinosaur. You must have space to expand or the spell is lost. When you cast this spell, choose ankylosaurus, brontosaurus, deinonychus, stegosaurus, triceratops, or tyrannosaurus. You can decide the specific type of animal, but this has no effect on the form's Size or statistics. While in this form, you gain the animal and dinosaur traits. You can Dismiss the spell.%r%rYou gain the following statistics and abilities regardless of which battle form you choose:%r%r- AC = 18 + your level. Ignore your armor's check penalty and Speed reduction.%r- 15 temporary Hit Points.%r- Low-light vision and imprecise scent 30 feet.%r- One or more unarmed melee attacks specific to the battle form you choose, which are the only attacks you can Strike with. You're trained with them. Your attack modifier is +16, and your damage bonus is +9. These attacks are Strength based (for the purpose of the enfeebled condition, for example). If your unarmed attack modifier is higher, you can use it instead.%r- Athletics modifier of +18, unless your own modifier is higher.%r%rYou also gain specific abilities based on the form you choose:%r%r- **Ankylosaurus** Speed 25 feet; Melee [one-action] tail (backswing, reach 10 feet), Damage 2d6 bludgeoning; Melee [one-action] foot, Damage 2d6 bludgeoning.%r- **Brontosaurus** Speed 25 feet; Melee [one-action] tail (reach 15 feet), Damage 2d6 bludgeoning; Melee [one-action] foot, Damage 2d8 bludgeoning.%r- **Deinonychus** Speed 40 feet; Melee [one-action] talon (agile), Damage 2d4 piercing plus 1 persistent bleed; Melee [one-action] jaws, Damage 1d10 piercing.%r- **Stegosaurus** Speed 30 feet; Melee [one-action] tail (reach 10 feet), Damage 2d8 piercing.%r- **Triceratops** Speed 30 feet; Melee [one-action] horn, Damage 2d8 piercing, plus 1d6 persistent bleed on a critical hit; Melee [one-action] foot, Damage 2d6 bludgeoning.%r- **Tyrannosaurus** Speed 30 feet; Melee [one-action] jaws (deadly d12, reach 10 feet), Damage 1d12 piercing; Melee [one-action] tail (reach 10 feet), Damage 1d10 bludgeoning."
@@ -3056,16 +3056,16 @@ pf2e_spells:
     base_level: cantrip
     school: Enchantment
     traits:
-    - bard
-    - cantrip
-    - composition
-    - emotion
-    - enchantment
-    - fear
-    - mental
-    - uncommon
+      - bard
+      - cantrip
+      - composition
+      - emotion
+      - enchantment
+      - fear
+      - mental
+      - uncommon
     cast:
-    - verbal
+      - verbal
     actions: 1
     area: 30-foot emanation
     duration: 1 round
@@ -3074,15 +3074,15 @@ pf2e_spells:
     base_level: 8
     school: Illusion
     traits:
-    - illusion
+      - illusion
     tradition:
-    - arcane
-    - occult
+      - arcane
+      - occult
     bloodline:
-    - shadow
+      - shadow
     cast:
-    - material
-    - somatic
+      - material
+      - somatic
     actions: 2
     range: touch
     target: 1 creature
@@ -3092,17 +3092,17 @@ pf2e_spells:
     base_level: 4
     school: Divination
     traits:
-    - divination
-    - mental
-    - revelation
-    - uncommon
+      - divination
+      - mental
+      - revelation
+      - uncommon
     tradition:
-    - arcane
-    - divine
-    - occult
+      - arcane
+      - divine
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     duration: 10 minutes
     effect: Falsehoods ring in your ears like discordant notes. You gain a +4 status bonus to Perception checks when someone Lies.
@@ -3110,18 +3110,18 @@ pf2e_spells:
     base_level: 8
     school: Divination
     traits:
-    - detection
-    - divination
-    - uncommon
+      - detection
+      - divination
+      - uncommon
     tradition:
-    - arcane
-    - divine
-    - occult
+      - arcane
+      - divine
+      - occult
     actions: 10 minutes
     cast:
-    - material
-    - somatic
-    - verbal
+      - material
+      - somatic
+      - verbal
     range: unlimited
     target: 1 creature or object
     effect: You learn the name of the target's exact location (including the building, community, and country) and plane of existence.%r%rYou can target a creature only if you've seen it in person, have one of its significant belongings, or have a piece of its body. To target an object, you must have touched it or have a fragment of it. *Discern location* automatically overcomes protections against detection and divination of lower level than this spell, even if they would normally have a chance to block it.
@@ -3129,13 +3129,13 @@ pf2e_spells:
     base_level: cantrip
     school: Divination
     traits:
-    - cantrip
-    - divination
-    - hex
-    - uncommon
-    - witch
+      - cantrip
+      - divination
+      - hex
+      - uncommon
+      - witch
     cast:
-    - somatic
+      - somatic
     actions: 1
     range: 30 feet
     target: 1 creature
@@ -3147,16 +3147,16 @@ pf2e_spells:
     base_level: 6
     school: Evocation
     traits:
-    - attack
-    - evocation
+      - attack
+      - evocation
     bloodline:
-    - demonic
-    - imperial
+      - demonic
+      - imperial
     tradition:
-    - arcane
+      - arcane
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 120 feet
     target: 1 creature or unattended object
@@ -3165,22 +3165,22 @@ pf2e_spells:
     save: Fortitude
     effect: You fire a green ray at your target. Make a spell attack. On a hit, you deal 12d10 damage, and the target must attempt a basic Fortitude save. On a critical hit, treat the save result as one degree worse. A creature reduced to 0 HP is reduced to fine powder; its gear remains.%r%rAn object you hit is destroyed (no save), regardless of Hardness, unless it's an artifact or similarly hard to destroy. A single casting can destroy no more than a 10-foot cube of matter. This automatically destroys any force construct, such as a *wall of force*.
     heighten:
-    - 14d10
-    - 16d10
-    - 18d10
-    - 20d10
+      - 14d10
+      - 16d10
+      - 18d10
+      - 20d10
   Disjunction:
     base_level: 9
     school: Abjuration
     traits:
-    - abjuration
-    - uncommon
+      - abjuration
+      - uncommon
     tradition:
-    - arcane
-    - primal
+      - arcane
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 120 feet
     target: 1 magic item
@@ -3189,13 +3189,13 @@ pf2e_spells:
     base_level: 2
     school: Transmutation
     traits:
-    - transmutation
+      - transmutation
     tradition:
-    - arcane
-    - primal
+      - arcane
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: touch
     target: 1 non-magical object in your possession of 1 Bulk or less
@@ -3208,17 +3208,17 @@ pf2e_spells:
     base_level: 2
     school: Abjuration
     traits:
-    - abjuration
+      - abjuration
     tradition:
-    - arcane
-    - divine
-    - occult
-    - primal
+      - arcane
+      - divine
+      - occult
+      - primal
     bloodline:
-    - imperial
+      - imperial
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 120 feet
     target: 1 spell effect or unattended magic item
@@ -3227,13 +3227,13 @@ pf2e_spells:
     base_level: 4
     school: Transmutation
     traits:
-    - air
-    - cleric
-    - polymorph
-    - transmutation
-    - uncommon
+      - air
+      - cleric
+      - polymorph
+      - transmutation
+      - uncommon
     cast:
-    - somatic
+      - somatic
     actions: reaction
     trigger: You take damage from an enemy or a hazard.
     effect: After taking the triggering damage, you transform into air. Until the end of the current turn, you can't be attacked or targeted, you don't take up space, you can't act, and any auras or emanations you have are suppressed. At the end of the turn, you re-form in any space you can occupy within 15 feet of where you were when you dispersed. Any auras or emanations you had are restored as long as their duration didn't run out while you were dispersed.
@@ -3241,17 +3241,17 @@ pf2e_spells:
     base_level: cantrip
     school: Necromancy
     traits:
-    - cantrip
-    - necromancy
-    - positive
+      - cantrip
+      - necromancy
+      - positive
     bloodline:
-    - psychopomp
+      - psychopomp
     tradition:
-    - divine
-    - primal
+      - divine
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 undead creature
@@ -3260,27 +3260,27 @@ pf2e_spells:
     save: Fortitude
     effect: You lance the target with energy. You deal 1d6 positive damage plus your spellcasting ability modifier. The target must attempt a basic Fortitude save. If the creature critically fails the save, it is also enfeebled 1 for 1 round.
     heighten:
-    - 1d6
-    - 2d6
-    - 3d6
-    - 4d6
-    - 5d6
-    - 6d6
-    - 7d6
-    - 8d6
-    - 9d6
-    - 10d6
+      - 1d6
+      - 2d6
+      - 3d6
+      - 4d6
+      - 5d6
+      - 6d6
+      - 7d6
+      - 8d6
+      - 9d6
+      - 10d6
   Disrupting Weapons:
     base_level: 1
     school: Necromancy
     traits:
-    - necromancy
-    - positive
+      - necromancy
+      - positive
     tradition: 
-    - divine
+      - divine
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: touch
     target: up to two weapons, each of which must be wielded by you or a willing ally, or else unattended
@@ -3293,17 +3293,17 @@ pf2e_spells:
     base_level: 8
     school: Abjuration
     traits:
-    - abjuration
-    - aura
+      - abjuration
+      - aura
     bloodline:
-    - angelic
-    - demonic
-    - diabolic
+      - angelic
+      - demonic
+      - diabolic
     tradition:
-    - divine
+      - divine
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 10-foot emanation
     target: allies in the area
@@ -3313,13 +3313,13 @@ pf2e_spells:
     base_level: 8
     school: Enchantment
     traits:
-    - enchantment
-    - mental
+      - enchantment
+      - mental
     tradition:
-    - divine
+      - divine
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: touch
     target: 1 willing creature
@@ -3328,14 +3328,14 @@ pf2e_spells:
     base_level: cantrip
     school: Evocation
     traits:
-    - attack
-    - cantrip
-    - evocation
+      - attack
+      - cantrip
+      - evocation
     tradition: 
-    - divine
+      - divine
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 creature
@@ -3343,27 +3343,27 @@ pf2e_spells:
     damage_type: aligned
     effect: You unleash a beam of divine energy. Choose an alignment your deity has (chaotic, evil, good, or lawful). You can't cast this spell if you don't have a deity or if your deity is true neutral. Make a ranged spell attack roll against the target's AC. On a hit, the target takes damage of the chosen alignment type equal to 1d4 + your spellcasting ability modifier (double damage on a critical hit). The spell gains the trait of the alignment you chose.
     heighten:
-    - 1d4
-    - 2d4
-    - 3d4
-    - 4d4
-    - 5d4
-    - 6d4
-    - 7d4
-    - 8d4
-    - 9d4
-    - 10d4
+      - 1d4
+      - 2d4
+      - 3d4
+      - 4d4
+      - 5d4
+      - 6d4
+      - 7d4
+      - 8d4
+      - 9d4
+      - 10d4
   Diviner's Sight:
     base_level: 1
     school: Divination
     traits:
-    - concentrate
-    - divination
-    - fortune
-    - uncommon
-    - wizard
+      - concentrate
+      - divination
+      - fortune
+      - uncommon
+      - wizard
     cast:
-    - verbal
+      - verbal
     actions: 1
     range: 30 feet
     target: 1 willing living creature
@@ -3372,13 +3372,13 @@ pf2e_spells:
     base_level: 7
     school: Transmutation
     tradition:
-    - divine
+      - divine
     traits:
-    - morph
-    - transmutation
+      - morph
+      - transmutation
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     duration: 1 minute
     effect: "You accept otherworldly energies into your body; while you are still recognizably yourself, you gain the features of one of your deity's servitors. Choose an alignment your deity has (chaotic, evil, good, or lawful). You can't cast this spell if you don't have a deity or your deity is true neutral. This spell gains the trait of the alignment you chose.%r%rIf you were Medium or smaller, you become Large, as the effects of enlarge. You must have space to expand into, or the spell is lost. You also gain the following benefits:%r%r- 40 temporary Hit Points.%r- A fly Speed equal to your Speed.%r- Weakness 10 to the alignment opposite the one you chose.%r- A +1 status bonus to saves against spells.%r- Darkvision.%r- Your unarmed attacks and weapons deal 1 additional damage of the chosen alignment type.%r- One or more unarmed melee attacks. If you chose good or lawful, your fist attacks deal 2d8 damage. If you chose chaotic, you gain a bite unarmed attack that deals 2d10 piercing damage. If you chose evil, you gain a claws unarmed attack that deals 2d8 slashing damage and has the agile and finesse traits."
@@ -3388,15 +3388,15 @@ pf2e_spells:
     base_level: 4
     school: Evocation
     traits:
-    - evocation
+      - evocation
     bloodline:
-    - angelic
-    - demonic
+      - angelic
+      - demonic
     tradition:
-    - divine
+      - divine
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 20-foot burst
     range: 120 feet
@@ -3405,26 +3405,26 @@ pf2e_spells:
     save: Fortitude
     effect: "You can channel the fury of your deity against foes of opposed alignment. Choose an alignment your deity has (chaotic, evil, good, or lawful). You can't cast this spell if you don't have a deity or your deity is true neutral. This spell gains the trait of the alignment you chose. You deal 4d10 damage of the alignment you chose; each creature in the area must attempt a Fortitude save. Creatures that match the alignment you chose are unaffected. Those that neither match nor oppose it treat the result of their saving throw as one degree better.%r**Critical Success** The creature is unaffected.%r**Success** The creature takes half damage.%r**Failure** The creature takes full damage and is sickened 1.%r**Critical Failure** The creature takes full damage and is sickened 2; while it is sickened, it is also slowed 1."
     heighten:
-    - 5d10
-    - 6d10
-    - 7d10
-    - 8d10
-    - 9d10
-    - 10d10
+      - 5d10
+      - 6d10
+      - 7d10
+      - 8d10
+      - 9d10
+      - 10d10
   Dominate:
     base_level: 6
     school: Enchantment
     tradition:
-    - arcane
-    - occult
+      - arcane
+      - occult
     traits:
-    - enchantment
-    - incapacitation
-    - mental
-    - uncommon
+      - enchantment
+      - incapacitation
+      - mental
+      - uncommon
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 creature
@@ -3436,11 +3436,11 @@ pf2e_spells:
     base_level: 4
     school: Conjuration
     traits:
-    - cleric
-    - conjuration
+      - cleric
+      - conjuration
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 20 foot emanation
     range: 5 feet
@@ -3450,44 +3450,44 @@ pf2e_spells:
     save: fortitude
     effect: Striking at thin air, you create hairline cracks in an unoccupied adjacent space that lead somewhere outside reality. Air rushes through the cracks, drawing Large or smaller creatures and objects of light Bulk or less toward the center. Large or smaller creatures in the area must attempt a Fortitude save at the start of their turn; creatures that move into the area must attempt the save on entering.%r**Success** The creature is unaffected.%r**Failure** The creature is pulled 10 feet toward the door.%r**Critical Failure** The creature is pulled 20 feet toward the door.%r %rThe cracks of the *door to beyond* are too thin for anything to fully slip through, but decompressive effects deal 4d6 slashing damage to any creature or object that ends its turn in the door's space. You are unaffected by your own *door to beyond*. You can Dismiss the spell.
     heighten:
-    - 5d6
-    - 6d6
-    - 7d6
-    - 8d6
-    - 9d6
-    - 10d6
+      - 5d6
+      - 6d6
+      - 7d6
+      - 8d6
+      - 9d6
+      - 10d6
   Downpour:
     base_level: 4
     school: Evocation
     traits:
-    - cleric
-    - evocation
-    - uncommon
-    - water
+      - cleric
+      - evocation
+      - uncommon
+      - water
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 30-foot burst
     range: 120 feet
     duration: 1 minute
     effect: You call forth a torrential downpour, which extinguishes nonmagical flames. Creatures in the area are concealed and gain fire resistance 10. Creatures outside the area are concealed to those inside the area. Creatures with weakness to water that end their turns in the area take damage equal to their weakness.
     heighten:
-    - The fire resistance increases to a total of 12.
-    - The fire resistance increases to a total of 14.
-    - The fire resistance increases to a total of 16.
-    - The fire resistance increases to a total of 18.
-    - The fire resistance increases to a total of 20.
-    - The fire resistance increases to a total of 22.
+      - The fire resistance increases to a total of 12.
+      - The fire resistance increases to a total of 14.
+      - The fire resistance increases to a total of 16.
+      - The fire resistance increases to a total of 18.
+      - The fire resistance increases to a total of 20.
+      - The fire resistance increases to a total of 22.
   Draconic Barrage:
     base_level: 1
     school: Evocation
     traits:
-    - cleric
-    - evocation
+      - cleric
+      - evocation
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     duration: 1 minute
     damage: 1d6 + spellcasting ability modifier
@@ -3507,14 +3507,14 @@ pf2e_spells:
     base_level: 3
     school: Evocation
     traits:
-    - evocation
-    - sorcerer
-    - uncommon
+      - evocation
+      - sorcerer
+      - uncommon
     bloodline:
-    - draconic
+      - draconic
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 30-foot cone
     damage: 5d6
@@ -3522,27 +3522,27 @@ pf2e_spells:
     save: basic Reflex 
     effect: "You spew energy from your mouth, dealing 5d6 damage with a basic Reflex save. The damage type depends on the magical tradition related to the dragon that influenced your bloodline: **arcane** force, **divine** spirit, **occult** mental, or **primal** fire."
     heighten:
-    - The damage increases to a total of 7d6.
-    - The damage increases to a total of 9d6.
-    - The damage increases to a total of 11d6.
-    - The damage increases to a total of 13d6.
-    - The damage increases to a total of 15d6.
-    - The damage increases to a total of 17d6.
-    - The damage increases to a total of 19d6.
+      - The damage increases to a total of 7d6.
+      - The damage increases to a total of 9d6.
+      - The damage increases to a total of 11d6.
+      - The damage increases to a total of 13d6.
+      - The damage increases to a total of 15d6.
+      - The damage increases to a total of 17d6.
+      - The damage increases to a total of 19d6.
   Dragon Form:
     base_level: 6
     school: Transmutation
     traits:
-    - polymorph
-    - transmutation
+      - polymorph
+      - transmutation
     tradition:
-    - arcane
-    - primal
+      - arcane
+      - primal
     bloodline:
-    - draconic
+      - draconic
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     duration: 1 minute
     effect: "Calling upon powerful transformative magic, you gain a Large dragon battle form. You must have space to expand or the spell is lost. When you cast this spell, choose one type of chromatic or metallic dragon. While in this form, you gain the dragon trait. You have hands in this battle form and can take manipulate actions. You can Dismiss the spell.%r%rYou gain the following statistics and abilities regardless of which battle form you choose:%r%r- AC = 18 + your level. Ignore your armor's check penalty and Speed reduction.%r- 10 temporary Hit Points.%r- Speed 40 feet, fly Speed 100 feet.%r- Resistance 10 against the damage type of your breath weapon (see below).%r- Darkvision and imprecise scent 60 feet.%r- One or more unarmed melee attacks specific to the battle form you choose, which are the only attacks you can Strike with. You're trained with them. Your attack modifier is +22, and your damage bonus is +6. These attacks are Strength based (for the purpose of the enfeebled condition, for example). If your unarmed attack modifier is higher, you can use it instead. See below for more on these attacks.%r- Athletics modifier of +23, unless your own modifier is higher.%r- Breath Weapon [two-actions] (arcane, evocation) The shape, damage, and damage type of your breath weapon depend on your specific dragon form (see below). A creature in the area attempts a basic save against your spell DC. This is a Reflex save unless stated otherwise in the special ability description for your specific dragon form. Once activated, your breath weapon can't be used again for 1d4 rounds. Your breath weapon has the trait corresponding to the type of damage it deals.%r%rYou also gain specific abilities based on the type of dragon you choose:%r%r- **Black** swim Speed 60 feet; Melee [one-action] jaws, Damage 2d12 piercing plus 2d6 acid; Melee [one-action] claw (agile), Damage 3d10 slashing; Melee [one-action] tail (reach 10 feet), Damage 3d10 bludgeoning; Melee [one-action] horns (reach 10 feet), Damage 3d8 piercing; breath weapon 60-foot line, 11d6 acid.%r- **Blue** burrow Speed 20 feet; Melee [one-action] jaws, Damage 2d10 piercing plus 1d12 electricity; Melee [one-action] claw (agile), Damage 3d10 slashing; Melee [one-action] tail (reach 10 feet), Damage 3d10 bludgeoning; Melee [one-action] horns (reach 10 feet), Damage 3d8 piercing; breath weapon 80-foot line, 6d12 electricity.%r- **Brass** burrow Speed 20 feet; Melee [one-action] jaws, Damage 3d8 piercing plus 2d4 fire; Melee [one-action] claw (agile), 3d10 slashing; Melee [one-action] tail (reach 10 feet), Damage 3d10 bludgeoning; Melee [one-action] spikes (reach 10 feet), Damage 3d8 piercing; breath weapon 60-foot line, 15d4 fire.%r- **Bronze** swim Speed 40 feet; Melee [one-action] jaws, Damage 2d10 piercing plus 1d12 electricity; Melee [one-action] claw (agile), Damage 3d10 slashing; Melee [one-action] tail (reach 10 feet), Damage 3d10 bludgeoning; Melee [one-action] wing (reach 10 feet), Damage 3d8 slashing; breath weapon 80-foot line, 6d12 electricity.%r- **Copper** climb Speed 25 feet on stone only; Melee [one-action] jaws, Damage 2d12 piercing plus 2d6 acid; Melee [one-action] claw (agile), Damage 3d10 slashing; Melee [one-action] tail (reach 10 feet), Damage 3d10 bludgeoning; Melee [one-action] wing (reach 10 feet), Damage 3d8 bludgeoning; breath weapon 60-foot line, 10d6 acid.%r- **Gold** swim Speed 40 feet; Melee [one-action] jaws, Damage 2d12 piercing plus 2d6 fire; Melee [one-action] claw (agile), Damage 4d6 slashing; Melee [one-action] tail (reach 10 feet), Damage 3d10 bludgeoning; Melee [one-action] horns (reach 10 feet), Damage 3d8 piercing; breath weapon 30-foot cone, 6d10 fire.%r- **Green** swim Speed 40 feet, ignores difficult terrain from non-magical foliage; Melee [one-action] jaws, Damage 2d12 piercing plus 2d6 poison; Melee [one-action] claw (agile), Damage 3d10 slashing; Melee [one-action] tail (reach 10 feet), Damage 3d10 bludgeoning; Melee [one-action] horns (reach 10 feet), Damage 3d8 piercing; breath weapon 30-foot cone, 10d6 poison (Fortitude save instead of Reflex).%r- **Red** ignore concealed from smoke; Melee [one-action] jaws, Damage 2d12 piercing plus 2d6 fire; Melee [one-action] claw (agile), Damage 4d6 slashing; Melee [one-action] tail (reach 10 feet), Damage 3d10 bludgeoning; Melee [one-action] wing (reach 10 feet), Damage 3d8 bludgeoning; breath weapon 30-foot cone, 10d6 fire.%r- **Silver** cloud walk; Melee [one-action] jaws, Damage 2d12 piercing plus 2d6 cold; Melee [one-action] claw (agile), Damage 3d10 slashing; Melee [one-action] tail (reach 10), Damage 3d10 bludgeoning; breath weapon 30-foot cone, 8d8 cold.%r- **White** climb Speed 25 feet on ice only; Melee [one-action] jaws, Damage 3d6 piercing plus 2d6 cold; Melee [one-action] claw (agile), Damage 3d10 slashing; Melee [one-action] tail (reach 10 feet), Damage 3d10 bludgeoning; breath weapon 30-foot cone, 10d6 cold."
@@ -3552,15 +3552,15 @@ pf2e_spells:
     base_level: 5
     school: Transmutation
     traits:
-    - morph
-    - sorcerer
-    - transmutation
-    - uncommon
+      - morph
+      - sorcerer
+      - transmutation
+      - uncommon
     bloodline:
-    - draconic
+      - draconic
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     duration: 1 minute
     effect: Leathery wings sprout from your back, giving you a fly Speed of 60 feet or your Speed, whichever is faster. If you're still flying when this spell's duration would end, you float to the ground, with the effects of _feather fall_.
@@ -3570,14 +3570,14 @@ pf2e_spells:
     base_level: 3
     school: Necromancy
     traits:
-    - necromancy
-    - negative
-    - sorcerer
-    - uncommon
+      - necromancy
+      - negative
+      - sorcerer
+      - uncommon
     bloodline:
-    - undead
+      - undead
     cast:
-    - somatic
+      - somatic
     actions: 1
     range: 30 feet
     target: 1 living creature
@@ -3586,27 +3586,27 @@ pf2e_spells:
     save: basic Fortitude
     effect: You close your hand and pull life energy from another creature into yourself. This deals 3d4 negative damage; the target must attempt a basic Fortitude save. You gain temporary Hit Points equal to the damage the target takes, after resolving its save and applying your blood magic if applicable. If the target's Hit Points were lower than the damage you dealt, you gain temporary Hit Points equal to their remaining Hit Points instead. The temporary Hit Points last for 1 minute.
     heighten:
-    - 4d4
-    - 5d4
-    - 6d4
-    - 7d4
-    - 8d4
-    - 9d4
-    - 10d4
+      - 4d4
+      - 5d4
+      - 6d4
+      - 7d4
+      - 8d4
+      - 9d4
+      - 10d4
   Dread Aura:
     base_level: 4
     school: Enchantment
     traits:
-    - aura
-    - emotion
-    - enchantment
-    - fear
-    - mental
-    - uncommon
-    - wizard
+      - aura
+      - emotion
+      - enchantment
+      - fear
+      - mental
+      - uncommon
+      - wizard
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 30-foot-radius emanation
     duration: sustained up to 1 minute
@@ -3615,18 +3615,18 @@ pf2e_spells:
     base_level: 6
     school: Divination
     traits:
-    - cursebound
-    - divination
-    - emotion
-    - fear
-    - mental
-    - oracle
-    - uncommon
+      - cursebound
+      - divination
+      - emotion
+      - fear
+      - mental
+      - oracle
+      - uncommon
     mystery:
-    - lore
+      - lore
     cast:
-    - material
-    - somatic
+      - material
+      - somatic
     actions: 2
     range: 60 feet
     target: up to 6 creatures
@@ -3636,15 +3636,15 @@ pf2e_spells:
     base_level: 8
     school: Illusion
     traits:
-    - illusion
-    - mental
-    - sleep
+      - illusion
+      - mental
+      - sleep
     tradition:
-    - arcane
-    - occult
+      - arcane
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 10 minutes
     range: planetary
     target: up to 12 creatures you know by name and have met in person
@@ -3654,14 +3654,14 @@ pf2e_spells:
     base_level: 4
     school: Enchantment
     traits:
-    - cleric
-    - enchantment
-    - incapacitation
-    - mental
-    - uncommon
+      - cleric
+      - enchantment
+      - incapacitation
+      - mental
+      - uncommon
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 creature
@@ -3671,15 +3671,15 @@ pf2e_spells:
     base_level: 3
     school: Enchantment
     traits:
-    - enchantment
-    - mental
+      - enchantment
+      - mental
     tradition:
-    - arcane
-    - divine
-    - occult
+      - arcane
+      - divine
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 10 minutes
     range: planetary
     target: 1 creature you know by name and have met in person
@@ -3690,14 +3690,14 @@ pf2e_spells:
     base_level: 5
     school: Enchantment
     traits:
-    - enchantment
-    - mental
+      - enchantment
+      - mental
     tradition:
-    - occult
+      - occult
     cast:
-    - material
-    - somatic
-    - verbal
+      - material
+      - somatic
+      - verbal
     actions: 10 minutes
     range: touch
     target: 1 willing sleeping creature
@@ -3707,14 +3707,14 @@ pf2e_spells:
     base_level: 5
     school: Illusion
     traits:
-    - illusion
-    - uncommon
-    - visual
+      - illusion
+      - uncommon
+      - visual
     tradition:
-    - arcane
-    - divine
+      - arcane
+      - divine
     cast:
-    - somatic
+      - somatic
     actions: reaction
     trigger: a creature within range is hit by an attack from an enemy
     range: 120 feet
@@ -3727,17 +3727,17 @@ pf2e_spells:
     base_level: 4
     school: Enchantment
     traits:
-    - curse
-    - enchantment
-    - mental
-    - misfortune
+      - curse
+      - enchantment
+      - mental
+      - misfortune
     tradition:
-    - arcane
-    - divine
-    - occult
+      - arcane
+      - divine
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 120 feet
     target: 1 creature
@@ -3747,16 +3747,16 @@ pf2e_spells:
     base_level: 7
     school: Conjuration
     traits:
-    - conjuration
+      - conjuration
     bloodline:
-    - shadow
+      - shadow
     tradition:
-    - arcane
-    - occult
+      - arcane
+      - occult
     cast:
-    - material
-    - somatic
-    - verbal
+      - material
+      - somatic
+      - verbal
     actions: 3
     range: 30 feet
     target: 1 enemy of level 15 or lower
@@ -3764,18 +3764,18 @@ pf2e_spells:
     save: Fortitude
     effect: You try to create a temporary duplicate of an enemy to fight on your behalf. The target can attempt a Fortitude save to disrupt the spell. The duplicate appears in an unoccupied space adjacent to the target and has the target's attack modifier, AC, saving throw modifiers, Perception, and skill modifiers, but it has only 70 Hit Points and lacks the target's special abilities, including immunities, resistances, and weaknesses. It has no magic items except weapon potency runes.%r%rThe duplicate gains the minion trait, and it can only Stride and Strike. Its Strikes deal the target's normal damage but don't apply added effects, since it doesn't have special abilities. The spell automatically ends if the duplicate's Hit Points drop to 0.%r%rThe duplicate attacks your enemies to the best of its abilities. You can also try to give it additional instructions; when you Sustain the Spell, you can also Command a Minion as part of your action, but the GM determines whether the duplicate follows your command.%r%rThe duplicate is unstable, so each turn after it takes its actions, it loses 4d6 Hit Points. It's not a living creature, and it can never regain its lost Hit Points in any way.%r**Critical Success** You fail to create a duplicate.%r**Success** The duplicate deals half damage with its Strikes and the duration is reduced to a maximum of 2 rounds.%r**Failure** The duplicate works as described.
     heighten:
-    - The level of creature you can target increases by 2. The duplicate has 10 more HP.
-    - The level of creature you can target increases by 2. The duplicate has 10 more HP.
-    - The level of creature you can target increases by 2. The duplicate has 10 more HP.
+      - The level of creature you can target increases by 2. The duplicate has 10 more HP.
+      - The level of creature you can target increases by 2. The duplicate has 10 more HP.
+      - The level of creature you can target increases by 2. The duplicate has 10 more HP.
   Dutiful Challenge:
     base_level: 4
     school: Abjuration
     traits:
-    - abjuration
-    - cleric
+      - abjuration
+      - cleric
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     target: 1 creature
     duration: 1 minute
@@ -3787,14 +3787,14 @@ pf2e_spells:
     base_level: 3
     school: Transmutation
     tradition:
-    - arcane
-    - primal
+      - arcane
+      - primal
     traits:
-    - transmutation
+      - transmutation
     actions: 2
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     range: 120 feet
     target: 1 flying creature
     save: Fortitude
@@ -3803,14 +3803,14 @@ pf2e_spells:
     base_level: 8
     school: Evocation
     traits:
-    - earth
-    - evocation
+      - earth
+      - evocation
     tradition:
-    - arcane
-    - primal
+      - arcane
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 60-foot burst
     range: 500 feet
@@ -3822,17 +3822,17 @@ pf2e_spells:
     base_level: 7
     school: Necromancy
     traits:
-    - cold
-    - darkness
-    - necromancy
-    - negative
+      - cold
+      - darkness
+      - necromancy
+      - negative
     tradition:
-    - arcane
-    - divine
-    - primal
+      - arcane
+      - divine
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 60-foot burst
     range: 500 feet
@@ -3840,18 +3840,18 @@ pf2e_spells:
     save: cold plus negative
     effect: "A globe of freezing darkness explodes in the area, dealing 8d10 cold damage to creatures in the area, plus 8d4 additional negative damage to living creatures. Each creature in the area must attempt a Reflex save.%r%rIf the globe overlaps with an area of magical light or affects a creature affected by magical light, eclipse burst attempts to counteract the light effect.%r%r**Critical Success** The creature is unaffected.%r**Success** The creature takes half damage.%r**Failure** The creature takes full damage.%r**Critical Failure** The creature takes double damage and becomes blinded by the darkness for an unlimited duration."
     heighten:
-    - 9d10 plus 9d4
-    - 10d10 plus 10d4
-    - 11d10 plus 11d4
+      - 9d10 plus 9d4
+      - 10d10 plus 10d4
+      - 11d10 plus 11d4
   Ectoplasmic Interstice:
     base_level: 4
     school: Necromancy
     traits:
-    - cleric
-    - necromancy
+      - cleric
+      - necromancy
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 15 foot emanation
     range: 30 feet
@@ -3861,12 +3861,12 @@ pf2e_spells:
     base_level: 1
     school: Necromancy
     traits:
-    - cleric
-    - incapacitation
-    - necromancy
+      - cleric
+      - incapacitation
+      - necromancy
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: touch
     target: 1 living creature that has a soul
@@ -3880,17 +3880,17 @@ pf2e_spells:
     base_level: cantrip
     school: Evocation
     traits:
-    - cantrip
-    - electricity
-    - evocation
+      - cantrip
+      - electricity
+      - evocation
     tradition:
-    - arcane
-    - primal
+      - arcane
+      - primal
     mystery:
-    - tempest
+      - tempest
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 or 2 creatures
@@ -3899,26 +3899,26 @@ pf2e_spells:
     save: basic Reflex
     effect: An arc of lightning leaps from one target to another. You deal electricity damage equal to 1d4 plus your spellcasting ability modifier.
     heighten:
-    - 1d4
-    - 2d4
-    - 3d4
-    - 4d4
-    - 5d4
-    - 6d4
-    - 7d4
-    - 8d4
-    - 9d4
-    - 10d4
+      - 1d4
+      - 2d4
+      - 3d4
+      - 4d4
+      - 5d4
+      - 6d4
+      - 7d4
+      - 8d4
+      - 9d4
+      - 10d4
   Elemental Betrayal:
     base_level: 1
     school: Evocation
     traits:
-    - evocation
-    - hex
-    - uncommon
-    - witch
+      - evocation
+      - hex
+      - uncommon
+      - witch
     cast:
-    - verbal
+      - verbal
     actions: 1
     range: 30 feet
     target: 1 creature
@@ -3935,14 +3935,14 @@ pf2e_spells:
     base_level: 5
     school: Evocation
     traits:
-    - evocation
-    - sorcerer
-    - uncommon
+      - evocation
+      - sorcerer
+      - uncommon
     bloodline:
-    - elemental
+      - elemental
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 10-foot-radius burst, 30-foot cone, or 60-foot line
     range: 30 feet
@@ -3951,25 +3951,25 @@ pf2e_spells:
     save: basic Reflex
     effect: You gather elemental energy and blast your foes in one of the various listed shapes of your choosing, dealing 8d6 bludgeoning damage (or fire damage if your element is fire). This spell has your element's trait.
     heighten:
-    - 10d6
-    - 12d6
-    - 14d6
-    - 16d6
-    - 18d6
+      - 10d6
+      - 12d6
+      - 14d6
+      - 16d6
+      - 18d6
   Elemental Form:
     base_level: 5
     school: Transmutation
     traits:
-    - polymorph
-    - transmutation
+      - polymorph
+      - transmutation
     bloodline:
-    - elemental
+      - elemental
     tradition:
-    - arcane
-    - primal
+      - arcane
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     duration: 1 minute
     effect: "You call upon the power of the planes to transform into a Medium elemental battle form. When you cast this spell, choose air, earth, fire, or water. While in this form, you gain the corresponding trait and the elemental trait. You have hands in this battle form and can take manipulate actions. You can Dismiss the spell.%r%rYou gain the following statistics and abilities regardless of which battle form you choose:%r%r- AC = 19 + your level. Ignore your armor's check penalty and Speed reduction.%r- 10 temporary Hit Points.%r- Darkvision.%r- One or more unarmed melee attacks specific to the battle form you choose, which are the only attacks you can Strike with. You're trained with them. Your attack modifier is +18, and your damage bonus is +9. These are Dexterity based (air or fire) or Strength based (earth or water). If your corresponding unarmed attack modifier is higher, you can use it instead.%r- Acrobatics (air or fire) or Athletics (earth or water) modifier of +20; ignore this change if your own modifier is higher.%r%rYou also gain specific abilities based on the type of elemental you choose:%r%r- **Air** fly Speed 80 feet, movement doesn't trigger reactions; Melee [one-action] gust, Damage 1d4 bludgeoning.%r- **Earth** Speed 20 feet, burrow Speed 20 feet; Melee [one-action] fist, Damage 2d10 bludgeoning.%r- **Fire** Speed 50 feet; fire resistance 10, weakness 5 to cold and 5 to water; Melee [one-action] tendril , Damage 1d8 fire plus 1d4 persistent fire.%r- **Water** Speed 20 feet, swim Speed 60 feet; fire resistance 5; Melee [one-action] wave, Damage 1d12 bludgeoning, and you can spend an action immediately after a hit to push the target 5 feet with the effects of a successful Shove."
@@ -3980,14 +3980,14 @@ pf2e_spells:
     base_level: 3
     school: Evocation
     traits:
-    - evocation
-    - sorcerer
-    - uncommon
+      - evocation
+      - sorcerer
+      - uncommon
     bloodline:
-    - elemental
+      - elemental
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     duration: 1 minute
     effect: You call upon your element to propel you, improving your Speed depending on your element. This spell has your element's trait.%r- **Air** You gain a fly Speed equal to your Speed.%r- **Earth** You gain a burrow Speed of 10 feet.%r- **Fire** You gain a fly Speed equal to your Speed.%r- **Water** You gain a swim Speed equal to your Speed and can breathe underwater.
@@ -3998,12 +3998,12 @@ pf2e_spells:
     base_level: 4
     school: Evocation
     traits:
-    - evocation
-    - metamagic
-    - uncommon
-    - wizard
+      - evocation
+      - metamagic
+      - uncommon
+      - wizard
     cast:
-    - verbal
+      - verbal
     actions: 1
     damage: varies
     damage_type: varies
@@ -4012,14 +4012,14 @@ pf2e_spells:
     base_level: 1
     school: Evocation
     traits:
-    - attack
-    - evocation
-    - sorcerer
-    - uncommon
+      - attack
+      - evocation
+      - sorcerer
+      - uncommon
     bloodline:
-    - elemental
+      - elemental
     cast:
-    - somatic
+      - somatic
     actions: 1
     damage: 1d8
     range: 30 feet
@@ -4027,28 +4027,28 @@ pf2e_spells:
     damage_type: bludgeoning or fire
     effect: With a flick of your wrist, you fling a chunk of your elemental matter at your foe. Make a spell attack roll, dealing 1d8 bludgeoning damage (or fire damage if your element is fire) on a success, and double damage on a critical success. This spell has your element's trait.
     heighten:
-    - 2d8
-    - 3d8
-    - 4d8
-    - 5d8
-    - 6d8
-    - 7d8
-    - 8d8
-    - 9d8
-    - 10d8
+      - 2d8
+      - 3d8
+      - 4d8
+      - 5d8
+      - 6d8
+      - 7d8
+      - 8d8
+      - 9d8
+      - 10d8
   Embrace the Pit:
     base_level: 3
     school: Transmutation
     traits:
-    - evil
-    - morph
-    - sorcerer
-    - transmutation
-    - uncommon
+      - evil
+      - morph
+      - sorcerer
+      - transmutation
+      - uncommon
     bloodline:
-    - diabolic
+      - diabolic
     cast:
-    - verbal
+      - verbal
     actions: 1
     duration: 1 minute
     effect: Devil horns grow from your skull, and your skin takes on features of the devil responsible for your diabolic bloodline. You gain resistance 5 to evil, fire, and poison, and resistance 1 to physical damage (except silver). You can take good damage, even if you aren't evil, and you gain weakness 5 to good damage.
@@ -4060,13 +4060,13 @@ pf2e_spells:
     base_level: 9
     school: Conjuration
     traits:
-    - conjuration
-    - monk
-    - teleportation
-    - uncommon
+      - conjuration
+      - monk
+      - teleportation
+      - uncommon
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     duration: 1 minute
     effect: You turn ethereal, with the effects of ethereal jaunt, but you don't need to concentrate.
@@ -4074,11 +4074,11 @@ pf2e_spells:
     base_level: 1
     school: Abjuration
     traits:
-    - abjuration
-    - cleric
-    - mental
+      - abjuration
+      - cleric
+      - mental
     cast:
-    - verbal
+      - verbal
     actions: 1
     effect: You inject a sliver of the void into your mind, momentarily remaking it into a bleak and empty place. Attempt a counteract check against one emotion effect affecting you.
     heighten:
@@ -4087,14 +4087,14 @@ pf2e_spells:
     base_level: 2
     school: Abjuration
     traits:
-    - abjuration
+      - abjuration
     tradition:
-    - arcane
-    - divine
-    - primal
+      - arcane
+      - divine
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 10 minutes
     range: touch
     target: 1 willing creature
@@ -4106,57 +4106,57 @@ pf2e_spells:
     base_level: 4
     school: Abjuration
     traits:
-    - abjuration
-    - cleric
-    - uncommon
+      - abjuration
+      - cleric
+      - uncommon
     cast:
-    - somatic
+      - somatic
     actions: reaction
     trigger: An attack or effect would deal damage to you.
     effect: Your own might mingles with divine power to protect you. You gain resistance equal to 8 plus your Strength modifier against all damage from the triggering attack or effect.
     heighten:
-    - The resistance increases by 2.
-    - The resistance increases by 4.
-    - The resistance increases by 6.
-    - The resistance increases by 8.
-    - The resistance increases by 10.
-    - The resistance increases by 12.
+      - The resistance increases by 2.
+      - The resistance increases by 4.
+      - The resistance increases by 6.
+      - The resistance increases by 8.
+      - The resistance increases by 10.
+      - The resistance increases by 12.
   Energy Absorption:
     base_level: 4
     school: Abjuration
     traits:
-    - abjuration
-    - uncommon
-    - wizard
+      - abjuration
+      - uncommon
+      - wizard
     cast:
-    - verbal
+      - verbal
     actions: reaction
     trigger: An effect would deal acid, cold, electricity, or fire damage to you.
     effect: You gain resistance 15 to acid, cold, electricity, or fire damage from the triggering effect (one type of your choice). The resistance applies only to the triggering effect's initial damage.
     heighten:
-    - The resistance increases by 5.
-    - The resistance increases by 10.
-    - The resistance increases by 15.
-    - The resistance increases by 20.
-    - The resistance increases by 25.
-    - The resistance increases by 30.
+      - The resistance increases by 5.
+      - The resistance increases by 10.
+      - The resistance increases by 15.
+      - The resistance increases by 20.
+      - The resistance increases by 25.
+      - The resistance increases by 30.
   Energy Aegis:
     base_level: 7
     school: Abjuration
     traits:
-    - abjuration
+      - abjuration
     bloodline:
-    - elemental
-    - genie
+      - elemental
+      - genie
     tradition:
-    - arcane
-    - divine
-    - occult
-    - primal
+      - arcane
+      - divine
+      - occult
+      - primal
     cast:
-    - material
-    - somatic
-    - verbal
+      - material
+      - somatic
+      - verbal
     actions: 1 minute
     range: touch
     target: 1 creature
@@ -4167,15 +4167,15 @@ pf2e_spells:
     base_level: 4
     school: Necromancy
     traits:
-    - necromancy
-    - negative
+      - necromancy
+      - negative
     tradition:
-    - arcane
-    - divine
-    - occult
+      - arcane
+      - divine
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 30-foot line
     damage: varies
@@ -4190,43 +4190,43 @@ pf2e_spells:
     base_level: 2
     school: Transmutation
     traits:
-    - transmutation
+      - transmutation
     tradition:
-    - divine
-    - primal
+      - divine
+      - primal
     cast:
-    - material
-    - somatic
-    - verbal
+      - material
+      - somatic
+      - verbal
     actions: 1 minute
     range: touch
     target: up to 1 gallon of non-magical water or up to 5 pounds of food
     duration: 1 hour
     effect: You transform the target into delicious fare, changing water into wine or another fine beverage or enhancing the food's taste and ingredients to make it a gourmet treat.%r%rPrior to the transformation, the spell attempts to counteract any poisons in the food or water. The food turns back to normal if not consumed before the duration expires, though any poisons that were counteracted are still gone.
     heighten:
-    - The number of gallons of water you can target increases by 1, or the number of pounds of food you can target increases by 5.
-    - The number of gallons of water you can target increases by 1, or the number of pounds of food you can target increases by 5.
-    - The number of gallons of water you can target increases by 1, or the number of pounds of food you can target increases by 5.
-    - The number of gallons of water you can target increases by 1, or the number of pounds of food you can target increases by 5.
-    - The number of gallons of water you can target increases by 1, or the number of pounds of food you can target increases by 5.
-    - The number of gallons of water you can target increases by 1, or the number of pounds of food you can target increases by 5.
-    - The number of gallons of water you can target increases by 1, or the number of pounds of food you can target increases by 5.
-    - The number of gallons of water you can target increases by 1, or the number of pounds of food you can target increases by 5.
-    - The number of gallons of water you can target increases by 1, or the number of pounds of food you can target increases by 5.
+      - The number of gallons of water you can target increases by 1, or the number of pounds of food you can target increases by 5.
+      - The number of gallons of water you can target increases by 1, or the number of pounds of food you can target increases by 5.
+      - The number of gallons of water you can target increases by 1, or the number of pounds of food you can target increases by 5.
+      - The number of gallons of water you can target increases by 1, or the number of pounds of food you can target increases by 5.
+      - The number of gallons of water you can target increases by 1, or the number of pounds of food you can target increases by 5.
+      - The number of gallons of water you can target increases by 1, or the number of pounds of food you can target increases by 5.
+      - The number of gallons of water you can target increases by 1, or the number of pounds of food you can target increases by 5.
+      - The number of gallons of water you can target increases by 1, or the number of pounds of food you can target increases by 5.
+      - The number of gallons of water you can target increases by 1, or the number of pounds of food you can target increases by 5.
   Enlarge:
     base_level: 2
     school: Transmutation
     traits:
-    - polymorph
-    - transmutation
+      - polymorph
+      - transmutation
     bloodline:
-    - demonic
+      - demonic
     tradition:
-    - arcane
-    - primal
+      - arcane
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: 1 willing creature
@@ -4239,13 +4239,13 @@ pf2e_spells:
     base_level: 4
     school: Transmutation
     traits:
-    - polymorph
-    - ranger
-    - transmutation
-    - uncommon
+      - polymorph
+      - ranger
+      - transmutation
+      - uncommon
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 30 feet
     target: your animal companion
@@ -4255,13 +4255,13 @@ pf2e_spells:
     base_level: 2
     school: Transmutation
     traits:
-    - plant
-    - transmutation
+      - plant
+      - transmutation
     tradition:
-    - primal
+      - primal
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: all squares in a 20-foot-radius burst that contain plants or fungi
     range: 120 feet
@@ -4271,19 +4271,19 @@ pf2e_spells:
     base_level: 3
     school: Enchantment
     traits:
-    - auditory
-    - emotion
-    - enchantment
+      - auditory
+      - emotion
+      - enchantment
     bloodline:
-    - diabolic
-    - fey
-    - genie
+      - diabolic
+      - fey
+      - genie
     tradition:
-    - arcane
-    - occult
+      - arcane
+      - occult
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     range: 120 feet
     target: all creatures in range
@@ -4293,12 +4293,12 @@ pf2e_spells:
     base_level: 3
     school: Divination
     traits:
-    - divination
-    - ranger
-    - uncommon
+      - divination
+      - ranger
+      - uncommon
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     duration: 1 hour
     effect: "You can look at currents in the air and water and see tracks that you can follow just as you would on land. You can use Survival to Track through both air and water, noticing aerial or aquatic 'tracks' of all creatures who passed nearby in the last hour. It's more difficult to Track in this way: the DC to Track through air or water is always at least 30, or higher after precipitation or wind (in the air) or heavy tides or currents (in the water). It's possible to Cover Tracks against this spell, but creatures might not realize they need to do so."
@@ -4306,13 +4306,13 @@ pf2e_spells:
     base_level: 4
     school: Necromancy
     traits:
-    - cleric
-    - necromancy
-    - positive
-    - uncommon
+      - cleric
+      - necromancy
+      - positive
+      - uncommon
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 30-foot cone
     damage: 4d12
@@ -4320,24 +4320,24 @@ pf2e_spells:
     save: basic Fortitude
     effect: A massive deluge of life energy causes the undead to fall apart. Each undead creature in the area takes 4d12 positive damage.
     heighten:
-    - 5d12
-    - 6d12
-    - 7d12
-    - 8d12
-    - 9d12
-    - 10d12
+      - 5d12
+      - 6d12
+      - 7d12
+      - 8d12
+      - 9d12
+      - 10d12
   Establish Ward:
     base_level: 5
     school: Abjuration
     traits:
-    - abjuration
-    - sorcerer
-    - uncommon
+      - abjuration
+      - sorcerer
+      - uncommon
     bloodline:
-    - nymph
+      - nymph
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     actions: 2
     area: 30-foot burst
     duration: 1 minute
@@ -4351,16 +4351,16 @@ pf2e_spells:
     base_level: 7
     school: Conjuration
     traits:
-    - conjuration
-    - teleportation
-    - uncommon
+      - conjuration
+      - teleportation
+      - uncommon
     tradition:
-    - divine
-    - occult
+      - divine
+      - occult
     actions: 2
     cast:
-    - somatic
-    - verbal
+      - somatic
+      - verbal
     duration: 1 minute
     effect: "You travel to the Ethereal Plane, which overlaps the Material Plane. Material Plane creatures can't see you, and you can move through things on the Material Plane. You move at half your normal Speeds, but can move in any direction (including up and down).%r%rYou can see onto the Material Plane within a radius of 60 feet; it is gray, hazy, and concealed from you. You can't affect the Material Plane, and you can't be affected by the Material Plane except by force effects and abjurations originating there.%r%rWhen the spell ends, you return to the Material Plane. If you're in the air, you fall (unless you can fly), and if you're inside an object, you're pushed into the nearest open space and take 1d6 damage per 5 feet you were pushed.%r%rIf you cast this spell when not on the Material Plane, it is lost."
     heighten:
@@ -4369,17 +4369,17 @@ pf2e_spells:
     base_level: cantrip
     school: Enchantment
     traits:
-    - cantrip
-    - curse
-    - emotion
-    - enchantment
-    - fear
-    - hex
-    - mental
-    - uncommon
-    - witch
+      - cantrip
+      - curse
+      - emotion
+      - enchantment
+      - fear
+      - hex
+      - mental
+      - uncommon
+      - witch
     cast:
-    - somatic
+      - somatic
     actions: 1
     range: 30 feet
     target: 1 creature
@@ -4390,13 +4390,13 @@ pf2e_spells:
     base_level: 3
     school: Divination
     traits:
-    - divination
-    - metamagic
-    - sorcerer
-    - uncommon
+      - divination
+      - metamagic
+      - sorcerer
+      - uncommon
     bloodline:
-    - imperial
+      - imperial
     cast:
-    - verbal
+      - verbal
     actions: 1
     effect: You call upon your blood's knowledge of the ancients to extend your magic. If your next action is to Cast a Spell with a duration of 1 minute and a single target, the spell instead lasts 10 minutes. You can extend a spell only if you cast it from a spell slot lower than your highest spell slot, and you can have only one active spell at a time extended in this way.

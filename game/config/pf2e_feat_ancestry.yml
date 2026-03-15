@@ -4235,3 +4235,22 @@ pf2e_feats:
       feat:
         - Fiendish Wings
     shortdesc: Your wings are now a permanent part of your physiology. You gain the effects of Fiendish Wings at all times, rather than just once per day for 10 minutes.
+# TESTING FEAT ONLY
+  Fey Bullshit Vibe:
+    feat_type: 
+      - Ancestry
+    assoc_ancestry: 
+      - Sildanyar
+    traits: []
+    prereq:
+      level: 1
+    grants:
+      magic_stats:
+        innate_spell:
+          level: 2
+          name: 
+            - Glitterdust
+            - Acid Arrow
+          tradition: primal
+          cast_stat: Charisma
+    shortdesc: You call forth fey bullshit to assault your enemies. You can cast _glitterdust_ and _acid arrow_ as 2nd-level primal innate spells once per day.

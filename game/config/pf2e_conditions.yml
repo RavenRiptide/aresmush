@@ -9,7 +9,7 @@ pf2e_conditions:
     short_descr: Your movements become clumsy and inexact.
     value: true
     affected_stat:
-    - "Dexterity"
+      - "Dexterity"
     override: false
   Confused:
     short_descr: You lose your wits and attack wildly.
@@ -39,7 +39,7 @@ pf2e_conditions:
     value: true
     override: false
     affected_stat:
-    - "Constitution"
+      - "Constitution"
     daily: -1
   Dying:
     short_descr: You are close to death.
@@ -56,7 +56,7 @@ pf2e_conditions:
     short_descr: You are physically weakened.
     value: true
     affected_stat:
-    - "Strength"
+      - "Strength"
     override: false
   Fascinated:
     short_descr: You are compelled to focus your attention on something.
@@ -137,9 +137,9 @@ pf2e_conditions:
   Stupefied:
     short_descr: Your thoughts are cloudy and indistinct.
     affected_stat:
-    - "Intelligence"
-    - "Wisdom"
-    - "Charisma"
+      - "Intelligence"
+      - "Wisdom"
+      - "Charisma"
     value: true
     override: false
   Unconscious:
