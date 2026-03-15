@@ -155,7 +155,7 @@ module AresMUSH
 
           feat_list[use_ftype] = sublist
 
-          new_gated_list = gate_options - [ self.gate.downcase ]
+          new_gated_list = gate_options.reject { |g| g.to_s.casecmp?(self.gate) }
   
           to_assign[key] = new_gated_list
         else
@@ -182,6 +182,11 @@ module AresMUSH
 
 
         client.emit_success t('pf2e.feat_set_ok', :name => fname, :type => self.feat_type)
+
+        # If a feat is a gated feat, serve a message that alerts them to look at cg/review.
+        if fdeets['grants'] && fdeets['grants']['gated_feat']
+          client.emit_ooc t('pf2e.cg_feat_grants_addl', :element => 'item')
+        end
 
         # Feat-specific messages.
         if fname == "Deity's Domain"

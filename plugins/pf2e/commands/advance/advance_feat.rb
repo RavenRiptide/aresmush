@@ -243,7 +243,7 @@ module AresMUSH
         has_grants = fdetails['grants']
 
         if has_grants
-          client.emit_ooc t('pf2e.feat_grants_addl', :element => 'item. See %xUadvance/review%xU for more information.')
+          client.emit_ooc t('pf2e.advancement_feat_grants_addl', :element => 'item')
           grants = to_assign['grants']  || {}
           adv_grants = advancement['grants'] || {}
 

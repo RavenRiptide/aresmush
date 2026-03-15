@@ -573,11 +573,12 @@ pf2e_heritage:
     reaction: []
     attack: {}
   Seer:
-    magic:
+    magic_stats:
       innate_spell:
-        cantrip:
-          - Detect Magic
-        spell_trad: arcane
+          level: 1
+          name: Detect Magic
+          tradition: arcane
+          cast_stat: Charisma
     action:
       - Identify Magic
       - Decipher Writing
