@@ -65,7 +65,7 @@ ul.dropdown-menu {
 }
 
 .header-wrap nav {
-    background-color: rgba(0, 0, 0, 0.55); /* transparent black */
+    background-color: rgba(0, 0, 0, 0.45); /* transparent black */
 }
 
 /* Play screen styling */
@@ -120,9 +120,18 @@ body {
     margin: auto;
 }
 
-/* Banner removal & jumbotron background removal */
+/* Header styling */
 
-div.header-wrap,
+div.header-wrap {
+    background: url("/game/uploads/theme_images/header.png");
+}
+
+div.title-wrap {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Jumbotron background removal */
+
 div.jumbotron {
     background: none;
 }
@@ -143,15 +152,18 @@ div.site-subtitle {
     font-style: italic;
 }
 
-/* Body semi-transparent background */
+/* Container styling */
 
-div.body-wrap {
-    background: rgba(32, 26, 26, 0.8) /* Eerie Black semi-transparent */
+div.container-fluid {
+    background-color: #392E2E;
+    border: 2px solid #E1B07E;
+    border-top: none;
+    border-bottom: none;
+    border-image: linear-gradient(to bottom, #CBC0AD, #E1B07E, #E1B07E21) 1; /* Dark Vanilla - Tumbleweed - Transparent gradient */
 }
 
-div.body-wrap,
-div.header-wrap {
-    box-shadow: 0px 0px 20px 0px #302727; /* Dark Pine */
+div.body-wrap {
+    background-color: transparent
 }
 
 /* Mobile version body styling */
@@ -170,6 +182,14 @@ div.header-wrap {
         background-size: 100%;
         width: 55%;
     }
+}
+
+/* Navbar styling */
+
+nav.navbar.navbar-expand-lg.navbar-dark div.container-fluid {
+    box-shadow: none;
+    background: none;
+    border: none;
 }
 
 /* Right sidebar styling */
@@ -910,6 +930,50 @@ th.deity-image {
     text-align: right;
 }
 
+/* Deity Summary Flexbox */
+
+div.deity-summary {
+    margin: auto;
+    width: 100%;
+    border: 1px solid #CBC0AD;
+    border-image: linear-gradient(to bottom right, #CBC0AD, #CBC0AD1A, #CBC0AD) 1;
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: .3rem;
+}
+
+div.deity-summary-row {
+    margin: auto;
+    width: 100%;
+    display: flex;
+}
+
+div.deity-summary-headercell {
+    flex: 1 1 0px;
+    background-color: #00000082;
+    border-bottom: 1px solid #302727;
+    border-right: 1px solid #302727;
+    color: #dbd3c6;
+    padding: 8px;
+}
+
+div.deity-summary-tablecell {
+    flex: 1 1 0px;
+    background-color: #201a1a;
+    border-bottom: 1px solid #302727;
+    border-right: 1px solid #302727;
+    padding: 8px;
+}
+
+ul.list-summary {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    padding-left: 1rem;
+    list-style-type: circle;
+}
+
 /* Org Table Styling */
 
 table.org-table-intro {
@@ -1282,6 +1346,13 @@ div.spot-art-left p {
 div.spot-art-left img {
     width: 50%;
     float: left;
+}
+
+/* Image wrap */
+
+div.image-wrap {
+    margin: auto;
+    overflow: hidden;
 }
 
 /* Letter styling */
