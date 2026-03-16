@@ -142,6 +142,19 @@ module AresMUSH
             archetype_info = Global.read_config('pf2e_archetype', archetype) || {}
             archetype_features_info = archetype_info['initial_dedication'] || {}
             archetype_key_abilities = Array(archetype_info['key_abil']).compact.map { |a| a.to_s.strip }.reject(&:empty?).uniq
+            if archetype_info['use_deity']
+              existing_deity = enactor.pf2_faith['deity']
+
+              if !existing_deity.blank?
+                to_assign['archetype deity'] = existing_deity
+                advancement['archetype_deity'] = existing_deity
+                client.emit_ooc t('pf2e.adv_archetype_deity_assigned', :deity => existing_deity, :archetype => archetype)
+              else
+                # If the archetype has a deity choice, open it up.
+                to_assign['archetype deity'] = 'open'
+                client.emit_ooc t('pf2e.adv_archetype_deity_select', :archetype => archetype)
+              end
+            end
             # Handle automatic skill increases from archetype, if present, and merge them with any other pending skill increases.
             archetype_skills = Array(archetype_features_info['skills']).compact.map { |s| s.to_s.strip }.reject(&:empty?)
             if !archetype_skills.empty?

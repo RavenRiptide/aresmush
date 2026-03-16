@@ -58,6 +58,10 @@ pf2e_feats:
       ability: 
         - Strength/14
         - Charisma/14
+      oralign:
+        - LG
+        - NG
+        - CG
     shortdesc: Choose a deity and cause as you would if you were a champion. You become trained in light, medium, and heavy armor. You become trained in Religion and your deity's associated skill; for each of these skills in which you were already trained, you instead become trained in a skill of your choice. You become trained in champion class DC.%r%rYou are bound by your deity's anathema and must follow the champion's code and alignment requirements for your cause. You don't gain any other abilities from your choice of deity or cause.%r%rSpecial You cannot select another dedication feat until you have gained two other feats from the champion archetype.
     traits:
       - archetype

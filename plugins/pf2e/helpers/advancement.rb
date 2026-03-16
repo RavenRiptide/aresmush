@@ -251,6 +251,10 @@ module AresMUSH
 
           signatures[charclass] = class_sigs
           magic.update(signature_spells: signatures)
+        when "archetype_deity"
+          faith_info = char.pf2_faith
+          faith_info['deity'] = value
+          char.pf2_faith = faith_info
         when "grants"
           value.each_pair do |feat, info|
             do_feat_grants(char, info, charclass, client)
@@ -355,6 +359,8 @@ module AresMUSH
           end
 
           msg << t('pf2e.adv_item_archetype_key_ability') if needs_choice
+        when "archetype deity"
+          msg << t('pf2e.adv_item_archetype_deity') if info.to_s.downcase == 'open'
         when "special feat"
           msg << t('pf2e.unassigned_gated_feat', :options => info.sort.join(", "))
         when "grants"

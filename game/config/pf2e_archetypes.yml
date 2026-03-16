@@ -14,7 +14,7 @@ pf2e_archetype:
         - Alchemical Crafting
       action: []
       reaction: []
-      reagents: 
+      reagents:
         alchemist_archetype: [0, 0, 0]
   Barbarian Archetype:
     key_abil:

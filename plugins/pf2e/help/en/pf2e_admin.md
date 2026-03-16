@@ -89,6 +89,21 @@ Game admins and those they designate can make some modifications to characters' 
 `<character>`: The character's name.
 `[heal|harm]`: Choose `heal` to set healing font; choose `harm` to set harming font.
 
+## Setting alignment and deity
+**Command**:
+`admin/set <character>/alignment = <alignment>`
+`admin/set <character>/deity = <deity>`
+
+%xrWARNING%xn: 
+- Do not use these commands on a character with the Champion class or a character with the Champion Archetype, due to how their class works. 
+- Do not use the deity command to change a Cleric's deity or a character with the Cleric Archetype's deity, due to how their class works. 
+Offer respecs to these characters instead if they want to redo their sheet!
+
+**Key**:
+`<character>`: The character's name.
+`<alignment>`: Alignment code (such as, `LG`, `N`, or `CN`).
+`<deity>`: The deity's name.
+
 ## Etching runes
 **Commands**:
 `etch/potency <character>=<category>/<item number>/<potency level>`

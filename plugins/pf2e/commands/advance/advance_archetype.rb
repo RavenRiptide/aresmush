@@ -100,8 +100,47 @@ module AresMUSH
               enactor.save
 
               client.emit_success t('pf2e.adv_archetype_key_ability_assigned', :ability => chosen_ability, :archetype => archetype)
+            when 'deity'
+              unless to_assign['archetype deity']&.casecmp?('open')
+                client.emit_failure t('pf2e.adv_no_archetype_deity_needed')
+                return
+              end
+
+              deities = Global.read_config('pf2e_deities')&.keys || []
+              chosen_deity = deities.find { |d| d.casecmp?(self.value) }
+
+              unless chosen_deity
+                client.emit_failure t('pf2e.adv_invalid_archetype_deity', :options => deities.sort.join(", "))
+                return
+              end
+
+              if Global.read_config('pf2e', 'use_alignment')
+                alignment = enactor.pf2_faith['alignment']
+
+                if alignment.blank?
+                  client.emit_failure t('pf2e.alignment_missing')
+                  return
+                end
+
+                allowed_alignments = Global.read_config('pf2e_deities', chosen_deity, 'allowed_alignments') || []
+
+                unless allowed_alignments.include?(alignment)
+                  client.emit_failure t('pf2e.adv_archetype_deity_mismatch', :deity => chosen_deity, :alignment => alignment, :options => allowed_alignments.join(", "))
+                  return
+                end
+              end
+
+              to_assign['archetype deity'] = chosen_deity
+              advancement = enactor.pf2_advancement || {}
+              advancement['archetype_deity'] = chosen_deity
+
+              enactor.pf2_advancement = advancement
+              enactor.pf2_to_assign = to_assign
+              enactor.save
+
+              client.emit_success t('pf2e.adv_archetype_deity_assigned', :deity => chosen_deity, :archetype => archetype)
             else
-              client.emit_failure t('pf2e.bad_option', :element => 'archetype assignment', :options => 'specialty, key ability')
+              client.emit_failure t('pf2e.bad_option', :element => 'archetype assignment', :options => 'specialty, key ability, deity')
               return
             end
         end
