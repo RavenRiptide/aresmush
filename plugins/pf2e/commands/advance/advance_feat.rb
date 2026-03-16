@@ -59,21 +59,33 @@ module AresMUSH
           return
         end
 
-        # Qualification checks for all kinds of stuff, including whether the feat in question exists.
+        advancement = enactor.pf2_advancement
 
-        qualifies = Pf2e.can_take_gated_feat?(enactor, self.value, self.type)
+        # Check for grants.
+        feat = Pf2e.get_feat_details(self.value)
+
+        if feat.is_a?(String)
+          if feat == 'ambiguous'
+            options = Pf2e.get_feat_match_options(self.value)
+            msg = t('pf2e.multiple_feat_matches', :options => options.join(", "))
+          else
+            msg = t('pf2e.bad_feat_name', :name => self.value)
+          end
+
+          client.emit_failure msg
+          return
+        end
+
+        fname = feat[0]
+        fdetails = feat[1]
+
+        # Qualification checks for all kinds of stuff, including whether the feat in question exists.
+        qualifies = Pf2e.can_take_gated_feat?(enactor, fname, self.type)
 
         unless qualifies
           client.emit_failure t('pf2e.feat_fails_gate')
           return
         end
-
-        advancement = enactor.pf2_advancement
-
-        # Check for grants.
-        feat = Pf2e.get_feat_details(self.value)
-        fname = feat[0]
-        fdetails = feat[1]
 
         # Check prerequisites
         prereqs = fdetails["prereq"]
@@ -299,7 +311,13 @@ module AresMUSH
         feat = Pf2e.get_feat_details(self.value)
 
         if feat.is_a?(String)
-          msg = feat == 'ambiguous' ? t('pf2e.multiple_matches', :element => 'feat') : t('pf2e.bad_feat_name', :name => self.value)
+          if feat == 'ambiguous'
+            options = Pf2e.get_feat_match_options(self.value)
+            msg = t('pf2e.multiple_feat_matches', :options => options.join(", "))
+          else
+            msg = t('pf2e.bad_feat_name', :name => self.value)
+          end
+
           client.emit_failure msg
           return
         end

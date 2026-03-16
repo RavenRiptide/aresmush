@@ -11,6 +11,7 @@ en:
     cant_refocus_pool: "Your current focus pool must be less than its maximum number of focus points to refocus."
     cant_refocus_time: "You last refocused at %{time} (local time) and can only refocus once per hour. Wait longer."
     cg_magic_ok: "%xgNo issues seen with magic options.%xn"
+    cg_innate_spells: "%xrYou have %{details} to assign.%xn"
     cg_rep_spells: "%xcYou have repertoire spells to learn. Spells left to choose: %r%b%b%{rcount}%xn"
     cg_spell_select_ok: "Spell added successfully."
     cg_spellbook_spells: "%xcYou have spells to put in your spellbook. Spells left to choose: %r%b%b%{scount}%xn"

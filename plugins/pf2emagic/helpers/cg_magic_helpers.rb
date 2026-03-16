@@ -374,6 +374,33 @@ module AresMUSH
         msg << t('pf2emagic.choose_school_spell', :wizard_school => specialize_info) if has_school_spell == 'school'
       end
 
+      innate_spells = magic&.innate_spells || {}
+      open_innate = innate_spells.select { |k, _| k.to_s.casecmp?('open') }
+
+      if !open_innate.empty?
+        labels = open_innate.values.map do |info|
+          level_label = info['level'].to_s.downcase
+          is_cantrip = (level_label == 'cantrip' || level_label == '0')
+          tradition = Array(info['tradition']).first
+          tradition_label = tradition.to_s.empty? ? 'unknown tradition' : tradition.to_s
+
+          if is_cantrip
+            "innate cantrip (#{tradition_label})"
+          else
+            "#{Pf2emagic.ordinal_level(level_label)}-level spell (#{tradition_label})"
+          end
+        end
+
+        counts = labels.tally
+        details = counts.map do |label, count|
+          plural_label = Pf2emagic.pluralize_label(label, count)
+          "#{count} #{plural_label}"
+        end
+
+        details_text = Pf2emagic.join_with_and(details)
+        msg << t('pf2emagic.cg_innate_spells', :details => details_text)
+      end
+
     end
 
     def self.can_take_gated_spell?(char, charclass, level, term, gate, is_dedication=false)
@@ -422,6 +449,50 @@ module AresMUSH
       end
 
       passes_gate
+    end
+
+    def self.ordinal_level(level_label)
+      level = level_label.to_i
+
+      return level_label if level.zero?
+
+      mod_100 = level % 100
+      suffix = if mod_100.between?(11, 13)
+        'th'
+      else
+        case level % 10
+        when 1
+          'st'
+        when 2
+          'nd'
+        when 3
+          'rd'
+        else
+          'th'
+        end
+      end
+
+      "#{level}#{suffix}"
+    end
+
+    def self.join_with_and(items)
+      return '' if items.empty?
+      return items.first if items.size == 1
+      return "#{items[0]} and #{items[1]}" if items.size == 2
+
+      "#{items[0..-2].join(', ')}, and #{items[-1]}"
+    end
+
+    def self.pluralize_label(label, count)
+      return label if count == 1
+
+      if label.include?('cantrip')
+        label.sub('cantrip', 'cantrips')
+      elsif label.include?(' spell')
+        label.sub(' spell', ' spells')
+      else
+        label + 's'
+      end
     end
   end
 end

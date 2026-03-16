@@ -24,6 +24,8 @@ module AresMUSH
             name = match.find { |item| item.casecmp?(term) } || name
           end
         end
+
+        return 'ambiguous' if name.empty?
       else
         # Pull the unique feat name out of the array so it can be used as a key to get the feat deets.
           name = match.first
@@ -31,6 +33,21 @@ module AresMUSH
 
       # First is the name of the feat matched, the second is the details for the feat.
       return [ name, feats[name] ]
+    end
+
+    def self.get_feat_match_options(term)
+      return [] unless term.is_a? String
+
+      feats = Global.read_config('pf2e_feats')
+      keys = feats.keys
+
+      match = keys.select { |f| f.upcase.match? Regexp.escape(term.upcase) }
+      return [] if match.empty?
+
+      exact = match.find { |item| item.casecmp?(term) }
+      return [] if exact
+
+      match.sort
     end
 
     def self.search_feats(search_type, term, operator='=')
@@ -458,10 +475,84 @@ module AresMUSH
       info.each_pair do |key, value|
         case key
         when 'magic_stats'
-          return_msg << t('pf2e.feat_grants_magic')
           update = PF2Magic.update_magic(char, charclass, value, client)
           # Use core classes explicitly to avoid any constant shadowing.
           return_msg << update if update.is_a?(::String)
+
+          source_counts = {
+            'repertoire' => {},
+            'spellbook' => {}
+          }
+
+          if update.is_a?(::Hash)
+            update.each_pair do |update_key, v|
+              next unless source_counts.key?(update_key)
+
+              if v.is_a?(Hash)
+                v.each_pair do |level, list|
+                  level_label = level.to_s.downcase
+                  open_count = Array(list).count { |entry| entry.to_s.downcase == 'open' }
+                  next if open_count.zero?
+
+                  source_counts[update_key][level_label] ||= 0
+                  source_counts[update_key][level_label] += open_count
+                end
+              elsif v.is_a?(Array)
+                open_count = v.count { |entry| entry.to_s.downcase == 'open' }
+                next if open_count.zero?
+
+                source_counts[update_key]['1'] ||= 0
+                source_counts[update_key]['1'] += open_count
+              end
+            end
+          end
+
+          innate_spells = char.magic&.innate_spells || {}
+          open_innate = innate_spells.select { |k, _| k.to_s.casecmp?('open') }
+          open_innate_labels = open_innate.values.map do |info|
+            level_label = info['level'].to_s.downcase
+            is_cantrip = (level_label == 'cantrip' || level_label == '0')
+            tradition = Array(info['tradition']).first
+            tradition_label = tradition.to_s.empty? ? 'unknown tradition' : tradition.to_s
+
+            if is_cantrip
+              "innate cantrip (#{tradition_label})"
+            else
+              "innate #{Pf2emagic.ordinal_level(level_label)}-level spell (#{tradition_label})"
+            end
+          end
+
+          details_parts = []
+
+          open_innate_counts = open_innate_labels.tally
+          open_innate_counts.each_pair do |label, count|
+            plural_label = Pf2emagic.pluralize_label(label, count)
+            details_parts << "#{count} #{plural_label} to assign"
+          end
+
+          source_counts.each_pair do |source, level_counts|
+            next if level_counts.empty?
+
+            level_counts.each_pair do |level_label, count|
+              is_cantrip = (level_label == 'cantrip' || level_label == '0')
+              level_text = is_cantrip ? 'cantrip' : "#{Pf2emagic.ordinal_level(level_label)}-level spell"
+              level_text = Pf2emagic.pluralize_label(level_text, count)
+
+              if source == 'spellbook'
+                details_parts << "#{count} #{level_text} to add to your spellbook"
+              elsif source == 'repertoire'
+                details_parts << "#{count} #{level_text} to add to your repertoire"
+              end
+            end
+          end
+
+          if details_parts.any?
+            details_text = Pf2emagic.join_with_and(details_parts)
+            review_cmd = char.advancing ? 'advance/review' : 'cg/review'
+            return_msg << t('pf2e.feat_grants_magic_open', :review_cmd => review_cmd, :details => details_text)
+          else
+            return_msg << t('pf2e.feat_grants_magic')
+          end
 
           # Update_magic returns a hash intended to be stuffed into pf2_to_assign. Do that.
           if update.is_a?(::Hash) && !(update.empty?)

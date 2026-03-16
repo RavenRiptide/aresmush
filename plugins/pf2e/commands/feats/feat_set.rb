@@ -66,7 +66,13 @@ module AresMUSH
         feat_check = Pf2e.get_feat_details(self.feat_name)
 
         if feat_check.is_a?(String)
-          msg = feat_check == 'ambiguous' ? t('pf2e.multiple_matches', :element => 'feat') : t('pf2e.bad_feat_name', :name => self.feat_name)
+          if feat_check == 'ambiguous'
+            options = Pf2e.get_feat_match_options(self.feat_name)
+            msg = t('pf2e.multiple_feat_matches', :options => options.join(", "))
+          else
+            msg = t('pf2e.bad_feat_name', :name => self.feat_name)
+          end
+
           client.emit_failure msg
           return
         end
