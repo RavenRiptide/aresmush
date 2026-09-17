@@ -348,24 +348,33 @@ module AresMUSH
 
     end
 
-    def self.abilmod_with_finesse(char)
-      strength = Pf2eAbilities.abilmod(Pf2eAbilities.get_score(char, "Strength"))
-      dexterity = Pf2eAbilities.abilmod(Pf2eAbilities.get_score(char, "Dexterity"))
+    # What the attack and damage arithmetic need to know about an attack, from a catalogue weapon or
+    # from an unarmed attack. Config writes `Finesse` and chargen writes `finesse`, which is why traits
+    # are compared with `has_trait?` rather than `include?`.
+    #
+    # `id`, `group` and `base` are here because the domains are built off them: a rune that says
+    # `{item|id}-damage` reaches this weapon and nothing else, and a feat that says
+    # `sword-weapon-group-damage` reaches every sword.
+    def self.attack_descriptor(char, weapon, twohand = false)
+      info = weapon_info(weapon.name) || {}
+      damage = twohand && weapon.wp_damage_2h ? weapon.wp_damage_2h : weapon.wp_damage
 
-      dexterity > strength ? dexterity : strength
-    end
-
-    # What the attack arithmetic needs to know, from a catalogue weapon or from an unarmed attack.
-    # Config writes `Finesse` and chargen writes `finesse`, which is why traits are compared with
-    # `has_trait?` rather than `include?`.
-    def self.attack_descriptor(char, weapon)
-      { 'name' => weapon.name, 'prof' => get_weapon_prof(char, weapon.name),
+      { 'id' => weapon.id.to_s, 'name' => weapon.name,
+        'prof' => get_weapon_prof(char, weapon.name),
+        'group' => info['group'], 'base' => info['base'] || weapon.name,
         'traits' => weapon.traits, 'ranged' => weapon.wp_type == 'ranged',
+        'unarmed' => Pf2e.has_trait?(weapon.traits, 'unarmed'),
+        'bomb' => bomb?(info),
+        'die' => damage, 'damage_type' => weapon.wp_damage_type,
+        'striking' => Pf2egear.get_rune_value(weapon, 'fundamental', 'power'),
         'rune' => Pf2egear.get_rune_value(weapon, 'fundamental', 'potency') }
     end
 
     def self.unarmed_descriptor(name, info, prof)
-      { 'name' => name, 'prof' => prof, 'traits' => info['traits'], 'ranged' => false, 'rune' => 0 }
+      { 'id' => nil, 'name' => name, 'prof' => prof, 'group' => info['group'], 'base' => name,
+        'traits' => info['traits'], 'ranged' => false, 'unarmed' => true, 'bomb' => false,
+        'die' => info['damage'], 'damage_type' => info['damage_type'] || 'B',
+        'striking' => 0, 'rune' => 0 }
     end
 
     def self.get_wpattack_bonus(char, weapon, options = [])
@@ -380,38 +389,24 @@ module AresMUSH
 
     end
 
-    def self.get_damage(char, attack, weapon=nil, twohand=false)
-      if weapon
-        # twohanddmg represents a one-handed weapon that does more damage when wielded two-handed
-        # This is called as a switch in roll, so defaults to false.
-        twohanddmg = weapon.wp_damage_2h
-        # If the weapon does not change damage for 2h wield, twohand argument is ignored
-        twohand = false unless twohanddmg
-        base_damage = twohand ? twohanddmg : weapon.wp_damage
-        damage_type = weapon.wp_damage_type
-      else
-        combat = char.combat
-        attack = combat.unarmed_attacks[attack.capitalize]
-        base_damage = attack ? attack['damage'] : 0
-        damage_type = "B"
-      end
+    # `twohand` is for a one-handed weapon that does more damage wielded in two; it is ignored for a
+    # weapon whose damage does not change.
+    def self.damage_descriptor(char, attack, weapon = nil, twohand = false)
+      return attack_descriptor(char, weapon, twohand) if weapon
 
-      # Alchemical Bombs are their own animal, will do all the deets later.
+      info = (char.combat&.unarmed_attacks || {})[attack.to_s.capitalize] || {}
 
-      base_info = char.pf2_base_info
-      use_dex_for_dmg = base_info['specialize'] == 'Thief'
+      name = attack.to_s.capitalize
 
-      abil_mod = use_dex_for_dmg ? abilmod_with_finesse(char) :
-        Pf2eAbilities.abilmod(Pf2eAbilities.get_score(char, "Strength"))
+      unarmed_descriptor(name, info, get_unarmed_prof(char, name, info))
+    end
 
-      striking_rune = weapon ? weapon.runes['fundamental']['power'] : false
-      striking_rune = 0 if !striking_rune
+    def self.get_damage(char, attack, weapon=nil, twohand=false, options=[])
+      Pf2e::Damage.formula(char, damage_descriptor(char, attack, weapon, twohand), options)
+    end
 
-      number_of_dice = 1 + striking_rune
-
-      dmg_mod = abil_mod + striking_rune
-
-      "#{number_of_dice}#{base_damage}+#{dmg_mod}"
+    def self.damage_breakdown(char, attack, weapon=nil, twohand=false, options=[])
+      Pf2e::Damage.of(char, damage_descriptor(char, attack, weapon, twohand), options)
     end
 
     def self.factory_default(char)

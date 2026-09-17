@@ -109,17 +109,21 @@ module AresMUSH
 
       BY_KIND = KINDS.each_with_object({}) { |row, out| out[row['name']] = row }.freeze
 
-      # `options` are the circumstances a `when:` is tested against beyond what is true of the
+      # `options` are the circumstances a predicate is tested against beyond what is true of the
       # character anyway - what the player said they are doing. A roll supplies them; a sheet does not,
       # which is why a sheet reports a conditional bonus rather than counting it.
-      def self.of(char, kind, name = nil, options = [])
+      #
+      # `extra` are domains this reading of the figure also answers to. Initiative is a Perception check
+      # that also answers to `initiative`, which is how Foundry composes it: the base statistic's
+      # domains plus its own.
+      def self.of(char, kind, name = nil, options = [], extra = [])
         row = BY_KIND[kind.to_s]
 
         raise ArgumentError, "no such kind of statistic: #{kind.inspect}" unless row
 
         ability = row['ability'].call(char, name)
         named = row['domain_name'] ? row['domain_name'].call(name) : name
-        domains = Domains.for(kind, named, ability)
+        domains = Domains.for(kind, named, ability) + Array(extra)
 
         effects = Effects.modifiers(Effects.sources(char), domains, Effects.context(char),
                                     Effects.options(char) + Array(options))
@@ -132,8 +136,8 @@ module AresMUSH
                  .merge('conditional' => unmet)
       end
 
-      def self.total(char, kind, name = nil, options = [])
-        of(char, kind, name, options)['total']
+      def self.total(char, kind, name = nil, options = [], extra = [])
+        of(char, kind, name, options, extra)['total']
       end
 
       # What a player means by a figure's name. Tried in order, so `fort` reaches the save rather than

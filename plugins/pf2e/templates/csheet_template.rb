@@ -225,7 +225,7 @@ module AresMUSH
         damage = Pf2eCombat.get_damage(char, w.name, w)
         traits = w.traits.map { |t| titleize_trait(t) }.join(", ")
 
-        "%b%b#{left(i, 3)}%b#{left(name, 40)}%b#{left("#{bonus} (#{prof})",10)}%b#{left(damage, 15)}\n%b%b#{item_color}Traits:%xn #{traits}"
+        "%b%b#{left(i, 3)}%b#{left(name, 40)}%b#{left("#{bonus} (#{prof})",10)}%b#{left(damage, 22)}\n%b%b#{item_color}Traits:%xn #{traits}"
       end
 
       def format_save(char,name)
