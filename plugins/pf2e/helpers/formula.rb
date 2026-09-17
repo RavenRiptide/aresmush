@@ -9,14 +9,16 @@ module AresMUSH
     # hand-translating the two thousand formulas their data ships, and a wrong sign or a dropped floor
     # is a number that looks right and is not.
     #
-    # Dentaku does the tokenising, the precedence and the tree. It is already a dependency - the `math`
-    # command uses it - so what is left to us is only what Dentaku cannot know about:
+    # Dentaku does the tokenising, the precedence and the tree, and it is taught Foundry's syntax
+    # rather than fed a rewritten copy of it. `install!` registers two scanners and asks for
+    # case-sensitive identifiers, so `@actor.flags.sneakAttackDamage` and
+    # `@actor.system.proficiencies.attacks.advanced-firearms-crossbows.rank` arrive at the parser as
+    # single identifiers spelled exactly as the data spells them. A formula string is never edited on
+    # its way in, and an identifier is the verbatim source text - which is also what tells a reference
+    # from a bare word, since Foundry marks every reference with `@` or braces.
     #
-    #   * `@actor.level` and `{item|flags…}` are Foundry's reference syntax rather than arithmetic.
-    #     They are rewritten to plain identifiers before Dentaku sees them, and resolved against a
-    #     flattened context.
-    #   * `ternary`, `gte`, `floor` and the rest are Foundry's names for things Dentaku spells
-    #     differently or not at all, so they are registered as functions.
+    # `ternary`, `gte` and the rest are Foundry's names for things Dentaku spells differently or not at
+    # all, so they are registered as functions. `max` and `min` it already has.
     #
     # Nothing here evaluates Ruby: Dentaku parses arithmetic over a fixed function set, so an
     # expression cannot reach the host, and a function we have not registered is refused rather than
@@ -29,13 +31,11 @@ module AresMUSH
 
       class Invalid < StandardError; end
 
-      # A hyphen is subtraction to any arithmetic parser, and Foundry has path segments holding one -
-      # `…attacks.advanced-firearms-crossbows.rank`. Both the formula and the context keys are
-      # rewritten so a hyphen inside a path never reaches the parser.
-      HYPHEN = '__h__'.freeze
-
-      REFERENCE = /@(?:[A-Za-z0-9_\-]+|\{[^}]*\})(?:\.(?:[A-Za-z0-9_\-]+|\{[^}]*\}))*/
-      INTERPOLATION = /\{[^}]*\}/
+      # `{item|flags.pf2e.rulesSelections.skill}` - a value fetched from somewhere other than the
+      # actor. The pipe is what keeps this clear of Dentaku's own `{1,2}` array literal.
+      INTERPOLATION = /\{[^{}|]*\|[^{}]*\}/
+      SEGMENT = /[\w-]+|#{INTERPOLATION}/
+      REFERENCE = /@(?:#{SEGMENT})(?:\.(?:#{SEGMENT}))*/
 
       # Foundry's function names, onto Ruby. Comparisons answer 1 and 0 because `ternary` takes its
       # test as a number. `clamped` is a misspelling of clamp appearing once in the shipped data;
@@ -70,90 +70,74 @@ module AresMUSH
 
       # Whether Dentaku can read it at all, without needing a context to resolve against.
       def self.parses?(formula)
-        text, _missing, named = prepare(formula.to_s, {})
-        ast = calculator.ast(text)
-        strays = ast.dependencies.map { |name| name.to_s.downcase } - named
-
-        strays.empty?
+        names(formula.to_s).all? { |name| reference?(name) }
       rescue StandardError
         false
       end
 
       def self.evaluate(formula, context)
+        text = formula.to_s
         flat = flatten(context)
-        text, missing, named = prepare(formula.to_s, flat)
-        bound = flat.each_with_object({}) { |(key, held), out| out[safe(key)] = held if held.is_a?(Numeric) }
+        missing = []
 
-        [ compute(text, bound, missing, named), missing.uniq ]
+        bound = names(text).each_with_object({}) do |name, out|
+          out[name] = reference?(name) ? held(name, flat, missing) : nil
+        end
+
+        [ compute(text, bound.compact, missing.uniq), missing.uniq ]
       end
 
       # ------------------------------------------------------------------------------
 
-      # `named` is the set of identifiers this formula reached by way of a reference. Every other
-      # identifier is a formula that does not say what it means: Foundry marks a reference with `@` or
-      # an interpolation, always, so a bare word is malformed rather than merely unresolved. That
-      # distinction is what keeps a nonsense formula loud - Dentaku reads `` `ls` `` as an identifier,
-      # and binding it to zero would have swallowed it.
-      def self.compute(text, bound, missing, named)
-        normalise(calculator.evaluate!(text, bound))
-      rescue ZeroDivisionError
-        # Only a reference that resolved to nothing divides by zero here - no shipped formula divides
-        # by a literal. `unresolved` already names it, and raising would take a whole sheet render down
-        # over one bad path.
-        0
-      rescue Dentaku::UnboundVariableError => problem
-        # An unknown identifier is a path the context did not hold. Bind it to zero and carry on, so
-        # one bad path costs one term rather than the whole formula.
-        names = Array(problem.unbound_variables).map { |name| name.to_s.downcase }
-        stray = names.reject { |name| named.include?(name) }
+      # Teaches Dentaku Foundry's two reference syntaxes. The scanners have to sit ahead of the array
+      # scanner, which would otherwise take an interpolation's opening brace, so the whole ordered list
+      # is re-registered rather than appended to.
+      #
+      # `register_scanners` sends each id to the class, which is why these are singleton methods. It is
+      # global to Dentaku, so the `math` command reads the same grammar - it gains `@path` identifiers
+      # it had no use for and loses the `{1,2}` array literal, neither of which a player types.
+      def self.install!
+        scanner = Dentaku::TokenScanner
 
-        raise Invalid, "#{text.inspect} names #{stray.join(', ')}, which is not a reference" if stray.any?
+        scanner.define_singleton_method(:pf2e_reference) { new(:identifier, REFERENCE) }
+        scanner.define_singleton_method(:pf2e_interpolation) { new(:identifier, INTERPOLATION) }
 
-        names.each { |name| missing << name.gsub(HYPHEN, '-') }
+        ids = scanner.available_scanners
+        scanner.register_scanners(ids.insert(ids.index(:numeric), :pf2e_reference, :pf2e_interpolation))
+      end
 
-        compute(text, bound.merge(names.each_with_object({}) { |name, out| out[name] = 0 }), missing, named)
-      rescue Invalid
-        raise
-      rescue StandardError => problem
+      # Every identifier the formula names, spelled as the formula spells it. Anything Dentaku cannot
+      # tokenise or parse is refused here, so a caller sees one error class whether the formula was
+      # unreadable or merely wrong.
+      def self.names(text)
+        calculator.ast(text).dependencies
+      rescue Dentaku::Error, Dentaku::ArgumentError => problem
         raise Invalid, "#{problem.class}: #{problem.message} in #{text.inspect}"
       end
 
-      # Whole answers stay whole, so `18 + @actor.level` reads as an integer on a sheet and Dentaku's
-      # BigDecimal does not leak out.
-      def self.normalise(result)
-        raise Invalid, "not a number: #{result.inspect}" unless result.is_a?(Numeric)
-
-        whole = result.to_i
-
-        whole == result ? whole : result.to_f
+      # Foundry marks a reference with `@` or with braces, always, so a bare word is a formula that
+      # does not say what it means - malformed rather than merely unresolved. Keeping that distinction
+      # is what makes a nonsense formula loud: Dentaku reads `` `ls` `` as an identifier, and binding it
+      # to zero would have swallowed it.
+      def self.reference?(name)
+        name.start_with?('@', '{')
       end
 
-      # Rewrites Foundry's reference syntax into identifiers Dentaku can read, resolving any
-      # interpolation on the way: `@actor.skills.{item|…}.rank` resolves in two stages, the inner value
-      # becoming a segment of the outer path.
-      def self.prepare(formula, flat)
-        missing = []
-        named = []
+      # What the context holds for one reference. An interpolation inside a path resolves first and
+      # becomes a segment of it: `@actor.skills.{item|…}.rank` is two lookups, not one.
+      def self.held(name, flat, missing)
+        key = if name.start_with?('{')
+                source, _, inner = name[1..-2].partition('|')
+                "#{source}.#{inner}"
+              else
+                name[1..].gsub(INTERPOLATION) { |brace| interpolate(brace, flat, missing) }
+              end
 
-        # References first, because an interpolation inside one is a path segment rather than a value
-        # of its own. Whatever braces are left stand alone, and in a value field those name a path the
-        # same way a reference does.
-        text = formula.gsub(REFERENCE) do |reference|
-          identifier = safe(reference[1..].gsub(INTERPOLATION) { |brace| interpolate(brace, flat, missing) })
-          named << identifier
+        return flat[key] if flat[key].is_a?(Numeric)
 
-          identifier
-        end
+        missing << key
 
-        text = text.gsub(INTERPOLATION) do |brace|
-          source, _, inner = brace[1..-2].partition('|')
-          identifier = safe("#{source}.#{inner}")
-          named << identifier
-
-          identifier
-        end
-
-        [ text, missing, named ]
+        0
       end
 
       def self.interpolate(brace, flat, missing)
@@ -168,10 +152,28 @@ module AresMUSH
         ''
       end
 
-      # Dentaku folds identifier case, so a path is folded once here and every comparison and binding
-      # against it is folded the same way. `sneakAttackDamage` and `sneakattackdamage` are one path.
-      def self.safe(path)
-        path.gsub('-', HYPHEN).downcase
+      def self.compute(text, bound, missing)
+        normalise(calculator.evaluate!(text, bound))
+      rescue ZeroDivisionError
+        # Only a reference that resolved to nothing divides by zero here - no shipped formula divides
+        # by a literal. `unresolved` already names it, and raising would take a whole sheet render down
+        # over one bad path.
+        0
+      rescue Dentaku::UnboundVariableError => problem
+        raise Invalid, "#{text.inspect} names #{Array(problem.unbound_variables).join(', ')}, " \
+                       "which is not a reference"
+      rescue StandardError => problem
+        raise Invalid, "#{problem.class}: #{problem.message} in #{text.inspect}"
+      end
+
+      # Whole answers stay whole, so `18 + @actor.level` reads as an integer on a sheet and Dentaku's
+      # BigDecimal does not leak out.
+      def self.normalise(result)
+        raise Invalid, "not a number: #{result.inspect}" unless result.is_a?(Numeric)
+
+        whole = result.to_i
+
+        whole == result ? whole : result.to_f
       end
 
       # A nested context to the dotted keys a formula names: { 'actor' => { 'level' => 5 } } becomes
@@ -191,8 +193,12 @@ module AresMUSH
       end
 
       def self.calculator
-        @calculator ||= Dentaku::Calculator.new.tap do |calc|
-          FUNCTIONS.each_pair { |name, (type, body)| calc.add_function(name, type, body) }
+        @calculator ||= begin
+          install!
+
+          Dentaku::Calculator.new(:case_sensitive => true).tap do |calc|
+            FUNCTIONS.each_pair { |name, (type, body)| calc.add_function(name, type, body) }
+          end
         end
       end
     end

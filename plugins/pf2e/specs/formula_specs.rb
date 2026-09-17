@@ -13,6 +13,11 @@ module AresMUSH
     # The grammar is closed. Four operators, twelve functions, dotted references and interpolations.
     # No property access on arbitrary objects and no function this does not name, so there is nothing
     # to sandbox.
+    #
+    # Dentaku is taught that grammar rather than handed a rewritten copy of it, so a formula reaches
+    # the parser as the data wrote it and an identifier is the verbatim path. The specs below hold that
+    # to the constructs which would break a parser that only reads arithmetic: mixed case, hyphens in a
+    # path segment, and a brace where a path segment belongs.
     describe Formula do
 
       def ctx(paths = {})
@@ -92,6 +97,67 @@ module AresMUSH
 
         it "should say which paths it could not resolve" do
           expect(Formula.unresolved('@actor.nonsense + @actor.level', ctx)).to eq [ 'actor.nonsense' ]
+        end
+      end
+
+      describe "reading the data's own spelling" do
+        it "should keep a reference's case, so two paths differing by case are two paths" do
+          context = { 'actor' => { 'flags' => { 'sneakAttackDamage' => 7, 'sneakattackdamage' => 2 } } }
+
+          expect(Formula.value('@actor.flags.sneakAttackDamage', context)).to eq 7
+          expect(Formula.value('@actor.flags.sneakattackdamage', context)).to eq 2
+        end
+
+        # A hyphen is subtraction to any arithmetic parser, and Foundry has path segments holding one.
+        it "should read a hyphenated segment as one path rather than a subtraction" do
+          context = { 'actor' => { 'proficiencies' => { 'advanced-firearms-crossbows' => 4 } } }
+
+          expect(Formula.value('@actor.proficiencies.advanced-firearms-crossbows', context)).to eq 4
+        end
+
+        it "should not edit the formula it was given" do
+          formula = '@actor.flags.sneakAttackDamage'.freeze
+
+          expect { Formula.value(formula, {}) }.to_not raise_error
+        end
+
+        # `{source|path}` where a value belongs: the value at that path, from somewhere other than the
+        # actor.
+        it "should read an interpolation standing on its own as a value" do
+          context = { 'item' => { 'flags' => { 'pf2e' => { 'rulesSelections' =>
+                      { 'pistolerosChallengeSkill' => 5 } } } } }
+
+          expect(Formula.value('max({item|flags.pf2e.rulesSelections.pistolerosChallengeSkill},2)',
+                               context)).to eq 5
+        end
+
+        # The same braces where a path segment belongs: the inner value names the segment, so it
+        # resolves in two stages.
+        it "should resolve an interpolation inside a path into a segment of that path" do
+          context = { 'item' => { 'flags' => { 'pf2e' => { 'rulesSelections' => { 'skill' => 'stealth' } } } },
+                      'actor' => { 'skills' => { 'stealth' => { 'rank' => 3 } } } }
+
+          expect(Formula.value('@actor.skills.{item|flags.pf2e.rulesSelections.skill}.rank', context))
+            .to eq 3
+        end
+
+        it "should name the interpolation it could not resolve" do
+          context = { 'actor' => { 'skills' => { 'stealth' => { 'rank' => 3 } } } }
+
+          expect(Formula.unresolved('@actor.skills.{item|flags.pf2e.rulesSelections.skill}.rank', context))
+            .to include 'item.flags.pf2e.rulesSelections.skill'
+        end
+      end
+
+      # Teaching Dentaku Foundry's syntax is global to the gem, and the `math` command shares it.
+      describe "the math command's grammar" do
+        it "should still read the arithmetic a player types" do
+          Formula.value('1', {})
+
+          expect(Dentaku('(2 + 3) * 4')).to eq 20
+          expect(Dentaku('2 ^ 8')).to eq 256
+          expect(Dentaku('max(3, 7)')).to eq 7
+          expect(Dentaku('10 - 6 / 2')).to eq 7
         end
       end
 
