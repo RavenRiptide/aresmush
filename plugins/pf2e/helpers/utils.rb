@@ -155,12 +155,12 @@ module AresMUSH
       {
         'name' => 'save',
         'match' => lambda { |word| SAVES.include?(word) },
-        'value' => lambda { |char, word, options| Pf2eCombat.get_save_bonus(char, word, options) }
+        'value' => lambda { |char, word, options| Check.of(char, 'save', word, options).total }
       },
       {
         'name' => 'perception',
         'match' => lambda { |word| word == 'perception' },
-        'value' => lambda { |char, _word, options| Pf2eCombat.get_perception(char, options) }
+        'value' => lambda { |char, _word, options| Check.of(char, 'perception', nil, options).total }
       },
       {
         'name' => 'attack',
@@ -226,11 +226,14 @@ module AresMUSH
       Pf2e.roll_dice(amount.to_i, sides.to_i)
     end
 
+    # A skill term in a roll string is a check rather than a figure, so it carries the circumstances a
+    # check establishes: that it is a skill check, and which skill. Deafened's own rule is predicated on
+    # exactly those.
     def self.skill_keyword_bonus(char, word, options = [])
       name = word.capitalize
       return 0 unless Global.read_config('pf2e_skills').keys.include?(name)
 
-      Pf2eSkills.get_skill_bonus(char, name, options)
+      Check.of(char, Pf2eSkills.lore?(name) ? 'lore' : 'skill', name, options).total
     end
 
     def self.roll_dice(amount=1, sides=20)
@@ -298,40 +301,26 @@ module AresMUSH
       return return_hash
     end
 
-    def self.get_degree(list,result,total,dc)
-      degrees = [ "(%xrCRITICAL FAILURE%xn)",
-        "(%xh%xyFAILURE%xn)",
-        "(%xgSUCCESS!%xn)",
-        "(%xh%xmCRITICAL SUCCESS!%xn)"
-      ]
-      if total - dc >= 10
-        scase = 3
-      elsif total >= dc
-        scase = 2
-      elsif total - dc <= -10
-        scase = 0
-      else
-        scase = 1
-      end
+    # How the roll is shown. The outcome itself is `Pf2e::Degree`'s, so anything that has to change an
+    # outcome works on a number rather than on a coloured string.
+    DEGREE_LABELS = [ "(%xrCRITICAL FAILURE%xn)",
+                      "(%xh%xyFAILURE%xn)",
+                      "(%xgSUCCESS!%xn)",
+                      "(%xh%xmCRITICAL SUCCESS!%xn)" ].freeze
 
-      #### Success modifiers happen only if the first item in the list is a 1d20.
+    def self.get_degree(list, result, total, dc, adjustments = [])
+      die = natural_die(list, result)
+      degree = Degree.adjusted(Degree.of(total, dc, die), adjustments)
 
-      succ_mod = 0
-      whirldice = ""
+      DEGREE_LABELS[degree] + (die == 1 ? t('pf2e.whirldice') : "")
+    end
 
-      if list[0] == '1d20'
+    # The face the d20 came up, when the roll opened with one. A natural twenty or one shifts the
+    # outcome, and only the first term being a d20 makes the roll a check at all.
+    def self.natural_die(list, result)
+      return nil unless list.to_a.first == '1d20'
 
-        int_result = result[0].delete_prefix("(%xc").delete_suffix("%xn)").to_i
-        if int_result == 20
-          succ_mod = 1
-        elsif int_result == 1
-          succ_mod = -1
-          whirldice = t('pf2e.whirldice')
-        end
-      end
-
-      success_case = (scase + succ_mod).clamp(0,3)
-      degrees[success_case] + whirldice
+      result.to_a.first.to_s.delete_prefix("(%xc").delete_suffix("%xn)").to_i
     end
 
     def self.pretty_string(string)
