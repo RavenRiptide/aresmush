@@ -2,15 +2,19 @@ pf2e_conditions:
   Blinded:
     short_descr: You're unable to see.
     value: false
-    affected_stat:
-      Perception: -4
     override: "Dazzled"
+    modifies:
+      - domain: perception
+        type: status
+        value: "-4"
   Clumsy:
     short_descr: Your movements become clumsy and inexact.
     value: true
-    affected_stat:
-      - "Dexterity"
     override: false
+    modifies:
+      - domain: dex-based
+        type: status
+        value: "-@source.value"
   Confused:
     short_descr: You lose your wits and attack wildly.
     value: false
@@ -26,9 +30,11 @@ pf2e_conditions:
   Deafened:
     short_descr: You cannot hear.
     value: false
-    affected_stat:
-      Perception: -2
     override: false
+    modifies:
+      - domain: perception
+        type: status
+        value: "-2"
   Doomed:
     short_descr: A powerful force is pulling you towards death.
     value: true
@@ -38,9 +44,14 @@ pf2e_conditions:
     short_descr: You have lost some of your blood or life force.
     value: true
     override: false
-    affected_stat:
-      - "Constitution"
     daily: -1
+    modifies:
+      - domain: con-based
+        type: status
+        value: "-@source.value"
+      - domain: hp
+        type: status
+        value: "-@source.value * @actor.level"
   Dying:
     short_descr: You are close to death.
     value: true
@@ -48,31 +59,40 @@ pf2e_conditions:
   Encumbered:
     short_descr: You are carrying too much.
     value: false
-    affected_stat:
-      Speed: -10
     override: false
+    modifies:
+      - domain: speed
+        type: status
+        value: "-10"
   Enfeebled:
     short_descr: You are physically weakened.
     value: true
-    affected_stat:
-      - "Strength"
     override: false
+    modifies:
+      - domain: str-based
+        type: status
+        value: "-@source.value"
   Fascinated:
     short_descr: You are compelled to focus your attention on something.
     value: false
     override: false
-    affected_stat:
-      Perception: -2
+    modifies:
+      - domain:
+          - perception
+          - skill-check
+        type: status
+        value: "-2"
   Fatigued:
     short_descr: You are tired and cannot summon much energy.
     value: false
-    affected_stat:
-      Base AC: -1
-      Fortitude: -1
-      Reflex: -1
-      Will: -1
     override: false
     daily: false
+    modifies:
+      - domain:
+          - ac
+          - saving-throw
+        type: status
+        value: "-1"
   Fleeing:
     short_descr: You can take no action other than running away.
     value: false
@@ -81,6 +101,10 @@ pf2e_conditions:
     short_descr: You are gripped by fear.
     value: true
     override: false
+    modifies:
+      - domain: all
+        type: status
+        value: "-@source.value"
   Grabbed:
     short_descr: You are being held by another creature.
     value: false
@@ -97,8 +121,10 @@ pf2e_conditions:
     short_descr: You are caught off-guard or otherwise unable to fully defend yourself.
     value: false
     override: false
-    affected_stat:
-      Base AC: -2
+    modifies:
+      - domain: ac
+        type: circumstance
+        value: "-2"
   Paralyzed:
     short_descr: You are frozen in place.
   Persistent:
@@ -113,6 +139,10 @@ pf2e_conditions:
     short_descr: You are lying on the ground.
     value: false
     override: false
+    modifies:
+      - domain: attack-roll
+        type: circumstance
+        value: "-2"
   Quickened:
     short_descr: You move faster than normal.
     value: false
@@ -125,6 +155,10 @@ pf2e_conditions:
     short_descr: You feel ill.
     value: true
     override: false
+    modifies:
+      - domain: all
+        type: status
+        value: "-@source.value"
   Slowed:
     short_descr: You move more slowly than normal.
     value: true
@@ -135,16 +169,26 @@ pf2e_conditions:
     override: "Slowed"
   Stupefied:
     short_descr: Your thoughts are cloudy and indistinct.
-    affected_stat:
-      - "Intelligence"
-      - "Wisdom"
-      - "Charisma"
     value: true
     override: false
+    modifies:
+      - domain:
+          - int-based
+          - wis-based
+          - cha-based
+        type: status
+        value: "-@source.value"
   Unconscious:
     short_descr: You are sleeping or knocked out.
     value: false
     override: false
+    modifies:
+      - domain:
+          - ac
+          - perception
+          - will
+        type: status
+        value: "-4"
   Wounded:
     short_descr: You have been seriously injured.
     value: true
