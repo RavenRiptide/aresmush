@@ -243,6 +243,43 @@ module AresMUSH
         it "should accept the data's one misspelling of clamp" do
           expect(Formula.value('clamped(9,1,4)', ctx)).to eq 4
         end
+
+        it "should say whether a value falls between two others" do
+          expect(Formula.value('btwn(@actor.level,4,6)', ctx)).to eq 1
+          expect(Formula.value('btwn(@actor.level,6,8)', ctx)).to eq 0
+        end
+
+        # `when` answers nothing when its test fails and `match` takes the first answer that is not
+        # nothing, which together are how the data writes a value that steps up with level.
+        describe "a value that steps with level" do
+          def steps
+            'match(when(lte(@actor.level,10),2), when(btwn(@actor.level,11,14),6), ' \
+              'when(gte(@actor.level,15),8))'
+          end
+
+          it "should take the step the level falls in" do
+            expect(Formula.value(steps, 'actor' => { 'level' => 3 })).to eq 2
+            expect(Formula.value(steps, 'actor' => { 'level' => 12 })).to eq 6
+            expect(Formula.value(steps, 'actor' => { 'level' => 20 })).to eq 8
+          end
+
+          it "should take the first step that matches, not the last" do
+            overlapping = 'match(when(gte(@actor.level,1),1), when(gte(@actor.level,2),2))'
+
+            expect(Formula.value(overlapping, 'actor' => { 'level' => 9 })).to eq 1
+          end
+
+          # Their `match` answers zero when nothing matched, rather than failing.
+          it "should answer nothing as zero when no step matches" do
+            expect(Formula.value('match(when(gte(@actor.level,99),5))', ctx)).to eq 0
+          end
+
+          # `when` is one of Dentaku's own `case ... when ... end` keywords, so the word would never
+          # reach the function scanner without being claimed as a function first.
+          it "should read when as a function rather than as a case keyword" do
+            expect(Formula.parses?('when(gte(@actor.level,1),4)')).to be true
+          end
+        end
       end
 
       describe "refusals" do
@@ -280,7 +317,7 @@ module AresMUSH
         end
 
         it "should have a corpus to check against" do
-          expect(corpus.size).to be > 600
+          expect(corpus.size).to be > 750
         end
 
         it "should parse every one of them" do

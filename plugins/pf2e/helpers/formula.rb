@@ -42,9 +42,17 @@ module AresMUSH
       SEGMENT = /[\w-]+|#{INTERPOLATION}/
       REFERENCE = /@(?:#{SEGMENT})(?:\.(?:#{SEGMENT}))*/
 
-      # Foundry's function names, onto Ruby. Comparisons answer 1 and 0 because `ternary` takes its
-      # test as a number. `clamped` is a misspelling of clamp appearing once in the shipped data;
-      # accepting it costs nothing, and refusing it would fail an import over someone else's slip.
+      # `when` answers nothing when its test fails, and `match` takes the first answer that is not
+      # nothing (`scripts/hooks/load.ts:149`). Nothing has to be a number here, since Dentaku's
+      # arithmetic is numeric, and a NaN is the one number that cannot be mistaken for an answer: it
+      # propagates through any arithmetic it touches rather than quietly reading as zero. Every use in
+      # their shipped data has `when` directly inside `match`, so a NaN never escapes one.
+      NOTHING = Float::NAN
+
+      # Foundry's functions, from where they are registered (`scripts/hooks/load.ts:140`). Comparisons
+      # answer 1 and 0, which is what their JavaScript booleans are worth in arithmetic. `clamped` is a
+      # misspelling of clamp appearing once in the shipped data; accepting it costs nothing, and
+      # refusing it would fail an import over someone else's slip.
       FUNCTIONS = {
         :floor => [ :numeric, ->(value) { value.floor } ],
         :ceil => [ :numeric, ->(value) { value.ceil } ],
@@ -59,7 +67,11 @@ module AresMUSH
         :ne => [ :numeric, ->(left, right) { left == right ? 0 : 1 } ],
         :ternary => [ :numeric, ->(test, yes, no) { test.zero? ? no : yes } ],
         :clamp => [ :numeric, ->(value, low, high) { value.clamp(low, high) } ],
-        :clamped => [ :numeric, ->(value, low, high) { value.clamp(low, high) } ]
+        :clamped => [ :numeric, ->(value, low, high) { value.clamp(low, high) } ],
+        :btwn => [ :numeric, ->(value, low, high) { value >= low && value <= high ? 1 : 0 } ],
+        :when => [ :numeric, ->(test, then_value) { test.zero? ? NOTHING : then_value } ],
+        # Variadic, so Dentaku is handed one argument: it passes an array for a splat-shaped lambda.
+        :match => [ :numeric, ->(*answers) { answers.flatten.find { |one| !one.to_f.nan? } || 0 } ]
       }.freeze
 
       def self.value(formula, context = {})
@@ -94,6 +106,11 @@ module AresMUSH
 
       # ------------------------------------------------------------------------------
 
+      # Dentaku reads `when` as part of its own `case … when … end` syntax, so the word never reaches
+      # the function scanner. Foundry's `when` is a function, and this claims it as one - emitting the
+      # same pair of tokens Dentaku's own function scanner does.
+      KEYWORD_FUNCTIONS = /(?:when)\s*\(/
+
       GRAMMAR = :pf2e_formula_grammar
 
       # Both scanners decline unless this reader asked for them, which is what keeps Foundry's grammar
@@ -111,9 +128,18 @@ module AresMUSH
 
         scanner.define_singleton_method(:pf2e_reference) { new(:identifier, REFERENCE, nil, ACTIVE) }
         scanner.define_singleton_method(:pf2e_interpolation) { new(:identifier, INTERPOLATION, nil, ACTIVE) }
+        scanner.define_singleton_method(:pf2e_keyword_function) do
+          new(:function, KEYWORD_FUNCTIONS, lambda { |raw|
+            name = raw.gsub('(', '').strip.downcase
+
+            [ Dentaku::Token.new(:function, name.to_sym, name),
+              Dentaku::Token.new(:grouping, :open, '(') ]
+          }, ACTIVE)
+        end
 
         ids = scanner.available_scanners
-        scanner.register_scanners(ids.insert(ids.index(:numeric), :pf2e_reference, :pf2e_interpolation))
+        ours = [ :pf2e_reference, :pf2e_interpolation, :pf2e_keyword_function ]
+        scanner.register_scanners(ids.insert(ids.index(:numeric), *ours))
       end
 
       # Foundry's grammar, for the duration of the block. Nested because `evaluate` reads the names and
