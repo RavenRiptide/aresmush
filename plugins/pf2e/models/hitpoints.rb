@@ -103,22 +103,28 @@ module AresMUSH
       char.hp
     end
 
-    # A character who has not committed base info has no HP row yet, and approving one used to
-    # raise `undefined method 'ancestry_hp' for nil`. No row means no hit points.
-    def self.get_max_hp(char)
+    # Hit points before anything modifies them. Constitution belongs here rather than in a modifier
+    # because it is counted per level; Drained's own row multiplies by level to match.
+    #
+    # A character who has not committed base info has no HP row yet, and approving one used to raise
+    # `undefined method 'ancestry_hp' for nil`. No row means no hit points.
+    def self.base_max_hp(char)
       hp = get_hp_obj(char)
 
       return 0 unless hp
 
       con_mod = Pf2eAbilities.abilmod(Pf2eAbilities.get_score(char, "Constitution"))
-      ancestry_hp = hp.ancestry_hp
-      charclass_hp = hp.charclass_hp
-      level = char.pf2_level
-      # drain_value = Pf2e.get_condition_value(char, 'Drained')
-      # For right now, until I do conditions, it's just 0
-      drain_value = 0
 
-      (charclass_hp + con_mod - drain_value) * level + ancestry_hp
+      (hp.charclass_hp + con_mod) * char.pf2_level + hp.ancestry_hp
+    end
+
+    def self.get_max_hp(char)
+      Pf2e::Stat.total(char, 'hp')
+    end
+
+    # The arithmetic as well as the answer, for a sheet that shows a player why Drained cost them 40.
+    def self.max_hp_breakdown(char)
+      Pf2e::Stat.of(char, 'hp')
     end
 
     def self.get_current_hp(char)

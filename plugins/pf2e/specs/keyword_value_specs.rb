@@ -43,9 +43,18 @@ module AresMUSH
       end
 
       it "should resolve a save" do
-        allow(Pf2eCombat).to receive(:get_save_bonus).with(anything, 'will').and_return(11)
+        allow(Pf2eCombat).to receive(:get_save_bonus).with(anything, 'will', anything).and_return(11)
 
         expect(Pf2e.get_keyword_value(char, 'Will')).to eq 11
+      end
+
+      # A term saying what the roller is doing reaches the figure, so a bonus that applies only then
+      # can be counted.
+      it "should hand the circumstances to the figure it asks" do
+        expect(Pf2eCombat).to receive(:get_save_bonus).with(anything, 'will', [ 'action:brace' ])
+                                                      .and_return(11)
+
+        expect(Pf2e.get_keyword_value(char, 'Will', [ 'action:brace' ])).to eq 11
       end
 
       it "should resolve perception" do

@@ -117,29 +117,14 @@ module AresMUSH
       combat.update(archetype_class_dcs: existing)
     end
 
-    def self.get_save_bonus(char, save)
-      prof_bonus = Pf2e.get_prof_bonus(char, Pf2eCombat.get_save_from_char(char, save))
-
-      mod = Pf2e.get_linked_attr_mod(char, save)
-      mod = 0 if !mod
-
-      item = Pf2egear.get_rune_value(Pf2eCombat.get_equipped_armor(char), 'fundamental', 'power')
-      item_bonus = item ? item : 0
-
-      prof_bonus + mod + item_bonus
+    def self.get_save_bonus(char, save, options = [])
+      Pf2e::Stat.total(char, 'save', save, options)
     end
 
     def self.get_class_dc(char)
-      combat_stats = char.combat
+      return 0 if !char.combat
 
-      return 0 if !combat_stats
-
-      prof_bonus = Pf2e.get_prof_bonus(char, combat_stats.class_dc)
-
-      key_ability = combat_stats.key_abil ? combat_stats.key_abil : "Strength"
-      abil_mod = Pf2eAbilities.abilmod(Pf2eAbilities.get_score(char, key_ability))
-
-      10 + prof_bonus + abil_mod
+      Pf2e::Stat.total(char, 'class_dc')
     end
 
     def self.get_archetype_class_dcs(char)
@@ -179,20 +164,29 @@ module AresMUSH
       dc_hash
     end
 
-    def self.calculate_ac(char)
+    # Armour Class before anything modifies it: the flat 10, the armour worn, and proficiency with it.
+    def self.base_ac(char)
       armor = get_equipped_armor(char)
+      category = armor ? armor.category : "unarmored"
 
-      abonus = armor ? armor.ac_bonus : 0
-      a_cat = armor ? armor.category : "unarmored"
-      prof_with_armor = char.combat.armor_prof[a_cat]
-      pbonus = Pf2e.get_prof_bonus(char, prof_with_armor)
+      10 + (armor ? armor.ac_bonus : 0) + Pf2e.get_prof_bonus(char, char.combat.armor_prof[category])
+    end
 
-      ibonus = Pf2egear.get_rune_value(armor, 'fundamental', 'potency')
+    # The attribute and the rune, typed so they stack like anything else. The attribute is offered as
+    # an `ability` modifier rather than added to the base, so an effect that lets a character use some
+    # other attribute for AC needs only to offer that one and the better of the two applies.
+    def self.ac_modifiers(char)
+      armor = get_equipped_armor(char)
+      cap = armor ? armor.dex_cap : 99
 
-      dex_cap = armor ? armor.dex_cap : 99
-      dbonus = Pf2eAbilities.abilmod(Pf2eAbilities.get_score(char, 'Dexterity')).clamp(-99, dex_cap)
+      dex = Pf2e::Stat.ability_mod(char, 'Dexterity')
+      dex['value'] = dex['value'].clamp(-99, cap)
 
-      10 + abonus + pbonus + ibonus + dbonus
+      [ dex, Pf2e::Stat.rune(char, 'potency') ]
+    end
+
+    def self.calculate_ac(char)
+      Pf2e::Stat.total(char, 'ac')
     end
 
     def self.get_equipped_armor(char)
@@ -203,18 +197,8 @@ module AresMUSH
       char.shields&.select { |s| s.equipped }.first
     end
 
-    def self.get_perception(char)
-      abil_mod = Pf2e.get_linked_attr_mod(char, 'perception')
-      combat_stats = char.combat
-
-      return abil_mod if !combat_stats
-
-      prof_bonus = Pf2e.get_prof_bonus(char, combat_stats.perception)
-
-      item = Pf2egear.bonus_from_item(char, 'Perception')
-      item_bonus = item ? item : 0
-
-      abil_mod + prof_bonus + item_bonus
+    def self.get_perception(char, options = [])
+      Pf2e::Stat.total(char, 'perception', nil, options)
     end
 
     # Stat block for anything that can be attacked with, by name.
@@ -371,24 +355,25 @@ module AresMUSH
       dexterity > strength ? dexterity : strength
     end
 
-    def self.get_wpattack_bonus(char, weapon)
-      prof = get_weapon_prof(char, weapon.name)
-      prof_bonus = Pf2e.get_prof_bonus(char, prof)
+    # What the attack arithmetic needs to know, from a catalogue weapon or from an unarmed attack.
+    # Config writes `Finesse` and chargen writes `finesse`, which is why traits are compared with
+    # `has_trait?` rather than `include?`.
+    def self.attack_descriptor(char, weapon)
+      { 'name' => weapon.name, 'prof' => get_weapon_prof(char, weapon.name),
+        'traits' => weapon.traits, 'ranged' => weapon.wp_type == 'ranged',
+        'rune' => Pf2egear.get_rune_value(weapon, 'fundamental', 'potency') }
+    end
 
-      if (weapon.wp_type == 'ranged')
-        abil_bonus = Pf2eAbilities.abilmod(Pf2eAbilities.get_score(char, "Dexterity"))
-      else
-        traits = weapon.traits
-        # Config writes `Finesse` and chargen writes `finesse`, so the comparison cannot be
-        # `include?`: every catalogue weapon used Strength before this.
-        abil_bonus = Pf2e.has_trait?(traits, 'finesse') ?
-          Pf2eCombat.abilmod_with_finesse(char) :
-          Pf2eAbilities.abilmod(Pf2eAbilities.get_score(char, "Strength"))
-      end
+    def self.unarmed_descriptor(name, info, prof)
+      { 'name' => name, 'prof' => prof, 'traits' => info['traits'], 'ranged' => false, 'rune' => 0 }
+    end
 
-      potency_rune = Pf2egear.get_rune_value(weapon, 'fundamental', 'potency')
+    def self.get_wpattack_bonus(char, weapon, options = [])
+      Pf2e::Stat.total(char, 'attack', attack_descriptor(char, weapon), options)
+    end
 
-      prof_bonus + abil_bonus + potency_rune
+    def self.get_unarmed_bonus(char, name, info, prof)
+      Pf2e::Stat.total(char, 'attack', unarmed_descriptor(name, info, prof))
     end
 
     def self.get_natattack_bonus(char, attack)

@@ -29,11 +29,7 @@ module AresMUSH
       end
 
       def speed
-        base_speed = @char.pf2_movement['base_speed']
-
-        penalty = @armor ? @armor.speed_penalty : 0
-
-        base_speed + penalty
+        AresMUSH::Pf2e::Stat.total(@char, 'speed')
       end
 
       def movement
@@ -244,12 +240,7 @@ module AresMUSH
 
         traits = atk_info['traits']
 
-        abilmod = Pf2e.has_trait?(traits, 'finesse') ?
-          Pf2eCombat.abilmod_with_finesse(char) :
-          Pf2eAbilities.abilmod(Pf2eAbilities.get_score(char, "Strength"))
-        prof = Pf2e.get_prof_bonus(char, unarmed_prof)
-
-        bonus = abilmod + prof
+        bonus = Pf2eCombat.get_unarmed_bonus(char, atk_name, atk_info, unarmed_prof)
         p_str = unarmed_prof[0].upcase
 
         traits = traits.map { |t| titleize_trait(t) }.join(", ")

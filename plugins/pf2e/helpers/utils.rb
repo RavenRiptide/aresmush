@@ -49,16 +49,24 @@ module AresMUSH
       !char.chargen_stage.nil?
     end
 
+    PROF_BONUS = { "untrained" => 0, "trained" => 2, "expert" => 4,
+                   "master" => 6, "legendary" => 8 }.freeze
+
     def self.get_prof_bonus(char, p="untrained")
-      p = "untrained" unless p
-      level = (p == "untrained") ? 0 : char.pf2_level
+      p = "untrained" if p.to_s.strip.empty?
+
+      # A rank spelled some way this does not know would otherwise be `nil + level`. Untrained is the
+      # safe reading, and the log says so rather than leaving a figure quietly short.
+      unless PROF_BONUS.key?(p)
+        Global.logger.warn "PF2e read a proficiency rank of #{p.inspect}, which is none of #{PROF_BONUS.keys.join(', ')}; treating as untrained."
+        p = "untrained"
+      end
 
       if p == "untrained" && Pf2e.has_feat?(char, "Untrained Improvisation")
         return untrained_improv_bonus(char.pf2_level)
       end
 
-      profs = { "untrained"=>0, "trained"=>2, "expert"=>4, "master"=>6, "legendary"=>8 }
-      profs[p] + level
+      PROF_BONUS[p] + ((p == "untrained") ? 0 : char.pf2_level)
     end
 
     # Untrained Improvisation: level - 2, improving to level - 1 at 5th and full level at 7th.
@@ -90,6 +98,16 @@ module AresMUSH
 
     SAVES = %w(will fort fortitude ref reflex).freeze
 
+    # A save under one name, whichever of its names was typed. Both spellings reach the same statistic,
+    # so both have to reach the same domain - a condition that penalises Fortitude cannot depend on
+    # whether the caller wrote `fort`.
+    CANONICAL_SAVE = { 'fort' => 'fortitude', 'fortitude' => 'fortitude',
+                       'ref' => 'reflex', 'reflex' => 'reflex', 'will' => 'will' }.freeze
+
+    def self.canonical_save(name)
+      CANONICAL_SAVE[name.to_s.strip.downcase] || name
+    end
+
     # An attack keyword names which ability the attack uses. The bonus comes from the weapon, so the
     # keyword itself adds nothing to a roll.
     ATTACK_KINDS = %w(melee ranged unarmed finesse).freeze
@@ -109,6 +127,11 @@ module AresMUSH
       ability_mod(char, ability)
     end
 
+    # The land speed the ancestry sets, which is what armour and conditions modify.
+    def self.ancestry_speed(char)
+      (char.pf2_movement || {})['base_speed'].to_i
+    end
+
     def self.ability_mod(char, ability)
       Pf2eAbilities.abilmod(Pf2eAbilities.get_score(char, ability))
     end
@@ -120,49 +143,70 @@ module AresMUSH
     #
     # A row may return an array of individual dice, which `parse_roll_string` shows in brackets
     # and flattens into the total. Sneak attack does; that is deliberate.
+    #
+    # `options` are what the roller said they are doing - `action:pick-a-lock` and the like - which is
+    # what a conditional bonus is tested against. A row that reads no figure ignores them.
     KEYWORDS = [
       {
         'name' => 'shenanigans',
         'match' => lambda { |word| word == 'shenanigans' },
-        'value' => lambda { |_char, _word| Pf2e.shenanigans }
+        'value' => lambda { |_char, _word, _options| Pf2e.shenanigans }
       },
       {
         'name' => 'save',
         'match' => lambda { |word| SAVES.include?(word) },
-        'value' => lambda { |char, word| Pf2eCombat.get_save_bonus(char, word) }
+        'value' => lambda { |char, word, options| Pf2eCombat.get_save_bonus(char, word, options) }
       },
       {
         'name' => 'perception',
         'match' => lambda { |word| word == 'perception' },
-        'value' => lambda { |char, _word| Pf2eCombat.get_perception(char) }
+        'value' => lambda { |char, _word, options| Pf2eCombat.get_perception(char, options) }
       },
       {
         'name' => 'attack',
         'match' => lambda { |word| ATTACK_KINDS.include?(word) },
-        'value' => lambda { |_char, _word| 0 }
+        'value' => lambda { |_char, _word, _options| 0 }
       },
       {
         'name' => 'ability',
         'match' => lambda { |word| ABILITY_BY_WORD.key?(word) },
-        'value' => lambda { |char, word| Pf2e.ability_mod(char, ABILITY_BY_WORD[word]) }
+        'value' => lambda { |char, word, _options| Pf2e.ability_mod(char, ABILITY_BY_WORD[word]) }
       },
       {
         'name' => 'sneak attack',
         'match' => lambda { |word| word == 'sneak attack' },
-        'value' => lambda { |char, _word| Pf2e.sneak_attack_dice(char) }
+        'value' => lambda { |char, _word, _options| Pf2e.sneak_attack_dice(char) }
       },
       {
         'name' => 'skill',
         'match' => lambda { |_word| true },
-        'value' => lambda { |char, word| Pf2e.skill_keyword_bonus(char, word) }
+        'value' => lambda { |char, word, options| Pf2e.skill_keyword_bonus(char, word, options) }
       }
     ].freeze
 
-    def self.get_keyword_value(char, word)
+    def self.get_keyword_value(char, word, options = [])
       downcased = word.to_s.downcase
       keyword = KEYWORDS.find { |k| k['match'].call(downcased) }
 
-      keyword['value'].call(char, downcased)
+      keyword['value'].call(char, downcased, options)
+    end
+
+    # The terms of a roll string: `athletics-2` is athletics and minus two.
+    def self.roll_terms(string)
+      string.to_s.gsub('-', '+-').gsub('--', '-').split('+').map(&:strip).reject(&:empty?)
+    end
+
+    # What a player said they were doing, as the options a predicate is tested against.
+    #
+    # Foundry spells an action `action:pick-a-lock` and a circumstance that is not an action as a bare
+    # word - `visual` for a check that needs sight. A player should not have to know which, so a named
+    # circumstance is offered as both.
+    def self.circumstances(words)
+      Array(words).flat_map do |word|
+        slug = word.to_s.strip.downcase.gsub(/[^a-z0-9]+/, '-').gsub(/\A-|-\z/, '')
+
+        slug.empty? ? [] : [ slug, "action:#{slug}" ]
+      end
     end
 
     # A joke roll: some number of some die, as often negative as not.
@@ -182,11 +226,11 @@ module AresMUSH
       Pf2e.roll_dice(amount.to_i, sides.to_i)
     end
 
-    def self.skill_keyword_bonus(char, word)
+    def self.skill_keyword_bonus(char, word, options = [])
       name = word.capitalize
       return 0 unless Global.read_config('pf2e_skills').keys.include?(name)
 
-      Pf2eSkills.get_skill_bonus(char, name) + Pf2egear.bonus_from_item(char, name)
+      Pf2eSkills.get_skill_bonus(char, name, options)
     end
 
     def self.roll_dice(amount=1, sides=20)
@@ -209,12 +253,12 @@ module AresMUSH
       1 + ((level - 1) / 4)
     end
 
-    def self.parse_roll_string(target,list)
+    # `options` are the circumstances the roller named, which is what a conditional bonus is tested
+    # against. They add no number of their own: they decide whether a figure counts a bonus it holds.
+    def self.parse_roll_string(target, list, options = [])
       aliases = target.pf2_roll_aliases
       roll_list = list.map { |word|
-        aliases.has_key?(word) ?
-        aliases[word].gsub("-", "+-").gsub("--","-").split("+")
-        : word
+        aliases.has_key?(word) ? Pf2e.roll_terms(aliases[word]) : word
       }.flatten
 
       dice_pattern = /([0-9]+)d[0-9]+/i
@@ -230,7 +274,7 @@ module AresMUSH
           sides = dice[1].to_i
           result << Pf2e.roll_dice(amount, sides)
         elsif e.to_i == 0
-          result << Pf2e.get_keyword_value(target, e)
+          result << Pf2e.get_keyword_value(target, e, options)
         else
           result << e.to_i
         end
@@ -249,6 +293,7 @@ module AresMUSH
       return_hash['list'] = roll_list
       return_hash['result'] = fmt_result
       return_hash['total'] = result.flatten.sum
+      return_hash['options'] = options
 
       return return_hash
     end
