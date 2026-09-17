@@ -236,6 +236,8 @@ en:
     missing_sanctification: "Your class requires you to choose a sanctification."
     char_has_code: "%x229Edicts:%xn%r%{edicts}%r%r%x229Anathema%xn:%r%{anathema}"
     char_not_found: "I didn't find a character by that name."
+    which_figure: "Which figure? Try %xh%xcsheet/why reflex%xn, or a skill's name."
+    no_such_figure: "There's no figure on the sheet called '%{figure}'. Try hp, ac, speed, perception, a save, class dc, or a skill or lore by name."
     condition_not_found: "That is not a valid condition. Valid options: %{options}"
     condition_needs_value: "This condition requires that a value be associated with it."
     condition_set_ok: "Condition %{condition} set on %{target}."

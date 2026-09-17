@@ -60,6 +60,8 @@ module AresMUSH
           return PF2ShowSheetCmd
         when "combat"
           return PF2DisplayCombatSheetCmd
+        when "why"
+          return PF2StatBreakdownCmd
         else
           return PF2DisplaySheetCmd
         end
