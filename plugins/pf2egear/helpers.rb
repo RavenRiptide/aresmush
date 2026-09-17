@@ -111,10 +111,20 @@ module AresMUSH
       build_item(char, category, name, item_info)
     end
 
+    # Copies the catalogue's per-item facts onto the item: its bulk, its price, its runes.
+    #
+    # Only the keys the model actually has. A catalogue row also carries things that belong to the
+    # kind of item rather than to this one - what it modifies, what it says about itself - and those
+    # are read from the catalogue when wanted, so writing them onto every copy would both waste the
+    # space and freeze a catalogue we edit constantly.
     def self.build_item(char, category, name, item_info)
-      item = Inventory.model(category).create(:character => char, :name => name)
+      model = Inventory.model(category)
+      item = model.create(:character => char, :name => name)
+      known = model.attributes.map(&:to_s)
 
-      (item_info || {}).each_pair { |key, value| item.update("#{key}": value) }
+      (item_info || {}).each_pair do |key, value|
+        item.update("#{key}": value) if known.include?(key.to_s)
+      end
 
       item
     end
@@ -139,18 +149,29 @@ module AresMUSH
                .select { |item| item.invested }
     end
 
-    def self.bonus_from_item(char, roll)
-      invested_items = get_invested_items(char)
+    # Every item the character has actually got working, each paired with the category it came from.
+    #
+    # `use_needs` already says what has to be true before an item does anything: armour and weapons
+    # have to be worn, a magic item has to be invested. A category with no `use_needs` - gear, a
+    # consumable, a shield - has nothing worn about it, so nothing there modifies a figure passively;
+    # a potion in a backpack is not a bonus, and a shield's AC comes from raising it.
+    def self.effective_items(char)
+      Inventory.categories.map { |c| Inventory.canonical(c) }.uniq.flat_map do |category|
+        needs = Inventory.use_needs(category)
 
-      blist = [ 0 ]
+        next [] unless needs
 
-      invested_items.each do |i|
-        bonus = i.bonus[roll]
-
-        blist << bonus if bonus
+        Inventory.held(char, category).select { |item| item.send(needs) }
+                 .map { |item| [ category, item ] }
       end
+    end
 
-      blist.sort.pop
+    # The catalogue row an item was made from, which is where its effects live - the same way a feat's
+    # effects live in the feat catalogue rather than on the character.
+    def self.catalogue_entry(category, item)
+      catalogue = Inventory.config(category)
+
+      catalogue && Global.read_config(catalogue, item.name)
     end
 
     def self.destroy_item(item, client, enactor)

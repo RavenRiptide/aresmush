@@ -107,21 +107,32 @@ module AresMUSH
 
       end
 
+      # What the item does to a figure, from the catalogue rather than from a copy written onto the
+      # item. A bonus that applies only in some circumstance says so, because an item bonus a player
+      # thinks is always on is worse than no bonus at all.
+      def modifier_summary
+        rows = Array((Pf2egear.catalogue_entry(@category, @item) || {})['modifies'])
+
+        return nil if rows.empty?
+
+        rows.map { |row| format_modifier(row) }.join(', ')
+      end
+
+      def format_modifier(row)
+        where = Array(row['domain']).join('/')
+        sign = row['value'].to_s.start_with?('-') ? '' : '+'
+        note = row['when'] ? " only with #{Array(row['when']).map(&:to_s).join(', ')}" : ''
+
+        "#{sign}#{row['value']} to #{where}#{note}"
+      end
+
       def magical_properties
 
         if @category == "magicitem"
 
           list = []
 
-          bonus_list = []
-
-          bonuses = @item.bonus.each_pair do |k,v|
-
-            bonus_list << "+#{v} to #{k}"
-
-          end
-
-          list << "%b%b#{item_color}Bonuses:%xn #{bonus_list.join(", ")}"
+          list << "%b%b#{item_color}Bonuses:%xn #{modifier_summary}" if modifier_summary
 
           
         elsif @category == ("shield" || "shields")

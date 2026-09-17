@@ -32,6 +32,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain: nature
+        type: circumstance
+        value: "2"
+        when: ["target:trait:animal", {"or": ["action:recall-knowledge", "action:identify"]}]
   Animal Staff (Greater):
     wp_type: melee
     category: simple
@@ -49,6 +54,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain: nature
+        type: circumstance
+        value: "2"
+        when: ["target:trait:animal", {"or": ["action:recall-knowledge", "action:identify"]}]
   Animal Staff (Major):
     wp_type: melee
     category: simple
@@ -66,6 +76,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain: nature
+        type: circumstance
+        value: "2"
+        when: ["target:trait:animal", {"or": ["action:recall-knowledge", "action:identify"]}]
   Arbalest:
     wp_type: ranged
     category: martial
@@ -567,6 +582,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain: perception
+        type: circumstance
+        value: "2"
+        when: ["action:identify-magic", {"or": ["item:trait:morph", "item:trait:polymorph"]}]
   Fluid Form Staff (Greater):
     wp_type: melee
     category: simple
@@ -584,6 +604,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain: perception
+        type: circumstance
+        value: "2"
+        when: ["action:identify-magic", {"or": ["item:trait:morph", "item:trait:polymorph"]}]
   Fluid Form Staff (Major):
     wp_type: melee
     category: simple
@@ -601,6 +626,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain: perception
+        type: circumstance
+        value: "2"
+        when: ["action:identify-magic", {"or": ["item:trait:morph", "item:trait:polymorph"]}]
   Flying Talon:
     wp_type: melee
     category: advanced
@@ -1400,6 +1430,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain: skill-check
+        type: circumstance
+        value: "2"
+        when: ["action:identify-magic", "mental"]
   Mentalist's Staff (Greater):
     wp_type: melee
     category: simple
@@ -1417,6 +1452,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain: skill-check
+        type: circumstance
+        value: "2"
+        when: ["action:identify-magic", "mental"]
   Mentalist's Staff (Major):
     wp_type: melee
     category: simple
@@ -1434,6 +1474,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain: skill-check
+        type: circumstance
+        value: "2"
+        when: ["action:identify-magic", "mental"]
   Morningstar:
     wp_type: melee
     category: simple
@@ -2058,6 +2103,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain: diplomacy
+        type: status
+        value: "1"
+        when: ["action:request"]
   Staff of Control (Greater):
     wp_type: melee
     category: simple
@@ -2075,6 +2125,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain: diplomacy
+        type: status
+        value: "1"
+        when: ["action:request"]
   Staff of Control (Major):
     wp_type: melee
     category: simple
@@ -2093,6 +2148,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain: diplomacy
+        type: status
+        value: "1"
+        when: ["action:request"]
   Staff of Elemental Power:
     wp_type: melee
     category: simple
@@ -2110,6 +2170,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain: skill-check
+        type: circumstance
+        value: "2"
+        when: ["target:trait:elemental", {"or": ["action:recall-knowledge", "action:identify"]}]
   Staff of Elemental Power (Greater):
     wp_type: melee
     category: simple
@@ -2127,6 +2192,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain: skill-check
+        type: circumstance
+        value: "2"
+        when: ["target:trait:elemental", {"or": ["action:recall-knowledge", "action:identify"]}]
   Staff of Elemental Power (Major):
     wp_type: melee
     category: simple
@@ -2144,6 +2214,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain: skill-check
+        type: circumstance
+        value: "2"
+        when: ["target:trait:elemental", {"or": ["action:recall-knowledge", "action:identify"]}]
   Staff of Fire:
     wp_type: melee
     category: simple
@@ -2369,6 +2444,13 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain:
+          - perception
+          - will
+        type: status
+        value: "2"
+        when: ["item:trait:illusion"]
   Staff of Phantasms (Greater):
     wp_type: melee
     category: simple
@@ -2386,6 +2468,13 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain:
+          - perception
+          - will
+        type: status
+        value: "2"
+        when: ["item:trait:illusion"]
   Staff of Phantasms (Major):
     wp_type: melee
     category: simple
@@ -2403,6 +2492,13 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain:
+          - perception
+          - will
+        type: status
+        value: "2"
+        when: ["item:trait:illusion"]
   Staff of Protection:
     wp_type: melee
     category: simple
@@ -2420,6 +2516,13 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain:
+          - reflex
+          - fortitude
+        type: circumstance
+        value: "1"
+        when: [{"or": ["action:trip", "action:shove"]}]
   Staff of Protection (Greater):
     wp_type: melee
     category: simple
@@ -2437,6 +2540,13 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain:
+          - reflex
+          - fortitude
+        type: circumstance
+        value: "1"
+        when: [{"or": ["action:trip", "action:shove"]}]
   Staff of Protection (Major):
     wp_type: melee
     category: simple
@@ -2454,6 +2564,13 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain:
+          - reflex
+          - fortitude
+        type: circumstance
+        value: "1"
+        when: [{"or": ["action:trip", "action:shove"]}]
   Staff of Providence:
     wp_type: melee
     category: simple
@@ -2471,6 +2588,15 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain: survival
+        type: item
+        value: "1"
+        when: [{"or": ["action:sense-direction", "action:subsist"]}]
+      - domain: religion
+        type: item
+        value: "1"
+        when: ["action:recall-knowledge"]
   Staff of Providence (Greater):
     wp_type: melee
     category: simple
@@ -2488,6 +2614,15 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain: survival
+        type: item
+        value: "1"
+        when: [{"or": ["action:sense-direction", "action:subsist"]}]
+      - domain: religion
+        type: item
+        value: "1"
+        when: ["action:recall-knowledge"]
   Staff of Providence (Major):
     wp_type: melee
     category: simple
@@ -2505,6 +2640,15 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain: survival
+        type: item
+        value: "1"
+        when: [{"or": ["action:sense-direction", "action:subsist"]}]
+      - domain: religion
+        type: item
+        value: "1"
+        when: ["action:recall-knowledge"]
   Staff of Providence (True):
     wp_type: melee
     category: simple
@@ -2522,6 +2666,15 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain: survival
+        type: item
+        value: "1"
+        when: [{"or": ["action:sense-direction", "action:subsist"]}]
+      - domain: religion
+        type: item
+        value: "1"
+        when: ["action:recall-knowledge"]
   Staff of Summoning:
     wp_type: melee
     category: simple
@@ -2693,6 +2846,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain: perception
+        type: status
+        value: "1"
+        when: ["check:type:initiative"]
   Staff of the Unblinking Eye (Greater):
     wp_type: melee
     category: simple
@@ -2711,6 +2869,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain: perception
+        type: status
+        value: "1"
+        when: ["check:type:initiative"]
   Staff of the Unblinking Eye (Major):
     wp_type: melee
     category: simple
@@ -2729,6 +2892,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain: perception
+        type: status
+        value: "1"
+        when: ["check:type:initiative"]
   Starknife:
     wp_type: melee
     category: martial
@@ -2927,6 +3095,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain: skill-check
+        type: circumstance
+        value: "2"
+        when: [{"or": ["target:trait:plant", "target:trait:fungus"]}, {"or": ["action:recall-knowledge", "action:identify"]}]
   Verdant Staff (Greater):
     wp_type: melee
     category: simple
@@ -2944,6 +3117,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    modifies:
+      - domain: skill-check
+        type: circumstance
+        value: "2"
+        when: [{"or": ["target:trait:plant", "target:trait:fungus"]}, {"or": ["action:recall-knowledge", "action:identify"]}]
   Wakizashi:
     wp_type: melee
     category: martial
