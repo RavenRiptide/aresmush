@@ -26,7 +26,7 @@ module AresMUSH
     def self.initiative_bonus(char, stat, options = [])
       named = stat.to_s.strip
 
-      return Pf2e::Stat.total(char, 'perception', nil, options, [ 'initiative' ]) if
+      return Check.of(char, 'perception', nil, options, [ 'initiative' ]).total if
         named.casecmp?('Perception')
 
       if Pf2e::ABILITY_BY_WORD.key?(named.downcase)
@@ -35,7 +35,7 @@ module AresMUSH
 
       kind = Pf2eSkills.lore?(named) ? 'lore' : 'skill'
 
-      Pf2e::Stat.total(char, kind, named, options, [ 'initiative' ])
+      Check.of(char, kind, named, options, [ 'initiative' ]).total
     end
 
     def self.can_join_encounter(char, encounter)

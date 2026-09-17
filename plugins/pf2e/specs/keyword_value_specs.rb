@@ -42,23 +42,27 @@ module AresMUSH
         expect(Pf2e.get_keyword_value(char, 'strength')).to eq 2
       end
 
-      it "should resolve a save" do
-        allow(Pf2eCombat).to receive(:get_save_bonus).with(anything, 'will', anything).and_return(11)
+      # A save, a skill and Perception are checks rather than figures: a roll of one carries what kind
+      # of check it is, which is what a rule about a kind of check is predicated on.
+      it "should resolve a save through a check" do
+        expect(Pf2e::Check).to receive(:of).with(anything, 'save', 'will', anything)
+                                           .and_return(double(:total => 11))
 
         expect(Pf2e.get_keyword_value(char, 'Will')).to eq 11
       end
 
-      # A term saying what the roller is doing reaches the figure, so a bonus that applies only then
-      # can be counted.
-      it "should hand the circumstances to the figure it asks" do
-        expect(Pf2eCombat).to receive(:get_save_bonus).with(anything, 'will', [ 'action:brace' ])
-                                                      .and_return(11)
+      # A term saying what the roller is doing reaches the check, so a bonus that applies only then can
+      # be counted.
+      it "should hand the circumstances to the check it makes" do
+        expect(Pf2e::Check).to receive(:of).with(anything, 'save', 'will', [ 'action:brace' ])
+                                           .and_return(double(:total => 11))
 
         expect(Pf2e.get_keyword_value(char, 'Will', [ 'action:brace' ])).to eq 11
       end
 
-      it "should resolve perception" do
-        allow(Pf2eCombat).to receive(:get_perception).and_return(9)
+      it "should resolve perception through a check" do
+        expect(Pf2e::Check).to receive(:of).with(anything, 'perception', nil, anything)
+                                           .and_return(double(:total => 9))
 
         expect(Pf2e.get_keyword_value(char, 'perception')).to eq 9
       end
