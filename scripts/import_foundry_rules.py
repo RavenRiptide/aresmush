@@ -143,14 +143,9 @@ def take(rule, refused):
             refused[f"value {rule.get('value')!r}"] += 1
             return None
 
-    if rule['key'] == 'DamageDice':
-        if rule.get('override'):
-            refused['override'] += 1
-            return None
-
     # Keep only the fields we read, in a stable order, so a re-run produces the same file.
     order = ['key', 'selector', 'type', 'ability', 'value', 'min', 'max', 'diceNumber', 'dieSize',
-             'damageType', 'damageCategory', 'category', 'critical', 'predicate']
+             'damageType', 'damageCategory', 'category', 'critical', 'override', 'predicate']
 
     return {field: rule[field] for field in order if field in rule}
 

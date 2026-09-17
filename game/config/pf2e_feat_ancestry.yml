@@ -4082,6 +4082,11 @@ pf2e_feats:
     shortdesc: You have learned how to use your sling to fell enormous creatures. When you hit on an attack with a weapon of the sling group against a Large or larger creature, increase the size of the weapon damage die by one step.
     prereq:
       level: 1
+    rules:
+      - key: "DamageDice"
+        selector: "sling-weapon-group-damage"
+        override: {"upgrade": true}
+        predicate: [{"gte": ["target:size", 3]}]
   Toppling Dance:
     feat_type:
       - Ancestry
@@ -4334,6 +4339,10 @@ pf2e_feats:
     shortdesc: Your jaws unarmed attack deals 1d6 piercing damage instead of 1d4, and gains the backstabber trait. You can file down your teeth and regrow them later on, enabling you to select this feat at any level, and to retrain into and out of this feat.
     prereq:
       level: 1
+    rules:
+      - key: "DamageDice"
+        selector: "jaws-damage"
+        override: {"dieSize": "d6"}
   Vigorous Health:
     feat_type:
       - Ancestry

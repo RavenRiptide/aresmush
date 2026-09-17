@@ -150,6 +150,23 @@ module AresMUSH
       expect(rows.count { |_where, row| row['key'] == 'DamageDice' }).to be > 20
     end
 
+    # An override raises a die, sets it outright, or changes the kind of damage. Every one has exactly
+    # one property, which is what their own validation requires.
+    it "should carry only overrides the damage reader applies" do
+      known = %w{upgrade downgrade dieSize diceNumber damageType}
+
+      strays = rows.select { |_where, row| row['override'] }
+                   .flat_map { |where, row|
+                     (row['override'].keys.map(&:to_s) - known).map { |key| "#{where}: #{key}" }
+                   }
+
+      expect(strays.uniq).to eq []
+    end
+
+    it "should have overrides, since that is how a die size is raised" do
+      expect(rows.count { |_where, row| row['override'] }).to be > 5
+    end
+
     # One vocabulary, not two: a block left behind next to a `rules:` block would be read by different
     # code and counted twice.
     it "should have nothing left carrying the vocabularies this replaced" do

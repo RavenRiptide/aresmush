@@ -160,6 +160,122 @@ module AresMUSH
         end
       end
 
+      # `values.ts:112`. A row that says nothing about criticals doubles on one; a row that says false
+      # applies to both and never doubles; a row that says true applies only to a critical.
+      describe "a critical hit" do
+        def with_dice(rows)
+          allow(Effects).to receive(:damage_dice).and_return(rows)
+          allow(Effects).to receive(:modifiers).and_return([])
+        end
+
+        def die_row(fields = {})
+          { 'source' => 'Something', 'dice' => 1, 'die' => 'd6', 'damage_type' => nil,
+            'category' => nil, 'critical' => nil, 'met' => true }.merge(fields)
+        end
+
+        it "should double the weapon's own roll" do
+          with_dice([])
+
+          expect(Damage.critical(char, sword)).to eq '(1d8+4)x2 S'
+        end
+
+        it "should double dice that say nothing about criticals" do
+          with_dice([ die_row('die' => 'd8') ])
+
+          expect(Damage.critical(char, sword)).to eq '(2d8+4)x2 S'
+        end
+
+        # Deadly and similar dice are added on a critical and not doubled.
+        it "should add a critical-only row undoubled" do
+          with_dice([ die_row('critical' => true, 'die' => 'd10') ])
+
+          expect(Damage.critical(char, sword)).to eq '(1d8+4)x2+1d10 S'
+        end
+
+        it "should leave a critical-only row out of an ordinary hit" do
+          with_dice([ die_row('critical' => true, 'die' => 'd10') ])
+
+          expect(Damage.formula(char, sword)).to eq '1d8+4 S'
+        end
+
+        # A row that says false is in both, and doubles in neither.
+        it "should add a row that never doubles to both, undoubled" do
+          with_dice([ die_row('critical' => false, 'die' => 'd6') ])
+
+          expect(Damage.formula(char, sword)).to eq '1d8+4+1d6 S'
+          expect(Damage.critical(char, sword)).to eq '(1d8+4)x2+1d6 S'
+        end
+
+        it "should double each kind of damage on its own" do
+          with_dice([ die_row('damage_type' => 'fire') ])
+
+          expect(Damage.critical(char, sword)).to eq '(1d8+4)x2 S + (1d6)x2 fire'
+        end
+      end
+
+      # `helpers.ts:118`. A step in die size happens before an outright override of it, and a weapon's
+      # die can be raised only once however many effects say to raise it.
+      describe "an override" do
+        def with_override(*overrides)
+          rows = overrides.map { |one|
+            { 'source' => 'Something', 'dice' => 0, 'die' => nil, 'damage_type' => nil,
+              'category' => nil, 'critical' => nil, 'override' => one, 'met' => true }
+          }
+
+          allow(Effects).to receive(:damage_dice).and_return(rows)
+          allow(Effects).to receive(:modifiers).and_return([])
+        end
+
+        it "should raise the die a step" do
+          with_override('upgrade' => true)
+
+          expect(Damage.formula(char, sword)).to eq '1d10+4 S'
+        end
+
+        it "should raise it only once however many say to" do
+          with_override({ 'upgrade' => true }, { 'upgrade' => true })
+
+          expect(Damage.formula(char, sword)).to eq '1d10+4 S'
+        end
+
+        it "should net a raise against a lowering" do
+          with_override({ 'upgrade' => true }, { 'downgrade' => true })
+
+          expect(Damage.formula(char, sword)).to eq '1d8+4 S'
+        end
+
+        it "should stop at the largest die" do
+          with_override('upgrade' => true)
+
+          expect(Damage.formula(char, sword('die' => 'd12'))).to eq '1d12+4 S'
+        end
+
+        it "should set the die outright" do
+          with_override('dieSize' => 'd4')
+
+          expect(Damage.formula(char, sword)).to eq '1d4+4 S'
+        end
+
+        it "should change the kind of damage" do
+          with_override('damageType' => 'fire')
+
+          expect(Damage.formula(char, sword)).to eq '1d8+4 fire'
+        end
+
+        it "should set how many dice" do
+          with_override('diceNumber' => 3)
+
+          expect(Damage.formula(char, sword)).to eq '3d8+4 S'
+        end
+
+        # An override adjusts the weapon's dice rather than adding any, so it contributes none itself.
+        it "should add no dice of its own" do
+          with_override('damageType' => 'fire')
+
+          expect(Damage.of(char, sword)['instances'].size).to eq 1
+        end
+      end
+
       describe "what it reports" do
         it "should name what went into each roll" do
           allow(Effects).to receive(:damage_dice).and_return([])

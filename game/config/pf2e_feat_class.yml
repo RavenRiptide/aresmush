@@ -2520,11 +2520,31 @@ pf2e_feats:
     grants_options:
       - dual-handed-assault
     rules:
+      - key: "DamageDice"
+        selector: "strike-damage"
+        override: {"upgrade": true}
+        predicate: ["dual-handed-assault", "item:hands-held:1", {"nor": ["two-hand-d6", "two-hand-d8", "two-hand-d10", "two-hand-d12"]}]
       - key: "FlatModifier"
         selector: "strike-damage"
         type: "circumstance"
         value: "@weapon.system.damage.dice"
         predicate: ["dual-handed-assault", "item:hands-held:1", {"or": ["two-hand-d6", "two-hand-d8", "two-hand-d10", "two-hand-d12"]}]
+      - key: "DamageDice"
+        selector: "strike-damage"
+        override: {"dieSize": "d6"}
+        predicate: ["dual-handed-assault", "item:hands-held:1", "item:trait:two-hand-d6"]
+      - key: "DamageDice"
+        selector: "strike-damage"
+        override: {"dieSize": "d8"}
+        predicate: ["dual-handed-assault", "item:hands-held:1", "item:trait:two-hand-d8"]
+      - key: "DamageDice"
+        selector: "strike-damage"
+        override: {"dieSize": "d10"}
+        predicate: ["dual-handed-assault", "item:hands-held:1", "item:trait:two-hand-d10"]
+      - key: "DamageDice"
+        selector: "strike-damage"
+        override: {"dieSize": "d12"}
+        predicate: ["dual-handed-assault", "item:hands-held:1", "item:trait:two-hand-d12"]
   Efficient Alchemy (Alchemist):
     assoc_charclass:
       - Alchemist
@@ -3742,6 +3762,13 @@ pf2e_feats:
     traits:
       - fighter
       - press
+    grants_options:
+      - dazing-blow
+    rules:
+      - key: "DamageDice"
+        selector: "strike-damage"
+        override: {"damageType": "bludgeoning"}
+        predicate: ["dazing-blow"]
   Debilitating Bomb:
     assoc_charclass:
       - Alchemist

@@ -222,10 +222,12 @@ module AresMUSH
         name = w.nickname ? "#{w.nickname} (#{w.name})" : w.name
         bonus = Pf2eCombat.get_wpattack_bonus(char, w)
         prof = Pf2eCombat.get_weapon_prof(char, w.name)[0].upcase
-        damage = Pf2eCombat.get_damage(char, w.name, w)
+        breakdown = Pf2eCombat.damage_breakdown(char, w.name, w)
         traits = w.traits.map { |t| titleize_trait(t) }.join(", ")
 
-        "%b%b#{left(i, 3)}%b#{left(name, 40)}%b#{left("#{bonus} (#{prof})",10)}%b#{left(damage, 22)}\n%b%b#{item_color}Traits:%xn #{traits}"
+        "%b%b#{left(i, 3)}%b#{left(name, 40)}%b#{left("#{bonus} (#{prof})",10)}%b#{left(breakdown['formula'], 22)}" \
+          "\n%b%b#{item_color}Critical:%xn #{breakdown['critical']}" \
+          "\n%b%b#{item_color}Traits:%xn #{traits}"
       end
 
       def format_save(char,name)

@@ -27,11 +27,28 @@ module AresMUSH
       # PF2e's own words for the kinds of damage that are rolled apart from the main body of a roll.
       APART = %w{persistent splash precision}.freeze
 
+      # `system/damage/values.ts:40`. A die size steps along this list and stops at either end.
+      DIE_SIZES = %w{d4 d6 d8 d10 d12}.freeze
+
+      # A weapon's die size can be raised once however many effects say to raise it
+      # (`weapon.ts:478`), which is what stops two upgrades stacking into a d12 fist.
+      MAX_INCREASES = 1
+
+      # Whether a contribution doubles on a critical hit (`values.ts:112`). A row that says nothing
+      # doubles; one that says `false` applies to both a hit and a crit but never doubles; one that says
+      # `true` applies only to a crit, and does not double either.
+      #
+      #   nil   -> in a hit, and doubled in a crit
+      #   false -> in a hit, and in a crit undoubled
+      #   true  -> in a crit only, undoubled
+      BUCKETS = { nil => 'doubling', false => 'fixed', true => 'crit_only' }.freeze
+
       # What a weapon does, with everything that modifies it.
       #
       #   { 'instances' => [ { 'damage_type' =>, 'dice' => [ [ n, die ] ], 'modifier' =>,
       #                        'category' => } ],
-      #     'formula' => '2d12+1d6 fire+7', 'conditional' => [ … ] }
+      #     'formula' => '2d12+1d6 fire+7', 'critical' => '(2d12+7)x2 + 1d6 fire',
+      #     'conditional' => [ … ] }
       def self.of(char, attack, options = [])
         domains = Domains.for('damage', attack, damage_attribute(char, attack))
         sources = Effects.sources(char)
@@ -44,10 +61,15 @@ module AresMUSH
         met_dice, unmet_dice = dice.partition { |row| row['met'] }
         met_flat, unmet_flat = flat.partition { |row| row['met'] }
 
-        instances = assemble(char, attack, met_dice, met_flat)
+        # An override adjusts the weapon's own dice rather than adding any of its own, so it is taken
+        # out before the rest are added up.
+        overriding, adding = met_dice.partition { |row| row['override'] }
+
+        instances = assemble(char, attack, adding, met_flat, overriding)
 
         { 'instances' => instances,
-          'formula' => render(instances),
+          'formula' => render(instances, false),
+          'critical' => render(instances, true),
           'conditional' => unmet_dice + unmet_flat }
       end
 
@@ -55,19 +77,22 @@ module AresMUSH
         of(char, attack, options)['formula']
       end
 
+      def self.critical(char, attack, options = [])
+        of(char, attack, options)['critical']
+      end
+
       # ------------------------------------------------------------------------------
 
       # The weapon's own dice, then everything else grouped by the kind of damage it deals. A row that
       # names no kind deals the weapon's kind, which is what makes a plain +2 a bonus to the whole hit
       # rather than to something of its own.
-      def self.assemble(char, attack, dice, flat)
-        base = base_instance(char, attack)
+      def self.assemble(char, attack, dice, flat, overriding = [])
+        base = override(base_instance(char, attack), overriding)
         instances = { [ base['damage_type'], nil ] => base }
 
-        (dice + flat).reject { |row| row['critical'] }.each do |row|
+        (dice + flat).each do |row|
           key = [ row['damage_type'] || base['damage_type'], apart(row['category']) ]
-          into = instances[key] ||= { 'damage_type' => key.first, 'category' => key.last,
-                                      'dice' => [], 'modifier' => 0, 'sources' => [] }
+          into = instances[key] ||= empty_instance(key)
 
           add(into, row)
         end
@@ -75,20 +100,71 @@ module AresMUSH
         instances.values.reject { |instance| empty?(instance) }
       end
 
+      def self.empty_instance(key)
+        BUCKETS.values.each_with_object({ 'damage_type' => key.first, 'category' => key.last,
+                                          'sources' => [] }) do |bucket, out|
+          out[dice_key(bucket)] = []
+          out[modifier_key(bucket)] = 0
+        end
+      end
+
       def self.add(instance, row)
+        bucket = BUCKETS.fetch(row['critical'], 'doubling')
+
         instance['sources'] << row['source']
 
         if row['die'] && row['dice'].to_i.positive?
-          instance['dice'] << [ row['dice'].to_i, row['die'] ]
+          instance[dice_key(bucket)] << [ row['dice'].to_i, row['die'] ]
         else
-          instance['modifier'] += row['value'].to_i
+          instance[modifier_key(bucket)] += row['value'].to_i
         end
+      end
+
+      def self.dice_key(bucket)
+        bucket == 'doubling' ? 'dice' : "#{bucket}_dice"
+      end
+
+      def self.modifier_key(bucket)
+        bucket == 'doubling' ? 'modifier' : "#{bucket}_modifier"
       end
 
       # A category we keep apart, or nothing. An unrecognised one is treated as part of the main roll,
       # because a number in the wrong pile still adds up and a number dropped does not.
       def self.apart(category)
         APART.include?(category.to_s) ? category.to_s : nil
+      end
+
+      # `system/damage/helpers.ts:118`. A step up or down in die size happens first, because an override
+      # of the die size is meant to win over one - a fatal powerful fist is their example. Each
+      # direction is capped separately and then netted, so two effects that raise a weapon's die and one
+      # that lowers it come to one step up.
+      def self.override(base, overriding)
+        adjustments = overriding.map { |row| row['override'] }.compact
+
+        ups = [ adjustments.count { |one| one['upgrade'] }, MAX_INCREASES ].min
+        downs = [ adjustments.count { |one| one['downgrade'] }, MAX_INCREASES ].min
+
+        base['die'] = step(base['die'], ups - downs)
+
+        adjustments.each do |one|
+          base['damage_type'] = one['damageType'] if one['damageType']
+          base['die'] = one['dieSize'] if one['dieSize']
+          base['count'] = one['diceNumber'].to_i if one['diceNumber']
+          base['sources'] << 'override'
+        end
+
+        base['dice'] = base['die'] ? [ [ base['count'], base['die'] ] ] : []
+
+        base
+      end
+
+      # A die size some number of steps along, stopping at either end of the list.
+      def self.step(die, delta)
+        at = DIE_SIZES.index(die.to_s)
+
+        return die unless at && !delta.zero?
+
+        DIE_SIZES[(at + delta).clamp(0, DIE_SIZES.size - 1)]
       end
 
       # The weapon's own dice and the attribute modifier that goes with them.
@@ -100,11 +176,12 @@ module AresMUSH
         count = 1 + attack['striking'].to_i
         attribute = damage_attribute(char, attack)
 
-        { 'damage_type' => attack['damage_type'] || 'B',
-          'category' => nil,
-          'dice' => die ? [ [ count, die ] ] : [],
-          'modifier' => attribute ? Pf2e.ability_mod(char, attribute) : 0,
-          'sources' => [ attack['name'], attribute ].compact }
+        empty_instance([ attack['damage_type'] || 'B', nil ])
+          .merge('die' => die,
+                 'count' => count,
+                 'dice' => die ? [ [ count, die ] ] : [],
+                 'modifier' => attribute ? Pf2e.ability_mod(char, attribute) : 0,
+                 'sources' => [ attack['name'], attribute ].compact)
       end
 
       # Which attribute adds to this attack's damage, or nothing.
@@ -132,20 +209,38 @@ module AresMUSH
       end
 
       def self.empty?(instance)
-        instance['dice'].empty? && instance['modifier'].zero?
+        BUCKETS.values.all? do |bucket|
+          instance[dice_key(bucket)].empty? && instance[modifier_key(bucket)].zero?
+        end
       end
 
-      # `2d12+1d6 fire+7`, with anything kept apart named: `1d6 persistent bleed`.
-      def self.render(instances)
-        instances.map { |instance| render_instance(instance) }.join(' + ')
+      # `2d12+1d6 fire+7`, with anything kept apart named: `1d6 persistent bleed`. On a critical hit the
+      # doubling part is doubled and the rest is added to it, which is the default rule - doubling the
+      # total rather than the dice.
+      def self.render(instances, critical)
+        instances.map { |instance| render_instance(instance, critical) }
+                 .reject(&:empty?).join(' + ')
       end
 
-      def self.render_instance(instance)
-        dice = merge(instance['dice']).map { |count, die| "#{count}#{die}" }
-        flat = instance['modifier'].zero? ? [] : [ instance['modifier'].to_s ]
-        body = (dice + flat).join('+').gsub('+-', '-')
+      def self.render_instance(instance, critical)
+        doubled = body(instance, 'doubling')
+        doubled = doubled.empty? || !critical ? doubled : "(#{doubled})x2"
 
-        [ body, instance['category'], instance['damage_type'] ].compact.join(' ')
+        parts = [ doubled, body(instance, 'fixed') ]
+        parts << body(instance, 'crit_only') if critical
+
+        joined = parts.reject(&:empty?).join('+').gsub('+-', '-')
+
+        return '' if joined.empty?
+
+        [ joined, instance['category'], instance['damage_type'] ].compact.join(' ')
+      end
+
+      def self.body(instance, bucket)
+        dice = merge(instance[dice_key(bucket)]).map { |count, die| "#{count}#{die}" }
+        flat = instance[modifier_key(bucket)]
+
+        (dice + (flat.zero? ? [] : [ flat.to_s ])).join('+')
       end
 
       # Two rows of the same die size are one roll of that many dice.
