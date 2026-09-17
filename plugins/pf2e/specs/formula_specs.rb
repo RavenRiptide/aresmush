@@ -149,15 +149,46 @@ module AresMUSH
         end
       end
 
-      # Teaching Dentaku Foundry's syntax is global to the gem, and the `math` command shares it.
-      describe "the math command's grammar" do
-        it "should still read the arithmetic a player types" do
-          Formula.value('1', {})
+      # Dentaku's scanner registry is global to the gem, and the `math` command shares it. The two
+      # Foundry scanners are gated on a flag this reader raises, so `math` keeps the grammar it had.
+      describe "the math command, which shares the gem" do
+        before(:each) { Formula.value('1', {}) }
 
+        it "should still read the arithmetic a player types" do
           expect(Dentaku('(2 + 3) * 4')).to eq 20
           expect(Dentaku('2 ^ 8')).to eq 256
           expect(Dentaku('max(3, 7)')).to eq 7
           expect(Dentaku('10 - 6 / 2')).to eq 7
+        end
+
+        # The interpolation scanner would take this brace if it were unconditional.
+        it "should keep dentaku's own array literal" do
+          expect(Dentaku('{1,2}')).to eq [ 1, 2 ]
+        end
+
+        it "should keep a hyphen as subtraction" do
+          expect(Dentaku('a-b', 'a' => 5, 'b' => 2)).to eq 3
+        end
+
+        it "should keep folding identifier case" do
+          expect(Dentaku('Foo', 'foo' => 3)).to eq 3
+        end
+
+        it "should not read a foundry reference" do
+          expect { Dentaku!('@actor.level') }.to raise_error(Dentaku::TokenizerError)
+        end
+      end
+
+      describe "isolation between the two grammars" do
+        it "should leave the flag down once a formula has been read" do
+          Formula.value('@actor.level', ctx)
+
+          expect(Thread.current[Formula::GRAMMAR]).to be_nil
+        end
+
+        it "should leave it down when a formula is refused" do
+          expect { Formula.value('1 ; 2', ctx) }.to raise_error(Formula::Invalid)
+          expect(Thread.current[Formula::GRAMMAR]).to be_nil
         end
       end
 

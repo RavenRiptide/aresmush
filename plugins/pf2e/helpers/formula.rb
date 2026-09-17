@@ -17,6 +17,11 @@ module AresMUSH
     # its way in, and an identifier is the verbatim source text - which is also what tells a reference
     # from a bare word, since Foundry marks every reference with `@` or braces.
     #
+    # Dentaku's scanner registry is global to the gem and the `math` command shares it, so the two
+    # scanners are gated: each carries a condition that holds only while `reading` is on the stack, and
+    # `math` goes on seeing the grammar it always saw. The flag is thread-local because sheet work can
+    # run under `EventMachine.defer`.
+    #
     # `ternary`, `gte` and the rest are Foundry's names for things Dentaku spells differently or not at
     # all, so they are registered as functions. `max` and `min` it already has.
     #
@@ -89,28 +94,44 @@ module AresMUSH
 
       # ------------------------------------------------------------------------------
 
+      GRAMMAR = :pf2e_formula_grammar
+
+      # Both scanners decline unless this reader asked for them, which is what keeps Foundry's grammar
+      # off the `math` command: a scanner's condition is the gem's own way of making one conditional,
+      # and an inactive interpolation scanner leaves `{` to the array scanner that has always had it.
+      ACTIVE = ->(_last_token) { !Thread.current[GRAMMAR].nil? }
+
       # Teaches Dentaku Foundry's two reference syntaxes. The scanners have to sit ahead of the array
       # scanner, which would otherwise take an interpolation's opening brace, so the whole ordered list
       # is re-registered rather than appended to.
       #
-      # `register_scanners` sends each id to the class, which is why these are singleton methods. It is
-      # global to Dentaku, so the `math` command reads the same grammar - it gains `@path` identifiers
-      # it had no use for and loses the `{1,2}` array literal, neither of which a player types.
+      # `register_scanners` sends each id to the class, which is why these are singleton methods.
       def self.install!
         scanner = Dentaku::TokenScanner
 
-        scanner.define_singleton_method(:pf2e_reference) { new(:identifier, REFERENCE) }
-        scanner.define_singleton_method(:pf2e_interpolation) { new(:identifier, INTERPOLATION) }
+        scanner.define_singleton_method(:pf2e_reference) { new(:identifier, REFERENCE, nil, ACTIVE) }
+        scanner.define_singleton_method(:pf2e_interpolation) { new(:identifier, INTERPOLATION, nil, ACTIVE) }
 
         ids = scanner.available_scanners
         scanner.register_scanners(ids.insert(ids.index(:numeric), :pf2e_reference, :pf2e_interpolation))
+      end
+
+      # Foundry's grammar, for the duration of the block. Nested because `evaluate` reads the names and
+      # then computes, and both tokenise.
+      def self.reading
+        outer = Thread.current[GRAMMAR]
+        Thread.current[GRAMMAR] = true
+
+        yield
+      ensure
+        Thread.current[GRAMMAR] = outer
       end
 
       # Every identifier the formula names, spelled as the formula spells it. Anything Dentaku cannot
       # tokenise or parse is refused here, so a caller sees one error class whether the formula was
       # unreadable or merely wrong.
       def self.names(text)
-        calculator.ast(text).dependencies
+        reading { calculator.ast(text).dependencies }
       rescue Dentaku::Error, Dentaku::ArgumentError => problem
         raise Invalid, "#{problem.class}: #{problem.message} in #{text.inspect}"
       end
@@ -153,7 +174,7 @@ module AresMUSH
       end
 
       def self.compute(text, bound, missing)
-        normalise(calculator.evaluate!(text, bound))
+        normalise(reading { calculator.evaluate!(text, bound) })
       rescue ZeroDivisionError
         # Only a reference that resolved to nothing divides by zero here - no shipped formula divides
         # by a literal. `unresolved` already names it, and raising would take a whole sheet render down
