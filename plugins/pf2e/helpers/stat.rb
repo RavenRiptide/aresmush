@@ -84,7 +84,7 @@ module AresMUSH
           'base' => ->(char, attack) { Pf2e.get_prof_bonus(char, attack['prof']) },
           'intrinsic' => ->(char, attack) {
             attack_abilities(attack).map { |ability| ability_mod(char, ability) } +
-              [ item(attack['rune'], 'potency rune') ]
+              [ item(attack['rune'], 'potency rune', 'weapon-potency') ]
           } },
 
         # `name` is the caster stats block `Pf2emagic.get_caster_stats` returns, which already carries
@@ -182,11 +182,14 @@ module AresMUSH
       # An attribute's contribution is typed `ability`, so the best one applies and no two stack. That
       # is what lets an effect offer a different attribute for a figure without anything special-casing
       # which attribute the figure "really" uses.
+      #
+      # Foundry slugs an attribute modifier with the attribute's short name (`modifiers.ts`), which is
+      # what a rule adjusting one names, so ours are slugged the same way.
       def self.ability_mod(char, ability, source = nil)
         return nil unless ability
 
-        { 'source' => source || ability, 'type' => Modifiers::ABILITY,
-          'value' => Pf2e.ability_mod(char, ability) }
+        { 'source' => source || ability, 'slug' => Domains.abbreviation(ability),
+          'type' => Modifiers::ABILITY, 'value' => Pf2e.ability_mod(char, ability) }
       end
 
       def self.attack_abilities(attack)
@@ -195,24 +198,32 @@ module AresMUSH
         Pf2e.has_trait?(attack['traits'], 'finesse') ? [ 'Strength', 'Dexterity' ] : [ 'Strength' ]
       end
 
-      def self.item(value, source)
+      def self.item(value, source, slug = nil)
         return nil if value.to_i.zero?
 
-        { 'source' => source, 'type' => 'item', 'value' => value.to_i }
+        { 'source' => source, 'slug' => slug || Domains.slug(source), 'type' => 'item',
+          'value' => value.to_i }
       end
 
+      # Their slug, because a feat that lets a character ignore armour's speed penalty names it
+      # (`character/document.ts:933`).
       def self.armor_penalty(char)
         armor = Pf2eCombat.get_equipped_armor(char)
         penalty = armor ? armor.speed_penalty.to_i : 0
 
         return nil if penalty.zero?
 
-        { 'source' => armor.name, 'type' => Modifiers::UNTYPED, 'value' => penalty }
+        { 'source' => armor.name, 'slug' => 'armor-speed-penalty', 'type' => Modifiers::UNTYPED,
+          'value' => penalty }
       end
+
+      # This game's armour carries `potency` for AC and `power` for saves. The save rune is what the
+      # rules call resilient, and `resilient` is the slug their data adjusts.
+      RUNE_SLUGS = { 'potency' => 'armor-potency', 'power' => 'resilient' }.freeze
 
       def self.rune(char, subtype)
         item(Pf2egear.get_rune_value(Pf2eCombat.get_equipped_armor(char), 'fundamental', subtype),
-             "#{subtype} rune")
+             "#{subtype} rune", RUNE_SLUGS[subtype])
       end
     end
   end

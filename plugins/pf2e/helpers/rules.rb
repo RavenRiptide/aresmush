@@ -28,6 +28,10 @@ module AresMUSH
     # these rows refuses the same kinds for the same reason.
     module Rules
 
+      # A row's `slug` is the name other rules call it by: `AdjustModifier` names the modifier it
+      # changes, and their data names ours as well as its own - `resilient`, `armor-check-penalty`,
+      # `weapon-potency`. A row that does not say is slugged from whatever carries it.
+      #
       # `value` and `diceNumber` are read by `Pf2e::Formula`, `predicate` by `Pf2e::Predicate`. Every
       # other field is taken as it stands.
       FORMULA_FIELDS = %w{value diceNumber}.freeze
@@ -43,6 +47,7 @@ module AresMUSH
           # goes. `damageType` makes it a bonus to one kind of damage rather than to the whole roll.
           'contribute' => lambda { |row, source, context|
             { 'source' => row['ability'] ? row['ability'].to_s.capitalize : source['name'],
+              'slug' => row['slug'] || Domains.slug(source['name']),
               'type' => (row['type'] || Modifiers::UNTYPED).to_s.downcase,
               'value' => clamp(Formula.value(row['value'], context), row),
               'damage_type' => row['damageType'],
@@ -58,6 +63,7 @@ module AresMUSH
           # which are rolled and applied apart from the rest.
           'contribute' => lambda { |row, source, context|
             { 'source' => source['name'],
+              'slug' => row['slug'] || Domains.slug(source['name']),
               'dice' => Formula.value(row['diceNumber'] || 1, context),
               'die' => row['dieSize'],
               'damage_type' => row['damageType'],
@@ -77,6 +83,34 @@ module AresMUSH
         value = [ value, high ].min if high
 
         value
+      end
+
+      # Rules that change how a check turned out. `AdjustDegreeOfSuccess` is not implemented, so this is
+      # empty - but a check asks for its outcome through it, which is what makes implementing the kind a
+      # change to `KINDS` rather than a change to `Pf2e::Check`.
+      def self.adjustments(sources, domains, options)
+        gather(sources, domains, options, 'AdjustDegreeOfSuccess') { |row| row['adjustment'] }
+      end
+
+      # Text shown with a roll. `Note` is likewise not implemented yet.
+      def self.notes(sources, domains, options)
+        gather(sources, domains, options, 'Note') { |row| row['text'] }
+      end
+
+      # Every row of a kind that reaches these domains and whose circumstances are met, as whatever the
+      # block makes of it. The kinds above are read here rather than through `Effects.rows_of` because
+      # they contribute neither a modifier nor dice: there is nothing to stack.
+      def self.gather(sources, domains, options, key)
+        return [] unless known?(key)
+
+        Array(sources).flat_map do |source|
+          held = Array(options) + Array(source['options'])
+
+          of_kind(source, key).select { |row| Domains.matches?(row['selector'], domains) }
+                              .select { |row| Predicate.test(row['predicate'], held) }
+                              .map { |row| yield(row) }
+                              .compact
+        end
       end
 
       def self.known?(key)

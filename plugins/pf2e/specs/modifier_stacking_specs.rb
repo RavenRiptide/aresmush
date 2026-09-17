@@ -106,6 +106,32 @@ module AresMUSH
 
       # Proficiency is the other half of every figure's base, and a rank spelled some way the table
       # does not know used to be `nil + level`.
+      # A modifier's slug is the name other rules call it by: their AdjustModifier rules name ours as
+      # well as their own, so the ones we create ourselves carry Foundry's spelling.
+      describe "naming a modifier" do
+        it "should slug an attribute modifier with the attribute's short name" do
+          allow(Pf2e).to receive(:ability_mod).and_return(3)
+
+          expect(Pf2e::Stat.ability_mod(double, 'Dexterity')['slug']).to eq 'dex'
+        end
+
+        it "should slug the save rune the way the rules name it" do
+          expect(Pf2e::Stat::RUNE_SLUGS['power']).to eq 'resilient'
+        end
+
+        it "should slug what a rule says, in preference to the thing carrying it" do
+          row = { 'key' => 'FlatModifier', 'selector' => 'hp', 'value' => 1, 'slug' => 'toughness-hp' }
+
+          expect(Pf2e::Rules.contribute(row, { 'name' => 'Toughness' }, {})['slug']).to eq 'toughness-hp'
+        end
+
+        it "should slug from the thing carrying it when the rule does not say" do
+          row = { 'key' => 'FlatModifier', 'selector' => 'hp', 'value' => 1 }
+
+          expect(Pf2e::Rules.contribute(row, { 'name' => 'Cat Fall' }, {})['slug']).to eq 'cat-fall'
+        end
+      end
+
       describe "a proficiency rank we do not know" do
         it "should read it as untrained rather than raise" do
           allow(Global).to receive(:logger).and_return(double(:warn => nil))
