@@ -12,6 +12,19 @@ module AresMUSH
       return v
     end
 
+    # What a condition is worth to arithmetic: its value, or zero when it is absent or carries none.
+    #
+    # get_condition_value tells absent from valueless, which a display needs. Anything doing sums
+    # wants a number - the dying rules add and subtract three conditions at once, and one absent
+    # condition there made it `1 + nil`.
+    def self.condition_level(char, condition)
+      held = (char.pf2_conditions || {}).find { |name, _info| name.to_s.casecmp?(condition.to_s) }
+
+      return 0 unless held
+
+      held.last.is_a?(Hash) ? held.last['value'].to_i : 0
+    end
+
     def self.set_condition(char, condition, value=nil, duration=false)
       list = char.pf2_conditions
 
