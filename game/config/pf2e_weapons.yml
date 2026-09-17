@@ -37,6 +37,7 @@ pf2e_weapons:
         selector: "nature"
         type: "circumstance"
         value: 2
+        label: "Animal Staff (identify animals)"
         predicate: ["target:trait:animal", {"or": ["action:recall-knowledge", "action:identify"]}]
   Animal Staff (Greater):
     wp_type: melee
@@ -60,6 +61,7 @@ pf2e_weapons:
         selector: "nature"
         type: "circumstance"
         value: 2
+        label: "Animal Staff (identify animals)"
         predicate: ["target:trait:animal", {"or": ["action:recall-knowledge", "action:identify"]}]
   Animal Staff (Major):
     wp_type: melee
@@ -83,6 +85,7 @@ pf2e_weapons:
         selector: "nature"
         type: "circumstance"
         value: 2
+        label: "Animal Staff (identify animals)"
         predicate: ["target:trait:animal", {"or": ["action:recall-knowledge", "action:identify"]}]
   Arbalest:
     wp_type: ranged
@@ -311,6 +314,12 @@ pf2e_weapons:
         potency: 1
         power: 1
     rules:
+      - key: "RollOption"
+        option: "chaplains-cudgel:two-action-spell"
+        domain: "damage"
+        toggleable: true
+        label: "PF2E.SpecificRule.Equipment.ChaplainsCudgel.CastTwoActionSpellLabel"
+        predicate: ["chaplains-cudgel:bow-to-a-higher-power"]
       - key: "FlatModifier"
         selector: "strike-damage"
         type: "status"
@@ -545,6 +554,11 @@ pf2e_weapons:
     runes:
       fundamental:
         potency: 1
+    rules:
+      - key: "RollOption"
+        option: "fighters-fork:fluid-length"
+        toggleable: true
+        label: "PF2E.SpecificRule.Equipment.FightersFork.FluidLengthLabel"
   Filcher's Fork:
     wp_type: melee
     category: martial
@@ -744,6 +758,10 @@ pf2e_weapons:
       fundamental:
         potency: 1
     rules:
+      - key: "RollOption"
+        option: "lighting:dim-light"
+        toggleable: true
+        label: "PF2E.SkillVariant.DimLightOrDarkness"
       - key: "DamageDice"
         selector: "{item|_id}-damage"
         diceNumber: 1
@@ -1461,6 +1479,7 @@ pf2e_weapons:
         selector: "skill-check"
         type: "circumstance"
         value: 2
+        label: "Mentalist's Staff (identifying mental magic)"
         predicate: ["action:identify-magic", "mental"]
   Mentalist's Staff (Greater):
     wp_type: melee
@@ -1484,6 +1503,7 @@ pf2e_weapons:
         selector: "skill-check"
         type: "circumstance"
         value: 2
+        label: "Mentalist's Staff (identifying mental magic)"
         predicate: ["action:identify-magic", "mental"]
   Mentalist's Staff (Major):
     wp_type: melee
@@ -1507,6 +1527,7 @@ pf2e_weapons:
         selector: "skill-check"
         type: "circumstance"
         value: 2
+        label: "Mentalist's Staff (identifying mental magic)"
         predicate: ["action:identify-magic", "mental"]
   Morningstar:
     wp_type: melee
@@ -1637,9 +1658,12 @@ pf2e_weapons:
     runes:
       fundamental:
         potency: 1
-    grants_options:
-      - retribution-axe
     rules:
+      - key: "RollOption"
+        option: "retribution-axe"
+        domain: "damage"
+        toggleable: true
+        label: "Target was last creature to damage you"
       - key: "FlatModifier"
         selector: "{item|_id}-damage"
         type: "circumstance"

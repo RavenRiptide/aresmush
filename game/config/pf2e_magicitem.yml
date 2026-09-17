@@ -41,6 +41,12 @@ pf2e_magicitem:
     bulk: 4
     shortdesc: "This iron cauldron stands upon sturdy iron crow's feet. A *walking cauldron* has a land Speed of 25 feet and can be used as a suitable tool to *Craft* potions, oils, or other liquids.%r%rAs a single action, which has the *auditory* and *concentrate* traits, you can command the cauldron to either follow you or to stand in place. When following you, the cauldron does its best to remain within 30 feet of you, but its ungainly movements are too imprecise to predictably direct in a combat encounter or other situation where seconds and precise locations count. It can carry up to 2 Bulk of ingredients for potions or other liquids inside of itself while following you, but if overloaded or if you put anything else inside it, it stands in place and refuses to move until 10 minutes after you remove the excess."
   # Level 2 Magic Items
+    rules:
+      - key: "RollOption"
+        option: "walking-cauldron-walking"
+        toggleable: true
+        value: true
+        label: "PF2E.SpecificRule.Equipment.WalkingCauldron.ToggleLabel"
   Antler Arrow:
     traits:
       - consumable
@@ -174,9 +180,12 @@ pf2e_magicitem:
     price: 6000
     bulk: 1
     shortdesc: "A *maestro's instrument* can be crafted in the form of any variety of handheld musical instruments. A *maestro's instrument* grants you a +1 item bonus to Performance checks while playing music with the instrument.%r%r**Activate--Charming Performance** 2 actions (manipulate); **Frequency** once per day; **Effect** You play the instrument, causing it to cast a DC 17 *charm* spell.%r%r**Craft Requirements** You must supply a casting of *charm* of the appropriate rank."
-    grants_options:
-      - playing
     rules:
+      - key: "RollOption"
+        option: "playing"
+        domain: "performance"
+        toggleable: true
+        label: "PF2E.SpecificRule.PlayingItem"
       - key: "FlatModifier"
         selector: "performance"
         type: "item"
@@ -196,6 +205,7 @@ pf2e_magicitem:
         selector: "performance"
         type: "item"
         value: 1
+        label: "Persona Mask (acting, orating, comedy, singing)"
         predicate: [{"or": ["acting", "orating", "performing-comedy", "singing"]}]
   Slumber Arrow:
     traits:
@@ -228,6 +238,7 @@ pf2e_magicitem:
         selector: "survival"
         type: "item"
         value: 1
+        label: "Tracker's Goggles (Sense Direction & Track)"
         predicate: [{"or": ["action:sense-direction", "action:track"]}]
   Twisting Twine (Lesser):
     traits:
@@ -266,14 +277,16 @@ pf2e_magicitem:
     price: 10000
     bulk: 0
     shortdesc: "These brass goggles are engraved with flame patterns and have thick, heavy lenses.%r%rWhile worn, they give you a +1 item bonus to Crafting checks to Craft alchemical items. When making Strikes with alchemical bombs, you ignore lesser cover.%r%rIf your Strike with an alchemical bomb fails (but doesn't critically fail), you gain a +1 item bonus to the splash damage the target of the Strike takes."
-    grants_options:
-      - alchemist-goggles-failure
     rules:
       - key: "FlatModifier"
         selector: "crafting"
         type: "item"
         value: 1
         predicate: ["item:trait:alchemical", "action:craft"]
+      - key: "RollOption"
+        option: "alchemist-goggles-failure"
+        toggleable: true
+        label: "PF2E.SpecificRule.Equipment.AlchemistGoggles.RollOptionLabel"
       - key: "FlatModifier"
         selector: "alchemical-bomb-base-damage"
         type: "item"
@@ -344,6 +357,10 @@ pf2e_magicitem:
     bulk: 0.1
     shortdesc: "The end of this wand is forked with a peridot setting.%r%r**Activate** Cast a Spell; The activation takes 2 actions if the spell normally takes 1 action to cast, or 3 actions if the spell normally take 2 actions%r%r**Effect** You Cast the Spell, and increase its area. Add 5 feet to the radius of a burst that normally has a radius of at least 10 feet; add 5 feet to the length of a cone or line that is normally 15 feet long or smaller; or add 10 feet to the length of a larger cone or line.%r%r**Craft Requirements** Supply a casting of a spell of the appropriate rank. The spell must have a casting time of 1 action or 2 actions , can't have a duration, and must have an area of burst (10 feet or more), cone, or line."
   # Level 5 Magic Items
+    rules:
+      - key: "RollOption"
+        option: "wand-of-widening"
+        toggleable: true
   Aeon Stone (Preserving):
     traits:
       - uncommon
@@ -417,6 +434,7 @@ pf2e_magicitem:
         selector: "thievery"
         type: "item"
         value: 1
+        label: "Skeleton Key (Pick a Lock)"
         predicate: ["action:pick-a-lock"]
   Spellstrike Ammunition (Type II):
     traits:
@@ -481,9 +499,11 @@ pf2e_magicitem:
     price: 23000
     bulk: 0.1
     shortdesc: "When you pull up the hood of this nondescript gray cloak (an Interact action), you become drab and uninteresting, gaining a +1 item bonus to Stealth checks and to Deception checks to Impersonate a forgettable background character, such as a servant, but also taking a -1 item penalty to Diplomacy and Intimidation checks.%r%r**Activate--Cloak Identity** 2 actions (concentrate, manipulate); **Frequency** once per day; **Effect** You pull the cloak's hood up and gain the benefits of *veil of privacy* for 1 hour or until you pull the hood back down, whichever comes first."
-    grants_options:
-      - clandestine-cloak
     rules:
+      - key: "RollOption"
+        option: "clandestine-cloak"
+        toggleable: true
+        label: "PF2E.SpecificRule.Equipment.ClandestineCloak.RollOptionLabel"
       - key: "FlatModifier"
         selector: "stealth"
         type: "item"
@@ -547,6 +567,10 @@ pf2e_magicitem:
     bulk: 0.1
     shortdesc: "The end of this wand is forked with a peridot setting.%r%r**Activate** Cast a Spell; The activation takes 2 actions if the spell normally takes 1 action to cast, or 3 actions if the spell normally take 2 actions%r%r**Effect** You Cast the Spell, and increase its area. Add 5 feet to the radius of a burst that normally has a radius of at least 10 feet; add 5 feet to the length of a cone or line that is normally 15 feet long or smaller; or add 10 feet to the length of a larger cone or line.%r%r**Craft Requirements** Supply a casting of a spell of the appropriate rank. The spell must have a casting time of 1 action or 2 actions , can't have a duration, and must have an area of burst (10 feet or more), cone, or line."
   # Level 7 Magic Items
+    rules:
+      - key: "RollOption"
+        option: "wand-of-widening"
+        toggleable: true
   Aeon Stone (Delaying):
     traits:
       - uncommon
@@ -716,6 +740,10 @@ pf2e_magicitem:
     bulk: 0.1
     shortdesc: "The end of this wand is forked with a peridot setting.%r%r**Activate** Cast a Spell; The activation takes 2 actions if the spell normally takes 1 action to cast, or 3 actions if the spell normally take 2 actions%r%r**Effect** You Cast the Spell, and increase its area. Add 5 feet to the radius of a burst that normally has a radius of at least 10 feet; add 5 feet to the length of a cone or line that is normally 15 feet long or smaller; or add 10 feet to the length of a larger cone or line.%r%r**Craft Requirements** Supply a casting of a spell of the appropriate rank. The spell must have a casting time of 1 action or 2 actions , can't have a duration, and must have an area of burst (10 feet or more), cone, or line."
   # Level 9 Magic Items
+    rules:
+      - key: "RollOption"
+        option: "wand-of-widening"
+        toggleable: true
   Armbands of Athleticism:
     traits:
       - invested
@@ -873,6 +901,7 @@ pf2e_magicitem:
         selector: "performance"
         type: "item"
         value: 2
+        label: "Persona Mask (acting, orating, comedy, singing)"
         predicate: [{"or": ["acting", "orating", "performing-comedy", "singing"]}]
   Spellstrike Ammunition (Type IV):
     traits:
@@ -905,6 +934,7 @@ pf2e_magicitem:
         selector: "survival"
         type: "item"
         value: 2
+        label: "Tracker's Goggles (Sense Direction & Track)"
         predicate: [{"or": ["action:sense-direction", "action:track"]}]
   Urn of Ashes:
     traits:
@@ -980,9 +1010,11 @@ pf2e_magicitem:
     price: 90000
     bulk: 0.1
     shortdesc: "When you pull up the hood of this nondescript gray cloak (an Interact action), you become drab and uninteresting, gaining a +2 item bonus to Stealth checks and to Deception checks to Impersonate a forgettable background character, such as a servant, but also taking a -1 item penalty to Diplomacy and Intimidation checks.%r%r**Activate--Cloak Identity** 2 actions (concentrate, manipulate); **Frequency** once per day; **Effect** You pull the cloak's hood up and gain the benefits of a 5th-rank *veil of privacy* for 8 hours or until you pull the hood back down, whichever comes first."
-    grants_options:
-      - clandestine-cloak
     rules:
+      - key: "RollOption"
+        option: "clandestine-cloak"
+        toggleable: true
+        label: "PF2E.SpecificRule.Equipment.ClandestineCloak.RollOptionLabel"
       - key: "FlatModifier"
         selector: "stealth"
         type: "item"
@@ -1029,6 +1061,7 @@ pf2e_magicitem:
         selector: "skill-check"
         type: "circumstance"
         value: 1
+        label: "PF2E.SpecificRule.Equipment.DaredevilBoots.TumbleThroughLabel"
         predicate: ["action:tumble-through"]
   Demon Mask (Greater):
     traits:
@@ -1073,9 +1106,12 @@ pf2e_magicitem:
     price: 90000
     bulk: 1
     shortdesc: "A *maestro's instrument* can be crafted in the form of any variety of handheld musical instruments. A *maestro's instrument* grants you a +2 item bonus to Performance checks while playing music with the instrument.%r%r**Activate--Charming Performance** 2 actions (manipulate); **Frequency** once per day; **Effect** You play the instrument, causing it to cast a 4th-rank *charm* spell with DC 27.%r%r**Craft Requirements** You must supply a casting of *charm* of the appropriate rank."
-    grants_options:
-      - playing
     rules:
+      - key: "RollOption"
+        option: "playing"
+        domain: "performance"
+        toggleable: true
+        label: "PF2E.SpecificRule.PlayingItem"
       - key: "FlatModifier"
         selector: "performance"
         type: "item"
@@ -1133,6 +1169,10 @@ pf2e_magicitem:
     price: 100000
     bulk: 0.1
     shortdesc: "The end of this wand is forked with a peridot setting.%r%r**Activate** Cast a Spell; The activation takes 2 actions if the spell normally takes 1 action to cast, or 3 actions if the spell normally take 2 actions%r%r**Effect** You Cast the Spell, and increase its area. Add 5 feet to the radius of a burst that normally has a radius of at least 10 feet; add 5 feet to the length of a cone or line that is normally 15 feet long or smaller; or add 10 feet to the length of a larger cone or line.%r%r**Craft Requirements** Supply a casting of a spell of the appropriate rank. The spell must have a casting time of 1 action or 2 actions , can't have a duration, and must have an area of burst (10 feet or more), cone, or line."
+    rules:
+      - key: "RollOption"
+        option: "wand-of-widening"
+        toggleable: true
   Winged Sandals:
     traits:
       - air
@@ -1151,14 +1191,16 @@ pf2e_magicitem:
     price: 140000
     bulk: 0
     shortdesc: "These brass goggles are engraved with flame patterns and have thick, heavy lenses.%r%rWhile worn, they give you a +2 item bonus to Crafting checks to Craft alchemical items. When making Strikes with alchemical bombs, you ignore lesser cover.%r%rIf your Strike with an alchemical bomb fails (but doesn't critically fail), you gain a +2 item bonus to the splash damage the target of the Strike takes."
-    grants_options:
-      - alchemist-goggles-failure
     rules:
       - key: "FlatModifier"
         selector: "crafting"
         type: "item"
         value: 2
         predicate: ["item:trait:alchemical", "action:craft"]
+      - key: "RollOption"
+        option: "alchemist-goggles-failure"
+        toggleable: true
+        label: "PF2E.SpecificRule.Equipment.AlchemistGoggles.RollOptionLabel"
       - key: "FlatModifier"
         selector: "alchemical-bomb-base-damage"
         type: "item"
@@ -1237,6 +1279,9 @@ pf2e_magicitem:
         type: "item"
         value: 2
         predicate: ["item:trait:visual"]
+      - key: "RollOption"
+        option: "obsidian-goggles-greater"
+        toggleable: true
   Ring of Maniacal Devices:
     traits:
       - invested
@@ -1268,6 +1313,7 @@ pf2e_magicitem:
         selector: "thievery"
         type: "item"
         value: 2
+        label: "Skeleton Key, Greater (Pick a Lock)"
         predicate: ["action:pick-a-lock"]
   Spellstrike Ammunition (Type V):
     traits:
@@ -1339,6 +1385,10 @@ pf2e_magicitem:
     bulk: 0.1
     shortdesc: "The end of this wand is forked with a peridot setting.%r%r**Activate** Cast a Spell; The activation takes 2 actions if the spell normally takes 1 action to cast, or 3 actions if the spell normally take 2 actions%r%r**Effect** You Cast the Spell, and increase its area. Add 5 feet to the radius of a burst that normally has a radius of at least 10 feet; add 5 feet to the length of a cone or line that is normally 15 feet long or smaller; or add 10 feet to the length of a larger cone or line.%r%r**Craft Requirements** Supply a casting of a spell of the appropriate rank. The spell must have a casting time of 1 action or 2 actions , can't have a duration, and must have an area of burst (10 feet or more), cone, or line."
   # Level 13 Magic Items
+    rules:
+      - key: "RollOption"
+        option: "wand-of-widening"
+        toggleable: true
   Eternal Eruption of the Kueu:
     traits:
       - fire
@@ -1483,6 +1533,10 @@ pf2e_magicitem:
     bulk: 0.1
     shortdesc: "The end of this wand is forked with a peridot setting.%r%r**Activate** Cast a Spell; The activation takes 2 actions if the spell normally takes 1 action to cast, or 3 actions if the spell normally take 2 actions%r%r**Effect** You Cast the Spell, and increase its area. Add 5 feet to the radius of a burst that normally has a radius of at least 10 feet; add 5 feet to the length of a cone or line that is normally 15 feet long or smaller; or add 10 feet to the length of a larger cone or line.%r%r**Craft Requirements** Supply a casting of a spell of the appropriate rank. The spell must have a casting time of 1 action or 2 actions , can't have a duration, and must have an area of burst (10 feet or more), cone, or line."
   # Level 15 Magic Items
+    rules:
+      - key: "RollOption"
+        option: "wand-of-widening"
+        toggleable: true
   Countering Charm (Greater):
     traits:
       - uncommon
@@ -1593,6 +1647,10 @@ pf2e_magicitem:
     price: 1000000
     bulk: 0.1
     shortdesc: "The end of this wand is forked with a peridot setting.%r%r**Activate** Cast a Spell; The activation takes 2 actions if the spell normally takes 1 action to cast, or 3 actions if the spell normally take 2 actions%r%r**Effect** You Cast the Spell, and increase its area. Add 5 feet to the radius of a burst that normally has a radius of at least 10 feet; add 5 feet to the length of a cone or line that is normally 15 feet long or smaller; or add 10 feet to the length of a larger cone or line.%r%r**Craft Requirements** Supply a casting of a spell of the appropriate rank. The spell must have a casting time of 1 action or 2 actions , can't have a duration, and must have an area of burst (10 feet or more), cone, or line."
+    rules:
+      - key: "RollOption"
+        option: "wand-of-widening"
+        toggleable: true
   Weapon Potency (+3):
     traits:
       - magical
@@ -1609,14 +1667,16 @@ pf2e_magicitem:
     price: 1500000
     bulk: 0
     shortdesc: "These brass goggles are engraved with flame patterns and have thick, heavy lenses.%r%rWhile worn, they give you a +3 item bonus to Crafting checks to Craft alchemical items. When making Strikes with alchemical bombs, you ignore lesser cover.%r%rIf your Strike with an alchemical bomb fails (but doesn't critically fail), you gain a +3 item bonus to the splash damage the target of the Strike takes."
-    grants_options:
-      - alchemist-goggles-failure
     rules:
       - key: "FlatModifier"
         selector: "crafting"
         type: "item"
         value: 3
         predicate: ["item:trait:alchemical", "action:craft"]
+      - key: "RollOption"
+        option: "alchemist-goggles-failure"
+        toggleable: true
+        label: "PF2E.SpecificRule.Equipment.AlchemistGoggles.RollOptionLabel"
       - key: "FlatModifier"
         selector: "alchemical-bomb-base-damage"
         type: "item"
@@ -1719,6 +1779,7 @@ pf2e_magicitem:
         selector: "skill-check"
         type: "circumstance"
         value: 2
+        label: "PF2E.SpecificRule.Equipment.DaredevilBoots.TumbleThroughLabel"
         predicate: ["action:tumble-through"]
   Dread Blindfold:
     traits:
@@ -1863,6 +1924,7 @@ pf2e_magicitem:
         selector: "crafting"
         type: "item"
         value: 3
+        label: "Inexplicable Apparatus (craft, earn income, repair)"
         predicate: [{"or": ["action:craft", "action:earn-income", "action:repair"]}]
   Maestro's Instrument (Greater):
     traits:
@@ -1871,9 +1933,12 @@ pf2e_magicitem:
     price: 1900000
     bulk: 1
     shortdesc: "A *maestro's instrument* can be crafted in the form of any variety of handheld musical instruments. A *maestro's instrument* grants you a +3 item bonus to Performance checks while playing music with the instrument.%r%r**Activate--Charming Performance** 2 actions (manipulate); **Frequency** once per day; **Effect** You play the instrument, causing it to cast a 8th-rank *charm* spell with DC 38.%r%r**Craft Requirements** You must supply a casting of *charm* of the appropriate rank."
-    grants_options:
-      - playing
     rules:
+      - key: "RollOption"
+        option: "playing"
+        domain: "performance"
+        toggleable: true
+        label: "PF2E.SpecificRule.PlayingItem"
       - key: "FlatModifier"
         selector: "performance"
         type: "item"
@@ -1900,6 +1965,9 @@ pf2e_magicitem:
         type: "item"
         value: 3
         predicate: ["item:trait:visual"]
+      - key: "RollOption"
+        option: "obsidian-goggles-major"
+        toggleable: true
   Possibility Tome:
     traits:
       - magical
@@ -1912,6 +1980,7 @@ pf2e_magicitem:
         selector: "skill-check"
         type: "item"
         value: 3
+        label: "Possibility Tome (Recall Knowledge)"
         predicate: ["action:recall-knowledge"]
   Ring of Maniacal Devices (Greater):
     traits:
@@ -1941,6 +2010,10 @@ pf2e_magicitem:
     bulk: 0.1
     shortdesc: "The end of this wand is forked with a peridot setting.%r%r**Activate** Cast a Spell; The activation takes 2 actions if the spell normally takes 1 action to cast, or 3 actions if the spell normally take 2 actions%r%r**Effect** You Cast the Spell, and increase its area. Add 5 feet to the radius of a burst that normally has a radius of at least 10 feet; add 5 feet to the length of a cone or line that is normally 15 feet long or smaller; or add 10 feet to the length of a larger cone or line.%r%r**Craft Requirements** Supply a casting of a spell of the appropriate rank. The spell must have a casting time of 1 action or 2 actions , can't have a duration, and must have an area of burst (10 feet or more), cone, or line."
   # Level 19 Magic Items
+    rules:
+      - key: "RollOption"
+        option: "wand-of-widening"
+        toggleable: true
   Crystal Ball (Obsidian):
     traits:
       - uncommon
@@ -2044,6 +2117,10 @@ pf2e_magicitem:
     price: 7000000
     bulk: 0.1
     shortdesc: "The end of this wand is forked with a peridot setting.%r%r**Activate** Cast a Spell; The activation takes 2 actions if the spell normally takes 1 action to cast, or 3 actions if the spell normally take 2 actions%r%r**Effect** You Cast the Spell, and increase its area. Add 5 feet to the radius of a burst that normally has a radius of at least 10 feet; add 5 feet to the length of a cone or line that is normally 15 feet long or smaller; or add 10 feet to the length of a larger cone or line.%r%r**Craft Requirements** Supply a casting of a spell of the appropriate rank. The spell must have a casting time of 1 action or 2 actions , can't have a duration, and must have an area of burst (10 feet or more), cone, or line."
+    rules:
+      - key: "RollOption"
+        option: "wand-of-widening"
+        toggleable: true
   Whisper of the First Lie:
     traits:
       - rare

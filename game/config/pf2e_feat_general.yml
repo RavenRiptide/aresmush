@@ -270,6 +270,7 @@ pf2e_feats:
         selector: "perception"
         type: "circumstance"
         value: 2
+        label: "Thorough Search (Seek thoroughly)"
         predicate: ["action:seek", "thorough-search"]
   Untrained Improvisation:
     feat_type:
@@ -320,6 +321,7 @@ pf2e_feats:
         selector: "skill-check"
         type: "circumstance"
         value: 2
+        label: "Supertaster (recall knowledge or investigate via taste)"
         predicate: ["taste", {"or": ["action:recall-knowledge", "action:investigate"]}]
   A Home in Every Port:
     feat_type:

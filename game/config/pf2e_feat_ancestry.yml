@@ -100,9 +100,11 @@ pf2e_feats:
     shortdesc: "You work at a pace born from longevity that enhances your thoroughness. You can voluntarily spend twice as much time as normal on a Perception check or skill check that takes 1 action or longer. If you do, you gain a +2 circumstance bonus to the check and don't automatically reduce your degree of success on a natural 1 (you get a critical failure only if your result is 10 lower than the DC). For example, you could get these benefits if you spent 2 actions to Seek, which normally takes 1 action. You can get these benefits during exploration by taking twice as long exploring as normal, or in downtime by spending twice as much downtime.%r%rThe GM might determine a situation doesn't grant you a benefit if a delay would be directly counterproductive to your success, such as a tense negotiation with an impatient creature."
     prereq:
       level: 5
-    grants_options:
-      - ageless-patience
     rules:
+      - key: "RollOption"
+        option: "ageless-patience"
+        domain: "check"
+        toggleable: true
       - key: "FlatModifier"
         selector: ["perception", "skill-check"]
         type: "circumstance"
@@ -963,6 +965,7 @@ pf2e_feats:
         selector: ["society", "survival"]
         type: "circumstance"
         value: 1
+        label: "PF2E.SpecificRule.Goblin.CityScavenger.EarnIncome"
         predicate: ["action:earn-income", "with-subsist"]
   Clever Improviser:
     feat_type:
@@ -1604,6 +1607,7 @@ pf2e_feats:
         selector: "saving-throw"
         type: "circumstance"
         value: 1
+        label: "Against emotion effects"
         predicate: ["emotion"]
   Form of the Bat:
     feat_type:
@@ -1693,6 +1697,11 @@ pf2e_feats:
     prereq:
       level: 1
       heritage: Ashen One
+    rules:
+      - key: "RollOption"
+        option: "target:trait:incorporeal"
+        toggleable: "totm"
+        label: "PF2E.SpecificRule.TOTMToggle.Incorporeal"
   Gnome Obsession:
     feat_type:
       - Ancestry
@@ -1979,6 +1988,11 @@ pf2e_feats:
     prereq:
       level: 1
       heritage: Aesa
+    rules:
+      - key: "RollOption"
+        option: "halo-active"
+        toggleable: true
+        value: true
   Harbinger's Caw:
     feat_type:
       - Ancestry
@@ -2134,14 +2148,16 @@ pf2e_feats:
         - Clever Improviser
     actions: free
     frequency: once per day
-    grants_options:
-      - incredible-improvisation
     rules:
       - key: "FlatModifier"
         selector: "skill-check"
         type: "circumstance"
         value: 4
         predicate: ["proficiency:untrained", "incredible-improvisation"]
+      - key: "RollOption"
+        option: "incredible-improvisation"
+        domain: "skill-check"
+        toggleable: true
   Inspire Imitation:
     feat_type:
       - Ancestry
@@ -2570,6 +2586,7 @@ pf2e_feats:
         selector: ["attack", "acrobatics", "athletics"]
         type: "circumstance"
         value: 1
+        label: "Musetouched (to Escape)"
         predicate: ["action:escape"]
   Natural Ambition:
     feat_type:
@@ -2973,6 +2990,9 @@ pf2e_feats:
       level: 9
       feat:
         - Oruch Superstition
+    rules:
+      - key: "RollOption"
+        option: "orc-superstition"
   Pitborn:
     feat_type:
       - Ancestry
@@ -3656,6 +3676,11 @@ pf2e_feats:
       heritage: Skyborn Egalrin
     actions: 1
     frequency: once per round
+    rules:
+      - key: "RollOption"
+        option: "soaring-flight"
+        toggleable: true
+        predicate: [{"not": "feat:soaring-form"}]
   Soaring Form:
     feat_type:
       - Ancestry
@@ -4029,14 +4054,16 @@ pf2e_feats:
     shortdesc: You channel strength from the earth beneath your feet to pummel your enemies. When making a melee Strike against a target who is standing on the same earth or stone surface as you are, you gain a circumstance bonus to the damage roll equal to the number of weapon damage dice.
     prereq:
       level: 13
-    grants_options:
-      - telluric-power
     rules:
       - key: "FlatModifier"
         selector: "melee-strike-damage"
         type: "circumstance"
         value: "@weapon.system.damage.dice"
         predicate: ["telluric-power"]
+      - key: "RollOption"
+        option: "telluric-power"
+        domain: "damage"
+        toggleable: true
   Terrain Advantage:
     feat_type:
       - Ancestry
@@ -4099,6 +4126,10 @@ pf2e_feats:
       level: 13
       feat:
         - Dance Underfoot
+    rules:
+      - key: "RollOption"
+        option: "toppling-dance"
+        toggleable: true
   Tree Climber (Sildanyar):
     feat_type:
       - Ancestry
@@ -4197,14 +4228,20 @@ pf2e_feats:
     prereq:
       level: 5
       heritage: Dar
-    grants_options:
-      - target:mode:undead
     rules:
       - key: "FlatModifier"
         selector: "strike-damage"
         type: "circumstance"
         value: "@weapon.system.damage.dice"
         predicate: ["target:mode:undead"]
+      - key: "RollOption"
+        option: "target:mode:undead"
+        toggleable: "totm"
+        label: "PF2E.SpecificRule.TOTMToggle.Undead"
+      - key: "RollOption"
+        option: "target:trait:vampire"
+        toggleable: "totm"
+        label: "PF2E.SpecificRule.TOTMToggle.Vampire"
   Undying Ferocity:
     feat_type:
       - Ancestry
@@ -4450,6 +4487,10 @@ pf2e_feats:
     shortdesc: You gain the trained proficiency rank in Survival. If you would automatically become trained in Survival (from your background or class, for example), you become trained in another skill of your choice. When you Sense Direction or attempt a roll against a *quandary* spell, you get a result one degree of success better than you rolled. You don't take a penalty to Sense Direction when you lack a compass.
     prereq:
       level: 1
+    rules:
+      - key: "RollOption"
+        option: "compass-in-possession"
+        domain: "skill-check"
   Watchful Bassin:
     feat_type:
       - Ancestry

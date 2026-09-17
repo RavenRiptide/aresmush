@@ -27,6 +27,7 @@ pf2e_feats:
         selector: "athletics"
         type: "status"
         value: 1
+        label: "PF2E.SkillVariant.EscapeForceOpenOrLift"
         predicate: ["self:effect:rage", {"or": ["action:escape", "action:force-open", "action:lift-heavy-object"]}]
   Alchemical Assessment:
     assoc_charclass:
@@ -249,6 +250,10 @@ pf2e_feats:
     shortdesc: You knock weapons from the hands of your foes with style. When you Disarm, the action gains the bravado trait.
     traits:
       - swashbuckler
+    rules:
+      - key: "RollOption"
+        option: "item:trait:bravado"
+        predicate: ["action:disarm"]
   Divine Castigation:
     assoc_charclass:
       - Cleric
@@ -259,6 +264,10 @@ pf2e_feats:
     shortdesc: Your deity's grace doesn't extend to your sworn enemies. When you cast a *harm* or *heal* spell, you can add your holy or unholy trait to it. If you do, the spell deals damage to creatures with the opposing trait, even if it wouldn't normally damage them. The spell deals spirit damage when used this way. For example, if you are holy, you could add the holy trait to a *heal* spell and deal spirit damage to a fiend that has the unholy trait.
     traits:
       - cleric
+    rules:
+      - key: "RollOption"
+        option: "divine-castigation"
+        toggleable: true
   Domain Initiate:
     repeatable: true
     assoc_charclass:
@@ -281,9 +290,11 @@ pf2e_feats:
     shortdesc: "**Requirements** You are wielding two melee weapons, each in a different hand.%r%rYou lash out at your foe with both weapons. Make two Strikes, one with each of your two melee weapons, each using your current multiple attack penalty. Both Strikes must have the same target. If the second Strike is made with a weapon that doesn't have the agile trait, it takes a –2 penalty.%r%rIf both attacks hit, combine their damage, and then add any other applicable effects from both weapons. You add any precision damage only once, to the attack of your choice. Combine the damage from both Strikes and apply resistances and weaknesses only once. This counts as two attacks when calculating your multiple attack penalty."
     traits:
       - fighter
-    grants_options:
-      - double-slice-second
     rules:
+      - key: "RollOption"
+        option: "double-slice-second"
+        toggleable: true
+        label: "PF2E.SpecificRule.Fighter.DoubleSlice.SecondAttackLabel"
       - key: "FlatModifier"
         selector: ["melee-strike-attack-roll"]
         value: -2
@@ -305,6 +316,7 @@ pf2e_feats:
         selector: "saving-throw"
         type: "status"
         value: 2
+        label: "PF2E.SkillVariant.VsEmotion"
         predicate: ["self:effect:rage", "item:trait:emotion"]
   Dragon Stance:
     assoc_charclass:
@@ -327,6 +339,11 @@ pf2e_feats:
     shortdesc: "You've learned a flexible way to position your Buckler to provide more protection. When you Raise a Shield to gain a circumstance bonus to AC from a buckler, increase the bonus from +1 to +2.%r%rWhile you have a buckler raised, if a creature critically misses you with a Strike, you gain panache until the end of your next turn."
     traits:
       - swashbuckler
+    rules:
+      - key: "RollOption"
+        option: "elegant-buckler"
+        toggleable: true
+        label: "PF2E.SpecificRule.Swashbuckler.ElegantBuckler.RollOptionLabel"
   Eliminate Red Herrings:
     assoc_charclass:
       - Investigator
@@ -400,9 +417,10 @@ pf2e_feats:
     shortdesc: "**Trigger** A creature you can see targets you with an attack.%r%r**Requirements** You aren't encumbered.%r%rYou deftly dodge out of the way, gaining a +2 circumstance bonus to AC against the triggering attack. If the Strike misses, you gain panache until the end of your next turn."
     traits:
       - swashbuckler
-    grants_options:
-      - flashy-dodge
     rules:
+      - key: "RollOption"
+        option: "flashy-dodge"
+        toggleable: true
       - key: "FlatModifier"
         selector: "ac"
         type: "circumstance"
@@ -428,6 +446,11 @@ pf2e_feats:
     shortdesc: You apply your flashy techniques to thrown weapons as easily as melee attacks. You apply your precise strike damage on ranged Strikes you make with a thrown weapon within that weapon's first range increment. The thrown weapon must be an agile or finesse weapon. This also allows you to make a thrown weapon ranged Strike for Confident Finisher and any other finisher that includes a Strike that can benefit from your precise strike.
     traits:
       - swashbuckler
+    rules:
+      - key: "RollOption"
+        option: "target:range-increment:1"
+        toggleable: "totm"
+        label: "PF2E.SpecificRule.TOTMToggle.FirstRangeIncrement"
   Focused Fascination:
     assoc_charclass:
       - Swashbuckler
@@ -637,9 +660,10 @@ pf2e_feats:
     shortdesc: "**Trigger** A creature targets you with an attack and you can see the attacker.%r%r**Requirements** You are not encumbered.%r%rYou deftly dodge out of the way, gaining a +2 circumstance bonus to AC against the triggering attack."
     traits:
       - rogue
-    grants_options:
-      - nimble-dodge
     rules:
+      - key: "RollOption"
+        option: "nimble-dodge"
+        toggleable: true
       - key: "FlatModifier"
         selector: "ac"
         type: "circumstance"
@@ -769,9 +793,11 @@ pf2e_feats:
     shortdesc: "**Trigger** You are about to roll a saving throw against a hazard.%r%rYour deity grants you a moment's foresight. You gain a +2 circumstance bonus to the triggering saving throw."
     traits:
       - cleric
-    grants_options:
-      - premonition-of-avoidance
     rules:
+      - key: "RollOption"
+        option: "premonition-of-avoidance"
+        domain: "saving-throw"
+        toggleable: true
       - key: "FlatModifier"
         selector: "saving-throw"
         type: "circumstance"
@@ -976,10 +1002,16 @@ pf2e_feats:
     traits:
       - investigator
       - rogue
-    grants_options:
-      - trap-finder
-      - origin:trait:trap
     rules:
+      - key: "RollOption"
+        option: "trap-finder"
+        domain: "perception"
+        toggleable: true
+        label: "PF2E.SpecificRule.TrapFinder.SearchLabel"
+      - key: "RollOption"
+        option: "origin:trait:trap"
+        toggleable: "totm"
+        label: "PF2E.SpecificRule.TrapFinder.DefendingLabel"
       - key: "FlatModifier"
         selector: ["saving-throw", "ac"]
         type: "circumstance"
@@ -1000,6 +1032,10 @@ pf2e_feats:
     shortdesc: You tumble under and behind your foe, your rapid movement letting you catch them off guard. When you successfully Tumble Through, the foe whose space you passed through is off-guard against the next attack you make before the end of your turn.
     traits:
       - rogue
+    rules:
+      - key: "RollOption"
+        option: "tumble-behind"
+        toggleable: true
   Twin Feint:
     assoc_charclass:
       - Rogue
@@ -1087,13 +1123,15 @@ pf2e_feats:
     traits:
       - fighter
       - flourish
-    grants_options:
-      - vicious-swing
     rules:
       - key: "DamageDice"
         selector: "melee-strike-damage"
         diceNumber: "ternary(gte(@actor.level,18),3,ternary(gte(@actor.level,10),2,1))"
         predicate: ["vicious-swing"]
+      - key: "RollOption"
+        option: "vicious-swing"
+        domain: "damage"
+        toggleable: true
   Weight of Guilt:
     assoc_charclass:
       - Champion
@@ -1105,6 +1143,10 @@ pf2e_feats:
     shortdesc: Guilt clouds the minds of those who ignore your Glimpse of Redemption. Instead of making the triggering creature enfeebled 2, you can make it stupefied 2 for the same duration.
     traits:
       - champion
+    rules:
+      - key: "RollOption"
+        option: "weight-of-guilt"
+        toggleable: true
   Well-Versed:
     assoc_charclass:
       - Bard
@@ -1120,6 +1162,7 @@ pf2e_feats:
         selector: "saving-throw"
         type: "circumstance"
         value: 1
+        label: "Well-Versed (vs. performative effects)"
         predicate: [{"or": ["auditory", "illusion", "linguistic", "sonic", "visual"]}]
   Whispers of Weakness:
     assoc_charclass:
@@ -1269,6 +1312,10 @@ pf2e_feats:
     traits:
       - fighter
       - press
+    rules:
+      - key: "RollOption"
+        option: "assisting-shot"
+        toggleable: true
   Athletic Strategist:
     assoc_charclass:
       - Investigator
@@ -1292,14 +1339,16 @@ pf2e_feats:
     traits:
       - barbarian
       - flourish
-    grants_options:
-      - bashing-charge
     rules:
       - key: "FlatModifier"
         selector: "athletics"
         type: "circumstance"
         value: 1
         predicate: ["bashing-charge"]
+      - key: "RollOption"
+        option: "bashing-charge"
+        domain: "athletics"
+        toggleable: true
   Basic Lesson:
     assoc_charclass:
       - Witch
@@ -1427,9 +1476,10 @@ pf2e_feats:
     shortdesc: "**Trigger** You attempt a saving throw, but you haven't rolled yet.%r%rWhen danger calls, you have a strange knack for coming out on top. You gain a +2 circumstance bonus to the triggering save. If you succeed on the triggering saving throw, you gain panache until the end of your next turn."
     traits:
       - swashbuckler
-    grants_options:
-      - charmed-life
     rules:
+      - key: "RollOption"
+        option: "charmed-life"
+        toggleable: true
       - key: "FlatModifier"
         selector: "saving-throw"
         type: "circumstance"
@@ -1745,9 +1795,11 @@ pf2e_feats:
     traits:
       - concentrate
       - ranger
-    grants_options:
-      - hunters-aim
     rules:
+      - key: "RollOption"
+        option: "hunters-aim"
+        domain: "ranged-strike-attack-roll"
+        toggleable: true
       - key: "FlatModifier"
         selector: "ranged-strike-attack-roll"
         type: "circumstance"
@@ -1814,6 +1866,10 @@ pf2e_feats:
     shortdesc: "**Requirements** You are wielding a melee weapon.%r%rYou attack an enemy at the edge of your reach. Make a Strike with a melee weapon, increasing your reach by 5 feet for that Strike. If the weapon has the disarm, shove, or trip trait, you can use the corresponding action instead of a Strike."
     traits:
       - fighter
+    rules:
+      - key: "RollOption"
+        option: "lunge"
+        toggleable: true
   Meddling Futures:
     assoc_charclass:
       - Oracle
@@ -1858,6 +1914,9 @@ pf2e_feats:
     shortdesc: "Your muse doesn't fall into a single label. Choose a type of muse other than that of your own. You gain a 1st-level feat that requires that muse, and your muse is now also a muse of that type, allowing you to take feats with the other muse as a prerequisite. You don't gain any of the other effects of the muse you chose.%r%r**Special** You can take this feat multiple times. Each time you do, you must choose a different type of muse other than that of your own."
     traits:
       - bard
+    rules:
+      - key: "RollOption"
+        option: "feature:{item|flags.system.rulesSelections.muse}"
   No Escape:
     assoc_charclass:
       - Barbarian
@@ -1975,6 +2034,10 @@ pf2e_feats:
     shortdesc: "**Trigger** An ally is reduced to 0 Hit Points.%r%rYou work quickly and efficiently in times of danger to deliver needed assistance. You Stride towards the triggering ally. You gain a +10-foot circumstance bonus to your Speed during this movement."
     traits:
       - cleric
+    rules:
+      - key: "RollOption"
+        option: "rapid-response"
+        toggleable: true
   Rebounding Toss:
     assoc_charclass:
       - Fighter
@@ -2086,6 +2149,11 @@ pf2e_feats:
     traits:
       - additive
       - alchemist
+    rules:
+      - key: "RollOption"
+        option: "smoke-bomb"
+        domain: "attack-roll"
+        toggleable: true
   Solid Lead:
     assoc_charclass:
       - Investigator
@@ -2128,6 +2196,11 @@ pf2e_feats:
     shortdesc: The focused power of your flurry threatens to overwhelm your opponent. When you target the same creature with two Strikes from your Flurry of Blows, you can try to stun the creature. If either Strike hits and deals damage, the target must succeed at a Fortitude save against your class DC or be stunned 1 (or stunned 3 on a critical failure). This is an incapacitation effect.
     traits:
       - monk
+    rules:
+      - key: "RollOption"
+        option: "stunning-blows"
+        domain: "damage"
+        toggleable: true
   Tumble Behind (Swashbuckler):
     assoc_charclass:
       - Swashbuckler
@@ -2138,6 +2211,10 @@ pf2e_feats:
     shortdesc: Your tumbling puts your foes on the back foot. When you Tumble Through successfully, the foe you Tumbled Through is off-guard against the next attack you make before the end of your turn.
     traits:
       - swashbuckler
+    rules:
+      - key: "RollOption"
+        option: "tumble-behind"
+        toggleable: true
   Unbalancing Blow:
     assoc_charclass:
       - Rogue
@@ -2209,6 +2286,11 @@ pf2e_feats:
     shortdesc: As you explore your deity's aspects, you move beyond restrictions on healing or harming. You can prepare either *harm* or *heal* in the spell slots gained from the harmful font or healing font.
     traits:
       - cleric
+    rules:
+      - key: "RollOption"
+        option: "divine-font:heal"
+      - key: "RollOption"
+        option: "divine-font:harm"
   Warpriest's Armor:
     grants:
       combat_stats:
@@ -2405,9 +2487,11 @@ pf2e_feats:
     shortdesc: "**Trigger** You are the target of a physical ranged attack.%r%r**Requirements** You're aware of the attack, are not off-guard against it, and have a hand free.%r%rYou gain a +4 circumstance bonus to AC against the triggering attack. If the attack misses, you have deflected it. You cannot use this feat to deflect unusually massive ranged projectiles (such as boulders or ballista bolts)."
     traits:
       - monk
-    grants_options:
-      - deflect-projectile
     rules:
+      - key: "RollOption"
+        option: "deflect-projectile"
+        domain: "ac"
+        toggleable: true
       - key: "FlatModifier"
         selector: "ac"
         type: "circumstance"
@@ -2489,9 +2573,11 @@ pf2e_feats:
     traits:
       - fighter
       - flourish
-    grants_options:
-      - double-shot
     rules:
+      - key: "RollOption"
+        option: "double-shot"
+        domain: "ranged-attack-roll"
+        toggleable: true
       - key: "FlatModifier"
         selector: "ranged-attack-roll"
         value: -2
@@ -2517,9 +2603,10 @@ pf2e_feats:
     traits:
       - fighter
       - flourish
-    grants_options:
-      - dual-handed-assault
     rules:
+      - key: "RollOption"
+        option: "dual-handed-assault"
+        toggleable: true
       - key: "DamageDice"
         selector: "strike-damage"
         override: {"upgrade": true}
@@ -2672,14 +2759,17 @@ pf2e_feats:
     shortdesc: Your guard is up, even while moving. You gain a +4 circumstance bonus to AC against reactions triggered by your movement.
     traits:
       - monk
-    grants_options:
-      - guarded-movement
     rules:
       - key: "FlatModifier"
         selector: "ac"
         type: "circumstance"
         value: 4
+        label: "Guarded Movement (against reactions triggered by movement)"
         predicate: ["guarded-movement"]
+      - key: "RollOption"
+        option: "guarded-movement"
+        toggleable: true
+        label: "Guarded Movement (your movement triggers a reaction)"
   Guardian's Deflection (Swashbuckler):
     assoc_charclass:
       - Swashbuckler
@@ -2830,6 +2920,7 @@ pf2e_feats:
         selector: ["deception", "diplomacy", "intimidation", "performance"]
         type: "circumstance"
         value: 1
+        label: "Lie Detector (against a known liar)"
         predicate: ["known-liar"]
   Linked Focus:
     assoc_charclass:
@@ -3038,6 +3129,12 @@ pf2e_feats:
     shortdesc: "**Requirements** You are wielding a religious symbol.%r%rYou present your religious symbol emphatically. You gain a +2 circumstance bonus to saving throws until the start of your next turn. While it's raised, if you roll a success at a saving throw against a vitality or void effect, you get a critical success instead. If the religious symbol you're raising is a shield, such as with Emblazon Armament, you gain the effects of Raise a Shield when you use this action and the effects of this action when you Raise a Shield."
     traits:
       - cleric
+    rules:
+      - key: "RollOption"
+        option: "shield-religious-symbol"
+        toggleable: true
+        label: "PF2E.SpecificRule.Cleric.RaiseSymbol.RollOptionLabel"
+        predicate: ["self:shield:equipped", {"not": "emblazon-armament:item:shield"}]
   Rallying Anthem:
     assoc_charclass:
       - Bard
@@ -3164,6 +3261,10 @@ pf2e_feats:
     traits:
       - barbarian
       - rage
+    rules:
+      - key: "RollOption"
+        option: "scars-of-steel"
+        toggleable: true
   Scoundrel's Surprise:
     assoc_charclass:
       - Rogue
@@ -3198,6 +3299,10 @@ pf2e_feats:
     shortdesc: Those you shield can benefit from your lasting protection. You can cast *shields of the spirit* using 2 actions instead of 1. If you do, you can choose one ally in your champion's aura to gain a spirit shield that accompanies it. For 1 minute, that ally gains the benefits of *shields of the spirit*, even while the ally isn't in your champion's aura and even if your shield isn't raised. If you create another companion shield, any previous one ends.
     traits:
       - champion
+    rules:
+      - key: "RollOption"
+        option: "security"
+        toggleable: true
   Shielded Stride:
     assoc_charclass:
       - Fighter
@@ -3314,9 +3419,11 @@ pf2e_feats:
     shortdesc: "**Trigger** You are about to roll initiative.%r%rYou swagger readily into any fight. You gain a +2 circumstance bonus to your initiative roll and can Interact to draw a weapon. If you are the first to act in combat, you gain panache."
     traits:
       - swashbuckler
-    grants_options:
-      - swaggering-initiative
     rules:
+      - key: "RollOption"
+        option: "swaggering-initiative"
+        domain: "initiative"
+        toggleable: true
       - key: "FlatModifier"
         selector: "initiative"
         type: "circumstance"
@@ -3348,6 +3455,11 @@ pf2e_feats:
     traits:
       - witch
     init_magic: true
+    rules:
+      - key: "RollOption"
+        option: "sympathetic-strike"
+        domain: "unarmed-attack-roll"
+        toggleable: true
   Tenacious Toxins:
     assoc_charclass:
       - Alchemist
@@ -3368,6 +3480,11 @@ pf2e_feats:
     shortdesc: You make your foes fall painfully when you trip them. When you successfully Trip an off-guard foe, your target takes 1d6 bludgeoning damage. On a critical success, the target takes 1d6 bludgeoning damage plus your sneak attack damage.
     traits:
       - rogue
+    rules:
+      - key: "RollOption"
+        option: "target:condition:off-guard"
+        toggleable: "totm"
+        label: "PF2E.SpecificRule.TOTMToggle.OffGuard"
   Thousand Visions:
     assoc_charclass:
       - Oracle
@@ -3415,6 +3532,9 @@ pf2e_feats:
     traits:
       - fighter
       - ranger
+    rules:
+      - key: "RollOption"
+        option: "weapon-parry"
   Twirling Throw:
     assoc_charclass:
       - Swashbuckler
@@ -3428,6 +3548,11 @@ pf2e_feats:
     traits:
       - finisher
       - swashbuckler
+    rules:
+      - key: "RollOption"
+        option: "ignore-range-penalty:3"
+        domain: "ranged-attack-roll"
+        predicate: ["finisher:twirling-throw"]
   Versatile Signature:
     assoc_charclass:
       - Bard
@@ -3540,9 +3665,11 @@ pf2e_feats:
     traits:
       - fighter
       - press
-    grants_options:
-      - advantageous-assault
     rules:
+      - key: "RollOption"
+        option: "advantageous-assault"
+        domain: "strike-damage"
+        toggleable: true
       - key: "FlatModifier"
         selector: "strike-damage"
         type: "circumstance"
@@ -3581,9 +3708,11 @@ pf2e_feats:
     shortdesc: "**Requirements** You have identified a creature with Recall Knowledge.%r%rYour knowledge of a creature's physiology helps you attack with pinpoint accuracy. You carefully study a creature that you've identified to scope out particularly weak points in its positioning or physical form. The next time you deal sneak attack damage to the chosen creature with a Strike before the end of your turn, add an additional 2d6 precision damage.%r%rAt 11th level, the additional damage becomes 3d6, and at 17th level it becomes 4d6."
     traits:
       - rogue
-    grants_options:
-      - analyze-weakness
     rules:
+      - key: "RollOption"
+        option: "analyze-weakness"
+        domain: "damage"
+        toggleable: true
       - key: "DamageDice"
         selector: "strike-damage"
         diceNumber: "match(when(lte(@actor.level, 10), 2), when(btwn(@actor.level, 11, 16), 3), when(gte(@actor.level, 17), 4))"
@@ -3727,8 +3856,6 @@ pf2e_feats:
     shortdesc: "**Trigger** You are targeted with an attack by an observed attacker.%r%r**Requirements** You are in Crane Stance.%r%rYou interpose your arm between yourself and your opponent. Your circumstance bonus to AC from Crane Stance increases to +3 against the triggering attack. If the attack misses you and the attacker is within your reach, you can immediately make a crane wing Strike against the attacker at a -2 penalty."
     traits:
       - monk
-    grants_options:
-      - crane-flutter
     rules:
       - key: "FlatModifier"
         selector: "ac"
@@ -3762,9 +3889,10 @@ pf2e_feats:
     traits:
       - fighter
       - press
-    grants_options:
-      - dazing-blow
     rules:
+      - key: "RollOption"
+        option: "dazing-blow"
+        toggleable: true
       - key: "DamageDice"
         selector: "strike-damage"
         override: {"damageType": "bludgeoning"}
@@ -3780,6 +3908,11 @@ pf2e_feats:
     traits:
       - additive
       - alchemist
+    rules:
+      - key: "RollOption"
+        option: "debilitating-bomb"
+        domain: "alchemical-bomb-base-attack-roll"
+        toggleable: true
   Defensive Coordination:
     assoc_charclass:
       - Bard
@@ -3806,6 +3939,11 @@ pf2e_feats:
     shortdesc: "You can lob bombs with great force and a precise trajectory to angle the splash in a cone that sprays in a single direction, potentially allowing you to avoid allies and splash deeper into enemy lines. When throwing an alchemical bomb with the splash trait, instead of splashing all squares adjacent to the target, you can create a splash in a 15-ft cone. You choose the cone's direction, but its first square must be a square in the target's space.%r%r**Special** If you have the Expanded Splash feat or another ability that increases the radius of splash damage, you can have the splash damage be a 20-ft cone."
     traits:
       - alchemist
+    rules:
+      - key: "RollOption"
+        option: "directional-bombs"
+        domain: "alchemical-bomb-base-attack-roll"
+        toggleable: true
   Dirge of Doom:
     assoc_charclass:
       - Bard
@@ -3849,6 +3987,10 @@ pf2e_feats:
     traits:
       - cleric
       - divine
+    rules:
+      - key: "RollOption"
+        option: "divine-rebuttal"
+        toggleable: true
   Divine Weapon:
     assoc_charclass:
       - Cleric
@@ -3875,8 +4017,6 @@ pf2e_feats:
       - fear
       - mental
       - monk
-    grants_options:
-      - dragon-roar
     rules:
       - key: "FlatModifier"
         selector: "attack-damage"
@@ -4584,8 +4724,6 @@ pf2e_feats:
     shortdesc: "**Requirements** You are in Tiger Stance%r%rYou make a fierce swipe with both hands. Make a tiger claw Strike. It deals two extra weapon damage dice (three extra dice if you're 14th level or higher), and you can push the target 5 feet away as if you had successfully Shoved them.%r%rIf the attack is a critical success and deals damage, add your Strength modifier to the persistent bleed damage from your tiger claw."
     traits:
       - monk
-    grants_options:
-      - tiger-slash
     rules:
       - key: "DamageDice"
         selector: "tiger-claw-damage"
@@ -4844,9 +4982,11 @@ pf2e_feats:
     shortdesc: You carefully take aim to avoid your foe's concealment and cover. On your next Strike with a thrown weapon before the end of your turn, you gain a +1 circumstance bonus to your attack roll and ignore your target's concealed condition, as well as the target's lesser cover or standard cover; if the target had greater cover, they instead have only standard cover against the Strike.
     traits:
       - rogue
-    grants_options:
-      - bullseye
     rules:
+      - key: "RollOption"
+        option: "bullseye"
+        domain: "attack-roll"
+        toggleable: true
       - key: "FlatModifier"
         selector: "attack"
         type: "circumstance"
@@ -4926,9 +5066,10 @@ pf2e_feats:
     traits:
       - flourish
       - ranger
-    grants_options:
-      - deadly-aim
     rules:
+      - key: "RollOption"
+        option: "deadly-aim"
+        toggleable: true
       - key: "FlatModifier"
         selector: "attack"
         type: "circumstance"
@@ -5033,6 +5174,11 @@ pf2e_feats:
       - finisher
       - swashbuckler
     rules:
+      - key: "RollOption"
+        option: "dual-finisher-second"
+        toggleable: true
+        label: "PF2E.SpecificRule.Swashbuckler.Finisher.DualSecondAttackLabel"
+        predicate: ["finisher:dual"]
       - key: "FlatModifier"
         selector: ["melee-strike-attack-roll"]
         value: -2
@@ -5171,6 +5317,10 @@ pf2e_feats:
     traits:
       - barbarian
       - rage
+    rules:
+      - key: "RollOption"
+        option: "follow-up-assault"
+        toggleable: true
   Form Retention:
     assoc_charclass:
       - Wizard
@@ -5261,16 +5411,19 @@ pf2e_feats:
         selector: "perception"
         type: "circumstance"
         value: 1
+        label: "Hazard Finder (to find traps and hazards)"
         predicate: [{"or": ["trap", "hazard"]}]
       - key: "FlatModifier"
         selector: "ac"
         type: "circumstance"
         value: 1
+        label: "Hazard Finder (vs. attacks from traps and hazards)"
         predicate: [{"or": ["trap", "hazard"]}]
       - key: "FlatModifier"
         selector: "saving-throw"
         type: "circumstance"
         value: 1
+        label: "Hazard Finder (saves vs. traps and hazards)"
         predicate: [{"or": ["trap", "hazard"]}]
   Heal Mount:
     assoc_charclass:
@@ -5285,6 +5438,10 @@ pf2e_feats:
     shortdesc: "Your devotion to your mount manifests as a surge of vital energy.%r%rWhen you cast *lay on hands* on your mount, instead of the normal amount, the spell restores 10 Hit Points, plus 10 for each heightened rank."
     traits:
       - champion
+    rules:
+      - key: "RollOption"
+        option: "heal-mount"
+        toggleable: true
   Improved Invigorating Elixir:
     repeatable: 2
     assoc_charclass:
@@ -5321,9 +5478,11 @@ pf2e_feats:
     traits:
       - concentrate
       - fighter
-    grants_options:
-      - incredible-aim
     rules:
+      - key: "RollOption"
+        option: "incredible-aim"
+        domain: "attack-roll"
+        toggleable: true
       - key: "FlatModifier"
         selector: "ranged-attack-roll"
         type: "circumstance"
@@ -6121,9 +6280,11 @@ pf2e_feats:
     shortdesc: "**Trigger** You are the target of a physical ranged Strike.%r%r**Requirements** You're aware of the attack, not off-guard against it, and either have a hand free or are wielding a melee weapon.%r%rYou can knock aside ranged attacks. You gain a +4 circumstance bonus to AC against the triggering attack. If the attack misses, you knocked or cut it out of the air."
     traits:
       - fighter
-    grants_options:
-      - cut-from-the-air
     rules:
+      - key: "RollOption"
+        option: "cut-from-the-air"
+        domain: "ac"
+        toggleable: true
       - key: "FlatModifier"
         selector: "ac"
         type: "circumstance"
@@ -6231,9 +6392,10 @@ pf2e_feats:
     shortdesc: You can throw bombs at just the right trajectory to create especially large and powerful explosions. When you throw an alchemical bomb and that bomb has the splash trait, you can have the splash damage affect all creatures within 10 feet of the target instead of 5 feet. If you do, you gain a status bonus to the bomb's splash damage equal to your Intelligence modifier. If you have the bomber 5th-level field discovery, this additional damage applies even if you caused your bomb to deal splash damage equal to your Intelligence modifier instead of the normal amount, allowing your bombs to deal splash damage equal to double your Intelligence modifier.
     traits:
       - alchemist
-    grants_options:
-      - expanded-splash
     rules:
+      - key: "RollOption"
+        option: "expanded-splash"
+        toggleable: true
       - key: "FlatModifier"
         selector: "alchemical-bomb-damage"
         type: "status"
@@ -6394,6 +6556,10 @@ pf2e_feats:
     traits:
       - fortune
       - investigator
+    rules:
+      - key: "RollOption"
+        option: "just-one-more-thing"
+        toggleable: true
   Knockback:
     assoc_charclass:
       - Barbarian
@@ -7124,9 +7290,10 @@ pf2e_feats:
     traits:
       - champion
       - flourish
-    grants_options:
-      - blessed-counterstrike
     rules:
+      - key: "RollOption"
+        option: "blessed-counterstrike"
+        toggleable: true
       - key: "DamageDice"
         selector: "strike-damage"
         diceNumber: 1
@@ -7174,9 +7341,10 @@ pf2e_feats:
     traits:
       - fighter
       - press
-    grants_options:
-      - brutal-finish
     rules:
+      - key: "RollOption"
+        option: "brutal-finish"
+        toggleable: true
       - key: "DamageDice"
         selector: "melee-strike-damage"
         diceNumber: "ternary(gte(@actor.level,18),2,1)"
@@ -7610,6 +7778,10 @@ pf2e_feats:
     shortdesc: Your magical blood allows your spells to be fully effective against incorporeal creatures. Your spells have the effects of a *ghost touch* property rune. They can target or affect a creature projecting its consciousness (such as via *project image*) or possessing another creature, even if its body is elsewhere, though you must know about the possession or projection and choose to do so. Your spells can affect creatures on the Ethereal Plane, though this doesn't grant you the ability to locate them.
     traits:
       - sorcerer
+    rules:
+      - key: "RollOption"
+        option: "item:rune:property:ghost-touch"
+        domain: "spell-damage"
   Hex Focus:
     assoc_charclass:
       - Witch
@@ -8026,6 +8198,11 @@ pf2e_feats:
     traits:
       - bravado
       - swashbuckler
+    rules:
+      - key: "RollOption"
+        option: "the-bigger-they-are"
+        domain: "skill-check"
+        toggleable: true
   Titan's Stature:
     assoc_charclass:
       - Barbarian
@@ -8199,6 +8376,10 @@ pf2e_feats:
     shortdesc: You pour divine energy into a desperate block. When you Shield Block, you can expend a *harm* or *heal* spell. Roll 1d8 for each rank of the spell, and increase the shield's Hardness by the total for this block.
     traits:
       - cleric
+    rules:
+      - key: "RollOption"
+        option: "channeling-block"
+        toggleable: true
   Defensive Roll:
     assoc_charclass:
       - Rogue
@@ -8432,8 +8613,6 @@ pf2e_feats:
     shortdesc: "**Requirements** You are in Ironblood Stance%r%rYou steel yourself, preparing to resist oncoming attacks and using your muscles to absorb the impact.%r%rYou gain the benefits of your iron sweep's parry trait (a +1 circumstance bonus to AC until the start of your next turn) and your resistance from Ironblood Stance increases to your Strength modifier (if it's higher) for the same duration."
     traits:
       - monk
-    grants_options:
-      - ironblood-surge
     rules:
       - key: "FlatModifier"
         selector: "ac"
@@ -9052,6 +9231,10 @@ pf2e_feats:
       - cursebound
       - divine
       - oracle
+    rules:
+      - key: "RollOption"
+        option: "conduit-of-void-and-vitality"
+        toggleable: true
   Courageous Onslaught:
     assoc_charclass:
       - Bard
@@ -9122,9 +9305,11 @@ pf2e_feats:
     traits:
       - oracle
     init_magic: true
-    grants_options:
-      - used-diverse-mystery
     rules:
+      - key: "RollOption"
+        option: "used-diverse-mystery"
+        toggleable: true
+        label: "PF2E.SpecificRule.Oracle.DiverseMystery.Toggle"
       - key: "FlatModifier"
         selector: "saving-throw"
         type: "status"
@@ -9193,6 +9378,11 @@ pf2e_feats:
     shortdesc: Your deeds have brought your deity's grace to you for all of eternity. You're continuously surrounded by a *bless* spell, with a spell rank equal to half your level (rounded up). The radius is 15 feet, and you can't increase it. You can Dismiss the spell; if you do, it returns automatically after 1 minute.
     traits:
       - cleric
+    rules:
+      - key: "RollOption"
+        option: "eternal-blessing-active"
+        toggleable: true
+        value: true
   Eternal Elixir:
     assoc_charclass:
       - Alchemist
@@ -9216,6 +9406,11 @@ pf2e_feats:
     traits:
       - additive
       - alchemist
+    rules:
+      - key: "RollOption"
+        option: "exploitive-bomb"
+        domain: "attack-roll"
+        toggleable: true
   Felicitous Riposte:
     assoc_charclass:
       - Swashbuckler
@@ -9461,6 +9656,11 @@ pf2e_feats:
     shortdesc: You throw your weight into a powerful attack that leaves you vulnerable. Make a melee Strike. This counts as three attacks when calculating your multiple attack penalty. If this Strike hits, you get a critical hit. If you roll a critical hit, your weapon or unarmed attack also gains the deadly d12 trait (this replaces any deadly trait it already has). Whether or not you hit, you become stunned 1 and are off-guard until the start of your next turn.
     traits:
       - fighter
+    rules:
+      - key: "RollOption"
+        option: "overwhelming-blow"
+        toggleable: true
+        label: "PF2E.SpecificRule.OverwhelmingBlow.CriticalHit"
   Penetrating Projectile:
     assoc_charclass:
       - Barbarian
@@ -9788,6 +9988,9 @@ pf2e_feats:
     traits:
       - bard
       - sonic
+    rules:
+      - key: "RollOption"
+        option: "self:discordant-voice"
   Divine Apex:
     assoc_charclass:
       - Cleric
@@ -9952,6 +10155,7 @@ pf2e_feats:
       - key: "FlatModifier"
         selector: "ranged-attack-roll"
         value: -2
+        label: "Impossible Volley"
         predicate: ["impossible-volley", "volley-30", "reload-0"]
   Improbable Elixirs:
     assoc_charclass:
@@ -10122,9 +10326,10 @@ pf2e_feats:
       - concentrate
       - fortune
       - rage
-    grants_options:
-      - perfect-clarity
     rules:
+      - key: "RollOption"
+        option: "perfect-clarity"
+        toggleable: true
       - key: "FlatModifier"
         selector: ["attack-roll", "will"]
         type: "circumstance"
@@ -10329,9 +10534,12 @@ pf2e_feats:
       - concentrate
       - fortune
       - monk
-    grants_options:
-      - triangle-shot
     rules:
+      - key: "RollOption"
+        option: "triangle-shot"
+        domain: "attack-roll"
+        toggleable: true
+        label: "Triangle Shot (-2 penalty to attack)"
       - key: "FlatModifier"
         selector: "ranged-attack-roll"
         value: -2
@@ -10680,6 +10888,10 @@ pf2e_feats:
     shortdesc: You focus on your hunted prey, perceiving angles, air resistance, and every variable that would affect your ranged attack. If you have master proficiency with your ranged weapon, you can ignore the penalty for attacking up to five range increments away when attacking your hunted prey.
     traits:
       - ranger
+    rules:
+      - key: "RollOption"
+        option: "ignore-range-penalty:5"
+        domain: "ranged-attack-roll"
   Ley Line Conduit:
     assoc_charclass:
       - Druid

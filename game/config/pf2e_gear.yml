@@ -50,6 +50,11 @@ pf2e_gear:
     level: 0
     price: 1
     traits: []
+    rules:
+      - key: "RollOption"
+        option: "lit-candle"
+        toggleable: true
+        label: "PF2E.SpecificRule.LitCandle"
   Chain:
     bulk: 1
     level: 0
@@ -165,6 +170,11 @@ pf2e_gear:
     level: 0
     price: 70
     traits: []
+    rules:
+      - key: "RollOption"
+        option: "active-lantern"
+        toggleable: true
+        label: "PF2E.SpecificRule.LitItem"
   Light Barding (Large):
     bulk: 4
     level: 0
@@ -344,14 +354,16 @@ pf2e_gear:
     level: 0
     price: 1
     traits: []
-    grants_options:
-      - lit-torch
     rules:
       - key: "FlatModifier"
         selector: "{item|_id}-damage"
         value: 1
         damageType: "fire"
         predicate: ["lit-torch"]
+      - key: "RollOption"
+        option: "lit-torch"
+        toggleable: true
+        label: "PF2E.SpecificRule.LitTorch"
   Waterskin:
     bulk: 0.1
     level: 0
@@ -404,6 +416,7 @@ pf2e_gear:
         selector: "crafting"
         type: "item"
         value: 1
+        label: "Alchemist's Lab, Expanded (craft alchemical items)"
         predicate: ["alchemical", "action:craft"]
   Artisan's Toolkit (Sterling):
     bulk: 2
@@ -415,6 +428,7 @@ pf2e_gear:
         selector: "crafting"
         type: "item"
         value: 1
+        label: "Artisan's Tools, Sterling (craft items)"
         predicate: ["action:craft"]
   Climbing Kit (Extreme):
     bulk: 1
@@ -437,6 +451,7 @@ pf2e_gear:
         selector: "diplomacy"
         type: "item"
         value: 1
+        label: "High-Fashion Clothes (Make an Impression on nobility)"
         predicate: ["action:make-an-impression"]
   Compass (Lensatic):
     bulk: 0
@@ -448,6 +463,7 @@ pf2e_gear:
         selector: "survival"
         type: "item"
         value: 1
+        label: "Lensatic Compass (Sense Direction or navigate)"
         predicate: [{"or": ["action:sense-direction", "action:navigate"]}]
   Concealed Sheath:
     bulk: 0
@@ -459,6 +475,7 @@ pf2e_gear:
         selector: "stealth"
         type: "item"
         value: 1
+        label: "Concealed Sheath (hide or conceal contents)"
         predicate: ["action:conceal-an-object", "target:contents"]
   Crowbar (Levered):
     bulk: 0.1
@@ -470,6 +487,7 @@ pf2e_gear:
         selector: "athletics"
         type: "item"
         value: 1
+        label: "Levered Crowbar (Force Open)"
         predicate: ["action:force-open"]
   Detective's Kit:
     bulk: 1
@@ -497,6 +515,7 @@ pf2e_gear:
         selector: "deception"
         type: "item"
         value: 1
+        label: "Elite Disguise Kit (Impersonate)"
         predicate: ["action:impersonate"]
   Fishing Tackle (Professional):
     bulk: 1
@@ -536,6 +555,7 @@ pf2e_gear:
         selector: "perception"
         type: "item"
         value: 1
+        label: "Magnifying Glass (minute details)"
         predicate: ["minute-details"]
   Manacles (Average):
     bulk: 0
@@ -547,9 +567,12 @@ pf2e_gear:
     level: 3
     price: 5000
     traits: []
-    grants_options:
-      - playing
     rules:
+      - key: "RollOption"
+        option: "playing"
+        domain: "performance"
+        toggleable: true
+        label: "PF2E.SpecificRule.PlayingItem"
       - key: "FlatModifier"
         selector: "performance"
         type: "item"
@@ -560,9 +583,12 @@ pf2e_gear:
     level: 3
     price: 10000
     traits: []
-    grants_options:
-      - playing
     rules:
+      - key: "RollOption"
+        option: "playing"
+        domain: "performance"
+        toggleable: true
+        label: "PF2E.SpecificRule.PlayingItem"
       - key: "FlatModifier"
         selector: "performance"
         type: "item"
@@ -578,6 +604,7 @@ pf2e_gear:
         selector: "crafting"
         type: "item"
         value: 1
+        label: "Repair Kit, Superb (Repair)"
         predicate: ["action:repair"]
   Scholarly Journal:
     bulk: 0.1
@@ -602,11 +629,13 @@ pf2e_gear:
         selector: "survival"
         type: "item"
         value: 1
+        label: "Survey Map (mapped area)"
         predicate: ["mapped-area"]
       - key: "FlatModifier"
         selector: "skill-check"
         type: "item"
         value: 1
+        label: "Survey Map (Recall knowledge on mapped area)"
         predicate: ["mapped-area", "action:recall-knowledge"]
   Survey Map (Atlas):
     bulk: 0.1
@@ -619,11 +648,13 @@ pf2e_gear:
         selector: "survival"
         type: "item"
         value: 1
+        label: "Survey Map (mapped area)"
         predicate: ["mapped-area"]
       - key: "FlatModifier"
         selector: "skill-check"
         type: "item"
         value: 1
+        label: "Survey Map (Recall knowledge on mapped area)"
         predicate: ["mapped-area", "action:recall-knowledge"]
   Thieves' Toolkit (Infiltrator Picks):
     bulk: 0
@@ -651,6 +682,7 @@ pf2e_gear:
         selector: "perception"
         type: "item"
         value: 1
+        label: "Fine Spyglass (Notice details at distance)"
         predicate: ["distance"]
   Lock (Good):
     bulk: 0

@@ -319,9 +319,11 @@ pf2e_shields:
     traits:
       - uncommon
       - magical
-    grants_options:
-      - reflecting-shield
     rules:
+      - key: "RollOption"
+        option: "reflecting-shield"
+        toggleable: true
+        label: "PF2E.SpecificRule.Equipment.SpellguardShield.RollOptionLabel"
       - key: "FlatModifier"
         selector: "saving-throw"
         type: "circumstance"
@@ -337,9 +339,11 @@ pf2e_shields:
     speed_penalty: 0
     traits:
       - magical
-    grants_options:
-      - spellguard-shield
     rules:
+      - key: "RollOption"
+        option: "spellguard-shield"
+        toggleable: true
+        label: "PF2E.SpecificRule.Equipment.SpellguardShield.RollOptionLabel"
       - key: "FlatModifier"
         selector: "saving-throw"
         type: "circumstance"

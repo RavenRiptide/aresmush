@@ -116,6 +116,19 @@ module AresMUSH
       expect(strays.uniq).to eq []
     end
 
+    # A declaration reaches no statistic, so it names no selector and must name an option instead.
+    it "should have an option on every declaration and a selector on nothing else" do
+      declarations, reaching = rows.partition { |_where, row| row['key'] == 'RollOption' }
+
+      expect(declarations.reject { |_where, row| row['option'] }.map(&:first).uniq).to eq []
+      expect(declarations.select { |_where, row| row['selector'] }.map(&:first).uniq).to eq []
+      expect(reaching.reject { |_where, row| row['selector'] }.map(&:first).uniq).to eq []
+    end
+
+    it "should have declarations, since most of what an item offers is one" do
+      expect(rows.count { |_where, row| row['key'] == 'RollOption' }).to be > 50
+    end
+
     it "should name only modifier types the stacking rule knows" do
       strays = rows.select { |_where, row| row['type'] }
                    .reject { |_where, row| Pf2e::Modifiers::TYPES.include?(row['type'].to_s) }

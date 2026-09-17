@@ -365,11 +365,13 @@ pf2e_armor:
         selector: "athletics"
         type: "item"
         value: 2
+        label: "Electric Eelskin (Swim)"
         predicate: ["action:swim"]
       - key: "FlatModifier"
         selector: "stealth"
         type: "item"
         value: 2
+        label: "Electric Eelskin (Water)"
         predicate: ["terrain:water"]
   Explorer's Clothing:
     category: unarmored
@@ -528,6 +530,12 @@ pf2e_armor:
         power: 1
       property:
         - Fortification
+    rules:
+      - key: "RollOption"
+        option: "lit-life-saver-mail"
+        toggleable: true
+        value: true
+        label: "PF2E.SpecificRule.LitItem"
   Life-Saver Mail (Greater):
     category: heavy
     traits:
@@ -547,6 +555,12 @@ pf2e_armor:
         power: 2
       property:
         - Fortification (Greater)
+    rules:
+      - key: "RollOption"
+        option: "lit-life-saver-mail"
+        toggleable: true
+        value: true
+        label: "PF2E.SpecificRule.LitItem"
   Lion's Armor:
     category: heavy
     traits:
@@ -636,6 +650,11 @@ pf2e_armor:
     runes:
       fundamental:
         potency: 1
+    rules:
+      - key: "RollOption"
+        option: "terrain:moonlight"
+        toggleable: true
+        label: "PF2E.SkillVariant.Moonlight"
   Onslaught Hide:
     category: medium
     traits:
@@ -655,6 +674,12 @@ pf2e_armor:
         potency: 1
         power: 1
     rules:
+      - key: "RollOption"
+        option: "action:sudden-charge"
+        domain: "damage"
+        toggleable: true
+        label: "Sudden Charge"
+        predicate: ["sudden-charge"]
       - key: "DamageDice"
         selector: "strike-damage"
         diceNumber: 1
@@ -730,6 +755,7 @@ pf2e_armor:
         selector: "athletics"
         type: "item"
         value: 2
+        label: "Tideplate (Swim)"
         predicate: ["action:swim"]
   Unholy Plate:
     category: heavy

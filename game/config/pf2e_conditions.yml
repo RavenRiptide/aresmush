@@ -21,6 +21,13 @@ pf2e_conditions:
     short_descr: You lose your wits and attack wildly.
     value: false
     override: false
+    rules:
+      - key: "RollOption"
+        option: "target:ally"
+        value: false
+      - key: "RollOption"
+        option: "origin:ally"
+        value: false
   Controlled:
     short_descr: You are no longer in control of your own actions.
     value: false

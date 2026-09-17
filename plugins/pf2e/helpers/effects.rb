@@ -86,9 +86,23 @@ module AresMUSH
       end
 
       def self.build_options(char)
-        [ "self:level:#{char.pf2_level.to_i}" ] +
-          (char.pf2_conditions || {}).keys.map { |name| "self:condition:#{Domains.slug(name)}" } +
-          Array(char.pf2_traits).map { |trait| "self:trait:#{Domains.slug(trait)}" }
+        facts(char) + RollOptions.active(char)
+      end
+
+      # What is true about the character whatever anyone has switched on. Kept apart from the switched-on
+      # options because the store asks for these while working out what is switched on, and asking it
+      # for its own answer would not terminate.
+      def self.facts(char)
+        SheetReads.memo(char, :effect_facts) do
+          [ "self:level:#{char.pf2_level.to_i}" ] +
+            (char.pf2_conditions || {}).keys.map { |name| "self:condition:#{Domains.slug(name)}" } +
+            Array(char.pf2_traits).map { |trait| "self:trait:#{Domains.slug(trait)}" }
+        end
+      end
+
+      # What a declaration on this source is tested against: the character's own facts and the source's.
+      def self.options_of(char, source)
+        facts(char) + Array(source['options'])
       end
 
       # A condition's value is its badge, which is Foundry's word for the number a condition carries.
@@ -130,7 +144,7 @@ module AresMUSH
           source(Pf2egear.get_item_name(item), info['rules'],
                  'id' => item.id.to_s,
                  'item' => { 'level' => item_level(item) },
-                 'options' => item_options(item) + Array(info['grants_options']))
+                 'options' => item_options(item))
         end.compact
       end
 

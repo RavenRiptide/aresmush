@@ -62,6 +62,8 @@ module AresMUSH
           return PF2DisplayCombatSheetCmd
         when "why"
           return PF2StatBreakdownCmd
+        when "option", "options"
+          return PF2RollOptionCmd
         else
           return PF2DisplaySheetCmd
         end

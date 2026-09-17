@@ -41,7 +41,14 @@ KINDS = {
                      'damageCategory', 'critical', 'predicate', 'slug', 'label', 'hideIfDisabled'},
     'DamageDice': {'key', 'selector', 'diceNumber', 'dieSize', 'damageType', 'category', 'critical',
                    'predicate', 'slug', 'label', 'hideIfDisabled', 'override', 'tags'},
+    # placement and mergeable position a toggle in Foundry's character sheet, which is not a mechanic
+    # and not an interface we have.
+    'RollOption': {'key', 'option', 'domain', 'toggleable', 'value', 'predicate', 'slug', 'label',
+                   'placement', 'mergeable'},
 }
+
+# A RollOption has no selector; it declares a circumstance rather than reaching a statistic.
+SELECTORLESS = {'RollOption'}
 
 TYPES = {'item', 'circumstance', 'status', 'ability', 'proficiency', 'potency', 'untyped'}
 
@@ -114,8 +121,6 @@ def foundry(checkout, pack):
                     continue
                 if rule.get('key') in KINDS:
                     rules.append(rule)
-                elif rule.get('key') == 'RollOption' and rule.get('option') and not rule.get('predicate'):
-                    options.append(rule['option'])
 
     return found
 
@@ -124,16 +129,21 @@ def take(rule, refused):
     """The rule as we would write it, or None with a reason recorded."""
     fields = KINDS[rule['key']]
 
+    if rule['key'] not in SELECTORLESS and 'selector' not in rule:
+        refused['no selector'] += 1
+        return None
+
     strays = set(rule) - fields
     if strays:
         refused[f'field {sorted(strays)}'] += 1
         return None
 
-    selectors = rule['selector'] if isinstance(rule['selector'], list) else [rule['selector']]
-    bad = [s for s in selectors if not selector_ok(s)]
-    if bad:
-        refused[f'selector {bad}'] += 1
-        return None
+    if rule['key'] not in SELECTORLESS:
+        selectors = rule['selector'] if isinstance(rule['selector'], list) else [rule['selector']]
+        bad = [s for s in selectors if not selector_ok(s)]
+        if bad:
+            refused[f'selector {bad}'] += 1
+            return None
 
     if rule['key'] == 'FlatModifier':
         if rule.get('type') and rule['type'] not in TYPES:
@@ -144,8 +154,9 @@ def take(rule, refused):
             return None
 
     # Keep only the fields we read, in a stable order, so a re-run produces the same file.
-    order = ['key', 'selector', 'type', 'ability', 'value', 'min', 'max', 'diceNumber', 'dieSize',
-             'damageType', 'damageCategory', 'category', 'critical', 'override', 'predicate']
+    order = ['key', 'option', 'domain', 'toggleable', 'selector', 'type', 'ability', 'value', 'min',
+             'max', 'diceNumber', 'dieSize', 'damageType', 'damageCategory', 'category', 'critical',
+             'override', 'label', 'predicate']
 
     return {field: rule[field] for field in order if field in rule}
 
@@ -177,9 +188,7 @@ def main():
                 rows = [row for row in (take(rule, refused) for rule in rules) if row]
                 if not rows:
                     continue
-                wanted = json.dumps([row.get('predicate') for row in rows])
-                needed = [o for o in dict.fromkeys(declared) if f'"{o}"' in wanted]
-                additions[item] = (rows, needed)
+                additions[item] = (rows, [])
 
             totals[pack] += len(additions)
             totals[f'{pack} rows'] += sum(len(rows) for rows, _ in additions.values())
@@ -207,12 +216,8 @@ def yaml_value(value, indent):
 
 
 def yaml_rows(entry, indent='    '):
-    rows, needed = entry
-    out = []
-    if needed:
-        out.append(f'{indent}grants_options:')
-        out.extend(f'{indent}  - {option}' for option in needed)
-    out.append(f'{indent}rules:')
+    rows, _unused = entry
+    out = [f'{indent}rules:']
     for row in rows:
         first = True
         for field, value in row.items():

@@ -70,10 +70,46 @@ module AresMUSH
               'category' => row['category'],
               'critical' => row['critical'] }
           }
+        },
+        {
+          'key' => 'RollOption',
+          'fields' => %w{key option domain toggleable value predicate label slug},
+          # Declares a circumstance rather than a number. A rule on the same feat or item is then
+          # predicated on it - a Clandestine Cloak declares `clandestine-cloak` and predicates its own
+          # bonuses on it - so this contributes an option, not a modifier.
+          #
+          # `value` decides whether it holds without being asked for. Foundry defaults a toggleable one
+          # to off and everything else to on; here an option a character has is on unless they turn it
+          # off, because an item you are wearing should do what it says.
+          'contribute' => lambda { |row, source, context|
+            { 'source' => source['name'],
+              'slug' => row['slug'] || Domains.slug(source['name']),
+              'option' => row['option'],
+              'domain' => row['domain'] || Domains::ALL,
+              'label' => row['label'],
+              'default' => truthy(row['value'], context) }
+          }
         }
       ].freeze
 
+      # Fields that position a toggle in Foundry's character sheet. They are neither read nor complained
+      # about: a field we ignore that changes the mechanics is a sheet that is quietly wrong, and one
+      # that describes where a control sits in an interface we do not have is neither.
+      PRESENTATION = { 'RollOption' => %w{placement mergeable} }.freeze
+
       BY_KEY = KINDS.each_with_object({}) { |row, out| out[row['key']] = row }.freeze
+
+      # A RollOption's `value` is a boolean or a formula, not a number: `true` and `false` mean what they
+      # say, and anything else is read as arithmetic and true when it comes to something other than zero.
+      # An option that says nothing is on, which is this game's default rather than Foundry's.
+      def self.truthy(value, context)
+        return true if value.nil?
+        return value if value == true || value == false
+
+        !Formula.value(value, context).to_i.zero?
+      rescue StandardError
+        false
+      end
 
       def self.clamp(value, row)
         low = row['min'] ? Formula.value(row['min']) : nil
@@ -142,7 +178,8 @@ module AresMUSH
           return
         end
 
-        strays = row.keys.map(&:to_s) - kind['fields']
+        strays = row.keys.map(&:to_s) - kind['fields'] -
+                 Array(PRESENTATION[row['key'].to_s])
 
         return if strays.empty?
 
