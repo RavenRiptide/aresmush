@@ -1,0 +1,82 @@
+module AresMUSH
+  module Pf2e
+
+    # PF2e's bonus arithmetic: a figure is a base plus a list of modifiers, and the modifier's type
+    # decides which of them count.
+    #
+    # The type is the whole reason this is not a sum. Two +1 item bonuses are one +1, because the rules
+    # say the highest of a type applies and the rest do not - so a character wearing a ring and under a
+    # spell that both grant an item bonus gets the better of the two, not their total.
+    #
+    # A modifier that does not count is switched off rather than dropped. That is what lets a sheet
+    # print "+2 item (ring of protection), +1 item (spell, overridden)" instead of a bare total, and it
+    # is the difference between a player being able to check our arithmetic and having to trust it.
+    module Modifiers
+
+      # Foundry's seven (`actor/modifiers.ts:29`), which are the rules' own.
+      TYPES = %w{ability circumstance item potency proficiency status untyped}.freeze
+
+      UNTYPED = 'untyped'.freeze
+      ABILITY = 'ability'.freeze
+
+      # Which of a type's modifiers count. A row per type that does not follow the ordinary rule, and
+      # the ordinary rule for everything else.
+      STACKING = {
+        # Untyped modifiers always stack: each is its own thing and none overrides another.
+        UNTYPED => ->(group) { group },
+
+        # Attribute modifiers never stack with each other - the best one applies alone. This is what
+        # makes "use your best attribute for AC" need no special case: offer both, take the better.
+        ABILITY => ->(group) { [ group.max_by { |row| value_of(row) } ].compact }
+      }.freeze
+
+      # The highest bonus and the lowest penalty of the type both apply. A zero is neither, so it
+      # counts for nothing either way.
+      ORDINARY = lambda do |group|
+        bonuses = group.select { |row| value_of(row) > 0 }
+        penalties = group.select { |row| value_of(row) < 0 }
+
+        [ bonuses.max_by { |row| value_of(row) }, penalties.min_by { |row| value_of(row) } ].compact
+      end
+
+      def self.stack(modifiers)
+        rows = Array(modifiers).map { |row| row.merge('enabled' => false) }
+
+        rows.group_by { |row| type_of(row) }.each_pair do |type, group|
+          (STACKING[type] || ORDINARY).call(group).each { |row| row['enabled'] = true }
+        end
+
+        rows
+      end
+
+      def self.total(modifiers)
+        Array(modifiers).select { |row| row['enabled'] }.sum { |row| value_of(row) }
+      end
+
+      # A figure and its arithmetic together, which is what a sheet wants: a caller that only needs the
+      # number reads `total`, and one that shows a player where it came from reads `modifiers`.
+      def self.breakdown(base, modifiers)
+        stacked = stack(modifiers)
+
+        { 'base' => base, 'modifiers' => stacked, 'total' => base + total(stacked) }
+      end
+
+      def self.value_of(row)
+        row['value'].to_i
+      end
+
+      # An unrecognised type is treated as untyped, and says so. Untyped is the permissive reading -
+      # it always counts - so a config typo shows up as a number that is too big rather than a bonus
+      # that silently went missing.
+      def self.type_of(row)
+        type = row['type'].to_s.downcase
+
+        return type if TYPES.include?(type)
+
+        Global.logger.warn "PF2e modifier from #{row['source'].inspect} has unknown type #{row['type'].inspect}; treating as untyped."
+
+        UNTYPED
+      end
+    end
+  end
+end
