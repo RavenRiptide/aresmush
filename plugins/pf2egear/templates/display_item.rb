@@ -111,7 +111,8 @@ module AresMUSH
       # item. A bonus that applies only in some circumstance says so, because an item bonus a player
       # thinks is always on is worse than no bonus at all.
       def modifier_summary
-        rows = Array((Pf2egear.catalogue_entry(@category, @item) || {})['modifies'])
+        rows = Array((Pf2egear.catalogue_entry(@category, @item) || {})['rules'])
+                 .select { |row| row['key'] == 'FlatModifier' }
 
         return nil if rows.empty?
 
@@ -119,9 +120,9 @@ module AresMUSH
       end
 
       def format_modifier(row)
-        where = Array(row['domain']).join('/')
+        where = Array(row['selector']).join('/')
         sign = row['value'].to_s.start_with?('-') ? '' : '+'
-        note = row['when'] ? " only with #{Array(row['when']).map(&:to_s).join(', ')}" : ''
+        note = row['predicate'] ? " only with #{Array(row['predicate']).map(&:to_s).join(', ')}" : ''
 
         "#{sign}#{row['value']} to #{where}#{note}"
       end

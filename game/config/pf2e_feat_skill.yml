@@ -10,6 +10,12 @@ pf2e_feats:
     prereq:
       level: 1
       skill: Acrobatics/trained
+    rules:
+      - key: "FlatModifier"
+        selector: "acrobatics"
+        type: "circumstance"
+        value: 1
+        predicate: ["action:perform", {"gte": ["skill:acrobatics:rank", 1]}, {"gte": ["skill:performance:rank", 1]}]
   Additional Lore:
     repeatable: true
     feat_type:
@@ -232,6 +238,12 @@ pf2e_feats:
     prereq:
       level: 1
       skill: Society/trained
+    rules:
+      - key: "FlatModifier"
+        selector: "skill-check"
+        type: "circumstance"
+        value: 2
+        predicate: ["action:decipher-writing", "numerical"]
   Fascinating Performance:
     feat_type:
       - Skill
@@ -383,6 +395,12 @@ pf2e_feats:
     prereq:
       level: 1
       skill: Nature/trained
+    rules:
+      - key: "FlatModifier"
+        selector: "nature"
+        type: "circumstance"
+        value: 2
+        predicate: ["action:treat-wounds", "fresh-ingredients"]
   No Cause for Alarm:
     feat_type:
       - Skill
@@ -407,6 +425,12 @@ pf2e_feats:
     prereq:
       level: 1
       skill: Occultism/trained
+    rules:
+      - key: "FlatModifier"
+        selector: "occultism"
+        type: "circumstance"
+        value: 2
+        predicate: ["item:magical", {"or": ["action:identify-magic", "action:recall-knowledge"]}, {"or": ["item:trait:detection", "item:trait:fortune", "item:trait:mental", "item:trait:misfortune", "item:trait:prediction", "item:trait:revelation", "item:trait:scrying"]}]
   Pickpocket:
     feat_type:
       - Skill
@@ -529,6 +553,14 @@ pf2e_feats:
         - Nature/trained
         - Occultism/trained
         - Religion/trained
+    grants_options:
+      - recognize-spell
+    rules:
+      - key: "FlatModifier"
+        selector: ["ac", "saving-throw"]
+        type: "circumstance"
+        value: 1
+        predicate: ["recognize-spell"]
   Risky Surgery:
     feat_type:
       - Skill
@@ -538,6 +570,14 @@ pf2e_feats:
     prereq:
       level: 1
       skill: Medicine/trained
+    grants_options:
+      - risky-surgery
+    rules:
+      - key: "FlatModifier"
+        selector: "medicine"
+        type: "circumstance"
+        value: 2
+        predicate: ["action:treat-wounds", "risky-surgery"]
   Root Magic:
     feat_type:
       - Skill
@@ -571,6 +611,12 @@ pf2e_feats:
         - Alcohol Lore/trained
         - Cooking Lore/trained
         - Crafting/trained
+    rules:
+      - key: "FlatModifier"
+        selector: "crafting"
+        type: "circumstance"
+        value: "ternary(gte(@actor.system.skills.crafting.rank,3),2,1)"
+        predicate: ["action:craft", {"or": ["item:tag:food", "item:tag:drink", {"and": ["feat:magical-crafting", "item:trait:potion"]}, {"and": ["feat:alchemical-crafting", "item:trait:elixir"]}]}]
   Skill Training:
     repeatable: true
     feat_type:
@@ -602,6 +648,12 @@ pf2e_feats:
     prereq:
       level: 1
       skill: Crafting/trained
+    rules:
+      - key: "FlatModifier"
+        selector: "crafting"
+        type: "circumstance"
+        value: "ternary(gte(@actor.system.skills.crafting.rank,3),2,1)"
+        predicate: ["action:craft", "{item|flags.system.rulesSelections.specialtyCrafting}"]
   Steady Balance:
     feat_type:
       - Skill
@@ -669,6 +721,12 @@ pf2e_feats:
     prereq:
       level: 1
       skill: Survival/trained
+    rules:
+      - key: "FlatModifier"
+        selector: "survival"
+        type: "circumstance"
+        value: 1
+        predicate: ["terrain:{item|flags.system.rulesSelections.terrain}"]
   Terrain Stalker:
     repeatable: true
     feat_type:
@@ -738,6 +796,12 @@ pf2e_feats:
       level: 1
       skill: Performance/trained
   # Level 2 Feats
+    rules:
+      - key: "FlatModifier"
+        selector: "performance"
+        type: "circumstance"
+        value: "ternary(gte(@actor.system.skills.performance.rank,3),2,1)"
+        predicate: ["action:perform:{item|flags.system.rulesSelections.performanceType}"]
   Armored Stealth:
     feat_type:
       - Skill
@@ -877,6 +941,22 @@ pf2e_feats:
         - Thul
         - Vardama
       skill: Religion/expert
+    rules:
+      - key: "FlatModifier"
+        selector: "diplomacy"
+        type: "circumstance"
+        value: 2
+        predicate: ["action:request", "member-of-your-faith"]
+      - key: "FlatModifier"
+        selector: "intimidation"
+        type: "circumstance"
+        value: 2
+        predicate: ["action:coerce", "member-of-your-faith"]
+      - key: "FlatModifier"
+        selector: "religion"
+        type: "circumstance"
+        value: 2
+        predicate: ["member-of-your-faith", {"or": ["action:request", "action:coerce"]}]
   Eyes of the City:
     feat_type:
       - Skill
@@ -910,6 +990,12 @@ pf2e_feats:
       ability:
         - Strength/16
       skill: Intimidation/expert
+    rules:
+      - key: "FlatModifier"
+        selector: "intimidation"
+        type: "circumstance"
+        value: 1
+        predicate: ["target:physically-menaced", {"or": ["action:coerce", "action:demoralize"]}]
   Lasting Coercion:
     feat_type:
       - Skill
@@ -1076,6 +1162,12 @@ pf2e_feats:
     prereq:
       level: 2
       skill: Intimidation/expert
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 1
+        predicate: ["demoralized-by-you", "item:type:spell"]
   Tumbling Teamwork:
     feat_type:
       - Skill
@@ -1134,6 +1226,12 @@ pf2e_feats:
       level: 2
       skill: Thievery/expert
   # Level 7 Feats
+    rules:
+      - key: "FlatModifier"
+        selector: ["ac", "saving-throw"]
+        type: "circumstance"
+        value: 2
+        predicate: ["trap"]
   Advanced First Aid:
     feat_type:
       - Skill
@@ -1155,6 +1253,12 @@ pf2e_feats:
     prereq:
       level: 7
       skill: Acrobatics/master
+    rules:
+      - key: "FlatModifier"
+        selector: "acrobatics"
+        type: "circumstance"
+        value: 2
+        predicate: ["action:maneuver-in-flight"]
   Battle Cry:
     feat_type:
       - Skill
@@ -1427,6 +1531,14 @@ pf2e_feats:
       skill: 
         - Acrobatics/expert
         - Thievery/expert
+    grants_options:
+      - tumbling-theft
+    rules:
+      - key: "FlatModifier"
+        selector: "thievery"
+        type: "circumstance"
+        value: 1
+        predicate: ["tumbling-theft"]
   Wall Jump:
     feat_type:
       - Skill

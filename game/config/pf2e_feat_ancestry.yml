@@ -21,6 +21,14 @@ pf2e_feats:
     prereq:
       level: 9
       heritage: Changeling
+    rules:
+      - key: "DamageDice"
+        selector: "claw-damage"
+        diceNumber: 1
+        dieSize: "d4"
+        damageType: "mental"
+        category: "persistent"
+        critical: true
   Adapted Cantrip:
     feat_type:
       - Ancestry
@@ -92,6 +100,14 @@ pf2e_feats:
     shortdesc: "You work at a pace born from longevity that enhances your thoroughness. You can voluntarily spend twice as much time as normal on a Perception check or skill check that takes 1 action or longer. If you do, you gain a +2 circumstance bonus to the check and don't automatically reduce your degree of success on a natural 1 (you get a critical failure only if your result is 10 lower than the DC). For example, you could get these benefits if you spent 2 actions to Seek, which normally takes 1 action. You can get these benefits during exploration by taking twice as long exploring as normal, or in downtime by spending twice as much downtime.%r%rThe GM might determine a situation doesn't grant you a benefit if a delay would be directly counterproductive to your success, such as a tense negotiation with an impatient creature."
     prereq:
       level: 5
+    grants_options:
+      - ageless-patience
+    rules:
+      - key: "FlatModifier"
+        selector: ["perception", "skill-check"]
+        type: "circumstance"
+        value: 2
+        predicate: ["ageless-patience"]
   Agonizing Rebuke:
     feat_type:
       - Ancestry
@@ -135,6 +151,17 @@ pf2e_feats:
     shortdesc: Long-lived sildanyari have seen civilizations rise and fall, often at the hands of outside forces. As a result, they have developed a wariness of others who might seek to influence or control them. You've been trained to resist such manipulation, gaining a +2 circumstance bonus to saving throws against effects that would make you controlled, such as *dominate*, and to Perception checks to Sense Motive when trying to determine if a creature is under the influence of such an effect. When you roll a success on a saving throw against such an effect, you get a critical success instead.
     prereq:
       level: 5
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 2
+        predicate: ["inflicts:controlled"]
+      - key: "FlatModifier"
+        selector: "perception"
+        type: "circumstance"
+        value: 2
+        predicate: ["action:sense-motive", "ancestral-suspicion"]
   Angelkin:
     feat_type:
       - Ancestry
@@ -186,6 +213,12 @@ pf2e_feats:
     shortdesc: You hear animal sounds as conversations instead of unintelligent noise, and you can respond in turn. You can ask questions of, receive answers from, and use the Diplomacy skill with animals. In most cases, wild animals will give you time to make your case. You gain a +1 circumstance bonus to Make an Impression on animals.
     prereq:
       level: 1
+    rules:
+      - key: "FlatModifier"
+        selector: "diplomacy"
+        type: "circumstance"
+        value: 1
+        predicate: ["target:trait:animal", "action:make-an-impression"]
   Arvek Lore:
     feat_type:
       - Ancestry
@@ -453,6 +486,13 @@ pf2e_feats:
     prereq:
       level: 9
       heritage: Dar
+    rules:
+      - key: "DamageDice"
+        selector: "fangs-damage"
+        diceNumber: 1
+        dieSize: "d4"
+        damageType: "bleed"
+        critical: true
   Bloody Blows:
     feat_type:
       - Ancestry
@@ -463,6 +503,14 @@ pf2e_feats:
     shortdesc: Your lethal unarmed attacks leave bloody gouges or cause severe internal bleeding. When you critically hit with a Strike using an unarmed attack that isn't nonlethal, the target takes 1d4 persistent bleed damage. This can be because you're taking the penalty to use a fist for a lethal attack or because you have an unarmed attack without the nonlethal trait due to Tusks or a similar ability.
     prereq:
       level: 5
+    rules:
+      - key: "DamageDice"
+        selector: "unarmed-damage"
+        diceNumber: 1
+        dieSize: "d4"
+        damageType: "bleed"
+        critical: true
+        predicate: [{"not": "nonlethal"}]
   Bone Investiture:
     feat_type:
       - Ancestry
@@ -543,6 +591,24 @@ pf2e_feats:
     shortdesc: Fire fascinates you. Your spells and alchemical items that deal fire damage gain a status bonus to damage equal to half the spell's rank or one-quarter the item's level (minimum bonus +1). You also gain a +1 status bonus to any persistent fire damage you deal.
     prereq:
       level: 1
+    rules:
+      - key: "FlatModifier"
+        selector: "strike-damage"
+        type: "status"
+        value: "max(floor(@weapon.level/4), 1)"
+        damageType: "fire"
+        predicate: ["item:trait:alchemical"]
+      - key: "FlatModifier"
+        selector: "spell-damage"
+        type: "status"
+        value: "max(floor(@spell.level/2), 1)"
+        damageType: "fire"
+      - key: "FlatModifier"
+        selector: "damage"
+        type: "status"
+        value: 1
+        damageType: "fire"
+        damageCategory: "persistent"
   Call the Swarm:
     feat_type:
       - Ancestry
@@ -578,6 +644,12 @@ pf2e_feats:
     prereq:
       level: 5
       heritage: Changeling
+    rules:
+      - key: "FlatModifier"
+        selector: "will"
+        type: "circumstance"
+        value: 1
+        predicate: ["mental"]
   Callow May:
     feat_type:
       - Ancestry
@@ -881,6 +953,17 @@ pf2e_feats:
     shortdesc: "You know that the greatest treasures often look like refuse. You gain a +1 circumstance bonus to checks to Subsist, and you can use Society or Survival when you Subsist in a settlement.%r%r**Special** If you have the irongut goblin heritage, increase the bonuses to +2."
     prereq:
       level: 1
+    rules:
+      - key: "FlatModifier"
+        selector: ["society", "survival"]
+        type: "circumstance"
+        value: 1
+        predicate: ["action:subsist"]
+      - key: "FlatModifier"
+        selector: ["society", "survival"]
+        type: "circumstance"
+        value: 1
+        predicate: ["action:earn-income", "with-subsist"]
   Clever Improviser:
     feat_type:
       - Ancestry
@@ -915,6 +998,12 @@ pf2e_feats:
     shortdesc: The short human life span lends perspective and has taught you from a young age to set aside differences and work with others to achieve greatness. You gain a +4 circumstance bonus on checks to Aid.
     prereq:
       level: 1
+    rules:
+      - key: "FlatModifier"
+        selector: "check"
+        type: "circumstance"
+        value: 4
+        predicate: ["action:aid"]
   Cooperative Soul:
     feat_type:
       - Ancestry
@@ -1057,6 +1146,12 @@ pf2e_feats:
       orheritage:
         - Aesa
         - Niasa
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 1
+        predicate: ["item:trait:divine"]
   Divine Declaration:
     feat_type:
       - Ancestry
@@ -1138,6 +1233,12 @@ pf2e_feats:
     prereq:
       level: 1
       heritage: Changeling
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 2
+        predicate: [{"or": ["sleep", "dream"]}]
   Earned Glory:
     feat_type:
       - Ancestry
@@ -1432,6 +1533,17 @@ pf2e_feats:
     shortdesc: "Your enhanced fey connection (either through your blood or via prolonged contact with their kind) affords you a warmer reception from creatures of the First World as well as tools to foil their tricks or withstand their magic. You gain a +2 circumstance bonus to both Perception checks and saving throws against fey.%r%rIn addition, whenever you meet a fey creature in a social situation, you can immediately attempt a Diplomacy check to Make an Impression on that creature rather than needing to converse for 1 minute. You take a –5 penalty to the check. If you fail, you can engage in 1 minute of conversation and attempt a new check at the end of that time rather than accepting the failure or critical failure result."
     prereq:
       level: 1
+    rules:
+      - key: "FlatModifier"
+        selector: "perception"
+        type: "circumstance"
+        value: 2
+        predicate: ["target:trait:fey"]
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 2
+        predicate: ["origin:trait:fey"]
   Fiendish Magic:
     feat_type:
       - Ancestry
@@ -1487,6 +1599,12 @@ pf2e_feats:
     shortdesc: Watching your friends age and die fills you with moroseness that protects you against harmful emotions. You gain a +1 circumstance bonus to saving throws against emotion effects. If you roll a success on a saving throw against an emotion effect, you get a critical success instead.
     prereq:
       level: 1
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 1
+        predicate: ["emotion"]
   Form of the Bat:
     feat_type:
       - Ancestry
@@ -1886,6 +2004,11 @@ pf2e_feats:
     shortdesc: There's no journey too far or burden too heavy when you have friends at your side or hope within your heart. Increase your maximum and encumbered Bulk limits by 1. In addition, you gain a +10-foot circumstance bonus to your Speed during overland travel.
     prereq:
       level: 9
+    rules:
+      - key: "FlatModifier"
+        selector: "travel-speed"
+        type: "circumstance"
+        value: 10
   Haughty Obstinacy:
     feat_type:
       - Ancestry
@@ -1979,6 +2102,12 @@ pf2e_feats:
     shortdesc: "Your ancestors spent their days cloaked and cradled in illusions, and as a result, sensing illusion magic is second nature to you. You gain a +1 circumstance bonus to both Perception checks and Will saves against illusions.%r%rWhen you come within 10 feet of an illusion that can be disbelieved, the GM rolls a secret check for you to disbelieve it, even if you didn't spend an action to Interact with the illusion."
     prereq:
       level: 1
+    rules:
+      - key: "FlatModifier"
+        selector: ["perception", "will"]
+        type: "circumstance"
+        value: 1
+        predicate: ["illusion"]
   Incredible Ferocity:
     feat_type:
       - Ancestry
@@ -2005,6 +2134,14 @@ pf2e_feats:
         - Clever Improviser
     actions: free
     frequency: once per day
+    grants_options:
+      - incredible-improvisation
+    rules:
+      - key: "FlatModifier"
+        selector: "skill-check"
+        type: "circumstance"
+        value: 4
+        predicate: ["proficiency:untrained", "incredible-improvisation"]
   Inspire Imitation:
     feat_type:
       - Ancestry
@@ -2169,6 +2306,12 @@ pf2e_feats:
     shortdesc: You've spent more than your share of time in an alchemy lab. You have been exposed to a wide variety of alchemical poisons and harmful substances, leaving you with an increased tolerance of their effects. You have a +1 circumstance bonus to saves against poisons and diseases. If you roll a success on your saving throw against a poison or disease, you get a critical success instead.
     prereq:
       level: 5
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 1
+        predicate: [{"or": ["item:trait:disease", "item:trait:poison"]}]
   Lawbringer:
     feat_type:
       - Ancestry
@@ -2192,6 +2335,12 @@ pf2e_feats:
     prereq:
       level: 1
       heritage: Aesa
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 1
+        predicate: ["emotion"]
   Leech-Clip:
     feat_type:
       - Ancestry
@@ -2363,6 +2512,12 @@ pf2e_feats:
     prereq:
       level: 1
       heritage: Ghaluch
+    rules:
+      - key: "FlatModifier"
+        selector: ["diplomacy", "perception"]
+        type: "circumstance"
+        value: 1
+        predicate: ["monstrous-peacemaker"]
   Mountain's Stoutness:
     feat_type:
       - Ancestry
@@ -2373,6 +2528,10 @@ pf2e_feats:
     shortdesc: "Your hardiness lets you withstand more punishment than most. Increase your maximum Hit Points by your level. When you have the dying 1 condition, the DC of your recovery checks is equal to 9 + your dying value (instead of 10 + your dying value).%r%rIf you also have the Toughness feat, the Hit Points gained from it and this feat are cumulative, and the DC of your recovery checks is equal to 6 + your dying value."
     prereq:
       level: 9
+    rules:
+      - key: "FlatModifier"
+        selector: "hp"
+        value: "@actor.level"
   Multitalented:
     feat_type:
       - Ancestry
@@ -2406,6 +2565,12 @@ pf2e_feats:
     prereq:
       level: 1
       heritage: Aesa
+    rules:
+      - key: "FlatModifier"
+        selector: ["attack", "acrobatics", "athletics"]
+        type: "circumstance"
+        value: 1
+        predicate: ["action:escape"]
   Natural Ambition:
     feat_type:
       - Ancestry
@@ -2457,6 +2622,12 @@ pf2e_feats:
     prereq:
       level: 5
       heritage: Dar
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 2
+        predicate: ["item:trait:disease"]
   Nephilim Eyes:
     feat_type:
       - Ancestry
@@ -2599,6 +2770,10 @@ pf2e_feats:
     prereq:
       level: 1
       heritage: Niasa
+    rules:
+      - key: "FlatModifier"
+        selector: "land-speed"
+        value: 5
   Nimble Sil:
     feat_type:
       - Ancestry
@@ -2631,6 +2806,12 @@ pf2e_feats:
       level: 9
       skill: Occultism/expert
       heritage: Changeling
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 1
+        predicate: ["item:trait:occult"]
   One-Toed Hop:
     feat_type:
       - Ancestry
@@ -2774,6 +2955,12 @@ pf2e_feats:
     shortdesc: "You were hatched from an unfertilized egg during hard times for your people, and are a biological copy of your mother. You gain a +1 circumstance bonus to saving throws against diseases. If you roll a success on a saving throw against a disease, you get a critical success instead. If you have a different ability that would improve the save in this way (such as the battle hardened fighter class feature), if you roll a critical failure on the save you get a failure instead.%r%rYou take damage only every 2 hours from thirst and every 2 days from starvation, rather than every hour and every day.%r%r**Special** You can select this feat only at 1st level."
     prereq:
       level: 1
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 1
+        predicate: ["item:trait:disease"]
   Pervasive Superstition:
     feat_type:
       - Ancestry
@@ -2831,6 +3018,12 @@ pf2e_feats:
     shortdesc: You grew up riding your clan's shaggy ponies and riding dogs. You become trained in Nature. If you would automatically become trained in Nature (from your background or class, for example), you instead become trained in a skill of your choice. You also get a +1 circumstance bonus to Command an Animal if the target is a traditional bassin mount, such as a pony or riding dog.
     prereq:
       level: 1
+    rules:
+      - key: "FlatModifier"
+        selector: "nature"
+        type: "circumstance"
+        value: 1
+        predicate: ["action:command-an-animal", {"or": ["target:pony", "target:riding-dog"]}]
   Pride in Arms:
     feat_type:
       - Ancestry
@@ -2946,6 +3139,17 @@ pf2e_feats:
     prereq:
       level: 9
       heritage: Ashen One
+    rules:
+      - key: "FlatModifier"
+        selector: "strike-damage"
+        value: "ternary(gte(@weapon.system.runes.potency,3),2,1)"
+        damageType: "vitality"
+        predicate: ["target:mode:undead"]
+      - key: "FlatModifier"
+        selector: "strike-damage"
+        value: "ternary(gte(@weapon.system.runes.potency,3),2,1)"
+        damageType: "void"
+        predicate: ["target:mode:living"]
   Rallying Cry:
     feat_type:
       - Ancestry
@@ -3128,6 +3332,12 @@ pf2e_feats:
     shortdesc: "You are especially good at riding traditional goblin mounts. You gain the Ride feat, even if you don't meet the prerequisites. You gain a +1 circumstance bonus to Nature checks to use Command an Animal on a goblin dog or wolf mount.%r%rIf you gain a wolf as an animal companion, it gains the mount special ability (and if you gain an ability that grants you an animal companion with the mount special ability, you can choose a wolf)."
     prereq:
       level: 1
+    rules:
+      - key: "FlatModifier"
+        selector: "nature"
+        type: "circumstance"
+        value: 1
+        predicate: ["action:command-an-animal", {"or": ["target:goblin-dog", "target:wolf"]}]
   Runtsage:
     feat_type:
       - Ancestry
@@ -3168,6 +3378,12 @@ pf2e_feats:
     shortdesc: You're always on the lookout for supplies and valuables. You gain a +2 circumstance bonus to locate objects (including secret doors and hazards) you search for within 30 feet with a Seek action.
     prereq:
       level: 1
+    rules:
+      - key: "FlatModifier"
+        selector: "perception"
+        type: "circumstance"
+        value: 2
+        predicate: ["item:tag:object"]
   Scion Transformation:
     feat_type:
       - Ancestry
@@ -3179,6 +3395,14 @@ pf2e_feats:
     shortdesc: You go into hibernation for twenty-four hours and perform a ritual dedicated to your ancestors, undergoing a one-time metamorphosis. You permanently gain the effects of *enlarge*, and your maximum Hit Points increase by your level. The ritual transforms most of your gear to the appropriate size for your new body (though powerful items like artifacts or items strongly tied to their original size may not transform, at the GM's discretion).
     prereq:
       level: 17
+    rules:
+      - key: "FlatModifier"
+        selector: "hp"
+        value: "@actor.level"
+      - key: "FlatModifier"
+        selector: "melee-strike-damage"
+        type: "status"
+        value: 2
   Scion of Many Planes:
     feat_type:
       - Ancestry
@@ -3477,6 +3701,12 @@ pf2e_feats:
     prereq:
       level: 5
       heritage: Ashen One
+    rules:
+      - key: "FlatModifier"
+        selector: "skill-check"
+        type: "circumstance"
+        value: 1
+        predicate: ["origin:trait:haunt"]
   Squad Tactics:
     feat_type:
       - Ancestry
@@ -3530,6 +3760,12 @@ pf2e_feats:
     shortdesc: You've mastered the art of composure, even in the face of fear. You gain a +1 circumstance bonus to saves against effects with the fear trait and a +2 circumstance bonus to your Will DC against Intimidation skill actions, such as Demoralize.
     prereq:
       level: 1
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 1
+        predicate: ["item:trait:fear"]
   Stonegate:
     feat_type:
       - Ancestry
@@ -3564,6 +3800,12 @@ pf2e_feats:
     shortdesc: "You understand the intricacies of stonework. You become trained in Crafting. If you're already trained in Crafting, you instead gain the Specialty Crafting skill feat for stonemasonry.%r%rYou also gain a +2 circumstance bonus to Perception checks to notice unusual stonework. This bonus applies to checks to discover mechanical traps made of stone or hidden within stone.%r%rIf you aren't using the Seek action or searching, the GM automatically rolls a secret check for you to notice unusual stonework anyway. This check doesn't gain your normal circumstance bonus."
     prereq:
       level: 1
+    rules:
+      - key: "FlatModifier"
+        selector: "perception"
+        type: "circumstance"
+        value: 2
+        predicate: ["action:seek", "terrain:unusual-stonework"]
   Stonewalker:
     feat_type:
       - Ancestry
@@ -3633,6 +3875,12 @@ pf2e_feats:
     prereq:
       level: 1
       heritage: Dar
+    rules:
+      - key: "FlatModifier"
+        selector: "perception"
+        type: "circumstance"
+        value: 1
+        predicate: [{"or": ["action:sense-motive", "action:lie"]}]
   Stubborn Persistence:
     feat_type:
       - Ancestry
@@ -3729,6 +3977,11 @@ pf2e_feats:
     prereq:
       level: 1
       heritage: Dar
+    rules:
+      - key: "FlatModifier"
+        selector: "hp"
+        value: "@actor.level"
+        predicate: ["self:condition:drained"]
   Swift Swimmer:
     feat_type:
       - Ancestry
@@ -3776,6 +4029,14 @@ pf2e_feats:
     shortdesc: You channel strength from the earth beneath your feet to pummel your enemies. When making a melee Strike against a target who is standing on the same earth or stone surface as you are, you gain a circumstance bonus to the damage roll equal to the number of weapon damage dice.
     prereq:
       level: 13
+    grants_options:
+      - telluric-power
+    rules:
+      - key: "FlatModifier"
+        selector: "melee-strike-damage"
+        type: "circumstance"
+        value: "@weapon.system.damage.dice"
+        predicate: ["telluric-power"]
   Terrain Advantage:
     feat_type:
       - Ancestry
@@ -3931,6 +4192,14 @@ pf2e_feats:
     prereq:
       level: 5
       heritage: Dar
+    grants_options:
+      - target:mode:undead
+    rules:
+      - key: "FlatModifier"
+        selector: "strike-damage"
+        type: "circumstance"
+        value: "@weapon.system.damage.dice"
+        predicate: ["target:mode:undead"]
   Undying Ferocity:
     feat_type:
       - Ancestry
@@ -4106,6 +4375,12 @@ pf2e_feats:
     prereq:
       level: 1
       heritage: Dar
+    rules:
+      - key: "FlatModifier"
+        selector: "diplomacy"
+        type: "circumstance"
+        value: 1
+        predicate: ["action:make-an-impression", {"or": ["target:tag:bat", "target:tag:rat", "target:tag:wolf"]}]
   War Conditioning:
     feat_type:
       - Ancestry
@@ -4137,6 +4412,12 @@ pf2e_feats:
     prereq:
       level: 5
       heritage: Ashen One
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 1
+        predicate: [{"or": ["item:trait:death", "item:trait:disease", "origin:mode:undead", "origin:trait:sakhil"]}]
   Warren Digger:
     feat_type:
       - Ancestry

@@ -64,6 +64,11 @@ pf2e_feats:
       - archetype
       - dedication
       - multiclass
+    rules:
+      - key: "FlatModifier"
+        selector: "ac"
+        value: -1
+        predicate: ["self:effect:rage"]
   Bard Dedication:
     assoc_archetype:
       - Bard Archetype
@@ -548,6 +553,10 @@ pf2e_feats:
     shortdesc: You gain 3 additional Hit Points for each barbarian archetype class feat you have. As you continue selecting barbarian archetype class feats, you continue to gain additional Hit Points in this way.
     traits:
       - archetype
+    rules:
+      - key: "FlatModifier"
+        selector: "hp"
+        value: "3 * @actor.flags.system.barbarian.archetypeFeatCount"
   Basic Arcana:
     feat_choice:
       summary: 1st- or 2nd-level wizard feat
@@ -1007,6 +1016,10 @@ pf2e_feats:
     shortdesc: You gain 3 additional Hit Points for each champion archetype class feat you have. As you continue selecting champion archetype class feats, you continue to gain additional Hit Points in this way.
     traits:
       - archetype
+    rules:
+      - key: "FlatModifier"
+        selector: "hp"
+        value: "3 * @actor.flags.system.championDedicationCount"
   Devout Magic:
     feat_choice:
       summary: devotion spell
@@ -1037,6 +1050,10 @@ pf2e_feats:
     shortdesc: You gain 3 additional Hit Points for each fighter archetype class feat you have. As you continue selecting fighter archetype class feats, you continue to gain additional Hit Points in this way.
     traits:
       - archetype
+    rules:
+      - key: "FlatModifier"
+        selector: "hp"
+        value: "3 * @actor.flags.system.fighterDedicationCount"
   Finishing Precision:
     assoc_archetype:
       - Swashbuckler Archetype
@@ -1095,6 +1112,10 @@ pf2e_feats:
     shortdesc: You gain 3 additional Hit Points for each monk archetype class feat you have. As you continue selecting monk archetype class feats, you continue to gain additional Hit Points in this way.
     traits:
       - archetype
+    rules:
+      - key: "FlatModifier"
+        selector: "hp"
+        value: "3*@actor.flags.system.monkDedicationCount"
   Order Spell:
     feat_choice:
       auto: subclass_spell
@@ -1127,6 +1148,10 @@ pf2e_feats:
     shortdesc: You gain 3 additional Hit Points for each ranger archetype class feat you have. As you continue selecting ranger archetype class feats, you continue to gain additional Hit Points in this way.
     traits:
       - archetype
+    rules:
+      - key: "FlatModifier"
+        selector: "hp"
+        value: "3 * @actor.flags.system.rangerDedicationCount"
   Reactive Striker:
     assoc_archetype:
       - Fighter Archetype
@@ -1671,6 +1696,11 @@ pf2e_feats:
     shortdesc: You gain a +10-foot status bonus to your Speed when you're not wearing armor.
     traits:
       - archetype
+    rules:
+      - key: "FlatModifier"
+        selector: "land-speed"
+        type: "status"
+        value: 10
   Mysterious Breadth:
     assoc_archetype:
       - Oracle Archetype
@@ -1771,6 +1801,17 @@ pf2e_feats:
     traits:
       - archetype
   # Level 10 Archetype Feats
+    rules:
+      - key: "FlatModifier"
+        selector: "all-speeds"
+        type: "status"
+        value: 10
+        predicate: ["self:effect:panache"]
+      - key: "FlatModifier"
+        selector: "all-speeds"
+        type: "status"
+        value: 5
+        predicate: [{"not": "self:effect:panache"}]
   Monk's Flurry:
     assoc_archetype:
       - Monk Archetype

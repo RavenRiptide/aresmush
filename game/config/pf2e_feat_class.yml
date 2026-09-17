@@ -22,6 +22,12 @@ pf2e_feats:
     traits:
       - barbarian
       - rage
+    rules:
+      - key: "FlatModifier"
+        selector: "athletics"
+        type: "status"
+        value: 1
+        predicate: ["self:effect:rage", {"or": ["action:escape", "action:force-open", "action:lift-heavy-object"]}]
   Alchemical Assessment:
     assoc_charclass:
       - Alchemist
@@ -147,6 +153,12 @@ pf2e_feats:
     shortdesc: You make a telegraphed attack to learn about your foe. Make a melee Strike. On a hit, you can immediately attempt a check to Recall Knowledge about the target. On a critical hit, you gain a +2 circumstance bonus to the check to Recall Knowledge. The target is temporarily immune to Combat Assessment for 1 day.
     traits:
       - fighter
+    rules:
+      - key: "FlatModifier"
+        selector: "skill-check"
+        type: "circumstance"
+        value: 2
+        predicate: ["action:recall-knowledge", "critical-assessment"]
   Counterspell:
     assoc_charclass:
       - Witch
@@ -269,6 +281,13 @@ pf2e_feats:
     shortdesc: "**Requirements** You are wielding two melee weapons, each in a different hand.%r%rYou lash out at your foe with both weapons. Make two Strikes, one with each of your two melee weapons, each using your current multiple attack penalty. Both Strikes must have the same target. If the second Strike is made with a weapon that doesn't have the agile trait, it takes a –2 penalty.%r%rIf both attacks hit, combine their damage, and then add any other applicable effects from both weapons. You add any precision damage only once, to the attack of your choice. Combine the damage from both Strikes and apply resistances and weaknesses only once. This counts as two attacks when calculating your multiple attack penalty."
     traits:
       - fighter
+    grants_options:
+      - double-slice-second
+    rules:
+      - key: "FlatModifier"
+        selector: ["melee-strike-attack-roll"]
+        value: -2
+        predicate: ["double-slice-second", {"not": "item:trait:agile"}]
   Draconic Arrogance:
     assoc_charclass:
       - Barbarian
@@ -281,6 +300,12 @@ pf2e_feats:
     traits:
       - barbarian
       - rage
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "status"
+        value: 2
+        predicate: ["self:effect:rage", "item:trait:emotion"]
   Dragon Stance:
     assoc_charclass:
       - Monk
@@ -375,6 +400,14 @@ pf2e_feats:
     shortdesc: "**Trigger** A creature you can see targets you with an attack.%r%r**Requirements** You aren't encumbered.%r%rYou deftly dodge out of the way, gaining a +2 circumstance bonus to AC against the triggering attack. If the Strike misses, you gain panache until the end of your next turn."
     traits:
       - swashbuckler
+    grants_options:
+      - flashy-dodge
+    rules:
+      - key: "FlatModifier"
+        selector: "ac"
+        type: "circumstance"
+        value: 2
+        predicate: ["flashy-dodge"]
   Flexible Studies:
     assoc_charclass:
       - Investigator
@@ -604,6 +637,14 @@ pf2e_feats:
     shortdesc: "**Trigger** A creature targets you with an attack and you can see the attacker.%r%r**Requirements** You are not encumbered.%r%rYou deftly dodge out of the way, gaining a +2 circumstance bonus to AC against the triggering attack."
     traits:
       - rogue
+    grants_options:
+      - nimble-dodge
+    rules:
+      - key: "FlatModifier"
+        selector: "ac"
+        type: "circumstance"
+        value: 2
+        predicate: ["nimble-dodge"]
   Nimble Reprisal:
     assoc_charclass:
       - Champion
@@ -728,6 +769,14 @@ pf2e_feats:
     shortdesc: "**Trigger** You are about to roll a saving throw against a hazard.%r%rYour deity grants you a moment's foresight. You gain a +2 circumstance bonus to the triggering saving throw."
     traits:
       - cleric
+    grants_options:
+      - premonition-of-avoidance
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 2
+        predicate: ["origin:type:hazard", "premonition-of-avoidance"]
   Qi Spells:
     grants:
       grant_choice_once:
@@ -927,6 +976,20 @@ pf2e_feats:
     traits:
       - investigator
       - rogue
+    grants_options:
+      - trap-finder
+      - origin:trait:trap
+    rules:
+      - key: "FlatModifier"
+        selector: ["saving-throw", "ac"]
+        type: "circumstance"
+        value: "ternary(gte(@actor.system.skills.thievery.rank,3),2,1)"
+        predicate: ["origin:trait:trap"]
+      - key: "FlatModifier"
+        selector: "perception"
+        type: "circumstance"
+        value: "ternary(gte(@actor.system.skills.thievery.rank,3),2,1)"
+        predicate: ["trap-finder"]
   Tumble Behind (Rogue):
     assoc_charclass:
       - Rogue
@@ -1024,6 +1087,13 @@ pf2e_feats:
     traits:
       - fighter
       - flourish
+    grants_options:
+      - vicious-swing
+    rules:
+      - key: "DamageDice"
+        selector: "melee-strike-damage"
+        diceNumber: "ternary(gte(@actor.level,18),3,ternary(gte(@actor.level,10),2,1))"
+        predicate: ["vicious-swing"]
   Weight of Guilt:
     assoc_charclass:
       - Champion
@@ -1045,6 +1115,12 @@ pf2e_feats:
     shortdesc: You're resilient to performative influences that aren't your own. You gain a +1 circumstance bonus to saving throws against effects with the auditory, illusion, linguistic, sonic, or visual traits.
     traits:
       - bard
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 1
+        predicate: [{"or": ["auditory", "illusion", "linguistic", "sonic", "visual"]}]
   Whispers of Weakness:
     assoc_charclass:
       - Oracle
@@ -1115,6 +1191,12 @@ pf2e_feats:
       - rogue
       - swashbuckler
 # Level 2 Class Feats
+    rules:
+      - key: "FlatModifier"
+        selector: "intimidation"
+        type: "circumstance"
+        value: 2
+        predicate: ["action:demoralize", "youre-next"]
   Acute Scent:
     assoc_charclass:
       - Barbarian
@@ -1210,6 +1292,14 @@ pf2e_feats:
     traits:
       - barbarian
       - flourish
+    grants_options:
+      - bashing-charge
+    rules:
+      - key: "FlatModifier"
+        selector: "athletics"
+        type: "circumstance"
+        value: 1
+        predicate: ["bashing-charge"]
   Basic Lesson:
     assoc_charclass:
       - Witch
@@ -1337,6 +1427,14 @@ pf2e_feats:
     shortdesc: "**Trigger** You attempt a saving throw, but you haven't rolled yet.%r%rWhen danger calls, you have a strange knack for coming out on top. You gain a +2 circumstance bonus to the triggering save. If you succeed on the triggering saving throw, you gain panache until the end of your next turn."
     traits:
       - swashbuckler
+    grants_options:
+      - charmed-life
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 2
+        predicate: ["charmed-life"]
   Clever Gambit:
     assoc_charclass:
       - Rogue
@@ -1457,6 +1555,12 @@ pf2e_feats:
     shortdesc: "**Trigger** You attempt a save against a spell, but you haven't rolled yet.%r%rYou call upon your deity's grace, gaining a +2 circumstance bonus to the save."
     traits:
       - champion
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 2
+        predicate: ["item:type:spell", "divine-grace"]
   Divine Health:
     assoc_charclass:
       - Champion
@@ -1467,6 +1571,12 @@ pf2e_feats:
     shortdesc: "Your faith makes you resistant to disease, protecting you as you offer succor to the ill. You gain a +2 status bonus to saves against diseases and poisons and to flat checks to recover from persistent poison damage. Allies in your champion's aura get this benefit, but their bonus is +1.%r%rIn addition, if you roll a success on a save against a disease or poison, you get a critical success instead. (Your allies don't share this benefit.) If you have the sacred body class feature, when you roll a critical failure on a save against a disease or poison, you get a failure instead."
     traits:
       - champion
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "status"
+        value: 2
+        predicate: [{"or": ["item:trait:disease", "item:trait:poison"]}]
   Domain Acumen:
     repeatable: true
     assoc_charclass:
@@ -1635,6 +1745,14 @@ pf2e_feats:
     traits:
       - concentrate
       - ranger
+    grants_options:
+      - hunters-aim
+    rules:
+      - key: "FlatModifier"
+        selector: "ranged-strike-attack-roll"
+        type: "circumstance"
+        value: 2
+        predicate: ["hunters-aim", "target:mark:hunted-prey"]
   Improvise Admixture:
     assoc_charclass:
       - Alchemist
@@ -1819,6 +1937,12 @@ pf2e_feats:
     traits:
       - alchemist
       - druid
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "status"
+        value: 1
+        predicate: ["poison"]
   Propelling Sorcery:
     assoc_charclass:
       - Sorcerer
@@ -2047,6 +2171,11 @@ pf2e_feats:
     shortdesc: You capitalize on the distraction provided by an ally. You Sneak up to a foe adjacent to one of your allies. You can roll against the foe you're Sneaking up on, even if it's currently observing you, as though you were hidden. You take a –2 penalty on your Stealth check. If your Stealth check against the chosen foe succeeds, you can make a melee Strike against that foe at the end of your Sneak.
     traits:
       - rogue
+    rules:
+      - key: "FlatModifier"
+        selector: "stealth"
+        value: -2
+        predicate: ["action:sneak", "underhanded-assault"]
   Uplifting Overture:
     assoc_charclass:
       - Bard
@@ -2276,6 +2405,14 @@ pf2e_feats:
     shortdesc: "**Trigger** You are the target of a physical ranged attack.%r%r**Requirements** You're aware of the attack, are not off-guard against it, and have a hand free.%r%rYou gain a +4 circumstance bonus to AC against the triggering attack. If the attack misses, you have deflected it. You cannot use this feat to deflect unusually massive ranged projectiles (such as boulders or ballista bolts)."
     traits:
       - monk
+    grants_options:
+      - deflect-projectile
+    rules:
+      - key: "FlatModifier"
+        selector: "ac"
+        type: "circumstance"
+        value: 4
+        predicate: ["deflect-projectile", "item:damage:category:physical", "item:ranged", {"gte": ["hands-free", 1]}, {"not": "self:condition:off-guard"}]
   Detective's Readiness:
     assoc_charclass:
       - Investigator
@@ -2286,6 +2423,12 @@ pf2e_feats:
     shortdesc: When you're on a case, you stay watchful and resolute to avoid tricks your suspect might pull. You gain your investigation bonus from Pursue a Lead on saving throws (and their DCs, as normal) against creatures or effects that are related to the question at the heart of an open investigation, and you can use Clue In to assist an ally's saving throw against that creature or effect.
     traits:
       - investigator
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 1
+        predicate: ["pursue-a-lead"]
   Directed Channel:
     assoc_charclass:
       - Cleric
@@ -2346,6 +2489,13 @@ pf2e_feats:
     traits:
       - fighter
       - flourish
+    grants_options:
+      - double-shot
+    rules:
+      - key: "FlatModifier"
+        selector: "ranged-attack-roll"
+        value: -2
+        predicate: ["double-shot", "item:reload:0"]
   Dread Striker:
     assoc_charclass:
       - Rogue
@@ -2367,6 +2517,14 @@ pf2e_feats:
     traits:
       - fighter
       - flourish
+    grants_options:
+      - dual-handed-assault
+    rules:
+      - key: "FlatModifier"
+        selector: "strike-damage"
+        type: "circumstance"
+        value: "@weapon.system.damage.dice"
+        predicate: ["dual-handed-assault", "item:hands-held:1", {"or": ["two-hand-d6", "two-hand-d8", "two-hand-d10", "two-hand-d12"]}]
   Efficient Alchemy (Alchemist):
     assoc_charclass:
       - Alchemist
@@ -2494,6 +2652,14 @@ pf2e_feats:
     shortdesc: Your guard is up, even while moving. You gain a +4 circumstance bonus to AC against reactions triggered by your movement.
     traits:
       - monk
+    grants_options:
+      - guarded-movement
+    rules:
+      - key: "FlatModifier"
+        selector: "ac"
+        type: "circumstance"
+        value: 4
+        predicate: ["guarded-movement"]
   Guardian's Deflection (Swashbuckler):
     assoc_charclass:
       - Swashbuckler
@@ -2634,6 +2800,17 @@ pf2e_feats:
     shortdesc: "You're adept at noticing the tells of a liar—sweat, flushing, a quavering voice, a quickening pulse. You gain a +1 circumstance bonus to Perception checks to Sense Motive and to Perception DCs against attempts to Lie to you. When you determine someone is lying to you, you can use their deceit to your advantage to gain a +1 circumstance bonus to the next Deception, Diplomacy, Intimidation, or Performance check you attempt against that creature within the next minute.%r%rIf you would gain your Pursue a Lead investigation bonus to any of the above checks, that bonus increases by 1 instead of you gaining the +1 bonus listed."
     traits:
       - investigator
+    rules:
+      - key: "FlatModifier"
+        selector: "perception"
+        type: "circumstance"
+        value: 1
+        predicate: ["action:sense-motive"]
+      - key: "FlatModifier"
+        selector: ["deception", "diplomacy", "intimidation", "performance"]
+        type: "circumstance"
+        value: 1
+        predicate: ["known-liar"]
   Linked Focus:
     assoc_charclass:
       - Wizard
@@ -2906,6 +3083,12 @@ pf2e_feats:
     traits:
       - bard
       - uncommon
+    rules:
+      - key: "FlatModifier"
+        selector: "skill-check"
+        type: "circumstance"
+        value: 2
+        predicate: ["ritual", {"or": ["primary-check", "secondary-check"]}]
   Sabotage:
     assoc_charclass:
       - Rogue
@@ -2941,6 +3124,14 @@ pf2e_feats:
     shortdesc: Your stratagems benefit from your precise knowledge of anatomy. When you critically hit with an attack on which you substituted your attack roll due to Devising a Stratagem, if your attack dealt piercing or slashing damage, you also deal 1d6 persistent bleed damage to your target.
     traits:
       - investigator
+    rules:
+      - key: "DamageDice"
+        selector: "strike-damage"
+        diceNumber: 1
+        dieSize: "d6"
+        damageType: "bleed"
+        critical: true
+        predicate: ["check:substitution:devise-a-stratagem", {"or": ["item:damage:type:piercing", "item:damage:type:slashing"]}]
   Scars of Steel:
     assoc_charclass:
       - Barbarian
@@ -3103,6 +3294,14 @@ pf2e_feats:
     shortdesc: "**Trigger** You are about to roll initiative.%r%rYou swagger readily into any fight. You gain a +2 circumstance bonus to your initiative roll and can Interact to draw a weapon. If you are the first to act in combat, you gain panache."
     traits:
       - swashbuckler
+    grants_options:
+      - swaggering-initiative
+    rules:
+      - key: "FlatModifier"
+        selector: "initiative"
+        type: "circumstance"
+        value: 2
+        predicate: ["swaggering-initiative"]
   Swipe:
     assoc_charclass:
       - Barbarian
@@ -3321,6 +3520,14 @@ pf2e_feats:
     traits:
       - fighter
       - press
+    grants_options:
+      - advantageous-assault
+    rules:
+      - key: "FlatModifier"
+        selector: "strike-damage"
+        type: "circumstance"
+        value: "@weapon.system.damage.dice"
+        predicate: ["advantageous-assault", {"or": ["target:condition:grabbed", "target:condition:prone", "target:condition:restrained"]}, {"gt": ["map:increases", 0]}]
   Agile Maneuvers:
     assoc_charclass:
       - Swashbuckler
@@ -3354,6 +3561,15 @@ pf2e_feats:
     shortdesc: "**Requirements** You have identified a creature with Recall Knowledge.%r%rYour knowledge of a creature's physiology helps you attack with pinpoint accuracy. You carefully study a creature that you've identified to scope out particularly weak points in its positioning or physical form. The next time you deal sneak attack damage to the chosen creature with a Strike before the end of your turn, add an additional 2d6 precision damage.%r%rAt 11th level, the additional damage becomes 3d6, and at 17th level it becomes 4d6."
     traits:
       - rogue
+    grants_options:
+      - analyze-weakness
+    rules:
+      - key: "DamageDice"
+        selector: "strike-damage"
+        diceNumber: "match(when(lte(@actor.level, 10), 2), when(btwn(@actor.level, 11, 16), 3), when(gte(@actor.level, 17), 4))"
+        dieSize: "d6"
+        category: "precision"
+        predicate: ["analyze-weakness"]
   Animal Skin:
     assoc_charclass:
       - Barbarian
@@ -3491,6 +3707,18 @@ pf2e_feats:
     shortdesc: "**Trigger** You are targeted with an attack by an observed attacker.%r%r**Requirements** You are in Crane Stance.%r%rYou interpose your arm between yourself and your opponent. Your circumstance bonus to AC from Crane Stance increases to +3 against the triggering attack. If the attack misses you and the attacker is within your reach, you can immediately make a crane wing Strike against the attacker at a -2 penalty."
     traits:
       - monk
+    grants_options:
+      - crane-flutter
+    rules:
+      - key: "FlatModifier"
+        selector: "ac"
+        type: "circumstance"
+        value: 3
+        predicate: ["crane-flutter"]
+      - key: "FlatModifier"
+        selector: "crane-wing-attack"
+        value: -2
+        predicate: ["crane-flutter"]
   Current Spell:
     assoc_charclass:
       - Druid
@@ -3620,6 +3848,14 @@ pf2e_feats:
       - fear
       - mental
       - monk
+    grants_options:
+      - dragon-roar
+    rules:
+      - key: "FlatModifier"
+        selector: "attack-damage"
+        type: "circumstance"
+        value: 4
+        predicate: ["dragon-roar"]
   Dragon's Rage Breath:
     assoc_charclass:
       - Barbarian
@@ -3768,6 +4004,12 @@ pf2e_feats:
     shortdesc: "You can communicate with plants and fungi on a basic level and use Diplomacy to Make an Impression on them and to make very simple Requests of them. Non-creature plants and fungi typically can't fulfill most requests you might ask of them unless you have access to other magic such as *speak with plants*.%r%rBecause of your affiliation with the leaf order, plants and fungi have a sense that you support them, so you gain a +2 circumstance bonus on your check to Make a Request of a plant or fungus using Green Empathy."
     traits:
       - druid
+    rules:
+      - key: "FlatModifier"
+        selector: "diplomacy"
+        type: "circumstance"
+        value: 2
+        predicate: ["action:request", "target:trait:plant"]
   Grown of Oak:
     assoc_charclass:
       - Druid
@@ -3956,6 +4198,15 @@ pf2e_feats:
     shortdesc: "You put all your force into a single mighty, carefully controlled blow. Make an unarmed Strike. If you spend two actions and this Strike hits, you deal an extra die of weapon damage. You can instead spend 3 actions to perform an even more powerful attack, dealing a second additional die of weapon damage on a hit.%r%rIf you're at least 10th level, the number of additional dice you add from this feat doubles, for a total of 2 additional dice if you spend 2 actions or 4 additional dice if you spend 3 actions.%r%rIf you're at least 18th level, the number of additional dice you add from this feat triples, for a total of 3 additional dice if you spend 2 actions or 6 additional dice if you spend 3 actions."
     traits:
       - monk
+    rules:
+      - key: "DamageDice"
+        selector: ["melee-strike-damage", "ranged-strike-damage"]
+        diceNumber: "ternary(gte(@actor.level, 18), 3, ternary(gte(@actor.level, 10), 2, 1))"
+        predicate: [{"or": ["unarmed", {"and": ["feat:monastic-weaponry", "item:trait:monk"]}, {"and": ["monastic-archer:half-increment", "item:group:bow"]}]}, "one-inch-punch:two"]
+      - key: "DamageDice"
+        selector: ["melee-strike-damage", "ranged-strike-damage"]
+        diceNumber: "ternary(gte(@actor.level, 18), 6, ternary(gte(@actor.level, 10), 4, 2))"
+        predicate: [{"or": ["unarmed", {"and": ["feat:monastic-weaponry", "item:trait:monk"]}, {"and": ["monastic-archer:half-increment", "item:group:bow"]}]}, "one-inch-punch:three"]
   Precise Finisher:
     assoc_charclass:
       - Swashbuckler
@@ -4004,6 +4255,12 @@ pf2e_feats:
     shortdesc: "You can use your shield to fend off explosions and the like. When you Raise your Shield, you gain your shield's circumstance bonus to Reflex saves.%r%r**Special** If you have the Shield Block reaction, damage you take as a result of a Reflex save can trigger that reaction, even if the damage isn't physical damage."
     traits:
       - fighter
+    rules:
+      - key: "FlatModifier"
+        selector: "reflex"
+        type: "circumstance"
+        value: "@actor.system.attributes.shield.ac"
+        predicate: ["self:effect:raise-a-shield"]
   Return Fire:
     assoc_charclass:
       - Monk
@@ -4300,6 +4557,19 @@ pf2e_feats:
     shortdesc: "**Requirements** You are in Tiger Stance%r%rYou make a fierce swipe with both hands. Make a tiger claw Strike. It deals two extra weapon damage dice (three extra dice if you're 14th level or higher), and you can push the target 5 feet away as if you had successfully Shoved them.%r%rIf the attack is a critical success and deals damage, add your Strength modifier to the persistent bleed damage from your tiger claw."
     traits:
       - monk
+    grants_options:
+      - tiger-slash
+    rules:
+      - key: "DamageDice"
+        selector: "tiger-claw-damage"
+        diceNumber: "match(when(lte(@actor.level, 13), 2), when(gte(@actor.level, 14), 3))"
+        predicate: ["tiger-slash"]
+      - key: "FlatModifier"
+        selector: "tiger-claw-damage"
+        value: "@actor.abilities.str.mod"
+        damageType: "bleed"
+        critical: true
+        predicate: ["tiger-slash"]
   Triple Shot:
     assoc_charclass:
       - Fighter
@@ -4484,6 +4754,14 @@ pf2e_feats:
     traits:
       - finisher
       - swashbuckler
+    rules:
+      - key: "DamageDice"
+        selector: "strike-damage"
+        diceNumber: "@actor.flags.system.swashbuckler.preciseStrike"
+        dieSize: "d6"
+        damageType: "bleed"
+        category: "persistent"
+        predicate: ["finisher:bleeding", {"or": ["item:melee", {"and": ["feat:flying-blade", "item:thrown", {"or": ["target:range-increment:1", {"and": ["finisher:twirling-throw", {"lte": ["target:range-increment", 3]}]}]}]}]}, {"or": ["item:trait:agile", "item:trait:finesse"]}, {"or": ["item:damage:type:piercing", "item:damage:type:slashing"]}]
   Blind-Fight:
     assoc_charclass:
       - Fighter
@@ -4511,6 +4789,12 @@ pf2e_feats:
     shortdesc: Your magical blood makes you more resistant to magic. You gain a +1 status bonus to saving throws against spells and magical effects.
     traits:
       - sorcerer
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "status"
+        value: 1
+        predicate: [{"or": ["magical", "arcane", "divine", "occult", "primal", "item:type:spell"]}]
   Bond Conservation:
     assoc_charclass:
       - Wizard
@@ -4533,6 +4817,14 @@ pf2e_feats:
     shortdesc: You carefully take aim to avoid your foe's concealment and cover. On your next Strike with a thrown weapon before the end of your turn, you gain a +1 circumstance bonus to your attack roll and ignore your target's concealed condition, as well as the target's lesser cover or standard cover; if the target had greater cover, they instead have only standard cover against the Strike.
     traits:
       - rogue
+    grants_options:
+      - bullseye
+    rules:
+      - key: "FlatModifier"
+        selector: "attack"
+        type: "circumstance"
+        value: 1
+        predicate: ["bullseye"]
   Call and Response:
     assoc_charclass:
       - Bard
@@ -4607,6 +4899,19 @@ pf2e_feats:
     traits:
       - flourish
       - ranger
+    grants_options:
+      - deadly-aim
+    rules:
+      - key: "FlatModifier"
+        selector: "attack"
+        type: "circumstance"
+        value: -2
+        predicate: ["deadly-aim"]
+      - key: "FlatModifier"
+        selector: "strike-damage"
+        type: "circumstance"
+        value: "match(when(btwn(@actor.level, 8, 10), 4), when(btwn(@actor.level, 11, 14), 6), when(gte(@actor.level, 15), 8))"
+        predicate: ["deadly-aim"]
   Debilitating Dichotomy:
     assoc_charclass:
       - Oracle
@@ -4700,6 +5005,11 @@ pf2e_feats:
     traits:
       - finisher
       - swashbuckler
+    rules:
+      - key: "FlatModifier"
+        selector: ["melee-strike-attack-roll"]
+        value: -2
+        predicate: ["dual-finisher-second", {"not": "item:trait:agile"}]
   Dueling Riposte:
     assoc_charclass:
       - Fighter
@@ -4724,6 +5034,12 @@ pf2e_feats:
     shortdesc: Your broad experiences translate to a range of skills. Your proficiency bonus to untrained skill checks is equal to your level. You can attempt any skill check that normally requires you to be trained, even if you are untrained. If you have legendary proficiency in Occultism, you can attempt any skill check that normally requires you to have expert proficiency, even if untrained or trained.
     traits:
       - bard
+    rules:
+      - key: "FlatModifier"
+        selector: "skill-check"
+        type: "proficiency"
+        value: "@actor.level"
+        predicate: ["proficiency:untrained"]
   Emblazon Energy:
     assoc_charclass:
       - Cleric
@@ -4768,6 +5084,12 @@ pf2e_feats:
     shortdesc: You've mastered the shape of dinosaurs. Add the shapes listed in Dinosaur Form to your untamed form list. Whenever you use *untamed form* to take a shape that grants you a specific Athletics modifier, you gain a +1 status bonus to your Athletics checks.
     traits:
       - druid
+    rules:
+      - key: "FlatModifier"
+        selector: "athletics"
+        type: "status"
+        value: 1
+        predicate: ["self:effect:untamed-form", "battle-form:athletics"]
   Fey Caller:
     assoc_charclass:
       - Druid
@@ -4791,6 +5113,12 @@ pf2e_feats:
     shortdesc: "You can use Flashy Dodge before attempting a Reflex save, in addition to its original trigger. If you do, the circumstance bonus applies to your Reflex save against the triggering effect.%r%rWhen you use Flashy Dodge and the triggering attack fails or critically fails, or when you succeed or critically succeed at the saving throw, you can also Stride up to 10 feet as part of the reaction. If you do, the reaction gains the move trait. You can use Flashy Roll while Flying or Swimming instead of Striding if you have the corresponding movement type."
     traits:
       - swashbuckler
+    rules:
+      - key: "FlatModifier"
+        selector: "reflex"
+        type: "circumstance"
+        value: 2
+        predicate: ["flashy-dodge"]
   Floral Restoration:
     assoc_charclass:
       - Druid
@@ -4861,6 +5189,12 @@ pf2e_feats:
     shortdesc: You bully foes across the battlefield. While raging, you gain a +2 circumstance bonus to Athletics checks for attack actions.
     traits:
       - barbarian
+    rules:
+      - key: "FlatModifier"
+        selector: "athletics"
+        type: "circumstance"
+        value: 2
+        predicate: ["self:effect:rage", "attack"]
   Greater Mercy:
     assoc_charclass:
       - Champion
@@ -4895,6 +5229,22 @@ pf2e_feats:
     shortdesc: You have an intuitive ability to sense hazards. You gain a +1 circumstance bonus to Perception checks to find traps and hazards, to AC against their attacks, and to saves against their effects. You can find hazards that would normally require you to Search even if you aren't Searching.
     traits:
       - ranger
+    rules:
+      - key: "FlatModifier"
+        selector: "perception"
+        type: "circumstance"
+        value: 1
+        predicate: [{"or": ["trap", "hazard"]}]
+      - key: "FlatModifier"
+        selector: "ac"
+        type: "circumstance"
+        value: 1
+        predicate: [{"or": ["trap", "hazard"]}]
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 1
+        predicate: [{"or": ["trap", "hazard"]}]
   Heal Mount:
     assoc_charclass:
       - Champion
@@ -4944,6 +5294,14 @@ pf2e_feats:
     traits:
       - concentrate
       - fighter
+    grants_options:
+      - incredible-aim
+    rules:
+      - key: "FlatModifier"
+        selector: "ranged-attack-roll"
+        type: "circumstance"
+        value: 2
+        predicate: ["incredible-aim"]
   Incredible Companion (Druid):
     assoc_charclass:
       - Druid
@@ -5078,6 +5436,12 @@ pf2e_feats:
     shortdesc: "Basic mutagens that affect your physical form can bring out the beast within you, turn you nigh invincible, or make your body more elastic. While you're affected by one of the listed mutagens, you get an additional benefit.%r%r**Quicksilver Mutagen** You can stretch your legs and Step up to 10 feet, and you can squish and compress your body, allowing you to make it through tight spaces as if you were one size smaller, in addition to any effect from Squeezing.%r%r**Special** If you can be under the effects of multiple mutagens (with the mutagenist greater field discovery, for example), you get all relevant benefits."
     traits:
       - alchemist
+    rules:
+      - key: "FlatModifier"
+        selector: "intimidation"
+        type: "item"
+        value: 1
+        predicate: [{"or": ["self:effect:bestial-mutagen-lesser", "self:effect:bestial-mutagen-moderate", "self:effect:bestial-mutagen-greater", "self:effect:bestial-mutagen-major"]}]
   Nimble Roll:
     assoc_charclass:
       - Rogue
@@ -5090,6 +5454,12 @@ pf2e_feats:
     shortdesc: "You throw yourself into a roll to escape imminent danger. You can use Nimble Dodge before attempting a Reflex save in addition to its original trigger. If you do, the circumstance bonus applies to your Reflex save against the triggering effect.%r%rWhen you use Nimble Dodge and the triggering attack fails or critically fails, or when you succeed or critically succeed at the saving throw, you can also Stride up to 10 feet as part of the reaction. If you do, the reaction gains the move trait. You can use Nimble Roll while Flying or Swimming instead of Striding if you have the corresponding movement type."
     traits:
       - rogue
+    rules:
+      - key: "FlatModifier"
+        selector: "reflex"
+        type: "circumstance"
+        value: 2
+        predicate: ["nimble-dodge"]
   Opportune Backstab:
     assoc_charclass:
       - Rogue
@@ -5306,6 +5676,13 @@ pf2e_feats:
     shortdesc: "Your attacks deal more damage, even against creatures that aren't off-guard. When you succeed or critically succeed at a Strike against a creature that isn't off-guard, you also deal 1d6 precision damage. This applies only if you're using a weapon or unarmed attack you could deal sneak attack damage with.%r%rAt 14th level, if you would normally deal 3d6 or more sneak attack damage to off-guard creatures, you deal 2d6 precision damage to creatures that aren't off-guard."
     traits:
       - rogue
+    rules:
+      - key: "DamageDice"
+        selector: "strike-damage"
+        diceNumber: "ternary(gte(@actor.level,14),ternary(gte(@actor.flags.system.sneakAttackDamage.number,3),2,1),1)"
+        dieSize: "d6"
+        category: "precision"
+        predicate: ["item:tag:sneak-attack", {"not": "target:condition:off-guard"}]
   Soaring Shape:
     assoc_charclass:
       - Druid
@@ -5318,6 +5695,12 @@ pf2e_feats:
     shortdesc: Wings free you from the shackles of the ground below. Add the bat and bird shapes in *aerial form* to your *untamed form* list. If you have Insect Shape, you also add the wasp shape to your *untamed form* list. If you have Ferocious Shape, you also add the pterosaur shape to your *untamed form* list. Whenever you use *untamed form* to take a shape that grants you a specific Acrobatics modifier, you gain a +1 status bonus to Acrobatics checks.
     traits:
       - druid
+    rules:
+      - key: "FlatModifier"
+        selector: "acrobatics"
+        type: "status"
+        value: 1
+        predicate: ["battle-form:acrobatics"]
   Soulsight (Bard):
     assoc_charclass:
       - Bard
@@ -5711,6 +6094,14 @@ pf2e_feats:
     shortdesc: "**Trigger** You are the target of a physical ranged Strike.%r%r**Requirements** You're aware of the attack, not off-guard against it, and either have a hand free or are wielding a melee weapon.%r%rYou can knock aside ranged attacks. You gain a +4 circumstance bonus to AC against the triggering attack. If the attack misses, you knocked or cut it out of the air."
     traits:
       - fighter
+    grants_options:
+      - cut-from-the-air
+    rules:
+      - key: "FlatModifier"
+        selector: "ac"
+        type: "circumstance"
+        value: 4
+        predicate: ["cut-from-the-air", "item:damage:category:physical", "item:ranged", {"not": "self:condition:off-guard"}]
   Debilitating Shot:
     assoc_charclass:
       - Fighter
@@ -5813,6 +6204,15 @@ pf2e_feats:
     shortdesc: You can throw bombs at just the right trajectory to create especially large and powerful explosions. When you throw an alchemical bomb and that bomb has the splash trait, you can have the splash damage affect all creatures within 10 feet of the target instead of 5 feet. If you do, you gain a status bonus to the bomb's splash damage equal to your Intelligence modifier. If you have the bomber 5th-level field discovery, this additional damage applies even if you caused your bomb to deal splash damage equal to your Intelligence modifier instead of the normal amount, allowing your bombs to deal splash damage equal to double your Intelligence modifier.
     traits:
       - alchemist
+    grants_options:
+      - expanded-splash
+    rules:
+      - key: "FlatModifier"
+        selector: "alchemical-bomb-damage"
+        type: "status"
+        value: "@actor.abilities.int.mod"
+        damageCategory: "splash"
+        predicate: ["item:trait:splash", "expanded-splash"]
   Fearsome Brute:
     assoc_charclass:
       - Fighter
@@ -5823,6 +6223,12 @@ pf2e_feats:
     shortdesc: "Fear makes your foes weak and more vulnerable to your attacks. You gain a circumstance bonus to damage rolls for Strikes against frightened creatures. The bonus is equal to double the target's frightened value.%r%rIf you're a master in Intimidation, increase the bonus to triple the target's frightened value."
     traits:
       - fighter
+    rules:
+      - key: "FlatModifier"
+        selector: "strike-damage"
+        type: "circumstance"
+        value: "2 * @target.conditions.frightened.badge.value"
+        predicate: ["target:condition:frightened"]
   Flinging Charge:
     assoc_charclass:
       - Fighter
@@ -6062,6 +6468,12 @@ pf2e_feats:
     shortdesc: "You're constantly studying small aspects of everyone's movements, even if you don't have a stratagem in place ahead of time.%r%rOn any Strike for which you didn't Devise a Stratagem, you still deal precision damage equal to your number of strategic strike damage dice so long as the weapon or unarmed attack you used is one that would have let you use your Intelligence modifier had you Devised a Stratagem."
     traits:
       - investigator
+    rules:
+      - key: "FlatModifier"
+        selector: "strike-damage"
+        value: "floor((@actor.level + 3)/4)"
+        damageCategory: "precision"
+        predicate: ["class:investigator", {"not": "check:substitution:devise-a-stratagem"}, {"or": ["item:trait:agile", "item:trait:finesse", {"and": ["item:ranged", {"not": "item:thrown-melee"}]}, "item:base:sap", {"and": ["feat:takedown-expert", "item:group:club", "item:hands-held:1"]}]}]
   Overpowering Charge:
     assoc_charclass:
       - Barbarian
@@ -6138,6 +6550,13 @@ pf2e_feats:
     shortdesc: You attack with great precision. Add the following debilitations to the list you can choose from when you use Debilitating Strike.
     traits:
       - rogue
+    rules:
+      - key: "DamageDice"
+        selector: "strike-damage"
+        diceNumber: 2
+        dieSize: "d6"
+        category: "precision"
+        predicate: ["target:mark:precise-debilitations"]
   Prevailing Position:
     assoc_charclass:
       - Monk
@@ -6678,6 +7097,13 @@ pf2e_feats:
     traits:
       - champion
       - flourish
+    grants_options:
+      - blessed-counterstrike
+    rules:
+      - key: "DamageDice"
+        selector: "strike-damage"
+        diceNumber: 1
+        predicate: ["blessed-counterstrike"]
   Blood Sovereignty:
     assoc_charclass:
       - Sorcerer
@@ -6721,6 +7147,13 @@ pf2e_feats:
     traits:
       - fighter
       - press
+    grants_options:
+      - brutal-finish
+    rules:
+      - key: "DamageDice"
+        selector: "melee-strike-damage"
+        diceNumber: "ternary(gte(@actor.level,18),2,1)"
+        predicate: ["item:type:weapon", "brutal-finish"]
   Champion's Sacrifice:
     assoc_charclass:
       - Champion
@@ -7972,6 +8405,14 @@ pf2e_feats:
     shortdesc: "**Requirements** You are in Ironblood Stance%r%rYou steel yourself, preparing to resist oncoming attacks and using your muscles to absorb the impact.%r%rYou gain the benefits of your iron sweep's parry trait (a +1 circumstance bonus to AC until the start of your next turn) and your resistance from Ironblood Stance increases to your Strength modifier (if it's higher) for the same duration."
     traits:
       - monk
+    grants_options:
+      - ironblood-surge
+    rules:
+      - key: "FlatModifier"
+        selector: "ac"
+        type: "circumstance"
+        value: 1
+        predicate: ["ironblood-surge"]
   Lasting Armament:
     assoc_charclass:
       - Cleric
@@ -8007,6 +8448,12 @@ pf2e_feats:
     traits:
       - divine
       - oracle
+    rules:
+      - key: "FlatModifier"
+        selector: "fly-speed"
+        type: "status"
+        value: 10
+        predicate: [{"gte": ["self:condition:cursebound", 3]}]
   Mountain Quake:
     assoc_charclass:
       - Monk
@@ -8069,6 +8516,11 @@ pf2e_feats:
     shortdesc: Your mastery over your body is perfect enough to hold back the ravages of time. You cease aging, though you still die when your time is up. In addition, you gain a +2 status bonus to Fortitude and Will saving throws.
     traits:
       - monk
+    rules:
+      - key: "FlatModifier"
+        selector: ["fortitude", "will"]
+        type: "status"
+        value: 2
   Perfect Finisher:
     assoc_charclass:
       - Swashbuckler
@@ -8363,6 +8815,12 @@ pf2e_feats:
     shortdesc: With primal magic sustaining you, you cease aging. The overflowing primal energy gives you a +2 status bonus to saves against diseases and primal magic.
     traits:
       - druid
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "status"
+        value: 2
+        predicate: [{"or": ["disease", "primal"]}]
   Triumphant Inspiration:
     assoc_charclass:
       - Bard
@@ -8637,6 +9095,19 @@ pf2e_feats:
     traits:
       - oracle
     init_magic: true
+    grants_options:
+      - used-diverse-mystery
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "status"
+        value: -1
+        predicate: ["diverse-mystery:spray-of-stars", "used-diverse-mystery", "self:condition:cursebound", "forced-movement"]
+      - key: "FlatModifier"
+        selector: ["perception", "will"]
+        type: "status"
+        value: -1
+        predicate: ["self:condition:cursebound", "diverse-mystery:brain-drain", "used-diverse-mystery"]
   Dragon Transformation:
     assoc_charclass:
       - Barbarian
@@ -8856,6 +9327,12 @@ pf2e_feats:
     shortdesc: Divine energy fills your weapon. Whenever you critically hit an enemy with Blessed Counterstrike or Retributive Strike, your attack deals an extra weapon damage die, and the target is slowed 1 on its next turn
     traits:
       - champion
+    rules:
+      - key: "DamageDice"
+        selector: "strike-damage"
+        diceNumber: 1
+        critical: true
+        predicate: [{"or": ["blessed-counterstrike", "retributive-strike"]}]
   Legendary Monster Hunter:
     assoc_charclass:
       - Ranger
@@ -9237,6 +9714,18 @@ pf2e_feats:
     shortdesc: Your critical hits are particularly devastating. On a critical hit with a melee Strike, add one extra damage die. This is in addition to any extra dice you gain if the weapon is deadly or fatal. The target also takes persistent bleed damage equal to two damage dice.
     traits:
       - barbarian
+    rules:
+      - key: "DamageDice"
+        selector: "strike-damage"
+        diceNumber: 1
+        critical: true
+        predicate: [{"or": ["item:melee", {"and": ["item:trait:thrown", "feat:raging-thrower"]}]}]
+      - key: "DamageDice"
+        selector: "strike-damage"
+        diceNumber: 2
+        damageType: "bleed"
+        critical: true
+        predicate: [{"or": ["item:melee", {"and": ["item:trait:thrown", "feat:raging-thrower"]}]}]
   Deep Lore:
     assoc_charclass:
       - Bard
@@ -9432,6 +9921,11 @@ pf2e_feats:
       - fighter
       - flourish
       - ranger
+    rules:
+      - key: "FlatModifier"
+        selector: "ranged-attack-roll"
+        value: -2
+        predicate: ["impossible-volley", "volley-30", "reload-0"]
   Improbable Elixirs:
     assoc_charclass:
       - Alchemist
@@ -9601,6 +10095,14 @@ pf2e_feats:
       - concentrate
       - fortune
       - rage
+    grants_options:
+      - perfect-clarity
+    rules:
+      - key: "FlatModifier"
+        selector: ["attack-roll", "will"]
+        type: "circumstance"
+        value: 2
+        predicate: ["perfect-clarity"]
   Perfect Debilitation:
     assoc_charclass:
       - Alchemist
@@ -9800,6 +10302,13 @@ pf2e_feats:
       - concentrate
       - fortune
       - monk
+    grants_options:
+      - triangle-shot
+    rules:
+      - key: "FlatModifier"
+        selector: "ranged-attack-roll"
+        value: -2
+        predicate: ["triangle-shot"]
   Trickster's Ace:
     assoc_charclass:
       - Investigator

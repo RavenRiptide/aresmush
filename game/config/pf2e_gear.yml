@@ -344,6 +344,14 @@ pf2e_gear:
     level: 0
     price: 1
     traits: []
+    grants_options:
+      - lit-torch
+    rules:
+      - key: "FlatModifier"
+        selector: "{item|_id}-damage"
+        value: 1
+        damageType: "fire"
+        predicate: ["lit-torch"]
   Waterskin:
     bulk: 0.1
     level: 0
@@ -391,83 +399,89 @@ pf2e_gear:
     level: 3
     price: 5500
     traits: []
-    modifies:
-      - domain: crafting
-        type: item
-        value: "1"
-        when: ["alchemical", "action:craft"]
+    rules:
+      - key: "FlatModifier"
+        selector: "crafting"
+        type: "item"
+        value: 1
+        predicate: ["alchemical", "action:craft"]
   Artisan's Toolkit (Sterling):
     bulk: 2
     level: 3
     price: 5000
     traits: []
-    modifies:
-      - domain: crafting
-        type: item
-        value: "1"
-        when: ["action:craft"]
+    rules:
+      - key: "FlatModifier"
+        selector: "crafting"
+        type: "item"
+        value: 1
+        predicate: ["action:craft"]
   Climbing Kit (Extreme):
     bulk: 1
     level: 3
     price: 4000
     traits: []
-    modifies:
-      - domain: athletics
-        type: item
-        value: "1"
-        when: ["action:climb"]
+    rules:
+      - key: "FlatModifier"
+        selector: "athletics"
+        type: "item"
+        value: 1
+        predicate: ["action:climb"]
   Clothing (High-Fashion Fine):
     bulk: 0.1
     level: 3
     price: 5500
     traits: []
-    modifies:
-      - domain: diplomacy
-        type: item
-        value: "1"
-        when: ["action:make-an-impression"]
+    rules:
+      - key: "FlatModifier"
+        selector: "diplomacy"
+        type: "item"
+        value: 1
+        predicate: ["action:make-an-impression"]
   Compass (Lensatic):
     bulk: 0
     level: 3
     price: 2000
     traits: []
-    modifies:
-      - domain: survival
-        type: item
-        value: "1"
-        when: [{"or": ["action:sense-direction", "action:navigate"]}]
+    rules:
+      - key: "FlatModifier"
+        selector: "survival"
+        type: "item"
+        value: 1
+        predicate: [{"or": ["action:sense-direction", "action:navigate"]}]
   Concealed Sheath:
     bulk: 0
     level: 3
     price: 2500
     traits: []
-    modifies:
-      - domain: stealth
-        type: item
-        value: "1"
-        when: ["action:conceal-an-object", "target:contents"]
+    rules:
+      - key: "FlatModifier"
+        selector: "stealth"
+        type: "item"
+        value: 1
+        predicate: ["action:conceal-an-object", "target:contents"]
   Crowbar (Levered):
     bulk: 0.1
     level: 3
     price: 2000
     traits: []
-    modifies:
-      - domain: athletics
-        type: item
-        value: "1"
-        when: ["action:force-open"]
+    rules:
+      - key: "FlatModifier"
+        selector: "athletics"
+        type: "item"
+        value: 1
+        predicate: ["action:force-open"]
   Detective's Kit:
     bulk: 1
     level: 3
     price: 2500
     traits: []
-    modifies:
-      - domain:
-          - perception
-          - skill-check
-        type: item
-        value: "1"
-        when: ["action:investigate"]
+    rules:
+      - key: "FlatModifier"
+        selector: ["perception", "skill-check"]
+        type: "item"
+        value: 1
+        predicate: ["action:investigate"]
   Disguise Kit (Elite Cosmetics):
     bulk: 0.1
     level: 3
@@ -478,11 +492,12 @@ pf2e_gear:
     level: 3
     price: 4000
     traits: []
-    modifies:
-      - domain: deception
-        type: item
-        value: "1"
-        when: ["action:impersonate"]
+    rules:
+      - key: "FlatModifier"
+        selector: "deception"
+        type: "item"
+        value: 1
+        predicate: ["action:impersonate"]
   Fishing Tackle (Professional):
     bulk: 1
     level: 3
@@ -493,11 +508,12 @@ pf2e_gear:
     level: 3
     price: 5000
     traits: []
-    modifies:
-      - domain: medicine
-        type: item
-        value: "1"
-        when: [{"or": ["action:administer-first-aid", "action:treat-disease", "action:treat-poison", "action:treat-wounds"]}]
+    rules:
+      - key: "FlatModifier"
+        selector: "medicine"
+        type: "item"
+        value: 1
+        predicate: [{"or": ["action:administer-first-aid", "action:treat-disease", "action:treat-poison", "action:treat-wounds"]}]
   Heavy Barding (Large):
     bulk: 4
     level: 3
@@ -515,11 +531,12 @@ pf2e_gear:
     level: 3
     price: 4000
     traits: []
-    modifies:
-      - domain: perception
-        type: item
-        value: "1"
-        when: ["minute-details"]
+    rules:
+      - key: "FlatModifier"
+        selector: "perception"
+        type: "item"
+        value: 1
+        predicate: ["minute-details"]
   Manacles (Average):
     bulk: 0
     level: 3
@@ -532,11 +549,12 @@ pf2e_gear:
     traits: []
     grants_options:
       - playing
-    modifies:
-      - domain: performance
-        type: item
-        value: "1"
-        when: ["playing"]
+    rules:
+      - key: "FlatModifier"
+        selector: "performance"
+        type: "item"
+        value: 1
+        predicate: ["playing"]
   Musical Instrument (Virtuoso heavy):
     bulk: 16
     level: 3
@@ -544,21 +562,23 @@ pf2e_gear:
     traits: []
     grants_options:
       - playing
-    modifies:
-      - domain: performance
-        type: item
-        value: "1"
-        when: ["playing"]
+    rules:
+      - key: "FlatModifier"
+        selector: "performance"
+        type: "item"
+        value: 1
+        predicate: ["playing"]
   Repair Toolkit (Superb):
     bulk: 1
     level: 3
     price: 2500
     traits: []
-    modifies:
-      - domain: crafting
-        type: item
-        value: "1"
-        when: ["action:repair"]
+    rules:
+      - key: "FlatModifier"
+        selector: "crafting"
+        type: "item"
+        value: 1
+        predicate: ["action:repair"]
   Scholarly Journal:
     bulk: 0.1
     level: 3
@@ -577,30 +597,34 @@ pf2e_gear:
     price: 1000
     traits:
       - uncommon
-    modifies:
-      - domain: survival
-        type: item
-        value: "1"
-        when: ["mapped-area"]
-      - domain: skill-check
-        type: item
-        value: "1"
-        when: ["mapped-area", "action:recall-knowledge"]
+    rules:
+      - key: "FlatModifier"
+        selector: "survival"
+        type: "item"
+        value: 1
+        predicate: ["mapped-area"]
+      - key: "FlatModifier"
+        selector: "skill-check"
+        type: "item"
+        value: 1
+        predicate: ["mapped-area", "action:recall-knowledge"]
   Survey Map (Atlas):
     bulk: 0.1
     level: 3
     price: 5000
     traits:
       - uncommon
-    modifies:
-      - domain: survival
-        type: item
-        value: "1"
-        when: ["mapped-area"]
-      - domain: skill-check
-        type: item
-        value: "1"
-        when: ["mapped-area", "action:recall-knowledge"]
+    rules:
+      - key: "FlatModifier"
+        selector: "survival"
+        type: "item"
+        value: 1
+        predicate: ["mapped-area"]
+      - key: "FlatModifier"
+        selector: "skill-check"
+        type: "item"
+        value: 1
+        predicate: ["mapped-area", "action:recall-knowledge"]
   Thieves' Toolkit (Infiltrator Picks):
     bulk: 0
     level: 3
@@ -611,21 +635,23 @@ pf2e_gear:
     level: 3
     price: 5000
     traits: []
-    modifies:
-      - domain: thievery
-        type: item
-        value: "1"
-        when: [{"or": ["action:disable-a-device", "action:pick-a-lock"]}]
+    rules:
+      - key: "FlatModifier"
+        selector: "thievery"
+        type: "item"
+        value: 1
+        predicate: [{"or": ["action:disable-a-device", "action:pick-a-lock"]}]
   Spyglass (Fine):
     bulk: 0.1
     level: 4
     price: 8000
     traits: []
-    modifies:
-      - domain: perception
-        type: item
-        value: "1"
-        when: ["distance"]
+    rules:
+      - key: "FlatModifier"
+        selector: "perception"
+        type: "item"
+        value: 1
+        predicate: ["distance"]
   Lock (Good):
     bulk: 0
     level: 9

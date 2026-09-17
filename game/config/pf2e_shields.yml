@@ -239,11 +239,12 @@ pf2e_shields:
     speed_penalty: 0
     traits:
       - magical
-    modifies:
-      - domain: deception
-        type: item
-        value: "1"
-        when: ["action:feint", "self:shield:raised"]
+    rules:
+      - key: "FlatModifier"
+        selector: "deception"
+        type: "item"
+        value: 1
+        predicate: ["action:feint", "self:shield:raised"]
   Indestructible Shield:
     ac_bonus: 2
     bulk: 1
@@ -320,11 +321,12 @@ pf2e_shields:
       - magical
     grants_options:
       - reflecting-shield
-    modifies:
-      - domain: saving-throw
-        type: circumstance
-        value: "2"
-        when: ["self:shield:raised", "reflecting-shield", "item:type:spell"]
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 2
+        predicate: ["self:shield:raised", "reflecting-shield", "item:type:spell"]
   Spellguard Shield:
     ac_bonus: 2
     bulk: 1
@@ -337,11 +339,12 @@ pf2e_shields:
       - magical
     grants_options:
       - spellguard-shield
-    modifies:
-      - domain: saving-throw
-        type: circumstance
-        value: "2"
-        when: ["self:shield:raised", "spellguard-shield", "item:type:spell"]
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 2
+        predicate: ["self:shield:raised", "spellguard-shield", "item:type:spell"]
   Spined Shield:
     ac_bonus: 2
     bulk: 1

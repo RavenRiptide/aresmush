@@ -360,15 +360,17 @@ pf2e_armor:
         power: 1
       property:
         - Slick (Greater)
-    modifies:
-      - domain: athletics
-        type: item
-        value: "2"
-        when: ["action:swim"]
-      - domain: stealth
-        type: item
-        value: "2"
-        when: ["terrain:water"]
+    rules:
+      - key: "FlatModifier"
+        selector: "athletics"
+        type: "item"
+        value: 2
+        predicate: ["action:swim"]
+      - key: "FlatModifier"
+        selector: "stealth"
+        type: "item"
+        value: 2
+        predicate: ["terrain:water"]
   Explorer's Clothing:
     category: unarmored
     traits:
@@ -413,11 +415,12 @@ pf2e_armor:
     runes:
       fundamental:
         potency: 1
-    modifies:
-      - domain: saving-throw
-        type: item
-        value: "1"
-        when: ["item:trait:curse"]
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "item"
+        value: 1
+        predicate: ["item:trait:curse"]
   Half Plate:
     category: heavy
     traits: []
@@ -462,17 +465,17 @@ pf2e_armor:
       fundamental:
         potency: 2
         power: 1
-    modifies:
-      - domain:
-          - ac
-          - saving-throw
-        type: circumstance
-        value: "1"
-        when: ["origin:trait:fiend"]
-      - domain: diplomacy
-        type: item
-        value: "2"
-        when: [{"not": "target:trait:fiend"}]
+    rules:
+      - key: "FlatModifier"
+        selector: ["ac", "saving-throw"]
+        type: "circumstance"
+        value: 1
+        predicate: ["origin:trait:fiend"]
+      - key: "FlatModifier"
+        selector: "diplomacy"
+        type: "item"
+        value: 2
+        predicate: [{"not": "target:trait:fiend"}]
   Impenetrable Scale:
     category: medium
     traits:
@@ -562,10 +565,11 @@ pf2e_armor:
       fundamental:
         potency: 2
         power: 1
-    modifies:
-      - domain: intimidation
-        type: item
-        value: "2"
+    rules:
+      - key: "FlatModifier"
+        selector: "intimidation"
+        type: "item"
+        value: 2
   Lion's Armor (Greater):
     category: heavy
     traits:
@@ -584,10 +588,11 @@ pf2e_armor:
       fundamental:
         potency: 3
         power: 2
-    modifies:
-      - domain: intimidation
-        type: item
-        value: "3"
+    rules:
+      - key: "FlatModifier"
+        selector: "intimidation"
+        type: "item"
+        value: 3
   Mariner's Splint:
     category: heavy
     traits:
@@ -606,11 +611,12 @@ pf2e_armor:
     runes:
       fundamental:
         potency: 1
-    modifies:
-      - domain: athletics
-        type: item
-        value: "1"
-        when: [{"or": ["action:swim", "action:climb"]}]
+    rules:
+      - key: "FlatModifier"
+        selector: "athletics"
+        type: "item"
+        value: 1
+        predicate: [{"or": ["action:swim", "action:climb"]}]
   Moonlit Chain:
     category: light
     traits:
@@ -648,6 +654,12 @@ pf2e_armor:
       fundamental:
         potency: 1
         power: 1
+    rules:
+      - key: "DamageDice"
+        selector: "strike-damage"
+        diceNumber: 1
+        dieSize: "d8"
+        predicate: ["action:sudden-charge"]
   Padded:
     category: light
     traits:
@@ -713,11 +725,12 @@ pf2e_armor:
       fundamental:
         potency: 1
         power: 1
-    modifies:
-      - domain: athletics
-        type: item
-        value: "2"
-        when: ["action:swim"]
+    rules:
+      - key: "FlatModifier"
+        selector: "athletics"
+        type: "item"
+        value: 2
+        predicate: ["action:swim"]
   Unholy Plate:
     category: heavy
     traits:
@@ -756,16 +769,16 @@ pf2e_armor:
       fundamental:
         potency: 1
         power: 1
-    modifies:
-      - domain: diplomacy
-        type: item
-        value: "2"
-      - domain:
-          - deception
-          - stealth
-        type: item
-        value: "-2"
-        when: [{"or": ["action:hide", "action:sneak", "action:impersonate"]}]
+    rules:
+      - key: "FlatModifier"
+        selector: "diplomacy"
+        type: "item"
+        value: 2
+      - key: "FlatModifier"
+        selector: ["deception", "stealth"]
+        type: "item"
+        value: -2
+        predicate: [{"or": ["action:hide", "action:sneak", "action:impersonate"]}]
   Warleader's Bulwark (Greater):
     category: medium
     traits:
@@ -784,13 +797,13 @@ pf2e_armor:
       fundamental:
         potency: 2
         power: 2
-    modifies:
-      - domain: diplomacy
-        type: item
-        value: "3"
-      - domain:
-          - deception
-          - stealth
-        type: item
-        value: "-3"
-        when: [{"or": ["action:hide", "action:sneak", "action:impersonate"]}]
+    rules:
+      - key: "FlatModifier"
+        selector: "diplomacy"
+        type: "item"
+        value: 3
+      - key: "FlatModifier"
+        selector: ["deception", "stealth"]
+        type: "item"
+        value: -3
+        predicate: [{"or": ["action:hide", "action:sneak", "action:impersonate"]}]

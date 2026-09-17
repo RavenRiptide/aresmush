@@ -2659,6 +2659,12 @@ pf2e_consumables:
     traits:
       - consumable
       - magical
+    rules:
+      - key: "DamageDice"
+        selector: "{item|id}-ranged-damage"
+        diceNumber: 1
+        dieSize: "d6"
+        damageType: "bleed"
   Potion of Acid Retaliation (Greater):
     bulk: 0.1
     level: 12

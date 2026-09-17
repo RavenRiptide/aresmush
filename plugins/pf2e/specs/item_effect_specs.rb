@@ -7,8 +7,8 @@ module AresMUSH
   # Our catalogue used to carry a hand-written `bonus:` hash, and ten of its fifty-one entries granted
   # a conditional bonus unconditionally: Skeleton Key (Greater) gave its +2 to Thievery generally
   # rather than to picking a lock, and Boots of Bounding (Greater) gave +3 Athletics rather than +3 to
-  # jumping. The rows are now imported from the pf2e system's equipment packs with their predicates
-  # intact, and there is one vocabulary instead of two.
+  # jumping. The rules are now imported from the pf2e system's equipment packs in their own vocabulary,
+  # predicates intact, and there is one vocabulary instead of two.
   describe "item effects", :dbtest => true do
 
     before(:each) do
@@ -49,8 +49,8 @@ module AresMUSH
       item
     end
 
-    it "should have the catalogue rows the import wrote" do
-      expect(Global.read_config('pf2e_magicitem', 'Skeleton Key', 'modifies')).to_not be_nil
+    it "should have the catalogue rules the import wrote" do
+      expect(Global.read_config('pf2e_magicitem', 'Skeleton Key', 'rules')).to_not be_nil
     end
 
     it "should make an item without raising, now that the catalogue carries keys the model has not" do

@@ -57,6 +57,12 @@ pf2e_feats:
     shortdesc: You can breathe even in hazardous or sparse air. You can hold your breath for 25 times as long as usual before suffocating. You gain a +1 circumstance bonus to saving throws against inhaled threats, such as inhaled poisons, and if you roll a success on such a saving throw, you get a critical success instead.
     prereq:
       level: 1
+    rules:
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 1
+        predicate: ["item:trait:inhaled"]
   Canny Acumen:
     feat_type:
       - General
@@ -132,12 +138,21 @@ pf2e_feats:
     shortdesc: You move more quickly on foot. Your Speed increases by 5 feet.
     prereq:
       level: 1
+    rules:
+      - key: "FlatModifier"
+        selector: "land-speed"
+        value: 5
   Incredible Initiative:
     feat_type:
       - General
     shortdesc: You react more quickly than others can. You gain a +2 circumstance bonus to initiative rolls.
     prereq:
       level: 1
+    rules:
+      - key: "FlatModifier"
+        selector: "initiative"
+        type: "circumstance"
+        value: 2
   Pet:
     feat_type:
       - General
@@ -162,6 +177,10 @@ pf2e_feats:
     shortdesc: Your body can withstand more punishment than most before succumbing. Increase your maximum Hit Points by your level. You reduce the DC of recovery checks by 1.
     prereq:
       level: 1
+    rules:
+      - key: "FlatModifier"
+        selector: "hp"
+        value: "@actor.level"
   Weapon Proficiency:
     repeatable: true
     feat_type:
@@ -246,6 +265,12 @@ pf2e_feats:
     prereq:
       level: 3
       combat_stats: Perception/expert
+    rules:
+      - key: "FlatModifier"
+        selector: "perception"
+        type: "circumstance"
+        value: 2
+        predicate: ["action:seek", "thorough-search"]
   Untrained Improvisation:
     feat_type:
       - General
@@ -253,6 +278,11 @@ pf2e_feats:
     prereq:
       level: 3
   # Level 7 General Feats
+    rules:
+      - key: "FlatModifier"
+        selector: "skill-check"
+        type: "proficiency"
+        value: "@actor.level + clamp(-2,floor((@actor.level - 7) / 2),0)"
   Expeditious Search:
     feat_type:
       - General
@@ -285,6 +315,12 @@ pf2e_feats:
       level: 7
       combat_stats: Perception/master
   # Level 11 General Feats
+    rules:
+      - key: "FlatModifier"
+        selector: "skill-check"
+        type: "circumstance"
+        value: 2
+        predicate: ["taste", {"or": ["action:recall-knowledge", "action:investigate"]}]
   A Home in Every Port:
     feat_type:
       - General
