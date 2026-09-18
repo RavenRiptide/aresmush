@@ -165,6 +165,15 @@ module AresMUSH
         end
       when "effects"
         return PF2EffectListCmd
+      when "action"
+        case cmd.switch
+        when "use"
+          return PF2ActionUseCmd
+        when "search"
+          return PF2ActionSearchCmd
+        when nil
+          return PF2ActionViewCmd
+        end
       when "encounter", "initiative", "init"
         case cmd.switch
         when "start"
