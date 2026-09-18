@@ -156,8 +156,12 @@ module AresMUSH
 
         # An unmet row is kept out of the stacking, so it cannot override one that applies, but it is
         # still reported: "+2, but only while picking a lock" is what a player wants to know.
-        Modifiers.breakdown(row['base'].call(char, name).to_i, adjusted)
-                 .merge('conditional' => unmet + waived)
+        figure = Modifiers.breakdown(row['base'].call(char, name).to_i, adjusted)
+                          .merge('conditional' => unmet + waived)
+
+        # A character in a battle form has the form's AC, skills, attacks and speeds where those are
+        # better or the form insists.
+        BattleForms.override(char, kind, name, figure)
       end
 
       def self.total(char, kind, name = nil, options = [], extra = [])

@@ -78,6 +78,15 @@ module AresMUSH
         evaluate(formula, context).first
       end
 
+      # A value that may be a word rather than arithmetic - a size, `tiny` - read as the word when it is
+      # one and as a number otherwise.
+      def self.value_or_word(formula, context = {})
+        return formula if formula.is_a?(Numeric)
+        return formula.to_s if formula.to_s.match?(/\A[a-z]+\z/i)
+
+        value(formula, context)
+      end
+
       # The paths the formula asked for that the context did not hold. A reference resolving to nothing
       # counts as zero, which is what Foundry does - and is also how a mistyped path hides, so a caller
       # that wants to know can ask.

@@ -229,6 +229,12 @@ pf2e_shields:
     traits:
       - uncommon
       - magical
+    rules:
+      - key: "Aura"
+        radius: 5
+        effects: [{"affects": "allies", "uuid": "Compendium.pf2e.equipment-effects.Item.Effect: Forge Warden"}]
+        slug: "forge-warden"
+        predicate: ["self:shield:raised"]
   Glamorous Buckler:
     ac_bonus: 1
     bulk: 0.1

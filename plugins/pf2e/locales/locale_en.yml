@@ -260,6 +260,7 @@ en:
     effect_removed: "%{effect} ended on %{targets}."
     effect_ended: "%{effect} has ended on %{name}."
     fast_healing: "%{name} regains %{amount} hit points from %{source}."
+    aura_not_found: "%{name} projects no aura called %{aura}."
     persistent_dealt: "%{name} takes %{amount} persistent %{type} damage."
     persistent_ended: "%{name}'s persistent %{type} damage ends (%{die} against DC %{dc})."
     effect_search_found: "Effects: %{list}"

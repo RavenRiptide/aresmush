@@ -337,6 +337,24 @@ module AresMUSH
           }
         },
         {
+          'key' => 'CreatureSize',
+          'fields' => %w{key value reach maximumSize minimumSize predicate slug label},
+          # A size by name or one step up or down; `Pf2e::Size` reads it.
+          'contribute' => lambda { |row, source, _context| row.merge('source' => source['name']) }
+        },
+        {
+          'key' => 'Aura',
+          'fields' => %w{key radius slug traits effects predicate level label},
+          # An emanation putting effects on whoever is inside it; `Pf2e::Auras` reads it.
+          'contribute' => lambda { |row, source, _context| row.merge('source' => source['name']) }
+        },
+        {
+          'key' => 'BattleForm',
+          'fields' => %w{key overrides brackets predicate ownUnarmed value slug label},
+          # A polymorph; `Pf2e::BattleForms` reads it.
+          'contribute' => lambda { |row, source, _context| row.merge('source' => source['name']) }
+        },
+        {
           'key' => 'TempHP',
           'fields' => %w{key value predicate events slug label},
           # Temporary hit points an effect gives: when it begins, and again at the start of each turn
@@ -400,7 +418,10 @@ module AresMUSH
                        'Strike' => %w{img},
                        'GrantItem' => %w{priority},
                        'Note' => %w{visibility priority},
-                       'ItemAlteration' => %w{priority phase fromEquipment} }.freeze
+                       'ItemAlteration' => %w{priority phase fromEquipment},
+                       'CreatureSize' => %w{resizeEquipment},
+                       'Aura' => %w{appearance priority mergeExisting},
+                       'BattleForm' => %w{hasHands canCast} }.freeze
 
       BY_KEY = KINDS.each_with_object({}) { |row, out| out[row['key']] = row }.freeze
 

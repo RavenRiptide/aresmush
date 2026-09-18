@@ -48,6 +48,15 @@ KINDS = {
     # Text shown with a roll, for an outcome where it says: Revel in Retribution's reminder on a hit.
     'Note': {'key', 'selector', 'text', 'title', 'predicate', 'outcome', 'slug', 'label', 'visibility',
              'priority'},
+    # How big the character is, and how far they reach.
+    'CreatureSize': {'key', 'value', 'reach', 'resizeEquipment', 'maximumSize', 'minimumSize', 'predicate',
+                     'slug', 'label'},
+    # An emanation that puts effects on whoever is inside it.
+    'Aura': {'key', 'radius', 'slug', 'traits', 'effects', 'predicate', 'level', 'label', 'appearance',
+             'priority', 'mergeExisting'},
+    # A polymorph: the form's AC, attacks, speeds and senses in place of the character's own.
+    'BattleForm': {'key', 'overrides', 'brackets', 'predicate', 'hasHands', 'canCast', 'ownUnarmed',
+                   'value', 'slug', 'label'},
     # Hit points regained as each turn starts; regeneration is switched off by damage it names.
     'FastHealing': {'key', 'value', 'type', 'details', 'deactivatedBy', 'predicate', 'slug', 'label'},
     # What an effect changes about one of the character's things while it lasts: Magic Weapon's runes.
@@ -134,13 +143,21 @@ PRESENTATION = {
     # `fromEquipment` marks an alteration automatic bonus progression would replace, and there is no
     # automatic bonus progression here.
     'ItemAlteration': {'priority', 'phase', 'fromEquipment'},
+    # Resizing the character's equipment matters to how items look in Foundry's canvas, and to Bulk, which
+    # a size here does not change. How an aura is drawn is the canvas's too.
+    'CreatureSize': {'resizeEquipment'},
+    'Aura': {'appearance', 'priority', 'mergeExisting'},
+    # Whether a form has hands, or can cast, is a question for the actions it allows, which this engine
+    # does not police.
+    'BattleForm': {'hasHands', 'canCast'},
     # Who sees a note is a question for Foundry's chat log, which we do not have.
     'Note': {'visibility', 'priority'},
 }
 
 # The order fields are written in, so a re-run produces the same file. A field of a kind that is not
 # named here still gets written, after these.
-ORDER = ['key', 'itemType', 'itemId', 'property', 'uuid', 'inMemoryOnly', 'allowDuplicate', 'onDeleteActions', 'alterations', 'option', 'domain', 'toggleable', 'alwaysActive', 'suboptions', 'selection',
+ORDER = ['key', 'overrides', 'brackets', 'radius', 'effects', 'reach', 'maximumSize', 'minimumSize',
+         'ownUnarmed', 'itemType', 'itemId', 'property', 'uuid', 'inMemoryOnly', 'allowDuplicate', 'onDeleteActions', 'alterations', 'option', 'domain', 'toggleable', 'alwaysActive', 'suboptions', 'selection',
          'disabledIf', 'disabledValue', 'flag', 'rollOption', 'prompt', 'choices',
          'allowNoSelection', 'path', 'mode', 'merge',
          'property', 'definition', 'sameAs', 'maxRank',
@@ -162,7 +179,7 @@ def written(key):
 
 # Neither of these reaches a statistic: one declares a circumstance and the other writes a value.
 SELECTORLESS = {'RollOption', 'ActiveEffectLike', 'Immunity', 'Weakness', 'Resistance', 'AdjustStrike', 'GrantItem',
-                'TempHP', 'ItemAlteration', 'FastHealing',
+                'TempHP', 'ItemAlteration', 'FastHealing', 'CreatureSize', 'Aura', 'BattleForm',
                 'Strike', 'MartialProficiency', 'CriticalSpecialization', 'Sense', 'ChoiceSet'}
 
 # Senses this engine knows. One it does not would be a fact nothing could show or ask about.

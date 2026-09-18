@@ -3943,6 +3943,9 @@ pf2e_feats:
         selector: "melee-strike-damage"
         type: "status"
         value: 2
+      - key: "CreatureSize"
+        reach: {"override": 10}
+        value: "large"
       - key: "GrantItem"
         uuid: "Compendium.pf2e.conditionitems.Item.Clumsy"
         inMemoryOnly: true

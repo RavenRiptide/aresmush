@@ -102,6 +102,7 @@ module AresMUSH
       def self.build_facts(char)
         character_facts(char) +
           armor_facts(char) +
+          Size.facts(char) +
           named('self:condition', Pf2e.held_conditions(char).keys) +
           named('self:sense', granted_sense_names(char))
       end

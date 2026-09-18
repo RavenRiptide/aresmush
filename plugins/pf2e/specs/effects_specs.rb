@@ -220,7 +220,8 @@ module AresMUSH
 
           expect(logger).to receive(:warn).with(/which nothing applies/)
 
-          Effects.source('Something', [ { 'key' => 'Aura', 'selector' => 'hp' } ])
+          # A token's light is Foundry's canvas, which nothing here draws.
+          Effects.source('Something', [ { 'key' => 'TokenLight', 'selector' => 'hp' } ])
         end
 
         it "should contribute nothing for it" do

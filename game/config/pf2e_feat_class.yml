@@ -1915,6 +1915,11 @@ pf2e_feats:
         selector: "saving-throw"
         adjustment: {"criticalFailure": "one-degree-better"}
         predicate: ["feature:sacred-body", {"or": ["item:trait:disease", "item:trait:poison"]}]
+      - key: "Aura"
+        radius: "@actor.flags.system.champion.aura"
+        effects: [{"affects": "allies", "includesSelf": false, "uuid": "Compendium.pf2e.feat-effects.Item.Effect: Divine Health"}]
+        slug: "champions-aura"
+        predicate: ["champions-aura", {"not": "self:condition:unconscious"}]
   Domain Acumen:
     repeatable: true
     assoc_charclass:
@@ -8464,6 +8469,12 @@ pf2e_feats:
     shortdesc: You radiate an aura of belief that imbues your attacks and those of nearby allies with divine power. Each willing ally in your champion's aura adds the holy trait to their Strikes if you're holy or adds the unholy trait to their Strikes if you're unholy.
     traits:
       - champion
+    rules:
+      - key: "Aura"
+        radius: "@actor.flags.system.champion.aura"
+        effects: [{"affects": "allies", "includesSelf": false, "uuid": "Compendium.pf2e.feat-effects.Item.Effect: Aura of Faith"}]
+        slug: "champions-aura"
+        predicate: ["champions-aura", {"not": "self:condition:unconscious"}]
   Blessed Counterstrike:
     assoc_charclass:
       - Champion
@@ -9612,6 +9623,12 @@ pf2e_feats:
     shortdesc: Your aura protects against powers that would twist the mind and body. You and all allies in your champion's aura gain a +1 status bonus to saving throws against mental, morph, and polymorph effects.
     traits:
       - champion
+    rules:
+      - key: "Aura"
+        radius: "@actor.flags.system.champion.aura"
+        effects: [{"affects": "allies", "uuid": "Compendium.pf2e.feat-effects.Item.Effect: Aura of Determination"}]
+        slug: "champions-aura"
+        predicate: ["champions-aura", {"not": "self:condition:unconscious"}]
   Aura of Life:
     assoc_charclass:
       - Champion
@@ -9622,6 +9639,12 @@ pf2e_feats:
     shortdesc: Your aura protects against the power of the Void. You and all allies in your champion's aura gain resistance 5 to void damage and a +1 status bonus to saves against void effects.
     traits:
       - champion
+    rules:
+      - key: "Aura"
+        radius: "@actor.flags.system.champion.aura"
+        effects: [{"affects": "allies", "uuid": "Compendium.pf2e.feat-effects.Item.Effect: Aura of Life"}]
+        slug: "champions-aura"
+        predicate: ["champions-aura", {"not": "self:condition:unconscious"}]
   Aura of Righteousness:
     assoc_charclass:
       - Champion
@@ -9634,6 +9657,12 @@ pf2e_feats:
     shortdesc: Your righteous aura dampens evil's might and prevents the unholy from escaping you. You and all allies in your champion's aura gain resistance 5 to unholy spells, unholy Strikes, and other unholy effects. If a teleportation spell or effect would teleport an unholy creature out of your champion's aura, your aura attempts to counteract it, using the spell rank and DC of your devotion spells.
     traits:
       - champion
+    rules:
+      - key: "Aura"
+        radius: "@actor.flags.system.champion.aura"
+        effects: [{"uuid": "Compendium.pf2e.feat-effects.Item.Effect: Aura of Righteousness"}]
+        slug: "champions-aura"
+        predicate: ["champions-aura", {"not": "self:condition:unconscious"}]
   Awesome Blow:
     assoc_charclass:
       - Barbarian
@@ -10856,6 +10885,12 @@ pf2e_feats:
         option: "eternal-blessing-active"
         toggleable: true
         value: true
+      - key: "Aura"
+        radius: 15
+        effects: [{"affects": "allies", "events": ["enter"], "uuid": "Compendium.pf2e.spell-effects.Item.Spell Effect: Bless"}]
+        traits: ["mental"]
+        slug: "eternal-blessing"
+        predicate: ["eternal-blessing-active"]
   Eternal Elixir:
     assoc_charclass:
       - Alchemist
@@ -11987,6 +12022,11 @@ pf2e_feats:
     shortdesc: You surround yourself with a thick field of protective primal energy. You and allies within 30 feet of you gain resistance equal to your Wisdom modifier to acid, cold, electricity, fire, vitality, and void damage.
     traits:
       - druid
+    rules:
+      - key: "Aura"
+        radius: 30
+        effects: [{"affects": "allies", "events": ["enter"], "uuid": "Compendium.pf2e.feat-effects.Item.Effect: Primal Aegis"}]
+        slug: "primal-aegis"
   Qi Center:
     assoc_charclass:
       - Monk

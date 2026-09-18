@@ -45,6 +45,10 @@ module AresMUSH
     # The effect that brought this one with it, where one did, so this one ends when that one does.
     attribute :granted_by
 
+    # The aura that put it here - its emitter's id and the aura's slug - so leaving the aura, or the aura
+    # ending, ends it.
+    attribute :aura_of
+
     # The answers to what the effect asked when it was applied: which kind of energy Resist Energy
     # resists. Keyed by the choice set's flag, as Foundry keys them.
     attribute :answers, :type => DataType::Array, :default => []
@@ -53,5 +57,6 @@ module AresMUSH
     reference :encounter, "AresMUSH::PF2Encounter"
 
     index :name
+    index :aura_of
   end
 end

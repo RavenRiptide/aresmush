@@ -81,7 +81,7 @@ module AresMUSH
       # asks for them. An effect another brought with it for as long as it lasts is a source too.
       def self.sources(char)
         on(char).flat_map { |effect| source_and_derived(char, effect.name, instance_item(effect),
-                                                        effect.answers, 0) }
+                                                        effect.answers, 0, BattleForms.rows(char, effect)) }
       end
 
       def self.instance_item(effect)
@@ -89,8 +89,10 @@ module AresMUSH
           'badge' => { 'value' => effect.badge.to_i } }
       end
 
-      def self.source_and_derived(char, name, item, answers, depth)
-        rules = Array(info(name)['rules'])
+      # `extra` is what the effect gives through the ordinary rules beyond its own - a battle form's
+      # senses, size and resistances.
+      def self.source_and_derived(char, name, item, answers, depth, extra = [])
+        rules = Array(info(name)['rules']) + extra
         built = Effects.with_selections(char, Effects.source(name, rules, 'item' => item,
                                                              'chosen' => answers))
 
@@ -246,7 +248,9 @@ module AresMUSH
 
         return unless hp
 
-        rows = Rules.of_kind({ 'rules' => info(effect.name)['rules'] }, 'TempHP')
+        # Its own rules and what it gives through them - a battle form's temporary hit points.
+        rows = Rules.of_kind({ 'rules' => Array(info(effect.name)['rules']) + BattleForms.rows(char, effect) },
+                             'TempHP')
         source = Effects.source(effect.name, [], 'item' => instance_item(effect))
         context = Effects.context(char).merge('item' => instance_item(effect))
 
@@ -277,6 +281,7 @@ module AresMUSH
         name = effect.name
 
         take_temp_hp(char, effect)
+        Auras.dispelled(char, effect)
         effect.delete
 
         # Another instance of the same effect still holds what it granted.

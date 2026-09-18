@@ -131,10 +131,12 @@ module AresMUSH
     # Kinds that reach no statistic, so they name no domain: one declares a circumstance, one writes a
     # value, three describe damage, two describe an attack, one asks a question, one brings another
     # condition with it, one gives temporary hit points, one changes a thing the character has, one heals
-    # as a turn starts, and BaseSpeed names a kind of movement.
+    # as a turn starts, three change the character's body or what is around it - size, an aura, a battle
+    # form - and BaseSpeed names a kind of movement.
     SELECTORLESS = %w{RollOption ActiveEffectLike Immunity Weakness Resistance AdjustStrike Strike
                       BaseSpeed Sense MartialProficiency CriticalSpecialization ChoiceSet
-                      GrantItem TempHP ItemAlteration FastHealing}.freeze
+                      GrantItem TempHP ItemAlteration FastHealing CreatureSize Aura
+                      BattleForm}.freeze
 
     # Of those, the two that still carry a `selector` - because a movement type and a sense are not
     # domains, they are the thing being granted.
@@ -142,7 +144,8 @@ module AresMUSH
 
     # Kinds whose `value` is a word rather than arithmetic: a trait, a kind of damage, a sense, and what
     # an alteration makes a thing into.
-    NOT_ARITHMETIC = %w{ActiveEffectLike AdjustStrike Strike DamageAlteration ItemAlteration}.freeze
+    NOT_ARITHMETIC = %w{ActiveEffectLike AdjustStrike Strike DamageAlteration ItemAlteration CreatureSize
+                        Aura BattleForm}.freeze
     IWR_KINDS = %w{Immunity Weakness Resistance}.freeze
 
     # A row may name one selector or several, and their data uses both spellings.
@@ -306,9 +309,23 @@ module AresMUSH
     end
 
     # The nineteen that change a number, three read at a roll - a note, fortune and misfortune, and an
-    # alteration of what is rolled with - and fast healing, read as a turn starts.
-    it "should have all twenty-three kinds it reads" do
-      expect(rows.map { |_where, row| row['key'] }.uniq.size).to eq 23
+    # alteration of what is rolled with - fast healing, read as a turn starts, and size, auras and
+    # battle forms.
+    it "should have all twenty-six kinds it reads" do
+      expect(rows.map { |_where, row| row['key'] }.uniq.size).to eq 26
+    end
+
+    # An aura's effects have to be effects the catalogue holds, or it puts nothing on anyone.
+    it "should project only effects that exist" do
+      auras = rows.select { |_where, row| row['key'] == 'Aura' }
+
+      strays = auras.flat_map { |where, row|
+        Array(row['effects']).map { |one| Pf2e::Grants.target(one['uuid']) }
+                             .reject { |catalogue, name| catalogue == 'effects' && Pf2e::ActiveEffects.catalogue.key?(name) }
+                             .map { |_catalogue, name| "#{where}: #{name}" }
+      }
+
+      expect(strays.uniq).to eq []
     end
 
     # An alteration has to change something this engine models, on a kind of thing it has.

@@ -61,6 +61,12 @@ module AresMUSH
         dice = Effects.damage_dice(sources, domains, context, held)
         flat = Effects.modifiers(sources, domains, context, held)
 
+        # A battle form's attack keeps only what the form allows of the character's own.
+        if attack['form']
+          dice = dice.select { |row| BattleForms.damage_kept?(row, attack['traits']) }
+          flat = flat.select { |row| BattleForms.damage_kept?(row, attack['traits']) }
+        end
+
         met_dice, unmet_dice = dice.partition { |row| row['met'] }
         met_flat, unmet_flat = flat.partition { |row| row['met'] }
 
@@ -225,11 +231,17 @@ module AresMUSH
         count = (attack['dice'] || 1).to_i + attack['striking'].to_i
         attribute = damage_attribute(char, attack)
 
+        # A battle form's attack has its own damage modifier where the attribute would be.
+        modifier = if attack['form'] then attack['form']['damage_modifier'].to_i
+                   elsif attribute then Pf2e.ability_mod(char, attribute)
+                   else 0
+                   end
+
         empty_instance([ attack['damage_type'] || 'B', nil ])
           .merge('die' => die,
                  'count' => count,
                  'dice' => die ? [ [ count, die ] ] : [],
-                 'modifier' => attribute ? Pf2e.ability_mod(char, attribute) : 0,
+                 'modifier' => modifier,
                  'sources' => [ attack['name'], attribute ].compact)
       end
 
