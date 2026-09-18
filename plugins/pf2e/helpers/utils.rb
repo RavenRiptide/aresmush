@@ -155,12 +155,12 @@ module AresMUSH
       {
         'name' => 'save',
         'match' => lambda { |word| SAVES.include?(word) },
-        'value' => lambda { |char, word, options| Check.of(char, 'save', word, options).total }
+        'value' => lambda { |char, word, options| Check.of(char, 'save', word, options) }
       },
       {
         'name' => 'perception',
         'match' => lambda { |word| word == 'perception' },
-        'value' => lambda { |char, _word, options| Check.of(char, 'perception', nil, options).total }
+        'value' => lambda { |char, _word, options| Check.of(char, 'perception', nil, options) }
       },
       {
         'name' => 'attack',
@@ -184,11 +184,22 @@ module AresMUSH
       }
     ].freeze
 
-    def self.get_keyword_value(char, word, options = [])
+    # A word that names a check answers with the check rather than a number, so the roll can ask it what
+    # it is worth *and* what changes its outcome. `collect` is where the latter goes; a caller that only
+    # wants the number leaves it out.
+    def self.get_keyword_value(char, word, options = [], collect = nil)
       downcased = word.to_s.downcase
       keyword = KEYWORDS.find { |k| k['match'].call(downcased) }
 
-      keyword['value'].call(char, downcased, options)
+      held = keyword['value'].call(char, downcased, options)
+
+      # Asked for what it can do rather than what it is: a keyword may answer with a number, with several
+      # dice, or with a check.
+      return held unless held.respond_to?(:total) && held.respond_to?(:adjustments)
+
+      collect&.concat(held.adjustments)
+
+      held.total
     end
 
     # The terms of a roll string: `athletics-2` is athletics and minus two.
@@ -233,7 +244,7 @@ module AresMUSH
       name = word.capitalize
       return 0 unless Global.read_config('pf2e_skills').keys.include?(name)
 
-      Check.of(char, Pf2eSkills.lore?(name) ? 'lore' : 'skill', name, options).total
+      Check.of(char, Pf2eSkills.lore?(name) ? 'lore' : 'skill', name, options)
     end
 
     def self.roll_dice(amount=1, sides=20)
@@ -270,6 +281,8 @@ module AresMUSH
       roll_list.unshift('1d20') if find_dice.empty?
 
       result = []
+      adjustments = []
+
       roll_list.map do |e|
         if e =~ dice_pattern
           dice = e.gsub("d"," ").split
@@ -277,7 +290,7 @@ module AresMUSH
           sides = dice[1].to_i
           result << Pf2e.roll_dice(amount, sides)
         elsif e.to_i == 0
-          result << Pf2e.get_keyword_value(target, e, options)
+          result << Pf2e.get_keyword_value(target, e, options, adjustments)
         else
           result << e.to_i
         end
@@ -297,6 +310,8 @@ module AresMUSH
       return_hash['result'] = fmt_result
       return_hash['total'] = result.flatten.sum
       return_hash['options'] = options
+      # What the statistics rolled say about the outcome, so the degree of success is theirs to change.
+      return_hash['adjustments'] = adjustments
 
       return return_hash
     end

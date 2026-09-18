@@ -132,6 +132,86 @@ module AresMUSH
         end
       end
 
+      # A rule that changes a modifier rather than adding one. Applied before anything is stacked, so the
+      # comparison that decides which modifiers count is against the adjusted numbers.
+      describe "adjusting a modifier" do
+        def adjustment(fields)
+          { 'source' => 'Something', 'slug' => nil, 'mode' => 'add', 'value' => 1,
+            'suppress' => false, 'relabel' => nil, 'max' => nil }.merge(fields)
+        end
+
+        def slugged(type, value, slug)
+          mod(type, value, slug).merge('slug' => slug)
+        end
+
+        it "should change the modifier it names" do
+          rows = Modifiers.adjust([ slugged('item', 1, 'ring') ],
+                                  [ adjustment('slug' => 'ring', 'value' => 2) ])
+
+          expect(rows.first['value']).to eq 3
+        end
+
+        it "should leave a modifier it does not name alone" do
+          rows = Modifiers.adjust([ slugged('item', 1, 'ring') ],
+                                  [ adjustment('slug' => 'cloak', 'value' => 2) ])
+
+          expect(rows.first['value']).to eq 1
+        end
+
+        # A row with no slug reaches every modifier the statistic has, which is how most of their data
+        # writes it.
+        it "should change every modifier when it names none" do
+          rows = Modifiers.adjust([ slugged('item', 1, 'ring'), slugged('status', 2, 'blessing') ],
+                                  [ adjustment('value' => 1) ])
+
+          expect(rows.map { |row| row['value'] }).to eq [ 2, 3 ]
+        end
+
+        it "should read every mode, since they are the same seven a write uses" do
+          rows = Modifiers.adjust([ slugged('item', 2, 'ring') ],
+                                  [ adjustment('mode' => 'upgrade', 'value' => 5) ])
+
+          expect(rows.first['value']).to eq 5
+        end
+
+        # `suppress` drops the modifier rather than zeroing it, so it is not in the breakdown either.
+        it "should drop a modifier it suppresses" do
+          rows = Modifiers.adjust([ slugged('item', -2, 'no-crowbar'), slugged('item', 1, 'ring') ],
+                                  [ adjustment('slug' => 'no-crowbar', 'suppress' => true) ])
+
+          expect(rows.map { |row| row['slug'] }).to eq [ 'ring' ]
+        end
+
+        it "should cap how many modifiers one adjustment changes" do
+          rows = Modifiers.adjust([ slugged('item', 1, 'a'), slugged('item', 1, 'b') ],
+                                  [ adjustment('value' => 1, 'max' => 1) ])
+
+          expect(rows.map { |row| row['value'] }).to eq [ 2, 1 ]
+        end
+
+        it "should rename what it relabels, so a breakdown says what changed it" do
+          rows = Modifiers.adjust([ slugged('ability', 2, 'str') ],
+                                  [ adjustment('slug' => 'str', 'value' => 2,
+                                               'relabel' => 'Intimidating Prowess') ])
+
+          expect(rows.first['source']).to eq 'Intimidating Prowess'
+        end
+
+        # The reason it happens first: a raised modifier has to be compared at its raised value.
+        it "should decide stacking on the adjusted number" do
+          rows = Modifiers.adjust([ slugged('item', 1, 'ring'), slugged('item', 2, 'spell') ],
+                                  [ adjustment('slug' => 'ring', 'mode' => 'override', 'value' => 5) ])
+
+          expect(Modifiers.total(Modifiers.stack(rows))).to eq 5
+        end
+
+        it "should leave everything alone when nothing adjusts it" do
+          rows = Modifiers.adjust([ slugged('item', 1, 'ring') ], [])
+
+          expect(rows.first['value']).to eq 1
+        end
+      end
+
       describe "a proficiency rank we do not know" do
         it "should read it as untrained rather than raise" do
           allow(Global).to receive(:logger).and_return(double(:warn => nil))

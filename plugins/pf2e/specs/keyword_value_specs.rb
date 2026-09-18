@@ -42,11 +42,15 @@ module AresMUSH
         expect(Pf2e.get_keyword_value(char, 'strength')).to eq 2
       end
 
+      def a_check(total, adjustments = [])
+        instance_double(Pf2e::Check, :total => total, :adjustments => adjustments)
+      end
+
       # A save, a skill and Perception are checks rather than figures: a roll of one carries what kind
       # of check it is, which is what a rule about a kind of check is predicated on.
       it "should resolve a save through a check" do
         expect(Pf2e::Check).to receive(:of).with(anything, 'save', 'will', anything)
-                                           .and_return(double(:total => 11))
+                                           .and_return(a_check(11))
 
         expect(Pf2e.get_keyword_value(char, 'Will')).to eq 11
       end
@@ -55,16 +59,26 @@ module AresMUSH
       # be counted.
       it "should hand the circumstances to the check it makes" do
         expect(Pf2e::Check).to receive(:of).with(anything, 'save', 'will', [ 'action:brace' ])
-                                           .and_return(double(:total => 11))
+                                           .and_return(a_check(11))
 
         expect(Pf2e.get_keyword_value(char, 'Will', [ 'action:brace' ])).to eq 11
       end
 
       it "should resolve perception through a check" do
         expect(Pf2e::Check).to receive(:of).with(anything, 'perception', nil, anything)
-                                           .and_return(double(:total => 9))
+                                           .and_return(a_check(9))
 
         expect(Pf2e.get_keyword_value(char, 'perception')).to eq 9
+      end
+
+      # What changes the outcome comes back with the number, so the roll can hand it to the degree.
+      it "should collect what the check says changes its outcome" do
+        allow(Pf2e::Check).to receive(:of).and_return(a_check(9, [ { 'all' => 'one-degree-better' } ]))
+        collected = []
+
+        Pf2e.get_keyword_value(char, 'perception', [], collected)
+
+        expect(collected).to eq [ { 'all' => 'one-degree-better' } ]
       end
 
       it "should give nothing for an attack keyword, which only picks the linked ability" do

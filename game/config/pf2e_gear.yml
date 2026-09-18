@@ -105,6 +105,10 @@ pf2e_gear:
     level: 0
     price: 50
     traits: []
+    rules:
+      - key: "AdjustModifier"
+        selector: "athletics"
+        suppress: true
   Disguise Kit:
     bulk: 0.1
     level: 0
@@ -489,6 +493,9 @@ pf2e_gear:
         value: 1
         label: "Levered Crowbar (Force Open)"
         predicate: ["action:force-open"]
+      - key: "AdjustModifier"
+        selector: "athletics"
+        suppress: true
   Detective's Kit:
     bulk: 1
     level: 3

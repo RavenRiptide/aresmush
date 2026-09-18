@@ -50,6 +50,10 @@ pf2e_conditions:
         predicate: [{"or": [{"and": ["check:type:skill", "item:trait:auditory"]}, {"and": ["check:statistic:base:perception", "check:statistic:initiative"]}]}]
       - key: "Immunity"
         type: "auditory"
+      - key: "AdjustDegreeOfSuccess"
+        selector: "perception"
+        adjustment: {"all": "to-critical-failure"}
+        predicate: ["item:trait:auditory"]
   Doomed:
     short_descr: A powerful force is pulling you towards death.
     value: true

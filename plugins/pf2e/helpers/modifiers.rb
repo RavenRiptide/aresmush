@@ -39,6 +39,45 @@ module AresMUSH
         [ bonuses.max_by { |row| value_of(row) }, penalties.min_by { |row| value_of(row) } ].compact
       end
 
+      # Applies the rules that change a modifier rather than adding one, before any stacking decides which
+      # of them count - a modifier raised from +1 to +3 has to be raised before it is compared with the
+      # others, or the comparison is against the wrong number.
+      #
+      # An adjustment with no slug reaches every modifier the statistic has
+      # (`rules/helpers.ts:47`); one with a slug reaches only the modifier of that name. `suppress` drops
+      # the modifier outright, and `maxApplications` caps how many modifiers one adjustment may change.
+      def self.adjust(modifiers, adjustments)
+        counts = {}
+
+        Array(modifiers).each_with_object([]) do |row, out|
+          applicable = Array(adjustments).select { |one| reaches?(one, row, counts) }
+
+          next if applicable.any? { |one| one['suppress'] }
+
+          out << applicable.reduce(row) { |held, one| applied(held, one, counts) }
+        end
+      end
+
+      def self.reaches?(adjustment, row, counts)
+        return false unless adjustment['slug'].nil? || adjustment['slug'].to_s == row['slug'].to_s
+
+        limit = adjustment['max']
+
+        limit.nil? || counts.fetch(adjustment.object_id, 0) < limit.to_i
+      end
+
+      def self.applied(row, adjustment, counts)
+        counts[adjustment.object_id] = counts.fetch(adjustment.object_id, 0) + 1
+
+        return row if adjustment['value'].nil?
+
+        changed = Paths::MODES.fetch(adjustment['mode'], Paths::MODES['override'])
+                              .call(value_of(row), adjustment['value'])
+
+        row.merge('value' => changed.to_i,
+                  'source' => adjustment['relabel'] || row['source'])
+      end
+
       def self.stack(modifiers)
         rows = Array(modifiers).map { |row| row.merge('enabled' => false) }
 

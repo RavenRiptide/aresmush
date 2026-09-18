@@ -125,14 +125,21 @@ module AresMUSH
         named = row['domain_name'] ? row['domain_name'].call(name) : name
         domains = Domains.for(kind, named, ability) + Array(extra)
 
-        effects = Effects.modifiers(Effects.sources(char), domains, Effects.context(char),
-                                    Effects.options(char) + Array(options))
+        sources = Effects.sources(char)
+        context = Effects.context(char)
+        held = Effects.options(char) + Array(options)
+
+        effects = Effects.modifiers(sources, domains, context, held)
         met, unmet = effects.partition { |effect| effect['met'] }
+
+        # A rule that changes a modifier is applied before anything is stacked, so the comparison that
+        # decides which of them count is against the adjusted numbers.
+        adjusted = Modifiers.adjust(row['intrinsic'].call(char, name).compact + met,
+                                    Rules.modifier_adjustments(sources, domains, held, context))
 
         # An unmet row is kept out of the stacking, so it cannot override one that applies, but it is
         # still reported: "+2, but only while picking a lock" is what a player wants to know.
-        Modifiers.breakdown(row['base'].call(char, name).to_i,
-                            row['intrinsic'].call(char, name).compact + met)
+        Modifiers.breakdown(row['base'].call(char, name).to_i, adjusted)
                  .merge('conditional' => unmet)
       end
 

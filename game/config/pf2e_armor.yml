@@ -423,6 +423,11 @@ pf2e_armor:
         type: "item"
         value: 1
         predicate: ["item:trait:curse"]
+      - key: "AdjustModifier"
+        mode: "add"
+        selector: "saving-throw"
+        value: 1
+        predicate: ["item:trait:curse"]
   Half Plate:
     category: heavy
     traits: []

@@ -359,6 +359,11 @@ pf2e_feats:
         option: "elegant-buckler"
         toggleable: true
         label: "PF2E.SpecificRule.Swashbuckler.ElegantBuckler.RollOptionLabel"
+      - key: "AdjustModifier"
+        mode: "upgrade"
+        selector: "ac"
+        value: 2
+        predicate: ["elegant-buckler"]
   Eliminate Red Herrings:
     assoc_charclass:
       - Investigator
@@ -369,6 +374,11 @@ pf2e_feats:
     shortdesc: You have a keen sense for avoiding spurious lines of inquiry. When you roll a critical failure on a skill check to Recall Knowledge related to a question about one of your active investigations, you get a failure instead.
     traits:
       - investigator
+    rules:
+      - key: "AdjustDegreeOfSuccess"
+        selector: "skill-check"
+        adjustment: {"criticalFailure": "to-failure"}
+        predicate: ["pursue-a-lead", "action:recall-knowledge"]
   Exacting Strike:
     assoc_charclass:
       - Fighter
@@ -1642,6 +1652,14 @@ pf2e_feats:
         type: "status"
         value: 2
         predicate: [{"or": ["item:trait:disease", "item:trait:poison"]}]
+      - key: "AdjustDegreeOfSuccess"
+        selector: "saving-throw"
+        adjustment: {"success": "one-degree-better"}
+        predicate: [{"or": ["item:trait:disease", "item:trait:poison"]}]
+      - key: "AdjustDegreeOfSuccess"
+        selector: "saving-throw"
+        adjustment: {"criticalFailure": "one-degree-better"}
+        predicate: ["feature:sacred-body", {"or": ["item:trait:disease", "item:trait:poison"]}]
   Domain Acumen:
     repeatable: true
     assoc_charclass:
@@ -1663,6 +1681,17 @@ pf2e_feats:
     shortdesc: "**Requirements** You are wielding a single one-handed melee weapon and hold nothing else in your hands.%r%rYou can parry attacks against you with your one-handed weapon. You gain a +2 circumstance bonus to AC until the start of your next turn as long as you continue to meet the requirements."
     traits:
       - fighter
+    rules:
+      - key: "AdjustModifier"
+        mode: "upgrade"
+        selector: "ac"
+        value: 2
+        predicate: [{"gte": ["hands-free", 1]}]
+      - key: "AdjustModifier"
+        mode: "override"
+        selector: "ac"
+        value: 0
+        predicate: ["hands-free:0"]
   Elemental Fist:
     assoc_charclass:
       - Monk
@@ -3555,6 +3584,11 @@ pf2e_feats:
       - fighter
       - ranger
     rules:
+      - key: "AdjustModifier"
+        mode: "upgrade"
+        selector: "ac"
+        value: 2
+        predicate: [{"or": [{"gte": ["hands-free", 1]}, "parry-bonus-upgrade:yes"]}]
       - key: "RollOption"
         option: "weapon-parry"
   Twirling Throw:
@@ -3697,6 +3731,11 @@ pf2e_feats:
         type: "circumstance"
         value: "@weapon.system.damage.dice"
         predicate: ["advantageous-assault", {"or": ["target:condition:grabbed", "target:condition:prone", "target:condition:restrained"]}, {"gt": ["map:increases", 0]}]
+      - key: "AdjustModifier"
+        mode: "add"
+        selector: "strike-damage"
+        value: 2
+        predicate: ["item:hands-held:2"]
   Agile Maneuvers:
     assoc_charclass:
       - Swashbuckler
@@ -3764,6 +3803,24 @@ pf2e_feats:
         mode: "upgrade"
         value: 3
         predicate: ["feature:greater-juggernaut"]
+      - key: "AdjustModifier"
+        mode: "add"
+        selector: "ac"
+        relabel: "PF2E.SpecificRule.AnimalSkin.BracersOfArmor"
+        value: "@actor.flags.system.animalSkinBonus"
+        predicate: ["self:effect:rage"]
+      - key: "AdjustModifier"
+        mode: "add"
+        selector: "ac"
+        relabel: "PF2E.SpecificRule.AnimalSkin.ExplorersClothing"
+        value: "@actor.flags.system.animalSkinBonus"
+        predicate: ["self:effect:rage"]
+      - key: "AdjustModifier"
+        mode: "add"
+        selector: "ac"
+        relabel: "PF2E.SpecificRule.AnimalSkin.MageArmor"
+        value: "@actor.flags.system.animalSkinBonus"
+        predicate: ["self:effect:rage"]
   Anticipate Ambush:
     assoc_charclass:
       - Rogue
@@ -3787,6 +3844,11 @@ pf2e_feats:
     shortdesc: "You can procure information with confidence. Whenever you Recall Knowledge using any skill (including Bardic Lore), you can forgo rolling your check to instead receive a result of 10 + your proficiency bonus (don't apply any other bonuses, penalties, or modifiers).%r%rAs long as you are an expert in a skill, you meet the prerequisites for the Automatic Knowledge skill feat in that skill, even if you don't have Assurance in that skill."
     traits:
       - bard
+    rules:
+      - key: "AdjustModifier"
+        selector: "skill-check"
+        suppress: true
+        predicate: ["action:recall-knowledge", "substitute:assured-knowledge", {"not": "bonus:type:proficiency"}]
   Brutal Bully:
     assoc_charclass:
       - Barbarian
@@ -4136,6 +4198,12 @@ pf2e_feats:
     shortdesc: When you Strike with a thrown weapon, you take only a –1 penalty for each additional range increment between you and the target, rather than a –2 penalty.
     traits:
       - rogue
+    rules:
+      - key: "AdjustModifier"
+        mode: "add"
+        selectors: ["ranged-attack-roll"]
+        value: 1
+        predicate: ["item:trait:thrown"]
   Fortified Elixirs:
     assoc_charclass:
       - Alchemist
@@ -4790,6 +4858,13 @@ pf2e_feats:
     shortdesc: You can quickly fire multiple shots with greater control. When you use Double Shot, you can make the attacks against the same target. You can add an additional action to Double Shot to make three ranged Strikes instead of two. If you do, the penalty is –4. All attacks count toward your multiple attack penalty, but the penalty doesn't increase until after you've made all of them.
     traits:
       - fighter
+    rules:
+      - key: "AdjustModifier"
+        mode: "override"
+        selector: "ranged-attack-roll"
+        relabel: "{item|name}"
+        value: -4
+        predicate: ["double-shot", "triple-shot"]
   Twist the Knife:
     assoc_charclass:
       - Rogue
@@ -5676,6 +5751,21 @@ pf2e_feats:
         type: "item"
         value: 1
         predicate: [{"or": ["self:effect:bestial-mutagen-lesser", "self:effect:bestial-mutagen-moderate", "self:effect:bestial-mutagen-greater", "self:effect:bestial-mutagen-major"]}]
+      - key: "AdjustModifier"
+        mode: "upgrade"
+        selector: "intimidation"
+        value: 2
+        predicate: ["self:effect:bestial-mutagen-moderate"]
+      - key: "AdjustModifier"
+        mode: "upgrade"
+        selector: "intimidation"
+        value: 3
+        predicate: ["self:effect:bestial-mutagen-greater"]
+      - key: "AdjustModifier"
+        mode: "upgrade"
+        selector: "intimidation"
+        value: 4
+        predicate: ["self:effect:bestial-mutagen-major"]
       - key: "Resistance"
         type: "physical"
         value: "floor(@actor.level/2)"
@@ -6284,6 +6374,11 @@ pf2e_feats:
     traits:
       - monk
       - poison
+    rules:
+      - key: "AdjustModifier"
+        mode: "add"
+        selector: "fortitude"
+        value: 1
   Come and Get Me:
     assoc_charclass:
       - Barbarian
@@ -6475,6 +6570,11 @@ pf2e_feats:
         type: "circumstance"
         value: "2 * @target.conditions.frightened.badge.value"
         predicate: ["target:condition:frightened"]
+      - key: "AdjustModifier"
+        mode: "multiply"
+        selector: "strike-damage"
+        value: 1.5
+        predicate: [{"gte": ["skill:intimidation:rank", 3]}]
   Flinging Charge:
     assoc_charclass:
       - Fighter
@@ -6617,6 +6717,11 @@ pf2e_feats:
       - key: "RollOption"
         option: "just-one-more-thing"
         toggleable: true
+      - key: "AdjustModifier"
+        mode: "multiply"
+        selector: "skill-check"
+        value: 2
+        predicate: ["just-one-more-thing", {"or": ["action:feint", "action:demoralize", "action:request"]}]
   Knockback:
     assoc_charclass:
       - Barbarian
@@ -7032,6 +7137,11 @@ pf2e_feats:
     shortdesc: It's almost impossible to spot you. When you roll a failure on a Sneak action, you get a success instead. You can still critically fail.
     traits:
       - rogue
+    rules:
+      - key: "AdjustDegreeOfSuccess"
+        selector: "stealth"
+        adjustment: {"failure": "to-success"}
+        predicate: ["action:sneak"]
   Spectral Advance:
     assoc_charclass:
       - Champion
@@ -10526,6 +10636,11 @@ pf2e_feats:
     shortdesc: The wounds you inflict are grievous. When you Strike with a weapon or unarmed attack for which you have legendary proficiency, you critically succeed if you roll a 19 on the die as long as that result would be a success. This has no effect on a 19 if the result would be a failure.
     traits:
       - fighter
+    rules:
+      - key: "AdjustDegreeOfSuccess"
+        selector: "strike-attack-roll"
+        adjustment: {"success": "to-critical-success"}
+        predicate: ["check:roll:total:natural:19", "item:proficiency:rank:4"]
   Second Thoughts:
     assoc_charclass:
       - Wizard
@@ -10967,6 +11082,11 @@ pf2e_feats:
     shortdesc: "You fundamentally understand everything to the point where your research can't possibly be wrong. You are permanently quickened and can use the extra action to Recall Knowledge. In addition, you gain the following benefits with Recall Knowledge.%r%rWhen one of your allies Recalls Knowledge and gains false information, you also know that information is inaccurate if they share it with you."
     traits:
       - investigator
+    rules:
+      - key: "AdjustDegreeOfSuccess"
+        selector: "skill-check"
+        adjustment: {"all": "one-degree-better"}
+        predicate: ["action:recall-knowledge"]
   Legendary Shot:
     assoc_charclass:
       - Ranger

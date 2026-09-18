@@ -263,6 +263,11 @@ pf2e_feats:
     prereq:
       level: 1
       skill: Survival/trained
+    rules:
+      - key: "AdjustDegreeOfSuccess"
+        selector: "survival"
+        adjustment: {"criticalFailure": "to-success", "failure": "to-success"}
+        predicate: ["action:subsist"]
   Forensic Acumen:
     feat_type:
       - Skill
@@ -326,6 +331,11 @@ pf2e_feats:
     prereq:
       level: 1
       skill: Diplomacy/trained
+    rules:
+      - key: "AdjustDegreeOfSuccess"
+        selector: "diplomacy"
+        adjustment: {"criticalFailure": "one-degree-better"}
+        predicate: [{"gte": ["skill:diplomacy:rank", 3]}, "action:gather-information"]
   Impressive Performance:
     feat_type:
       - Skill
@@ -601,6 +611,10 @@ pf2e_feats:
         type: "circumstance"
         value: 2
         predicate: ["action:treat-wounds", "risky-surgery"]
+      - key: "AdjustDegreeOfSuccess"
+        selector: "medicine"
+        adjustment: {"success": "one-degree-better"}
+        predicate: ["risky-surgery", "action:treat-wounds"]
   Root Magic:
     feat_type:
       - Skill
@@ -708,6 +722,14 @@ pf2e_feats:
       - key: "RollOption"
         option: "student-of-the-canon"
         toggleable: true
+      - key: "AdjustDegreeOfSuccess"
+        selector: "religion"
+        adjustment: {"failure": "one-degree-better"}
+        predicate: ["action:decipher-writing", "student-of-the-canon"]
+      - key: "AdjustDegreeOfSuccess"
+        selector: "religion"
+        adjustment: {"all": "one-degree-better"}
+        predicate: ["action:recall-knowledge", "student-of-the-canon"]
   Subtle Theft:
     feat_type:
       - Skill
@@ -816,6 +838,10 @@ pf2e_feats:
     rules:
       - key: "RollOption"
         option: "aquatic-combat:not-off-guard"
+      - key: "AdjustModifier"
+        mode: "override"
+        selector: "melee-attack-roll"
+        suppress: true
   Virtuosic Performer:
     feat_type:
       - Skill
@@ -862,6 +888,11 @@ pf2e_feats:
         - Nature/expert
         - Occultism/expert
         - Religion/expert
+    rules:
+      - key: "AdjustDegreeOfSuccess"
+        selector: "skill-check"
+        adjustment: {"criticalFailure": "one-degree-better"}
+        predicate: ["action:identify-magic"]
   Automatic Knowledge:
     repeatable: true
     feat_type:
@@ -1033,6 +1064,11 @@ pf2e_feats:
         type: "circumstance"
         value: 1
         predicate: ["target:physically-menaced", {"or": ["action:coerce", "action:demoralize"]}]
+      - key: "AdjustModifier"
+        mode: "upgrade"
+        selector: "intimidation"
+        value: 2
+        predicate: [{"gte": ["attribute:str:mod", 5]}, {"gte": ["skill:intimidation:rank", 3]}]
   Lasting Coercion:
     feat_type:
       - Skill

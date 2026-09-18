@@ -105,6 +105,37 @@ module AresMUSH
           }
         },
         {
+          'key' => 'AdjustModifier',
+          'fields' => %w{key selector selectors slug mode value suppress relabel damageType
+                         maxApplications predicate label priority},
+          # Changes a modifier that already exists rather than adding one: Intimidating Prowess raises
+          # the Strength modifier on Intimidation, and a feat that says you need no crowbar suppresses
+          # the penalty for not having one.
+          #
+          # A row with no slug adjusts *every* modifier the selector reaches
+          # (`rules/helpers.ts:47`), which is why the slug is carried as nil rather than defaulted.
+          'contribute' => lambda { |row, source, context|
+            { 'source' => source['name'],
+              'slug' => row['slug'],
+              'mode' => (row['suppress'] ? 'override' : row['mode']).to_s,
+              'value' => row['value'] ? Formula.value(row['value'], context) : nil,
+              'suppress' => !!row['suppress'],
+              'relabel' => row['relabel'],
+              'max' => row['maxApplications'] }
+          }
+        },
+        {
+          'key' => 'AdjustDegreeOfSuccess',
+          'fields' => %w{key selector adjustment predicate slug label},
+          # Turns one outcome into another: Assurance makes a failure a success, Deafened drops an
+          # auditory Perception check to a critical failure. `Pf2e::Degree` applies it.
+          'contribute' => lambda { |row, source, _context|
+            { 'source' => source['name'],
+              'slug' => row['slug'] || Domains.slug(source['name']),
+              'adjustment' => row['adjustment'] }
+          }
+        },
+        {
           'key' => 'Immunity',
           'fields' => %w{key type value predicate label definition exceptions},
           'contribute' => lambda { |row, source, context| declaration_of(row, source, context) }
@@ -201,11 +232,27 @@ module AresMUSH
                 .sort_by { |write| MODE_ORDER.index(write['mode']) || MODE_ORDER.size }
       end
 
-      # Rules that change how a check turned out. `AdjustDegreeOfSuccess` is not implemented, so this is
-      # empty - but a check asks for its outcome through it, which is what makes implementing the kind a
-      # change to `KINDS` rather than a change to `Pf2e::Check`.
+      # Rules that change how a check turned out.
       def self.adjustments(sources, domains, options)
         gather(sources, domains, options, 'AdjustDegreeOfSuccess') { |row| row['adjustment'] }
+      end
+
+      # Rules that change a modifier that already exists. A row naming several selectors reaches a
+      # statistic answering to any of them, which is why `selectors` is read alongside `selector`.
+      def self.modifier_adjustments(sources, domains, options, context = {})
+        Array(sources).flat_map do |source|
+          held = Array(options) + Array(source['options'])
+
+          of_kind(source, 'AdjustModifier')
+            .select { |row| Domains.matches?(selectors_of(row), domains) }
+            .select { |row| Predicate.test(row['predicate'], held) }
+            .map { |row| contribute(row, source, context) }
+            .compact
+        end
+      end
+
+      def self.selectors_of(row)
+        Array(row['selector']) + Array(row['selectors'])
       end
 
       # Text shown with a roll. `Note` is likewise not implemented yet.
@@ -222,7 +269,7 @@ module AresMUSH
         Array(sources).flat_map do |source|
           held = Array(options) + Array(source['options'])
 
-          of_kind(source, key).select { |row| Domains.matches?(row['selector'], domains) }
+          of_kind(source, key).select { |row| Domains.matches?(selectors_of(row), domains) }
                               .select { |row| Predicate.test(row['predicate'], held) }
                               .map { |row| yield(row) }
                               .compact

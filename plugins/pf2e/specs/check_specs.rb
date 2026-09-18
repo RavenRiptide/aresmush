@@ -157,14 +157,71 @@ module AresMUSH
         expect(check.outcome(20, 20, 20)).to eq Pf2e::Degree::CRITICAL_SUCCESS
       end
 
-      # Nothing produces either yet: asking through them is what makes reading AdjustDegreeOfSuccess
-      # and Note a change to one table rather than a change here.
-      it "should have somewhere for an outcome adjustment to come from" do
+      it "should have no adjustment when nothing the character carries changes an outcome" do
         expect(check.adjustments).to eq []
       end
 
+      # Note is still unread, and asking through it is what makes reading the kind a change to one table.
       it "should have somewhere for a note to come from" do
         expect(check.notes).to eq []
+      end
+    end
+
+    # Deafened is the case where both halves land on the same check: a penalty to the roll, and an
+    # outcome dropped to a critical failure. Both are its own rules and both are predicated on the check.
+    describe "a rule that changes the outcome" do
+      before(:each) do
+        @char.update(:pf2_conditions => { 'Deafened' => { 'status' => true } })
+      end
+
+      def auditory
+        Pf2e::Check.of(Character[@char.id], 'perception', nil, [ 'item:trait:auditory' ])
+      end
+
+      it "should be found for the check it applies to" do
+        expect(auditory.adjustments).to eq [ { 'all' => 'to-critical-failure' } ]
+      end
+
+      it "should turn a success into a critical failure" do
+        expect(auditory.outcome(30, 20)).to eq Pf2e::Degree::CRITICAL_FAILURE
+      end
+
+      it "should leave a check it does not apply to alone" do
+        plain = Pf2e::Check.of(Character[@char.id], 'perception')
+
+        expect(plain.adjustments).to eq []
+        expect(plain.outcome(30, 20)).to eq Pf2e::Degree::CRITICAL_SUCCESS
+      end
+
+      it "should leave another statistic alone" do
+        other = Pf2e::Check.of(Character[@char.id], 'skill', 'Athletics', [ 'item:trait:auditory' ])
+
+        expect(other.adjustments).to eq []
+      end
+
+      # The roll has to carry it out to the degree of success, or the rule is read and does nothing.
+      it "should come back from a roll, so the degree of success can use it" do
+        parsed = Pf2e.parse_roll_string(Character[@char.id], [ '1d20', 'perception' ],
+                                        [ 'item:trait:auditory' ])
+
+        expect(parsed['adjustments']).to eq [ { 'all' => 'to-critical-failure' } ]
+      end
+
+      it "should make the roll read as a critical failure however well it went" do
+        parsed = Pf2e.parse_roll_string(Character[@char.id], [ '0d1', '40', 'perception' ],
+                                        [ 'item:trait:auditory' ])
+        shown = Pf2e.get_degree(parsed['list'], parsed['result'], parsed['total'], 15,
+                                parsed['adjustments'])
+
+        expect(shown).to match(/CRITICAL FAILURE/)
+      end
+
+      it "should leave a roll it does not apply to as it was" do
+        parsed = Pf2e.parse_roll_string(Character[@char.id], [ '0d1', '40', 'perception' ])
+        shown = Pf2e.get_degree(parsed['list'], parsed['result'], parsed['total'], 15,
+                                parsed['adjustments'])
+
+        expect(shown).to match(/CRITICAL SUCCESS/)
       end
     end
   end

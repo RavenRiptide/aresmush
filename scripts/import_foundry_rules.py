@@ -49,6 +49,10 @@ KINDS = {
     # the modes are ordered instead, which is what the ordering is for.
     'ActiveEffectLike': {'key', 'path', 'mode', 'value', 'predicate', 'slug', 'label', 'phase',
                          'priority', 'merge'},
+    # priority orders adjustments against Foundry's data preparation; ours are ordered by mode.
+    'AdjustModifier': {'key', 'selector', 'selectors', 'slug', 'mode', 'value', 'suppress', 'relabel',
+                       'damageType', 'maxApplications', 'predicate', 'label', 'priority'},
+    'AdjustDegreeOfSuccess': {'key', 'selector', 'adjustment', 'predicate', 'slug', 'label'},
     'Immunity': {'key', 'type', 'value', 'predicate', 'slug', 'label', 'exceptions'},
     'Weakness': {'key', 'type', 'value', 'predicate', 'slug', 'label', 'exceptions'},
     'Resistance': {'key', 'type', 'value', 'predicate', 'slug', 'label', 'exceptions', 'doubleVs'},
@@ -144,9 +148,21 @@ def take(rule, refused):
     """The rule as we would write it, or None with a reason recorded."""
     fields = KINDS[rule['key']]
 
-    if rule['key'] not in SELECTORLESS and 'selector' not in rule:
+    if rule['key'] not in SELECTORLESS and not (rule.get('selector') or rule.get('selectors')):
         refused['no selector'] += 1
         return None
+
+    # An adjustment that changes only a damage type, or one whose outcome we cannot read, adjusts
+    # nothing here.
+    if rule['key'] == 'AdjustModifier' and not (rule.get('suppress') or rule.get('value') is not None):
+        refused['adjustment with no value'] += 1
+        return None
+
+    if rule['key'] == 'AdjustDegreeOfSuccess':
+        named = rule.get('adjustment')
+        if not isinstance(named, dict) or not named:
+            refused['degree adjustment is not a mapping'] += 1
+            return None
 
     # A kind of damage we cannot resolve - a charm whose type the wearer chose - would resist nothing.
     if rule['key'] in ('Immunity', 'Weakness', 'Resistance'):
@@ -171,7 +187,8 @@ def take(rule, refused):
         return None
 
     if rule['key'] not in SELECTORLESS:
-        selectors = rule['selector'] if isinstance(rule['selector'], list) else [rule['selector']]
+        named = rule.get('selector') or rule.get('selectors')
+        selectors = named if isinstance(named, list) else [named]
         bad = [s for s in selectors if not selector_ok(s)]
         if bad:
             refused[f'selector {bad}'] += 1
@@ -186,8 +203,8 @@ def take(rule, refused):
             return None
 
     # Keep only the fields we read, in a stable order, so a re-run produces the same file.
-    order = ['key', 'option', 'domain', 'toggleable', 'path', 'mode', 'exceptions', 'selector', 'type',
-             'ability',
+    order = ['key', 'option', 'domain', 'toggleable', 'path', 'mode', 'exceptions', 'selector',
+             'selectors', 'adjustment', 'suppress', 'relabel', 'maxApplications', 'type', 'ability',
              'value', 'min',
              'max', 'diceNumber', 'dieSize', 'damageType', 'damageCategory', 'category', 'critical',
              'override', 'label', 'predicate']

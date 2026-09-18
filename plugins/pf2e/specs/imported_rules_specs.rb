@@ -109,8 +109,8 @@ module AresMUSH
       held = reachable
 
       strays = rows.flat_map { |where, row|
-        Array(row['selector']).reject { |selector| resolvable?(selector, held) }
-                              .map { |selector| "#{where}: #{selector}" }
+        Pf2e::Rules.selectors_of(row).reject { |selector| resolvable?(selector, held) }
+                   .map { |selector| "#{where}: #{selector}" }
       }
 
       expect(strays.uniq).to eq []
@@ -121,11 +121,14 @@ module AresMUSH
     SELECTORLESS = %w{RollOption ActiveEffectLike Immunity Weakness Resistance}.freeze
     IWR_KINDS = %w{Immunity Weakness Resistance}.freeze
 
+    # A row may name one selector or several, and their data uses both spellings.
     it "should have a selector on everything that reaches a statistic, and on nothing else" do
       reaching, apart = rows.partition { |_where, row| !SELECTORLESS.include?(row['key']) }
 
-      expect(reaching.reject { |_where, row| row['selector'] }.map(&:first).uniq).to eq []
-      expect(apart.select { |_where, row| row['selector'] }.map(&:first).uniq).to eq []
+      expect(reaching.reject { |_where, row| Pf2e::Rules.selectors_of(row).any? }
+                     .map(&:first).uniq).to eq []
+      expect(apart.select { |_where, row| Pf2e::Rules.selectors_of(row).any? }
+                  .map(&:first).uniq).to eq []
     end
 
     it "should have an option on every declaration" do
@@ -171,6 +174,36 @@ module AresMUSH
 
     it "should have immunities and resistances, which conditions and items both declare" do
       expect(rows.count { |_where, row| IWR_KINDS.include?(row['key']) }).to be > 5
+    end
+
+    # An adjustment has to name a mode the arithmetic knows, or suppress instead.
+    it "should adjust modifiers only with modes we apply" do
+      adjusting = rows.select { |_where, row| row['key'] == 'AdjustModifier' }
+
+      strays = adjusting.reject { |_where, row|
+        row['suppress'] || Pf2e::Paths::MODES.key?(row['mode'].to_s)
+      }.map { |where, row| "#{where}: #{row['mode'].inspect}" }
+
+      expect(strays.uniq).to eq []
+    end
+
+    # An outcome adjustment has to name an outcome and a change `Pf2e::Degree` knows.
+    it "should adjust outcomes only in ways Degree reads" do
+      adjusting = rows.select { |_where, row| row['key'] == 'AdjustDegreeOfSuccess' }
+      outcomes = Pf2e::Degree::NAMES + [ 'all' ]
+
+      strays = adjusting.flat_map { |where, row|
+        row['adjustment'].to_h.reject { |outcome, named|
+          outcomes.include?(outcome.to_s) && Pf2e::Degree::ADJUSTMENTS.key?(named.to_s)
+        }.map { |outcome, named| "#{where}: #{outcome}=#{named}" }
+      }
+
+      expect(strays.uniq).to eq []
+    end
+
+    it "should have adjustments of both kinds, since that is what the foundations were for" do
+      expect(rows.count { |_where, row| row['key'] == 'AdjustModifier' }).to be > 20
+      expect(rows.count { |_where, row| row['key'] == 'AdjustDegreeOfSuccess' }).to be > 20
     end
 
     it "should have writes, since that is the second half of some feats" do

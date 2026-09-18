@@ -110,6 +110,14 @@ pf2e_feats:
         type: "circumstance"
         value: 2
         predicate: ["ageless-patience"]
+      - key: "AdjustDegreeOfSuccess"
+        selector: "skill-check"
+        adjustment: {"all": "one-degree-better"}
+        predicate: ["ageless-patience", "check:total:natural:1", {"gte": ["check:total:delta", -9]}]
+      - key: "AdjustDegreeOfSuccess"
+        selector: "perception"
+        adjustment: {"all": "one-degree-better"}
+        predicate: ["ageless-patience", "check:total:natural:1", {"gte": ["check:total:delta", -9]}]
   Agonizing Rebuke:
     feat_type:
       - Ancestry
@@ -712,6 +720,11 @@ pf2e_feats:
     shortdesc: The life energy that helped create the first arvek is particularly potent in you, protecting you from ongoing maladies. If you roll a success on a saving throw against a disease or poison, you get a critical success instead. If you have a different ability that would improve the save in this way (such as the Battle Hardened fighter class feature), if you roll a critical failure on the save you get a failure instead.
     prereq:
       level: 1
+    rules:
+      - key: "AdjustDegreeOfSuccess"
+        selector: "saving-throw"
+        adjustment: {"success": "one-degree-better"}
+        predicate: [{"or": ["item:trait:disease", "item:trait:poison"]}]
   Cantorian Rejuvenation:
     feat_type:
       - Ancestry
@@ -986,6 +999,16 @@ pf2e_feats:
         value: 1
         label: "PF2E.SpecificRule.Goblin.CityScavenger.EarnIncome"
         predicate: ["action:earn-income", "with-subsist"]
+      - key: "AdjustModifier"
+        mode: "add"
+        selectors: ["society", "survival"]
+        value: 1
+        predicate: ["heritage:irongut-goblin"]
+      - key: "AdjustModifier"
+        mode: "add"
+        selectors: ["society", "survival"]
+        value: 1
+        predicate: ["heritage:irongut-goblin"]
   Clever Improviser:
     feat_type:
       - Ancestry
@@ -1036,6 +1059,11 @@ pf2e_feats:
     shortdesc: You have developed a soul-deep bond with your comrades and maintain an even greater degree of cooperation with them. If you are at least an expert in the skill you are Aiding, when you roll a failure or critical failure to Aid a skill check, you get a success instead.
     prereq:
       level: 9
+    rules:
+      - key: "AdjustDegreeOfSuccess"
+        selector: "skill-check"
+        adjustment: {"criticalFailure": "to-success", "failure": "to-success"}
+        predicate: ["action:aid", {"or": ["proficiency:expert", "proficiency:master", "proficiency:legendary"]}]
   Cornered Fury:
     feat_type:
       - Ancestry
@@ -1694,6 +1722,11 @@ pf2e_feats:
     shortdesc: "You cling to walls with a preternatural grip. You gain the Combat Climber feat as a bonus feat, and if you roll a success on an Athletics check to climb, you get a critical success instead.%r%r**Special** If you have the pantli ciith heritage, you instead gain a climb Speed of 15 feet."
     prereq:
       level: 5
+    rules:
+      - key: "AdjustDegreeOfSuccess"
+        selector: "athletics"
+        adjustment: {"success": "one-degree-better"}
+        predicate: ["action:climb", {"not": "heritage:cliffscale-lizardfolk"}]
   General Training:
     repeatable: true
     feat_type:
@@ -2384,6 +2417,10 @@ pf2e_feats:
         type: "circumstance"
         value: 1
         predicate: [{"or": ["item:trait:disease", "item:trait:poison"]}]
+      - key: "AdjustDegreeOfSuccess"
+        selector: "saving-throw"
+        adjustment: {"success": "one-degree-better"}
+        predicate: [{"or": ["item:trait:disease", "item:trait:poison"]}]
   Lawbringer:
     feat_type:
       - Ancestry
@@ -2654,6 +2691,18 @@ pf2e_feats:
         value: 1
         label: "Musetouched (to Escape)"
         predicate: ["action:escape"]
+      - key: "AdjustDegreeOfSuccess"
+        selector: "attack-roll"
+        adjustment: {"criticalFailure": "one-degree-better", "success": "one-degree-better"}
+        predicate: ["action:escape"]
+      - key: "AdjustDegreeOfSuccess"
+        selector: "athletics"
+        adjustment: {"criticalFailure": "one-degree-better", "success": "one-degree-better"}
+        predicate: ["action:escape"]
+      - key: "AdjustDegreeOfSuccess"
+        selector: "acrobatics"
+        adjustment: {"criticalFailure": "one-degree-better", "success": "one-degree-better"}
+        predicate: ["action:escape"]
   Natural Ambition:
     feat_type:
       - Ancestry
@@ -2710,6 +2759,10 @@ pf2e_feats:
         selector: "saving-throw"
         type: "circumstance"
         value: 2
+        predicate: ["item:trait:disease"]
+      - key: "AdjustDegreeOfSuccess"
+        selector: "saving-throw"
+        adjustment: {"success": "one-degree-better"}
         predicate: ["item:trait:disease"]
   Nephilim Eyes:
     feat_type:
@@ -3044,6 +3097,10 @@ pf2e_feats:
     prereq:
       level: 1
     rules:
+      - key: "AdjustDegreeOfSuccess"
+        selector: "saving-throw"
+        adjustment: {"success": "one-degree-better"}
+        predicate: ["item:trait:disease"]
       - key: "FlatModifier"
         selector: "saving-throw"
         type: "circumstance"
@@ -4064,6 +4121,15 @@ pf2e_feats:
     shortdesc: Whether keeping your balance or climbing, your feet easily find purchase. If you roll a success on an Acrobatics check to Balance or an Athletics check to Climb, you get a critical success instead. You're not off-guard when you attempt to Balance or Climb.
     prereq:
       level: 1
+    rules:
+      - key: "AdjustDegreeOfSuccess"
+        selector: "acrobatics"
+        adjustment: {"success": "one-degree-better"}
+        predicate: ["action:balance"]
+      - key: "AdjustDegreeOfSuccess"
+        selector: "athletics"
+        adjustment: {"success": "one-degree-better"}
+        predicate: ["action:climb"]
   Svetocher:
     feat_type:
       - Ancestry
@@ -4094,6 +4160,10 @@ pf2e_feats:
       - key: "ActiveEffectLike"
         path: "system.skills.diplomacy.rank"
         mode: "upgrade"
+        value: 1
+      - key: "AdjustModifier"
+        mode: "add"
+        selector: "fortitude"
         value: 1
       - key: "FlatModifier"
         selector: "hp"
@@ -4267,6 +4337,16 @@ pf2e_feats:
     shortdesc: "You've learned techniques first devised by your ancestors during their ancient conflicts with the khazad-rukh, allowing you to comfortably wear massive suits of armor. Ignore the reduction to your Speed from any armor you wear.%r%rIn addition, any time you're taking a penalty to your Speed for some other reason (such as from the encumbered condition or from a spell), deduct 5 feet from the penalty. For example, the encumbered condition normally gives a –10-foot penalty to Speed, but this feat would reduce it to a –5-foot penalty. If your Speed is taking multiple penalties, pick only one penalty to reduce."
     prereq:
       level: 1
+    rules:
+      - key: "AdjustModifier"
+        selectors: ["land-speed"]
+        suppress: true
+      - key: "AdjustModifier"
+        mode: "add"
+        selectors: ["land-speed"]
+        maxApplications: 1
+        value: 5
+        predicate: [{"not": "penalty:slug:armor-speed-penalty"}, {"lte": ["penalty:value", -5]}]
   Uncanny Agility:
     feat_type:
       - Ancestry
@@ -4331,6 +4411,11 @@ pf2e_feats:
         type: "circumstance"
         value: "@weapon.system.damage.dice"
         predicate: ["target:mode:undead"]
+      - key: "AdjustModifier"
+        mode: "multiply"
+        selector: "strike-damage"
+        value: "2"
+        predicate: ["target:trait:vampire"]
       - key: "RollOption"
         option: "target:mode:undead"
         toggleable: "totm"
@@ -4575,6 +4660,11 @@ pf2e_feats:
         type: "circumstance"
         value: 1
         predicate: [{"or": ["item:trait:death", "item:trait:disease", "origin:mode:undead", "origin:trait:sakhil"]}]
+      - key: "AdjustModifier"
+        mode: "add"
+        selector: "saving-throw"
+        value: 1
+        predicate: [{"or": ["item:trait:disease", "item:trait:death"]}, {"or": ["origin:mode:undead", "origin:trait:sakhil"]}]
   Warren Digger:
     feat_type:
       - Ancestry
@@ -4603,6 +4693,10 @@ pf2e_feats:
         path: "system.skills.survival.rank"
         mode: "upgrade"
         value: 1
+      - key: "AdjustDegreeOfSuccess"
+        selector: "all"
+        adjustment: {"all": "one-degree-better"}
+        predicate: [{"or": ["action:sense-direction", "item:slug:quandary"]}]
       - key: "RollOption"
         option: "compass-in-possession"
         domain: "skill-check"
