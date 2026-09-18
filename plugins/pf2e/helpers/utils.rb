@@ -283,20 +283,35 @@ module AresMUSH
 
       roll_list.unshift('1d20') if find_dice.empty?
 
-      result = []
+      # The words are worked out before any die is rolled, because what they are can change how the d20
+      # is rolled: fortune rolls it twice and keeps the higher.
       checks = []
-
-      roll_list.map do |e|
+      terms = roll_list.map do |e|
         if e =~ dice_pattern
-          dice = e.gsub("d"," ").split
-          amount = dice[0].to_i > 0 ? dice[0].to_i : 1
-          sides = dice[1].to_i
-          result << Pf2e.roll_dice(amount, sides)
+          nil
         elsif e.to_i == 0
-          result << Pf2e.get_keyword_value(target, e, options, checks)
+          Pf2e.get_keyword_value(target, e, options, checks)
         else
-          result << e.to_i
+          e.to_i
         end
+      end
+
+      keep = roll_twice(checks)
+      twice = nil
+
+      result = roll_list.each_with_index.map do |e, index|
+        next terms[index] unless e =~ dice_pattern
+
+        dice = e.gsub("d"," ").split
+        amount = dice[0].to_i > 0 ? dice[0].to_i : 1
+        sides = dice[1].to_i
+
+        if keep && index.zero? && e == '1d20'
+          twice = { 'keep' => keep, 'rolls' => [ Pf2e.roll_dice(1, 20).first, Pf2e.roll_dice(1, 20).first ] }
+          next [ keep == 'keep-higher' ? twice['rolls'].max : twice['rolls'].min ]
+        end
+
+        Pf2e.roll_dice(amount, sides)
       end
 
       fmt_result = result.map do |word|
@@ -317,8 +332,21 @@ module AresMUSH
       # themselves so a rule about how the die came up can be asked once the die is known.
       return_hash['checks'] = checks
       return_hash['adjustments'] = checks.flat_map(&:adjustments)
+      # Both dice, where the d20 was rolled twice, and which was kept.
+      return_hash['rolled_twice'] = twice
+
+      # What the roll spent is spent: Guidance's bonus, a fortune effect.
+      die = natural_die(roll_list, fmt_result)
+      checks.each { |check| check.rolled!(return_hash['total'], nil, die) if check.respond_to?(:rolled!) }
 
       return return_hash
+    end
+
+    # Fortune or misfortune on this roll, from the checks in it: one of each cancels, which is the rule.
+    def self.roll_twice(checks)
+      keeps = checks.map { |check| check.respond_to?(:roll_twice) ? check.roll_twice : nil }.compact.uniq
+
+      keeps.size == 1 ? keeps.first : nil
     end
 
     # How the roll is shown. The outcome itself is `Pf2e::Degree`'s, so anything that has to change an

@@ -159,6 +159,7 @@ module AresMUSH
         name = found.state
         entry = info(name)
         said = parse(options)
+        said['answers'] = owned_answers(char, name, said['answers'])
         duration = entry['duration'] || {}
         unit = UNITS.key?(duration['unit']) ? duration['unit'] : 'unlimited'
 
@@ -182,6 +183,16 @@ module AresMUSH
         give_temp_hp(char, effect, 'on_create')
 
         Ok.new(:state => effect)
+      end
+
+      # An answer naming one of the character's own things - `longsword` for "the weapon you choose" - is
+      # held as that thing's id, which is what the effect's rules name.
+      def self.owned_answers(char, name, answers)
+        sets = Rules.choice_sets(Effects.source(name, Array(info(name)['rules']))).select { |set| set['owned'] }
+
+        answers.map do |typed|
+          sets.map { |set| Choices.owned_answer(set, char, typed) }.compact.first || typed
+        end
       end
 
       def self.parse(options)
@@ -305,6 +316,46 @@ module AresMUSH
         end
 
         found.map { |_name, result| result.target }
+      end
+
+      # ------------------------------------------------------------------------------
+      # What a roll spends
+
+      # Foundry asks every rule a character has after any check they make (`statistic.ts:631`), and two
+      # kinds end the effect carrying them there:
+      #
+      #   FlatModifier `removeAfterRoll`  true: the next roll, whatever it was
+      #                                   `if-enabled`: a roll the bonus counted in - Guidance, Aid
+      #                                   a predicate: a roll whose circumstances satisfy it
+      #   RollTwice                       a roll it made twice, unless it says otherwise
+      #                                   (`roll-twice.ts`)
+      #
+      # `options` are the check's own, with what the roll established added.
+      def self.after_roll(char, check, options)
+        counted = Array(check.breakdown['modifiers']).select { |one| one['enabled'] }
+                                                   .map { |one| one['origin'].to_s }
+
+        on(char).select { |effect|
+          Array(info(effect.name)['rules']).any? { |row| spent?(row, effect, counted, check, options) }
+        }.each { |effect| remove(char, effect) }
+      end
+
+      def self.spent?(row, effect, counted, check, options)
+        case row['key'].to_s
+        when 'FlatModifier'
+          spent = row['removeAfterRoll']
+
+          return true if spent == true
+          return counted.include?(effect.id.to_s) if spent == 'if-enabled'
+
+          spent.is_a?(Array) && Predicate.test(spent, options)
+        when 'RollTwice'
+          row['removeAfterRoll'] != false && !check.roll_twice.nil? &&
+            Domains.matches?(Rules.selectors_of(row), check.domains) &&
+            Predicate.test(row['predicate'], options)
+        else
+          false
+        end
       end
 
       # ------------------------------------------------------------------------------

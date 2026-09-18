@@ -32,6 +32,11 @@ pf2e_magicitem:
     price: 300
     bulk: 0
     shortdesc: "*Shining ammunition* gives off a faint glow. When shot, it sheds bright light in a 20-foot radius (and dim light to the next 20 feet) for 10 minutes. If it hits a target, it sticks, causing the target to shed light in the same radius. A creature can remove the ammunition with an Interact action, but the ammunition itself continues to glow for the rest of the duration or until destroyed."
+    rules:
+      - key: "Note"
+        selector: "{item|_id}-attack"
+        title: "Shining Ammunition"
+        text: "The ammunition sheds bright light in a 20-foot radius (and dim light to the next 20 feet) for 10 minutes. If it hits a target, it sticks, causing the target to shed light in the same radius. Effect: Shining Ammunition"
   Walking Cauldron:
     traits:
       - invested
@@ -46,7 +51,7 @@ pf2e_magicitem:
         option: "walking-cauldron-walking"
         toggleable: true
         value: true
-        label: "PF2E.SpecificRule.Equipment.WalkingCauldron.ToggleLabel"
+        label: "Walking Cauldron \u2014 Animated"
   Antler Arrow:
     traits:
       - consumable
@@ -55,6 +60,35 @@ pf2e_magicitem:
     price: 700
     bulk: 0
     shortdesc: "**Activate** A (manipulate)%r%rCreation of these arrows was inspired by an encounter with a horned archon scout who sought to peacefully restrain their foes. When an activated *antler arrow* hits a target, bone antlers extend to pin it down. The target must succeed at a DC 16 Reflex save or become stuck to the surface, taking the critical specialization effects of a bow.%r%rIf the hit with the *antler arrow* is a critical hit and you have access to the bow critical specialization effect, the DC of the Athletics check increases to 15."
+    rules:
+      - key: "Note"
+        selector: "{item|id}-ranged-damage"
+        outcome: ["success"]
+        title: "Antler Arrow"
+        text: "The target must succeed at a save or become stuck to the surface, taking the critical specialization effects of a bow"
+      - key: "Note"
+        selector: "{item|id}-ranged-damage"
+        outcome: ["success"]
+        title: "Critical Specialization"
+        text: "If the target of the critical hit is adjacent to a surface, it gets stuck to that surface by the missile. The target is Immobilized and must spend an Interact action to attempt a check to pull the missile free; it can't move from its space until it succeeds. The creature doesn't become stuck if it is incorporeal, is liquid, or could otherwise escape without effort (such as by being large enough that the missile would not be an impediment.)"
+      - key: "Note"
+        selector: "{item|id}-ranged-damage"
+        outcome: ["criticalSuccess"]
+        title: "Antler Arrow"
+        text: "The target must succeed at a save or become stuck to the surface, taking the critical specialization effects of a bow"
+        predicate: [{"not": "critical-specialization"}]
+      - key: "Note"
+        selector: "{item|id}-ranged-damage"
+        outcome: ["criticalSuccess"]
+        title: "Critical Specialization"
+        text: "If the target of the critical hit is adjacent to a surface, it gets stuck to that surface by the missile. The target is Immobilized and must spend an Interact action to attempt a check to pull the missile free; it can't move from its space until it succeeds. The creature doesn't become stuck if it is incorporeal, is liquid, or could otherwise escape without effort (such as by being large enough that the missile would not be an impediment.)"
+        predicate: [{"not": "critical-specialization"}]
+      - key: "Note"
+        selector: "{item|id}-ranged-damage"
+        outcome: ["criticalSuccess"]
+        title: "Antler Arrow"
+        text: "The DC of the Athletics check to pull the missile free increases to"
+        predicate: ["critical-specialization"]
   Masquerade Scarf:
     traits:
       - invested
@@ -122,7 +156,7 @@ pf2e_magicitem:
         definition: [{"or": [{"and": ["self:mode:living", "item:type:spell", "item:slug:harm"]}, {"and": ["self:mode:undead", "item:type:spell", "item:slug:heal"]}]}]
         type: "custom"
         value: 5
-        label: "PF2E.SpecificRule.Equipment.ChannelProtectionAmuletLabel"
+        label: "Channel Protection"
   Charlatan's Gloves:
     traits:
       - invested
@@ -149,6 +183,12 @@ pf2e_magicitem:
         selector: "survival"
         type: "item"
         value: 1
+      - key: "Note"
+        selector: "survival"
+        outcome: ["criticalSuccess"]
+        title: "{item|name}"
+        text: "If you critically succeed at your Survival check to Subsist, you can feed twice as many additional creatures."
+        predicate: ["action:subsist"]
   Crafter's Eyepiece:
     traits:
       - invested
@@ -197,7 +237,7 @@ pf2e_magicitem:
         option: "playing"
         domain: "performance"
         toggleable: true
-        label: "PF2E.SpecificRule.PlayingItem"
+        label: "Playing {item}"
       - key: "FlatModifier"
         selector: "performance"
         type: "item"
@@ -298,7 +338,7 @@ pf2e_magicitem:
       - key: "RollOption"
         option: "alchemist-goggles-failure"
         toggleable: true
-        label: "PF2E.SpecificRule.Equipment.AlchemistGoggles.RollOptionLabel"
+        label: "Failed Strike with an alchemical bomb"
       - key: "FlatModifier"
         selector: "alchemical-bomb-base-damage"
         type: "item"
@@ -424,6 +464,11 @@ pf2e_magicitem:
     price: 2500
     bulk: 0
     shortdesc: "**Activate** 1 action (manipulate)%r%rThis chilly ammunition is dark blue and cold to the touch. When activated *freezing ammunition* hits a target, the target must succeed at a DC 19 Fortitude save or be slowed 1 for 1 round by the intense cold (slowed 1 for 1 minute on a critical failure)."
+    rules:
+      - key: "Note"
+        selector: "{item|id}-ranged-damage"
+        title: "Freezing Ammunition"
+        text: "The target must succeed at a save or be Slowed 1 for 1 round by the intense cold (slowed 1 for 1 minute on a critical failure)."
   Obsidian Goggles:
     traits:
       - invested
@@ -504,8 +549,8 @@ pf2e_magicitem:
     rules:
       - key: "ChoiceSet"
         flag: "damageType"
-        prompt: "PF2E.SpecificRule.Prompt.DamageType"
-        choices: [{"label": "PF2E.TraitAcid", "value": "acid"}, {"label": "PF2E.TraitCold", "value": "cold"}, {"label": "PF2E.TraitElectricity", "value": "electricity"}, {"label": "PF2E.TraitFire", "value": "fire"}, {"label": "PF2E.TraitSonic", "value": "sonic"}]
+        prompt: "Select a damage type."
+        choices: [{"label": "Acid", "value": "acid"}, {"label": "Cold", "value": "cold"}, {"label": "Electricity", "value": "electricity"}, {"label": "Fire", "value": "fire"}, {"label": "Sonic", "value": "sonic"}]
       - key: "Resistance"
         type: "{item|flags.system.rulesSelections.damageType}"
         value: 5
@@ -535,7 +580,7 @@ pf2e_magicitem:
       - key: "RollOption"
         option: "clandestine-cloak"
         toggleable: true
-        label: "PF2E.SpecificRule.Equipment.ClandestineCloak.RollOptionLabel"
+        label: "Clandestine Cloak \u2014 Pull up the Hood"
       - key: "FlatModifier"
         selector: "stealth"
         type: "item"
@@ -800,6 +845,12 @@ pf2e_magicitem:
         selector: "athletics"
         type: "item"
         value: 2
+      - key: "Note"
+        selector: "athletics"
+        outcome: ["success", "criticalSuccess"]
+        title: "{item|name}"
+        text: "Whenever you use an action to Climb or Swim and you succeed at the Athletics check, add a +5-foot item bonus to the distance you move."
+        predicate: [{"or": ["action:climb", "action:swim"]}]
   Bracers of Missile Deflection (Greater):
     traits:
       - invested
@@ -834,6 +885,12 @@ pf2e_magicitem:
         selector: "survival"
         type: "item"
         value: 2
+      - key: "Note"
+        selector: "survival"
+        outcome: ["criticalSuccess"]
+        title: "{item|name}"
+        text: "If you critically succeed at your Survival check to Subsist, you can feed four times as many additional creatures."
+        predicate: ["action:subsist"]
   Dancing Scarf (Greater):
     traits:
       - invested
@@ -875,6 +932,11 @@ pf2e_magicitem:
     price: 13000
     bulk: 0
     shortdesc: "**Ammunition** any%r%r**Activate** A (manipulate)%r%rThis piece of ammunition is coated in gritty black soot. When activated *explosive ammunition* hits a target, the missile explodes in a 10-ft burst, dealing 6d6 fire damage to each creature in the area (including the target). Each creature must attempt a DC 25 basic Reflex save."
+    rules:
+      - key: "Note"
+        selector: "{item|id}-ranged-damage"
+        title: "Explosive Ammunition"
+        text: "The missile explodes in a , dealing |options:area-damage] damage to each creature in the area (including the target). Each creature must attempt a save."
   Eyes of the Cat:
     traits:
       - invested
@@ -1036,8 +1098,8 @@ pf2e_magicitem:
     rules:
       - key: "ChoiceSet"
         flag: "damageType"
-        prompt: "PF2E.SpecificRule.Prompt.DamageType"
-        choices: [{"label": "PF2E.TraitAcid", "value": "acid"}, {"label": "PF2E.TraitCold", "value": "cold"}, {"label": "PF2E.TraitElectricity", "value": "electricity"}, {"label": "PF2E.TraitFire", "value": "fire"}, {"label": "PF2E.TraitSonic", "value": "sonic"}]
+        prompt: "Select a damage type."
+        choices: [{"label": "Acid", "value": "acid"}, {"label": "Cold", "value": "cold"}, {"label": "Electricity", "value": "electricity"}, {"label": "Fire", "value": "fire"}, {"label": "Sonic", "value": "sonic"}]
       - key: "Resistance"
         type: "{item|flags.system.rulesSelections.damageType}"
         value: 10
@@ -1067,7 +1129,7 @@ pf2e_magicitem:
       - key: "RollOption"
         option: "clandestine-cloak"
         toggleable: true
-        label: "PF2E.SpecificRule.Equipment.ClandestineCloak.RollOptionLabel"
+        label: "Clandestine Cloak \u2014 Pull up the Hood"
       - key: "FlatModifier"
         selector: "stealth"
         type: "item"
@@ -1115,7 +1177,7 @@ pf2e_magicitem:
         type: "circumstance"
         value: 1
         slug: "daredevil-boots-tumble-through"
-        label: "PF2E.SpecificRule.Equipment.DaredevilBoots.TumbleThroughLabel"
+        label: "{item} (Tumble Through)"
         predicate: ["action:tumble-through"]
   Demon Mask (Greater):
     traits:
@@ -1165,7 +1227,7 @@ pf2e_magicitem:
         option: "playing"
         domain: "performance"
         toggleable: true
-        label: "PF2E.SpecificRule.PlayingItem"
+        label: "Playing {item}"
       - key: "FlatModifier"
         selector: "performance"
         type: "item"
@@ -1219,7 +1281,12 @@ pf2e_magicitem:
       - key: "RollOption"
         option: "shadow-signet"
         toggleable: true
-        suboptions: [{"label": "PF2E.Check.DC.Specific.fortitude", "value": "fortitude-dc"}, {"label": "PF2E.Check.DC.Specific.reflex", "value": "reflex-dc"}]
+        suboptions: [{"label": "Fortitude DC", "value": "fortitude-dc"}, {"label": "Reflex DC", "value": "reflex-dc"}]
+      - key: "Note"
+        selector: "spell-attack-roll"
+        title: "{item|name}"
+        text: "If your next action is to Cast a Spell that requires a spell attack roll against Armor Class, choose Fortitude DC or Reflex DC. You make your spell attack roll against that defense instead of AC."
+        predicate: ["shadow-signet", "item:trait:attack", {"or": ["item:defense:fortitude-dc", "item:defense:reflex-dc"]}]
   Wand of Widening (4th-Rank Spell):
     traits:
       - magical
@@ -1259,7 +1326,7 @@ pf2e_magicitem:
       - key: "RollOption"
         option: "alchemist-goggles-failure"
         toggleable: true
-        label: "PF2E.SpecificRule.Equipment.AlchemistGoggles.RollOptionLabel"
+        label: "Failed Strike with an alchemical bomb"
       - key: "FlatModifier"
         selector: "alchemical-bomb-base-damage"
         type: "item"
@@ -1482,6 +1549,11 @@ pf2e_magicitem:
     price: 52000
     bulk: 0
     shortdesc: "**Ammunition** any%r%r**Activate** A (manipulate)%r%rThis piece of ammunition is coated in gritty black soot. When activated *greater explosive ammunition* hits a target, the missile explodes in a 10-ft burst, dealing 10d6 fire damage to each creature in the area (including the target). Each creature must attempt a DC 30 basic Reflex save."
+    rules:
+      - key: "Note"
+        selector: "{item|id}-ranged-damage"
+        title: "Explosive Ammunition (Greater)"
+        text: "The missile explodes in a , dealing |options:area-damage] damage to each creature in the area (including the target). Each creature must attempt a save."
   Eye of Fortune:
     traits:
       - invested
@@ -1580,8 +1652,8 @@ pf2e_magicitem:
     rules:
       - key: "ChoiceSet"
         flag: "damageType"
-        prompt: "PF2E.SpecificRule.Prompt.DamageType"
-        choices: [{"label": "PF2E.TraitAcid", "value": "acid"}, {"label": "PF2E.TraitCold", "value": "cold"}, {"label": "PF2E.TraitElectricity", "value": "electricity"}, {"label": "PF2E.TraitFire", "value": "fire"}, {"label": "PF2E.TraitSonic", "value": "sonic"}]
+        prompt: "Select a damage type."
+        choices: [{"label": "Acid", "value": "acid"}, {"label": "Cold", "value": "cold"}, {"label": "Electricity", "value": "electricity"}, {"label": "Fire", "value": "fire"}, {"label": "Sonic", "value": "sonic"}]
       - key: "Resistance"
         type: "{item|flags.system.rulesSelections.damageType}"
         value: 15
@@ -1603,8 +1675,8 @@ pf2e_magicitem:
     shortdesc: "**Ammunition** any%r%r*Ghost ammunition* is cool to the touch. This ammunition has the benefits of the **ghost touch** property rune and can fly through any obstacle except those that can block incorporeal creatures or effects. Though the ammunition penetrates barriers and ignores all cover, the target still benefits from the flat check from being concealed or hidden. You still can't target an undetected creature without guessing.%r%rAfter it is launched, the ammunition vanishes into mist. However, in the dead of the night 1d4 days later, it reappears in the last quiver or other container it was taken from."
     rules:
       - key: "AdjustStrike"
-        mode: "add"
         property: "property-runes"
+        mode: "add"
         definition: ["item:id:{item|_id}"]
         value: "ghost-touch"
   Primeval Mistletoe (Greater):
@@ -1772,7 +1844,7 @@ pf2e_magicitem:
       - key: "RollOption"
         option: "alchemist-goggles-failure"
         toggleable: true
-        label: "PF2E.SpecificRule.Equipment.AlchemistGoggles.RollOptionLabel"
+        label: "Failed Strike with an alchemical bomb"
       - key: "FlatModifier"
         selector: "alchemical-bomb-base-damage"
         type: "item"
@@ -1792,6 +1864,12 @@ pf2e_magicitem:
         selector: "athletics"
         type: "item"
         value: 3
+      - key: "Note"
+        selector: "athletics"
+        outcome: ["success", "criticalSuccess"]
+        title: "{item|name}"
+        text: "Whenever you use an action to Climb or Swim and you succeed at the Athletics check, add a +10-foot item bonus to the distance you move."
+        predicate: [{"or": ["action:climb", "action:swim"]}]
   Belt of Long Life:
     traits:
       - apex
@@ -1880,7 +1958,7 @@ pf2e_magicitem:
         type: "circumstance"
         value: 2
         slug: "daredevil-boots-tumble-through"
-        label: "PF2E.SpecificRule.Equipment.DaredevilBoots.TumbleThroughLabel"
+        label: "{item} (Tumble Through)"
         predicate: ["action:tumble-through"]
   Dread Blindfold:
     traits:
@@ -2041,7 +2119,7 @@ pf2e_magicitem:
         option: "playing"
         domain: "performance"
         toggleable: true
-        label: "PF2E.SpecificRule.PlayingItem"
+        label: "Playing {item}"
       - key: "FlatModifier"
         selector: "performance"
         type: "item"

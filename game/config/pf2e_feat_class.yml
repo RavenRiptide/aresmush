@@ -31,7 +31,7 @@ pf2e_feats:
         selector: "athletics"
         type: "status"
         value: 1
-        label: "PF2E.SkillVariant.EscapeForceOpenOrLift"
+        label: "To Escape, Force Open, or Lift Heavy Objects"
         predicate: ["self:effect:rage", {"or": ["action:escape", "action:force-open", "action:lift-heavy-object"]}]
       - key: "ActiveEffectLike"
         path: "inventory.bulk.encumberedAfterAddend"
@@ -54,6 +54,12 @@ pf2e_feats:
     shortdesc: You can identify alchemical items quickly. When using the Crafting skill to Identify Alchemy on an alchemical item you hold, you can do so as a single action, rather than spending 10 minutes.
     traits:
       - alchemist
+    rules:
+      - key: "Note"
+        selector: "crafting"
+        title: "{item|name}"
+        text: "If have the formula for the item you're identifying, and you roll a critical failure, you get a failure instead."
+        predicate: ["action:identify-alchemy"]
   Alchemical Familiar:
     assoc_charclass:
       - Alchemist
@@ -121,6 +127,31 @@ pf2e_feats:
     shortdesc: "**Trigger** A creature targets you with a spell of the same tradition as your bloodline.%r%rThe magic in your blood surges in response to your foe's spell. You generate a blood magic effect you know, even if you are already under the effects of blood magic. The target must be either you or the creature that triggered Blood Rising. If the blood magic effect grants you a bonus to AC or the appropriate saving throw, that bonus applies against the triggering spell. If the effect has a duration, it instead lasts until the beginning of your next turn.%r%r**Special** This feat has the trait corresponding to the tradition of your bloodline."
     traits:
       - sorcerer
+    rules:
+      - key: "ItemAlteration"
+        itemId: "{item|id}"
+        property: "traits"
+        mode: "add"
+        value: "arcane"
+        predicate: ["feature:bloodline:tradition:arcane"]
+      - key: "ItemAlteration"
+        itemId: "{item|id}"
+        property: "traits"
+        mode: "add"
+        value: "divine"
+        predicate: ["feature:bloodline:tradition:divine"]
+      - key: "ItemAlteration"
+        itemId: "{item|id}"
+        property: "traits"
+        mode: "add"
+        value: "occult"
+        predicate: ["feature:bloodline:tradition:occult"]
+      - key: "ItemAlteration"
+        itemId: "{item|id}"
+        property: "traits"
+        mode: "add"
+        value: "primal"
+        predicate: ["feature:bloodline:tradition:primal"]
   Blowgun Poisoner:
     assoc_charclass:
       - Alchemist
@@ -131,6 +162,17 @@ pf2e_feats:
     shortdesc: "You can capably deliver toxins with a blowgun. Your blowgun Strikes can apply injury poisons even if they deal no damage due to a creature's resistance. If you critically succeed at a blowgun Strike using a poisoned dart, the target's initial save against the poison is one degree of success worse than the creature rolls; this is a misfortune effect.%r%rIn addition, if you make a blowgun Strike while hidden or undetected, you don't automatically become observed. Instead, immediately attempt a Stealth check against the Perception DC of the target. If you succeed, you don't become observed, and are hidden (if you were undetected, you still become hidden rather than remaining undetected)."
     traits:
       - alchemist
+    rules:
+      - key: "Note"
+        selector: "blowgun-attack"
+        outcome: ["criticalSuccess"]
+        title: "{item|name}"
+        text: "If you critically succeed at a blowgun Strike using a poisoned dart, the target's initial save against the poison is one degree of success worse than the creature rolls; this is a misfortune effect."
+      - key: "Note"
+        selector: "blowgun-attack"
+        title: "{item|name}"
+        text: "In addition, if you make a blowgun Strike while Hidden or Undetected, you don't automatically become Observed. Instead, immediately attempt a check against the Perception DC of the target. If you succeed, you don't become observed, and are hidden (if you were undetected, you still become hidden rather than remaining undetected)."
+        predicate: [{"or": ["self:condition:hidden", "self:condition:undetected"]}]
   Brilliant Flash:
     assoc_charclass:
       - Champion
@@ -226,6 +268,12 @@ pf2e_feats:
     shortdesc: "When you are wielding your deity's favored weapon, increase the damage die size of that weapon by one step.%r%rIf your deity's favored weapon is an unarmed attack (such as a fist, if you worship Navos) and its damage die is smaller than d6, instead increase its damage die size to d6."
     traits:
       - cleric
+    rules:
+      - key: "ItemAlteration"
+        itemType: "weapon"
+        property: "damage-dice-faces"
+        mode: "upgrade"
+        predicate: ["item:deity-favored", {"or": ["item:category:simple", {"and": ["item:category:unarmed", "item:damage:die:faces:4"]}]}]
   Defensive Advance:
     assoc_charclass:
       - Champion
@@ -289,8 +337,8 @@ pf2e_feats:
         option: "divine-castigation"
         toggleable: true
       - key: "DamageAlteration"
-        mode: "override"
         property: "damage-type"
+        mode: "override"
         selectors: ["spell-damage"]
         value: "spirit"
         predicate: ["divine-castigation", {"or": ["self:trait:holy", "self:trait:unholy"]}, {"or": ["item:slug:harm", "item:slug:heal"]}]
@@ -325,7 +373,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "double-slice-second"
         toggleable: true
-        label: "PF2E.SpecificRule.Fighter.DoubleSlice.SecondAttackLabel"
+        label: "Double Slice Second Attack"
       - key: "FlatModifier"
         selector: ["melee-strike-attack-roll"]
         value: -2
@@ -347,7 +395,7 @@ pf2e_feats:
         selector: "saving-throw"
         type: "status"
         value: 2
-        label: "PF2E.SkillVariant.VsEmotion"
+        label: "vs. Emotion effects"
         predicate: ["self:effect:rage", "item:trait:emotion"]
   Dragon Stance:
     assoc_charclass:
@@ -374,7 +422,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "elegant-buckler"
         toggleable: true
-        label: "PF2E.SpecificRule.Swashbuckler.ElegantBuckler.RollOptionLabel"
+        label: "Elegant Buckler \u2014 Using a buckler"
       - key: "AdjustModifier"
         mode: "upgrade"
         selector: "ac"
@@ -451,8 +499,8 @@ pf2e_feats:
       - alchemist
     rules:
       - key: "AdjustStrike"
-        mode: "upgrade"
         property: "range-increment"
+        mode: "upgrade"
         definition: ["item:base:alchemical-bomb"]
         value: 30
   Flashy Dodge:
@@ -508,7 +556,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "target:range-increment:1"
         toggleable: "totm"
-        label: "PF2E.SpecificRule.TOTMToggle.FirstRangeIncrement"
+        label: "Enable abilities that require a target within the first range increment."
   Focused Fascination:
     assoc_charclass:
       - Swashbuckler
@@ -556,6 +604,13 @@ pf2e_feats:
     shortdesc: "Your tricks make foes overextend their attacks. On a Feint, you can use the following success and critical success effects instead of any other effects you would gain when you Feint; if you do, other abilities that adjust the normal effects of your Feint no longer apply. You can choose whether to use the Goading Feint benefits or the normal benefits each time you Feint a given foe.%r%r**Critical Success** The target takes a –2 circumstance penalty to all attack rolls against you before the end of its next turn.%r**Success** The target takes a –2 circumstance penalty to its next attack roll against you before the end of its next turn."
     traits:
       - swashbuckler
+    rules:
+      - key: "Note"
+        selector: "skill-check"
+        outcome: ["criticalSuccess", "success"]
+        title: "{item|name}"
+        text: "On a successful Feint, the target take a -2 circumstance penalty to attack rolls against you instead of any other effects that you would gain when you Feint. Effect: Goading Feint"
+        predicate: ["action:feint", "goading-feint"]
   Harming Hands:
     assoc_charclass:
       - Cleric
@@ -776,7 +831,7 @@ pf2e_feats:
         option: "nudge-the-scales"
         toggleable: true
         alwaysActive: true
-        suboptions: [{"label": "PF2E.SpecificRule.Oracle.NudgeTheScales.Life", "value": "life"}, {"label": "PF2E.SpecificRule.Oracle.NudgeTheScales.Death", "value": "death"}]
+        suboptions: [{"label": "Life", "value": "life"}, {"label": "Death", "value": "death"}]
   One for All:
     assoc_charclass:
       - Swashbuckler
@@ -819,6 +874,13 @@ pf2e_feats:
     shortdesc: "You goad a foe into overextending. On a successful Feint, you can use the following success and critical success effects instead of any other effects that would occur when you Feint.%r%r**Critical Success** The target takes a –2 circumstance penalty to all attack rolls against you before the end of its next turn.%r**Success** The target takes a –2 circumstance penalty to its next attack roll against you before the end of its next turn."
     traits:
       - rogue
+    rules:
+      - key: "Note"
+        selector: "skill-check"
+        outcome: ["criticalSuccess", "success"]
+        title: "{item|name}"
+        text: "On a successful Feint, you can have the target take a -2 circumstance penalty to attack rolls against you instead of any other effects that would occur when you Feint. Effect: Overextending Feint"
+        predicate: ["action:feint"]
   Plant Empathy:
     assoc_charclass:
       - Druid
@@ -969,7 +1031,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "reach-spell"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Reactive Shield:
     assoc_charclass:
       - Fighter
@@ -1096,11 +1158,11 @@ pf2e_feats:
         option: "trap-finder"
         domain: "perception"
         toggleable: true
-        label: "PF2E.SpecificRule.TrapFinder.SearchLabel"
+        label: "Trap Finder (searching for traps)"
       - key: "RollOption"
         option: "origin:trait:trap"
         toggleable: "totm"
-        label: "PF2E.SpecificRule.TrapFinder.DefendingLabel"
+        label: "Trap Finder (defending against traps)"
       - key: "FlatModifier"
         selector: ["saving-throw", "ac"]
         type: "circumstance"
@@ -1125,6 +1187,12 @@ pf2e_feats:
       - key: "RollOption"
         option: "tumble-behind"
         toggleable: true
+      - key: "Note"
+        selector: "skill-check"
+        outcome: ["success", "criticalSuccess"]
+        title: "{item|name}"
+        text: "{item|system.description.value}"
+        predicate: ["action:tumble-through"]
   Twin Feint:
     assoc_charclass:
       - Rogue
@@ -1193,13 +1261,18 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         rollOption: "verdant-weapon-origin"
-        prompt: "PF2E.SpecificRule.Exemplar.Ikon.Physical.Prompt"
-        choices: [{"label": "PF2E.UI.RuleElements.GrantItem.GrantNew", "value": "granted"}, {"label": "PF2E.UI.RuleElements.GrantItem.ExistingItem", "value": "existing"}]
+        prompt: "What item will be your ikon?"
+        choices: [{"label": "Grant me a new item.", "value": "granted"}, {"label": "Use an existing item in my inventory.", "value": "existing"}]
       - key: "ChoiceSet"
         flag: "grantedVerdantWeapon"
-        prompt: "PF2E.SpecificRule.Prompt.Weapon"
+        prompt: "Select a weapon."
         choices: {"filter": ["item:level:0", {"nor": ["item:magical", "item:trait:consumable", "item:group:firearm"]}], "itemType": "weapon"}
         predicate: ["verdant-weapon-origin:granted"]
+      - key: "ChoiceSet"
+        flag: "existingVerdantWeapon"
+        prompt: "Select a weapon."
+        choices: {"ownedItems": true, "predicate": [{"not": "item:trait:consumable"}], "types": ["weapon"]}
+        predicate: ["verdant-weapon-origin:existing"]
   Versatile Performance:
     assoc_charclass:
       - Bard
@@ -1301,7 +1374,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "widen-spell"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Witch's Armaments:
     assoc_charclass:
       - Witch
@@ -1315,8 +1388,8 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         rollOption: "witchs-armaments"
-        prompt: "PF2E.SpecificRule.Prompt.UnarmedAttack"
-        choices: [{"img": "icons/creatures/claws/claw-talons-glowing-orange.webp", "label": "PF2E.SpecificRule.Witch.WitchsArmaments.EldritchNails", "predicate": [{"not": "witchs-armaments:nails"}], "value": "nails"}, {"img": "icons/creatures/abilities/mouth-teeth-rows-red.webp", "label": "PF2E.SpecificRule.Witch.WitchsArmaments.IronTeeth", "predicate": [{"not": "witchs-armaments:teeth"}], "value": "teeth"}, {"img": "icons/creatures/webs/web-thin-pruple.webp", "label": "PF2E.SpecificRule.Witch.WitchsArmaments.LivingHair", "predicate": [{"not": "witchs-armaments:hair"}], "value": "hair"}]
+        prompt: "Select an unarmed attack."
+        choices: [{"img": "icons/creatures/claws/claw-talons-glowing-orange.webp", "label": "Eldritch Nails", "predicate": [{"not": "witchs-armaments:nails"}], "value": "nails"}, {"img": "icons/creatures/abilities/mouth-teeth-rows-red.webp", "label": "Iron Teeth", "predicate": [{"not": "witchs-armaments:teeth"}], "value": "teeth"}, {"img": "icons/creatures/webs/web-thin-pruple.webp", "label": "Living Hair", "predicate": [{"not": "witchs-armaments:hair"}], "value": "hair"}]
       - key: "Strike"
         range: null
         category: "unarmed"
@@ -1324,7 +1397,7 @@ pf2e_feats:
         baseType: "nails"
         damage: {"base": {"damageType": "slashing", "dice": 1, "die": "d6"}}
         traits: ["agile", "unarmed"]
-        label: "PF2E.SpecificRule.Witch.WitchsArmaments.EldritchNails"
+        label: "Eldritch Nails"
         predicate: ["witchs-armaments:nails"]
       - key: "Strike"
         range: null
@@ -1333,7 +1406,7 @@ pf2e_feats:
         baseType: "jaws"
         damage: {"base": {"damageType": "piercing", "dice": 1, "die": "d8"}}
         traits: ["unarmed"]
-        label: "PF2E.SpecificRule.Witch.WitchsArmaments.IronTeeth"
+        label: "Iron Teeth"
         predicate: ["witchs-armaments:teeth"]
       - key: "Strike"
         range: null
@@ -1341,7 +1414,7 @@ pf2e_feats:
         group: "brawling"
         damage: {"base": {"damageType": "bludgeoning", "dice": 1, "die": "d4"}}
         traits: ["agile", "disarm", "finesse", "trip", "unarmed"]
-        label: "PF2E.SpecificRule.Witch.WitchsArmaments.LivingHair"
+        label: "Living Hair"
         predicate: ["witchs-armaments:hair"]
   Wolf Stance:
     assoc_charclass:
@@ -1444,6 +1517,13 @@ pf2e_feats:
     shortdesc: Your taunts and threats earn your foes' ire. When you successfully Demoralize a creature, its frightened condition can't decrease to less than 1 at the end of its turn until it either uses a hostile action against you or can no longer observe or sense you for at least 1 round.
     traits:
       - swashbuckler
+    rules:
+      - key: "Note"
+        selector: "skill-check"
+        outcome: ["success", "criticalSuccess"]
+        title: "{item|name}"
+        text: "{item|system.description.value}"
+        predicate: ["action:demoralize"]
   Assisting Shot:
     assoc_charclass:
       - Fighter
@@ -1459,6 +1539,12 @@ pf2e_feats:
       - key: "RollOption"
         option: "assisting-shot"
         toggleable: true
+      - key: "Note"
+        selector: "ranged-attack-roll"
+        outcome: ["criticalSuccess", "success"]
+        title: "{item|name}"
+        text: "{item|system.description.value}"
+        predicate: ["assisting-shot"]
   Athletic Strategist:
     assoc_charclass:
       - Investigator
@@ -1506,7 +1592,7 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         flag: "lesson"
-        prompt: "PF2E.SpecificRule.Prompt.Lesson"
+        prompt: "Select a lesson."
         choices: {"filter": ["item:tag:witch-lesson", "item:level:2"]}
   Blade Brake:
     assoc_charclass:
@@ -1554,6 +1640,12 @@ pf2e_feats:
       - fear
       - mental
       - rogue
+    rules:
+      - key: "Note"
+        selector: "strike-damage"
+        outcome: ["criticalSuccess"]
+        title: "{item|name}"
+        text: "{item|system.description.value}"
   Brutish Shove:
     assoc_charclass:
       - Fighter
@@ -1612,6 +1704,13 @@ pf2e_feats:
     shortdesc: You know exactly where to strike a foe to target their weak spots. When you make a Strike that you're adding your Intelligence modifier to due to Devising a Stratagem and miss, you deal half of your strategic strike damage to the target. This damage type is that of the weapon or unarmed attack you used for the Strike.
     traits:
       - investigator
+    rules:
+      - key: "Note"
+        selector: "strike-attack-roll"
+        outcome: ["failure", "criticalFailure"]
+        title: "{item|name}"
+        text: "You deal half of your )[@item.system.damage.damageType]|options:certain-stratagem]{Strategic Strike damage} to the target"
+        predicate: ["devise-a-stratagem:attack", "target:mark:devise-a-stratagem"]
   Charmed Life:
     assoc_charclass:
       - Swashbuckler
@@ -1632,6 +1731,12 @@ pf2e_feats:
         selector: "saving-throw"
         type: "circumstance"
         value: 2
+        predicate: ["charmed-life"]
+      - key: "Note"
+        selector: "saving-throw"
+        outcome: ["success", "criticalSuccess"]
+        title: "{item|name}"
+        text: "You gain panache until the end of your next turn Effect: Panache (Temporary)"
         predicate: ["charmed-life"]
   Clever Gambit:
     assoc_charclass:
@@ -1696,7 +1801,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "conceal-spell"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Crushing Grab:
     assoc_charclass:
       - Monk
@@ -1707,6 +1812,13 @@ pf2e_feats:
     shortdesc: Like a powerful constrictor, you crush targets in your unyielding grasp. When you successfully Grapple a creature, you can deal bludgeoning damage to that creature equal to your Strength modifier. You can make this attack nonlethal with no penalty.
     traits:
       - monk
+    rules:
+      - key: "Note"
+        selector: "athletics"
+        outcome: ["success", "criticalSuccess"]
+        title: "{item|name}"
+        text: "{item|description}"
+        predicate: ["action:grapple"]
   Dancing Leaf:
     assoc_charclass:
       - Monk
@@ -1717,6 +1829,13 @@ pf2e_feats:
     shortdesc: You are as light as a leaf whirling in the breeze. When you Leap or succeed at a High Jump or Long Jump, increase the distance you jump by 5 feet. When calculating the damage you take from falling, don't count any distance fallen while you are adjacent to a wall.
     traits:
       - monk
+    rules:
+      - key: "Note"
+        selector: "athletics"
+        outcome: ["success", "criticalSuccess"]
+        title: "{item|name}"
+        text: "{item|description}"
+        predicate: [{"or": ["action:high-jump", "action:long-jump"]}]
   Directed Audience:
     assoc_charclass:
       - Bard
@@ -1738,6 +1857,13 @@ pf2e_feats:
     shortdesc: Your Feints are far more distracting than normal. While a creature is off-guard by your Feint, it also takes a –2 circumstance penalty to Perception checks and Reflex saves.
     traits:
       - rogue
+    rules:
+      - key: "Note"
+        selector: "skill-check"
+        outcome: ["criticalSuccess", "success"]
+        title: "{item|name}"
+        text: "While a creature is off-guard by your Feint, it also takes a -2 circumstance penalty to Perception checks and Reflex saves. Effect: Distracting Feint"
+        predicate: ["action:feint"]
   Divine Aegis:
     assoc_charclass:
       - Oracle
@@ -1873,7 +1999,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "energy-ablation"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Enhanced Familiar:
     assoc_charclass:
       - Druid
@@ -1939,6 +2065,12 @@ pf2e_feats:
     shortdesc: "You've learned to speak with your familiar and other creatures like it. You can ask questions of, receive answers from, and use the Diplomacy skill with creatures of the same family of animals as your familiar. For example, if your familiar were a cat, you could gain the effects of *speak with animals* for any felines (including leopards, lions, and tigers, among others). This ability doesn't make them more friendly than normal. If your familiar ever changes to a different creature, you can't use this ability for 1 week while you absorb your new familiar's language.%r%r**Special** This feat has the trait corresponding to the tradition of spells you cast (arcane, divine, occult, or primal)."
     traits:
       - witch
+    rules:
+      - key: "ItemAlteration"
+        itemId: "{item|id}"
+        property: "traits"
+        mode: "add"
+        value: "{actor|system.proficiencies.aliases.witch}"
   Favored Terrain:
     assoc_charclass:
       - Ranger
@@ -1991,6 +2123,11 @@ pf2e_feats:
         type: "circumstance"
         value: 2
         predicate: ["hunters-aim", "target:mark:hunted-prey"]
+      - key: "Note"
+        selector: "ranged-strike-attack-roll"
+        title: "{item|name}"
+        text: "{item|description}"
+        predicate: ["hunters-aim", "target:mark:hunted-prey", {"or": ["target:condition:concealed", "target:cover-level:lesser"]}]
   Improvise Admixture:
     assoc_charclass:
       - Alchemist
@@ -2103,11 +2240,11 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         flag: "muse"
-        prompt: "PF2E.SpecificRule.Bard.Muse.Prompt"
+        prompt: "Select a muse."
         choices: {"filter": ["item:tag:bard-muse"]}
       - key: "ChoiceSet"
         flag: "feat"
-        prompt: "PF2E.SpecificRule.Prompt.Feat"
+        prompt: "Select a feat."
         choices: {"filter": ["item:level:1", "item:category:class", "item:trait:bard"], "itemType": "feat"}
       - key: "RollOption"
         option: "feature:{item|flags.system.rulesSelections.muse}"
@@ -2139,7 +2276,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "nonlethal-spell"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Order Explorer:
     assoc_charclass:
       - Druid
@@ -2154,7 +2291,7 @@ pf2e_feats:
       - key: "ChoiceSet"
         flag: "order"
         rollOption: "feat:order-explorer"
-        prompt: "PF2E.SpecificRule.Druid.DruidicOrder.Prompt"
+        prompt: "Select a druidic order."
         choices: {"filter": ["item:tag:druid-order", {"not": "item:tag:class-archetype"}]}
   Panic the Dead:
     assoc_charclass:
@@ -2169,6 +2306,12 @@ pf2e_feats:
       - emotion
       - fear
       - mental
+    rules:
+      - key: "Note"
+        selector: "spell-damage"
+        title: "{item|name}"
+        text: "{item|description}"
+        predicate: ["item:slug:heal"]
   Pernicious Poison:
     assoc_charclass:
       - Alchemist
@@ -2227,12 +2370,12 @@ pf2e_feats:
         toggleable: true
         alwaysActive: true
         suboptions: [{"label": "{item|name}", "value": "propelling-sorcery"}]
-        label: "PF2E.SpecificRule.Sorcerer.Bloodline.BloodMagicDescription.Title"
+        label: "Blood Magic"
       - key: "RollOption"
         option: "second-blood-magic"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "propelling-sorcery"}]
-        label: "PF2E.SpecificRule.Sorcerer.SecondBloodMagic"
+        label: "Second Blood Magic"
         predicate: [{"or": ["feat:blood-ascendancy", "feat:blood-sovereignty"]}]
   Quick Draw:
     assoc_charclass:
@@ -2286,10 +2429,16 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
-        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.Retreating", "value": "retreating"}]
+        suboptions: [{"label": "Retreating", "value": "retreating"}]
         disabledIf: [{"not": "self:effect:panache"}]
         disabledValue: false
-        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
+        label: "Finisher"
+      - key: "Note"
+        selector: "strike-attack-roll"
+        outcome: ["failure"]
+        title: "{item|name}"
+        text: "You Step as a free action."
+        predicate: ["finisher:retreating", {"or": ["item:melee", {"and": ["feat:flying-blade", "item:thrown", "target:range-increment:1"]}]}, {"or": ["item:trait:agile", "item:trait:finesse"]}]
   Revivifying Mutagen:
     assoc_charclass:
       - Alchemist
@@ -2312,6 +2461,12 @@ pf2e_feats:
     traits:
       - cleric
       - healing
+    rules:
+      - key: "Note"
+        selector: "spell-damage"
+        title: "{item|name}"
+        text: "When you cast a harm spell and damage at least one living creature, you regain ] Hit Points."
+        predicate: ["item:slug:harm", "self:mode:living"]
   Second Wind:
     assoc_charclass:
       - Barbarian
@@ -2344,6 +2499,13 @@ pf2e_feats:
     shortdesc: The plans you make include your allies as well as yourself. When you hit a creature with an attack on which you substituted your attack roll due to Devising a Stratagem, designate one ally. The creature you hit is off-guard to that ally on the next attack that ally makes against that creature before the start of your next turn.
     traits:
       - investigator
+    rules:
+      - key: "Note"
+        selector: "strike-attack-roll"
+        outcome: ["success", "criticalSuccess"]
+        title: "{item|name}"
+        text: "The creature you hit is Off-Guard to a designated ally on the next attack the ally makes against the creature before the start of your next turn."
+        predicate: ["target:mark:devise-a-stratagem"]
   Shooting Stars Stance:
     assoc_charclass:
       - Monk
@@ -2380,6 +2542,11 @@ pf2e_feats:
       - additive
       - alchemist
     rules:
+      - key: "Note"
+        selector: "attack-roll"
+        title: "{item|name}"
+        text: "Your bomb creates a cloud of smoke in a 10-foot radius burst, centered on a corner of the target's space of your choice. The smoke conceals creatures in the area, and lasts for 1 minute."
+        predicate: ["alchemical", "bomb", "smoke-bomb"]
       - key: "RollOption"
         option: "smoke-bomb"
         domain: "attack-roll"
@@ -2418,8 +2585,8 @@ pf2e_feats:
       - rogue
     rules:
       - key: "AdjustStrike"
-        mode: "add"
         property: "range-increment"
+        mode: "add"
         definition: ["item:thrown"]
         value: 10
   Stunning Blows:
@@ -2437,6 +2604,11 @@ pf2e_feats:
         option: "stunning-blows"
         domain: "damage"
         toggleable: true
+      - key: "Note"
+        selector: "strike-damage"
+        title: "{item|name}"
+        text: "The target must succeed at a save against your class DC or be Stunned 1 (or Stunned 3 on a critical failure)."
+        predicate: ["stunning-blows"]
   Tumble Behind (Swashbuckler):
     assoc_charclass:
       - Swashbuckler
@@ -2448,6 +2620,12 @@ pf2e_feats:
     traits:
       - swashbuckler
     rules:
+      - key: "Note"
+        selector: "acrobatics"
+        outcome: ["success", "criticalSuccess"]
+        title: "{item|name}"
+        text: "{item|system.description.value}"
+        predicate: ["action:tumble-through"]
       - key: "RollOption"
         option: "tumble-behind"
         toggleable: true
@@ -2462,6 +2640,12 @@ pf2e_feats:
     shortdesc: Interweaving attacks, you unbalance your foes. Whenever your Strike is a critical hit and deals damage, the target is off-guard against your attacks until the end of your next turn.
     traits:
       - rogue
+    rules:
+      - key: "Note"
+        selector: "strike-damage"
+        outcome: ["criticalSuccess"]
+        title: "{item|name}"
+        text: "{item|system.description.value}"
   Unbalancing Finisher:
     assoc_charclass:
       - Swashbuckler
@@ -2477,10 +2661,15 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
-        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.Unbalancing", "value": "unbalancing"}]
+        suboptions: [{"label": "Unbalancing", "value": "unbalancing"}]
         disabledIf: [{"not": "self:effect:panache"}]
         disabledValue: false
-        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
+        label: "Finisher"
+      - key: "Note"
+        selector: "strike-damage"
+        title: "{item|name}"
+        text: "{item|system.description.value}"
+        predicate: ["finisher:unbalancing"]
   Underhanded Assault:
     assoc_charclass:
       - Rogue
@@ -2720,7 +2909,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "courageous-advance"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Dastardly Dash:
     assoc_charclass:
       - Swashbuckler
@@ -2823,7 +3012,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "divine-infusion"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Double Shot:
     assoc_charclass:
       - Fighter
@@ -2947,8 +3136,8 @@ pf2e_feats:
       - ranger
     rules:
       - key: "AdjustStrike"
-        mode: "multiply"
         property: "range-increment"
+        mode: "multiply"
         definition: ["item:ranged"]
         value: 2
   Favored Prey:
@@ -3032,7 +3221,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "form-control"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Guarded Movement:
     assoc_charclass:
       - Monk
@@ -3121,10 +3310,10 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
-        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.Impaling", "value": "impaling"}]
+        suboptions: [{"label": "Impaling", "value": "impaling"}]
         disabledIf: [{"not": "self:effect:panache"}]
         disabledValue: false
-        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
+        label: "Finisher"
   In Tune:
     assoc_charclass:
       - Bard
@@ -3144,7 +3333,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "in-tune"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Invigorating Elixir:
     assoc_charclass:
       - Alchemist
@@ -3176,7 +3365,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "knowledge-of-shapes"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Leading Dance:
     assoc_charclass:
       - Swashbuckler
@@ -3278,7 +3467,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "melodious-spell"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Mercy:
     assoc_charclass:
       - Champion
@@ -3294,7 +3483,7 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         rollOption: "mercy"
-        choices: [{"label": "PF2E.SpecificRule.Champion.Mercy.Body.Label", "predicate": [{"not": "mercy:body"}], "value": "body"}, {"label": "PF2E.SpecificRule.Champion.Mercy.Grace.Label", "predicate": [{"not": "mercy:grace"}], "value": "grace"}, {"label": "PF2E.SpecificRule.Champion.Mercy.Mind.Label", "predicate": [{"not": "mercy:mind"}], "value": "mind"}]
+        choices: [{"label": "Mercy of the Body", "predicate": [{"not": "mercy:body"}], "value": "body"}, {"label": "Mercy of Grace", "predicate": [{"not": "mercy:grace"}], "value": "grace"}, {"label": "Mercy of the Mind", "predicate": [{"not": "mercy:mind"}], "value": "mind"}]
   Mug:
     assoc_charclass:
       - Rogue
@@ -3461,7 +3650,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "shield-religious-symbol"
         toggleable: true
-        label: "PF2E.SpecificRule.Cleric.RaiseSymbol.RollOptionLabel"
+        label: "Wielding shield as a religious symbol"
         predicate: ["self:shield:equipped", {"not": "emblazon-armament:item:shield"}]
   Rallying Anthem:
     assoc_charclass:
@@ -3676,7 +3865,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "snowdrift-spell"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Spell Protection Array:
     assoc_charclass:
       - Wizard
@@ -3719,7 +3908,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "split-shot"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Stand Still:
     assoc_charclass:
       - Monk
@@ -3804,6 +3993,12 @@ pf2e_feats:
         option: "sympathetic-strike"
         domain: "unarmed-attack-roll"
         toggleable: true
+      - key: "Note"
+        selector: "unarmed-attack-roll"
+        outcome: ["success", "criticalSuccess"]
+        title: "{item|name}"
+        text: "Until the beginning of your next turn, the target takes a \u20131 circumstance penalty to its saves against your hexes, or a \u20132 penalty if the triggering Strike was a critical hit. Effect: Sympathetic Strike"
+        predicate: ["item:tag:witchs-armaments", "sympathetic-strike"]
   Tenacious Toxins:
     assoc_charclass:
       - Alchemist
@@ -3828,7 +4023,19 @@ pf2e_feats:
       - key: "RollOption"
         option: "target:condition:off-guard"
         toggleable: "totm"
-        label: "PF2E.SpecificRule.TOTMToggle.OffGuard"
+        label: "Enable abilities that require an off-guard target"
+      - key: "Note"
+        selector: "skill-check"
+        outcome: ["criticalSuccess"]
+        title: "{item|name}"
+        text: "On a critical success, your target takes ,(((@actor.flags.system.sneakAttackDamage.number)d(@actor.flags.system.sneakAttackDamage.faces))[precision])[bludgeoning]] damage."
+        predicate: ["action:trip", "target:condition:off-guard"]
+      - key: "Note"
+        selector: "skill-check"
+        outcome: ["success"]
+        title: "{item|name}"
+        text: "On a success, your target takes ] damage."
+        predicate: ["action:trip", "target:condition:off-guard"]
   Thousand Visions:
     assoc_charclass:
       - Oracle
@@ -3902,13 +4109,19 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
-        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.TwirlingThrow", "value": "twirling-throw"}]
+        suboptions: [{"label": "Twirling Throw", "value": "twirling-throw"}]
         disabledIf: [{"not": "self:effect:panache"}]
         disabledValue: false
-        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
+        label: "Finisher"
       - key: "RollOption"
         option: "ignore-range-penalty:3"
         domain: "ranged-attack-roll"
+        predicate: ["finisher:twirling-throw"]
+      - key: "Note"
+        selector: "ranged-strike-attack-roll"
+        outcome: ["failure", "success", "criticalSuccess"]
+        title: "{item|name}"
+        text: "The weapon returns to your hand after the attack"
         predicate: ["finisher:twirling-throw"]
   Versatile Signature:
     assoc_charclass:
@@ -3969,7 +4182,7 @@ pf2e_feats:
         definition: ["item:trait:monk", "item:category:advanced"]
         sameAs: "martial"
         slug: "advanced-monastic-weaponry"
-        label: "PF2E.SpecificRule.MartialProficiency.AdvancedMonasticWeaponry"
+        label: "Advanced Monastic Weaponry"
   Advanced Qi Spells:
     grants:
       grant_choice_once:
@@ -4020,7 +4233,7 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         flag: "group"
-        prompt: "PF2E.SpecificRule.Prompt.WeaponGroup"
+        prompt: "Select a weapon group."
         choices: {"config": "weaponGroups"}
       - key: "MartialProficiency"
         definition: ["item:group:{item|flags.system.rulesSelections.group}", "item:category:advanced"]
@@ -4181,6 +4394,13 @@ pf2e_feats:
     shortdesc: You push your foes around and leave bruises. While raging, when you successfully Disarm, Grapple, Reposition, Shove, or Trip an enemy, you deal that enemy bludgeoning damage equal to your Strength modifier; add this to the damage from a critical success to Trip.
     traits:
       - barbarian
+    rules:
+      - key: "Note"
+        selector: "skill-check"
+        outcome: ["criticalSuccess", "success"]
+        title: "{item|name}"
+        text: "{item|system.description.value}"
+        predicate: ["self:effect:rage", {"or": ["action:disarm", "action:grapple", "action:shove", "action:trip"]}]
   Cast Down:
     assoc_charclass:
       - Cleric
@@ -4198,7 +4418,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "cast-down"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Ceremonial Knife:
     assoc_charclass:
       - Witch
@@ -4309,7 +4529,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "current-spell"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Dazing Blow:
     assoc_charclass:
       - Fighter
@@ -4329,6 +4549,12 @@ pf2e_feats:
         selector: "strike-damage"
         override: {"damageType": "bludgeoning"}
         predicate: ["dazing-blow"]
+      - key: "Note"
+        selector: "strike-attack-roll"
+        outcome: ["criticalSuccess", "success"]
+        title: "{item|name}"
+        text: "If the Strike hits, the creature must attempt a save against your class DC; this is an incapacitation effect.%rCritical Success The creature is unaffected.%rSuccess The creature is Stunned 1.%rFailure The creature is Stunned 2.%rCritical Failure The creature is Stunned 3."
+        predicate: ["dazing-blow"]
   Debilitating Bomb:
     assoc_charclass:
       - Alchemist
@@ -4345,6 +4571,12 @@ pf2e_feats:
         option: "debilitating-bomb"
         domain: "alchemical-bomb-base-attack-roll"
         toggleable: true
+      - key: "Note"
+        selector: "alchemical-bomb-base-attack-roll"
+        outcome: ["success", "criticalSuccess"]
+        title: "{item|name}"
+        text: "The target must succed at a , or suffer one of the following effects: dazzled, deafened, off-guard, or take a -5 foot status penalty to Speeds. Effect: Debilitating Bomb"
+        predicate: ["debilitating-bomb", {"not": "feat:greater-debilitating-bomb"}]
   Defensive Coordination:
     assoc_charclass:
       - Bard
@@ -4366,7 +4598,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "defensive-coordination"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Directional Bombs:
     assoc_charclass:
       - Alchemist
@@ -4382,6 +4614,11 @@ pf2e_feats:
         option: "directional-bombs"
         domain: "alchemical-bomb-base-attack-roll"
         toggleable: true
+      - key: "Note"
+        selector: "alchemical-bomb-base-attack-roll"
+        title: "{item|name}"
+        text: "{item|description}"
+        predicate: ["item:trait:splash", "directional-bombs"]
   Dirge of Doom:
     assoc_charclass:
       - Bard
@@ -4430,17 +4667,23 @@ pf2e_feats:
         option: "divine-rebuttal"
         toggleable: true
       - key: "AdjustStrike"
-        mode: "add"
         property: "traits"
+        mode: "add"
         definition: ["item:deity-favored"]
         value: "holy"
         predicate: ["divine-rebuttal", "self:trait:holy"]
       - key: "AdjustStrike"
-        mode: "add"
         property: "traits"
+        mode: "add"
         definition: ["item:deity-favored"]
         value: "unholy"
         predicate: ["divine-rebuttal", "self:trait:unholy"]
+      - key: "Note"
+        selector: "strike-attack-roll"
+        outcome: ["criticalSuccess", "success"]
+        title: "{item|name}"
+        text: "If your Strike hits, all your allies gain a +2 circumstance bonus to the triggering saving throw (or a +3 circumstance bonus on a critical hit). Effect: Divine Rebuttal"
+        predicate: ["divine-rebuttal", "item:deity-favored"]
   Divine Weapon:
     assoc_charclass:
       - Cleric
@@ -4473,7 +4716,7 @@ pf2e_feats:
         toggleable: true
         disabledIf: [{"not": "self:effect:dragon-stance"}]
         disabledValue: false
-        label: "PF2E.SpecificRule.Monk.DragonRoar.Label"
+        label: "First attack vs. frightened creature"
       - key: "FlatModifier"
         selector: "attack-damage"
         type: "circumstance"
@@ -4492,6 +4735,12 @@ pf2e_feats:
       - barbarian
       - concentrate
       - rage
+    rules:
+      - key: "ItemAlteration"
+        itemId: "{item|id}"
+        property: "traits"
+        mode: "add"
+        value: "{actor|flags.system.barbarian.instinct.dragon.tradition}"
   Educate Allies:
     assoc_charclass:
       - Bard
@@ -4554,13 +4803,13 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "explosive-arrival"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
       - key: "RollOption"
         option: "arrival-damage"
         toggleable: true
         alwaysActive: true
-        suboptions: [{"label": "PF2E.TraitFire", "value": "fire"}, {"label": "PF2E.TraitAcid", "value": "acid"}, {"label": "PF2E.TraitCold", "value": "cold"}, {"label": "PF2E.TraitElectricity", "value": "electricity"}, {"label": "PF2E.TraitSonic", "value": "sonic"}, {"label": "PF2E.TraitSpirit", "value": "spirit"}]
-        label: "PF2E.SpecificRule.Wizard.ExplosiveArrival.Label"
+        suboptions: [{"label": "Fire", "value": "fire"}, {"label": "Acid", "value": "acid"}, {"label": "Cold", "value": "cold"}, {"label": "Electricity", "value": "electricity"}, {"label": "Sonic", "value": "sonic"}, {"label": "Spirit", "value": "spirit"}]
+        label: "Explosive Arrival: Creature Trait"
         predicate: ["spellshape:explosive-arrival"]
       - key: "ActiveEffectLike"
         path: "flags.system.spellshape.explosiveArrivalDamage"
@@ -4658,7 +4907,7 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         flag: "lesson"
-        prompt: "PF2E.SpecificRule.Prompt.Lesson"
+        prompt: "Select a lesson."
         choices: {"filter": ["item:tag:witch-lesson", {"lte": ["item:level", 6]}]}
   Green Empathy:
     assoc_charclass:
@@ -4717,7 +4966,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "harmonize"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Inner Strength:
     assoc_charclass:
       - Barbarian
@@ -4884,7 +5133,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "one-inch-punch"
         toggleable: true
-        suboptions: [{"label": "PF2E.SpecificRule.Actions.TwoActions", "value": "two"}, {"label": "PF2E.SpecificRule.Actions.ThreeActions", "value": "three"}]
+        suboptions: [{"label": "Two Actions", "value": "two"}, {"label": "Three Actions", "value": "three"}]
       - key: "DamageDice"
         selector: ["melee-strike-damage", "ranged-strike-damage"]
         diceNumber: "ternary(gte(@actor.level, 18), 3, ternary(gte(@actor.level, 10), 2, 1))"
@@ -4903,6 +5152,13 @@ pf2e_feats:
     shortdesc: Even when your foe avoids your Confident Finisher, you can still hit a vital spot. On a failure with Confident Finisher, you apply your full precise strike damage instead of half.
     traits:
       - swashbuckler
+    rules:
+      - key: "Note"
+        selector: "strike-attack-roll"
+        outcome: ["failure"]
+        title: "{item|name}"
+        text: "On a failure, you apply your )[@item.system.damage.damageType]]{full precise strike damage} instead of half."
+        predicate: [{"or": ["finisher:confident", "eternal-confidence"]}, {"or": ["item:melee", {"and": ["feat:flying-blade", "item:thrown", {"or": ["target:range-increment:1", {"and": ["finisher:twirling-throw", {"lte": ["target:range-increment", 3]}]}]}]}]}, {"or": ["item:trait:agile", "item:trait:finesse"]}]
   Predictive Purchase (Investigator):
     assoc_charclass:
       - Investigator
@@ -4998,7 +5254,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "safeguard-spell"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Scouring Rage:
     assoc_charclass:
       - Barbarian
@@ -5243,6 +5499,13 @@ pf2e_feats:
     shortdesc: You have comprehensive knowledge in your fields of interest. When you succeed at a Recall Knowledge check, you gain additional information or context. When you critically succeed at a check to Recall Knowledge, you get additional information or context or can ask an additional follow-up question (the GM chooses which).
     traits:
       - investigator
+    rules:
+      - key: "Note"
+        selector: "skill-check"
+        outcome: ["success", "criticalSuccess"]
+        title: "{item|name}"
+        text: "{item|description}"
+        predicate: ["action:recall-knowledge"]
   Tiger Slash:
     assoc_charclass:
       - Monk
@@ -5363,6 +5626,12 @@ pf2e_feats:
     traits:
       - detection
       - witch
+    rules:
+      - key: "ItemAlteration"
+        itemId: "{item|id}"
+        property: "traits"
+        mode: "add"
+        value: "{actor|system.proficiencies.aliases.witch}"
   Wolf Drag:
     assoc_charclass:
       - Monk
@@ -5382,6 +5651,18 @@ pf2e_feats:
         toggleable: true
         disabledIf: [{"not": "self:effect:wolf-stance"}]
         disabledValue: false
+      - key: "ItemAlteration"
+        itemType: "weapon"
+        property: "traits"
+        mode: "add"
+        value: "fatal-d12"
+        predicate: ["item:slug:wolf-jaws", "wolf-drag"]
+      - key: "Note"
+        selector: "wolf-jaws-attack"
+        outcome: ["criticalSuccess", "success"]
+        title: "{item|name}"
+        text: "If the attack succeeds, you knock the target Prone."
+        predicate: ["item:slug:wolf-jaws", "wolf-drag"]
   Accompany:
     assoc_charclass:
       - Bard
@@ -5483,10 +5764,10 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
-        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.Bleeding", "value": "bleeding"}]
+        suboptions: [{"label": "Bleeding", "value": "bleeding"}]
         disabledIf: [{"not": "self:effect:panache"}]
         disabledValue: false
-        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
+        label: "Finisher"
       - key: "DamageDice"
         category: "persistent"
         selector: "strike-damage"
@@ -5544,7 +5825,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "bond-conservation"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Bullseye:
     assoc_charclass:
       - Rogue
@@ -5583,7 +5864,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "call-and-response"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Clinging Shadows Initiate:
     grants:
       grant_choice_once:
@@ -5624,6 +5905,12 @@ pf2e_feats:
     shortdesc: Your overwhelming vitality sets undead alight. When you use a *heal* spell to damage undead, each undead that takes damage also takes persistent fire damage equal to the spell's rank.
     traits:
       - cleric
+    rules:
+      - key: "Note"
+        selector: "spell-damage"
+        title: "{item|name}"
+        text: "When you use a heal spell to damage undead, each undead that takes damage also takes ]."
+        predicate: ["item:slug:heal"]
   Crossblooded Evolution:
     assoc_charclass:
       - Sorcerer
@@ -5637,7 +5924,7 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         flag: "bloodline"
-        prompt: "PF2E.SpecificRule.Sorcerer.Bloodline.Prompt"
+        prompt: "Select a bloodline."
         choices: {"filter": ["item:tag:sorcerer-bloodline"]}
   Deadly Aim:
     assoc_charclass:
@@ -5761,14 +6048,14 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
-        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.Dual", "value": "dual"}]
+        suboptions: [{"label": "Dual", "value": "dual"}]
         disabledIf: [{"not": "self:effect:panache"}]
         disabledValue: false
-        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
+        label: "Finisher"
       - key: "RollOption"
         option: "dual-finisher-second"
         toggleable: true
-        label: "PF2E.SpecificRule.Swashbuckler.Finisher.DualSecondAttackLabel"
+        label: "Dual Finisher \u2014 Second Attack"
         predicate: ["finisher:dual"]
       - key: "FlatModifier"
         selector: ["melee-strike-attack-roll"]
@@ -5832,34 +6119,34 @@ pf2e_feats:
         toggleable: true
         alwaysActive: true
         suboptions: [{"label": "{item|name}", "value": "explosion-of-power"}]
-        label: "PF2E.SpecificRule.Sorcerer.Bloodline.BloodMagicDescription.Title"
+        label: "Blood Magic"
       - key: "RollOption"
         option: "second-blood-magic"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "explosion-of-power"}]
-        label: "PF2E.SpecificRule.Sorcerer.SecondBloodMagic"
+        label: "Second Blood Magic"
         predicate: [{"or": ["feat:blood-ascendancy", "feat:blood-sovereignty"]}]
       - key: "DamageAlteration"
-        mode: "override"
         property: "damage-type"
+        mode: "override"
         selectors: ["inline-damage"]
         value: "force"
         predicate: ["explosion-of-power", "feature:bloodline:tradition:arcane"]
       - key: "DamageAlteration"
-        mode: "override"
         property: "damage-type"
+        mode: "override"
         selectors: ["inline-damage"]
         value: "spirit"
         predicate: ["explosion-of-power", "feature:bloodline:tradition:divine"]
       - key: "DamageAlteration"
-        mode: "override"
         property: "damage-type"
+        mode: "override"
         selectors: ["inline-damage"]
         value: "mental"
         predicate: ["explosion-of-power", "feature:bloodline:tradition:occult"]
       - key: "DamageAlteration"
-        mode: "override"
         property: "damage-type"
+        mode: "override"
         selectors: ["inline-damage"]
         value: "fire"
         predicate: ["explosion-of-power", "feature:bloodline:tradition:primal"]
@@ -5949,6 +6236,18 @@ pf2e_feats:
       - key: "RollOption"
         option: "follow-up-assault"
         toggleable: true
+      - key: "ItemAlteration"
+        itemType: "weapon"
+        property: "traits"
+        mode: "add"
+        value: "backswing"
+        predicate: ["item:melee", "follow-up-assault"]
+      - key: "ItemAlteration"
+        itemType: "weapon"
+        property: "traits"
+        mode: "add"
+        value: "forceful"
+        predicate: ["item:melee", "follow-up-assault"]
   Form Retention:
     assoc_charclass:
       - Wizard
@@ -6086,7 +6385,7 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         rollOption: "improved-invigorating-elixir"
-        choices: [{"label": "PF2E.SpecificRule.Alchemist.ImprovedInvigoratingElixir.Mental.Label", "value": "mental"}, {"label": "PF2E.SpecificRule.Alchemist.ImprovedInvigoratingElixir.Physical.Label", "value": "physical"}]
+        choices: [{"label": "Mental Invigoration", "value": "mental"}, {"label": "Physical Invigoration", "value": "physical"}]
   Improved Poison Weapon:
     assoc_charclass:
       - Rogue
@@ -6119,6 +6418,11 @@ pf2e_feats:
         selector: "ranged-attack-roll"
         type: "circumstance"
         value: 2
+        predicate: ["incredible-aim"]
+      - key: "Note"
+        selector: "attack"
+        title: "{item|name}"
+        text: "You ignore the target's @UUID[Compendium.pf2e.conditionitems.Item.Concealed] condition."
         predicate: ["incredible-aim"]
   Incredible Companion (Druid):
     assoc_charclass:
@@ -6228,7 +6532,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "martyr"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Mixed Maneuver:
     assoc_charclass:
       - Monk
@@ -6272,6 +6576,17 @@ pf2e_feats:
     traits:
       - alchemist
     rules:
+      - key: "ItemAlteration"
+        itemType: "weapon"
+        property: "damage-dice-faces"
+        mode: "upgrade"
+        predicate: ["item:tag:bestial-mutagen-strike"]
+      - key: "ItemAlteration"
+        itemType: "weapon"
+        property: "traits"
+        mode: "add"
+        value: "deadly-d10"
+        predicate: ["item:tag:bestial-mutagen-strike"]
       - key: "FlatModifier"
         selector: "intimidation"
         type: "item"
@@ -6454,6 +6769,12 @@ pf2e_feats:
     shortdesc: Even your fears serve as fuel for your fighting spirit. When you critically succeed at a Will save against a foe's ability, you gain a +1 status bonus to saves and a number of temporary Hit Points equal to half your level for 1 minute. These benefits are doubled if you critically succeed against a fear effect.
     traits:
       - fighter
+    rules:
+      - key: "Note"
+        selector: "will"
+        outcome: ["criticalSuccess"]
+        title: "{item|name}"
+        text: "{item|description}"
   Restorative Channel:
     assoc_charclass:
       - Cleric
@@ -6614,10 +6935,16 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
-        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.Stunning", "value": "stunning"}]
+        suboptions: [{"label": "Stunning", "value": "stunning"}]
         disabledIf: [{"not": "self:effect:panache"}]
         disabledValue: false
-        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
+        label: "Finisher"
+      - key: "Note"
+        selector: "strike-attack-roll"
+        outcome: ["success", "criticalSuccess"]
+        title: "{item|name}"
+        text: "{item|description}"
+        predicate: ["finisher:stunning"]
   Sudden Leap:
     assoc_charclass:
       - Barbarian
@@ -6658,7 +6985,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "surging-might"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Swipe Souvenir:
     assoc_charclass:
       - Rogue
@@ -6898,6 +7225,12 @@ pf2e_feats:
     shortdesc: The force of your deity's castigation strengthens your body so you can strike down the enemy and its allies. After you deal spirit damage due to Divine Castigation, your weapon or unarmed Strikes gain your holy or unholy trait and deal additional spirit damage until the end of your turn. The spirit damage is equal to the rank of harm or heal you dealt spirit damage with, and is in addition to any spirit damage the weapon already deals (such as from a *holy* rune).
     traits:
       - cleric
+    rules:
+      - key: "Note"
+        selector: "spell-damage"
+        title: "{item|name}"
+        text: "After you deal spirit damage due to Divine Castigation, your weapon or unarmed Strikes gain your holy or unholy trait and deal additional spirit damage until the end of your turn. Effect: Castigating Weapon"
+        predicate: ["divine-castigation", {"or": ["item:slug:harm", "item:slug:heal"]}]
   Certain Strike:
     assoc_charclass:
       - Fighter
@@ -6959,7 +7292,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "courageous-assault"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Crashing Slam:
     assoc_charclass:
       - Fighter
@@ -7014,6 +7347,11 @@ pf2e_feats:
     traits:
       - fortune
       - swashbuckler
+    rules:
+      - key: "RollTwice"
+        selector: "skill-check"
+        keep: "higher"
+        predicate: ["self:effect:panache", "item:trait:bravado"]
   Devoted Focus:
     assoc_charclass:
       - Champion
@@ -7094,7 +7432,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "energy-fusion"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Expanded Splash:
     assoc_charclass:
       - Alchemist
@@ -7114,6 +7452,11 @@ pf2e_feats:
         type: "status"
         value: "@actor.abilities.int.mod"
         damageCategory: "splash"
+        predicate: ["item:trait:splash", "expanded-splash"]
+      - key: "Note"
+        selector: "alchemical-bomb-damage"
+        title: "{item|name}"
+        text: "The splash damage affects all creatures within 10 feet of the target instead of 5 feet."
         predicate: ["item:trait:splash", "expanded-splash"]
   Fearsome Brute:
     assoc_charclass:
@@ -7196,6 +7539,13 @@ pf2e_feats:
     shortdesc: "You have learned enhanced techniques and alchemical secrets that allow you to expand the range of effects you can impose with your bombs. When you use Debilitating Bomb, add the following to the list you can choose from: clumsy 1, enfeebled 1, stupefied 1, or –10-foot status penalty to Speeds."
     traits:
       - alchemist
+    rules:
+      - key: "Note"
+        selector: "alchemical-bomb-base-attack-roll"
+        outcome: ["success", "criticalSuccess"]
+        title: "{item|name}"
+        text: "The target must succed at a , or suffer one of the following effects: clumsy 1, dazzled, deafened, enfeebled 1, off-guard, stupefied 1, or take a \u201310-foot status penalty to Speeds. Effect: Debilitating Bomb"
+        predicate: ["debilitating-bomb", {"not": "feat:true-debilitating-bomb"}]
   Healing Transformation:
     assoc_charclass:
       - Druid
@@ -7212,7 +7562,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "healing-transformation"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Heroic Recovery:
     assoc_charclass:
       - Cleric
@@ -7232,7 +7582,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "heroic-recovery"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   House of Imaginary Walls:
     assoc_charclass:
       - Bard
@@ -7337,7 +7687,7 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         flag: "lesson"
-        prompt: "PF2E.SpecificRule.Prompt.Lesson"
+        prompt: "Select a lesson."
         choices: {"filter": ["item:tag:witch-lesson", {"lte": ["item:level", 10]}]}
   Master Monster Hunter:
     assoc_charclass:
@@ -7424,6 +7774,13 @@ pf2e_feats:
     traits:
       - barbarian
       - fighter
+    rules:
+      - key: "Note"
+        selector: "athletics"
+        outcome: ["success", "criticalSuccess"]
+        title: "{item|name}"
+        text: "{item|description}"
+        predicate: ["action:barreling-charge"]
   Overwhelming Energy:
     assoc_charclass:
       - Druid
@@ -7445,7 +7802,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "overwhelming-energy"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Peerless Warden:
     assoc_charclass:
       - Ranger
@@ -7542,15 +7899,21 @@ pf2e_feats:
       - druid
     rules:
       - key: "AdjustStrike"
-        mode: "add"
         property: "materials"
+        mode: "add"
         definition: ["item:tag:verdant-weapon"]
         value: "cold-iron"
       - key: "AdjustStrike"
-        mode: "add"
         property: "materials"
+        mode: "add"
         definition: ["item:tag:verdant-weapon"]
         value: "silver"
+      - key: "Note"
+        selector: "strike-damage"
+        outcome: ["criticalSuccess"]
+        title: "{item|name}"
+        text: "If the target has a weakness to cold iron or silver, it also takes ] damage."
+        predicate: ["item:tag:verdant-weapon"]
   Quickened Casting:
     assoc_charclass:
       - Bard
@@ -7576,7 +7939,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "quickened-casting"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Radiant Armament:
     assoc_charclass:
       - Champion
@@ -7611,6 +7974,12 @@ pf2e_feats:
     shortdesc: Striking out against your enemies draws praise and protection from your deity. When you damage a creature with a Strike using your deity's favored weapon, you gain a number of temporary Hit Points equal to half your level, or equal to your level if the Strike was a critical hit. These temporary Hit Points last until the start of your next turn.
     traits:
       - cleric
+    rules:
+      - key: "Note"
+        selector: "strike-damage"
+        title: "{item|name}"
+        text: "When you damage a creature with a Strike using your deity's favored weapon, you gain a number of temporary Hit Points equal to half your level, or equal to your level if the Strike was a critical hit. Effect: Replenishment of War"
+        predicate: ["item:deity-favored"]
   Resounding Blow:
     assoc_charclass:
       - Barbarian
@@ -7782,10 +8151,16 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
-        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.Stumbling", "value": "stumbling"}]
+        suboptions: [{"label": "Stumbling", "value": "stumbling"}]
         disabledIf: [{"not": "self:effect:panache"}]
         disabledValue: false
-        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
+        label: "Finisher"
+      - key: "Note"
+        selector: "strike-attack-roll"
+        outcome: ["success", "criticalSuccess"]
+        title: "{item|name}"
+        text: "{item|description}"
+        predicate: ["finisher:stumbling"]
   Suspect of Opportunity:
     assoc_charclass:
       - Investigator
@@ -7866,10 +8241,16 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
-        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.Targeting", "value": "targeting"}]
+        suboptions: [{"label": "Targeting", "value": "targeting"}]
         disabledIf: [{"not": "self:effect:panache"}]
         disabledValue: false
-        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
+        label: "Finisher"
+      - key: "Note"
+        selector: "strike-damage"
+        outcome: ["success", "criticalSuccess"]
+        title: "{item|name}"
+        text: "{item|system.description.value}"
+        predicate: ["finisher:targeting"]
   Terrifying Howl:
     assoc_charclass:
       - Barbarian
@@ -7915,7 +8296,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "thunderclap-spell"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Trial by Skyfire:
     assoc_charclass:
       - Oracle
@@ -7974,7 +8355,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "unusual-composition"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Vicious Debilitations:
     assoc_charclass:
       - Rogue
@@ -8158,6 +8539,12 @@ pf2e_feats:
         selector: "melee-strike-damage"
         diceNumber: "ternary(gte(@actor.level,18),2,1)"
         predicate: ["item:type:weapon", "brutal-finish"]
+      - key: "Note"
+        selector: "melee-strike-attack-roll"
+        outcome: ["failure"]
+        title: "Failure"
+        text: "You deal ] damage."
+        predicate: ["brutal-finish", "item:type:weapon"]
   Champion's Sacrifice:
     assoc_charclass:
       - Champion
@@ -8243,7 +8630,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "defensive-recovery"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Disrupt Qi:
     assoc_charclass:
       - Monk
@@ -8290,7 +8677,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "dodging-roll"
         toggleable: true
-        suboptions: [{"label": "PF2E.SpecificRule.Monk.DodgingRoll.StepIn", "value": "in"}, {"label": "PF2E.SpecificRule.Monk.DodgingRoll.StepOut", "value": "out"}]
+        suboptions: [{"label": "Step into effect's area", "value": "in"}, {"label": "Step out of effect's area", "value": "out"}]
       - key: "Resistance"
         type: "all-damage"
         value: "@actor.level"
@@ -8358,6 +8745,12 @@ pf2e_feats:
       - barbarian
       - morph
       - rage
+    rules:
+      - key: "ItemAlteration"
+        itemId: "{item|id}"
+        property: "traits"
+        mode: "add"
+        value: "{actor|flags.system.barbarian.instinct.dragon.tradition}"
   Dueling Dance (Fighter):
     assoc_charclass:
       - Fighter
@@ -8517,7 +8910,7 @@ pf2e_feats:
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "forcible-energy"}]
         value: true
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Foresee Danger:
     assoc_charclass:
       - Investigator
@@ -8569,7 +8962,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "garland-spell"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Get Used to Disappointment:
     assoc_charclass:
       - Swashbuckler
@@ -8745,6 +9138,13 @@ pf2e_feats:
     shortdesc: Your line of questioning lets a suspect know you can see right through them, shaking them to the core. When you succeed at using Pointed Question, the target is also frightened 1 (or frightened 2 on a critical success). This added effect is an emotion and fear effect, but the other effects of Pointed Question still apply even if the target is immune to fear.
     traits:
       - investigator
+    rules:
+      - key: "Note"
+        selector: "diplomacy"
+        outcome: ["success", "criticalSuccess"]
+        title: "{item|name}"
+        text: "{item|description}"
+        predicate: ["action:pointed-question"]
   Meditative Focus:
     assoc_charclass:
       - Monk
@@ -8773,10 +9173,10 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
-        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.Mobile", "value": "mobile"}]
+        suboptions: [{"label": "Mobile", "value": "mobile"}]
         disabledIf: [{"not": "self:effect:panache"}]
         disabledValue: false
-        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
+        label: "Finisher"
   Overwhelming Breath:
     assoc_charclass:
       - Monk
@@ -8796,7 +9196,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "overwhelming-breath"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Predator's Pounce:
     assoc_charclass:
       - Barbarian
@@ -8874,6 +9274,11 @@ pf2e_feats:
     shortdesc: "**Trigger** You roll initiative%r%rYou enter a stance without a thought. Use an action that has the stance trait."
     traits:
       - monk
+    rules:
+      - key: "Note"
+        selector: "initiative"
+        title: "{item|name} <span class=\"action-glyph\">F</span>"
+        text: "{item|description}"
   Reverberate:
     assoc_charclass:
       - Bard
@@ -8955,6 +9360,12 @@ pf2e_feats:
     shortdesc: When your deity blesses your warlike acts, you can extend that favor to your allies. You can grant the temporary Hit Points from Replenishment of War to an ally within 10 feet instead of gaining them yourself. You can grant these temporary Hit Points to a different ally each time, meaning you might be able to grant them to multiple creatures in a single turn.
     traits:
       - cleric
+    rules:
+      - key: "Note"
+        selector: "strike-damage"
+        title: "{item|name}"
+        text: "You can grant the temporary Hit Points from Replenishment of War to an ally within 10 feet instead of gaining them yourself."
+        predicate: ["item:deity-favored"]
   Side by Side (Ranger):
     assoc_charclass:
       - Ranger
@@ -9053,12 +9464,12 @@ pf2e_feats:
         toggleable: true
         alwaysActive: true
         suboptions: [{"label": "{item|name}", "value": "terraforming-trickery"}]
-        label: "PF2E.SpecificRule.Sorcerer.Bloodline.BloodMagicDescription.Title"
+        label: "Blood Magic"
       - key: "RollOption"
         option: "second-blood-magic"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "terraforming-trickery"}]
-        label: "PF2E.SpecificRule.Sorcerer.SecondBloodMagic"
+        label: "Second Blood Magic"
         predicate: [{"or": ["feat:blood-ascendancy", "feat:blood-sovereignty"]}]
   The Bigger They Are:
     assoc_charclass:
@@ -9076,6 +9487,18 @@ pf2e_feats:
         option: "the-bigger-they-are"
         domain: "skill-check"
         toggleable: true
+      - key: "Note"
+        selector: "skill-check"
+        outcome: ["criticalSuccess"]
+        title: "{item|name}"
+        text: "On a critical success, if you successfully pass through the target's square, the target gains weakness to your precision damage until the end of your turn. Effect: The Bigger They Are"
+        predicate: ["action:tumble-through", "the-bigger-they-are", {"gt": ["target:size", "self:size"]}]
+      - key: "Note"
+        selector: "skill-check"
+        outcome: ["success"]
+        title: "{item|name}"
+        text: "On a success, if you successfully pass through the target's square, the target gains weakness to your precision damage for your next attack. Effect: The Bigger They Are"
+        predicate: ["action:tumble-through", "the-bigger-they-are", {"gt": ["target:size", "self:size"]}]
   Titan's Stature:
     assoc_charclass:
       - Barbarian
@@ -9113,10 +9536,15 @@ pf2e_feats:
       - alchemist
     rules:
       - key: "AdjustStrike"
-        mode: "upgrade"
         property: "range-increment"
+        mode: "upgrade"
         definition: ["item:base:alchemical-bomb"]
         value: 60
+      - key: "Note"
+        selector: "alchemical-bomb-base-attack-roll"
+        title: "{item|name}"
+        text: "You automatically succeed at the flat check when targeting a Concealed creature."
+        predicate: ["target:condition:concealed"]
   Uplifting Winds:
     assoc_charclass:
       - Druid
@@ -9353,7 +9781,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "ebb-and-flow"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Fast Channel:
     assoc_charclass:
       - Cleric
@@ -9454,12 +9882,18 @@ pf2e_feats:
       - key: "RollOption"
         option: "impossible-riposte"
         toggleable: true
-        suboptions: [{"label": "PF2E.TraitBludgeoning", "value": "bludgeoning"}, {"label": "PF2E.TraitPiercing", "value": "piercing"}, {"label": "PF2E.TraitSlashing", "value": "slashing"}, {"label": "PF2E.TraitAcid", "value": "acid"}, {"label": "PF2E.TraitCold", "value": "cold"}, {"label": "PF2E.TraitElectricity", "value": "electricity"}, {"label": "PF2E.TraitFire", "value": "fire"}, {"label": "PF2E.TraitSonic", "value": "sonic"}, {"label": "PF2E.TraitVitality", "value": "vitality"}, {"label": "PF2E.TraitVoid", "value": "void"}, {"label": "PF2E.TraitForce", "value": "force"}, {"label": "PF2E.TraitSpirit", "value": "spirit"}, {"label": "PF2E.TraitMental", "value": "mental"}, {"label": "PF2E.TraitPoison", "value": "poison"}, {"label": "PF2E.TraitBleed", "value": "bleed"}]
+        suboptions: [{"label": "Bludgeoning", "value": "bludgeoning"}, {"label": "Piercing", "value": "piercing"}, {"label": "Slashing", "value": "slashing"}, {"label": "Acid", "value": "acid"}, {"label": "Cold", "value": "cold"}, {"label": "Electricity", "value": "electricity"}, {"label": "Fire", "value": "fire"}, {"label": "Sonic", "value": "sonic"}, {"label": "Vitality", "value": "vitality"}, {"label": "Void", "value": "void"}, {"label": "Force", "value": "force"}, {"label": "Spirit", "value": "spirit"}, {"label": "Mental", "value": "mental"}, {"label": "Poison", "value": "poison"}, {"label": "Bleed", "value": "bleed"}]
         disabledIf: [{"not": "opportune-riposte"}]
         disabledValue: false
-      - key: "DamageAlteration"
-        mode: "override"
+      - key: "ItemAlteration"
+        itemType: "weapon"
         property: "damage-type"
+        mode: "override"
+        value: "{item|flags.system.rulesSelections.impossibleRiposte}"
+        predicate: ["impossible-riposte"]
+      - key: "DamageAlteration"
+        property: "damage-type"
+        mode: "override"
         selectors: ["strike-damage"]
         value: "{item|flags.system.rulesSelections.impossibleRiposte}"
         predicate: ["impossible-riposte"]
@@ -9504,7 +9938,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "interweave-dispel"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Ironblood Surge:
     assoc_charclass:
       - Monk
@@ -9660,10 +10094,15 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
-        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.Perfect", "value": "perfect"}]
+        suboptions: [{"label": "Perfect", "value": "perfect"}]
         disabledIf: [{"not": "self:effect:panache"}]
         disabledValue: false
-        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
+        label: "Finisher"
+      - key: "RollTwice"
+        selector: "strike-attack-roll"
+        keep: "higher"
+        removeAfterRoll: false
+        predicate: ["finisher:perfect"]
   Plot the Future:
     assoc_charclass:
       - Investigator
@@ -9721,12 +10160,12 @@ pf2e_feats:
         toggleable: true
         alwaysActive: true
         suboptions: [{"label": "{item|name}", "value": "reflect-harm"}]
-        label: "PF2E.SpecificRule.Sorcerer.Bloodline.BloodMagicDescription.Title"
+        label: "Blood Magic"
       - key: "RollOption"
         option: "second-blood-magic"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "reflect-harm"}]
-        label: "PF2E.SpecificRule.Sorcerer.SecondBloodMagic"
+        label: "Second Blood Magic"
         predicate: [{"or": ["feat:blood-ascendancy", "feat:blood-sovereignty"]}]
   Reflect Spell:
     assoc_charclass:
@@ -9781,13 +10220,13 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "secondary-detonation-array"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
       - key: "RollOption"
         option: "array-damage"
         toggleable: true
         alwaysActive: true
-        suboptions: [{"label": "PF2E.TraitAcid", "value": "acid"}, {"label": "PF2E.TraitCold", "value": "cold"}, {"label": "PF2E.TraitElectricity", "value": "electricity"}, {"label": "PF2E.TraitFire", "value": "fire"}, {"label": "PF2E.TraitForce", "value": "force"}, {"label": "PF2E.TraitMental", "value": "mental"}, {"label": "PF2E.TraitPoison", "value": "poison"}, {"label": "PF2E.TraitSonic", "value": "sonic"}]
-        label: "PF2E.SpecificRule.Prompt.DamageType"
+        suboptions: [{"label": "Acid", "value": "acid"}, {"label": "Cold", "value": "cold"}, {"label": "Electricity", "value": "electricity"}, {"label": "Fire", "value": "fire"}, {"label": "Force", "value": "force"}, {"label": "Mental", "value": "mental"}, {"label": "Poison", "value": "poison"}, {"label": "Sonic", "value": "sonic"}]
+        label: "Select a damage type."
         predicate: ["spellshape:secondary-detonation-array"]
       - key: "ActiveEffectLike"
         path: "flags.system.spellshape.arrayDamage"
@@ -9868,7 +10307,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "sow-spell"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Specialized Companion (Druid):
     repeatable: 3
     assoc_charclass:
@@ -9899,7 +10338,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "spell-shroud"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Stay Down!:
     assoc_charclass:
       - Rogue
@@ -9934,6 +10373,13 @@ pf2e_feats:
     shortdesc: Your plans account for your foes' resistances, enabling you to strike a telling blow. When you hit with a Strike on which you substituted your attack roll due to Devise a Stratagem, you ignore an amount of resistance equal to your Intelligence modifier for each resistance that applies against your attack.
     traits:
       - investigator
+    rules:
+      - key: "Note"
+        selector: "strike-attack-roll"
+        outcome: ["success", "criticalSuccess"]
+        title: "{item|name}"
+        text: "{item|description}"
+        predicate: ["target:mark:devise-a-stratagem"]
   Sunder Enchantment:
     assoc_charclass:
       - Barbarian
@@ -10005,6 +10451,12 @@ pf2e_feats:
     shortdesc: "**Trigger** You critically hit a foe with a melee weapon Strike or a melee unarmed attack.%r%rWith a triumphant shout, you inspire your allies. You cast a composition cantrip you know that normally takes a single action to cast."
     traits:
       - bard
+    rules:
+      - key: "Note"
+        selector: "melee-strike-attack-roll"
+        outcome: ["criticalSuccess"]
+        title: "{item|name}"
+        text: "With a triumphant shout, you inspire your allies. You cast a composition cantrip you know that normally takes a single action to cast."
   True Debilitating Bomb:
     assoc_charclass:
       - Alchemist
@@ -10017,6 +10469,13 @@ pf2e_feats:
     shortdesc: "You have discovered increasingly devastating ways for your bombs to impede your foes. When you use Debilitating Bomb, add the following to the list of effects you can choose from: enfeebled 2, stupefied 2, or a –15-foot status penalty to Speeds."
     traits:
       - alchemist
+    rules:
+      - key: "Note"
+        selector: "alchemical-bomb-base-attack-roll"
+        outcome: ["success", "criticalSuccess"]
+        title: "{item|name}"
+        text: "The target must succed at a , or suffer one of the following effects: clumsy 1, dazzled, deafened, enfeebled 2, off-guard, stupefied 2, or take a \u201315-foot status penalty to Speeds. Effect: Debilitating Bomb"
+        predicate: ["debilitating-bomb"]
   True Hypercognition:
     assoc_charclass:
       - Bard
@@ -10082,7 +10541,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "vigorous-anthem"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Warden's Guidance:
     assoc_charclass:
       - Ranger
@@ -10229,7 +10688,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "courageous-onslaught"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Deadly Grace:
     assoc_charclass:
       - Swashbuckler
@@ -10241,9 +10700,15 @@ pf2e_feats:
     traits:
       - swashbuckler
     rules:
+      - key: "ItemAlteration"
+        itemType: "weapon"
+        property: "traits"
+        mode: "add"
+        value: "deadly-d8"
+        predicate: ["item:tag:deadly-from-deadly-grace"]
       - key: "DamageAlteration"
-        mode: "multiply"
         property: "dice-number"
+        mode: "multiply"
         selectors: ["strike-damage"]
         value: 2
         predicate: [{"not": "item:tag:deadly-from-deadly-grace"}, {"or": ["item:trait:agile", "item:trait:finesse"]}, {"or": ["dice:slug:deadly-d4", "dice:slug:deadly-d6", "dice:slug:deadly-d8", "dice:slug:deadly-d10", "dice:slug:deadly-d12"]}]
@@ -10295,12 +10760,12 @@ pf2e_feats:
       - key: "ChoiceSet"
         flag: "diverseMystery"
         rollOption: "diverse-mystery"
-        prompt: "PF2E.SpecificRule.Prompt.Spell"
+        prompt: "Select a spell."
         choices: {"filter": ["item:trait:focus", "item:trait:oracle", {"lte": ["item:rank", 3]}], "itemType": "spell", "slugsAsValues": true}
       - key: "RollOption"
         option: "used-diverse-mystery"
         toggleable: true
-        label: "PF2E.SpecificRule.Oracle.DiverseMystery.Toggle"
+        label: "Used Diverse Mystery cursebound spell"
       - key: "Weakness"
         type: "spells"
         value: 2
@@ -10415,6 +10880,11 @@ pf2e_feats:
       - additive
       - alchemist
     rules:
+      - key: "Note"
+        selector: "attack-roll"
+        title: "{item|name}"
+        text: "The bomb reduces one resistance the enemy has to its damage type by an amount equal to your level, but only for that attack."
+        predicate: ["alchemical", "bomb", "explotive-bomb"]
       - key: "RollOption"
         option: "exploitive-bomb"
         domain: "attack-roll"
@@ -10430,6 +10900,11 @@ pf2e_feats:
     traits:
       - fortune
       - swashbuckler
+    rules:
+      - key: "RollTwice"
+        selector: "strike-attack-roll"
+        keep: "higher"
+        predicate: ["opportune-riposte"]
   Furious Vengeance:
     assoc_charclass:
       - Barbarian
@@ -10563,6 +11038,12 @@ pf2e_feats:
         diceNumber: 1
         critical: true
         predicate: [{"or": ["blessed-counterstrike", "retributive-strike"]}]
+      - key: "Note"
+        selector: "strike-attack-roll"
+        outcome: ["criticalSuccess"]
+        title: "{item|name}"
+        text: "{item|description}"
+        predicate: [{"or": ["blessed-counterstrike", "retributive-strike"]}]
   Legendary Monster Hunter:
     assoc_charclass:
       - Ranger
@@ -10654,6 +11135,12 @@ pf2e_feats:
     shortdesc: "Your punches have incredible force and control. When you damage a target using One-Inch Punch, you can focus your qi to send the foe flying. If you do, the target must attempt a Fortitude save against your class DC.%r%r**Critical Success** The target is unaffected.%r**Success** The target is pushed back 5 feet.%r**Failure** The target is pushed back 10 feet.%r**Critical Failure** The target is pushed back 10 feet for each action you spent on One-Inch Punch."
     traits:
       - monk
+    rules:
+      - key: "Note"
+        selector: ["melee-strike-damage", "ranged-strike-damage"]
+        title: "{item|name}"
+        text: "{item|system.description.value}"
+        predicate: [{"or": ["unarmed", {"and": ["feat:monastic-weaponry", "item:trait:monk"]}, {"and": ["monastic-archer:half-increment", "item:group:bow"]}]}, {"or": ["one-inch-punch:three", "one-inch-punch:two"]}]
   Overwhelming Blow:
     assoc_charclass:
       - Fighter
@@ -10668,7 +11155,13 @@ pf2e_feats:
       - key: "RollOption"
         option: "overwhelming-blow"
         toggleable: true
-        label: "PF2E.SpecificRule.OverwhelmingBlow.CriticalHit"
+        label: "Critically hit with Overwhelming Blow"
+      - key: "ItemAlteration"
+        itemType: "weapon"
+        property: "traits"
+        mode: "add"
+        value: "deadly-d12"
+        predicate: ["overwhelming-blow"]
   Penetrating Projectile:
     assoc_charclass:
       - Barbarian
@@ -10723,7 +11216,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "portentous-spell"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Rebounding Smite:
     assoc_charclass:
       - Cleric
@@ -10766,7 +11259,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "remediate"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Resounding Finale:
     assoc_charclass:
       - Bard
@@ -10804,10 +11297,16 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
-        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.Revitalizing", "value": "revitalizing"}]
+        suboptions: [{"label": "Revitalizing", "value": "revitalizing"}]
         disabledIf: [{"not": "self:effect:panache"}]
         disabledValue: false
-        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
+        label: "Finisher"
+      - key: "Note"
+        selector: "strike-attack-roll"
+        outcome: ["failure", "success", "criticalSuccess"]
+        title: "{item|name}"
+        text: "{item|description}"
+        predicate: ["finisher:revitalizing"]
   Scintillating Spell:
     assoc_charclass:
       - Sorcerer
@@ -10828,7 +11327,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "scintillating-spell"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Shattering Blows:
     assoc_charclass:
       - Barbarian
@@ -10872,6 +11371,12 @@ pf2e_feats:
     shortdesc: "**Frequency** once per day%r%r**Requirements** You haven't acted yet on your turn.%r%rYou draw upon the reservoir of your patron's magic that resides within your familiar. During your turn, you can cast one spell your familiar knows that was granted by your patron or lessons without spending a spell slot to do so (or even having it prepared). The spell must be at least 1 rank lower than your highest-rank witch spell slot.%r%r**Special** This feat has the trait corresponding to the tradition of spells you cast (arcane, divine, occult, or primal)."
     traits:
       - witch
+    rules:
+      - key: "ItemAlteration"
+        itemId: "{item|id}"
+        property: "traits"
+        mode: "add"
+        value: "{actor|system.proficiencies.aliases.witch}"
   Specialized Companion (Ranger):
     repeatable: 3
     assoc_charclass:
@@ -11010,9 +11515,21 @@ pf2e_feats:
     traits:
       - monk
     rules:
+      - key: "ItemAlteration"
+        itemType: "weapon"
+        property: "traits"
+        mode: "add"
+        value: "deadly-d10"
+        predicate: ["item:category:unarmed"]
+      - key: "ItemAlteration"
+        itemType: "weapon"
+        property: "traits"
+        mode: "add"
+        value: "forceful"
+        predicate: ["item:category:unarmed"]
       - key: "DamageAlteration"
-        mode: "upgrade"
         property: "dice-faces"
+        mode: "upgrade"
         selectors: ["unarmed-damage"]
         slug: "base"
         predicate: ["item:tag:diamond-fists-dice-upgrade"]
@@ -11069,7 +11586,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "echoing-channel"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Echoing Spell:
     assoc_charclass:
       - Sorcerer
@@ -11087,7 +11604,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "echoing-spell"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Eternal Composition:
     assoc_charclass:
       - Bard
@@ -11249,6 +11766,11 @@ pf2e_feats:
     traits:
       - fortune
       - swashbuckler
+    rules:
+      - key: "RollTwice"
+        selector: "saving-throw"
+        keep: "higher"
+        predicate: ["charmed-life"]
   Infinite Possibilities:
     assoc_charclass:
       - Wizard
@@ -11310,10 +11832,15 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
-        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.Lethal", "value": "lethal"}]
+        suboptions: [{"label": "Lethal", "value": "lethal"}]
         disabledIf: [{"not": "self:effect:panache"}]
         disabledValue: false
-        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
+        label: "Finisher"
+      - key: "Note"
+        selector: "strike-attack-roll"
+        title: "{item|name}"
+        text: "{item|system.description.value}"
+        predicate: ["finisher:lethal"]
   Manifold Edge:
     assoc_charclass:
       - Ranger
@@ -11410,6 +11937,12 @@ pf2e_feats:
     shortdesc: You have perfected the formulas for bombs that impede your enemies. When you use Debilitating Bomb, your target avoids the condition the bomb imposes only if it critically succeeds at its saving throw.
     traits:
       - alchemist
+    rules:
+      - key: "Note"
+        selector: "attack-roll"
+        title: "{item|name}"
+        text: "If your bomb hits, the target must critically succed at its Fortitude save to avoid the condition the bomb imposes."
+        predicate: ["alchemical", "bomb", "debilitating-bomb"]
   Perfect Form Control:
     assoc_charclass:
       - Druid
@@ -11540,6 +12073,12 @@ pf2e_feats:
     shortdesc: You can project your premonitions of clarity to your allies. When you use Premonition of Clarity, allies within 15 feet of you who failed the same saving throw against the same mental effect can also spend their reactions to reroll the failed saving throw with a +2 circumstance bonus.
     traits:
       - cleric
+    rules:
+      - key: "Note"
+        selector: "saving-throw"
+        title: "{item|name}"
+        text: "{item|description}"
+        predicate: ["self:effect:premonition-of-clarity"]
   Smash from the Air:
     assoc_charclass:
       - Fighter
@@ -11569,7 +12108,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "split-hex"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Swift Retribution:
     assoc_charclass:
       - Champion
@@ -11755,7 +12294,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "bloodline-conduit"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Bloodline Mutation:
     assoc_charclass:
       - Sorcerer
@@ -11769,28 +12308,28 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         flag: "traitOne"
-        prompt: "PF2E.SpecificRule.Sorcerer.BloodlineMutation.TraitPrompt"
+        prompt: "Select a trait associated with your bloodline."
         choices: {"config": "creatureTraits"}
       - key: "ChoiceSet"
         rollOption: "bloodline-mutation-traits"
-        prompt: "PF2E.SpecificRule.Sorcerer.BloodlineMutation.SecondTraitPrompt"
-        choices: [{"label": "PF2E.UI.RuleElements.ChoiceSet.YesLabel", "value": "second-trait"}, {"label": "PF2E.UI.RuleElements.ChoiceSet.NoLabel", "value": "no-second-trait"}]
+        prompt: "Does your bloodline have a second associated trait?"
+        choices: [{"label": "Yes", "value": "second-trait"}, {"label": "No", "value": "no-second-trait"}]
       - key: "ChoiceSet"
         flag: "traitTwo"
-        prompt: "PF2E.SpecificRule.Sorcerer.BloodlineMutation.TraitPrompt"
+        prompt: "Select a trait associated with your bloodline."
         choices: {"config": "creatureTraits"}
         predicate: ["bloodline-mutation-traits:second-trait"]
       - key: "ChoiceSet"
         flag: "sense"
         rollOption: "bloodline-mutation-sense"
-        choices: [{"label": "PF2E.Actor.Creature.Sense.Type.Darkvision", "value": "darkvision"}, {"label": "PF2E.Actor.Creature.Sense.Type.LowLightVision", "value": "low-light-vision"}]
+        choices: [{"label": "Darkvision", "value": "darkvision"}, {"label": "Low-Light Vision", "value": "low-light-vision"}]
         allowNoSelection: true
       - key: "ChoiceSet"
         rollOption: "bloodline-mutation-benefit"
-        choices: [{"label": "PF2E.Actor.Speed.Type.Fly", "value": "fly"}, {"label": "PF2E.TraitAmphibious", "value": "amphibious"}, {"label": "PF2E.RuleElement.Resistance", "value": "resistance"}]
+        choices: [{"label": "Fly", "value": "fly"}, {"label": "Amphibious", "value": "amphibious"}, {"label": "Resistance", "value": "resistance"}]
       - key: "ChoiceSet"
         flag: "damageType"
-        choices: [{"label": "PF2E.TraitAcid", "value": "acid"}, {"label": "PF2E.TraitCold", "value": "cold"}, {"label": "PF2E.TraitElectricity", "value": "electricity"}, {"label": "PF2E.TraitFire", "value": "fire"}, {"label": "PF2E.TraitSonic", "value": "sonic"}, {"label": "PF2E.TraitVoid", "value": "void"}]
+        choices: [{"label": "Acid", "value": "acid"}, {"label": "Cold", "value": "cold"}, {"label": "Electricity", "value": "electricity"}, {"label": "Fire", "value": "fire"}, {"label": "Sonic", "value": "sonic"}, {"label": "Void", "value": "void"}]
         predicate: ["bloodline-mutation-benefit:resistance"]
       - key: "Sense"
         selector: "low-light-vision"
@@ -11955,8 +12494,8 @@ pf2e_feats:
         disabledIf: [{"not": "finisher"}]
         disabledValue: false
       - key: "AdjustStrike"
-        mode: "add"
         property: "traits"
+        mode: "add"
         value: "bravado"
         predicate: ["finisher:illimitable"]
   Immortal Techniques:
@@ -12059,7 +12598,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "ley-line-conduit"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Lightning Qi:
     assoc_charclass:
       - Monk
@@ -12109,7 +12648,7 @@ pf2e_feats:
         option: "spellshape"
         toggleable: true
         suboptions: [{"label": "{item|name}", "value": "mystery-conduit"}]
-        label: "PF2E.TraitSpellshape"
+        label: "Spellshape"
   Oracular Providence:
     assoc_charclass:
       - Oracle
@@ -12220,18 +12759,18 @@ pf2e_feats:
         definition: [{"or": ["damage:type:bludgeoning", "damage:type:piercing", "damage:type:slashing"]}]
         type: "custom"
         value: 5
-        label: "PF2E.IWR.Custom.BludgeoningPiercingSlashing"
+        label: "bludgeoning, piercing and slashing damage"
       - key: "Resistance"
         definition: [{"or": ["damage:type:bludgeoning", "damage:type:piercing", "damage:type:slashing"]}, "origin:trait:unholy"]
         type: "custom"
         value: 10
-        label: "PF2E.IWR.Custom.UnholyBludgeoningPiercingSlashing"
+        label: "unholy bludgeoning, piercing and slashing damage"
         predicate: ["self:trait:holy"]
       - key: "Resistance"
         definition: [{"or": ["damage:type:bludgeoning", "damage:type:piercing", "damage:type:slashing"]}, "origin:trait:holy"]
         type: "custom"
         value: 10
-        label: "PF2E.IWR.Custom.HolyBludgeoningPiercingSlashing"
+        label: "holy bludgeoning, piercing and slashing damage"
         predicate: ["self:trait:unholy"]
   Shield Paragon:
     assoc_charclass:

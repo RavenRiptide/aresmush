@@ -92,7 +92,7 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         flag: "assurance"
-        prompt: "PF2E.SpecificRule.Prompt.Skill"
+        prompt: "Select a skill."
         choices: {"config": "skills", "predicate": [{"gte": ["skill:{choice|value}:rank", 1]}]}
   Battle Medicine:
     feat_type:
@@ -139,6 +139,13 @@ pf2e_feats:
     prereq:
       level: 1
       skill: Deception/trained
+    rules:
+      - key: "Note"
+        selector: "skill-check"
+        outcome: ["criticalSuccess"]
+        title: "{item|name}"
+        text: "When you get a critical success using the Lie action, the target's attitude toward you improves by one step, as though you'd succeeded at using Diplomacy to Make an Impression."
+        predicate: ["action:lie"]
   Combat Climber:
     feat_type:
       - Skill
@@ -205,6 +212,13 @@ pf2e_feats:
     prereq:
       level: 1
       skill: A Skill With The Recall Knowledge Action/trained
+    rules:
+      - key: "Note"
+        selector: "skill-check"
+        outcome: ["failure"]
+        title: "{item|name}"
+        text: "When you fail (but don't critically fail) a Recall Knowledge check using any skill, you learn the correct answer and an erroneous answer, but you don't have any way to differentiate which is which."
+        predicate: ["action:recall-knowledge"]
   Experienced Smuggler:
     feat_type:
       - Skill
@@ -272,6 +286,11 @@ pf2e_feats:
       - key: "AdjustDegreeOfSuccess"
         selector: "survival"
         adjustment: {"criticalFailure": "to-success", "failure": "to-success"}
+        predicate: ["action:subsist"]
+      - key: "Note"
+        selector: "survival"
+        title: "{item|name}"
+        text: "While using Survival to Subsist, if you roll any result worse than a success, you get a success. You can also provide for multiple creatures."
         predicate: ["action:subsist"]
   Forensic Acumen:
     feat_type:
@@ -388,6 +407,13 @@ pf2e_feats:
     prereq:
       level: 1
       skill: Deception/trained
+    rules:
+      - key: "Note"
+        selector: "deception"
+        outcome: ["criticalSuccess"]
+        title: "{item|name}"
+        text: "{item|description}"
+        predicate: ["action:create-a-diversion"]
   Lie to Me:
     feat_type:
       - Skill
@@ -591,7 +617,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "recognize-spell"
         toggleable: true
-        label: "PF2E.SpecificRule.SkillFeat.RecognizeSpell.RollOptionLabel"
+        label: "Critical success on Recognize Spell"
       - key: "FlatModifier"
         selector: ["ac", "saving-throw"]
         type: "circumstance"
@@ -615,6 +641,11 @@ pf2e_feats:
         selector: "medicine"
         type: "circumstance"
         value: 2
+        predicate: ["action:treat-wounds", "risky-surgery"]
+      - key: "Note"
+        selector: "medicine"
+        title: "{item|name}"
+        text: "When you Treat Wounds, you can deal ] damage to your patient just before applying the effects of the Treat Wounds. If you do, gain a +2 circumstance bonus to your Medicine check to Treat Wounds, and if you roll a success, you get a critical success instead."
         predicate: ["action:treat-wounds", "risky-surgery"]
       - key: "AdjustDegreeOfSuccess"
         selector: "medicine"
@@ -675,7 +706,7 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         flag: "skill"
-        prompt: "PF2E.SpecificRule.Prompt.Skill"
+        prompt: "Select a skill."
         choices: {"config": "skills", "predicate": ["skill:{choice|value}:rank:0"]}
       - key: "ActiveEffectLike"
         path: "system.skills.{item|flags.system.rulesSelections.skill}.rank"
@@ -703,8 +734,8 @@ pf2e_feats:
       - key: "ChoiceSet"
         flag: "specialtyCrafting"
         rollOption: "feat:specialty-crafting"
-        prompt: "PF2E.SpecificRule.SpecialtyCrafting.Prompt"
-        choices: [{"label": "PF2E.SpecificRule.SpecialtyCrafting.Alchemy", "predicate": [{"not": "feat:specialty-crafting:alchemy"}], "value": "alchemy"}, {"label": "PF2E.SpecificRule.SpecialtyCrafting.Artistry", "predicate": [{"not": "feat:specialty-crafting:artistry"}], "value": "artistry"}, {"label": "PF2E.SpecificRule.SpecialtyCrafting.Blacksmithing", "predicate": [{"not": "feat:specialty-crafting:blacksmithing"}], "value": "blacksmithing"}, {"label": "PF2E.SpecificRule.SpecialtyCrafting.Bookmaking", "predicate": [{"not": "feat:specialty-crafting:bookmaking"}], "value": "bookmaking"}, {"label": "PF2E.SpecificRule.SpecialtyCrafting.Glassmaking", "predicate": [{"not": "feat:specialty-crafting:glassmaking"}], "value": "glassmaking"}, {"label": "PF2E.SpecificRule.SpecialtyCrafting.Leatherworking", "predicate": [{"not": "feat:specialty-crafting:leatherworking"}], "value": "leatherworking"}, {"label": "PF2E.SpecificRule.SpecialtyCrafting.Pottery", "predicate": [{"not": "feat:specialty-crafting:pottery"}], "value": "pottery"}, {"label": "PF2E.SpecificRule.SpecialtyCrafting.Shipbuilding", "predicate": [{"not": "feat:specialty-crafting:shipbuilding"}], "value": "shipbuilding"}, {"label": "PF2E.SpecificRule.SpecialtyCrafting.Stonemasonry", "predicate": [{"not": "feat:specialty-crafting:stonemasonry"}], "value": "stonemasonry"}, {"label": "PF2E.SpecificRule.SpecialtyCrafting.Tailoring", "predicate": [{"not": "feat:specialty-crafting:tailoring"}], "value": "tailoring"}, {"label": "PF2E.SpecificRule.SpecialtyCrafting.Weaving", "predicate": [{"not": "feat:specialty-crafting:weaving"}], "value": "weaving"}, {"label": "PF2E.SpecificRule.SpecialtyCrafting.Woodworking", "predicate": [{"not": "feat:specialty-crafting:woodworking"}], "value": "woodworking"}]
+        prompt: "Select a specialty."
+        choices: [{"label": "Alchemy", "predicate": [{"not": "feat:specialty-crafting:alchemy"}], "value": "alchemy"}, {"label": "Artistry", "predicate": [{"not": "feat:specialty-crafting:artistry"}], "value": "artistry"}, {"label": "Blacksmithing", "predicate": [{"not": "feat:specialty-crafting:blacksmithing"}], "value": "blacksmithing"}, {"label": "Bookmaking", "predicate": [{"not": "feat:specialty-crafting:bookmaking"}], "value": "bookmaking"}, {"label": "Glassmaking", "predicate": [{"not": "feat:specialty-crafting:glassmaking"}], "value": "glassmaking"}, {"label": "Leatherworking", "predicate": [{"not": "feat:specialty-crafting:leatherworking"}], "value": "leatherworking"}, {"label": "Pottery", "predicate": [{"not": "feat:specialty-crafting:pottery"}], "value": "pottery"}, {"label": "Shipbuilding", "predicate": [{"not": "feat:specialty-crafting:shipbuilding"}], "value": "shipbuilding"}, {"label": "Stonemasonry", "predicate": [{"not": "feat:specialty-crafting:stonemasonry"}], "value": "stonemasonry"}, {"label": "Tailoring", "predicate": [{"not": "feat:specialty-crafting:tailoring"}], "value": "tailoring"}, {"label": "Weaving", "predicate": [{"not": "feat:specialty-crafting:weaving"}], "value": "weaving"}, {"label": "Woodworking", "predicate": [{"not": "feat:specialty-crafting:woodworking"}], "value": "woodworking"}]
       - key: "FlatModifier"
         selector: "crafting"
         type: "circumstance"
@@ -720,6 +751,11 @@ pf2e_feats:
       level: 1
       skill: Acrobatics/trained
     rules:
+      - key: "Note"
+        selector: "acrobatics"
+        title: "{item|name}"
+        text: "If you roll a success using the Balance action, you get a critical success instead."
+        predicate: ["action:balance"]
       - key: "AdjustDegreeOfSuccess"
         selector: "acrobatics"
         adjustment: {"success": "one-degree-better"}
@@ -798,8 +834,8 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         flag: "terrain"
-        prompt: "PF2E.SpecificRule.TerrainExpertise.Prompt"
-        choices: [{"label": "PF2E.Terrain.Aquatic", "value": "aquatic"}, {"label": "PF2E.Terrain.Arctic", "value": "arctic"}, {"label": "PF2E.Terrain.Desert", "value": "desert"}, {"label": "PF2E.Terrain.Forest", "value": "forest"}, {"label": "PF2E.Terrain.Mountain", "value": "mountain"}, {"label": "PF2E.Terrain.Plains", "value": "plain"}, {"label": "PF2E.Terrain.Sky", "value": "sky"}, {"label": "PF2E.Terrain.Swamp", "value": "swamp"}, {"label": "PF2E.Terrain.Underground", "value": "underground"}]
+        prompt: "Select a terrain."
+        choices: [{"label": "Aquatic", "value": "aquatic"}, {"label": "Arctic", "value": "arctic"}, {"label": "Desert", "value": "desert"}, {"label": "Forest", "value": "forest"}, {"label": "Mountain", "value": "mountain"}, {"label": "Plains", "value": "plain"}, {"label": "Sky", "value": "sky"}, {"label": "Swamp", "value": "swamp"}, {"label": "Underground", "value": "underground"}]
       - key: "FlatModifier"
         selector: "survival"
         type: "circumstance"
@@ -818,8 +854,8 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         rollOption: "terrain-stalker"
-        prompt: "PF2E.SpecificRule.TerrainExpertise.Prompt"
-        choices: [{"label": "PF2E.SpecificRule.TerrainStalker.Rubble", "predicate": [{"not": "terrain-stalker:rubble"}], "value": "rubble"}, {"label": "PF2E.SpecificRule.TerrainStalker.Snow", "predicate": [{"not": "terrain-stalker:snow"}], "value": "snow"}, {"label": "PF2E.SpecificRule.TerrainStalker.Underbrush", "predicate": [{"not": "terrain-stalker:underbrush"}], "value": "underbrush"}]
+        prompt: "Select a terrain."
+        choices: [{"label": "Rubble", "predicate": [{"not": "terrain-stalker:rubble"}], "value": "rubble"}, {"label": "Snow", "predicate": [{"not": "terrain-stalker:snow"}], "value": "snow"}, {"label": "Underbrush", "predicate": [{"not": "terrain-stalker:underbrush"}], "value": "underbrush"}]
   Titan Wrestler:
     feat_type:
       - Skill
@@ -890,8 +926,8 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         flag: "performanceType"
-        prompt: "PF2E.SpecificRule.VirtuosicPerformer.Prompt"
-        choices: [{"label": "PF2E.SpecificRule.VirtuosicPerformer.Acting", "value": "acting"}, {"label": "PF2E.SpecificRule.VirtuosicPerformer.Comedy", "value": "comedy"}, {"label": "PF2E.SpecificRule.VirtuosicPerformer.Dance", "value": "dance"}, {"label": "PF2E.SpecificRule.VirtuosicPerformer.Keyboards", "value": "keyboards"}, {"label": "PF2E.SpecificRule.VirtuosicPerformer.Oratory", "value": "oratory"}, {"label": "PF2E.SpecificRule.VirtuosicPerformer.Percussion", "value": "percussion"}, {"label": "PF2E.SpecificRule.VirtuosicPerformer.Singing", "value": "singing"}, {"label": "PF2E.SpecificRule.VirtuosicPerformer.Strings", "value": "strings"}, {"label": "PF2E.SpecificRule.VirtuosicPerformer.Winds", "value": "winds"}]
+        prompt: "Select a type of performance."
+        choices: [{"label": "Acting", "value": "acting"}, {"label": "Comedy", "value": "comedy"}, {"label": "Dance", "value": "dance"}, {"label": "Keyboards", "value": "keyboards"}, {"label": "Oratory", "value": "oratory"}, {"label": "Percussion", "value": "percussion"}, {"label": "Singing", "value": "singing"}, {"label": "Strings", "value": "strings"}, {"label": "Winds", "value": "winds"}]
       - key: "FlatModifier"
         selector: "performance"
         type: "circumstance"
@@ -942,6 +978,12 @@ pf2e_feats:
       - key: "AdjustDegreeOfSuccess"
         selector: "skill-check"
         adjustment: {"criticalFailure": "one-degree-better"}
+        predicate: ["action:identify-magic"]
+      - key: "Note"
+        selector: "skill-check"
+        outcome: ["success"]
+        title: "{item|name}"
+        text: "If you would misidentify a cursed item because you roll a success, you simply can't identify it."
         predicate: ["action:identify-magic"]
   Automatic Knowledge:
     repeatable: true
@@ -1002,6 +1044,12 @@ pf2e_feats:
     prereq:
       level: 2
       skill: Medicine/expert
+    rules:
+      - key: "Note"
+        selector: "skill-check"
+        title: "{item|name}"
+        text: "When you Treat Wounds, your patient becomes immune for only 10 minutes instead of 1 hour. This applies only to your Treat Wounds activities, not any other the patient receives."
+        predicate: ["action:treat-wounds"]
   Discreet Inquiry:
     feat_type:
       - Skill
@@ -1324,6 +1372,11 @@ pf2e_feats:
       level: 2
       skill: Lore/expert
     rules:
+      - key: "Note"
+        selector: "lore-skill-check"
+        title: "{item|name}"
+        text: "When you Recall Knowledge using any Lore subcategory in which you're trained, if you roll a critical failure, you get a failure instead. If you're a master in a Lore subcategory, on a critical success, you gain even more information or context than usual."
+        predicate: ["action:recall-knowledge"]
       - key: "AdjustDegreeOfSuccess"
         selector: "lore-skill-check"
         adjustment: {"criticalFailure": "one-degree-better"}
@@ -1347,6 +1400,12 @@ pf2e_feats:
     prereq:
       level: 2
       skill: Medicine/expert
+    rules:
+      - key: "Note"
+        selector: "skill-check"
+        title: "{item|name}"
+        text: "When you use Treat Disease or Treat Wounds, you can treat up to two targets. If you're a master in Medicine, you can treat up to four targets, and if you're legendary, you can treat up to eight targets."
+        predicate: [{"or": ["action:treat-wounds", "action:treat-disease"]}]
   Wary Disarmament:
     feat_type:
       - Skill
@@ -1401,6 +1460,17 @@ pf2e_feats:
     prereq:
       level: 7
       skill: Intimidation/master
+    rules:
+      - key: "Note"
+        selector: "initiative"
+        title: "{item|name}"
+        text: "{item|system.description.value}"
+      - key: "Note"
+        selector: "attack"
+        outcome: ["criticalSuccess"]
+        title: "{item|name}"
+        text: "{item|system.description.value}"
+        predicate: ["skill:intimidation:rank:4"]
   Biographical Eye:
     feat_type:
       - Skill
@@ -1468,6 +1538,31 @@ pf2e_feats:
     prereq:
       level: 7
       skill: Occultism/master
+    rules:
+      - key: "Note"
+        selector: ["occultism"]
+        outcome: ["criticalSuccess"]
+        title: "Critical Success"
+        text: "The target becomes Confused for 1 round and Frightened 1."
+        predicate: ["action:disturbing-knowledge"]
+      - key: "Note"
+        selector: ["occultism"]
+        outcome: ["success"]
+        title: "Success"
+        text: "The target becomes Frightened 1."
+        predicate: ["action:disturbing-knowledge"]
+      - key: "Note"
+        selector: ["occultism"]
+        outcome: ["failure"]
+        title: "Failure"
+        text: "The target is unaffected."
+        predicate: ["action:disturbing-knowledge"]
+      - key: "Note"
+        selector: ["occultism"]
+        outcome: ["criticalFailure"]
+        title: "Critical Failure"
+        text: "You get overly caught up in your own words and become Frightened 1."
+        predicate: ["action:disturbing-knowledge"]
   Doublespeak:
     feat_type:
       - Skill
@@ -1522,6 +1617,31 @@ pf2e_feats:
         - Thul
         - Vardama
       skill: Diplomacy/master
+    rules:
+      - key: "Note"
+        selector: ["diplomacy-check"]
+        outcome: ["criticalSuccess"]
+        title: "Critical Success"
+        text: "The target is Stupefied 2 for 1 round."
+        predicate: ["action:evangelize"]
+      - key: "Note"
+        selector: ["diplomacy-check"]
+        outcome: ["success"]
+        title: "Success"
+        text: "The target is Stupefied 1 for 1 round."
+        predicate: ["action:evangelize"]
+      - key: "Note"
+        selector: ["diplomacy-check"]
+        outcome: ["failure"]
+        title: "Failure"
+        text: "The target is unaffected."
+        predicate: ["action:evangelize"]
+      - key: "Note"
+        selector: ["diplomacy-check"]
+        outcome: ["criticalFailure"]
+        title: "Critical Failure"
+        text: "The target is unaffected."
+        predicate: ["action:evangelize"]
   Foil Senses:
     feat_type:
       - Skill
@@ -1574,6 +1694,12 @@ pf2e_feats:
         selector: "climb"
         value: "@actor.system.movement.speeds.land.value"
         predicate: ["skill:athletics:rank:4"]
+      - key: "Note"
+        selector: "athletics"
+        outcome: ["success", "criticalSuccess"]
+        title: "{item|name}"
+        text: "You move 5 more feet on a success and 10 more feet on a critical success, up to your Speed."
+        predicate: ["action:climb"]
   Quick Recognition:
     feat_type:
       - Skill
@@ -1607,6 +1733,12 @@ pf2e_feats:
         selector: "swim"
         value: "@actor.system.movement.speeds.land.value"
         predicate: ["skill:athletics:rank:4"]
+      - key: "Note"
+        selector: "athletics"
+        outcome: ["success", "criticalSuccess"]
+        title: "{item|name}"
+        text: "You Swim 5 feet farther on a success and 10 feet farther on a critical success, to a maximum of your Speed."
+        predicate: ["action:swim"]
   Quick Unlock:
     feat_type:
       - Skill
@@ -1661,6 +1793,13 @@ pf2e_feats:
     prereq:
       level: 7
       skill: Intimidation/master
+    rules:
+      - key: "Note"
+        selector: "intimidation"
+        outcome: ["criticalSuccess"]
+        title: "{item|name}"
+        text: "{item|system.description.value}"
+        predicate: ["action:demoralize", {"gt": ["self:level", "target:level"]}]
   Tumbling Theft:
     feat_type:
       - Skill
@@ -1738,6 +1877,12 @@ pf2e_feats:
     prereq:
       level: 15
       skill: Society/legendary
+    rules:
+      - key: "Note"
+        selector: "society"
+        title: "{item|name}"
+        text: "If you Decipher Writing at the normal rate, and you roll a success, you get a critical success; if you critically succeed while spending the normal amount of time, you gain a nearly word-for-word understanding of the document."
+        predicate: ["action:decipher-writing"]
   Legendary Guide:
     feat_type:
       - Skill
@@ -1831,6 +1976,31 @@ pf2e_feats:
     prereq:
       level: 15
       skill: Intimidation/legendary
+    rules:
+      - key: "Note"
+        selector: ["intimidation"]
+        outcome: ["criticalSuccess"]
+        title: "Critical Success"
+        text: "The target must attempt a save against your Intimidation DC. On a critical failure, it dies. On any other result, it becomes Frightened 2 and is Fleeing for 1 round. The critical failure effect has the death trait."
+        predicate: ["action:scare-to-death"]
+      - key: "Note"
+        selector: ["intimidation"]
+        outcome: ["success"]
+        title: "Success"
+        text: "The target becomes Frightened 2."
+        predicate: ["action:scare-to-death"]
+      - key: "Note"
+        selector: ["intimidation"]
+        outcome: ["failure"]
+        title: "Failure"
+        text: "The target becomes Frightened 1."
+        predicate: ["action:scare-to-death"]
+      - key: "Note"
+        selector: ["intimidation"]
+        outcome: ["criticalFailure"]
+        title: "Critical Failure"
+        text: "The target is unaffected."
+        predicate: ["action:scare-to-death"]
   Unified Theory:
     feat_type:
       - Skill

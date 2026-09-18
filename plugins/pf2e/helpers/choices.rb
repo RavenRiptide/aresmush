@@ -54,8 +54,59 @@ module AresMUSH
           if listed.any?
 
         return from_vocabulary(set, held) if set['vocabulary']
+        return owned(set, char).select { |_id, facts| Predicate.test(set['each'], held + facts) }.keys \
+          if set['owned']
 
         from_filter(set, held)
+      end
+
+      # Their kinds of thing, onto our inventory categories. A creature's natural attack is one of their
+      # `melee` items, and a character's weapons stand in for it.
+      OWNED = { 'weapon' => 'weapons', 'melee' => 'weapons', 'armor' => 'armor', 'shield' => 'shields' }.freeze
+
+      # The character's own things of the kinds a set asks for, each as its id and what it answers to.
+      # The id is the answer, as it is in Foundry, because it is what a rule names: the damage of the
+      # weapon chosen is `{item|flags.system.rulesSelections.weapon}-damage`, which is that weapon's own
+      # damage domain. Handwraps of mighty blows stand for the unarmed attack, whose domain is `unarmed`.
+      def self.owned(set, char)
+        return {} unless char
+
+        categories = Array(set['owned']).map { |kind| OWNED[kind] }.compact.uniq
+
+        found = Pf2egear.carried_items(char).select { |category, _item| categories.include?(category) }
+                        .to_h { |category, item| [ item.id.to_s, owned_facts(category, item) ] }
+
+        found['unarmed'] = [ 'item:category:unarmed' ] if set['handwraps'] && handwraps?(char)
+
+        found
+      end
+
+      # What one of the character's things answers to, from the catalogue: a filter over it has to be
+      # tested without assembling an attack, because this is asked while effects are being gathered.
+      def self.owned_facts(category, item)
+        info = Pf2egear.catalogue_entry(category, item) || {}
+        kind = category == 'weapons' ? 'weapon' : category.delete_suffix('s')
+
+        facts_of(item.name, info, kind) +
+          (category == 'weapons' ? Pf2eCombat.weapon_options(item.name, info) : [])
+      end
+
+      def self.handwraps?(char)
+        Pf2egear.carried_items(char).any? { |_category, item| Domains.slug(item.name).include?('handwraps') }
+      end
+
+      # What a player typed for one of their own things, as the id the answer is: the weapon's name or its
+      # nickname, whichever they used.
+      def self.owned_answer(set, char, typed)
+        wanted = Domains.slug(typed)
+
+        return 'unarmed' if wanted == 'unarmed' && owned(set, char).key?('unarmed')
+
+        Pf2egear.carried_items(char).find { |_category, item|
+          owned(set, char).key?(item.id.to_s) &&
+            [ item.name, (item.nickname if item.respond_to?(:nickname)) ].compact
+                                                                          .any? { |one| Domains.slug(one) == wanted }
+        }&.last&.id&.to_s
       end
 
       # Whether an answer belongs to this set at all - that it names a skill, a kind of damage, a feat
@@ -64,11 +115,15 @@ module AresMUSH
       #
       # Nothing here reads the character, which is what lets a recorded answer be read while the
       # character's own facts are still being assembled.
-      def self.includes?(set, answer)
+      #
+      # One of the character's own things is the exception: whether an answer is one of them depends on
+      # what they carry, so the character is asked - which reads the inventory and nothing derived.
+      def self.includes?(set, answer, char = nil)
         wanted = Domains.slug(answer)
         listed = Array(set['choices'])
 
         return listed.any? { |one| one['value'].to_s == wanted } if listed.any?
+        return owned(set, char).key?(answer.to_s) if set['owned']
         return from_vocabulary(set, nil).include?(wanted) if set['vocabulary']
 
         from_filter(set, []).include?(wanted)

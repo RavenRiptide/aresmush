@@ -129,11 +129,26 @@ module AresMUSH
         Rules.adjustments(Effects.sources(@char), @domains, @options + Array(rolled))
       end
 
-      # Text to show with the roll. `Note` is the one kind of rule element attached to a roll that is not
-      # read yet, and asking for notes here is what makes reading it a change to one table rather than
-      # to this.
-      def notes
-        Rules.notes(Effects.sources(@char), @domains, @options)
+      # Text to show with the roll, for the outcome it came to where a note names one. With no outcome,
+      # the notes that hold whatever happens.
+      def notes(outcome = nil)
+        named = outcome && Degree::NAMES[outcome]
+
+        Rules.notes(Effects.sources(@char), @domains, @options).select do |note|
+          note['outcome'].empty? || note['outcome'].include?(named)
+        end
+      end
+
+      # Fortune or misfortune on this roll: `keep-higher`, `keep-lower`, or nil.
+      def roll_twice
+        @roll_twice ||= Rules.roll_twice(Effects.sources(@char), @domains, @options) || false
+
+        @roll_twice || nil
+      end
+
+      # The roll has been made. What was spent on it is spent: Guidance's bonus, a fortune effect.
+      def rolled!(total, dc = nil, die = nil)
+        ActiveEffects.after_roll(@char, self, @options + rolled(total, dc, die))
       end
     end
   end

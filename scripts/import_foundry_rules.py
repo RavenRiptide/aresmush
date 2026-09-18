@@ -18,9 +18,11 @@ Usage: scripts/import_foundry_rules.py /path/to/foundryvtt-pf2e [--write]
 import argparse
 import collections
 import glob
+import html
 import json
 import os
 import re
+import subprocess
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG = os.path.join(ROOT, 'game', 'config')
@@ -41,7 +43,16 @@ SOURCES = [
 # selector touched. Anything deliberately not carried is named in PRESENTATION below instead.
 KINDS = {
     'FlatModifier': {'key', 'selector', 'value', 'type', 'ability', 'min', 'max', 'damageType',
-                     'damageCategory', 'critical', 'predicate', 'slug', 'label', 'hideIfDisabled', 'priority', 'phase', 'requiresEquipped'},
+                     'damageCategory', 'critical', 'predicate', 'slug', 'label', 'hideIfDisabled', 'priority', 'phase',
+                     'requiresEquipped', 'removeAfterRoll'},
+    # Text shown with a roll, for an outcome where it says: Revel in Retribution's reminder on a hit.
+    'Note': {'key', 'selector', 'text', 'title', 'predicate', 'outcome', 'slug', 'label', 'visibility',
+             'priority'},
+    # What an effect changes about one of the character's things while it lasts: Magic Weapon's runes.
+    'ItemAlteration': {'key', 'itemType', 'itemId', 'mode', 'property', 'value', 'predicate', 'slug',
+                       'label', 'priority', 'phase', 'fromEquipment'},
+    # Fortune and misfortune: roll the d20 twice and keep the higher, or the lower.
+    'RollTwice': {'key', 'selector', 'keep', 'predicate', 'removeAfterRoll', 'slug', 'label'},
     'DamageDice': {'key', 'selector', 'diceNumber', 'dieSize', 'damageType', 'category', 'critical',
                    'predicate', 'slug', 'label', 'hideIfDisabled', 'override', 'tags', 'priority', 'phase'},
     # placement and mergeable position a toggle in Foundry's character sheet, which is not a mechanic
@@ -85,6 +96,18 @@ KINDS = {
 # The compendia a GrantItem may name that we hold as a catalogue of our own. A grant of anything else -
 # an action, a monster's ability - has nothing here to become.
 GRANTABLE = {'conditionitems', 'spell-effects', 'feat-effects', 'equipment-effects', 'other-effects'}
+# The properties of an item an alteration may change that change something modelled here, and the
+# kinds of thing it may alter. A spell's area, an action's frequency, an item's description are not.
+ALTERED = {'traits', 'runes-potency', 'runes-striking', 'runes-resilient', 'damage-dice-faces',
+           'damage-dice-number', 'damage-type', 'material-type', 'range-increment', 'group', 'category',
+           'ac-bonus', 'dex-cap', 'check-penalty', 'speed-penalty', 'strength', 'hardness', 'badge-value',
+           'badge-max', 'pd-recovery-dc'}
+ALTERABLE_ITEMS = {'weapon', 'armor', 'shield', 'condition'}
+
+# The kinds of their own thing a character may be asked to choose among, as our inventory holds them.
+# `melee` is a creature's natural attack, which a character's weapons list stands in for.
+OWNED_TYPES = {'weapon', 'armor', 'shield', 'melee'}
+
 LEDGER_PACKS = {'feats-srd', 'classfeatures', 'ancestryfeatures', 'heritages'}
 GRANT_UUID = re.compile(r'^Compendium\.pf2e\.([\w-]+)\.Item\.(.+)$')
 
@@ -106,11 +129,16 @@ PRESENTATION = {
     'ChoiceSet': {'adjustName', 'allowedDrops', 'priority'},
     'Strike': {'img'},
     'GrantItem': {'priority'},
+    # `fromEquipment` marks an alteration automatic bonus progression would replace, and there is no
+    # automatic bonus progression here.
+    'ItemAlteration': {'priority', 'phase', 'fromEquipment'},
+    # Who sees a note is a question for Foundry's chat log, which we do not have.
+    'Note': {'visibility', 'priority'},
 }
 
 # The order fields are written in, so a re-run produces the same file. A field of a kind that is not
 # named here still gets written, after these.
-ORDER = ['key', 'uuid', 'inMemoryOnly', 'allowDuplicate', 'onDeleteActions', 'alterations', 'option', 'domain', 'toggleable', 'alwaysActive', 'suboptions', 'selection',
+ORDER = ['key', 'itemType', 'itemId', 'property', 'uuid', 'inMemoryOnly', 'allowDuplicate', 'onDeleteActions', 'alterations', 'option', 'domain', 'toggleable', 'alwaysActive', 'suboptions', 'selection',
          'disabledIf', 'disabledValue', 'flag', 'rollOption', 'prompt', 'choices',
          'allowNoSelection', 'path', 'mode', 'merge',
          'property', 'definition', 'sameAs', 'maxRank',
@@ -120,7 +148,7 @@ ORDER = ['key', 'uuid', 'inMemoryOnly', 'allowDuplicate', 'onDeleteActions', 'al
          'maxApplications', 'type', 'ability',
          'value', 'min', 'max', 'diceNumber', 'dieSize', 'damageType', 'damageCategory',
          'critical', 'override', 'tags', 'hideIfDisabled', 'slug', 'requiresEquipped',
-         'events', 'label', 'predicate']
+         'events', 'keep', 'outcome', 'removeAfterRoll', 'title', 'text', 'label', 'predicate']
 
 
 def written(key):
@@ -132,7 +160,7 @@ def written(key):
 
 # Neither of these reaches a statistic: one declares a circumstance and the other writes a value.
 SELECTORLESS = {'RollOption', 'ActiveEffectLike', 'Immunity', 'Weakness', 'Resistance', 'AdjustStrike', 'GrantItem',
-                'TempHP',
+                'TempHP', 'ItemAlteration',
                 'Strike', 'MartialProficiency', 'CriticalSpecialization', 'Sense', 'ChoiceSet'}
 
 # Senses this engine knows. One it does not would be a fact nothing could show or ask about.
@@ -200,12 +228,110 @@ INTERPOLATION = re.compile(r'\{[^}]*\}')
 INJECTED = re.compile(r'\{(?:item|actor|choice|weapon|spell)\|')
 
 
+# Their text is localisation keys - `PF2E.SpecificRule.Prompt.Skill` - with the English in
+# `static/lang/en.json` and, for rule text, `static/lang/re-en.json`. A key is translated on the way
+# in, so a note or a prompt reads as the words a player sees.
+LANG_FILES = ['static/lang/en.json', 'static/lang/re-en.json', 'static/lang/action-en.json']
+LANG_KEY = re.compile(r'\APF2E\.[\w.-]+\Z')
+
+# The fields of a rule that are words for a player rather than mechanics.
+WORDED = {'text', 'title', 'label', 'prompt'}
+
+ENRICHER = re.compile(r'@(\w+)\[([^\]]*)\](?:\{([^}]*)\})?')
+TAG = re.compile(r'<[^>]+>')
+
+
+def strings(checkout):
+    """Every localisation key their packs name, as its English."""
+    found = {}
+
+    for name in LANG_FILES:
+        path = os.path.join(checkout, name)
+        if os.path.exists(path):
+            text = open(path).read()
+        else:
+            shown = subprocess.run(['git', '-C', checkout, 'show', f'HEAD:{name}'],
+                                   capture_output=True, text=True)
+            if shown.returncode != 0:
+                continue
+            text = shown.stdout
+        flatten(json.loads(text), '', found)
+
+    return found
+
+
+def flatten(node, prefix, out):
+    for key, held in node.items():
+        path = f'{prefix}{key}'
+        if isinstance(held, dict):
+            flatten(held, path + '.', out)
+        else:
+            out[path] = held
+
+
+def enriched(found):
+    """What an enricher reads as: its label, or for a link with none, the name of what it links to."""
+    kind, target, label = found.groups()
+
+    if label:
+        return label
+    if kind == 'UUID':
+        return target.split('.Item.')[-1].split('.')[-1]
+
+    return ''
+
+
+def plain(text, limit=None):
+    """Their HTML as a line a player can read, with a paragraph as `%r`, which is how our config breaks
+    a line."""
+    text = ENRICHER.sub(enriched, text or '')
+    text = re.sub(r'</p>|<hr\s*/?>|<br\s*/?>', '\x00', text)
+    text = TAG.sub(' ', text)
+    text = html.unescape(re.sub(r'\s+', ' ', text)).strip()
+    text = re.sub(r'(?:\s*\x00\s*)+', '%r', text)
+    text = re.sub(r'\A(?:%r)+|(?:%r)+\Z', '', text)
+
+    if limit and len(text) > limit:
+        text = text[:limit].rsplit(' ', 1)[0] + '…'
+
+    return text
+
+
+def translated(value, found):
+    """A localisation key as its English; anything else as it stands."""
+    if isinstance(value, str) and LANG_KEY.match(value) and value in found:
+        return plain(found[value])
+
+    return value
+
+
+def worded(row, found):
+    """A rule with its player-facing words translated: its own label or note, and the labels of the
+    answers a choice set or an option offers."""
+    out = {}
+
+    for field, held in row.items():
+        if field in WORDED:
+            out[field] = translated(held, found)
+        elif field in ('choices', 'suboptions') and isinstance(held, list):
+            out[field] = [dict(one, label=translated(one.get('label'), found)) if isinstance(one, dict)
+                          and 'label' in one else one for one in held]
+        else:
+            out[field] = held
+
+    return out
+
+
 def selector_ok(selector):
     if not isinstance(selector, str):
         return False
     slug = selector.strip()
     if SELF_REFERENCE.match(slug):
         return True
+    # A selector naming the thing the player chose - `{item|flags.system.rulesSelections.weapon}-damage`
+    # is the damage of the weapon they picked - is checked by shape, with the answer standing in.
+    if INJECTED.search(slug):
+        return selector_ok(INTERPOLATION.sub('chosen', slug))
     if INTERPOLATION.search(slug):
         return False
     if slug in PLAIN or slug == 'damage' or slug.endswith('-lore'):
@@ -303,19 +429,30 @@ def take(rule, refused):
             refused['a grant altering something other than its badge'] += 1
             return None
 
+    if rule['key'] == 'ItemAlteration':
+        if rule.get('property') not in ALTERED:
+            refused[f"an alteration of {rule.get('property')}, which changes nothing modelled here"] += 1
+            return None
+        if not rule.get('itemId') and rule.get('itemType') not in ALTERABLE_ITEMS:
+            refused[f"an alteration of {rule.get('itemType')} items, which are not things here"] += 1
+            return None
+
     if rule['key'] == 'BaseSpeed':
         if rule.get('selector') not in MOVEMENT:
             refused[f"movement {rule.get('selector')!r}"] += 1
             return None
     elif rule['key'] == 'ChoiceSet':
-        # A set that queries the catalogue - "any skill feat of your level or lower" - is a search rather
-        # than a list, and Pf2e::Feats already asks those questions. Only an explicit list is taken.
         choices = rule.get('choices')
-        # A set either lists its answers, names a vocabulary, or describes them with a filter over a
-        # catalogue. A set shaped some other way says nothing we can offer.
+        # A set lists its answers, names a vocabulary, describes them with a filter over a catalogue, or
+        # asks for one of the character's own things - "the weapon you choose". A set shaped some other
+        # way says nothing we can offer.
         if isinstance(choices, list):
             if not all(isinstance(one, dict) and one.get('value') for one in choices):
                 refused['choice set whose listed answers say nothing'] += 1
+                return None
+        elif isinstance(choices, dict) and choices.get('ownedItems'):
+            if not set(choices.get('types') or []) <= OWNED_TYPES:
+                refused[f"choice set among owned {sorted(choices.get('types') or [])}"] += 1
                 return None
         elif isinstance(choices, dict):
             if not (choices.get('config') or choices.get('filter')):
@@ -395,6 +532,7 @@ def main():
     # Kinds of rule element nothing here reads at all, on the things we stock. Counted so the refusals
     # above are not the whole story: a kind we have not built is a larger gap than a rule we refused.
     unread = collections.Counter()
+    words = strings(args.checkout)
 
     for pack, catalogues in SOURCES:
         theirs = foundry(args.checkout, pack)
@@ -414,7 +552,8 @@ def main():
                 for rule in rules:
                     if rule.get('key') not in KINDS:
                         unread[rule.get('key')] += 1
-                rows = [row for row in (take(rule, refused) for rule in rules if rule.get('key') in KINDS)
+                rows = [worded(row, words)
+                        for row in (take(rule, refused) for rule in rules if rule.get('key') in KINDS)
                         if row]
                 if not rows:
                     continue

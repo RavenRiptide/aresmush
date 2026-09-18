@@ -273,7 +273,19 @@ pf2e_shields:
         group: "shield"
         damage: {"base": {"damageType": "bludgeoning", "dice": 1, "die": "d6"}}
         slug: "lions-head"
-        label: "PF2E.SpecificRule.Equipment.LionsShield.LionsHeadLabel"
+        label: "Lion's Head"
+      - key: "ItemAlteration"
+        itemType: "weapon"
+        property: "runes-potency"
+        mode: "upgrade"
+        value: 1
+        predicate: ["item:slug:lions-head"]
+      - key: "ItemAlteration"
+        itemType: "weapon"
+        property: "runes-striking"
+        mode: "upgrade"
+        value: 1
+        predicate: ["item:slug:lions-head"]
   Lodestone Shield:
     ac_bonus: 2
     bulk: 1
@@ -331,7 +343,7 @@ pf2e_shields:
       - key: "RollOption"
         option: "reflecting-shield"
         toggleable: true
-        label: "PF2E.SpecificRule.Equipment.SpellguardShield.RollOptionLabel"
+        label: "Block spell that targets you"
       - key: "FlatModifier"
         selector: "saving-throw"
         type: "circumstance"
@@ -351,7 +363,7 @@ pf2e_shields:
       - key: "RollOption"
         option: "spellguard-shield"
         toggleable: true
-        label: "PF2E.SpecificRule.Equipment.SpellguardShield.RollOptionLabel"
+        label: "Block spell that targets you"
       - key: "FlatModifier"
         selector: "saving-throw"
         type: "circumstance"

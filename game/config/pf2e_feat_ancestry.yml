@@ -93,7 +93,7 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         flag: "advancedGeneralTraining"
-        prompt: "PF2E.SpecificRule.AdvancedGeneralTraining.Prompt"
+        prompt: "Select a 7th-level or lower general feat."
         choices: {"filter": [{"lte": ["item:level", 7]}, "item:trait:general"], "itemType": "feat"}
   Ageless Patience:
     feat_type:
@@ -123,6 +123,11 @@ pf2e_feats:
         selector: "perception"
         adjustment: {"all": "one-degree-better"}
         predicate: ["ageless-patience", "check:total:natural:1", {"gte": ["check:total:delta", -9]}]
+      - key: "Note"
+        selector: ["perception", "skill-check"]
+        title: "{item|name}"
+        text: "You don't treat a natural 1 as worse than usual on this check; you get a critical failure only if your result is 10 lower than the DC."
+        predicate: ["ageless-patience", "check:total:natural:1", {"not": {"gte": ["check:total", "check:total:delta"]}}]
   Agonizing Rebuke:
     feat_type:
       - Ancestry
@@ -133,6 +138,12 @@ pf2e_feats:
     shortdesc: When you terrorize your enemies, you also cause them painful mental distress. When you successfully Demoralize an enemy, that enemy takes 1d4 mental damage at the start of each of its turns. This effect ends if the creature loses the frightened condition, if it is more than 30 feet away from you, or if 1 minute passes, whichever comes first. If you have master proficiency in Intimidation, the damage increases to 2d4, and if you have legendary proficiency, the damage increases to 3d4.
     prereq:
       level: 5
+    rules:
+      - key: "Note"
+        selector: "intimidation"
+        title: "{item|name}"
+        text: "When you successfully Demoralize a foe, that foe takes ]{1d4 mental damage} at the start of each of its turns as long as it remains Frightened and continues to engage in combat with you. If you have master proficiency in Intimidation, the damage increases to 2d4, and if you have legendary proficiency, the damage increases to 3d4."
+        predicate: ["action:demoralize"]
   Alchemical Scholar:
     feat_type:
       - Ancestry
@@ -187,6 +198,12 @@ pf2e_feats:
         type: "circumstance"
         value: 2
         predicate: ["action:sense-motive", "ancestral-suspicion"]
+      - key: "Note"
+        selector: "saving-throw"
+        outcome: ["success"]
+        title: "{item|name}"
+        text: "When you roll a success on a saving throw against an effect that would make you controlled, you get a critical success instead."
+        predicate: ["inflicts:controlled"]
   Angelkin:
     feat_type:
       - Ancestry
@@ -370,6 +387,11 @@ pf2e_feats:
         adjustment: {"success": "one-degree-better"}
         type: "skill"
         predicate: [{"or": ["action:climb", "action:swim"]}]
+      - key: "Note"
+        selector: "athletics"
+        title: "{item|name}"
+        text: "Whenever you roll a success on an Athletics check to Climb or Swim, you get a critical success instead."
+        predicate: [{"or": ["action:climb", "action:swim"]}]
   Avenge Ally:
     feat_type:
       - Ancestry
@@ -454,7 +476,7 @@ pf2e_feats:
         value: 1
       - key: "ChoiceSet"
         flag: "feat"
-        prompt: "PF2E.SpecificRule.Prompt.Feat"
+        prompt: "Select a feat."
         choices: [{"value": "Compendium.pf2e.feats-srd.Item.Pet"}, {"value": "Compendium.pf2e.feats-srd.Item.Train Animal"}]
   Bestial Manifestation:
     feat_type:
@@ -481,22 +503,22 @@ pf2e_feats:
       - key: "ChoiceSet"
         flag: "bestialManifestation"
         rollOption: "bestial-manifestation"
-        prompt: "PF2E.SpecificRule.Prompt.UnarmedAttack"
-        choices: [{"img": "icons/commodities/claws/claw-bear-brown-grey.webp", "label": "PF2E.BattleForm.Attack.Claw", "value": "claw"}, {"img": "icons/commodities/biological/foot-black-grey.webp", "label": "PF2E.BattleForm.Attack.Hoof", "value": "hoof"}, {"img": "icons/creatures/abilities/mouth-teeth-long-red.webp", "label": "PF2E.BattleForm.Attack.Jaws", "value": "jaws"}, {"img": "icons/creatures/abilities/tail-swipe-green.webp", "label": "PF2E.BattleForm.Attack.Tail", "value": "tail"}]
+        prompt: "Select an unarmed attack."
+        choices: [{"img": "icons/commodities/claws/claw-bear-brown-grey.webp", "label": "Claw", "value": "claw"}, {"img": "icons/commodities/biological/foot-black-grey.webp", "label": "Hoof", "value": "hoof"}, {"img": "icons/creatures/abilities/mouth-teeth-long-red.webp", "label": "Jaws", "value": "jaws"}, {"img": "icons/creatures/abilities/tail-swipe-green.webp", "label": "Tail", "value": "tail"}]
       - key: "Strike"
         category: "unarmed"
         group: "brawling"
         baseType: "claw"
         damage: {"base": {"damageType": "slashing", "dice": 1, "die": "d4"}}
         traits: ["agile", "finesse", "unarmed", "versatile-p"]
-        label: "PF2E.BattleForm.Attack.Claw"
+        label: "Claw"
         predicate: ["bestial-manifestation:claw"]
       - key: "Strike"
         category: "unarmed"
         group: "brawling"
         damage: {"base": {"damageType": "bludgeoning", "dice": 1, "die": "d6"}}
         traits: ["finesse", "unarmed"]
-        label: "PF2E.BattleForm.Attack.Hoof"
+        label: "Hoof"
         predicate: ["bestial-manifestation:hoof"]
       - key: "Strike"
         category: "unarmed"
@@ -504,15 +526,21 @@ pf2e_feats:
         baseType: "jaws"
         damage: {"base": {"damageType": "piercing", "dice": 1, "die": "d6"}}
         traits: ["finesse", "unarmed"]
-        label: "PF2E.BattleForm.Attack.Jaws"
+        label: "Jaws"
         predicate: ["bestial-manifestation:jaws"]
       - key: "Strike"
         category: "unarmed"
         group: "brawling"
         damage: {"base": {"damageType": "bludgeoning", "dice": 1, "die": "d4"}}
         traits: ["agile", "finesse", "unarmed"]
-        label: "PF2E.BattleForm.Attack.Tail"
+        label: "Tail"
         predicate: ["bestial-manifestation:tail"]
+      - key: "ItemAlteration"
+        itemId: "{item|id}"
+        property: "traits"
+        mode: "add"
+        value: "deadly-d6"
+        predicate: ["feat:bestial-brutality"]
       - key: "CriticalSpecialization"
         predicate: ["feat:bestial-brutality", "item:id:{item|id}"]
   Big Mouth:
@@ -665,6 +693,12 @@ pf2e_feats:
       level: 1
       heritage: Changeling
     rules:
+      - key: "Note"
+        selector: "athletics"
+        outcome: ["success"]
+        title: "{item|name}"
+        text: "When you roll a success on an Athletics check to swim, you get a critical success instead."
+        predicate: ["action:swim"]
       - key: "AdjustDegreeOfSuccess"
         selector: "athletics"
         adjustment: {"success": "one-degree-better"}
@@ -742,6 +776,12 @@ pf2e_feats:
         type: "circumstance"
         value: 1
         predicate: ["mental"]
+      - key: "Note"
+        selector: "saving-throw"
+        outcome: ["success"]
+        title: "{item|name}"
+        text: "When you roll a success on an saving throw against a mental effect that would make you controlled, you get a critical success instead."
+        predicate: ["mental", "inflicts:controlled"]
       - key: "AdjustDegreeOfSuccess"
         selector: "saving-throw"
         adjustment: {"success": "one-degree-better"}
@@ -897,7 +937,7 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         flag: "spell"
-        prompt: "PF2E.SpecificRule.Prompt.Spell"
+        prompt: "Select a spell."
         choices: {"filter": [{"or": ["item:slug:clear-mind", "item:slug:sure-footing", "item:slug:share-life", "item:slug:revealing-light", "item:slug:humanoid-form", "item:slug:everlight"]}], "itemType": "spell", "slugsAsValues": true}
   Celestial Mercy:
     feat_type:
@@ -1085,7 +1125,7 @@ pf2e_feats:
         type: "circumstance"
         value: 1
         slug: "scavenger-earn"
-        label: "PF2E.SpecificRule.Goblin.CityScavenger.EarnIncome"
+        label: "City Scavenger \u2014 Earn Income"
         predicate: ["action:earn-income", "with-subsist"]
       - key: "AdjustModifier"
         mode: "add"
@@ -1186,7 +1226,7 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         flag: "feat"
-        prompt: "PF2E.SpecificRule.Prompt.LevelOneAncestryFeat"
+        prompt: "Select a 1st-level ancestry feat."
         choices: {"filter": ["item:level:1", "item:trait:{actor|system.details.ancestry.adopted}"]}
   Dance Underfoot:
     feat_type:
@@ -1426,6 +1466,11 @@ pf2e_feats:
         path: "system.skills.performance.rank"
         mode: "upgrade"
         value: 1
+      - key: "Note"
+        selector: "performance"
+        title: "{item|name}"
+        text: "If you roll a critical failure when you Make an Impression on an elf, you get a failure instead."
+        predicate: ["action:make-an-impression", "target:trait:elf"]
       - key: "AdjustDegreeOfSuccess"
         selector: "performance"
         adjustment: {"criticalFailure": "one-degree-better"}
@@ -1684,7 +1729,7 @@ pf2e_feats:
         group: "brawling"
         damage: {"base": {"damageType": "piercing", "dice": 1, "die": "d6"}}
         traits: ["grapple", "unarmed"]
-        label: "PF2E.BattleForm.Attack.Fangs"
+        label: "Fangs"
   Fell Rider:
     feat_type:
       - Ancestry
@@ -1759,7 +1804,7 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         flag: "spell"
-        prompt: "PF2E.SpecificRule.Prompt.Spell"
+        prompt: "Select a spell."
         choices: {"filter": [{"or": ["item:slug:paranoia", "item:slug:shatter", "item:slug:disguise-magic", "item:slug:see-the-unseen", "item:slug:false-vitality", "item:slug:invisibility"]}], "itemType": "spell", "slugsAsValues": true}
   Flexible Tail:
     feat_type:
@@ -1798,6 +1843,12 @@ pf2e_feats:
         value: 1
         label: "Against emotion effects"
         predicate: ["emotion"]
+      - key: "Note"
+        selector: "saving-throw"
+        outcome: ["success"]
+        title: "{item|name}"
+        text: "If you roll a success on a saving throw against an emotion effect, you get a critical success instead."
+        predicate: ["item:trait:emotion"]
       - key: "AdjustDegreeOfSuccess"
         selector: "saving-throw"
         adjustment: {"success": "one-degree-better"}
@@ -1882,7 +1933,7 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         flag: "feat"
-        prompt: "PF2E.SpecificRule.GeneralTraining.Prompt"
+        prompt: "Select a 1st-level general feat."
         choices: {"filter": ["item:level:1", "item:trait:general"], "itemType": "feat"}
   Ghost Hunter:
     feat_type:
@@ -1909,16 +1960,16 @@ pf2e_feats:
       - key: "RollOption"
         option: "target:trait:incorporeal"
         toggleable: "totm"
-        label: "PF2E.SpecificRule.TOTMToggle.Incorporeal"
+        label: "Enable abilities that require an incorporeal target"
       - key: "AdjustStrike"
-        mode: "add"
         property: "property-runes"
+        mode: "add"
         definition: ["item:magical"]
         value: "ghost-touch"
         predicate: ["target:trait:incorporeal"]
       - key: "AdjustStrike"
-        mode: "add"
         property: "weapon-traits"
+        mode: "add"
         definition: [{"not": "item:magical"}]
         value: "magical"
         predicate: ["target:trait:incorporeal"]
@@ -1953,12 +2004,12 @@ pf2e_feats:
         definition: [{"or": [{"and": ["item:trait:gnome", "item:category:martial"]}, "item:base:glaive", "item:base:kukri"]}]
         sameAs: "simple"
         slug: "martial-gnome-weapons"
-        label: "PF2E.SpecificRule.MartialProficiency.MartialGnomeWeapons"
+        label: "Martial Gnome Weapons"
       - key: "MartialProficiency"
         definition: ["item:trait:gnome", "item:category:advanced"]
         sameAs: "martial"
         slug: "advanced-gnome-weapons"
-        label: "PF2E.SpecificRule.MartialProficiency.AdvancedGnomeWeapons"
+        label: "Advanced Gnome Weapons"
       - key: "CriticalSpecialization"
         predicate: [{"gte": ["self:level", 5]}, {"or": ["item:trait:gnome", "item:base:glaive", "item:base:kukri"]}]
   Goblin Lore:
@@ -2024,12 +2075,12 @@ pf2e_feats:
         definition: ["item:trait:goblin", "item:category:martial"]
         sameAs: "simple"
         slug: "martial-goblin-weapons"
-        label: "PF2E.SpecificRule.MartialProficiency.MartialGoblinWeapons"
+        label: "Martial Goblin Weapons"
       - key: "MartialProficiency"
         definition: ["item:trait:goblin", "item:category:advanced"]
         sameAs: "martial"
         slug: "advanced-goblin-weapons"
-        label: "PF2E.SpecificRule.MartialProficiency.AdvancedGoblinWeapons"
+        label: "Advanced Goblin Weapons"
       - key: "CriticalSpecialization"
         predicate: [{"gte": ["self:level", 5]}, "item:trait:goblin"]
   Gravesight:
@@ -2188,7 +2239,7 @@ pf2e_feats:
         baseType: "claw"
         damage: {"base": {"damageType": "slashing", "dice": 1, "die": "d4"}}
         traits: ["agile", "finesse", "unarmed"]
-        label: "PF2E.Weapon.Base.claw"
+        label: "Claw"
   Hag Magic:
     feat_type:
       - Ancestry
@@ -2213,7 +2264,7 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         flag: "hagMagic"
-        prompt: "PF2E.SpecificRule.Prompt.Spell"
+        prompt: "Select a spell."
         choices: {"filter": [{"or": ["item:slug:augury", "item:slug:charm", "item:slug:clairaudience", "item:slug:clairvoyance", "item:slug:dream-message", "item:slug:illusory-disguise", {"and": ["feat:brine-may", {"or": ["item:slug:humanoid-form", "item:slug:water-walk"]}]}, {"and": ["feat:callow-may", {"or": ["item:slug:honeyed-words", "item:slug:outcasts-curse"]}]}, {"and": [{"or": ["feat:dream-may", "feat:veil-may"]}, "item:slug:nightmare"]}, {"and": ["feat:slag-may", "item:slug:earthbind"]}, {"and": ["feat:snow-may", "item:slug:solid-fog"]}, {"and": ["feat:virga-may", "item:slug:hydraulic-torrent"]}]}], "itemType": "spell", "slugsAsValues": true}
   Hag's Sight:
     feat_type:
@@ -2491,6 +2542,17 @@ pf2e_feats:
     shortdesc: Your fists have been forged by battle, your naturally tough skin and dense bone further hardened by conflict. Your fist unarmed attacks no longer have the nonlethal trait and gain the shove weapon trait.
     prereq:
       level: 1
+    rules:
+      - key: "ItemAlteration"
+        itemId: "xxxxxxFISTxxxxxx"
+        property: "traits"
+        mode: "add"
+        value: "shove"
+      - key: "ItemAlteration"
+        itemId: "xxxxxxFISTxxxxxx"
+        property: "traits"
+        mode: "remove"
+        value: "nonlethal"
   Irrepressible (Bassin):
     feat_type:
       - Ancestry
@@ -2648,6 +2710,12 @@ pf2e_feats:
         selector: "saving-throw"
         type: "circumstance"
         value: 1
+        predicate: ["emotion"]
+      - key: "Note"
+        selector: "saving-throw"
+        outcome: ["success"]
+        title: "{item|name}"
+        text: "When you roll a success on a save against an emotion effect, you get a critical success instead."
         predicate: ["emotion"]
       - key: "AdjustDegreeOfSuccess"
         selector: "saving-throw"
@@ -2868,7 +2936,7 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         flag: "multitalented"
-        prompt: "PF2E.SpecificRule.Multitalented.Prompt"
+        prompt: "Select a multiclass dedication feat."
         choices: {"filter": ["item:level:2", "item:category:class", "item:trait:dedication", "item:trait:multiclass"], "itemType": "feat"}
   Musetouched:
     feat_type:
@@ -2904,13 +2972,28 @@ pf2e_feats:
         selector: "attack-roll"
         adjustment: {"criticalFailure": "one-degree-better", "success": "one-degree-better"}
         predicate: ["action:escape"]
+      - key: "Note"
+        selector: "attack"
+        title: "{item|name}"
+        text: "When you roll a critical failure on a check to Escape, you get a failure instead, and when you roll a success, you get a critical success instead."
+        predicate: ["action:escape"]
       - key: "AdjustDegreeOfSuccess"
         selector: "athletics"
         adjustment: {"criticalFailure": "one-degree-better", "success": "one-degree-better"}
         predicate: ["action:escape"]
+      - key: "Note"
+        selector: "athletics"
+        title: "{item|name}"
+        text: "When you roll a critical failure on a check to Escape, you get a failure instead, and when you roll a success, you get a critical success instead."
+        predicate: ["action:escape"]
       - key: "AdjustDegreeOfSuccess"
         selector: "acrobatics"
         adjustment: {"criticalFailure": "one-degree-better", "success": "one-degree-better"}
+        predicate: ["action:escape"]
+      - key: "Note"
+        selector: "acrobatics"
+        title: "{item|name}"
+        text: "When you roll a critical failure on a check to Escape, you get a failure instead, and when you roll a success, you get a critical success instead."
         predicate: ["action:escape"]
   Natural Ambition:
     feat_type:
@@ -2931,7 +3014,7 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         flag: "naturalAmbition"
-        prompt: "PF2E.SpecificRule.Prompt.LevelOneClassFeat"
+        prompt: "Select a 1st-level class feat."
         choices: {"filter": ["item:level:1", "item:category:class", "item:trait:{actor|system.details.class.trait}", {"or": ["feature:dragon-instinct", {"not": "item:draconic-arrogance"}]}, {"nor": ["item:animal-companion", "item:animal-companion-druid", "item:bardic-lore", "item:fire-lung", "item:lingering-composition", "item:leshy-familiar", "item:martial-performance", "item:shore-step", "item:steadying-stone", "item:storm-born", "item:versatile-performance", "item:untamed-form"]}], "itemType": "feat"}
   Natural Skill:
     feat_type:
@@ -2950,7 +3033,7 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         flag: "skillOne"
-        prompt: "PF2E.SpecificRule.Prompt.Skill"
+        prompt: "Select a skill."
         choices: {"config": "skills", "predicate": ["skill:{choice|value}:rank:0"]}
       - key: "ActiveEffectLike"
         path: "system.skills.{item|flags.system.rulesSelections.skillOne}.rank"
@@ -2958,7 +3041,7 @@ pf2e_feats:
         value: 1
       - key: "ChoiceSet"
         flag: "skillTwo"
-        prompt: "PF2E.SpecificRule.Prompt.Skill"
+        prompt: "Select a skill."
         choices: {"config": "skills", "predicate": ["skill:{choice|value}:rank:0"]}
       - key: "ActiveEffectLike"
         path: "system.skills.{item|flags.system.rulesSelections.skillTwo}.rank"
@@ -3070,8 +3153,8 @@ pf2e_feats:
         value: 1
       - key: "ChoiceSet"
         flag: "skill"
-        prompt: "PF2E.SpecificRule.Prompt.Skill"
-        choices: [{"label": "PF2E.Skill.Diplomacy", "predicate": ["skill:diplomacy:rank:0"], "value": "diplomacy"}, {"label": "PF2E.Skill.Intimidation", "predicate": ["skill:intimidation:rank:0"], "value": "intimidation"}]
+        prompt: "Select a skill."
+        choices: [{"label": "Diplomacy", "predicate": ["skill:diplomacy:rank:0"], "value": "diplomacy"}, {"label": "Intimidation", "predicate": ["skill:intimidation:rank:0"], "value": "intimidation"}]
       - key: "ActiveEffectLike"
         path: "system.skills.{item|flags.system.rulesSelections.skill}.rank"
         mode: "upgrade"
@@ -3103,8 +3186,8 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         flag: "featCelestialResistance"
-        prompt: "PF2E.SpecificRule.CelestialResistance.Prompt"
-        choices: [{"label": "PF2E.TraitFire", "value": "fire"}, {"label": "PF2E.TraitAcid", "value": "acid"}, {"label": "PF2E.TraitCold", "value": "cold"}, {"label": "PF2E.TraitSonic", "value": "sonic"}, {"label": "PF2E.TraitElectricity", "value": "electricity"}]
+        prompt: "Select a type of energy associated with your bloodline."
+        choices: [{"label": "Fire", "value": "fire"}, {"label": "Acid", "value": "acid"}, {"label": "Cold", "value": "cold"}, {"label": "Sonic", "value": "sonic"}, {"label": "Electricity", "value": "electricity"}]
       - key: "Resistance"
         type: "{item|flags.system.rulesSelections.featCelestialResistance}"
         value: 5
@@ -3407,7 +3490,7 @@ pf2e_feats:
         value: 1
       - key: "ChoiceSet"
         flag: "feat"
-        prompt: "PF2E.SpecificRule.Prompt.SkillFeat"
+        prompt: "Select a skill feat."
         choices: [{"value": "Compendium.pf2e.feats-srd.Item.Armor Assist"}, {"value": "Compendium.pf2e.feats-srd.Item.Combat Climber"}, {"value": "Compendium.pf2e.feats-srd.Item.Hefty Hauler"}, {"value": "Compendium.pf2e.feats-srd.Item.Quick Jump"}, {"value": "Compendium.pf2e.feats-srd.Item.Titan Wrestler"}, {"value": "Compendium.pf2e.feats-srd.Item.Underwater Marauder"}]
   Prairie Rider:
     feat_type:
@@ -3561,8 +3644,8 @@ pf2e_feats:
         slug: "spirit-strikes-living"
         predicate: ["target:mode:living"]
       - key: "AdjustStrike"
-        mode: "add"
         property: "traits"
+        mode: "add"
         value: "magical"
   Rallying Cry:
     feat_type:
@@ -3681,6 +3764,11 @@ pf2e_feats:
     prereq:
       level: 5
     actions: free
+    rules:
+      - key: "Note"
+        selector: "initiative"
+        title: "{item|name}"
+        text: "You interact and draw a weapon."
   Remorseless Lash:
     feat_type:
       - Ancestry
@@ -3691,6 +3779,13 @@ pf2e_feats:
     shortdesc: You're skilled at beating an enemy when their morale is already breaking. When you succeed at a melee weapon Strike against a Frightened enemy, that enemy can't reduce their frightened condition below 1 until the beginning of your next turn.
     prereq:
       level: 1
+    rules:
+      - key: "Note"
+        selector: "strike-attack-roll"
+        outcome: ["success", "criticalSuccess"]
+        title: "{item|name}"
+        text: "{item|system.description.value}"
+        predicate: ["target:condition:frightened", "item:melee"]
   Reptile Speaker:
     feat_type:
       - Ancestry
@@ -3748,6 +3843,11 @@ pf2e_feats:
         adjustment: {"success": "one-degree-better"}
         type: "save"
         predicate: ["action:balance", {"or": ["terrain:stone", "terrain:earth"]}]
+      - key: "Note"
+        selector: "acrobatics"
+        title: "{item|name}"
+        text: "When you use the Acrobatics skill to Balance on narrow surfaces or uneven ground made of stone or earth, you aren't off-guard, and when you roll a success at one of these Acrobatics checks, you get a critical success instead."
+        predicate: ["action:balance"]
   Rough Rider:
     feat_type:
       - Ancestry
@@ -3789,7 +3889,7 @@ pf2e_feats:
       level: 5
     rules:
       - key: "ChoiceSet"
-        prompt: "PF2E.SpecificRule.Prompt.LevelOneAncestryFeat"
+        prompt: "Select a 1st-level ancestry feat."
         choices: {"filter": ["item:level:1", "item:category:ancestry", "item:trait:goblin"], "itemType": "feat"}
   Scar-Thick Skin:
     feat_type:
@@ -3801,6 +3901,13 @@ pf2e_feats:
     shortdesc: Glorious, storied scars cover and protect much of your body, girding you in fleshly armor that resists any wound weaker than those you have already survived. Your DC on flat checks to end persistent bleed damage is reduced from 15 to 10, or from 10 to a 5 after receiving especially appropriate assistance.
     prereq:
       level: 5
+    rules:
+      - key: "ItemAlteration"
+        itemType: "condition"
+        property: "pd-recovery-dc"
+        mode: "downgrade"
+        value: 10
+        predicate: ["item:damage:type:bleed"]
   Scavenger's Search:
     feat_type:
       - Ancestry
@@ -4051,10 +4158,10 @@ pf2e_feats:
         damage: {"base": {"damageType": "slashing", "dice": 1, "die": "d6"}}
         traits: ["grapple"]
         slug: "slag-may-claw"
-        label: "PF2E.Weapon.Base.claw"
+        label: "Claw"
       - key: "AdjustStrike"
-        mode: "add"
         property: "materials"
+        mode: "add"
         definition: ["item:slug:slag-may-claw"]
         value: "cold-iron"
   Slip Sideways:
@@ -4148,6 +4255,13 @@ pf2e_feats:
       level: 13
       feat:
         - Pervasive Superstition
+    rules:
+      - key: "Note"
+        selector: "saving-throw"
+        outcome: ["criticalSuccess", "success"]
+        title: "{item|name}"
+        text: "Whenever you succeed at a saving throw against a spell or magical effect, you gain temporary Hit Points equal to double the spell's rank, or equal to the level if the magical effect isn't a spell. These temporary Hit Points last until the end of your next turn."
+        predicate: [{"or": ["arcane", "divine", "primal", "occult", "magical"]}]
   Spirit Soother:
     feat_type:
       - Ancestry
@@ -4429,6 +4543,16 @@ pf2e_feats:
     prereq:
       level: 1
     rules:
+      - key: "Note"
+        selector: "acrobatics"
+        title: "{item|name}"
+        text: "If you roll a success on an Acrobatics check to Balance, you get a critical success instead. You're not off-guard when you attempt to Balance."
+        predicate: ["action:balance"]
+      - key: "Note"
+        selector: "athletics"
+        title: "{item|name}"
+        text: "If you roll a success on an Athletics check to Climb, you get a critical success instead. You're not off-guard when you attempt to Climb."
+        predicate: ["action:climb"]
       - key: "AdjustDegreeOfSuccess"
         selector: "acrobatics"
         adjustment: {"success": "one-degree-better"}
@@ -4613,6 +4737,12 @@ pf2e_feats:
       - key: "RollOption"
         option: "toppling-dance"
         toggleable: true
+      - key: "ItemAlteration"
+        itemType: "weapon"
+        property: "traits"
+        mode: "add"
+        value: "trip"
+        predicate: ["item:melee", "toppling-dance"]
   Tree Climber (Sildanyar):
     feat_type:
       - Ancestry
@@ -4738,11 +4868,11 @@ pf2e_feats:
       - key: "RollOption"
         option: "target:mode:undead"
         toggleable: "totm"
-        label: "PF2E.SpecificRule.TOTMToggle.Undead"
+        label: "Enable abilities that require an undead target"
       - key: "RollOption"
         option: "target:trait:vampire"
         toggleable: "totm"
-        label: "PF2E.SpecificRule.TOTMToggle.Vampire"
+        label: "Enable abilities that require a vampire target"
   Undying Ferocity:
     feat_type:
       - Ancestry
@@ -4809,6 +4939,11 @@ pf2e_feats:
         selector: "saving-throw"
         adjustment: {"all": "one-degree-better"}
         type: "save"
+        predicate: ["sleep"]
+      - key: "Note"
+        selector: "saving-throw"
+        title: "{item|name}"
+        text: "Treat your saving throws against effects that would cause you to fall asleep as one degree of success better."
         predicate: ["sleep"]
   Vampire Lore:
     feat_type:
@@ -4901,6 +5036,12 @@ pf2e_feats:
       - key: "DamageDice"
         selector: "jaws-damage"
         override: {"dieSize": "d6"}
+      - key: "ItemAlteration"
+        itemType: "weapon"
+        property: "traits"
+        mode: "add"
+        value: "backstabber"
+        predicate: ["item:slug:jaws"]
   Vigorous Health:
     feat_type:
       - Ancestry
@@ -4961,8 +5102,8 @@ pf2e_feats:
     rules:
       - key: "ChoiceSet"
         flag: "warConditioning"
-        prompt: "PF2E.SpecificRule.Hobgoblin.WarConditioning.Prompt"
-        choices: [{"label": "PF2E.Actor.Speed.Type.Climb", "value": "climb"}, {"label": "PF2E.Actor.Speed.Type.Swim", "value": "swim"}]
+        prompt: "Select a movement type."
+        choices: [{"label": "Climb", "value": "climb"}, {"label": "Swim", "value": "swim"}]
   Ward Against Corruption:
     feat_type:
       - Ancestry

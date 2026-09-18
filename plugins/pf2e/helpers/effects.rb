@@ -47,8 +47,10 @@ module AresMUSH
 
             next unless contribution
 
+            # Where it came from, so a one-off can tell whether the roll it helped was this one.
             out << contribution.merge('when' => row['predicate'],
-                                      'met' => Predicate.test(row['predicate'], held))
+                                      'met' => Predicate.test(row['predicate'], held),
+                                      'origin' => (source['item'] || {})['id'])
           end
         end
       end
@@ -65,10 +67,13 @@ module AresMUSH
       # is applied, because a kind nothing applies would otherwise never be looked at: the reader
       # filters to the kind it wants first, and a rule nobody wants is exactly the one to complain
       # about. Sources are assembled once per read block, so this says it once.
+      # Its name is part of what its rules may read - a note titled `{item|name}` is titled with it.
       def self.source(name, rules, extras = {})
         Array(rules).each { |row| Rules.complain(name, row) }
 
-        { 'name' => name, 'rules' => rules }.merge(extras)
+        item = { 'name' => name }.merge(extras['item'] || {})
+
+        { 'name' => name, 'rules' => rules }.merge(extras).merge('item' => item)
       end
 
       # What is true about the character, as the options a predicate is tested against. Foundry's own
@@ -96,12 +101,14 @@ module AresMUSH
       # read and does nothing - which is the failure this branch has hit more than once.
       def self.build_facts(char)
         character_facts(char) +
+          armor_facts(char) +
           named('self:condition', Pf2e.held_conditions(char).keys) +
           named('self:sense', granted_sense_names(char))
       end
 
-      # What is true of the character without asking what they are under. A grant's predicate is tested
-      # against these, because working out which conditions a character has is itself one of the things
+      # What is true of the character without asking what they are under, or what the things they wear
+      # have been made into. A grant's or an alteration's predicate is tested against these, because
+      # which conditions a character has and what their armour counts as are themselves among the things
       # the full list of facts is built from.
       def self.character_facts(char)
         SheetReads.memo(char, :character_facts) { build_character_facts(char) }
@@ -120,8 +127,7 @@ module AresMUSH
           named('feature', (char.pf2_features || {}).values.flatten) +
           skill_facts(char) +
           proficiency_facts(char) +
-          attribute_facts(char) +
-          armor_facts(char)
+          attribute_facts(char)
       end
 
       # What is true of the armour a character is wearing. Foundry's `armor:` options
@@ -129,7 +135,7 @@ module AresMUSH
       # penalties armour carries are waived for a character strong enough to wear it, and a feat that
       # waives one of them says so by name.
       def self.armor_facts(char)
-        armor = Pf2eCombat.get_equipped_armor(char)
+        armor = Alterations.armor(char)
 
         return [] unless armor
 
@@ -238,10 +244,14 @@ module AresMUSH
         declared = Array(built['options'])
         selections = {}
 
-        sets.each do |set|
-          next unless Predicate.test(set['when'], declared)
+        # A set may ask something of the character - Azarim's choice is from 11th level - and what is
+        # true of them without asking what they are under is safe to read while sources are gathered.
+        known = character_facts(char)
 
-          answer = answer_to(set, chosen)
+        sets.each do |set|
+          next unless Predicate.test(set['when'], known + declared)
+
+          answer = answer_to(set, chosen, char)
 
           next unless answer
 
@@ -256,7 +266,14 @@ module AresMUSH
 
       # An answer counts only if it is one this set could have offered, so a choice recorded against some
       # other question on the same feat does not read as an answer to this one.
-      def self.answer_to(set, chosen)
+      def self.answer_to(set, chosen, char = nil)
+        # One of their own things is answered by its id, which is not a word to slug - or, for a feat whose
+        # choice was recorded as a name, by the name of something they carry.
+        if set['owned']
+          return chosen.map(&:to_s).find { |one| Choices.includes?(set, one, char) } ||
+                 chosen.map { |one| Choices.owned_answer(set, char, one) }.compact.first
+        end
+
         chosen.map { |one| Domains.slug(one) }.find { |one| Choices.includes?(set, one) }
       end
 

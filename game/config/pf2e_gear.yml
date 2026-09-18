@@ -54,7 +54,7 @@ pf2e_gear:
       - key: "RollOption"
         option: "lit-candle"
         toggleable: true
-        label: "PF2E.SpecificRule.LitCandle"
+        label: "Candle is lit"
   Chain:
     bulk: 1
     level: 0
@@ -185,7 +185,7 @@ pf2e_gear:
       - key: "RollOption"
         option: "active-lantern"
         toggleable: true
-        label: "PF2E.SpecificRule.LitItem"
+        label: "{item} is lit"
   Light Barding (Large):
     bulk: 4
     level: 0
@@ -392,7 +392,7 @@ pf2e_gear:
       - key: "RollOption"
         option: "lit-torch"
         toggleable: true
-        label: "PF2E.SpecificRule.LitTorch"
+        label: "Torch is lit"
   Waterskin:
     bulk: 0.1
     level: 0
@@ -610,7 +610,7 @@ pf2e_gear:
         option: "playing"
         domain: "performance"
         toggleable: true
-        label: "PF2E.SpecificRule.PlayingItem"
+        label: "Playing {item}"
       - key: "FlatModifier"
         selector: "performance"
         type: "item"
@@ -626,7 +626,7 @@ pf2e_gear:
         option: "playing"
         domain: "performance"
         toggleable: true
-        label: "PF2E.SpecificRule.PlayingItem"
+        label: "Playing {item}"
       - key: "FlatModifier"
         selector: "performance"
         type: "item"

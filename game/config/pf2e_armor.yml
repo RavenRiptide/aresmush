@@ -546,7 +546,7 @@ pf2e_armor:
         option: "lit-life-saver-mail"
         toggleable: true
         value: true
-        label: "PF2E.SpecificRule.LitItem"
+        label: "{item} is lit"
   Life-Saver Mail (Greater):
     category: heavy
     traits:
@@ -571,7 +571,7 @@ pf2e_armor:
         option: "lit-life-saver-mail"
         toggleable: true
         value: true
-        label: "PF2E.SpecificRule.LitItem"
+        label: "{item} is lit"
   Lion's Armor:
     category: heavy
     traits:
@@ -665,7 +665,7 @@ pf2e_armor:
       - key: "RollOption"
         option: "terrain:moonlight"
         toggleable: true
-        label: "PF2E.SkillVariant.Moonlight"
+        label: "In Moonlight"
       - key: "Sense"
         selector: "low-light-vision"
         predicate: ["terrain:moonlight"]
@@ -797,7 +797,17 @@ pf2e_armor:
         damage: {"base": {"damageType": "piercing", "dice": 2, "die": "d8"}}
         traits: ["deadly-d12", "unholy"]
         slug: "horns"
-        label: "PF2E.BattleForm.Attack.Horns"
+        label: "Horns"
+      - key: "ItemAlteration"
+        itemId: "{item|id}"
+        property: "runes-potency"
+        mode: "upgrade"
+        value: 2
+      - key: "Note"
+        selector: "{item|id}-attack"
+        outcome: ["criticalSuccess"]
+        title: "{item|name}"
+        text: "On a critical hit with the horns, the target must succeed at a or become Drained 1 (or Drained 2 on a critical failure)."
       - key: "GrantItem"
         uuid: "Compendium.pf2e.conditionitems.Item.Drained"
         inMemoryOnly: true

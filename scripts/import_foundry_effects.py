@@ -19,7 +19,6 @@ Usage: scripts/import_foundry_effects.py /path/to/foundryvtt-pf2e [--write]
 import argparse
 import collections
 import glob
-import html
 import json
 import os
 import re
@@ -40,11 +39,6 @@ PACKS = ['spell-effects', 'feat-effects', 'equipment-effects', 'other-effects']
 # The packs a grant may name by id, so an id can be turned into the name our catalogues use.
 NAMED_BY_ID = PACKS + ['conditionitems']
 
-# Their description is HTML with enrichers in it - `@UUID[...]{Label}`, `@Damage[...]`. What a player
-# reads is the label, so that is what is kept.
-ENRICHER = re.compile(r'@(\w+)\[([^\]]*)\](?:\{([^}]*)\})?')
-TAG = re.compile(r'<[^>]+>')
-
 # Long enough to say what the effect does; the full text belongs to the spell or the feat.
 DESCRIPTION = 600
 
@@ -60,31 +54,6 @@ def documents(checkout, pack):
 
         if isinstance(doc, dict) and doc.get('name'):
             yield doc
-
-
-def plain(text):
-    """Their description as a line a player can read."""
-    text = ENRICHER.sub(enriched, text or '')
-    # A paragraph is a line break, which the rest of our config writes as `%r`.
-    text = re.sub(r'</p>|<hr\s*/?>|<br\s*/?>', '\x00', text)
-    text = TAG.sub(' ', text)
-    text = html.unescape(re.sub(r'\s+', ' ', text)).strip()
-    text = re.sub(r'(?:\s*\x00\s*)+', '%r', text)
-    text = re.sub(r'\A(?:%r)+|(?:%r)+\Z', '', text)
-
-    return text if len(text) <= DESCRIPTION else text[:DESCRIPTION].rsplit(' ', 1)[0] + '…'
-
-
-def enriched(found):
-    """What an enricher reads as: its label, or for a link with none, the name of what it links to."""
-    kind, target, label = found.groups()
-
-    if label:
-        return label
-    if kind == 'UUID':
-        return target.split('.Item.')[-1].split('.')[-1]
-
-    return ''
 
 
 def by_id(checkout):
@@ -111,7 +80,7 @@ def named(rule, ids):
     return rule
 
 
-def entry_of(doc, pack, ids, refused, unread):
+def entry_of(doc, pack, ids, refused, unread, words):
     system = doc.get('system') or {}
     duration = system.get('duration') or {}
     badge = system.get('badge') or {}
@@ -127,7 +96,7 @@ def entry_of(doc, pack, ids, refused, unread):
         row = rules.take(named(rule, ids), refused)
 
         if row:
-            taken.append(row)
+            taken.append(rules.worded(row, words))
 
     entry = {
         'pack': pack,
@@ -135,7 +104,7 @@ def entry_of(doc, pack, ids, refused, unread):
         'duration': {'unit': duration.get('unit', 'unlimited'), 'value': duration.get('value', -1),
                      'expiry': duration.get('expiry'), 'sustained': bool(duration.get('sustained'))},
         'traits': (system.get('traits') or {}).get('value') or [],
-        'description': plain(system.get('description', {}).get('value')),
+        'description': rules.plain(system.get('description', {}).get('value'), DESCRIPTION),
     }
 
     # A counter is how many of something the effect holds - a stack, a number of rounds of rage - and
@@ -191,6 +160,7 @@ def main():
     args = parser.parse_args()
 
     ids = by_id(args.checkout)
+    words = rules.strings(args.checkout)
     refused = collections.Counter()
     unread = collections.Counter()
     entries = {}
@@ -198,7 +168,7 @@ def main():
 
     for pack in PACKS:
         for doc in documents(args.checkout, pack):
-            entries[doc['name']] = entry_of(doc, pack, ids, refused, unread)
+            entries[doc['name']] = entry_of(doc, pack, ids, refused, unread, words)
             per_pack[pack] += 1
 
     if args.write:

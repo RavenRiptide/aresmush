@@ -11,6 +11,12 @@ module AresMUSH
     # whether a character is dying or dead.
     describe :condition_level do
 
+      # Nothing alters a condition's value here: that is `Alterations`' own to answer, and this is about
+      # the arithmetic.
+      before(:each) do
+        allow(Pf2e::Alterations).to receive(:condition) { |_char, _name, value| value }
+      end
+
       # A character under no effects, since what an effect brings with it is a condition too.
       def char(conditions)
         double(:name => 'Someone', :pf2_conditions => conditions, :pf2_effects => [])

@@ -130,17 +130,19 @@ module AresMUSH
 
     # Kinds that reach no statistic, so they name no domain: one declares a circumstance, one writes a
     # value, three describe damage, two describe an attack, one asks a question, one brings another
-    # condition with it, one gives temporary hit points, and BaseSpeed names a kind of movement.
+    # condition with it, one gives temporary hit points, one changes a thing the character has, and
+    # BaseSpeed names a kind of movement.
     SELECTORLESS = %w{RollOption ActiveEffectLike Immunity Weakness Resistance AdjustStrike Strike
                       BaseSpeed Sense MartialProficiency CriticalSpecialization ChoiceSet
-                      GrantItem TempHP}.freeze
+                      GrantItem TempHP ItemAlteration}.freeze
 
     # Of those, the two that still carry a `selector` - because a movement type and a sense are not
     # domains, they are the thing being granted.
     NAMES_ITS_OWN_THING = %w{BaseSpeed Sense}.freeze
 
-    # Kinds whose `value` is a word rather than arithmetic: a trait, a kind of damage, a sense.
-    NOT_ARITHMETIC = %w{ActiveEffectLike AdjustStrike Strike DamageAlteration}.freeze
+    # Kinds whose `value` is a word rather than arithmetic: a trait, a kind of damage, a sense, and what
+    # an alteration makes a thing into.
+    NOT_ARITHMETIC = %w{ActiveEffectLike AdjustStrike Strike DamageAlteration ItemAlteration}.freeze
     IWR_KINDS = %w{Immunity Weakness Resistance}.freeze
 
     # A row may name one selector or several, and their data uses both spellings.
@@ -303,8 +305,22 @@ module AresMUSH
       end
     end
 
-    it "should have all nineteen kinds that change a number" do
-      expect(rows.map { |_where, row| row['key'] }.uniq.size).to eq 19
+    # The nineteen that change a number, and three read at a roll: a note, fortune and misfortune, and
+    # an alteration of what is rolled with.
+    it "should have all twenty-two kinds it reads" do
+      expect(rows.map { |_where, row| row['key'] }.uniq.size).to eq 22
+    end
+
+    # An alteration has to change something this engine models, on a kind of thing it has.
+    it "should alter only things and properties that are modelled" do
+      altering = rows.select { |_where, row| row['key'] == 'ItemAlteration' }
+
+      strays = altering.reject { |_where, row|
+        Pf2e::Alterations::PROPERTIES.key?(row['property'].to_s) &&
+          (row['itemId'] || Pf2e::Alterations::KINDS.include?(row['itemType'].to_s))
+      }.map { |where, row| "#{where}: #{row['itemType']} #{row['property']}" }
+
+      expect(strays.uniq).to eq []
     end
 
     # An effect granting another effect has to name one the catalogue holds, or it brings nothing.

@@ -58,7 +58,10 @@ module AresMUSH
                        'granted_by' => effect, 'derived' => true }
       end
 
-      derive_conditions(held, held.keys)
+      derive_conditions(held, held.keys).to_h do |name, one|
+        # What an effect does to a condition's value while it lasts.
+        [ name, one['value'] ? one.merge('value' => Alterations.condition(char, name, one['value'])) : one ]
+      end
     end
 
     # Whether what granted a condition still holds: a condition set on the character, or an effect they

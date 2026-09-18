@@ -40,11 +40,13 @@ module AresMUSH
         {
           'key' => 'FlatModifier',
           'fields' => %w{key selector value type ability min max damageType damageCategory critical
-                         predicate slug label requiresEquipped},
+                         predicate slug label requiresEquipped removeAfterRoll},
           # A number added to whatever the selector reaches, obeying the stacking rule for its type.
           #
           # `min` and `max` clamp it, which is how a bonus that scales with something says how far it
           # goes. `damageType` makes it a bonus to one kind of damage rather than to the whole roll.
+          # `removeAfterRoll` makes it a one-off: Guidance's +1 is spent on the roll it helps, and
+          # `Pf2e::ActiveEffects.after_roll` ends the effect that carried it.
           'contribute' => lambda { |row, source, context|
             { 'source' => row['ability'] ? row['ability'].to_s.capitalize : source['name'],
               'slug' => row['slug'] || Domains.slug(source['name']),
@@ -52,7 +54,33 @@ module AresMUSH
               'value' => clamp(Formula.value(row['value'], context), row),
               'damage_type' => row['damageType'],
               'category' => row['damageCategory'],
-              'critical' => row['critical'] }
+              'critical' => row['critical'],
+              'remove_after_roll' => row['removeAfterRoll'] }
+          }
+        },
+        {
+          'key' => 'Note',
+          'fields' => %w{key selector text title predicate outcome slug label},
+          # Text shown with a roll, and only for the outcomes it names: Revel in Retribution reminds you of
+          # its effect on a hit. The importer translates their localisation keys, so this is the English.
+          'contribute' => lambda { |row, source, _context|
+            { 'source' => source['name'],
+              'title' => row['title'] || source['name'],
+              'text' => row['text'].to_s,
+              'outcome' => Array(row['outcome']) }
+          }
+        },
+        {
+          'key' => 'RollTwice',
+          'fields' => %w{key selector keep predicate removeAfterRoll slug label},
+          # Fortune and misfortune: the d20 is rolled twice and the higher or the lower kept. One of each
+          # cancels, which is the rule (`rules/helpers.ts` `extractRollTwice`).
+          'contribute' => lambda { |row, source, _context|
+            { 'source' => source['name'],
+              'keep' => row['keep'].to_s,
+              'selectors' => selectors_of(row),
+              'predicate' => row['predicate'],
+              'remove_after_roll' => row['removeAfterRoll'] }
           }
         },
         {
@@ -140,7 +168,10 @@ module AresMUSH
               # What a candidate answer has to satisfy, which is how "any skill you are untrained in"
               # is written: the set's own predicate, tested once per answer with `{choice|value}` filled
               # in (`choice-set/rule-element.ts` `#choicesFromPath`).
-              'each' => query_of(row)['predicate'] }
+              'each' => query_of(row)['predicate'],
+              # One of the character's own things, by kind: "the weapon you choose".
+              'owned' => query_of(row)['ownedItems'] ? Array(query_of(row)['types']) : nil,
+              'handwraps' => query_of(row)['includeHandwraps'] == true }
           }
         },
         {
@@ -282,6 +313,17 @@ module AresMUSH
           }
         },
         {
+          'key' => 'ItemAlteration',
+          'fields' => %w{key itemType itemId mode property value predicate slug label},
+          # Changes one of the character's things while an effect lasts, rather than a figure: Magic
+          # Weapon's runes, a spell making armour cold iron. `Pf2e::Alterations` applies it to what an
+          # attack, the worn armour or a condition's value is read as.
+          'contribute' => lambda { |row, source, _context|
+            { 'source' => source['name'], 'item_type' => row['itemType'], 'item_id' => row['itemId'],
+              'property' => row['property'], 'mode' => row['mode'], 'value' => row['value'] }
+          }
+        },
+        {
           'key' => 'TempHP',
           'fields' => %w{key value predicate events slug label},
           # Temporary hit points an effect gives: when it begins, and again at the start of each turn
@@ -343,7 +385,9 @@ module AresMUSH
                        'DamageAlteration' => %w{phase priority},
                        'ChoiceSet' => %w{adjustName allowedDrops priority},
                        'Strike' => %w{img},
-                       'GrantItem' => %w{priority} }.freeze
+                       'GrantItem' => %w{priority},
+                       'Note' => %w{visibility priority},
+                       'ItemAlteration' => %w{priority phase fromEquipment} }.freeze
 
       BY_KEY = KINDS.each_with_object({}) { |row, out| out[row['key']] = row }.freeze
 
@@ -370,10 +414,19 @@ module AresMUSH
       end
 
       # A set that lists its answers outright.
+      # A listed answer may be an item by its compendium link - which variety of oil this is - and then
+      # the answer is that item's slug, which is what Foundry's option for it names
+      # (`oil-of-potency:oil-of-potency-greater`).
       def self.choices_of_set(row)
         Array(row['choices']).select { |one| one.is_a?(Hash) && one['value'] }
-                             .map { |one| { 'value' => one['value'].to_s, 'label' => one['label'],
+                             .map { |one| { 'value' => answer_value(one['value']), 'label' => one['label'],
                                             'when' => one['predicate'] } }
+      end
+
+      def self.answer_value(value)
+        found = Grants::UUID.match(value.to_s)
+
+        found ? Domains.slug(found[2]) : value.to_s
       end
 
       # Every choice a source asks the character to make.
@@ -593,9 +646,21 @@ module AresMUSH
         Array(row['selector']) + Array(row['selectors'])
       end
 
-      # Text shown with a roll. `Note` is likewise not implemented yet.
+      # Text to show with a roll, whatever the outcome; `Pf2e::Check#notes` keeps the ones for the
+      # outcome it came to.
       def self.notes(sources, domains, options)
-        gather(sources, domains, options, 'Note') { |row| row['text'] }
+        gather(sources, domains, options, 'Note') { |row, source| contribute(row, source, {}) }
+      end
+
+      # Whether this roll is rolled twice, and which is kept: `keep-higher`, `keep-lower`, or nil where
+      # nothing says so or where fortune and misfortune cancel.
+      def self.roll_twice(sources, domains, options)
+        keeps = gather(sources, domains, options, 'RollTwice') { |row, source| contribute(row, source, {}) }
+                  .map { |one| one['keep'] }.uniq
+
+        return nil if keeps.empty? || keeps.size > 1
+
+        "keep-#{keeps.first}"
       end
 
       # Every row of a kind that reaches these domains and whose circumstances are met, as whatever the
@@ -610,7 +675,7 @@ module AresMUSH
           of_kind(source, key).map { |row| resolved(row, source, {}) }
                               .select { |row| Domains.matches?(selectors_of(row), domains) }
                               .select { |row| Predicate.test(row['predicate'], held) }
-                              .map { |row| yield(row) }
+                              .map { |row| yield(row, source) }
                               .compact
         end
       end

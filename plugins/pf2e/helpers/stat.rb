@@ -258,7 +258,7 @@ module AresMUSH
       # (`character/document.ts:933`). A character strong enough for the armour is slowed five feet
       # less by it, and never sped up.
       def self.armor_penalty(char)
-        armor = Pf2eCombat.get_equipped_armor(char)
+        armor = Alterations.armor(char)
         penalty = armor ? armor.speed_penalty.to_i : 0
         penalty = [ penalty + 5, 0 ].min if armor && strong_enough?(char, armor)
 
@@ -278,7 +278,7 @@ module AresMUSH
       def self.armor_check_penalty(char, name)
         return nil unless ARMOR_SKILLS.include?(Pf2eSkills.get_linked_attr(name).to_s)
 
-        armor = Pf2eCombat.get_equipped_armor(char)
+        armor = Alterations.armor(char)
         penalty = armor ? armor.check_penalty.to_i : 0
 
         return nil unless penalty.negative?
@@ -316,9 +316,13 @@ module AresMUSH
       # rules call resilient, and `resilient` is the slug their data adjusts.
       RUNE_SLUGS = { 'potency' => 'armor-potency', 'power' => 'resilient' }.freeze
 
+      # Read off the armour as an alteration leaves it: Magic Armor's rune is the one it counts.
+      RUNE_FIELDS = { 'potency' => :potency, 'power' => :resilient }.freeze
+
       def self.rune(char, subtype)
-        item(Pf2egear.get_rune_value(Pf2eCombat.get_equipped_armor(char), 'fundamental', subtype),
-             "#{subtype} rune", RUNE_SLUGS[subtype])
+        worn = Alterations.armor(char)
+
+        item(worn ? worn.public_send(RUNE_FIELDS[subtype]) : 0, "#{subtype} rune", RUNE_SLUGS[subtype])
       end
     end
   end

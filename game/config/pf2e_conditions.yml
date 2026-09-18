@@ -229,6 +229,11 @@ pf2e_conditions:
       - key: "GrantItem"
         uuid: "Compendium.pf2e.conditionitems.Item.Immobilized"
         inMemoryOnly: true
+      - key: "Note"
+        selector: ["attack", "skill-check"]
+        title: "{item|name}"
+        text: "You can't use any attack or manipulate actions except to attempt to Escape or Force Open your bonds."
+        predicate: [{"nor": ["action:escape", "action:force-open"]}]
   Sickened:
     short_descr: You feel ill.
     value: true

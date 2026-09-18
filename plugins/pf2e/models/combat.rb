@@ -164,8 +164,9 @@ module AresMUSH
     end
 
     # Armour Class before anything modifies it: the flat 10, the armour worn, and proficiency with it.
+    # The armour as an alteration leaves it, so Magic Armor or a spell hardening it is counted.
     def self.base_ac(char)
-      armor = get_equipped_armor(char)
+      armor = Pf2e::Alterations.armor(char)
       category = armor ? armor.category : "unarmored"
 
       10 + (armor ? armor.ac_bonus : 0) + Pf2e.get_prof_bonus(char, char.combat.armor_prof[category])
@@ -175,7 +176,7 @@ module AresMUSH
     # an `ability` modifier rather than added to the base, so an effect that lets a character use some
     # other attribute for AC needs only to offer that one and the better of the two applies.
     def self.ac_modifiers(char)
-      armor = get_equipped_armor(char)
+      armor = Pf2e::Alterations.armor(char)
       cap = armor ? armor.dex_cap : 99
 
       dex = Pf2e::Stat.ability_mod(char, 'Dexterity')
@@ -473,7 +474,10 @@ module AresMUSH
                                                Pf2e::Effects.options(char),
                                                attack_options(descriptor, char))
 
-      changes.each_with_object(descriptor.dup) { |change, out| adjust_strike!(out, change) }
+      adjusted = changes.each_with_object(descriptor.dup) { |change, out| adjust_strike!(out, change) }
+
+      # And what an effect changes about the weapon itself while it lasts: Magic Weapon's runes.
+      Pf2e::Alterations.attack(char, adjusted)
     end
 
     def self.adjust_strike!(descriptor, change)
