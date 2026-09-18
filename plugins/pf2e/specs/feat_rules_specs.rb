@@ -26,6 +26,10 @@ module AresMUSH
       }
     end
 
+    def score(ability, value)
+      @abilities.find { |a| a.name == ability }.update(:base_val => value)
+    end
+
     after(:each) do
       @abilities.each(&:delete)
       @hp&.delete
@@ -134,6 +138,141 @@ module AresMUSH
 
       it "should refuse a path the registry does not know" do
         expect(Pf2e::Paths.apply!(reread, 'system.attributes.hp.max', 'add', 10)).to be false
+      end
+    end
+
+    # A speed of a kind the character would not otherwise have. Land is the ancestry's; any other kind
+    # exists because something granted it, and the highest grant wins.
+    describe "a feat that grants a speed" do
+      it "should give a climb speed to a character with none" do
+        expect(Pf2e::Stat.total(reread, 'speed', 'climb')).to eq 0
+
+        expect(Pf2e::Stat.total(with_feat('Cave Climber'), 'speed', 'climb')).to eq 10
+      end
+
+      it "should leave the land speed alone" do
+        before = Pf2e::Stat.total(reread, 'speed')
+
+        expect(Pf2e::Stat.total(with_feat('Cave Climber'), 'speed')).to eq before
+      end
+
+      # Two grants of the same kind are the better of the two, not the sum.
+      it "should take the better of two grants" do
+        @char.update(:pf2_feats => { 'general' => [ 'Cave Climber' ], 'ancestry' => [ "Gecko's Grip" ] },
+                     :pf2_base_info => { 'heritage' => 'Cliffscale Lizardfolk' })
+
+        expect(Pf2e::Stat.total(reread, 'speed', 'climb')).to eq 15
+      end
+
+      # A grant whose circumstances are unmet grants nothing: Gecko's Grip wants the heritage.
+      it "should not grant one whose circumstances are unmet" do
+        @char.update(:pf2_feats => { 'ancestry' => [ "Gecko's Grip" ] })
+
+        expect(Pf2e::Stat.total(reread, 'speed', 'climb')).to eq 0
+      end
+
+      # Encumbered is written against every speed, so it reaches a granted one too.
+      it "should let a condition reach a granted speed" do
+        with_feat('Cave Climber')
+        @char.update(:pf2_conditions => { 'Encumbered' => { 'status' => true } })
+
+        expect(Pf2e::Stat.total(reread, 'speed', 'climb')).to eq 0
+      end
+    end
+
+    # A trait is not decoration: a weapon that gains `thrown` adds Strength to its damage, and one that
+    # gains `finesse` may be attacked with Dexterity.
+    describe "a feat that adds a trait to an attack" do
+      def fist
+        Pf2eCombat.damage_descriptor(reread, 'Fist')
+      end
+
+      it "should add the trait the feat names" do
+        @char.update(:pf2_feats => { 'charclass' => [ 'Quietus Strikes' ] })
+
+        expect(Pf2eCombat.damage_descriptor(reread, 'Fist')['traits']).to include 'magical'
+      end
+
+      it "should add nothing for a character without the feat" do
+        expect(Array(fist['traits'])).to_not include 'magical'
+      end
+
+      # The point of reading traits at all: one of them changes the arithmetic.
+      it "should change the damage attribute when the trait is finesse" do
+        @char.update(:pf2_base_info => { 'specialize' => 'Thief' })
+        score('Strength', 10)
+        score('Dexterity', 18)
+
+        plain = Pf2e::Damage.formula(reread, fist)
+        finessed = Pf2e::Damage.formula(reread, fist.merge('traits' => [ 'finesse' ]))
+
+        expect(finessed).to_not eq plain
+      end
+    end
+
+    # An attack the character would not otherwise have. Described the same way a catalogue weapon is, so
+    # everything that reads an attack reads this one without knowing it came from a rule.
+    describe "a feat that grants an attack" do
+      before(:each) do
+        @combat.update(:weapon_prof => { 'unarmed' => 'expert' })
+      end
+
+      def granted
+        Pf2eCombat.granted_strikes(reread)
+      end
+
+      it "should grant none to a character with no such feat" do
+        expect(granted).to eq []
+      end
+
+      it "should grant the attack the feat describes" do
+        @char.update(:pf2_feats => { 'ancestry' => [ 'Hag Claws' ] })
+
+        expect(granted.map { |one| one['name'] }.size).to be > 0
+      end
+
+      # Nine of the fourteen granted attacks are gated on a choice the player made, which is a ChoiceSet
+      # and not a kind we read - so those grant nothing rather than granting unconditionally.
+      it "should grant nothing whose circumstances it cannot establish" do
+        @char.update(:pf2_feats => { 'ancestry' => [ 'Bestial Manifestation' ] })
+
+        expect(granted).to eq []
+      end
+
+      it "should say what granted it" do
+        @char.update(:pf2_feats => { 'ancestry' => [ 'Hag Claws' ] })
+
+        expect(granted.first['source']).to eq 'Hag Claws'
+      end
+
+      # It goes through the same arithmetic, so it takes the character's proficiency and attribute.
+      it "should have an attack bonus and a damage formula of its own" do
+        @char.update(:pf2_feats => { 'ancestry' => [ 'Hag Claws' ] })
+        strike = granted.first
+
+        expect(Pf2e::Stat.total(reread, 'attack', strike)).to be > 0
+        expect(Pf2eCombat.damage_breakdown(reread, strike['name'], nil, false, [], strike)['formula'])
+          .to match(/d\d/)
+      end
+
+      # Frightened is a penalty to every check, and a granted attack is a check like any other.
+      it "should take a penalty written against every check" do
+        @char.update(:pf2_feats => { 'ancestry' => [ 'Hag Claws' ] })
+        strike = granted.first
+        before = Pf2e::Stat.total(reread, 'attack', strike)
+
+        @char.update(:pf2_conditions => { 'Frightened' => { 'value' => 2, 'status' => true } })
+
+        expect(Pf2e::Stat.total(reread, 'attack', strike)).to eq before - 2
+      end
+
+      # Unholy Plate's horns roll two dice rather than one, which a catalogue weapon never does.
+      it "should roll as many dice as the rule says" do
+        strike = { 'name' => 'Horns', 'prof' => 'expert', 'traits' => [], 'ranged' => false,
+                   'unarmed' => false, 'bomb' => false, 'die' => 'd8', 'dice' => 2,
+                   'damage_type' => 'piercing', 'striking' => 0, 'rune' => 0 }
+
+        expect(Pf2e::Damage.formula(reread, strike)).to match(/\A2d8/)
       end
     end
 

@@ -1389,6 +1389,10 @@ pf2e_magicitem:
     price: 175000
     bulk: 0
     shortdesc: "Claw-like prongs on his thick golden band bears extend to dig deep into sheer surfaces when you are Climbing. This ring grants you a climb Speed equal to half your land Speed. Penalties to your Speed (including those from your armor) apply before halving."
+    rules:
+      - key: "BaseSpeed"
+        selector: "climb"
+        value: "@actor.system.movement.speeds.land.value*0.5"
   Ring of Swimming:
     traits:
       - invested
@@ -1397,6 +1401,10 @@ pf2e_magicitem:
     price: 175000
     bulk: 0
     shortdesc: "This blue metal ring grants you a swim Speed equal to half your land Speed. Penalties to your Speed (including from your armor) apply before halving."
+    rules:
+      - key: "BaseSpeed"
+        selector: "swim"
+        value: "@actor.system.movement.speeds.land.value*0.5"
   Wand of Widening (5th-Rank Spell):
     traits:
       - magical

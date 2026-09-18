@@ -173,7 +173,9 @@ module AresMUSH
       # the weapon's dice and its printed dice - and adds nothing flat.
       def self.base_instance(char, attack)
         die = attack['die']
-        count = 1 + attack['striking'].to_i
+        # A catalogue weapon rolls one die before striking; a granted attack says how many it rolls,
+        # because some of them roll two.
+        count = (attack['dice'] || 1).to_i + attack['striking'].to_i
         attribute = damage_attribute(char, attack)
 
         empty_instance([ attack['damage_type'] || 'B', nil ])

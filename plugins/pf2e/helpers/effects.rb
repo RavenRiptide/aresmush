@@ -93,10 +93,60 @@ module AresMUSH
       # options because the store asks for these while working out what is switched on, and asking it
       # for its own answer would not terminate.
       def self.facts(char)
-        SheetReads.memo(char, :effect_facts) do
-          [ "self:level:#{char.pf2_level.to_i}" ] +
-            (char.pf2_conditions || {}).keys.map { |name| "self:condition:#{Domains.slug(name)}" } +
-            Array(char.pf2_traits).map { |trait| "self:trait:#{Domains.slug(trait)}" }
+        SheetReads.memo(char, :effect_facts) { build_facts(char) }
+      end
+
+      # What is true about the character, in Foundry's spelling, so a predicate copied from their data
+      # reads the same facts.
+      #
+      # Every prefix here answers predicates that were in config and could never be met without it.
+      # `heritage:`, `feat:`, `feature:`, `class:`, `skill:<name>:rank:<n>` and `proficiency:` are all
+      # asked about by imported rules, and a predicate about a fact nobody supplies is a rule that is
+      # read and does nothing - which is the failure this branch has hit more than once.
+      def self.build_facts(char)
+        info = char.pf2_base_info || {}
+
+        [ "self:level:#{char.pf2_level.to_i}" ] +
+          named('self:condition', (char.pf2_conditions || {}).keys) +
+          named('self:trait', Array(char.pf2_traits)) +
+          named('heritage', [ info['heritage'] ]) +
+          named('ancestry', [ info['ancestry'] ]) +
+          named('class', [ info['charclass'] ]) +
+          named('background', [ info['background'] ]) +
+          named('feat', (char.pf2_feats || {}).values.flatten) +
+          named('feature', (char.pf2_features || {}).values.flatten) +
+          skill_facts(char) +
+          proficiency_facts(char) +
+          attribute_facts(char)
+      end
+
+      def self.named(prefix, values)
+        Array(values).reject { |one| one.to_s.strip.empty? }
+                     .map { |one| "#{prefix}:#{Domains.slug(one)}" }
+      end
+
+      # `skill:athletics:rank:4` is how a feat asks whether you are legendary in Athletics.
+      def self.skill_facts(char)
+        SheetReads.rows(char, :skills).flat_map do |skill|
+          rank = Pf2e::Paths.rank_number(skill.prof_level)
+
+          [ "skill:#{Domains.slug(skill.name)}:rank:#{rank}" ]
+        end
+      end
+
+      def self.proficiency_facts(char)
+        combat = char.combat
+
+        return [] unless combat
+
+        (combat.weapon_prof || {}).flat_map do |key, rank|
+          [ "proficiency:#{Domains.slug(key)}:rank:#{Pf2e::Paths.rank_number(rank)}" ]
+        end
+      end
+
+      def self.attribute_facts(char)
+        Pf2e::ABILITIES.map do |ability|
+          "attribute:#{Domains.abbreviation(ability)}:#{Pf2e.ability_mod(char, ability)}"
         end
       end
 
@@ -170,7 +220,12 @@ module AresMUSH
           out[Domains.abbreviation(ability)] = { 'mod' => Pf2e.ability_mod(char, ability) }
         end
 
-        { 'actor' => { 'level' => char.pf2_level.to_i, 'abilities' => mods } }
+        # The land speed is here because a granted speed is usually written as a fraction of it - a Ring
+        # of Swimming gives half. Only the base is exposed, not the figure: a granted speed that read the
+        # finished land speed would have to be assembled while the land speed was being assembled.
+        { 'actor' => { 'level' => char.pf2_level.to_i, 'abilities' => mods,
+                       'system' => { 'movement' => { 'speeds' =>
+                         { 'land' => { 'value' => Pf2e.ancestry_speed(char) } } } } } }
       end
 
       def self.for_stat(char, kind, name = nil, ability = nil, options = [])

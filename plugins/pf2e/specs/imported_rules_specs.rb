@@ -108,7 +108,8 @@ module AresMUSH
     it "should name only selectors some statistic answers to" do
       held = reachable
 
-      strays = rows.flat_map { |where, row|
+      strays = rows.reject { |_where, row| SELECTORLESS.include?(row['key']) }
+                   .flat_map { |where, row|
         Pf2e::Rules.selectors_of(row).reject { |selector| resolvable?(selector, held) }
                    .map { |selector| "#{where}: #{selector}" }
       }
@@ -118,7 +119,13 @@ module AresMUSH
 
     # Neither a declaration nor a write reaches a statistic, so neither names a selector: one names an
     # option and the other a path.
-    SELECTORLESS = %w{RollOption ActiveEffectLike Immunity Weakness Resistance}.freeze
+    # Kinds that reach no statistic, so they name no domain: one declares a circumstance, one writes a
+    # value, three describe damage, two describe an attack, and BaseSpeed names a kind of movement.
+    SELECTORLESS = %w{RollOption ActiveEffectLike Immunity Weakness Resistance AdjustStrike Strike
+                      BaseSpeed}.freeze
+
+    # Of those, the one that still carries a `selector` - because a movement type is not a domain.
+    NAMES_MOVEMENT = 'BaseSpeed'.freeze
     IWR_KINDS = %w{Immunity Weakness Resistance}.freeze
 
     # A row may name one selector or several, and their data uses both spellings.
@@ -127,7 +134,8 @@ module AresMUSH
 
       expect(reaching.reject { |_where, row| Pf2e::Rules.selectors_of(row).any? }
                      .map(&:first).uniq).to eq []
-      expect(apart.select { |_where, row| Pf2e::Rules.selectors_of(row).any? }
+      expect(apart.reject { |_where, row| row['key'] == NAMES_MOVEMENT }
+                  .select { |_where, row| Pf2e::Rules.selectors_of(row).any? }
                   .map(&:first).uniq).to eq []
     end
 
@@ -206,6 +214,45 @@ module AresMUSH
       expect(rows.count { |_where, row| row['key'] == 'AdjustDegreeOfSuccess' }).to be > 20
     end
 
+    # A granted speed names a kind of movement rather than a domain, and the kind has to be one that
+    # exists.
+    it "should grant speeds only of kinds of movement we have" do
+      speeds = rows.select { |_where, row| row['key'] == 'BaseSpeed' }
+
+      strays = speeds.reject { |_where, row| Pf2e::Domains::MOVEMENT.include?(row['selector'].to_s) }
+                     .map { |where, row| "#{where}: #{row['selector'].inspect}" }
+
+      expect(strays.uniq).to eq []
+    end
+
+    # An attack we could not roll is not an attack.
+    it "should grant attacks that have damage of their own" do
+      strikes = rows.select { |_where, row| row['key'] == 'Strike' }
+
+      strays = strikes.reject { |_where, row| row.dig('damage', 'base', 'die') }
+                      .map(&:first)
+
+      expect(strays.uniq).to eq []
+    end
+
+    # A trait changes numbers; the other properties an AdjustStrike can change name things this engine
+    # does not model, so they are refused rather than read and ignored.
+    it "should adjust attacks only in ways that change something" do
+      adjusting = rows.select { |_where, row| row['key'] == 'AdjustStrike' }
+
+      strays = adjusting.reject { |_where, row|
+        Pf2e::Rules::TRAIT_PROPERTIES.include?(row['property'].to_s) && row['mode'].to_s == 'add'
+      }.map { |where, row| "#{where}: #{row['property']} #{row['mode']}" }
+
+      expect(strays.uniq).to eq []
+    end
+
+    it "should have granted speeds, attacks and adjusted attacks" do
+      %w{BaseSpeed Strike AdjustStrike}.each do |kind|
+        expect(rows.count { |_where, row| row['key'] == kind }).to(be > 5, kind)
+      end
+    end
+
     it "should have writes, since that is the second half of some feats" do
       expect(rows.count { |_where, row| row['key'] == 'ActiveEffectLike' }).to be > 40
     end
@@ -242,7 +289,10 @@ module AresMUSH
       strays = rows.flat_map { |where, row|
         Pf2e::Rules::FORMULA_FIELDS
           .select { |field| row[field].is_a?(Numeric) || row[field].is_a?(String) }
-          .reject { |field| Pf2e::Formula.parses?(row[field]) || row['key'] == 'ActiveEffectLike' }
+          .reject { |field|
+            Pf2e::Formula.parses?(row[field]) ||
+              %w{ActiveEffectLike AdjustStrike Strike}.include?(row['key'])
+          }
           .map { |field| "#{where}: #{field} #{row[field].inspect}" }
       }
 

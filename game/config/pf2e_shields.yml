@@ -266,6 +266,13 @@ pf2e_shields:
     speed_penalty: 0
     traits:
       - magical
+    rules:
+      - key: "Strike"
+        category: "martial"
+        group: "shield"
+        damage: {"base": {"damageType": "bludgeoning", "dice": 1, "die": "d6"}}
+        range: null
+        label: "PF2E.SpecificRule.Equipment.LionsShield.LionsHeadLabel"
   Lodestone Shield:
     ac_bonus: 2
     bulk: 1

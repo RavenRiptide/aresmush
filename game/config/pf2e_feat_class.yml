@@ -1231,6 +1231,33 @@ pf2e_feats:
     shortdesc: "Your patron's power changes your body to ensure you are never defenseless. You gain one of the following unarmed attacks.%r%r**Special** You can take this feat more than once, gaining a different unarmed attack each time."
     traits:
       - witch
+    rules:
+      - key: "Strike"
+        category: "unarmed"
+        group: "brawling"
+        baseType: "nails"
+        damage: {"base": {"damageType": "slashing", "dice": 1, "die": "d6"}}
+        traits: ["agile", "unarmed"]
+        range: null
+        label: "PF2E.SpecificRule.Witch.WitchsArmaments.EldritchNails"
+        predicate: ["witchs-armaments:nails"]
+      - key: "Strike"
+        category: "unarmed"
+        group: "brawling"
+        baseType: "jaws"
+        damage: {"base": {"damageType": "piercing", "dice": 1, "die": "d8"}}
+        traits: ["unarmed"]
+        range: null
+        label: "PF2E.SpecificRule.Witch.WitchsArmaments.IronTeeth"
+        predicate: ["witchs-armaments:teeth"]
+      - key: "Strike"
+        category: "unarmed"
+        group: "brawling"
+        damage: {"base": {"damageType": "bludgeoning", "dice": 1, "die": "d4"}}
+        traits: ["agile", "disarm", "finesse", "trip", "unarmed"]
+        range: null
+        label: "PF2E.SpecificRule.Witch.WitchsArmaments.LivingHair"
+        predicate: ["witchs-armaments:hair"]
   Wolf Stance:
     assoc_charclass:
       - Monk
@@ -2750,6 +2777,15 @@ pf2e_feats:
     shortdesc: "Your Panache allows you to perform incredible feats: climbing, swimming, and leaping far beyond your normal capacity. While you have panache, you gain the following benefits."
     traits:
       - swashbuckler
+    rules:
+      - key: "BaseSpeed"
+        selector: "climb"
+        value: "floor(@actor.system.movement.speeds.land.value/2)"
+        predicate: ["self:effect:panache"]
+      - key: "BaseSpeed"
+        selector: "swim"
+        value: "floor(@actor.system.movement.speeds.land.value/2)"
+        predicate: ["self:effect:panache"]
   Flurry of Maneuvers:
     assoc_charclass:
       - Monk
@@ -3166,6 +3202,15 @@ pf2e_feats:
     shortdesc: Physical obstacles can't hold back your fury. While you are raging, you gain a climb Speed and swim Speed equal to your land Speed, the DC of your High Jumps and Long Jumps decreases by 10, and you increase your distance on a successful Long Jump by 10 feet. Your distance for a vertical Leap increases to 5 feet vertically, and your distance for a horizontal Leap increases to 15 feet if your Speed is at least 15 feet, and to 20 feet if your Speed is at least 30 feet.
     traits:
       - barbarian
+    rules:
+      - key: "BaseSpeed"
+        selector: "climb"
+        value: "@actor.system.movement.speeds.land.value"
+        predicate: ["self:effect:rage"]
+      - key: "BaseSpeed"
+        selector: "swim"
+        value: "@actor.system.movement.speeds.land.value"
+        predicate: ["self:effect:rage"]
   Raise Symbol:
     assoc_charclass:
       - Cleric
@@ -3775,10 +3820,10 @@ pf2e_feats:
         domain: "damage"
         toggleable: true
       - key: "DamageDice"
+        category: "precision"
         selector: "strike-damage"
         diceNumber: "match(when(lte(@actor.level, 10), 2), when(btwn(@actor.level, 11, 16), 3), when(gte(@actor.level, 17), 4))"
         dieSize: "d6"
-        category: "precision"
         predicate: ["analyze-weakness"]
   Animal Skin:
     assoc_charclass:
@@ -4085,6 +4130,18 @@ pf2e_feats:
       - key: "RollOption"
         option: "divine-rebuttal"
         toggleable: true
+      - key: "AdjustStrike"
+        property: "traits"
+        mode: "add"
+        definition: ["item:deity-favored"]
+        value: "holy"
+        predicate: ["divine-rebuttal", "self:trait:holy"]
+      - key: "AdjustStrike"
+        property: "traits"
+        mode: "add"
+        definition: ["item:deity-favored"]
+        value: "unholy"
+        predicate: ["divine-rebuttal", "self:trait:unholy"]
   Divine Weapon:
     assoc_charclass:
       - Cleric
@@ -5044,11 +5101,11 @@ pf2e_feats:
       - swashbuckler
     rules:
       - key: "DamageDice"
+        category: "persistent"
         selector: "strike-damage"
         diceNumber: "@actor.flags.system.swashbuckler.preciseStrike"
         dieSize: "d6"
         damageType: "bleed"
-        category: "persistent"
         predicate: ["finisher:bleeding", {"or": ["item:melee", {"and": ["feat:flying-blade", "item:thrown", {"or": ["target:range-increment:1", {"and": ["finisher:twirling-throw", {"lte": ["target:range-increment", 3]}]}]}]}]}, {"or": ["item:trait:agile", "item:trait:finesse"]}, {"or": ["item:damage:type:piercing", "item:damage:type:slashing"]}]
   Blind-Fight:
     assoc_charclass:
@@ -6006,10 +6063,10 @@ pf2e_feats:
       - rogue
     rules:
       - key: "DamageDice"
+        category: "precision"
         selector: "strike-damage"
         diceNumber: "ternary(gte(@actor.level,14),ternary(gte(@actor.flags.system.sneakAttackDamage.number,3),2,1),1)"
         dieSize: "d6"
-        category: "precision"
         predicate: ["item:tag:sneak-attack", {"not": "target:condition:off-guard"}]
   Soaring Shape:
     assoc_charclass:
@@ -6912,10 +6969,10 @@ pf2e_feats:
       - rogue
     rules:
       - key: "DamageDice"
+        category: "precision"
         selector: "strike-damage"
         diceNumber: 2
         dieSize: "d6"
-        category: "precision"
         predicate: ["target:mark:precise-debilitations"]
   Prevailing Position:
     assoc_charclass:
@@ -8840,6 +8897,10 @@ pf2e_feats:
       - divine
       - oracle
     rules:
+      - key: "BaseSpeed"
+        selector: "fly"
+        value: "max(20,@actor.system.movement.speeds.land.value)"
+        predicate: [{"gte": ["self:condition:cursebound", 1]}]
       - key: "FlatModifier"
         selector: "fly-speed"
         type: "status"
@@ -10891,6 +10952,15 @@ pf2e_feats:
     shortdesc: "You permanently mutate to become more like the creatures of your bloodline. You gain the appropriate trait or traits for those types of creatures (aberration for aberrant, angel and celestial for angelic, demon and fiend for demonic, and so on). You gain low-light vision or darkvision, if one is appropriate for creatures with those traits. Choose one of the following.%r%rIf creatures associated with your bloodline have a resistance or immunity to acid, cold, electricity, fire, void, or sonic, choose an energy type your bloodline is immune or resistant to and gain resistance 20 against that energy type."
     traits:
       - sorcerer
+    rules:
+      - key: "BaseSpeed"
+        selector: "fly"
+        value: "@actor.system.movement.speeds.land.value"
+        predicate: ["bloodline-mutation-benefit:fly"]
+      - key: "BaseSpeed"
+        selector: "swim"
+        value: "@actor.system.movement.speeds.land.value"
+        predicate: ["bloodline-mutation-benefit:amphibious"]
   Bloodline Perfection:
     assoc_charclass:
       - Sorcerer
@@ -11025,6 +11095,12 @@ pf2e_feats:
       - finisher
       - flourish
       - swashbuckler
+    rules:
+      - key: "AdjustStrike"
+        property: "traits"
+        mode: "add"
+        value: "bravado"
+        predicate: ["finisher:illimitable"]
   Immortal Techniques:
     assoc_charclass:
       - Monk

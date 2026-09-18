@@ -137,7 +137,8 @@ module AresMUSH
       describe "adjusting a modifier" do
         def adjustment(fields)
           { 'source' => 'Something', 'slug' => nil, 'mode' => 'add', 'value' => 1,
-            'suppress' => false, 'relabel' => nil, 'max' => nil }.merge(fields)
+            'suppress' => false, 'relabel' => nil, 'max' => nil, 'when' => nil,
+            'held' => [] }.merge(fields)
         end
 
         def slugged(type, value, slug)
@@ -209,6 +210,45 @@ module AresMUSH
           rows = Modifiers.adjust([ slugged('item', 1, 'ring') ], [])
 
           expect(rows.first['value']).to eq 1
+        end
+
+        # An adjustment may ask about the modifier it is adjusting rather than about the character, which
+        # is how Unburdened Iron lessens armour's speed penalty: it names the penalty by slug and asks
+        # how big it is.
+        describe "asking about the modifier it adjusts" do
+          it "should name it by slug" do
+            rows = Modifiers.adjust([ slugged('item', -2, 'armor-speed-penalty') ],
+                                    [ adjustment('value' => 1,
+                                                 'when' => [ 'penalty:slug:armor-speed-penalty' ]) ])
+
+            expect(rows.first['value']).to eq(-1)
+          end
+
+          it "should leave a modifier the predicate does not describe alone" do
+            rows = Modifiers.adjust([ slugged('item', -2, 'shield-speed-penalty') ],
+                                    [ adjustment('value' => 1,
+                                                 'when' => [ 'penalty:slug:armor-speed-penalty' ]) ])
+
+            expect(rows.first['value']).to eq(-2)
+          end
+
+          it "should ask how big it is" do
+            small = [ slugged('item', -2, 'a') ]
+            large = [ slugged('item', -10, 'b') ]
+            only_large = [ adjustment('value' => 5, 'when' => [ { 'lte' => [ 'penalty:value', -5 ] } ]) ]
+
+            expect(Modifiers.adjust(small, only_large).first['value']).to eq(-2)
+            expect(Modifiers.adjust(large, only_large).first['value']).to eq(-5)
+          end
+
+          # A bonus is a bonus and a penalty is a penalty, which is what tells the two prefixes apart.
+          it "should call a positive modifier a bonus and a negative one a penalty" do
+            bonus = Modifiers.facts_of(slugged('item', 2, 'ring'))
+            penalty = Modifiers.facts_of(slugged('item', -2, 'ring'))
+
+            expect(bonus).to include 'bonus:slug:ring'
+            expect(penalty).to include 'penalty:slug:ring'
+          end
         end
       end
 

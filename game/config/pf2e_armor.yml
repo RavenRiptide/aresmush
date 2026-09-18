@@ -782,6 +782,12 @@ pf2e_armor:
       fundamental:
         potency: 2
         power: 1
+    rules:
+      - key: "Strike"
+        category: "martial"
+        damage: {"base": {"damageType": "piercing", "dice": 2, "die": "d8"}}
+        traits: ["deadly-d12", "unholy"]
+        label: "PF2E.BattleForm.Attack.Horns"
   Warleader's Bulwark:
     category: medium
     traits:

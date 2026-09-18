@@ -359,6 +359,14 @@ pf2e_gear:
     price: 1
     traits: []
     rules:
+      - key: "Strike"
+        category: "simple"
+        damage: {"base": {"damageType": "bludgeoning", "dice": 1, "die": "d4"}}
+        predicate: [{"not": "lit-torch"}]
+      - key: "Strike"
+        category: "simple"
+        damage: {"base": {"damageType": "bludgeoning", "dice": 1, "die": "d4"}}
+        predicate: ["lit-torch"]
       - key: "FlatModifier"
         selector: "{item|_id}-damage"
         value: 1

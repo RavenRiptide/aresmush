@@ -1511,6 +1511,11 @@ pf2e_feats:
     prereq:
       level: 7
       skill: Athletics/master
+    rules:
+      - key: "BaseSpeed"
+        selector: "climb"
+        value: "@actor.system.movement.speeds.land.value"
+        predicate: ["skill:athletics:rank:4"]
   Quick Recognition:
     feat_type:
       - Skill
@@ -1539,6 +1544,11 @@ pf2e_feats:
     prereq:
       level: 7
       skill: Athletics/master
+    rules:
+      - key: "BaseSpeed"
+        selector: "swim"
+        value: "@actor.system.movement.speeds.land.value"
+        predicate: ["skill:athletics:rank:4"]
   Quick Unlock:
     feat_type:
       - Skill

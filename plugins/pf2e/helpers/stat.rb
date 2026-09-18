@@ -33,9 +33,11 @@ module AresMUSH
           'base' => ->(char, _name) { Pf2eHP.base_max_hp(char) },
           'intrinsic' => ->(_char, _name) { [] } },
 
+        # `name` is the kind of movement, land when nobody says. A kind other than land exists only
+        # because the ancestry has it or something granted it, and the highest grant wins.
         { 'name' => 'speed',
           'ability' => ->(_char, _name) { nil },
-          'base' => ->(char, _name) { Pf2e.ancestry_speed(char) },
+          'base' => ->(char, movement) { speed_base(char, movement) },
           # Armour slows a character by its own untyped amount, so Encumbered's status penalty is on
           # top of it rather than competing with it.
           'intrinsic' => ->(char, _name) { [ armor_penalty(char) ] } },
@@ -197,6 +199,21 @@ module AresMUSH
 
         { 'source' => source || ability, 'slug' => Domains.abbreviation(ability),
           'type' => Modifiers::ABILITY, 'value' => Pf2e.ability_mod(char, ability) }
+      end
+
+      LAND = 'land'.freeze
+
+      # What a speed starts from. Land is the ancestry's; any other kind is whatever the ancestry gives,
+      # or the best thing that granted one - a Ring of Swimming grants half the land speed.
+      def self.speed_base(char, movement)
+        kind = Domains.slug(movement || LAND)
+        known = (char.pf2_movement || {})[kind].to_i
+
+        return [ Pf2e.ancestry_speed(char), known ].max if kind == LAND
+
+        granted = Rules.speeds(Effects.sources(char), Effects.options(char), Effects.context(char))[kind]
+
+        [ known, granted ? granted['value'].to_i : 0 ].max
       end
 
       def self.class_attribute(char, named)

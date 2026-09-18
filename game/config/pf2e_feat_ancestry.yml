@@ -23,11 +23,11 @@ pf2e_feats:
       heritage: Changeling
     rules:
       - key: "DamageDice"
+        category: "persistent"
         selector: "claw-damage"
         diceNumber: 1
         dieSize: "d4"
         damageType: "mental"
-        category: "persistent"
         critical: true
   Adapted Cantrip:
     feat_type:
@@ -452,6 +452,37 @@ pf2e_feats:
     prereq:
       level: 1
       heritage: Niasa
+    rules:
+      - key: "Strike"
+        category: "unarmed"
+        group: "brawling"
+        baseType: "claw"
+        damage: {"base": {"damageType": "slashing", "dice": 1, "die": "d4"}}
+        traits: ["agile", "finesse", "unarmed", "versatile-p"]
+        label: "PF2E.BattleForm.Attack.Claw"
+        predicate: ["bestial-manifestation:claw"]
+      - key: "Strike"
+        category: "unarmed"
+        group: "brawling"
+        damage: {"base": {"damageType": "bludgeoning", "dice": 1, "die": "d6"}}
+        traits: ["finesse", "unarmed"]
+        label: "PF2E.BattleForm.Attack.Hoof"
+        predicate: ["bestial-manifestation:hoof"]
+      - key: "Strike"
+        category: "unarmed"
+        group: "brawling"
+        baseType: "jaws"
+        damage: {"base": {"damageType": "piercing", "dice": 1, "die": "d6"}}
+        traits: ["finesse", "unarmed"]
+        label: "PF2E.BattleForm.Attack.Jaws"
+        predicate: ["bestial-manifestation:jaws"]
+      - key: "Strike"
+        category: "unarmed"
+        group: "brawling"
+        damage: {"base": {"damageType": "bludgeoning", "dice": 1, "die": "d4"}}
+        traits: ["agile", "finesse", "unarmed"]
+        label: "PF2E.BattleForm.Attack.Tail"
+        predicate: ["bestial-manifestation:tail"]
   Big Mouth:
     feat_type:
       - Ancestry
@@ -776,6 +807,10 @@ pf2e_feats:
     shortdesc: After years of clambering through caverns, you can climb easily anywhere you go. You gain a climb Speed of 10 feet.
     prereq:
       level: 9
+    rules:
+      - key: "BaseSpeed"
+        selector: "climb"
+        value: 10
   Ceaseless Shadows:
     feat_type:
       - Ancestry
@@ -1563,6 +1598,14 @@ pf2e_feats:
     prereq:
       level: 1
       heritage: Dar
+    rules:
+      - key: "Strike"
+        category: "unarmed"
+        group: "brawling"
+        damage: {"base": {"damageType": "piercing", "dice": 1, "die": "d6"}}
+        traits: ["grapple", "unarmed"]
+        range: null
+        label: "PF2E.BattleForm.Attack.Fangs"
   Fell Rider:
     feat_type:
       - Ancestry
@@ -1727,6 +1770,10 @@ pf2e_feats:
         selector: "athletics"
         adjustment: {"success": "one-degree-better"}
         predicate: ["action:climb", {"not": "heritage:cliffscale-lizardfolk"}]
+      - key: "BaseSpeed"
+        selector: "climb"
+        value: 15
+        predicate: ["heritage:cliffscale-lizardfolk"]
   General Training:
     repeatable: true
     feat_type:
@@ -1769,6 +1816,12 @@ pf2e_feats:
         option: "target:trait:incorporeal"
         toggleable: "totm"
         label: "PF2E.SpecificRule.TOTMToggle.Incorporeal"
+      - key: "AdjustStrike"
+        property: "weapon-traits"
+        mode: "add"
+        definition: [{"not": "item:magical"}]
+        value: "magical"
+        predicate: ["target:trait:incorporeal"]
   Gnome Obsession:
     feat_type:
       - Ancestry
@@ -2001,6 +2054,15 @@ pf2e_feats:
     prereq:
       level: 1
       heritage: Changeling
+    rules:
+      - key: "Strike"
+        category: "unarmed"
+        group: "brawling"
+        baseType: "claw"
+        damage: {"base": {"damageType": "slashing", "dice": 1, "die": "d4"}}
+        traits: ["agile", "finesse", "unarmed"]
+        range: null
+        label: "PF2E.Weapon.Base.claw"
   Hag Magic:
     feat_type:
       - Ancestry
@@ -3307,6 +3369,10 @@ pf2e_feats:
         value: "ternary(gte(@weapon.system.runes.potency,3),2,1)"
         damageType: "void"
         predicate: ["target:mode:living"]
+      - key: "AdjustStrike"
+        property: "traits"
+        mode: "add"
+        value: "magical"
   Rallying Cry:
     feat_type:
       - Ancestry
@@ -3763,6 +3829,14 @@ pf2e_feats:
     prereq:
       level: 1
       heritage: Changeling
+    rules:
+      - key: "Strike"
+        category: "unarmed"
+        group: "brawling"
+        baseType: "claw"
+        damage: {"base": {"damageType": "slashing", "dice": 1, "die": "d6"}}
+        traits: ["grapple"]
+        label: "PF2E.Weapon.Base.claw"
   Slip Sideways:
     feat_type:
       - Ancestry
@@ -3822,6 +3896,10 @@ pf2e_feats:
         option: "soaring-flight"
         toggleable: true
         predicate: [{"not": "feat:soaring-form"}]
+      - key: "BaseSpeed"
+        selector: "fly"
+        value: 20
+        predicate: ["soaring-flight"]
   Soaring Form:
     feat_type:
       - Ancestry
@@ -3834,6 +3912,10 @@ pf2e_feats:
       level: 9
       feat:
         - Soaring Flight
+    rules:
+      - key: "BaseSpeed"
+        selector: "fly"
+        value: 20
   Spell Devourer:
     feat_type:
       - Ancestry
@@ -4179,6 +4261,14 @@ pf2e_feats:
     shortdesc: "You gain a swim Speed of 15 feet.%r%r**Special** If you have the makar ciith heritage, your swim Speed instead increases to 25 feet."
     prereq:
       level: 5
+    rules:
+      - key: "BaseSpeed"
+        selector: "swim"
+        value: 15
+      - key: "BaseSpeed"
+        selector: "swim"
+        value: 25
+        predicate: ["heritage:wetlander-lizardfolk"]
   Symphony of Blood:
     feat_type:
       - Ancestry
@@ -4675,6 +4765,10 @@ pf2e_feats:
     shortdesc: You've learned to put your sturdy claws to work digging through the earth. You gain a burrow Speed of 15 feet.
     prereq:
       level: 13
+    rules:
+      - key: "BaseSpeed"
+        selector: "burrow"
+        value: 15
   Warren Navigator:
     feat_type:
       - Ancestry

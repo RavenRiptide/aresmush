@@ -58,8 +58,23 @@ module AresMUSH
         end
       end
 
+      # An adjustment may ask about the modifier it is adjusting rather than about the character: a feat
+      # that lessens armour's speed penalty is written as `penalty:slug:armor-speed-penalty` and
+      # `{lte: ["penalty:value", -5]}`. Those facts are true of the modifier, so they are supplied here
+      # and nowhere else.
+      def self.facts_of(row)
+        kind = value_of(row).negative? ? 'penalty' : 'bonus'
+
+        [ kind, 'modifier' ].flat_map do |prefix|
+          [ "#{prefix}:slug:#{row['slug']}",
+            "#{prefix}:type:#{row['type']}",
+            "#{prefix}:value:#{value_of(row)}" ]
+        end
+      end
+
       def self.reaches?(adjustment, row, counts)
         return false unless adjustment['slug'].nil? || adjustment['slug'].to_s == row['slug'].to_s
+        return false unless Predicate.test(adjustment['when'], facts_of(row) + Array(adjustment['held']))
 
         limit = adjustment['max']
 

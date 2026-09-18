@@ -105,6 +105,61 @@ module AresMUSH
           }
         },
         {
+          'key' => 'Strike',
+          'fields' => %w{key slug label category group baseType damage traits otherTags range
+                         predicate img fist},
+          # An attack the character would not otherwise have: a shield's lion head, a torch swung as a
+          # club, the claws a stance grants. It becomes an unarmed-style attack, described the same way
+          # a catalogue weapon is, so everything that reads an attack reads this one too.
+          'contribute' => lambda { |row, source, _context|
+            base = (row['damage'] || {})['base'] || {}
+
+            { 'source' => source['name'],
+              'slug' => row['slug'] || Domains.slug(row['label'] || source['name']),
+              'name' => row['label'] || source['name'],
+              'category' => row['category'],
+              'group' => row['group'],
+              'base' => row['baseType'] || Domains.slug(row['label'] || source['name']),
+              'traits' => Array(row['traits']),
+              'dice' => base['dice'] || 1,
+              'die' => base['die'],
+              'damage_type' => base['damageType'],
+              'range' => row['range'] }
+          }
+        },
+        {
+          'key' => 'AdjustStrike',
+          'fields' => %w{key property mode value definition predicate slug label},
+          # Changes an attack rather than the roll: adds a trait to it. A trait is not decoration - a
+          # weapon that gains `finesse` may be attacked with Dexterity and one that gains `thrown` adds
+          # Strength to its damage - so the trait is what this reads and the other properties it can
+          # change are refused at import.
+          #
+          # `definition` says which attack, tested against that attack's own options rather than the
+          # character's.
+          'contribute' => lambda { |row, source, _context|
+            { 'source' => source['name'],
+              'slug' => row['slug'] || Domains.slug(source['name']),
+              'property' => Domains.slug(row['property']),
+              'mode' => row['mode'].to_s,
+              'trait' => Domains.slug(row['value']),
+              'definition' => row['definition'] }
+          }
+        },
+        {
+          'key' => 'BaseSpeed',
+          'fields' => %w{key selector value predicate slug label},
+          # A speed of a kind the character would not otherwise have, or a better one: a Ring of
+          # Swimming gives a swim speed of half their land speed. `selector` is the kind of movement,
+          # and the highest candidate is the one that counts.
+          'contribute' => lambda { |row, source, context|
+            { 'source' => source['name'],
+              'slug' => row['slug'] || Domains.slug(source['name']),
+              'movement' => Domains.slug(row['selector']),
+              'value' => Formula.value(row['value'], context) }
+          }
+        },
+        {
           'key' => 'AdjustModifier',
           'fields' => %w{key selector selectors slug mode value suppress relabel damageType
                          maxApplications predicate label priority},
@@ -237,6 +292,52 @@ module AresMUSH
         gather(sources, domains, options, 'AdjustDegreeOfSuccess') { |row| row['adjustment'] }
       end
 
+      # Attacks something granted the character. Each is described the way a catalogue weapon is, so
+      # nothing that reads an attack has to know it came from a rule.
+      def self.strikes(sources, options)
+        Array(sources).flat_map do |source|
+          held = Array(options) + Array(source['options'])
+
+          of_kind(source, 'Strike').select { |row| Predicate.test(row['predicate'], held) }
+                                   .map { |row| contribute(row, source, {}) }
+                                   .compact
+        end
+      end
+
+      # Traits an effect adds to an attack. `definition` is a predicate over the attack's own options, so a
+      # rune reaches the weapon it is on and a feat reaches every weapon of a base type.
+      TRAIT_PROPERTIES = %w{traits weapon-traits}.freeze
+
+      def self.strike_traits(sources, options, attack_options)
+        Array(sources).flat_map do |source|
+          held = Array(options) + Array(source['options'])
+
+          of_kind(source, 'AdjustStrike')
+            .select { |row| Predicate.test(row['predicate'], held) }
+            .map { |row| contribute(row, source, {}) }
+            .compact
+            .select { |one| TRAIT_PROPERTIES.include?(one['property']) && one['mode'] == 'add' }
+            .select { |one| Predicate.test(one['definition'], attack_options) }
+            .map { |one| one['trait'] }
+        end.uniq
+      end
+
+      # Speeds a character has because something gave them one, by kind of movement. The highest for a
+      # kind wins, which is Foundry's own rule (`creature/document.ts` `selectCandidate`) - two rings
+      # that both grant a swim speed are the better swim speed, not the sum.
+      def self.speeds(sources, options, context = {})
+        gathered = Array(sources).flat_map do |source|
+          held = Array(options) + Array(source['options'])
+
+          of_kind(source, 'BaseSpeed').select { |row| Predicate.test(row['predicate'], held) }
+                                      .map { |row| contribute(row, source, context) }
+                                      .compact
+        end
+
+        gathered.group_by { |one| one['movement'] }
+                .transform_values { |ones| ones.max_by { |one| one['value'].to_i } }
+      end
+
       # Rules that change a modifier that already exists. A row naming several selectors reaches a
       # statistic answering to any of them, which is why `selectors` is read alongside `selector`.
       def self.modifier_adjustments(sources, domains, options, context = {})
@@ -245,8 +346,8 @@ module AresMUSH
 
           of_kind(source, 'AdjustModifier')
             .select { |row| Domains.matches?(selectors_of(row), domains) }
-            .select { |row| Predicate.test(row['predicate'], held) }
-            .map { |row| contribute(row, source, context) }
+            .map { |row| contribute(row, source, context)&.merge('when' => row['predicate'],
+                                                                 'held' => held) }
             .compact
         end
       end

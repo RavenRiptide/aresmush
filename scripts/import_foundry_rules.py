@@ -53,13 +53,26 @@ KINDS = {
     'AdjustModifier': {'key', 'selector', 'selectors', 'slug', 'mode', 'value', 'suppress', 'relabel',
                        'damageType', 'maxApplications', 'predicate', 'label', 'priority'},
     'AdjustDegreeOfSuccess': {'key', 'selector', 'adjustment', 'predicate', 'slug', 'label'},
+    'BaseSpeed': {'key', 'selector', 'value', 'predicate', 'slug', 'label'},
+    # img is the icon their sheet shows; fist is a flag about replacing the default unarmed attack.
+    'Strike': {'key', 'slug', 'label', 'category', 'group', 'baseType', 'damage', 'traits', 'otherTags',
+               'range', 'predicate', 'img', 'fist'},
+    'AdjustStrike': {'key', 'property', 'mode', 'value', 'definition', 'predicate', 'slug', 'label'},
     'Immunity': {'key', 'type', 'value', 'predicate', 'slug', 'label', 'exceptions'},
     'Weakness': {'key', 'type', 'value', 'predicate', 'slug', 'label', 'exceptions'},
     'Resistance': {'key', 'type', 'value', 'predicate', 'slug', 'label', 'exceptions', 'doubleVs'},
 }
 
 # Neither of these reaches a statistic: one declares a circumstance and the other writes a value.
-SELECTORLESS = {'RollOption', 'ActiveEffectLike', 'Immunity', 'Weakness', 'Resistance'}
+SELECTORLESS = {'RollOption', 'ActiveEffectLike', 'Immunity', 'Weakness', 'Resistance', 'AdjustStrike',
+                'Strike'}
+
+# A BaseSpeed's selector is a kind of movement rather than a domain.
+MOVEMENT = {'land', 'burrow', 'climb', 'fly', 'swim'}
+
+# What an AdjustStrike may change and have it mean something here. A trait changes numbers; a material,
+# a range increment and a property rune name things this engine does not model.
+STRIKE_PROPERTIES = {'traits', 'weapon-traits'}
 
 # Paths Pf2e::Paths can write. Anything else is refused rather than written somewhere wrong.
 WRITABLE = [
@@ -148,7 +161,8 @@ def take(rule, refused):
     """The rule as we would write it, or None with a reason recorded."""
     fields = KINDS[rule['key']]
 
-    if rule['key'] not in SELECTORLESS and not (rule.get('selector') or rule.get('selectors')):
+    if rule['key'] not in SELECTORLESS and rule['key'] != 'BaseSpeed' \
+            and not (rule.get('selector') or rule.get('selectors')):
         refused['no selector'] += 1
         return None
 
@@ -186,7 +200,24 @@ def take(rule, refused):
         refused[f'field {sorted(strays)}'] += 1
         return None
 
-    if rule['key'] not in SELECTORLESS:
+    if rule['key'] == 'BaseSpeed':
+        if rule.get('selector') not in MOVEMENT:
+            refused[f"movement {rule.get('selector')!r}"] += 1
+            return None
+    elif rule['key'] == 'Strike':
+        # An attack with no damage of its own is one we could not roll.
+        base = (rule.get('damage') or {}).get('base') or {}
+        if not base.get('die'):
+            refused['strike with no damage die'] += 1
+            return None
+    elif rule['key'] == 'AdjustStrike':
+        if rule.get('property') not in STRIKE_PROPERTIES:
+            refused[f"strike property {rule.get('property')!r}"] += 1
+            return None
+        if rule.get('mode') != 'add':
+            refused[f"strike mode {rule.get('mode')!r}"] += 1
+            return None
+    elif rule['key'] not in SELECTORLESS:
         named = rule.get('selector') or rule.get('selectors')
         selectors = named if isinstance(named, list) else [named]
         bad = [s for s in selectors if not selector_ok(s)]
@@ -203,8 +234,10 @@ def take(rule, refused):
             return None
 
     # Keep only the fields we read, in a stable order, so a re-run produces the same file.
-    order = ['key', 'option', 'domain', 'toggleable', 'path', 'mode', 'exceptions', 'selector',
-             'selectors', 'adjustment', 'suppress', 'relabel', 'maxApplications', 'type', 'ability',
+    order = ['key', 'option', 'domain', 'toggleable', 'path', 'property', 'category', 'group',
+             'baseType', 'damage', 'traits', 'range', 'mode', 'exceptions',
+             'selector', 'selectors', 'definition', 'adjustment', 'suppress', 'relabel',
+             'maxApplications', 'type', 'ability',
              'value', 'min',
              'max', 'diceNumber', 'dieSize', 'damageType', 'damageCategory', 'category', 'critical',
              'override', 'label', 'predicate']

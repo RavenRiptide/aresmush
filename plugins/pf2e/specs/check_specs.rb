@@ -71,6 +71,28 @@ module AresMUSH
         expect(check.options).to include 'self:level:10'
       end
 
+      # Every one of these answers a predicate that was in config and could never be met without it.
+      it "should carry the character's own facts, which imported rules ask about" do
+        @char.update(:pf2_base_info => { 'heritage' => 'Cliffscale Lizardfolk', 'charclass' => 'Ranger',
+                                         'ancestry' => 'Lizardfolk' },
+                     :pf2_feats => { 'general' => [ 'Fleet' ] },
+                     :pf2_features => { 'charclass_features' => [ 'Hunt Prey' ] })
+
+        options = Pf2e::Check.of(Character[@char.id], 'skill', 'Athletics').options
+
+        expect(options).to include 'heritage:cliffscale-lizardfolk', 'class:ranger',
+                                   'ancestry:lizardfolk', 'feat:fleet', 'feature:hunt-prey'
+      end
+
+      it "should say what rank each skill is, which a feat asks about" do
+        expect(Pf2e::Check.of(reread, 'skill', 'Athletics').options)
+          .to include 'skill:athletics:rank:1'
+      end
+
+      it "should say what each attribute is worth" do
+        expect(Pf2e::Check.of(reread, 'skill', 'Athletics').options).to include 'attribute:str:2'
+      end
+
       # A check built on another statistic is that check, not the one underneath: rolling initiative off
       # Perception is an initiative check whose base statistic is Perception.
       it "should name an initiative check as one, and say what it is built on" do

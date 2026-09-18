@@ -354,11 +354,50 @@ module AresMUSH
     # `id`, `group` and `base` are here because the domains are built off them: a rune that says
     # `{item|id}-damage` reaches this weapon and nothing else, and a feat that says
     # `sword-weapon-group-damage` reaches every sword.
+    # What an attack answers to when a rule asks which attack it is: its id, its name, its base type and
+    # its traits, in Foundry's spelling, so a `definition` copied from their data reads the same facts.
+    # Attacks a feat or an item granted, as descriptors the rest of the attack code already reads.
+    #
+    # A granted attack is proficient as an unarmed attack of its category, which is what the rules say of
+    # the ones that exist - a stance's claws use your unarmed proficiency.
+    def self.granted_strikes(char)
+      Pf2e::Rules.strikes(Pf2e::Effects.sources(char), Pf2e::Effects.options(char)).map do |strike|
+        with_added_traits(char, {
+          'id' => nil, 'name' => strike['name'], 'source' => strike['source'],
+          'prof' => get_unarmed_prof(char, strike['name']),
+          'group' => strike['group'], 'base' => strike['base'],
+          'traits' => strike['traits'], 'ranged' => !strike['range'].nil?,
+          'unarmed' => strike['category'].to_s != 'martial',
+          'bomb' => false, 'die' => strike['die'], 'dice' => strike['dice'],
+          'damage_type' => strike['damage_type'] || 'B', 'striking' => 0, 'rune' => 0
+        })
+      end
+    end
+
+    def self.attack_options(descriptor)
+      [ "item:id:#{descriptor['id']}",
+        "item:slug:#{Pf2e::Domains.slug(descriptor['name'])}",
+        "item:base:#{Pf2e::Domains.slug(descriptor['base'])}" ] +
+        Array(descriptor['traits']).map { |trait| "item:trait:#{Pf2e::Domains.slug(trait)}" }
+    end
+
+    # Traits an effect adds to this attack. A trait changes numbers - `finesse` lets Dexterity attack
+    # with it, `thrown` adds Strength to its damage - so they are added before anything reads the
+    # descriptor.
+    def self.with_added_traits(char, descriptor)
+      added = Pf2e::Rules.strike_traits(Pf2e::Effects.sources(char), Pf2e::Effects.options(char),
+                                        attack_options(descriptor))
+
+      return descriptor if added.empty?
+
+      descriptor.merge('traits' => (Array(descriptor['traits']) + added).uniq)
+    end
+
     def self.attack_descriptor(char, weapon, twohand = false)
       info = weapon_info(weapon.name) || {}
       damage = twohand && weapon.wp_damage_2h ? weapon.wp_damage_2h : weapon.wp_damage
 
-      { 'id' => weapon.id.to_s, 'name' => weapon.name,
+      with_added_traits(char, { 'id' => weapon.id.to_s, 'name' => weapon.name,
         'prof' => get_weapon_prof(char, weapon.name),
         'group' => info['group'], 'base' => info['base'] || weapon.name,
         'traits' => weapon.traits, 'ranged' => weapon.wp_type == 'ranged',
@@ -366,14 +405,16 @@ module AresMUSH
         'bomb' => bomb?(info),
         'die' => damage, 'damage_type' => weapon.wp_damage_type,
         'striking' => Pf2egear.get_rune_value(weapon, 'fundamental', 'power'),
-        'rune' => Pf2egear.get_rune_value(weapon, 'fundamental', 'potency') }
+        'rune' => Pf2egear.get_rune_value(weapon, 'fundamental', 'potency') })
     end
 
-    def self.unarmed_descriptor(name, info, prof)
-      { 'id' => nil, 'name' => name, 'prof' => prof, 'group' => info['group'], 'base' => name,
-        'traits' => info['traits'], 'ranged' => false, 'unarmed' => true, 'bomb' => false,
-        'die' => info['damage'], 'damage_type' => info['damage_type'] || 'B',
-        'striking' => 0, 'rune' => 0 }
+    def self.unarmed_descriptor(name, info, prof, char = nil)
+      descriptor = { 'id' => nil, 'name' => name, 'prof' => prof, 'group' => info['group'],
+                     'base' => name, 'traits' => info['traits'], 'ranged' => false, 'unarmed' => true,
+                     'bomb' => false, 'die' => info['damage'],
+                     'damage_type' => info['damage_type'] || 'B', 'striking' => 0, 'rune' => 0 }
+
+      char ? with_added_traits(char, descriptor) : descriptor
     end
 
     def self.get_wpattack_bonus(char, weapon, options = [])
@@ -390,22 +431,23 @@ module AresMUSH
 
     # `twohand` is for a one-handed weapon that does more damage wielded in two; it is ignored for a
     # weapon whose damage does not change.
-    def self.damage_descriptor(char, attack, weapon = nil, twohand = false)
+    def self.damage_descriptor(char, attack, weapon = nil, twohand = false, given = nil)
+      return given if given
       return attack_descriptor(char, weapon, twohand) if weapon
 
       info = (char.combat&.unarmed_attacks || {})[attack.to_s.capitalize] || {}
 
       name = attack.to_s.capitalize
 
-      unarmed_descriptor(name, info, get_unarmed_prof(char, name, info))
+      unarmed_descriptor(name, info, get_unarmed_prof(char, name, info), char)
     end
 
     def self.get_damage(char, attack, weapon=nil, twohand=false, options=[])
       Pf2e::Damage.formula(char, damage_descriptor(char, attack, weapon, twohand), options)
     end
 
-    def self.damage_breakdown(char, attack, weapon=nil, twohand=false, options=[])
-      Pf2e::Damage.of(char, damage_descriptor(char, attack, weapon, twohand), options)
+    def self.damage_breakdown(char, attack, weapon=nil, twohand=false, options=[], given=nil)
+      Pf2e::Damage.of(char, damage_descriptor(char, attack, weapon, twohand, given), options)
     end
 
     def self.factory_default(char)

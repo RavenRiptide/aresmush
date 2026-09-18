@@ -320,6 +320,18 @@ pf2e_weapons:
         toggleable: true
         label: "PF2E.SpecificRule.Equipment.ChaplainsCudgel.CastTwoActionSpellLabel"
         predicate: ["chaplains-cudgel:bow-to-a-higher-power"]
+      - key: "AdjustStrike"
+        property: "traits"
+        mode: "add"
+        definition: ["item:id:{item|_id}"]
+        value: "holy"
+        predicate: ["chaplains-cudgel:bow-to-a-higher-power", "self:trait:holy"]
+      - key: "AdjustStrike"
+        property: "traits"
+        mode: "add"
+        definition: ["item:id:{item|_id}"]
+        value: "unholy"
+        predicate: ["chaplains-cudgel:bow-to-a-higher-power", "self:trait:unholy"]
       - key: "FlatModifier"
         selector: "strike-damage"
         type: "status"
@@ -763,10 +775,10 @@ pf2e_weapons:
         toggleable: true
         label: "PF2E.SkillVariant.DimLightOrDarkness"
       - key: "DamageDice"
+        category: "precision"
         selector: "{item|_id}-damage"
         diceNumber: 1
         dieSize: "d6"
-        category: "precision"
         predicate: ["self:condition:undetected"]
   Gnome Flickmace:
     wp_type: melee

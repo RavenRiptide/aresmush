@@ -130,7 +130,21 @@ module AresMUSH
           list << format_unarmed(@char, atk, info, Pf2eCombat.get_unarmed_prof(@char, atk, info))
         end
 
+        # Attacks a feat or an item granted. Shown alongside the ones the character has by nature,
+        # because to a player they are the same thing: something else to hit with.
+        Pf2eCombat.granted_strikes(@char).each { |strike| list << format_strike(@char, strike) }
+
         list
+      end
+
+      def format_strike(char, strike)
+        damage = Pf2eCombat.damage_breakdown(char, strike['name'], nil, false, [], strike)
+        traits = Array(strike['traits']).map { |t| titleize_trait(t) }.join(", ")
+        bonus = Pf2e::Stat.total(char, 'attack', strike)
+
+        "#{item_color}#{strike['name']}:%xn #{bonus} (#{strike['prof'][0].upcase}) " \
+          "#{damage['formula']}\n#{item_color}From:%xn #{strike['source']}" \
+          "#{traits.empty? ? '' : "\n#{item_color}Traits:%xn #{traits}"}%r"
       end
 
       def weapons
