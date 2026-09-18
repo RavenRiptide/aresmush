@@ -16,7 +16,7 @@ module AresMUSH
   describe "imported rules", :dbtest => true do
 
     CATALOGUES = %w{pf2e_conditions pf2e_magicitem pf2e_armor pf2e_weapons pf2e_shields pf2e_gear
-                    pf2e_consumables pf2e_feats}.freeze
+                    pf2e_consumables pf2e_feats pf2e_effects}.freeze
 
     before(:each) do
       bootstrapper = AresMUSH::Bootstrapper.new
@@ -130,10 +130,10 @@ module AresMUSH
 
     # Kinds that reach no statistic, so they name no domain: one declares a circumstance, one writes a
     # value, three describe damage, two describe an attack, one asks a question, one brings another
-    # condition with it, and BaseSpeed names a kind of movement.
+    # condition with it, one gives temporary hit points, and BaseSpeed names a kind of movement.
     SELECTORLESS = %w{RollOption ActiveEffectLike Immunity Weakness Resistance AdjustStrike Strike
                       BaseSpeed Sense MartialProficiency CriticalSpecialization ChoiceSet
-                      GrantItem}.freeze
+                      GrantItem TempHP}.freeze
 
     # Of those, the two that still carry a `selector` - because a movement type and a sense are not
     # domains, they are the thing being granted.
@@ -303,8 +303,20 @@ module AresMUSH
       end
     end
 
-    it "should have all eighteen kinds that change a number" do
-      expect(rows.map { |_where, row| row['key'] }.uniq.size).to eq 18
+    it "should have all nineteen kinds that change a number" do
+      expect(rows.map { |_where, row| row['key'] }.uniq.size).to eq 19
+    end
+
+    # An effect granting another effect has to name one the catalogue holds, or it brings nothing.
+    it "should grant effects that exist" do
+      named = rows.select { |_where, row| row['key'] == 'GrantItem' }
+                  .map { |where, row| [ where, Pf2e::Grants.target(row['uuid']) ] }
+                  .select { |_where, (catalogue, _name)| catalogue == 'effects' }
+
+      strays = named.reject { |_where, (_catalogue, name)| Pf2e::ActiveEffects.catalogue.key?(name) }
+                    .map { |where, (_catalogue, name)| "#{where}: #{name}" }
+
+      expect(strays.uniq).to eq []
     end
 
     # A grant has to name something a catalogue here holds, or it would bring nothing with it.

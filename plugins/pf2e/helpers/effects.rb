@@ -57,7 +57,7 @@ module AresMUSH
 
       def self.sources(char)
         SheetReads.memo(char, :effect_sources) do
-          conditions(char) + feats(char) + items(char) + runes(char)
+          conditions(char) + feats(char) + items(char) + runes(char) + ActiveEffects.sources(char)
         end
       end
 
@@ -95,10 +95,22 @@ module AresMUSH
       # asked about by imported rules, and a predicate about a fact nobody supplies is a rule that is
       # read and does nothing - which is the failure this branch has hit more than once.
       def self.build_facts(char)
+        character_facts(char) +
+          named('self:condition', Pf2e.held_conditions(char).keys) +
+          named('self:sense', granted_sense_names(char))
+      end
+
+      # What is true of the character without asking what they are under. A grant's predicate is tested
+      # against these, because working out which conditions a character has is itself one of the things
+      # the full list of facts is built from.
+      def self.character_facts(char)
+        SheetReads.memo(char, :character_facts) { build_character_facts(char) }
+      end
+
+      def self.build_character_facts(char)
         info = char.pf2_base_info || {}
 
         [ "self:level:#{char.pf2_level.to_i}" ] +
-          named('self:condition', Pf2e.held_conditions(char).keys) +
           named('self:trait', Array(char.pf2_traits)) +
           named('heritage', [ info['heritage'] ]) +
           named('ancestry', [ info['ancestry'] ]) +
@@ -109,8 +121,7 @@ module AresMUSH
           skill_facts(char) +
           proficiency_facts(char) +
           attribute_facts(char) +
-          armor_facts(char) +
-          named('self:sense', granted_sense_names(char))
+          armor_facts(char)
       end
 
       # What is true of the armour a character is wearing. Foundry's `armor:` options
@@ -222,7 +233,8 @@ module AresMUSH
 
         return built unless sets.any?
 
-        chosen = chosen_for(char, built['name'])
+        # An effect carries the answers it was applied with; a feat's are recorded with the feat.
+        chosen = built['chosen'] || chosen_for(char, built['name'])
         declared = Array(built['options'])
         selections = {}
 
@@ -345,7 +357,11 @@ module AresMUSH
         # Ranks are here because effects are written against them: Armored Stealth reduces the armour
         # penalty by your Stealth rank less one, and Specialty Crafting scales with Crafting. A rank is a
         # proficiency rather than a figure, so reading one assembles nothing.
+        #
+        # So are the counters a rule writes to `flags.system` for another to read: Rage's temporary hit
+        # points are `@actor.flags.system.rageTempHP`.
         { 'actor' => { 'level' => char.pf2_level.to_i, 'abilities' => mods,
+                       'flags' => { 'system' => Paths.flags(char) },
                        'system' => { 'movement' => { 'speeds' =>
                                        { 'land' => { 'value' => Pf2e.ancestry_speed(char) } } },
                                      'skills' => skill_ranks(char),

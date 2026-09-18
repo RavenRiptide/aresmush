@@ -282,6 +282,21 @@ module AresMUSH
           }
         },
         {
+          'key' => 'TempHP',
+          'fields' => %w{key value predicate events slug label},
+          # Temporary hit points an effect gives: when it begins, and again at the start of each turn
+          # where it says so. They do not stack - the better of what is held and what is given - and
+          # they go when the effect that gave them does (`rule-element/temp-hp.ts`).
+          'contribute' => lambda { |row, source, context|
+            events = row['events'] || {}
+
+            { 'source' => source['name'],
+              'value' => Formula.value(row['value'], context).to_i,
+              'on_create' => events['onCreate'] != false,
+              'on_turn_start' => events['onTurnStart'] == true }
+          }
+        },
+        {
           'key' => 'GrantItem',
           'fields' => %w{key uuid inMemoryOnly predicate onDeleteActions allowDuplicate alterations slug
                          label},
@@ -326,7 +341,7 @@ module AresMUSH
                        'DamageDice' => %w{hideIfDisabled phase priority},
                        'AdjustStrike' => %w{phase priority},
                        'DamageAlteration' => %w{phase priority},
-                       'ChoiceSet' => %w{adjustName allowedDrops},
+                       'ChoiceSet' => %w{adjustName allowedDrops priority},
                        'Strike' => %w{img},
                        'GrantItem' => %w{priority} }.freeze
 

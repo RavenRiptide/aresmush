@@ -25,6 +25,9 @@ module AresMUSH
       healing = get_daily_healing(char)
       Pf2eHP.modify_damage(char, healing, true)
 
+      # A night has passed: anything shorter than a day is over, and a day-long effect counts it.
+      ActiveEffects.rested(char)
+
       # Focus Pool
       daily_refresh_focus_pool(magic) if magic
 

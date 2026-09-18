@@ -216,6 +216,14 @@ module AresMUSH
         AnsiFormatter.strip_ansi(formatted).length
       end
 
+      # What the character is under and how long it has left. Its numbers are already in the figures
+      # above; this is where a player sees why.
+      def effects
+        ActiveEffects.on(@char).sort_by(&:name).map do |effect|
+          "#{item_color}#{effect.name}%xn: #{ActiveEffects.remaining(effect)}"
+        end
+      end
+
       # Including the ones another brought with it, and saying which: a grabbed character is off-guard,
       # and the sheet should say why.
       def conditions

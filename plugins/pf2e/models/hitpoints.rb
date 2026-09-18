@@ -9,6 +9,9 @@ module AresMUSH
     attribute :temp_max, :type => DataType::Integer, :default => 0
     attribute :temp_current, :type => DataType::Integer, :default => 0
     attribute :temp_hp, :type => DataType::Integer, :default => 0
+    # Which effect the temporary hit points came from, so ending that effect takes them away and ending
+    # some other one does not (`rule-element/temp-hp.ts`).
+    attribute :temp_hp_source
 
 
     reference :character, "AresMUSH::Character"

@@ -281,3 +281,23 @@ pf2e_conditions:
     short_descr: You have been seriously injured.
     value: true
     override: false
+  Concealed:
+    short_descr: "You are difficult for one or more creatures to see due to thick fog or some other obscuring feature."
+    value: false
+    override: false
+  Cursebound:
+    short_descr: "Your oracular curse is constricting around you as you receive divine punishment after drawing too deeply on your mystery's powers."
+    value: true
+    override: false
+  Hidden:
+    short_descr: "While you're hidden from a creature, that creature knows the space you're in but can't tell precisely where you are."
+    value: false
+    override: false
+  Undetected:
+    short_descr: "When you are undetected by a creature, that creature can't see you at all, has no idea what space you occupy, and can't target you, though you still can be affected by abilities that target an area."
+    value: false
+    override: false
+  Unnoticed:
+    short_descr: "If you're unnoticed by a creature, that creature has no idea you're present."
+    value: false
+    override: false

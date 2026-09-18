@@ -86,20 +86,23 @@ module AresMUSH
         # directly would be overwritten by the next fold, so the registry must not offer it.
         {
           'name' => 'fact',
-          'match' => %r{\Asystem\.attributes\.(flanking\.canFlank|flanking\.canGangUp|familiarAbilities\.value)\z},
+          'match' => %r{\Asystem\.attributes\.(flanking\.canFlank|flanking\.canGangUp|flanking\.flankable
+                        |familiarAbilities\.value)\z}x,
           'read' => ->(char, name) { Paths.held(char, Domains.slug(name)) },
           'write' => ->(char, name, value) { Paths.store(char, Domains.slug(name), value) }
         },
         # Counters and flags that exist so another rule can ask about them: how many dedications of a
-        # class you have, how many forms you know. Nothing reads them but predicates, which is exactly
-        # why they have to be written somewhere a predicate can see.
+        # class you have, how many forms you know, how many temporary hit points a rage gives. A formula
+        # reads them back as `@actor.flags.system.<name>` - Rage's temporary hit points are exactly that
+        # - so they are kept under the path's own spelling, which is how `Effects.build_context` finds
+        # them.
         {
           'name' => 'counter',
           'match' => %r{\Aflags\.system\.([\w.]+)\z},
           # Read as it stands rather than as a number: `override` writes lists and words here as readily
           # as counts, and coercing on the way out would raise on the next read.
-          'read' => ->(char, name) { Paths.held(char, Domains.slug(name)) },
-          'write' => ->(char, name, value) { Paths.store(char, Domains.slug(name), value) }
+          'read' => ->(char, name) { Paths.held(char, Paths.flag(name)) },
+          'write' => ->(char, name, value) { Paths.store(char, Paths.flag(name), value) }
         }
       ].freeze
 
@@ -153,6 +156,19 @@ module AresMUSH
         held = (char.pf2_derived || {}).merge(name.to_s => value)
 
         char.update(:pf2_derived => held)
+      end
+
+      FLAG = 'flags.system.'.freeze
+
+      def self.flag(name)
+        "#{FLAG}#{name}"
+      end
+
+      # Every counter, by its own name, as a formula reads them.
+      def self.flags(char)
+        (char.pf2_derived || {}).each_with_object({}) do |(key, value), out|
+          out[key.delete_prefix(FLAG)] = value if key.start_with?(FLAG)
+        end
       end
 
       def self.held(char, name)

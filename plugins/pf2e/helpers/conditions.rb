@@ -47,7 +47,24 @@ module AresMUSH
         out[name] = { 'value' => info['value'], 'granted_by' => info['granted_by'], 'derived' => false }
       end
 
+      # What the character's effects bring with them for as long as they last: an effect that knocks you
+      # prone, a stance that makes you off-guard.
+      ActiveEffects.derived_conditions(char).each do |grant, effect|
+        name = canonical_condition(grant['name'])
+
+        next if held.key?(name)
+
+        held[name] = { 'value' => grant['value'] || default_condition_value(name),
+                       'granted_by' => effect, 'derived' => true }
+      end
+
       derive_conditions(held, held.keys)
+    end
+
+    # Whether what granted a condition still holds: a condition set on the character, or an effect they
+    # are under.
+    def self.granter_holds?(char, granter)
+      (char.pf2_conditions || {}).key?(granter) || ActiveEffects.active?(char, granter)
     end
 
     # The grants a set of granters bring, followed to the end: Unconscious brings Prone, and Prone
@@ -128,7 +145,11 @@ module AresMUSH
 
       grant_stored_conditions(char, condition)
 
-      Ok.new(:state => list)
+      # A condition may write as well as modify - Confused cannot flank - and what it writes is derived,
+      # so it is rebuilt once the whole chain of grants has landed.
+      Paths.apply_all!(char) if granted.empty?
+
+      Ok.new(:state => char.pf2_conditions)
     end
 
     def self.grant_stored_conditions(char, granter)
@@ -159,7 +180,7 @@ module AresMUSH
 
       granter = held.is_a?(Hash) ? held['granted_by'] : nil
 
-      if !forced && granter && held['restricted'] && list.key?(granter)
+      if !forced && granter && held['restricted'] && granter_holds?(char, granter)
         return Err.new(:restricted, 'pf2e.condition_restricted', 'condition' => condition,
                        'granter' => granter)
       end
@@ -168,6 +189,8 @@ module AresMUSH
       char.update(pf2_conditions: list)
 
       release_grants(char, condition)
+
+      Paths.apply_all!(char) unless forced
 
       Ok.new(:state => char.pf2_conditions)
     end

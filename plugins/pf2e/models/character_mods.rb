@@ -69,6 +69,9 @@ module AresMUSH
     collection :pf2_ledger_entries, "AresMUSH::Pf2eLedgerEntry"
     collection :sheet_caches, "AresMUSH::Pf2eSheetCache"
 
+    # What the character is under for a while - Heroism, Rage, a potion. Live state, not sheet state.
+    collection :pf2_effects, "AresMUSH::Pf2eEffect"
+
     # The steps of an open draft, which exist only until it commits.
     collection :draft_steps, "AresMUSH::Pf2eDraftStep"
     collection :chargen_checkpoints, "AresMUSH::Pf2eChargenCheckpoint"
@@ -85,6 +88,7 @@ module AresMUSH
       Pf2e::Audit.delete_all!(self)
       self.spellcasting_entries.each { |e| e.delete } if self.respond_to?(:spellcasting_entries)
       self.sheet_caches.each { |c| c.delete }
+      self.pf2_effects.each { |e| e.delete }
       self.encounters.each {|e| e.delete self}
     end
 

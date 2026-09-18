@@ -152,6 +152,19 @@ module AresMUSH
         when "set"
           return PF2ConditionSetCmd
         end
+      when "effect"
+        case cmd.switch
+        when "add"
+          return PF2EffectAddCmd
+        when "remove"
+          return PF2EffectRemoveCmd
+        when "view"
+          return PF2EffectViewCmd
+        when "search"
+          return PF2EffectSearchCmd
+        end
+      when "effects"
+        return PF2EffectListCmd
       when "encounter", "initiative", "init"
         case cmd.switch
         when "start"

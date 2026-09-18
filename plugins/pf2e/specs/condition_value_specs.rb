@@ -11,8 +11,9 @@ module AresMUSH
     # whether a character is dying or dead.
     describe :condition_level do
 
+      # A character under no effects, since what an effect brings with it is a condition too.
       def char(conditions)
-        double(:name => 'Someone', :pf2_conditions => conditions)
+        double(:name => 'Someone', :pf2_conditions => conditions, :pf2_effects => [])
       end
 
       it "should be the value a condition carries" do
@@ -36,7 +37,7 @@ module AresMUSH
       end
 
       it "should answer for a character carrying no conditions at all" do
-        expect(Pf2e.condition_level(double(:name => 'Someone', :pf2_conditions => nil), 'Wounded')).to eq 0
+        expect(Pf2e.condition_level(double(:name => 'Someone', :pf2_conditions => nil, :pf2_effects => []), 'Wounded')).to eq 0
       end
 
       # The distinction the display relies on has to survive.

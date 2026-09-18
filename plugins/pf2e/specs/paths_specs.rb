@@ -103,7 +103,7 @@ module AresMUSH
       # the way out would raise the next time the same path was written.
       describe "a value that is not a number" do
         it "should read a stored list back as it stands" do
-          char = double(:pf2_derived => { 'wildshapeforms' => [ 'pest-form' ] })
+          char = double(:pf2_derived => { 'flags.system.wildShapeForms' => [ 'pest-form' ] })
 
           expect(Paths.for('flags.system.wildShapeForms').first['read']
                       .call(char, 'wildShapeForms')).to eq [ 'pest-form' ]

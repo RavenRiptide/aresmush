@@ -67,7 +67,7 @@ KINDS = {
     # adjustName renames the feat after the choice in Foundry's sheet; allowedDrops is a drag-and-drop
     # affordance. Neither is a mechanic.
     'ChoiceSet': {'key', 'choices', 'flag', 'prompt', 'rollOption', 'adjustName', 'predicate',
-                  'allowNoSelection', 'allowedDrops', 'slug', 'label'},
+                  'allowNoSelection', 'allowedDrops', 'slug', 'label', 'priority'},
     'DamageAlteration': {'key', 'property', 'mode', 'value', 'selectors', 'selector', 'predicate',
                          'slug', 'label', 'priority', 'phase', 'requiresEquipped'},
     'AdjustStrike': {'key', 'property', 'mode', 'value', 'definition', 'predicate', 'slug', 'label', 'priority', 'phase'},
@@ -76,6 +76,8 @@ KINDS = {
     'Resistance': {'key', 'type', 'value', 'predicate', 'definition', 'slug', 'label', 'exceptions', 'doubleVs'},
     # A condition or an effect that brings another with it: Grabbed makes you off-guard, Dying makes you
     # unconscious. `uuid` names the other by compendium, and Pf2e::Grants resolves it to our catalogue.
+    # Temporary hit points, set when an effect begins and refreshed each turn where it says so.
+    'TempHP': {'key', 'value', 'predicate', 'events', 'slug', 'label'},
     'GrantItem': {'key', 'uuid', 'inMemoryOnly', 'predicate', 'onDeleteActions', 'allowDuplicate',
                   'alterations', 'slug', 'label', 'priority'},
 }
@@ -101,7 +103,7 @@ PRESENTATION = {
     'DamageAlteration': {'priority', 'phase'},
     'DamageDice': {'priority', 'phase', 'hideIfDisabled'},
     'FlatModifier': {'priority', 'phase', 'hideIfDisabled'},
-    'ChoiceSet': {'adjustName', 'allowedDrops'},
+    'ChoiceSet': {'adjustName', 'allowedDrops', 'priority'},
     'Strike': {'img'},
     'GrantItem': {'priority'},
 }
@@ -118,7 +120,7 @@ ORDER = ['key', 'uuid', 'inMemoryOnly', 'allowDuplicate', 'onDeleteActions', 'al
          'maxApplications', 'type', 'ability',
          'value', 'min', 'max', 'diceNumber', 'dieSize', 'damageType', 'damageCategory',
          'critical', 'override', 'tags', 'hideIfDisabled', 'slug', 'requiresEquipped',
-         'label', 'predicate']
+         'events', 'label', 'predicate']
 
 
 def written(key):
@@ -130,6 +132,7 @@ def written(key):
 
 # Neither of these reaches a statistic: one declares a circumstance and the other writes a value.
 SELECTORLESS = {'RollOption', 'ActiveEffectLike', 'Immunity', 'Weakness', 'Resistance', 'AdjustStrike', 'GrantItem',
+                'TempHP',
                 'Strike', 'MartialProficiency', 'CriticalSpecialization', 'Sense', 'ChoiceSet'}
 
 # Senses this engine knows. One it does not would be a fact nothing could show or ask about.
@@ -156,7 +159,7 @@ WRITABLE = [
     re.compile(r'^system\.proficiencies\.(defenses|attacks)\.[\w-]+\.rank$'),
     re.compile(r'^system\.attributes\.dying\.recoveryDC$'),
     re.compile(r'^system\.attributes\.hp\.recoveryMultiplier$'),
-    re.compile(r'^system\.attributes\.(flanking\.canFlank|flanking\.canGangUp'
+    re.compile(r'^system\.attributes\.(flanking\.canFlank|flanking\.canGangUp|flanking\.flankable'
                r'|familiarAbilities\.value)$'),
     re.compile(r'^inventory\.bulk\.(maxAddend|encumberedAfterAddend)$'),
     re.compile(r'^flags\.system\.[\w.]+$'),
@@ -493,4 +496,5 @@ def insert(text, additions):
     return text if text.endswith('\n') else text + '\n'
 
 
-main()
+if __name__ == "__main__":
+    main()
