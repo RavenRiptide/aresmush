@@ -35,24 +35,27 @@ SOURCES = [
                'pf2e_feat_general.yml', 'pf2e_feat_skill.yml']),
 ]
 
-# The kinds Pf2e::Rules implements, and the fields it reads for each.
+# The kinds Pf2e::Rules implements, and the fields it reads for each. What is listed here is written
+# out: a field accepted and then dropped is a rule that reads as something other than what Foundry
+# wrote, which is how `slug` went missing and every imported adjustment reached every modifier its
+# selector touched. Anything deliberately not carried is named in PRESENTATION below instead.
 KINDS = {
     'FlatModifier': {'key', 'selector', 'value', 'type', 'ability', 'min', 'max', 'damageType',
-                     'damageCategory', 'critical', 'predicate', 'slug', 'label', 'hideIfDisabled', 'priority', 'phase'},
+                     'damageCategory', 'critical', 'predicate', 'slug', 'label', 'hideIfDisabled', 'priority', 'phase', 'requiresEquipped'},
     'DamageDice': {'key', 'selector', 'diceNumber', 'dieSize', 'damageType', 'category', 'critical',
                    'predicate', 'slug', 'label', 'hideIfDisabled', 'override', 'tags', 'priority', 'phase'},
     # placement and mergeable position a toggle in Foundry's character sheet, which is not a mechanic
     # and not an interface we have.
     'RollOption': {'key', 'option', 'domain', 'toggleable', 'value', 'predicate', 'slug', 'label',
                    'suboptions', 'selection', 'alwaysActive', 'disabledIf', 'disabledValue',
-                   'placement', 'mergeable', 'phase', 'priority'},
+                   'placement', 'mergeable', 'phase', 'priority', 'requiresEquipped'},
     # phase and priority order writes against Foundry's data preparation, which has no counterpart here;
     # the modes are ordered instead, which is what the ordering is for.
     'ActiveEffectLike': {'key', 'path', 'mode', 'value', 'predicate', 'slug', 'label', 'phase',
                          'priority', 'merge'},
     # priority orders adjustments against Foundry's data preparation; ours are ordered by mode.
     'AdjustModifier': {'key', 'selector', 'selectors', 'slug', 'mode', 'value', 'suppress', 'relabel',
-                       'damageType', 'maxApplications', 'predicate', 'label', 'priority'},
+                       'damageType', 'maxApplications', 'predicate', 'label', 'priority', 'requiresEquipped'},
     'AdjustDegreeOfSuccess': {'key', 'selector', 'adjustment', 'predicate', 'type', 'slug', 'label'},
     'BaseSpeed': {'key', 'selector', 'value', 'predicate', 'slug', 'label'},
     # img is the icon their sheet shows; fist is a flag about replacing the default unarmed attack.
@@ -61,17 +64,58 @@ KINDS = {
     'MartialProficiency': {'key', 'slug', 'definition', 'sameAs', 'maxRank', 'label'},
     'CriticalSpecialization': {'key', 'predicate', 'slug', 'label'},
     'Sense': {'key', 'selector', 'acuity', 'range', 'predicate', 'slug', 'label'},
+    # adjustName renames the feat after the choice in Foundry's sheet; allowedDrops is a drag-and-drop
+    # affordance. Neither is a mechanic.
+    'ChoiceSet': {'key', 'choices', 'flag', 'prompt', 'rollOption', 'adjustName', 'predicate',
+                  'allowNoSelection', 'allowedDrops', 'slug', 'label'},
     'DamageAlteration': {'key', 'property', 'mode', 'value', 'selectors', 'selector', 'predicate',
-                         'slug', 'label', 'priority', 'phase'},
+                         'slug', 'label', 'priority', 'phase', 'requiresEquipped'},
     'AdjustStrike': {'key', 'property', 'mode', 'value', 'definition', 'predicate', 'slug', 'label', 'priority', 'phase'},
     'Immunity': {'key', 'type', 'value', 'predicate', 'definition', 'slug', 'label', 'exceptions'},
     'Weakness': {'key', 'type', 'value', 'predicate', 'definition', 'slug', 'label', 'exceptions'},
     'Resistance': {'key', 'type', 'value', 'predicate', 'definition', 'slug', 'label', 'exceptions', 'doubleVs'},
 }
 
+# Fields that position a control in Foundry's character sheet, or order a rule against their data
+# preparation passes. Accepted so a rule carrying one is not refused, and not written out, because
+# neither describes a mechanic. This mirrors `Pf2e::Rules::PRESENTATION`.
+PRESENTATION = {
+    'RollOption': {'placement', 'mergeable', 'phase', 'priority'},
+    'ActiveEffectLike': {'phase', 'priority'},
+    'AdjustModifier': {'priority'},
+    'AdjustStrike': {'priority', 'phase'},
+    'DamageAlteration': {'priority', 'phase'},
+    'DamageDice': {'priority', 'phase', 'hideIfDisabled'},
+    'FlatModifier': {'priority', 'phase', 'hideIfDisabled'},
+    'ChoiceSet': {'adjustName', 'allowedDrops'},
+    'Strike': {'img'},
+}
+
+# The order fields are written in, so a re-run produces the same file. A field of a kind that is not
+# named here still gets written, after these.
+ORDER = ['key', 'option', 'domain', 'toggleable', 'alwaysActive', 'suboptions', 'selection',
+         'disabledIf', 'disabledValue', 'flag', 'rollOption', 'prompt', 'choices',
+         'allowNoSelection', 'path', 'mode', 'merge',
+         'property', 'definition', 'sameAs', 'maxRank',
+         'acuity', 'range', 'category', 'group',
+         'baseType', 'damage', 'traits', 'otherTags', 'fist', 'exceptions', 'doubleVs',
+         'selector', 'selectors', 'adjustment', 'suppress', 'relabel',
+         'maxApplications', 'type', 'ability',
+         'value', 'min', 'max', 'diceNumber', 'dieSize', 'damageType', 'damageCategory',
+         'critical', 'override', 'tags', 'hideIfDisabled', 'slug', 'requiresEquipped',
+         'label', 'predicate']
+
+
+def written(key):
+    """The fields of one kind that are written out, in order."""
+    fields = KINDS[key] - PRESENTATION.get(key, set()) - {''}
+
+    return sorted(fields, key=lambda f: (ORDER.index(f) if f in ORDER else len(ORDER), f))
+
+
 # Neither of these reaches a statistic: one declares a circumstance and the other writes a value.
 SELECTORLESS = {'RollOption', 'ActiveEffectLike', 'Immunity', 'Weakness', 'Resistance', 'AdjustStrike',
-                'Strike', 'MartialProficiency', 'CriticalSpecialization', 'Sense'}
+                'Strike', 'MartialProficiency', 'CriticalSpecialization', 'Sense', 'ChoiceSet'}
 
 # Senses this engine knows. One it does not would be a fact nothing could show or ask about.
 SENSES = {'darkvision', 'greater-darkvision', 'low-light-vision', 'scent', 'tremorsense', 'echolocation',
@@ -90,7 +134,7 @@ STRIKE_PROPERTIES = {'traits', 'weapon-traits'}
 
 # Paths Pf2e::Paths can write. Anything else is refused rather than written somewhere wrong.
 WRITABLE = [
-    re.compile(r'^system\.skills\.[\w-]+\.rank$'),
+    re.compile(r'^system\.skills\.(?:[\w-]+|\{[^}]*\})\.rank$'),
     re.compile(r'^system\.proficiencies\.(defenses|attacks)\.[\w-]+\.rank$'),
     re.compile(r'^system\.attributes\.dying\.recoveryDC$'),
     re.compile(r'^system\.attributes\.(flanking\.canFlank|flanking\.canGangUp'
@@ -205,9 +249,7 @@ def take(rule, refused):
         if not rule.get('type') and not rule.get('definition'):
             refused['iwr naming nothing'] += 1
             return None
-        if INTERPOLATION.search(str(rule.get('type') or '')):
-            refused[f"iwr type {rule.get('type')!r}"] += 1
-            return None
+        pass
 
     if rule['key'] == 'ActiveEffectLike':
         path = rule.get('path') or ''
@@ -229,6 +271,23 @@ def take(rule, refused):
         if rule.get('selector') not in MOVEMENT:
             refused[f"movement {rule.get('selector')!r}"] += 1
             return None
+    elif rule['key'] == 'ChoiceSet':
+        # A set that queries the catalogue - "any skill feat of your level or lower" - is a search rather
+        # than a list, and Pf2e::Feats already asks those questions. Only an explicit list is taken.
+        choices = rule.get('choices')
+        # A set either lists its answers, names a vocabulary, or describes them with a filter over a
+        # catalogue. A set shaped some other way says nothing we can offer.
+        if isinstance(choices, list):
+            if not all(isinstance(one, dict) and one.get('value') for one in choices):
+                refused['choice set whose listed answers say nothing'] += 1
+                return None
+        elif isinstance(choices, dict):
+            if not (choices.get('config') or choices.get('filter')):
+                refused[f'choice set querying {sorted(choices)}'] += 1
+                return None
+        else:
+            refused['choice set that is neither a list nor a query'] += 1
+            return None
     elif rule['key'] == 'Sense':
         if rule.get('selector') not in SENSES:
             refused[f"sense {rule.get('selector')!r}"] += 1
@@ -237,16 +296,12 @@ def take(rule, refused):
         if rule.get('property') not in ALTERABLE:
             refused[f"alterable {rule.get('property')!r}"] += 1
             return None
-        if INTERPOLATION.search(str(rule.get('value') or '')):
-            refused['alteration value is a choice we cannot read'] += 1
-            return None
+        pass
     elif rule['key'] == 'MartialProficiency':
         if not rule.get('sameAs'):
             refused['martial proficiency with nothing to copy'] += 1
             return None
-        if INJECTED.search(json.dumps(rule.get('definition') or [])):
-            refused['martial proficiency over a choice we cannot read'] += 1
-            return None
+        pass
     elif rule['key'] == 'Strike':
         # An attack with no damage of its own is one we could not roll.
         base = (rule.get('damage') or {}).get('base') or {}
@@ -276,25 +331,26 @@ def take(rule, refused):
             refused[f"value {rule.get('value')!r}"] += 1
             return None
 
-    # Keep only the fields we read, in a stable order, so a re-run produces the same file.
-    order = ['key', 'option', 'domain', 'toggleable', 'path', 'property', 'definition', 'sameAs',
-             'maxRank',
-             'acuity', 'range', 'category', 'group',
-             'baseType', 'damage', 'traits', 'range', 'mode', 'exceptions',
-             'selector', 'selectors', 'definition', 'adjustment', 'suppress', 'relabel',
-             'maxApplications', 'type', 'ability',
-             'value', 'min',
-             'max', 'diceNumber', 'dieSize', 'damageType', 'damageCategory', 'category', 'critical',
-             'override', 'label', 'predicate']
-
-    return {field: rule[field] for field in order if field in rule}
+    return {field: rule[field] for field in written(rule['key']) if field in rule}
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('checkout')
+    parser.add_argument('checkout', nargs='?')
     parser.add_argument('--write', action='store_true')
+    # What this reads, for `Pf2e::Rules` to be held against: a field accepted here and unread there
+    # would be a rule doing less than it says, and one read there and refused here an effect nobody
+    # can import. `imported_rules_specs.rb` compares the two.
+    parser.add_argument('--fields', action='store_true')
     args = parser.parse_args()
+
+    if args.fields:
+        print(json.dumps({'fields': {k: sorted(v) for k, v in KINDS.items()},
+                          'presentation': {k: sorted(v) for k, v in PRESENTATION.items()}}))
+        return
+
+    if not args.checkout:
+        raise SystemExit('a checkout of foundryvtt/pf2e is needed')
 
     refused = collections.Counter()
     totals = collections.Counter()

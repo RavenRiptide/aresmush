@@ -95,6 +95,12 @@ pf2e_gear:
     level: 0
     price: 100
     traits: []
+    rules:
+      - key: "AdjustModifier"
+        selector: "survival"
+        suppress: true
+        slug: "no-compass"
+        requiresEquipped: false
   Cookware:
     bulk: 2
     level: 0
@@ -109,6 +115,7 @@ pf2e_gear:
       - key: "AdjustModifier"
         selector: "athletics"
         suppress: true
+        slug: "no-crowbar"
   Disguise Kit:
     bulk: 0.1
     level: 0
@@ -263,11 +270,19 @@ pf2e_gear:
     level: 0
     price: 200
     traits: []
+    rules:
+      - key: "RollOption"
+        option: "has-religious-symbol"
+        requiresEquipped: false
   Religious Symbol (Wooden):
     bulk: 0.1
     level: 0
     price: 10
     traits: []
+    rules:
+      - key: "RollOption"
+        option: "has-religious-symbol"
+        requiresEquipped: false
   Religious Text:
     bulk: 0.1
     level: 0
@@ -362,10 +377,12 @@ pf2e_gear:
       - key: "Strike"
         category: "simple"
         damage: {"base": {"damageType": "bludgeoning", "dice": 1, "die": "d4"}}
+        otherTags: ["improvised"]
         predicate: [{"not": "lit-torch"}]
       - key: "Strike"
         category: "simple"
         damage: {"base": {"damageType": "bludgeoning", "dice": 1, "die": "d4"}}
+        otherTags: ["improvised"]
         predicate: ["lit-torch"]
       - key: "FlatModifier"
         selector: "{item|_id}-damage"
@@ -471,6 +488,11 @@ pf2e_gear:
     price: 2000
     traits: []
     rules:
+      - key: "AdjustModifier"
+        selector: "survival"
+        suppress: true
+        slug: "no-compass"
+        requiresEquipped: false
       - key: "FlatModifier"
         selector: "survival"
         type: "item"
@@ -504,6 +526,7 @@ pf2e_gear:
       - key: "AdjustModifier"
         selector: "athletics"
         suppress: true
+        slug: "no-crowbar"
   Detective's Kit:
     bulk: 1
     level: 3

@@ -427,6 +427,7 @@ pf2e_armor:
         mode: "add"
         selector: "saving-throw"
         value: 1
+        slug: "resilient"
         predicate: ["item:trait:curse"]
   Half Plate:
     category: heavy
@@ -790,6 +791,7 @@ pf2e_armor:
         category: "martial"
         damage: {"base": {"damageType": "piercing", "dice": 2, "die": "d8"}}
         traits: ["deadly-d12", "unholy"]
+        slug: "horns"
         label: "PF2E.BattleForm.Attack.Horns"
   Warleader's Bulwark:
     category: medium

@@ -1,4 +1,5 @@
 require "plugin_test_loader"
+require "json"
 
 module AresMUSH
 
@@ -76,8 +77,18 @@ module AresMUSH
     # has, which a feat can invent - Tiger Stance grants a tiger claw, so `tiger-claw-damage` is a real
     # domain that no catalogue contains. Both are checked by shape; everything else against the list,
     # which is what still catches `healing` and `will-dc`.
+    # What a field looks like once the wearer's or taker's answer has filled it in. A ChoiceSet answer
+    # is a slug, so a plain one stands for every answer the set could give: the claim being checked is
+    # that the shape reaches something, not that a particular choice does.
+    def once_chosen(text)
+      text.to_s.gsub(Pf2e::Rules::INTERPOLATION, 'chosen')
+    end
+
+    # A selector naming the choice its taker made, or the item it sits on, is checked as a shape: what
+    # it reaches depends on the answer, and an answer that reaches nothing is a rule that is ignored
+    # rather than a rule that is wrong.
     def resolvable?(selector, held)
-      return true if selector.to_s.match?(Pf2e::Effects::SELF_REFERENCE)
+      return true if selector.to_s.match?(Pf2e::Rules::INTERPOLATION)
 
       slug = Pf2e::Domains.slug(selector)
 
@@ -117,12 +128,11 @@ module AresMUSH
       expect(strays.uniq).to eq []
     end
 
-    # Neither a declaration nor a write reaches a statistic, so neither names a selector: one names an
-    # option and the other a path.
     # Kinds that reach no statistic, so they name no domain: one declares a circumstance, one writes a
-    # value, three describe damage, two describe an attack, and BaseSpeed names a kind of movement.
+    # value, three describe damage, two describe an attack, one asks a question, and BaseSpeed names a
+    # kind of movement.
     SELECTORLESS = %w{RollOption ActiveEffectLike Immunity Weakness Resistance AdjustStrike Strike
-                      BaseSpeed Sense MartialProficiency CriticalSpecialization}.freeze
+                      BaseSpeed Sense MartialProficiency CriticalSpecialization ChoiceSet}.freeze
 
     # Of those, the two that still carry a `selector` - because a movement type and a sense are not
     # domains, they are the thing being granted.
@@ -153,7 +163,7 @@ module AresMUSH
     it "should write only paths the registry knows" do
       writes = rows.select { |_where, row| row['key'] == 'ActiveEffectLike' }
 
-      strays = writes.reject { |_where, row| Pf2e::Paths.writable?(row['path']) }
+      strays = writes.reject { |_where, row| Pf2e::Paths.writable?(once_chosen(row['path'])) }
                      .map { |where, row| "#{where}: #{row['path']}" }
 
       expect(strays.uniq).to eq []
@@ -168,11 +178,14 @@ module AresMUSH
       expect(strays.uniq).to eq []
     end
 
-    # A kind of damage we cannot resolve would resist nothing, so the type has to be a plain word.
+    # A kind of damage we cannot resolve would resist nothing, so the type has to be a plain word - or
+    # an interpolation naming the choice its wearer made, which resolves to one before it is read.
     it "should resist only kinds of damage it can name" do
       iwr = rows.select { |_where, row| IWR_KINDS.include?(row['key']) }
 
-      strays = iwr.reject { |_where, row| Array(row['type']).all? { |one| !one.to_s.include?('{') } }
+      strays = iwr.reject { |_where, row|
+        Array(row['type']).all? { |one| !once_chosen(one).include?('{') }
+      }
                   .map { |where, row| "#{where}: #{row['type'].inspect}" }
 
       expect(strays.uniq).to eq []
@@ -253,8 +266,44 @@ module AresMUSH
       expect(strays.uniq).to eq []
     end
 
-    it "should have all sixteen kinds that change a number" do
-      expect(rows.map { |_where, row| row['key'] }.uniq.size).to eq 16
+    # The importer and `Pf2e::Rules` have to want the same fields. A field the importer accepts and does
+    # not write is a rule that arrives saying less than Foundry wrote - which is how every imported
+    # `slug` went missing, and with it every adjustment's aim: a row with no slug adjusts *every*
+    # modifier its selector reaches.
+    describe "the importer's vocabulary" do
+      def importer
+        found = `python3 scripts/import_foundry_rules.py --fields 2>/dev/null`
+
+        found.empty? ? nil : JSON.parse(found)
+      end
+
+      def ours
+        Pf2e::Rules::KINDS.each_with_object({}) do |row, out|
+          out[row['key']] = (row['fields'] + Array(Pf2e::Rules::PRESENTATION[row['key']])).sort
+        end
+      end
+
+      it "should read the same fields the importer accepts" do
+        theirs = importer
+
+        skip 'python3 is not available' unless theirs
+
+        expect(theirs['fields'].transform_values(&:sort)).to eq ours
+      end
+
+      it "should leave out the same fields the importer leaves out" do
+        theirs = importer
+
+        skip 'python3 is not available' unless theirs
+
+        mine = Pf2e::Rules::PRESENTATION.transform_values(&:sort)
+
+        expect(theirs['presentation'].transform_values(&:sort)).to eq mine
+      end
+    end
+
+    it "should have all seventeen kinds that change a number" do
+      expect(rows.map { |_where, row| row['key'] }.uniq.size).to eq 17
     end
 
     # A granted speed names a kind of movement rather than a domain, and the kind has to be one that

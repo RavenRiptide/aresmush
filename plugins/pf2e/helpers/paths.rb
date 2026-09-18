@@ -190,7 +190,7 @@ module AresMUSH
       def self.apply_all!(char)
         char.update(:pf2_derived => {})
 
-        writes = Rules.writes(Effects.sources(char), Effects.options(char))
+        writes = Rules.writes(Effects.sources(char), Effects.options(char), Effects.context(char))
 
         writes.each { |write| apply!(char, write['path'], write['mode'], write['value']) }
 

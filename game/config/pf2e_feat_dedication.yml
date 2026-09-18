@@ -78,6 +78,10 @@ pf2e_feats:
         path: "flags.system.barbarian.archetypeFeatCount"
         mode: "add"
         value: 1
+      - key: "ChoiceSet"
+        flag: "instinct"
+        prompt: "PF2E.SpecificRule.Barbarian.Instinct.Prompt"
+        choices: {"filter": ["item:tag:barbarian-instinct", {"not": "item:tag:class-archetype"}]}
       - key: "FlatModifier"
         selector: "ac"
         value: -1
@@ -118,6 +122,10 @@ pf2e_feats:
       - dedication
       - multiclass
     rules:
+      - key: "ChoiceSet"
+        flag: "dedicationMuse"
+        prompt: "PF2E.SpecificRule.Bard.Muse.Prompt"
+        choices: {"filter": ["item:tag:bard-muse", {"not": "item:tag:class-archetype"}], "slugsAsValues": true}
       - key: "RollOption"
         option: "feature:{item|flags.system.rulesSelections.dedicationMuse}"
       - key: "ActiveEffectLike"
@@ -161,6 +169,13 @@ pf2e_feats:
       - dedication
       - multiclass
     rules:
+      - key: "ChoiceSet"
+        rollOption: "champion-dedication"
+        choices: [{"label": "PF2E.Actor.Character.Proficiency.Defense.LightShort", "predicate": [{"or": ["defense:light:rank:0", "defense:medium:rank:0"]}], "value": "light-and-medium"}, {"label": "PF2E.Actor.Character.Proficiency.Defense.HeavyShort", "predicate": [{"nor": ["defense:light:rank:0", "defense:medium:rank:0"]}], "value": "heavy"}]
+      - key: "ChoiceSet"
+        flag: "attribute"
+        prompt: "PF2E.SpecificRule.Prompt.ClassDCAbilityScore"
+        choices: [{"label": "PF2E.AbilityStr", "value": "str"}, {"label": "PF2E.AbilityDex", "value": "dex"}]
       - key: "ActiveEffectLike"
         path: "system.skills.religion.rank"
         mode: "upgrade"
@@ -169,6 +184,10 @@ pf2e_feats:
         path: "flags.system.championDedicationCount"
         mode: "add"
         value: 1
+      - key: "ChoiceSet"
+        flag: "cause"
+        prompt: "PF2E.SpecificRule.DeityAndCause.Prompt"
+        choices: {"filter": ["item:tag:champion-cause", {"or": [{"and": ["item:tag:holy", "sanctification:holy"]}, {"and": ["item:tag:unholy", "sanctification:unholy"]}, {"nor": ["item:tag:holy", "item:tag:unholy"]}]}, {"not": "item:tag:class-archetype"}]}
       - key: "ActiveEffectLike"
         path: "system.proficiencies.defenses.light.rank"
         mode: "upgrade"
@@ -256,6 +275,10 @@ pf2e_feats:
         path: "system.skills.nature.rank"
         mode: "upgrade"
         value: 1
+      - key: "ChoiceSet"
+        flag: "druidicOrder"
+        prompt: "PF2E.SpecificRule.Druid.DruidicOrder.Prompt"
+        choices: {"filter": ["item:tag:druid-order", {"not": "item:tag:class-archetype"}]}
   Fighter Dedication:
     assoc_archetype:
       - Fighter Archetype
@@ -292,6 +315,18 @@ pf2e_feats:
       - key: "ActiveEffectLike"
         path: "flags.system.fighterDedicationCount"
         mode: "add"
+        value: 1
+      - key: "ChoiceSet"
+        flag: "attribute"
+        prompt: "PF2E.SpecificRule.Prompt.ClassDCAbilityScore"
+        choices: [{"label": "PF2E.AbilityStr", "value": "str"}, {"label": "PF2E.AbilityDex", "value": "dex"}]
+      - key: "ChoiceSet"
+        flag: "skill"
+        prompt: "PF2E.SpecificRule.Prompt.Skill"
+        choices: [{"label": "PF2E.Skill.Acrobatics", "value": "acrobatics"}, {"label": "PF2E.Skill.Athletics", "value": "athletics"}]
+      - key: "ActiveEffectLike"
+        path: "system.skills.{item|flags.system.rulesSelections.skill}.rank"
+        mode: "upgrade"
         value: 1
       - key: "ActiveEffectLike"
         path: "system.proficiencies.attacks.simple.rank"
@@ -370,6 +405,18 @@ pf2e_feats:
         path: "flags.system.monkDedicationCount"
         mode: "add"
         value: 1
+      - key: "ChoiceSet"
+        flag: "attribute"
+        prompt: "PF2E.SpecificRule.Prompt.ClassDCAbilityScore"
+        choices: [{"label": "PF2E.AbilityStr", "value": "str"}, {"label": "PF2E.AbilityDex", "value": "dex"}]
+      - key: "ChoiceSet"
+        flag: "skill"
+        prompt: "PF2E.SpecificRule.Prompt.Skill"
+        choices: [{"label": "PF2E.Skill.Acrobatics", "value": "acrobatics"}, {"label": "PF2E.Skill.Athletics", "value": "athletics"}]
+      - key: "ActiveEffectLike"
+        path: "system.skills.{item|flags.system.rulesSelections.skill}.rank"
+        mode: "upgrade"
+        value: 1
   Oracle Dedication:
     assoc_archetype:
       - Oracle Archetype
@@ -406,6 +453,10 @@ pf2e_feats:
         path: "system.skills.religion.rank"
         mode: "upgrade"
         value: 1
+      - key: "ChoiceSet"
+        flag: "mystery"
+        prompt: "PF2E.SpecificRule.Oracle.Mystery.Prompt"
+        choices: {"filter": ["item:tag:oracle-mystery", {"not": "item:tag:class-archetype"}]}
   Ranger Dedication:
     assoc_archetype:
       - Ranger Archetype
@@ -446,6 +497,10 @@ pf2e_feats:
         path: "flags.system.rangerDedicationCount"
         mode: "add"
         value: 1
+      - key: "ChoiceSet"
+        flag: "attribute"
+        prompt: "PF2E.SpecificRule.Prompt.ClassDCAbilityScore"
+        choices: [{"label": "PF2E.AbilityStr", "value": "str"}, {"label": "PF2E.AbilityDex", "value": "dex"}]
   Rogue Dedication:
     assoc_archetype:
       - Rogue Archetype
@@ -477,6 +532,15 @@ pf2e_feats:
       - archetype
       - dedication
       - multiclass
+    rules:
+      - key: "ChoiceSet"
+        flag: "rogueDedication"
+        prompt: "PF2E.SpecificRule.Rogue.TrainSkill.Prompt"
+        choices: [{"label": "PF2E.Skill.Stealth", "value": "system.skills.stealth.rank"}, {"label": "PF2E.Skill.Thievery", "value": "system.skills.thievery.rank"}]
+      - key: "ChoiceSet"
+        flag: "skillFeat"
+        prompt: "PF2E.SpecificRule.Prompt.SkillFeat"
+        choices: {"filter": ["item:trait:skill", {"lte": ["item:level", "self:level"]}], "itemType": "feat"}
   Sorcerer Dedication:
     assoc_archetype:
       - Sorcerer Archetype
@@ -508,6 +572,11 @@ pf2e_feats:
       - archetype
       - dedication
       - multiclass
+    rules:
+      - key: "ChoiceSet"
+        flag: "bloodline"
+        prompt: "PF2E.SpecificRule.Sorcerer.Bloodline.Prompt"
+        choices: {"filter": ["item:tag:sorcerer-bloodline", {"not": "item:tag:class-archetype"}]}
   Swashbuckler Dedication:
     assoc_archetype:
       - Swashbuckler Archetype
@@ -540,6 +609,19 @@ pf2e_feats:
       - archetype
       - dedication
       - multiclass
+    rules:
+      - key: "ChoiceSet"
+        flag: "swashbucklersStyle"
+        prompt: "PF2E.SpecificRule.Swashbuckler.Style.Prompt"
+        choices: {"filter": ["item:tag:swashbuckler-style", {"not": "item:tag:class-archetype"}]}
+      - key: "ChoiceSet"
+        flag: "skill"
+        prompt: "PF2E.SpecificRule.Prompt.Skill"
+        choices: [{"label": "PF2E.Skill.Acrobatics", "value": "acrobatics"}, {"label": "PF2E.Skill.Intimidation", "predicate": ["feature:braggart"], "value": "intimidation"}, {"label": "PF2E.Skill.Deception", "predicate": ["feature:fencer"], "value": "deception"}, {"label": "PF2E.Skill.Athletics", "predicate": ["feature:gymnast"], "value": "athletics"}, {"label": "PF2E.Skill.Diplomacy", "predicate": ["feature:wit"], "value": "diplomacy"}]
+      - key: "ActiveEffectLike"
+        path: "system.skills.{item|flags.system.rulesSelections.skill}.rank"
+        mode: "upgrade"
+        value: 1
   Witch Dedication:
     assoc_archetype:
       - Witch Archetype
@@ -571,6 +653,11 @@ pf2e_feats:
       - archetype
       - dedication
       - multiclass
+    rules:
+      - key: "ChoiceSet"
+        flag: "patron"
+        prompt: "PF2E.SpecificRule.Witch.Patron.Prompt"
+        choices: {"filter": ["item:tag:witch-patron", {"not": "item:tag:class-archetype"}]}
   Wizard Dedication:
     assoc_archetype:
       - Wizard Archetype
@@ -682,6 +769,11 @@ pf2e_feats:
     shortdesc: You gain a 1st- or 2nd-level wizard feat of your choice.
     traits:
       - archetype
+    rules:
+      - key: "ChoiceSet"
+        flag: "basicArcana"
+        prompt: "PF2E.SpecificRule.Prompt.LevelOneOrTwoClassFeat"
+        choices: {"filter": ["item:category:class", "item:trait:wizard", {"lte": ["item:level", 2]}], "itemType": "feat"}
   Basic Bard Spellcasting:
     assoc_archetype:
       - Bard Archetype
@@ -716,6 +808,11 @@ pf2e_feats:
     shortdesc: You gain a 1st- or 2nd-level sorcerer feat.
     traits:
       - archetype
+    rules:
+      - key: "ChoiceSet"
+        flag: "basicBloodPotency"
+        prompt: "PF2E.SpecificRule.Prompt.LevelOneOrTwoClassFeat"
+        choices: {"filter": ["item:category:class", "item:trait:sorcerer", {"lte": ["item:level", 2]}], "itemType": "feat"}
   Basic Bloodline Spell:
     feat_choice:
       auto: subclass_spell
@@ -768,6 +865,11 @@ pf2e_feats:
     shortdesc: You gain a 1st- or 2nd-level alchemist feat.
     traits:
       - archetype
+    rules:
+      - key: "ChoiceSet"
+        flag: "basicConcoction"
+        prompt: "PF2E.SpecificRule.Prompt.LevelOneOrTwoClassFeat"
+        choices: {"filter": ["item:category:class", "item:trait:alchemist", {"lte": ["item:level", 2]}], "itemType": "feat"}
   Basic Deduction:
     feat_choice:
       summary: 1st- or 2nd-level investigator feat
@@ -789,6 +891,11 @@ pf2e_feats:
     shortdesc: You gain a 1st- or 2nd-level investigator feat of your choice.
     traits:
       - archetype
+    rules:
+      - key: "ChoiceSet"
+        flag: "basicDeduction"
+        prompt: "PF2E.SpecificRule.Prompt.LevelOneOrTwoClassFeat"
+        choices: {"filter": ["item:category:class", "item:trait:investigator", {"lte": ["item:level", 2]}], "itemType": "feat"}
   Basic Devotion:
     feat_choice:
       summary: 1st- or 2nd-level champion feat
@@ -815,6 +922,10 @@ pf2e_feats:
         path: "flags.system.championDedicationCount"
         mode: "add"
         value: 1
+      - key: "ChoiceSet"
+        flag: "basicDevotion"
+        prompt: "PF2E.SpecificRule.Prompt.LevelOneOrTwoClassFeat"
+        choices: {"filter": ["item:category:class", "item:trait:champion", {"lte": ["item:level", 2]}], "itemType": "feat"}
   Basic Dogma:
     feat_choice:
       summary: 1st- or 2nd-level cleric feat
@@ -836,6 +947,11 @@ pf2e_feats:
     shortdesc: You gain a 1st- or 2nd-level cleric feat.
     traits:
       - archetype
+    rules:
+      - key: "ChoiceSet"
+        flag: "basicDogma"
+        prompt: "PF2E.SpecificRule.Prompt.LevelOneOrTwoClassFeat"
+        choices: {"filter": ["item:category:class", "item:trait:cleric", {"lte": ["item:level", 2]}], "itemType": "feat"}
   Basic Druid Spellcasting:
     assoc_archetype:
       - Druid Archetype
@@ -870,6 +986,11 @@ pf2e_feats:
     shortdesc: You gain a 1st- or 2nd-level swashbuckler feat of your choice.
     traits:
       - archetype
+    rules:
+      - key: "ChoiceSet"
+        flag: "basicFlair"
+        prompt: "PF2E.SpecificRule.Prompt.LevelOneOrTwoClassFeat"
+        choices: {"filter": ["item:category:class", "item:trait:swashbuckler", {"lte": ["item:level", 2]}], "itemType": "feat"}
   Basic Fury:
     feat_choice:
       summary: 1st- or 2nd-level barbarian feat
@@ -896,6 +1017,10 @@ pf2e_feats:
         path: "flags.system.barbarian.archetypeFeatCount"
         mode: "add"
         value: 1
+      - key: "ChoiceSet"
+        flag: "basicFury"
+        prompt: "PF2E.SpecificRule.Prompt.LevelOneOrTwoClassFeat"
+        choices: {"filter": ["item:category:class", "item:trait:barbarian", {"lte": ["item:level", 2]}], "itemType": "feat"}
   Basic Hunter's Trick:
     feat_choice:
       summary: 1st- or 2nd-level ranger feat
@@ -922,6 +1047,10 @@ pf2e_feats:
         path: "flags.system.rangerDedicationCount"
         mode: "add"
         value: 1
+      - key: "ChoiceSet"
+        flag: "basicHuntersTrick"
+        prompt: "PF2E.SpecificRule.Prompt.LevelOneOrTwoClassFeat"
+        choices: {"filter": ["item:category:class", "item:trait:ranger", {"lte": ["item:level", 2]}], "itemType": "feat"}
   Basic Kata:
     feat_choice:
       summary: 1st- or 2nd-level monk feat
@@ -948,6 +1077,10 @@ pf2e_feats:
         path: "flags.system.monkDedicationCount"
         mode: "add"
         value: 1
+      - key: "ChoiceSet"
+        flag: "basicKata"
+        prompt: "PF2E.SpecificRule.Prompt.LevelOneOrTwoClassFeat"
+        choices: {"filter": ["item:category:class", "item:trait:monk", {"lte": ["item:level", 2]}], "itemType": "feat"}
   Basic Maneuver:
     feat_choice:
       summary: 1st- or 2nd-level fighter feat
@@ -974,6 +1107,10 @@ pf2e_feats:
         path: "flags.system.fighterDedicationCount"
         mode: "add"
         value: 1
+      - key: "ChoiceSet"
+        flag: "basicManeuver"
+        prompt: "PF2E.SpecificRule.Prompt.LevelOneOrTwoClassFeat"
+        choices: {"filter": ["item:category:class", "item:trait:fighter", {"lte": ["item:level", 2]}], "itemType": "feat"}
   Basic Muse's Whispers:
     feat_choice:
       summary: 1st- or 2nd-level bard feat
@@ -995,6 +1132,11 @@ pf2e_feats:
     shortdesc: You gain a 1st- or 2nd-level bard feat.
     traits:
       - archetype
+    rules:
+      - key: "ChoiceSet"
+        flag: "basicMusesWhispers"
+        prompt: "PF2E.SpecificRule.Prompt.LevelOneOrTwoClassFeat"
+        choices: {"filter": ["item:category:class", "item:trait:bard", {"lte": ["item:level", 2]}], "itemType": "feat"}
   Basic Mysteries:
     feat_choice:
       summary: 1st- or 2nd-level oracle feat
@@ -1016,6 +1158,11 @@ pf2e_feats:
     shortdesc: You gain a 1st- or 2nd-level oracle feat of your choice.
     traits:
       - archetype
+    rules:
+      - key: "ChoiceSet"
+        flag: "basicMysteries"
+        prompt: "PF2E.SpecificRule.Prompt.LevelOneOrTwoClassFeat"
+        choices: {"filter": ["item:category:class", "item:trait:oracle", {"lte": ["item:level", 2]}], "itemType": "feat"}
   Basic Oracle Spellcasting:
     assoc_archetype:
       - Oracle Archetype
@@ -1063,6 +1210,11 @@ pf2e_feats:
     shortdesc: You gain a 1st- or 2nd-level rogue feat.
     traits:
       - archetype
+    rules:
+      - key: "ChoiceSet"
+        flag: "basicTrickery"
+        prompt: "PF2E.SpecificRule.Prompt.LevelOneOrTwoClassFeat"
+        choices: {"filter": ["item:category:class", "item:trait:rogue", {"lte": ["item:level", 2]}], "itemType": "feat"}
   Basic Wilding:
     feat_choice:
       summary: 1st- or 2nd-level druid feat
@@ -1084,6 +1236,11 @@ pf2e_feats:
     shortdesc: You gain a 1st- or 2nd-level druid feat.
     traits:
       - archetype
+    rules:
+      - key: "ChoiceSet"
+        flag: "basicWilding"
+        prompt: "PF2E.SpecificRule.Prompt.LevelOneOrTwoClassFeat"
+        choices: {"filter": ["item:category:class", "item:trait:druid", {"lte": ["item:level", 2]}], "itemType": "feat"}
   Basic Witch Spellcasting:
     assoc_archetype:
       - Witch Archetype
@@ -1123,6 +1280,10 @@ pf2e_feats:
         path: "system.attributes.familiarAbilities.value"
         mode: "upgrade"
         value: 3
+      - key: "ChoiceSet"
+        flag: "basicWitchcraft"
+        prompt: "PF2E.SpecificRule.Prompt.LevelOneOrTwoClassFeat"
+        choices: {"filter": ["item:category:class", "item:trait:witch", {"lte": ["item:level", 2]}], "itemType": "feat"}
   Basic Wizard Spellcasting:
     assoc_archetype:
       - Wizard Archetype
@@ -1783,6 +1944,10 @@ pf2e_feats:
         path: "flags.system.championDedicationCount"
         mode: "add"
         value: 1
+      - key: "ChoiceSet"
+        flag: "divineAlly"
+        prompt: "PF2E.SpecificRule.DivineAlly.Prompt"
+        choices: [{"value": "Compendium.pf2e.classfeatures.Item.Blessed Armament"}, {"value": "Compendium.pf2e.classfeatures.Item.Blessed Shield"}, {"value": "Compendium.pf2e.classfeatures.Item.Blessed Swiftness"}]
   Instinct Ability:
     assoc_archetype:
       - Barbarian Archetype
@@ -1801,6 +1966,11 @@ pf2e_feats:
         path: "flags.system.barbarian.archetypeFeatCount"
         mode: "add"
         value: 1
+      - key: "ChoiceSet"
+        flag: "furyInstinct"
+        prompt: "PF2E.SpecificRule.Prompt.LevelOneClassFeat"
+        choices: {"filter": ["item:level:1", "item:category:class", "item:trait:barbarian", {"not": "item:draconic-arrogance"}], "itemType": "feat"}
+        predicate: ["feature:fury-instinct"]
   Keen Recollection:
     assoc_archetype:
       - Investigator Archetype
@@ -2024,11 +2194,13 @@ pf2e_feats:
         selector: "all-speeds"
         type: "status"
         value: 10
+        slug: "swashbucklers-speed-panache"
         predicate: ["self:effect:panache"]
       - key: "FlatModifier"
         selector: "all-speeds"
         type: "status"
         value: 5
+        slug: "swashbucklers-speed-no-panache"
         predicate: [{"not": "self:effect:panache"}]
   Monk's Flurry:
     assoc_archetype:
@@ -2292,6 +2464,9 @@ pf2e_feats:
         path: "flags.system.monkDedicationCount"
         mode: "add"
         value: 1
+      - key: "ChoiceSet"
+        flag: "save"
+        choices: {"config": "saves", "predicate": ["save:{choice|value}:rank:2"]}
   Master Bard Spellcasting:
     assoc_archetype:
       - Bard Archetype

@@ -178,6 +178,7 @@ pf2e_feats:
         selector: "skill-check"
         type: "circumstance"
         value: 2
+        slug: "combat-assessment"
         predicate: ["action:recall-knowledge", "critical-assessment"]
   Counterspell:
     assoc_charclass:
@@ -288,8 +289,8 @@ pf2e_feats:
         option: "divine-castigation"
         toggleable: true
       - key: "DamageAlteration"
-        property: "damage-type"
         mode: "override"
+        property: "damage-type"
         selectors: ["spell-damage"]
         value: "spirit"
         predicate: ["divine-castigation", {"or": ["self:trait:holy", "self:trait:unholy"]}, {"or": ["item:slug:harm", "item:slug:heal"]}]
@@ -378,6 +379,7 @@ pf2e_feats:
         mode: "upgrade"
         selector: "ac"
         value: 2
+        slug: "raised-shield"
         predicate: ["elegant-buckler"]
   Eliminate Red Herrings:
     assoc_charclass:
@@ -480,6 +482,12 @@ pf2e_feats:
       - key: "RollOption"
         option: "flexible-studies"
         toggleable: true
+        alwaysActive: true
+        suboptions: {"config": "skills", "predicate": ["skill:{choice|value}:rank:0"]}
+      - key: "ActiveEffectLike"
+        path: "system.skills.{item|flags.system.rulesSelections.flexibleStudies}.rank"
+        mode: "upgrade"
+        value: 1
   Flying Blade:
     assoc_charclass:
       - Swashbuckler
@@ -689,6 +697,7 @@ pf2e_feats:
         definition: ["item:trait:monk", {"or": ["item:category:simple", "item:category:martial"]}]
         sameAs: "unarmed"
         maxRank: "master"
+        slug: "simple-martial-monk-weapons"
       - key: "CriticalSpecialization"
         predicate: ["feature:expert-strikes", "item:trait:monk"]
   Monster Hunter:
@@ -760,6 +769,8 @@ pf2e_feats:
       - key: "RollOption"
         option: "nudge-the-scales"
         toggleable: true
+        alwaysActive: true
+        suboptions: [{"label": "PF2E.SpecificRule.Oracle.NudgeTheScales.Life", "value": "life"}, {"label": "PF2E.SpecificRule.Oracle.NudgeTheScales.Death", "value": "death"}]
   One for All:
     assoc_charclass:
       - Swashbuckler
@@ -951,6 +962,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "reach-spell"}]
         label: "PF2E.TraitSpellshape"
   Reactive Shield:
     assoc_charclass:
@@ -1172,6 +1184,16 @@ pf2e_feats:
     traits:
       - druid
       - exploration
+    rules:
+      - key: "ChoiceSet"
+        rollOption: "verdant-weapon-origin"
+        prompt: "PF2E.SpecificRule.Exemplar.Ikon.Physical.Prompt"
+        choices: [{"label": "PF2E.UI.RuleElements.GrantItem.GrantNew", "value": "granted"}, {"label": "PF2E.UI.RuleElements.GrantItem.ExistingItem", "value": "existing"}]
+      - key: "ChoiceSet"
+        flag: "grantedVerdantWeapon"
+        prompt: "PF2E.SpecificRule.Prompt.Weapon"
+        choices: {"filter": ["item:level:0", {"nor": ["item:magical", "item:trait:consumable", "item:group:firearm"]}], "itemType": "weapon"}
+        predicate: ["verdant-weapon-origin:granted"]
   Versatile Performance:
     assoc_charclass:
       - Bard
@@ -1233,6 +1255,7 @@ pf2e_feats:
         selector: "saving-throw"
         type: "circumstance"
         value: 1
+        slug: "well-versed"
         label: "Well-Versed (vs. performative effects)"
         predicate: [{"or": ["auditory", "illusion", "linguistic", "sonic", "visual"]}]
   Whispers of Weakness:
@@ -1271,6 +1294,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "widen-spell"}]
         label: "PF2E.TraitSpellshape"
   Witch's Armaments:
     assoc_charclass:
@@ -1283,6 +1307,10 @@ pf2e_feats:
     traits:
       - witch
     rules:
+      - key: "ChoiceSet"
+        rollOption: "witchs-armaments"
+        prompt: "PF2E.SpecificRule.Prompt.UnarmedAttack"
+        choices: [{"img": "icons/creatures/claws/claw-talons-glowing-orange.webp", "label": "PF2E.SpecificRule.Witch.WitchsArmaments.EldritchNails", "predicate": [{"not": "witchs-armaments:nails"}], "value": "nails"}, {"img": "icons/creatures/abilities/mouth-teeth-rows-red.webp", "label": "PF2E.SpecificRule.Witch.WitchsArmaments.IronTeeth", "predicate": [{"not": "witchs-armaments:teeth"}], "value": "teeth"}, {"img": "icons/creatures/webs/web-thin-pruple.webp", "label": "PF2E.SpecificRule.Witch.WitchsArmaments.LivingHair", "predicate": [{"not": "witchs-armaments:hair"}], "value": "hair"}]
       - key: "Strike"
         range: null
         category: "unarmed"
@@ -1469,6 +1497,11 @@ pf2e_feats:
     traits:
       - witch
     init_magic: true
+    rules:
+      - key: "ChoiceSet"
+        flag: "lesson"
+        prompt: "PF2E.SpecificRule.Prompt.Lesson"
+        choices: {"filter": ["item:tag:witch-lesson", "item:level:2"]}
   Blade Brake:
     assoc_charclass:
       - Fighter
@@ -1656,6 +1689,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "conceal-spell"}]
         label: "PF2E.TraitSpellshape"
   Crushing Grab:
     assoc_charclass:
@@ -1775,11 +1809,13 @@ pf2e_feats:
         mode: "upgrade"
         selector: "ac"
         value: 2
+        slug: "parry-bonus"
         predicate: [{"gte": ["hands-free", 1]}]
       - key: "AdjustModifier"
         mode: "override"
         selector: "ac"
         value: 0
+        slug: "parry-bonus"
         predicate: ["hands-free:0"]
   Elemental Fist:
     assoc_charclass:
@@ -1830,6 +1866,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "energy-ablation"}]
         label: "PF2E.TraitSpellshape"
   Enhanced Familiar:
     assoc_charclass:
@@ -2058,6 +2095,14 @@ pf2e_feats:
     traits:
       - bard
     rules:
+      - key: "ChoiceSet"
+        flag: "muse"
+        prompt: "PF2E.SpecificRule.Bard.Muse.Prompt"
+        choices: {"filter": ["item:tag:bard-muse"]}
+      - key: "ChoiceSet"
+        flag: "feat"
+        prompt: "PF2E.SpecificRule.Prompt.Feat"
+        choices: {"filter": ["item:level:1", "item:category:class", "item:trait:bard"], "itemType": "feat"}
       - key: "RollOption"
         option: "feature:{item|flags.system.rulesSelections.muse}"
   No Escape:
@@ -2087,6 +2132,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "nonlethal-spell"}]
         label: "PF2E.TraitSpellshape"
   Order Explorer:
     assoc_charclass:
@@ -2098,6 +2144,12 @@ pf2e_feats:
     shortdesc: "You have learned the secrets of another druidic order, passing whatever rites of initiation that order requires and gaining access to its secrets. Choose an order other than your own. You gain a 1st-level feat that lists that order as a prerequisite, and you are now a member of that order for the purpose of meeting feat prerequisites. If you commit acts anathema to your new order, you lose all feats and abilities requiring that order but retain your other druid feats and abilities. You don't gain any of the other benefits of the order you chose.%r%r**Special** You can take this feat multiple times. Each time you do, you must choose a different order other than your own."
     traits:
       - druid
+    rules:
+      - key: "ChoiceSet"
+        flag: "order"
+        rollOption: "feat:order-explorer"
+        prompt: "PF2E.SpecificRule.Druid.DruidicOrder.Prompt"
+        choices: {"filter": ["item:tag:druid-order", {"not": "item:tag:class-archetype"}]}
   Panic the Dead:
     assoc_charclass:
       - Cleric
@@ -2167,10 +2219,13 @@ pf2e_feats:
       - key: "RollOption"
         option: "blood-magic"
         toggleable: true
+        alwaysActive: true
+        suboptions: [{"label": "{item|name}", "value": "propelling-sorcery"}]
         label: "PF2E.SpecificRule.Sorcerer.Bloodline.BloodMagicDescription.Title"
       - key: "RollOption"
         option: "second-blood-magic"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "propelling-sorcery"}]
         label: "PF2E.SpecificRule.Sorcerer.SecondBloodMagic"
         predicate: [{"or": ["feat:blood-ascendancy", "feat:blood-sovereignty"]}]
   Quick Draw:
@@ -2225,6 +2280,9 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
+        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.Retreating", "value": "retreating"}]
+        disabledIf: [{"not": "self:effect:panache"}]
+        disabledValue: false
         label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
   Revivifying Mutagen:
     assoc_charclass:
@@ -2407,6 +2465,9 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
+        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.Unbalancing", "value": "unbalancing"}]
+        disabledIf: [{"not": "self:effect:panache"}]
+        disabledValue: false
         label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
   Underhanded Assault:
     assoc_charclass:
@@ -2646,6 +2707,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "courageous-advance"}]
         label: "PF2E.TraitSpellshape"
   Dastardly Dash:
     assoc_charclass:
@@ -2693,6 +2755,7 @@ pf2e_feats:
         selector: "saving-throw"
         type: "circumstance"
         value: 1
+        slug: "pursue-a-lead"
         predicate: ["pursue-a-lead"]
   Directed Channel:
     assoc_charclass:
@@ -2747,6 +2810,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "divine-infusion"}]
         label: "PF2E.TraitSpellshape"
   Double Shot:
     assoc_charclass:
@@ -2767,6 +2831,7 @@ pf2e_feats:
       - key: "FlatModifier"
         selector: "ranged-attack-roll"
         value: -2
+        slug: "double-shot"
         predicate: ["double-shot", "item:reload:0"]
   Dread Striker:
     assoc_charclass:
@@ -2948,6 +3013,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "form-control"}]
         label: "PF2E.TraitSpellshape"
   Guarded Movement:
     assoc_charclass:
@@ -3037,6 +3103,9 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
+        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.Impaling", "value": "impaling"}]
+        disabledIf: [{"not": "self:effect:panache"}]
+        disabledValue: false
         label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
   In Tune:
     assoc_charclass:
@@ -3056,6 +3125,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "in-tune"}]
         label: "PF2E.TraitSpellshape"
   Invigorating Elixir:
     assoc_charclass:
@@ -3087,6 +3157,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "knowledge-of-shapes"}]
         label: "PF2E.TraitSpellshape"
   Leading Dance:
     assoc_charclass:
@@ -3188,6 +3259,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "melodious-spell"}]
         label: "PF2E.TraitSpellshape"
   Mercy:
     assoc_charclass:
@@ -3201,6 +3273,10 @@ pf2e_feats:
     shortdesc: "Your touch soothes the body or mind. You can cast lay on hands targeting a living creature using 2 actions instead of 1. If you do, you can attempt to counteract one condition of your choice affecting the target. When you select this feat, choose one of the following options, which determines the conditions you can choose:%r%r**Mercy of the Body** blinded, dazzled, deafened, enfeebled, sickened;%r%r**Mercy of Grace** clumsy, grabbed, paralyzed;%r%r**Mercy of the Mind** fleeing, frightened, stupefied.%r%r**Special** You can select this feat up to three times. Each time, choose a different type of mercy and add its options to those you can choose when you cast a 2-action lay on hands."
     traits:
       - champion
+    rules:
+      - key: "ChoiceSet"
+        rollOption: "mercy"
+        choices: [{"label": "PF2E.SpecificRule.Champion.Mercy.Body.Label", "predicate": [{"not": "mercy:body"}], "value": "body"}, {"label": "PF2E.SpecificRule.Champion.Mercy.Grace.Label", "predicate": [{"not": "mercy:grace"}], "value": "grace"}, {"label": "PF2E.SpecificRule.Champion.Mercy.Mind.Label", "predicate": [{"not": "mercy:mind"}], "value": "mind"}]
   Mug:
     assoc_charclass:
       - Rogue
@@ -3581,6 +3657,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "snowdrift-spell"}]
         label: "PF2E.TraitSpellshape"
   Spell Protection Array:
     assoc_charclass:
@@ -3623,6 +3700,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "split-shot"}]
         label: "PF2E.TraitSpellshape"
   Stand Still:
     assoc_charclass:
@@ -3785,6 +3863,7 @@ pf2e_feats:
         mode: "upgrade"
         selector: "ac"
         value: 2
+        slug: "parry-bonus"
         predicate: [{"or": [{"gte": ["hands-free", 1]}, "parry-bonus-upgrade:yes"]}]
       - key: "RollOption"
         option: "weapon-parry"
@@ -3805,6 +3884,9 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
+        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.TwirlingThrow", "value": "twirling-throw"}]
+        disabledIf: [{"not": "self:effect:panache"}]
+        disabledValue: false
         label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
       - key: "RollOption"
         option: "ignore-range-penalty:3"
@@ -3868,6 +3950,7 @@ pf2e_feats:
       - key: "MartialProficiency"
         definition: ["item:trait:monk", "item:category:advanced"]
         sameAs: "martial"
+        slug: "advanced-monastic-weaponry"
         label: "PF2E.SpecificRule.MartialProficiency.AdvancedMonasticWeaponry"
   Advanced Qi Spells:
     grants:
@@ -3916,6 +3999,15 @@ pf2e_feats:
     shortdesc: You've studied the art of wielding an advanced weapon. Choose a weapon group. You gain proficiency with all advanced weapons in that group as if they were martial weapons of their weapon group.
     traits:
       - fighter
+    rules:
+      - key: "ChoiceSet"
+        flag: "group"
+        prompt: "PF2E.SpecificRule.Prompt.WeaponGroup"
+        choices: {"config": "weaponGroups"}
+      - key: "MartialProficiency"
+        definition: ["item:group:{item|flags.system.rulesSelections.group}", "item:category:advanced"]
+        sameAs: "martial"
+        slug: "advanced-weapon-training"
   Advantageous Assault:
     assoc_charclass:
       - Fighter
@@ -3936,11 +4028,13 @@ pf2e_feats:
         selector: "strike-damage"
         type: "circumstance"
         value: "@weapon.system.damage.dice"
+        slug: "advantageous-assault"
         predicate: ["advantageous-assault", {"or": ["target:condition:grabbed", "target:condition:prone", "target:condition:restrained"]}, {"gt": ["map:increases", 0]}]
       - key: "AdjustModifier"
         mode: "add"
         selector: "strike-damage"
         value: 2
+        slug: "advantageous-assault"
         predicate: ["item:hands-held:2"]
   Agile Maneuvers:
     assoc_charclass:
@@ -4014,18 +4108,21 @@ pf2e_feats:
         selector: "ac"
         relabel: "PF2E.SpecificRule.AnimalSkin.BracersOfArmor"
         value: "@actor.flags.system.animalSkinBonus"
+        slug: "bands-of-force"
         predicate: ["self:effect:rage"]
       - key: "AdjustModifier"
         mode: "add"
         selector: "ac"
         relabel: "PF2E.SpecificRule.AnimalSkin.ExplorersClothing"
         value: "@actor.flags.system.animalSkinBonus"
+        slug: "explorers-clothing"
         predicate: ["self:effect:rage"]
       - key: "AdjustModifier"
         mode: "add"
         selector: "ac"
         relabel: "PF2E.SpecificRule.AnimalSkin.MageArmor"
         value: "@actor.flags.system.animalSkinBonus"
+        slug: "mage-armor"
         predicate: ["self:effect:rage"]
   Anticipate Ambush:
     assoc_charclass:
@@ -4082,6 +4179,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "cast-down"}]
         label: "PF2E.TraitSpellshape"
   Ceremonial Knife:
     assoc_charclass:
@@ -4165,6 +4263,8 @@ pf2e_feats:
       - key: "RollOption"
         option: "crane-flutter"
         toggleable: true
+        disabledIf: [{"not": "self:effect:crane-stance"}]
+        disabledValue: false
       - key: "FlatModifier"
         selector: "ac"
         type: "circumstance"
@@ -4190,6 +4290,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "current-spell"}]
         label: "PF2E.TraitSpellshape"
   Dazing Blow:
     assoc_charclass:
@@ -4246,6 +4347,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "defensive-coordination"}]
         label: "PF2E.TraitSpellshape"
   Directional Bombs:
     assoc_charclass:
@@ -4310,15 +4412,15 @@ pf2e_feats:
         option: "divine-rebuttal"
         toggleable: true
       - key: "AdjustStrike"
+        mode: "add"
         property: "traits"
         definition: ["item:deity-favored"]
-        mode: "add"
         value: "holy"
         predicate: ["divine-rebuttal", "self:trait:holy"]
       - key: "AdjustStrike"
+        mode: "add"
         property: "traits"
         definition: ["item:deity-favored"]
-        mode: "add"
         value: "unholy"
         predicate: ["divine-rebuttal", "self:trait:unholy"]
   Divine Weapon:
@@ -4351,6 +4453,8 @@ pf2e_feats:
       - key: "RollOption"
         option: "dragon-roar"
         toggleable: true
+        disabledIf: [{"not": "self:effect:dragon-stance"}]
+        disabledValue: false
         label: "PF2E.SpecificRule.Monk.DragonRoar.Label"
       - key: "FlatModifier"
         selector: "attack-damage"
@@ -4431,10 +4535,13 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "explosive-arrival"}]
         label: "PF2E.TraitSpellshape"
       - key: "RollOption"
         option: "arrival-damage"
         toggleable: true
+        alwaysActive: true
+        suboptions: [{"label": "PF2E.TraitFire", "value": "fire"}, {"label": "PF2E.TraitAcid", "value": "acid"}, {"label": "PF2E.TraitCold", "value": "cold"}, {"label": "PF2E.TraitElectricity", "value": "electricity"}, {"label": "PF2E.TraitSonic", "value": "sonic"}, {"label": "PF2E.TraitSpirit", "value": "spirit"}]
         label: "PF2E.SpecificRule.Wizard.ExplosiveArrival.Label"
         predicate: ["spellshape:explosive-arrival"]
       - key: "ActiveEffectLike"
@@ -4456,6 +4563,7 @@ pf2e_feats:
         mode: "add"
         selectors: ["ranged-attack-roll"]
         value: 1
+        slug: "range-penalty"
         predicate: ["item:trait:thrown"]
   Fortified Elixirs:
     assoc_charclass:
@@ -4529,6 +4637,11 @@ pf2e_feats:
     traits:
       - witch
     init_magic: true
+    rules:
+      - key: "ChoiceSet"
+        flag: "lesson"
+        prompt: "PF2E.SpecificRule.Prompt.Lesson"
+        choices: {"filter": ["item:tag:witch-lesson", {"lte": ["item:level", 6]}]}
   Green Empathy:
     assoc_charclass:
       - Druid
@@ -4585,6 +4698,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "harmonize"}]
         label: "PF2E.TraitSpellshape"
   Inner Strength:
     assoc_charclass:
@@ -4752,6 +4866,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "one-inch-punch"
         toggleable: true
+        suboptions: [{"label": "PF2E.SpecificRule.Actions.TwoActions", "value": "two"}, {"label": "PF2E.SpecificRule.Actions.ThreeActions", "value": "three"}]
       - key: "DamageDice"
         selector: ["melee-strike-damage", "ranged-strike-damage"]
         diceNumber: "ternary(gte(@actor.level, 18), 3, ternary(gte(@actor.level, 10), 2, 1))"
@@ -4864,6 +4979,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "safeguard-spell"}]
         label: "PF2E.TraitSpellshape"
   Scouring Rage:
     assoc_charclass:
@@ -5006,6 +5122,8 @@ pf2e_feats:
       - key: "RollOption"
         option: "spirits-interference"
         toggleable: true
+        disabledIf: [{"not": "self:effect:rage"}]
+        disabledValue: false
   Spiritual Sense:
     assoc_charclass:
       - Oracle
@@ -5123,6 +5241,8 @@ pf2e_feats:
       - key: "RollOption"
         option: "tiger-slash"
         toggleable: true
+        disabledIf: [{"not": "self:effect:tiger-stance"}]
+        disabledValue: false
       - key: "DamageDice"
         selector: "tiger-claw-damage"
         diceNumber: "match(when(lte(@actor.level, 13), 2), when(gte(@actor.level, 14), 3))"
@@ -5150,11 +5270,13 @@ pf2e_feats:
         option: "triple-shot"
         domain: "ranged-attack-roll"
         toggleable: true
+        disabledIf: [{"not": "double-shot"}]
       - key: "AdjustModifier"
         mode: "override"
         selector: "ranged-attack-roll"
         relabel: "{item|name}"
         value: -4
+        slug: "double-shot"
         predicate: ["double-shot", "triple-shot"]
   Twist the Knife:
     assoc_charclass:
@@ -5240,6 +5362,8 @@ pf2e_feats:
       - key: "RollOption"
         option: "wolf-drag"
         toggleable: true
+        disabledIf: [{"not": "self:effect:wolf-stance"}]
+        disabledValue: false
   Accompany:
     assoc_charclass:
       - Bard
@@ -5341,6 +5465,9 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
+        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.Bleeding", "value": "bleeding"}]
+        disabledIf: [{"not": "self:effect:panache"}]
+        disabledValue: false
         label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
       - key: "DamageDice"
         category: "persistent"
@@ -5398,6 +5525,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "bond-conservation"}]
         label: "PF2E.TraitSpellshape"
   Bullseye:
     assoc_charclass:
@@ -5436,6 +5564,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "call-and-response"}]
         label: "PF2E.TraitSpellshape"
   Clinging Shadows Initiate:
     grants:
@@ -5487,6 +5616,11 @@ pf2e_feats:
     shortdesc: Odd interactions in your bloodline provide you with unexpected effects. Choose another bloodline. You know the blood magic effect of that bloodline. If the blood magic effect has a variable effect based on a choice you would have made at 1st level (such as the elemental bloodline's elemental influence), you make that decision when you take this feat.
     traits:
       - sorcerer
+    rules:
+      - key: "ChoiceSet"
+        flag: "bloodline"
+        prompt: "PF2E.SpecificRule.Sorcerer.Bloodline.Prompt"
+        choices: {"filter": ["item:tag:sorcerer-bloodline"]}
   Deadly Aim:
     assoc_charclass:
       - Ranger
@@ -5609,6 +5743,9 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
+        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.Dual", "value": "dual"}]
+        disabledIf: [{"not": "self:effect:panache"}]
+        disabledValue: false
         label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
       - key: "RollOption"
         option: "dual-finisher-second"
@@ -5675,33 +5812,36 @@ pf2e_feats:
       - key: "RollOption"
         option: "blood-magic"
         toggleable: true
+        alwaysActive: true
+        suboptions: [{"label": "{item|name}", "value": "explosion-of-power"}]
         label: "PF2E.SpecificRule.Sorcerer.Bloodline.BloodMagicDescription.Title"
       - key: "RollOption"
         option: "second-blood-magic"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "explosion-of-power"}]
         label: "PF2E.SpecificRule.Sorcerer.SecondBloodMagic"
         predicate: [{"or": ["feat:blood-ascendancy", "feat:blood-sovereignty"]}]
       - key: "DamageAlteration"
-        property: "damage-type"
         mode: "override"
+        property: "damage-type"
         selectors: ["inline-damage"]
         value: "force"
         predicate: ["explosion-of-power", "feature:bloodline:tradition:arcane"]
       - key: "DamageAlteration"
-        property: "damage-type"
         mode: "override"
+        property: "damage-type"
         selectors: ["inline-damage"]
         value: "spirit"
         predicate: ["explosion-of-power", "feature:bloodline:tradition:divine"]
       - key: "DamageAlteration"
-        property: "damage-type"
         mode: "override"
+        property: "damage-type"
         selectors: ["inline-damage"]
         value: "mental"
         predicate: ["explosion-of-power", "feature:bloodline:tradition:occult"]
       - key: "DamageAlteration"
-        property: "damage-type"
         mode: "override"
+        property: "damage-type"
         selectors: ["inline-damage"]
         value: "fire"
         predicate: ["explosion-of-power", "feature:bloodline:tradition:primal"]
@@ -5925,6 +6065,10 @@ pf2e_feats:
     shortdesc: "Choose physical invigoration or mental invigoration, and add the listed conditions to those you can choose for an invigorating elixir you create to counteract:%r%r**Physical Invigoration** blinded, deafened, drained, paralyzed, slowed%r%r**Mental Invigoration** confused, controlled, fleeing, frightened, paralyzed, slowed.%r%r**Special** You can select this feat a second time to choose a different type of invigoration and add its options to those you can choose."
     traits:
       - alchemist
+    rules:
+      - key: "ChoiceSet"
+        rollOption: "improved-invigorating-elixir"
+        choices: [{"label": "PF2E.SpecificRule.Alchemist.ImprovedInvigoratingElixir.Mental.Label", "value": "mental"}, {"label": "PF2E.SpecificRule.Alchemist.ImprovedInvigoratingElixir.Physical.Label", "value": "physical"}]
   Improved Poison Weapon:
     assoc_charclass:
       - Rogue
@@ -6065,6 +6209,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "martyr"}]
         label: "PF2E.TraitSpellshape"
   Mixed Maneuver:
     assoc_charclass:
@@ -6113,21 +6258,25 @@ pf2e_feats:
         selector: "intimidation"
         type: "item"
         value: 1
+        slug: "mutant-physique-intimidation"
         predicate: [{"or": ["self:effect:bestial-mutagen-lesser", "self:effect:bestial-mutagen-moderate", "self:effect:bestial-mutagen-greater", "self:effect:bestial-mutagen-major"]}]
       - key: "AdjustModifier"
         mode: "upgrade"
         selector: "intimidation"
         value: 2
+        slug: "mutant-physique-intimidation"
         predicate: ["self:effect:bestial-mutagen-moderate"]
       - key: "AdjustModifier"
         mode: "upgrade"
         selector: "intimidation"
         value: 3
+        slug: "mutant-physique-intimidation"
         predicate: ["self:effect:bestial-mutagen-greater"]
       - key: "AdjustModifier"
         mode: "upgrade"
         selector: "intimidation"
         value: 4
+        slug: "mutant-physique-intimidation"
         predicate: ["self:effect:bestial-mutagen-major"]
       - key: "Resistance"
         type: "physical"
@@ -6334,6 +6483,10 @@ pf2e_feats:
     shortdesc: Your continued service grants you another boon. Choose a second blessing of the devoted (different from your first one) and gain its benefits.
     traits:
       - champion
+    rules:
+      - key: "ChoiceSet"
+        flag: "blessing"
+        choices: [{"predicate": [{"not": "feature:blessed-armament"}], "value": "Compendium.pf2e.classfeatures.Item.Blessed Armament"}, {"predicate": [{"not": "feature:blessed-shield"}], "value": "Compendium.pf2e.classfeatures.Item.Blessed Shield"}, {"predicate": [{"not": "feature:blessed-swiftness"}], "value": "Compendium.pf2e.classfeatures.Item.Blessed Swiftness"}]
   Share Rage:
     assoc_charclass:
       - Barbarian
@@ -6443,6 +6596,9 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
+        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.Stunning", "value": "stunning"}]
+        disabledIf: [{"not": "self:effect:panache"}]
+        disabledValue: false
         label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
   Sudden Leap:
     assoc_charclass:
@@ -6483,6 +6639,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "surging-might"}]
         label: "PF2E.TraitSpellshape"
   Swipe Souvenir:
     assoc_charclass:
@@ -6752,6 +6909,7 @@ pf2e_feats:
         mode: "add"
         selector: "fortitude"
         value: 1
+        slug: "cobra-stance"
   Come and Get Me:
     assoc_charclass:
       - Barbarian
@@ -6782,6 +6940,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "courageous-assault"}]
         label: "PF2E.TraitSpellshape"
   Crashing Slam:
     assoc_charclass:
@@ -6916,6 +7075,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "energy-fusion"}]
         label: "PF2E.TraitSpellshape"
   Expanded Splash:
     assoc_charclass:
@@ -6952,11 +7112,13 @@ pf2e_feats:
         selector: "strike-damage"
         type: "circumstance"
         value: "2 * @target.conditions.frightened.badge.value"
+        slug: "fearsome-brute"
         predicate: ["target:condition:frightened"]
       - key: "AdjustModifier"
         mode: "multiply"
         selector: "strike-damage"
         value: 1.5
+        slug: "fearsome-brute"
         predicate: [{"gte": ["skill:intimidation:rank", 3]}]
   Flinging Charge:
     assoc_charclass:
@@ -7031,6 +7193,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "healing-transformation"}]
         label: "PF2E.TraitSpellshape"
   Heroic Recovery:
     assoc_charclass:
@@ -7050,6 +7213,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "heroic-recovery"}]
         label: "PF2E.TraitSpellshape"
   House of Imaginary Walls:
     assoc_charclass:
@@ -7114,6 +7278,7 @@ pf2e_feats:
         mode: "multiply"
         selector: "skill-check"
         value: 2
+        slug: "pursue-a-lead"
         predicate: ["just-one-more-thing", {"or": ["action:feint", "action:demoralize", "action:request"]}]
   Knockback:
     assoc_charclass:
@@ -7151,6 +7316,11 @@ pf2e_feats:
     traits:
       - witch
     init_magic: true
+    rules:
+      - key: "ChoiceSet"
+        flag: "lesson"
+        prompt: "PF2E.SpecificRule.Prompt.Lesson"
+        choices: {"filter": ["item:tag:witch-lesson", {"lte": ["item:level", 10]}]}
   Master Monster Hunter:
     assoc_charclass:
       - Ranger
@@ -7256,6 +7426,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "overwhelming-energy"}]
         label: "PF2E.TraitSpellshape"
   Peerless Warden:
     assoc_charclass:
@@ -7375,6 +7546,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "quickened-casting"}]
         label: "PF2E.TraitSpellshape"
   Radiant Armament:
     assoc_charclass:
@@ -7581,6 +7753,9 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
+        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.Stumbling", "value": "stumbling"}]
+        disabledIf: [{"not": "self:effect:panache"}]
+        disabledValue: false
         label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
   Suspect of Opportunity:
     assoc_charclass:
@@ -7662,6 +7837,9 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
+        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.Targeting", "value": "targeting"}]
+        disabledIf: [{"not": "self:effect:panache"}]
+        disabledValue: false
         label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
   Terrifying Howl:
     assoc_charclass:
@@ -7707,6 +7885,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "thunderclap-spell"}]
         label: "PF2E.TraitSpellshape"
   Trial by Skyfire:
     assoc_charclass:
@@ -7765,6 +7944,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "unusual-composition"}]
         label: "PF2E.TraitSpellshape"
   Vicious Debilitations:
     assoc_charclass:
@@ -8033,6 +8213,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "defensive-recovery"}]
         label: "PF2E.TraitSpellshape"
   Disrupt Qi:
     assoc_charclass:
@@ -8080,6 +8261,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "dodging-roll"
         toggleable: true
+        suboptions: [{"label": "PF2E.SpecificRule.Monk.DodgingRoll.StepIn", "value": "in"}, {"label": "PF2E.SpecificRule.Monk.DodgingRoll.StepOut", "value": "out"}]
       - key: "Resistance"
         type: "all-damage"
         value: "@actor.level"
@@ -8304,6 +8486,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "forcible-energy"}]
         value: true
         label: "PF2E.TraitSpellshape"
   Foresee Danger:
@@ -8356,6 +8539,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "garland-spell"}]
         label: "PF2E.TraitSpellshape"
   Get Used to Disappointment:
     assoc_charclass:
@@ -8560,6 +8744,9 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
+        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.Mobile", "value": "mobile"}]
+        disabledIf: [{"not": "self:effect:panache"}]
+        disabledValue: false
         label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
   Overwhelming Breath:
     assoc_charclass:
@@ -8579,6 +8766,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "overwhelming-breath"}]
         label: "PF2E.TraitSpellshape"
   Predator's Pounce:
     assoc_charclass:
@@ -8834,10 +9022,13 @@ pf2e_feats:
       - key: "RollOption"
         option: "blood-magic"
         toggleable: true
+        alwaysActive: true
+        suboptions: [{"label": "{item|name}", "value": "terraforming-trickery"}]
         label: "PF2E.SpecificRule.Sorcerer.Bloodline.BloodMagicDescription.Title"
       - key: "RollOption"
         option: "second-blood-magic"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "terraforming-trickery"}]
         label: "PF2E.SpecificRule.Sorcerer.SecondBloodMagic"
         predicate: [{"or": ["feat:blood-ascendancy", "feat:blood-sovereignty"]}]
   The Bigger They Are:
@@ -9126,6 +9317,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "ebb-and-flow"}]
         label: "PF2E.TraitSpellshape"
   Fast Channel:
     assoc_charclass:
@@ -9227,6 +9419,15 @@ pf2e_feats:
       - key: "RollOption"
         option: "impossible-riposte"
         toggleable: true
+        suboptions: [{"label": "PF2E.TraitBludgeoning", "value": "bludgeoning"}, {"label": "PF2E.TraitPiercing", "value": "piercing"}, {"label": "PF2E.TraitSlashing", "value": "slashing"}, {"label": "PF2E.TraitAcid", "value": "acid"}, {"label": "PF2E.TraitCold", "value": "cold"}, {"label": "PF2E.TraitElectricity", "value": "electricity"}, {"label": "PF2E.TraitFire", "value": "fire"}, {"label": "PF2E.TraitSonic", "value": "sonic"}, {"label": "PF2E.TraitVitality", "value": "vitality"}, {"label": "PF2E.TraitVoid", "value": "void"}, {"label": "PF2E.TraitForce", "value": "force"}, {"label": "PF2E.TraitSpirit", "value": "spirit"}, {"label": "PF2E.TraitMental", "value": "mental"}, {"label": "PF2E.TraitPoison", "value": "poison"}, {"label": "PF2E.TraitBleed", "value": "bleed"}]
+        disabledIf: [{"not": "opportune-riposte"}]
+        disabledValue: false
+      - key: "DamageAlteration"
+        mode: "override"
+        property: "damage-type"
+        selectors: ["strike-damage"]
+        value: "{item|flags.system.rulesSelections.impossibleRiposte}"
+        predicate: ["impossible-riposte"]
   Improved Twin Riposte (Fighter):
     assoc_charclass:
       - Fighter
@@ -9267,6 +9468,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "interweave-dispel"}]
         label: "PF2E.TraitSpellshape"
   Ironblood Surge:
     assoc_charclass:
@@ -9284,6 +9486,8 @@ pf2e_feats:
       - key: "RollOption"
         option: "ironblood-surge"
         toggleable: true
+        disabledIf: [{"not": "self:effect:ironblood-stance"}]
+        disabledValue: false
       - key: "FlatModifier"
         selector: "ac"
         type: "circumstance"
@@ -9421,6 +9625,9 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
+        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.Perfect", "value": "perfect"}]
+        disabledIf: [{"not": "self:effect:panache"}]
+        disabledValue: false
         label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
   Plot the Future:
     assoc_charclass:
@@ -9477,10 +9684,13 @@ pf2e_feats:
       - key: "RollOption"
         option: "blood-magic"
         toggleable: true
+        alwaysActive: true
+        suboptions: [{"label": "{item|name}", "value": "reflect-harm"}]
         label: "PF2E.SpecificRule.Sorcerer.Bloodline.BloodMagicDescription.Title"
       - key: "RollOption"
         option: "second-blood-magic"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "reflect-harm"}]
         label: "PF2E.SpecificRule.Sorcerer.SecondBloodMagic"
         predicate: [{"or": ["feat:blood-ascendancy", "feat:blood-sovereignty"]}]
   Reflect Spell:
@@ -9535,10 +9745,13 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "secondary-detonation-array"}]
         label: "PF2E.TraitSpellshape"
       - key: "RollOption"
         option: "array-damage"
         toggleable: true
+        alwaysActive: true
+        suboptions: [{"label": "PF2E.TraitAcid", "value": "acid"}, {"label": "PF2E.TraitCold", "value": "cold"}, {"label": "PF2E.TraitElectricity", "value": "electricity"}, {"label": "PF2E.TraitFire", "value": "fire"}, {"label": "PF2E.TraitForce", "value": "force"}, {"label": "PF2E.TraitMental", "value": "mental"}, {"label": "PF2E.TraitPoison", "value": "poison"}, {"label": "PF2E.TraitSonic", "value": "sonic"}]
         label: "PF2E.SpecificRule.Prompt.DamageType"
         predicate: ["spellshape:secondary-detonation-array"]
       - key: "ActiveEffectLike"
@@ -9619,6 +9832,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "sow-spell"}]
         label: "PF2E.TraitSpellshape"
   Specialized Companion (Druid):
     repeatable: 3
@@ -9649,6 +9863,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "spell-shroud"}]
         label: "PF2E.TraitSpellshape"
   Stay Down!:
     assoc_charclass:
@@ -9831,6 +10046,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "vigorous-anthem"}]
         label: "PF2E.TraitSpellshape"
   Warden's Guidance:
     assoc_charclass:
@@ -9977,6 +10193,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "courageous-onslaught"}]
         label: "PF2E.TraitSpellshape"
   Deadly Grace:
     assoc_charclass:
@@ -9990,8 +10207,8 @@ pf2e_feats:
       - swashbuckler
     rules:
       - key: "DamageAlteration"
-        property: "dice-number"
         mode: "multiply"
+        property: "dice-number"
         selectors: ["strike-damage"]
         value: 2
         predicate: [{"not": "item:tag:deadly-from-deadly-grace"}, {"or": ["item:trait:agile", "item:trait:finesse"]}, {"or": ["dice:slug:deadly-d4", "dice:slug:deadly-d6", "dice:slug:deadly-d8", "dice:slug:deadly-d10", "dice:slug:deadly-d12"]}]
@@ -10040,6 +10257,11 @@ pf2e_feats:
       - oracle
     init_magic: true
     rules:
+      - key: "ChoiceSet"
+        flag: "diverseMystery"
+        rollOption: "diverse-mystery"
+        prompt: "PF2E.SpecificRule.Prompt.Spell"
+        choices: {"filter": ["item:trait:focus", "item:trait:oracle", {"lte": ["item:rank", 3]}], "itemType": "spell", "slugsAsValues": true}
       - key: "RollOption"
         option: "used-diverse-mystery"
         toggleable: true
@@ -10460,6 +10682,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "portentous-spell"}]
         label: "PF2E.TraitSpellshape"
   Rebounding Smite:
     assoc_charclass:
@@ -10502,6 +10725,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "remediate"}]
         label: "PF2E.TraitSpellshape"
   Resounding Finale:
     assoc_charclass:
@@ -10540,6 +10764,9 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
+        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.Revitalizing", "value": "revitalizing"}]
+        disabledIf: [{"not": "self:effect:panache"}]
+        disabledValue: false
         label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
   Scintillating Spell:
     assoc_charclass:
@@ -10560,6 +10787,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "scintillating-spell"}]
         label: "PF2E.TraitSpellshape"
   Shattering Blows:
     assoc_charclass:
@@ -10743,9 +10971,10 @@ pf2e_feats:
       - monk
     rules:
       - key: "DamageAlteration"
-        property: "dice-faces"
         mode: "upgrade"
+        property: "dice-faces"
         selectors: ["unarmed-damage"]
+        slug: "base"
         predicate: ["item:tag:diamond-fists-dice-upgrade"]
   Discordant Voice:
     assoc_charclass:
@@ -10799,6 +11028,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "echoing-channel"}]
         label: "PF2E.TraitSpellshape"
   Echoing Spell:
     assoc_charclass:
@@ -10816,6 +11046,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "echoing-spell"}]
         label: "PF2E.TraitSpellshape"
   Eternal Composition:
     assoc_charclass:
@@ -11035,6 +11266,9 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher"
         toggleable: true
+        suboptions: [{"label": "PF2E.SpecificRule.Swashbuckler.Finisher.Lethal", "value": "lethal"}]
+        disabledIf: [{"not": "self:effect:panache"}]
+        disabledValue: false
         label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
   Manifold Edge:
     assoc_charclass:
@@ -11290,6 +11524,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "split-hex"}]
         label: "PF2E.TraitSpellshape"
   Swift Retribution:
     assoc_charclass:
@@ -11475,6 +11710,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "bloodline-conduit"}]
         label: "PF2E.TraitSpellshape"
   Bloodline Mutation:
     assoc_charclass:
@@ -11487,6 +11723,31 @@ pf2e_feats:
     traits:
       - sorcerer
     rules:
+      - key: "ChoiceSet"
+        flag: "traitOne"
+        prompt: "PF2E.SpecificRule.Sorcerer.BloodlineMutation.TraitPrompt"
+        choices: {"config": "creatureTraits"}
+      - key: "ChoiceSet"
+        rollOption: "bloodline-mutation-traits"
+        prompt: "PF2E.SpecificRule.Sorcerer.BloodlineMutation.SecondTraitPrompt"
+        choices: [{"label": "PF2E.UI.RuleElements.ChoiceSet.YesLabel", "value": "second-trait"}, {"label": "PF2E.UI.RuleElements.ChoiceSet.NoLabel", "value": "no-second-trait"}]
+      - key: "ChoiceSet"
+        flag: "traitTwo"
+        prompt: "PF2E.SpecificRule.Sorcerer.BloodlineMutation.TraitPrompt"
+        choices: {"config": "creatureTraits"}
+        predicate: ["bloodline-mutation-traits:second-trait"]
+      - key: "ChoiceSet"
+        flag: "sense"
+        rollOption: "bloodline-mutation-sense"
+        choices: [{"label": "PF2E.Actor.Creature.Sense.Type.Darkvision", "value": "darkvision"}, {"label": "PF2E.Actor.Creature.Sense.Type.LowLightVision", "value": "low-light-vision"}]
+        allowNoSelection: true
+      - key: "ChoiceSet"
+        rollOption: "bloodline-mutation-benefit"
+        choices: [{"label": "PF2E.Actor.Speed.Type.Fly", "value": "fly"}, {"label": "PF2E.TraitAmphibious", "value": "amphibious"}, {"label": "PF2E.RuleElement.Resistance", "value": "resistance"}]
+      - key: "ChoiceSet"
+        flag: "damageType"
+        choices: [{"label": "PF2E.TraitAcid", "value": "acid"}, {"label": "PF2E.TraitCold", "value": "cold"}, {"label": "PF2E.TraitElectricity", "value": "electricity"}, {"label": "PF2E.TraitFire", "value": "fire"}, {"label": "PF2E.TraitSonic", "value": "sonic"}, {"label": "PF2E.TraitVoid", "value": "void"}]
+        predicate: ["bloodline-mutation-benefit:resistance"]
       - key: "Sense"
         selector: "low-light-vision"
         predicate: ["bloodline-mutation-sense:low-light-vision"]
@@ -11501,6 +11762,10 @@ pf2e_feats:
         selector: "swim"
         value: "@actor.system.movement.speeds.land.value"
         predicate: ["bloodline-mutation-benefit:amphibious"]
+      - key: "Resistance"
+        type: "{item|flags.system.rulesSelections.damageType}"
+        value: 20
+        predicate: ["bloodline-mutation-benefit:resistance"]
   Bloodline Perfection:
     assoc_charclass:
       - Sorcerer
@@ -11639,9 +11904,11 @@ pf2e_feats:
       - key: "RollOption"
         option: "finisher:illimitable"
         toggleable: true
+        disabledIf: [{"not": "finisher"}]
+        disabledValue: false
       - key: "AdjustStrike"
-        property: "traits"
         mode: "add"
+        property: "traits"
         value: "bravado"
         predicate: ["finisher:illimitable"]
   Immortal Techniques:
@@ -11740,6 +12007,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "ley-line-conduit"}]
         label: "PF2E.TraitSpellshape"
   Lightning Qi:
     assoc_charclass:
@@ -11789,6 +12057,7 @@ pf2e_feats:
       - key: "RollOption"
         option: "spellshape"
         toggleable: true
+        suboptions: [{"label": "{item|name}", "value": "mystery-conduit"}]
         label: "PF2E.TraitSpellshape"
   Oracular Providence:
     assoc_charclass:

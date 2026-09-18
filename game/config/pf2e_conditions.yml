@@ -8,6 +8,7 @@ pf2e_conditions:
         selector: "perception"
         type: "status"
         value: -4
+        slug: "blinded"
       - key: "Immunity"
         type: "visual"
   Clumsy:
@@ -19,6 +20,7 @@ pf2e_conditions:
         selector: "dex-based"
         type: "status"
         value: "-@item.badge.value"
+        slug: "clumsy"
   Confused:
     short_descr: You lose your wits and attack wildly.
     value: false
@@ -51,6 +53,7 @@ pf2e_conditions:
         selector: ["perception", "skill-check"]
         type: "status"
         value: -2
+        slug: "deafened"
         predicate: [{"or": [{"and": ["check:type:skill", "item:trait:auditory"]}, {"and": ["check:statistic:base:perception", "check:statistic:initiative"]}]}]
       - key: "Immunity"
         type: "auditory"
@@ -73,10 +76,12 @@ pf2e_conditions:
         selector: "con-based"
         type: "status"
         value: "-1 * @item.badge.value"
+        slug: "drained"
       - key: "FlatModifier"
         selector: "hp"
         type: "status"
         value: "min(-1 * @actor.level,-1) * @item.badge.value"
+        slug: "drained"
   Dying:
     short_descr: You are close to death.
     value: true
@@ -89,6 +94,7 @@ pf2e_conditions:
       - key: "FlatModifier"
         selector: "all-speeds"
         value: -10
+        slug: "encumbered"
   Enfeebled:
     short_descr: You are physically weakened.
     value: true
@@ -98,6 +104,7 @@ pf2e_conditions:
         selector: ["str-based", "str-damage"]
         type: "status"
         value: "-@item.badge.value"
+        slug: "enfeebled"
   Fascinated:
     short_descr: You are compelled to focus your attention on something.
     value: false
@@ -107,6 +114,7 @@ pf2e_conditions:
         selector: ["perception", "skill-check"]
         type: "status"
         value: -2
+        slug: "fascinated"
   Fatigued:
     short_descr: You are tired and cannot summon much energy.
     value: false
@@ -117,6 +125,7 @@ pf2e_conditions:
         selector: ["ac", "saving-throw"]
         type: "status"
         value: -1
+        slug: "fatigued"
   Fleeing:
     short_descr: You can take no action other than running away.
     value: false
@@ -130,6 +139,7 @@ pf2e_conditions:
         selector: "all"
         type: "status"
         value: "-@item.badge.value"
+        slug: "frightened"
   Grabbed:
     short_descr: You are being held by another creature.
     value: false
@@ -151,6 +161,7 @@ pf2e_conditions:
         selector: "ac"
         type: "circumstance"
         value: -2
+        slug: "off-guard"
   Paralyzed:
     short_descr: You are frozen in place.
     rules:
@@ -175,6 +186,7 @@ pf2e_conditions:
         selector: "attack-roll"
         type: "circumstance"
         value: -2
+        slug: "prone"
   Quickened:
     short_descr: You move faster than normal.
     value: false
@@ -197,6 +209,7 @@ pf2e_conditions:
         selector: "all"
         type: "status"
         value: "-@item.badge.value"
+        slug: "sickened"
   Slowed:
     short_descr: You move more slowly than normal.
     value: true
@@ -214,6 +227,7 @@ pf2e_conditions:
         selector: ["cha-based", "int-based", "wis-based"]
         type: "status"
         value: "-@item.badge.value"
+        slug: "stupefied"
   Unconscious:
     short_descr: You are sleeping or knocked out.
     value: false
@@ -223,6 +237,7 @@ pf2e_conditions:
         selector: ["ac", "perception", "reflex"]
         type: "status"
         value: -4
+        slug: "unconscious"
   Wounded:
     short_descr: You have been seriously injured.
     value: true

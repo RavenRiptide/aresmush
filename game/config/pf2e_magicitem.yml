@@ -73,6 +73,12 @@ pf2e_magicitem:
     bulk: 0
     shortdesc: "This compact compass repurposes ancient technology to draw fantastic powers from the mysterious magical items called *aeon stones*. A *wayfinder* functions as a compass.%r%rAn indentation in the middle of the *wayfinder* can hold a single *aeon stone*. Placing an *aeon stone* in this indentation provides you all the benefits of having the *aeon stone* orbiting your head, but it protects the stone from being noticed or stolen as easily. You invest a *wayfinder* and the *aeon stone* within it simultaneously, and they count as only one item toward your investiture limit. An invested *aeon stone* slotted in a *wayfinder* also grants its resonant power.%r%rIf you have more than one *wayfinder* with an invested *aeon stone* on your person at a given time, destructive interference from their resonance prevents you from gaining benefits from any of them. You can still benefit from additional *aeon stones* orbiting your head, just not in *wayfinders*.%r%r**Activate--Light** A (concentrate); **Effect** The *wayfinder* is targeted by a 1st-rank *light* spell."
   # Level 3 Magic Items
+    rules:
+      - key: "AdjustModifier"
+        selector: "survival"
+        suppress: true
+        slug: "no-compass"
+        requiresEquipped: false
   Beacon Shot:
     traits:
       - consumable
@@ -495,6 +501,14 @@ pf2e_magicitem:
     price: 24500
     bulk: 0
     shortdesc: "This charm, normally hung from the belt or worn around the neck, grants you resistance 5 against one type of energy damage: acid, cold, electricity, fire, or sonic. Each charm is crafted to protect against a particular type of energy damage, and its design usually embodies the type of energy it protects the wearer from in some way. For instance, a *charm of cold resistance* could be carved in the shape of a yeti, whereas a *charm of fire resistance* would be made from volcanic glass."
+    rules:
+      - key: "ChoiceSet"
+        flag: "damageType"
+        prompt: "PF2E.SpecificRule.Prompt.DamageType"
+        choices: [{"label": "PF2E.TraitAcid", "value": "acid"}, {"label": "PF2E.TraitCold", "value": "cold"}, {"label": "PF2E.TraitElectricity", "value": "electricity"}, {"label": "PF2E.TraitFire", "value": "fire"}, {"label": "PF2E.TraitSonic", "value": "sonic"}]
+      - key: "Resistance"
+        type: "{item|flags.system.rulesSelections.damageType}"
+        value: 5
   Choker of Elocution:
     traits:
       - invested
@@ -727,9 +741,11 @@ pf2e_magicitem:
         selector: ["ac", "saving-throw"]
         type: "item"
         value: 1
+        slug: "bands-of-force"
       - key: "FlatModifier"
         selector: ["athletics"]
         value: 14
+        slug: "bands-of-force"
         predicate: ["bands-of-force"]
       - key: "AdjustModifier"
         selector: "athletics"
@@ -1017,6 +1033,14 @@ pf2e_magicitem:
     price: 97500
     bulk: 0
     shortdesc: "This charm, normally hung from the belt or worn around the neck, grants you resistance 10 against one type of energy damage: acid, cold, electricity, fire, or sonic. Each charm is crafted to protect against a particular type of energy damage, and its design usually embodies the type of energy it protects the wearer from in some way. For instance, a *charm of cold resistance* could be carved in the shape of a yeti, whereas a *charm of fire resistance* would be made from volcanic glass."
+    rules:
+      - key: "ChoiceSet"
+        flag: "damageType"
+        prompt: "PF2E.SpecificRule.Prompt.DamageType"
+        choices: [{"label": "PF2E.TraitAcid", "value": "acid"}, {"label": "PF2E.TraitCold", "value": "cold"}, {"label": "PF2E.TraitElectricity", "value": "electricity"}, {"label": "PF2E.TraitFire", "value": "fire"}, {"label": "PF2E.TraitSonic", "value": "sonic"}]
+      - key: "Resistance"
+        type: "{item|flags.system.rulesSelections.damageType}"
+        value: 10
   Choker of Elocution (Greater):
     traits:
       - invested
@@ -1090,6 +1114,7 @@ pf2e_magicitem:
         selector: "skill-check"
         type: "circumstance"
         value: 1
+        slug: "daredevil-boots-tumble-through"
         label: "PF2E.SpecificRule.Equipment.DaredevilBoots.TumbleThroughLabel"
         predicate: ["action:tumble-through"]
   Demon Mask (Greater):
@@ -1194,6 +1219,7 @@ pf2e_magicitem:
       - key: "RollOption"
         option: "shadow-signet"
         toggleable: true
+        suboptions: [{"label": "PF2E.Check.DC.Specific.fortitude", "value": "fortitude-dc"}, {"label": "PF2E.Check.DC.Specific.reflex", "value": "reflex-dc"}]
   Wand of Widening (4th-Rank Spell):
     traits:
       - magical
@@ -1382,6 +1408,12 @@ pf2e_magicitem:
     price: 180000
     bulk: 1
     shortdesc: "This healer's toolkit contains a seemingly endless supply of bandages, herbs, and healing items of impeccable quality, granting you a +2 item bonus to Medicine checks.%r%rIf you use the *marvelous medicines* when you Treat Poison or Treat Disease, before you roll your check, the medicines attempt to counteract the poison or disease you're treating, with a counteract rank of 5 and a counteract modifier of +21. This is a healing effect.%r%rThe medicines can't be used to treat the same affliction for that patient again"
+    rules:
+      - key: "FlatModifier"
+        selector: "medicine"
+        type: "item"
+        value: 2
+        requiresEquipped: false
   Penetrating Ammunition:
     traits:
       - consumable
@@ -1509,9 +1541,11 @@ pf2e_magicitem:
         selector: ["ac", "saving-throw"]
         type: "item"
         value: 2
+        slug: "bands-of-force"
       - key: "FlatModifier"
         selector: ["athletics"]
         value: 21
+        slug: "bands-of-force-greater"
         predicate: ["bands-of-force-greater"]
       - key: "AdjustModifier"
         selector: "athletics"
@@ -1543,6 +1577,14 @@ pf2e_magicitem:
     price: 440000
     bulk: 0
     shortdesc: "This charm, normally hung from the belt or worn around the neck, grants you resistance 15 against one type of energy damage: acid, cold, electricity, fire, or sonic. Each charm is crafted to protect against a particular type of energy damage, and its design usually embodies the type of energy it protects the wearer from in some way. For instance, a *charm of cold resistance* could be carved in the shape of a yeti, whereas a *charm of fire resistance* would be made from volcanic glass."
+    rules:
+      - key: "ChoiceSet"
+        flag: "damageType"
+        prompt: "PF2E.SpecificRule.Prompt.DamageType"
+        choices: [{"label": "PF2E.TraitAcid", "value": "acid"}, {"label": "PF2E.TraitCold", "value": "cold"}, {"label": "PF2E.TraitElectricity", "value": "electricity"}, {"label": "PF2E.TraitFire", "value": "fire"}, {"label": "PF2E.TraitSonic", "value": "sonic"}]
+      - key: "Resistance"
+        type: "{item|flags.system.rulesSelections.damageType}"
+        value: 15
   Crystal Ball (Clear Quartz):
     traits:
       - uncommon
@@ -1771,6 +1813,7 @@ pf2e_magicitem:
         selector: "athletics"
         type: "circumstance"
         value: 2
+        slug: "bracers-of-strength-action"
         predicate: [{"or": ["action:lift-heavy-object", "action:escape", "action:force-open"]}]
   Cloak of Swiftness:
     traits:
@@ -1827,6 +1870,7 @@ pf2e_magicitem:
         selector: "skill-check"
         type: "circumstance"
         value: 2
+        slug: "daredevil-boots-tumble-through"
         label: "PF2E.SpecificRule.Equipment.DaredevilBoots.TumbleThroughLabel"
         predicate: ["action:tumble-through"]
   Dread Blindfold:
@@ -2001,6 +2045,12 @@ pf2e_magicitem:
     price: 1900000
     bulk: 1
     shortdesc: "This healer's toolkit contains a seemingly endless supply of bandages, herbs, and healing items of impeccable quality, granting you a +3 item bonus to Medicine checks.%r%rIf you use the *marvelous medicines* when you Treat Poison or Treat Disease, before you roll your check, the medicines attempt to counteract the poison or disease you're treating, with a counteract rank of 8 and a counteract modifier of +30. This is a healing effect.%r%rThe medicines can't be used to treat the same affliction for that patient again"
+    rules:
+      - key: "FlatModifier"
+        selector: "medicine"
+        type: "item"
+        value: 3
+        requiresEquipped: false
   Obsidian Goggles (Major):
     traits:
       - invested
@@ -2150,9 +2200,11 @@ pf2e_magicitem:
         selector: ["ac", "saving-throw"]
         type: "item"
         value: 3
+        slug: "bands-of-force"
       - key: "FlatModifier"
         selector: ["athletics"]
         value: 33
+        slug: "bands-of-force-major"
         predicate: ["bands-of-force-major"]
       - key: "AdjustModifier"
         selector: "athletics"

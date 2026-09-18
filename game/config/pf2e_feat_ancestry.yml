@@ -90,6 +90,11 @@ pf2e_feats:
     shortdesc: "Over the long course of your adventuring life, your adaptability has let you pick up numerous useful abilities. You gain a general feat of 7th level or lower. You must meet the feat's prerequisites.%r%r**Special** You can select this feat multiple times, choosing a different feat each time."
     prereq:
       level: 13
+    rules:
+      - key: "ChoiceSet"
+        flag: "advancedGeneralTraining"
+        prompt: "PF2E.SpecificRule.AdvancedGeneralTraining.Prompt"
+        choices: {"filter": [{"lte": ["item:level", 7]}, "item:trait:general"], "itemType": "feat"}
   Ageless Patience:
     feat_type:
       - Ancestry
@@ -155,6 +160,12 @@ pf2e_feats:
       - key: "RollOption"
         option: "ancestral-longevity"
         toggleable: true
+        alwaysActive: true
+        suboptions: {"config": "skills", "predicate": ["skill:{choice|value}:rank:0"]}
+      - key: "ActiveEffectLike"
+        path: "system.skills.{item|flags.system.rulesSelections.ancestralLongevity}.rank"
+        mode: "upgrade"
+        value: 1
   Ancestral Suspicion:
     feat_type:
       - Ancestry
@@ -441,6 +452,10 @@ pf2e_feats:
         path: "system.skills.nature.rank"
         mode: "upgrade"
         value: 1
+      - key: "ChoiceSet"
+        flag: "feat"
+        prompt: "PF2E.SpecificRule.Prompt.Feat"
+        choices: [{"value": "Compendium.pf2e.feats-srd.Item.Pet"}, {"value": "Compendium.pf2e.feats-srd.Item.Train Animal"}]
   Bestial Manifestation:
     feat_type:
       - Ancestry
@@ -463,6 +478,11 @@ pf2e_feats:
       level: 1
       heritage: Niasa
     rules:
+      - key: "ChoiceSet"
+        flag: "bestialManifestation"
+        rollOption: "bestial-manifestation"
+        prompt: "PF2E.SpecificRule.Prompt.UnarmedAttack"
+        choices: [{"img": "icons/commodities/claws/claw-bear-brown-grey.webp", "label": "PF2E.BattleForm.Attack.Claw", "value": "claw"}, {"img": "icons/commodities/biological/foot-black-grey.webp", "label": "PF2E.BattleForm.Attack.Hoof", "value": "hoof"}, {"img": "icons/creatures/abilities/mouth-teeth-long-red.webp", "label": "PF2E.BattleForm.Attack.Jaws", "value": "jaws"}, {"img": "icons/creatures/abilities/tail-swipe-green.webp", "label": "PF2E.BattleForm.Attack.Tail", "value": "tail"}]
       - key: "Strike"
         category: "unarmed"
         group: "brawling"
@@ -666,18 +686,21 @@ pf2e_feats:
         type: "status"
         value: "max(floor(@weapon.level/4), 1)"
         damageType: "fire"
+        slug: "burn-it-strike"
         predicate: ["item:trait:alchemical"]
       - key: "FlatModifier"
         selector: "spell-damage"
         type: "status"
         value: "max(floor(@spell.level/2), 1)"
         damageType: "fire"
+        slug: "burn-it-spell"
       - key: "FlatModifier"
         selector: "damage"
         type: "status"
         value: 1
         damageType: "fire"
         damageCategory: "persistent"
+        slug: "burn-it-persistent"
   Call the Swarm:
     feat_type:
       - Ancestry
@@ -871,6 +894,11 @@ pf2e_feats:
         - Lawbringer
         - Musetouched
       heritage: Aesa
+    rules:
+      - key: "ChoiceSet"
+        flag: "spell"
+        prompt: "PF2E.SpecificRule.Prompt.Spell"
+        choices: {"filter": [{"or": ["item:slug:clear-mind", "item:slug:sure-footing", "item:slug:share-life", "item:slug:revealing-light", "item:slug:humanoid-form", "item:slug:everlight"]}], "itemType": "spell", "slugsAsValues": true}
   Celestial Mercy:
     feat_type:
       - Ancestry
@@ -1050,22 +1078,26 @@ pf2e_feats:
         selector: ["society", "survival"]
         type: "circumstance"
         value: 1
+        slug: "scavenger-subsist"
         predicate: ["action:subsist"]
       - key: "FlatModifier"
         selector: ["society", "survival"]
         type: "circumstance"
         value: 1
+        slug: "scavenger-earn"
         label: "PF2E.SpecificRule.Goblin.CityScavenger.EarnIncome"
         predicate: ["action:earn-income", "with-subsist"]
       - key: "AdjustModifier"
         mode: "add"
         selectors: ["society", "survival"]
         value: 1
+        slug: "scavenger-subsist"
         predicate: ["heritage:irongut-goblin"]
       - key: "AdjustModifier"
         mode: "add"
         selectors: ["society", "survival"]
         value: 1
+        slug: "scavenger-earn"
         predicate: ["heritage:irongut-goblin"]
   Clever Improviser:
     feat_type:
@@ -1151,6 +1183,11 @@ pf2e_feats:
     shortdesc: During your adventures, you've honed your ability to adapt to the culture of the predominant ancestry around you. You gain the Adopted Ancestry general feat, and you also gain one 1st-level ancestry feat from the ancestry you chose for the Adopted Ancestry feat.
     prereq:
       level: 5
+    rules:
+      - key: "ChoiceSet"
+        flag: "feat"
+        prompt: "PF2E.SpecificRule.Prompt.LevelOneAncestryFeat"
+        choices: {"filter": ["item:level:1", "item:trait:{actor|system.details.ancestry.adopted}"]}
   Dance Underfoot:
     feat_type:
       - Ancestry
@@ -1562,6 +1599,12 @@ pf2e_feats:
       - key: "RollOption"
         option: "expert-longevity"
         toggleable: true
+        alwaysActive: true
+        suboptions: {"config": "skills", "predicate": ["skill:{choice|value}:rank:1"]}
+      - key: "ActiveEffectLike"
+        path: "system.skills.{item|flags.system.rulesSelections.expertLongevity}.rank"
+        mode: "upgrade"
+        value: 2
   Extraplanar Supplication:
     feat_type:
       - Ancestry
@@ -1709,6 +1752,11 @@ pf2e_feats:
         - Pitborn
         - Hellspawn
       heritage: Niasa
+    rules:
+      - key: "ChoiceSet"
+        flag: "spell"
+        prompt: "PF2E.SpecificRule.Prompt.Spell"
+        choices: {"filter": [{"or": ["item:slug:paranoia", "item:slug:shatter", "item:slug:disguise-magic", "item:slug:see-the-unseen", "item:slug:false-vitality", "item:slug:invisibility"]}], "itemType": "spell", "slugsAsValues": true}
   Flexible Tail:
     feat_type:
       - Ancestry
@@ -1827,6 +1875,11 @@ pf2e_feats:
     shortdesc: "Your adaptability manifests in your mastery of a range of useful abilities. You gain a 1st-level general feat. You must meet the feat's prerequisites, but if you select this feat during character creation, you can select the feat later in the process in order to determine which prerequisites you meet.%r%r**Special** You can select this feat multiple times, choosing a different feat each time."
     prereq:
       level: 1
+    rules:
+      - key: "ChoiceSet"
+        flag: "feat"
+        prompt: "PF2E.SpecificRule.GeneralTraining.Prompt"
+        choices: {"filter": ["item:level:1", "item:trait:general"], "itemType": "feat"}
   Ghost Hunter:
     feat_type:
       - Ancestry
@@ -1854,9 +1907,9 @@ pf2e_feats:
         toggleable: "totm"
         label: "PF2E.SpecificRule.TOTMToggle.Incorporeal"
       - key: "AdjustStrike"
+        mode: "add"
         property: "weapon-traits"
         definition: [{"not": "item:magical"}]
-        mode: "add"
         value: "magical"
         predicate: ["target:trait:incorporeal"]
   Gnome Obsession:
@@ -1889,10 +1942,12 @@ pf2e_feats:
       - key: "MartialProficiency"
         definition: [{"or": [{"and": ["item:trait:gnome", "item:category:martial"]}, "item:base:glaive", "item:base:kukri"]}]
         sameAs: "simple"
+        slug: "martial-gnome-weapons"
         label: "PF2E.SpecificRule.MartialProficiency.MartialGnomeWeapons"
       - key: "MartialProficiency"
         definition: ["item:trait:gnome", "item:category:advanced"]
         sameAs: "martial"
+        slug: "advanced-gnome-weapons"
         label: "PF2E.SpecificRule.MartialProficiency.AdvancedGnomeWeapons"
       - key: "CriticalSpecialization"
         predicate: [{"gte": ["self:level", 5]}, {"or": ["item:trait:gnome", "item:base:glaive", "item:base:kukri"]}]
@@ -1958,10 +2013,12 @@ pf2e_feats:
       - key: "MartialProficiency"
         definition: ["item:trait:goblin", "item:category:martial"]
         sameAs: "simple"
+        slug: "martial-goblin-weapons"
         label: "PF2E.SpecificRule.MartialProficiency.MartialGoblinWeapons"
       - key: "MartialProficiency"
         definition: ["item:trait:goblin", "item:category:advanced"]
         sameAs: "martial"
+        slug: "advanced-goblin-weapons"
         label: "PF2E.SpecificRule.MartialProficiency.AdvancedGoblinWeapons"
       - key: "CriticalSpecialization"
         predicate: [{"gte": ["self:level", 5]}, "item:trait:goblin"]
@@ -2143,6 +2200,11 @@ pf2e_feats:
     prereq:
       level: 13
       heritage: Changeling
+    rules:
+      - key: "ChoiceSet"
+        flag: "hagMagic"
+        prompt: "PF2E.SpecificRule.Prompt.Spell"
+        choices: {"filter": [{"or": ["item:slug:augury", "item:slug:charm", "item:slug:clairaudience", "item:slug:clairvoyance", "item:slug:dream-message", "item:slug:illusory-disguise", {"and": ["feat:brine-may", {"or": ["item:slug:humanoid-form", "item:slug:water-walk"]}]}, {"and": ["feat:callow-may", {"or": ["item:slug:honeyed-words", "item:slug:outcasts-curse"]}]}, {"and": [{"or": ["feat:dream-may", "feat:veil-may"]}, "item:slug:nightmare"]}, {"and": ["feat:slag-may", "item:slug:earthbind"]}, {"and": ["feat:snow-may", "item:slug:solid-fog"]}, {"and": ["feat:virga-may", "item:slug:hydraulic-torrent"]}]}], "itemType": "spell", "slugsAsValues": true}
   Hag's Sight:
     feat_type:
       - Ancestry
@@ -2793,6 +2855,11 @@ pf2e_feats:
     shortdesc: "You've learned to split your focus between multiple classes with ease. You gain a 2nd-level multiclass dedication feat, even if you normally couldn't take another dedication feat until you take more feats from your current archetype.%r%rIf you have the silyara heritage, you don't need to meet the feat's attribute modifier prerequisites."
     prereq:
       level: 9
+    rules:
+      - key: "ChoiceSet"
+        flag: "multitalented"
+        prompt: "PF2E.SpecificRule.Multitalented.Prompt"
+        choices: {"filter": ["item:level:2", "item:category:class", "item:trait:dedication", "item:trait:multiclass"], "itemType": "feat"}
   Musetouched:
     feat_type:
       - Ancestry
@@ -2851,6 +2918,11 @@ pf2e_feats:
     shortdesc: You were raised to be ambitious and always reach for the stars, leading you to progress quickly in your chosen field. You gain a 1st-level class feat for your class. You must meet the prerequisites, but you can select the feat later in the character creation process in order to determine which prerequisites you meet.
     prereq:
       level: 1
+    rules:
+      - key: "ChoiceSet"
+        flag: "naturalAmbition"
+        prompt: "PF2E.SpecificRule.Prompt.LevelOneClassFeat"
+        choices: {"filter": ["item:level:1", "item:category:class", "item:trait:{actor|system.details.class.trait}", {"or": ["feature:dragon-instinct", {"not": "item:draconic-arrogance"}]}, {"nor": ["item:animal-companion", "item:animal-companion-druid", "item:bardic-lore", "item:fire-lung", "item:lingering-composition", "item:leshy-familiar", "item:martial-performance", "item:shore-step", "item:steadying-stone", "item:storm-born", "item:versatile-performance", "item:untamed-form"]}], "itemType": "feat"}
   Natural Skill:
     feat_type:
       - Ancestry
@@ -2865,6 +2937,23 @@ pf2e_feats:
     shortdesc: Your ingenuity allows you to learn a wide variety of skills. You gain the trained proficiency rank in two skills of your choice.
     prereq:
       level: 1
+    rules:
+      - key: "ChoiceSet"
+        flag: "skillOne"
+        prompt: "PF2E.SpecificRule.Prompt.Skill"
+        choices: {"config": "skills", "predicate": ["skill:{choice|value}:rank:0"]}
+      - key: "ActiveEffectLike"
+        path: "system.skills.{item|flags.system.rulesSelections.skillOne}.rank"
+        mode: "upgrade"
+        value: 1
+      - key: "ChoiceSet"
+        flag: "skillTwo"
+        prompt: "PF2E.SpecificRule.Prompt.Skill"
+        choices: {"config": "skills", "predicate": ["skill:{choice|value}:rank:0"]}
+      - key: "ActiveEffectLike"
+        path: "system.skills.{item|flags.system.rulesSelections.skillTwo}.rank"
+        mode: "upgrade"
+        value: 1
   Necromantic Physiology:
     feat_type:
       - Ancestry
@@ -2969,6 +3058,14 @@ pf2e_feats:
         path: "system.skills.religion.rank"
         mode: "upgrade"
         value: 1
+      - key: "ChoiceSet"
+        flag: "skill"
+        prompt: "PF2E.SpecificRule.Prompt.Skill"
+        choices: [{"label": "PF2E.Skill.Diplomacy", "predicate": ["skill:diplomacy:rank:0"], "value": "diplomacy"}, {"label": "PF2E.Skill.Intimidation", "predicate": ["skill:intimidation:rank:0"], "value": "intimidation"}]
+      - key: "ActiveEffectLike"
+        path: "system.skills.{item|flags.system.rulesSelections.skill}.rank"
+        mode: "upgrade"
+        value: 1
   Nephilim Resistance:
     feat_type:
       - Ancestry
@@ -2993,6 +3090,14 @@ pf2e_feats:
       orheritage:
         - Aesa
         - Niasa
+    rules:
+      - key: "ChoiceSet"
+        flag: "featCelestialResistance"
+        prompt: "PF2E.SpecificRule.CelestialResistance.Prompt"
+        choices: [{"label": "PF2E.TraitFire", "value": "fire"}, {"label": "PF2E.TraitAcid", "value": "acid"}, {"label": "PF2E.TraitCold", "value": "cold"}, {"label": "PF2E.TraitSonic", "value": "sonic"}, {"label": "PF2E.TraitElectricity", "value": "electricity"}]
+      - key: "Resistance"
+        type: "{item|flags.system.rulesSelections.featCelestialResistance}"
+        value: 5
   Night Magic:
     feat_type:
       - Ancestry
@@ -3290,6 +3395,10 @@ pf2e_feats:
         path: "system.skills.athletics.rank"
         mode: "upgrade"
         value: 1
+      - key: "ChoiceSet"
+        flag: "feat"
+        prompt: "PF2E.SpecificRule.Prompt.SkillFeat"
+        choices: [{"value": "Compendium.pf2e.feats-srd.Item.Armor Assist"}, {"value": "Compendium.pf2e.feats-srd.Item.Combat Climber"}, {"value": "Compendium.pf2e.feats-srd.Item.Hefty Hauler"}, {"value": "Compendium.pf2e.feats-srd.Item.Quick Jump"}, {"value": "Compendium.pf2e.feats-srd.Item.Titan Wrestler"}, {"value": "Compendium.pf2e.feats-srd.Item.Underwater Marauder"}]
   Prairie Rider:
     feat_type:
       - Ancestry
@@ -3433,15 +3542,17 @@ pf2e_feats:
         selector: "strike-damage"
         value: "ternary(gte(@weapon.system.runes.potency,3),2,1)"
         damageType: "vitality"
+        slug: "spirit-strikes-undead"
         predicate: ["target:mode:undead"]
       - key: "FlatModifier"
         selector: "strike-damage"
         value: "ternary(gte(@weapon.system.runes.potency,3),2,1)"
         damageType: "void"
+        slug: "spirit-strikes-living"
         predicate: ["target:mode:living"]
       - key: "AdjustStrike"
-        property: "traits"
         mode: "add"
+        property: "traits"
         value: "magical"
   Rallying Cry:
     feat_type:
@@ -3666,6 +3777,10 @@ pf2e_feats:
     shortdesc: Unlike most of your kind, who dismiss goblins as embarrassments or expendable annoyances, you have studied the methodology behind their irresponsible and incomprehensible actions. You gain the Adopted Ancestry general feat and must select goblin as the feat's chosen ancestry. You also gain one 1st-level goblin ancestry feat.
     prereq:
       level: 5
+    rules:
+      - key: "ChoiceSet"
+        prompt: "PF2E.SpecificRule.Prompt.LevelOneAncestryFeat"
+        choices: {"filter": ["item:level:1", "item:category:ancestry", "item:trait:goblin"], "itemType": "feat"}
   Scar-Thick Skin:
     feat_type:
       - Ancestry
@@ -3741,6 +3856,11 @@ pf2e_feats:
       orheritage:
         - Aesa
         - Niasa
+    rules:
+      - key: "ChoiceSet"
+        flag: "lineage"
+        prompt: "Pick a lineage feat"
+        choices: {"filter": ["item:trait:lineage", "item:trait:nephilim", "item:type:feat"]}
   Sense Allies:
     feat_type:
       - Ancestry
@@ -3917,6 +4037,7 @@ pf2e_feats:
         baseType: "claw"
         damage: {"base": {"damageType": "slashing", "dice": 1, "die": "d6"}}
         traits: ["grapple"]
+        slug: "slag-may-claw"
         label: "PF2E.Weapon.Base.claw"
   Slip Sideways:
     feat_type:
@@ -4333,6 +4454,7 @@ pf2e_feats:
         mode: "add"
         selector: "fortitude"
         value: 1
+        slug: "drained"
       - key: "FlatModifier"
         selector: "hp"
         value: "@actor.level"
@@ -4517,6 +4639,7 @@ pf2e_feats:
       - key: "AdjustModifier"
         selectors: ["land-speed"]
         suppress: true
+        slug: "armor-speed-penalty"
       - key: "AdjustModifier"
         mode: "add"
         selectors: ["land-speed"]
@@ -4586,11 +4709,13 @@ pf2e_feats:
         selector: "strike-damage"
         type: "circumstance"
         value: "@weapon.system.damage.dice"
+        slug: "undead-slayer"
         predicate: ["target:mode:undead"]
       - key: "AdjustModifier"
         mode: "multiply"
         selector: "strike-damage"
         value: "2"
+        slug: "undead-slayer"
         predicate: ["target:trait:vampire"]
       - key: "RollOption"
         option: "target:mode:undead"
@@ -4815,6 +4940,11 @@ pf2e_feats:
     shortdesc: You have extensive training in remote environments, allowing you to move through these areas easily. When you gain this feat, you can choose to gain either a climb Speed of 20 feet or a swim Speed of 20 feet.
     prereq:
       level: 13
+    rules:
+      - key: "ChoiceSet"
+        flag: "warConditioning"
+        prompt: "PF2E.SpecificRule.Hobgoblin.WarConditioning.Prompt"
+        choices: [{"label": "PF2E.Actor.Speed.Type.Climb", "value": "climb"}, {"label": "PF2E.Actor.Speed.Type.Swim", "value": "swim"}]
   Ward Against Corruption:
     feat_type:
       - Ancestry
@@ -4846,6 +4976,7 @@ pf2e_feats:
         mode: "add"
         selector: "saving-throw"
         value: 1
+        slug: "ward-against-corruption"
         predicate: [{"or": ["item:trait:disease", "item:trait:death"]}, {"or": ["origin:mode:undead", "origin:trait:sakhil"]}]
   Warren Digger:
     feat_type:

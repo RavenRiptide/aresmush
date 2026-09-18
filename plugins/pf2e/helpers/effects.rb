@@ -19,11 +19,6 @@ module AresMUSH
     # conditional is what depends on the player: the action they are taking, or a fact about the check.
     module Effects
 
-      # Foundry writes a selector that names the item itself by interpolating its id, as in
-      # `{item|id}-damage`. The domain a statistic declares for that weapon is the resolved one, so the
-      # selector is resolved the same way before it is matched.
-      SELF_REFERENCE = /\{item\|_?id\}/
-
       def self.modifiers(sources, domains, context = {}, options = [])
         rows_of(sources, domains, context, options, 'FlatModifier')
       end
@@ -40,8 +35,13 @@ module AresMUSH
           held = Array(options) + Array(source['options'])
           own = context.merge('item' => source['item'] || {})
 
-          Rules.of_kind(source, key).each_with_object([]) do |row, out|
-            next unless reaches?(row, source, domains)
+          Rules.of_kind(source, key).each_with_object([]) do |raw, out|
+            # Resolved before the selector is matched, because a rule may name the item it sits on:
+            # a rune that adds fire damage to *this* sword says `{item|id}-damage`, and the domain the
+            # sword's damage declares is that id.
+            row = Rules.resolved(raw, source, own)
+
+            next unless row && Domains.matches?(Rules.selectors_of(row), domains)
 
             contribution = Rules.contribute(row, source, own)
 
@@ -51,16 +51,6 @@ module AresMUSH
                                       'met' => Predicate.test(row['predicate'], held))
           end
         end
-      end
-
-      def self.reaches?(row, source, domains)
-        selectors = Array(row['selector']).map { |named| resolve(named, source) }
-
-        Domains.matches?(selectors, domains)
-      end
-
-      def self.resolve(selector, source)
-        selector.to_s.gsub(SELF_REFERENCE, source['id'].to_s)
       end
 
       # ------------------------------------------------------------------------------
@@ -192,25 +182,82 @@ module AresMUSH
 
           next nil unless info && info['rules']
 
-          source(name, info['rules'],
-                 'id' => Domains.slug(name), 'item' => { 'level' => char.pf2_level.to_i })
+          built = source(name, info['rules'],
+                         'id' => Domains.slug(name), 'item' => { 'level' => char.pf2_level.to_i })
+
+          with_selections(char, built)
         end.compact
       end
 
-      # An item's effects come from the catalogue, the same way a feat's do, and only while the item is
-      # doing something: worn or held, and invested if it wants investing.
+      # The answers to the choices a source asked for.
+      #
+      # A rule reads an answer by interpolating `{item|flags.system.rulesSelections.<flag>}`, which is
+      # Foundry's own path, so the answer goes where that path looks for it. The answer itself is the
+      # choice already recorded with the feat - `cg/feat` and `advance/feat` write it - so nothing new
+      # stores it and a choice taken back goes with the feat.
+      #
+      # The sets are read in order, because one may ask whether another was answered: Bloodline
+      # Mutation's second trait is asked only of someone who said they wanted a second trait. Nothing
+      # here reads the character's facts, which are still being assembled when a source is built.
+      def self.with_selections(char, built)
+        sets = Rules.choice_sets(built)
+
+        return built unless sets.any?
+
+        chosen = chosen_for(char, built['name'])
+        declared = Array(built['options'])
+        selections = {}
+
+        sets.each do |set|
+          next unless Predicate.test(set['when'], declared)
+
+          answer = answer_to(set, chosen)
+
+          next unless answer
+
+          selections[set['flag'].to_s] = answer if set['flag']
+          declared += [ "#{set['roll_option']}:#{answer}" ] if set['roll_option']
+        end
+
+        built.merge('item' => (built['item'] || {}).merge(
+                      'flags' => { 'system' => { 'rulesSelections' => selections } }),
+                    'options' => declared)
+      end
+
+      # An answer counts only if it is one this set could have offered, so a choice recorded against some
+      # other question on the same feat does not read as an answer to this one.
+      def self.answer_to(set, chosen)
+        chosen.map { |one| Domains.slug(one) }.find { |one| Choices.includes?(set, one) }
+      end
+
+      # Every choice recorded against this feat, at any level. `pf2_level_tracker` is the ledger's own view
+      # of the choices a character made, rebuilt on every materialise, so a choice taken back is gone from
+      # here too.
+      def self.chosen_for(char, name)
+        (char.pf2_level_tracker || {}).values.flat_map { |entry|
+          Array((entry['feat_choices'] || {})[name])
+        }.compact
+      end
+
+      # An item's effects come from the catalogue, the same way a feat's do, and only the rules that apply
+      # given how the item is being carried: everything while it is worn or held and invested, and only
+      # the rules that say they need no wearing while it is merely in a pack.
       #
       # Its id is its own, because a rule may name it - a rune that adds fire damage to *this* sword
       # says `{item|id}-damage`, and the sword's damage domains include exactly that.
       def self.items(char)
-        Pf2egear.effective_items(char).map do |category, item|
+        worn = Pf2egear.effective_items(char).map { |_category, item| item.id.to_s }
+
+        Pf2egear.carried_items(char).map do |category, item|
           info = Pf2egear.catalogue_entry(category, item) || {}
+          rules = Array(info['rules'])
 
-          next nil unless info['rules']
+          rules = rules.reject { |row| Rules.needs_wearing?(row) } unless worn.include?(item.id.to_s)
 
-          source(Pf2egear.get_item_name(item), info['rules'],
-                 'id' => item.id.to_s,
-                 'item' => { 'level' => item_level(item) },
+          next nil if rules.empty?
+
+          source(Pf2egear.get_item_name(item), rules,
+                 'item' => { 'id' => item.id.to_s, '_id' => item.id.to_s, 'level' => item_level(item) },
                  'options' => item_options(item))
         end.compact
       end

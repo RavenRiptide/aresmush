@@ -272,6 +272,7 @@ pf2e_shields:
         category: "martial"
         group: "shield"
         damage: {"base": {"damageType": "bludgeoning", "dice": 1, "die": "d6"}}
+        slug: "lions-head"
         label: "PF2E.SpecificRule.Equipment.LionsShield.LionsHeadLabel"
   Lodestone Shield:
     ac_bonus: 2

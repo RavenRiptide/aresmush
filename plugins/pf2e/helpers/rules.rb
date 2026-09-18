@@ -40,7 +40,7 @@ module AresMUSH
         {
           'key' => 'FlatModifier',
           'fields' => %w{key selector value type ability min max damageType damageCategory critical
-                         predicate slug label hideIfDisabled},
+                         predicate slug label requiresEquipped},
           # A number added to whatever the selector reaches, obeying the stacking rule for its type.
           #
           # `min` and `max` clamp it, which is how a bonus that scales with something says how far it
@@ -58,7 +58,7 @@ module AresMUSH
         {
           'key' => 'DamageDice',
           'fields' => %w{key selector diceNumber dieSize damageType category critical predicate slug
-                         label hideIfDisabled override tags},
+                         label override tags},
           # Dice added to a damage roll. `category` separates persistent, precision and splash damage,
           # which are rolled and applied apart from the rest.
           'contribute' => lambda { |row, source, context|
@@ -74,7 +74,7 @@ module AresMUSH
         {
           'key' => 'RollOption',
           'fields' => %w{key option domain toggleable value predicate label slug suboptions selection
-                         alwaysActive disabledIf disabledValue},
+                         alwaysActive disabledIf disabledValue requiresEquipped},
           # Declares a circumstance rather than a number. A rule on the same feat or item is then
           # predicated on it - a Clandestine Cloak declares `clandestine-cloak` and predicates its own
           # bonuses on it - so this contributes an option, not a modifier.
@@ -101,7 +101,7 @@ module AresMUSH
         },
         {
           'key' => 'ActiveEffectLike',
-          'fields' => %w{key path mode value predicate slug label priority phase merge},
+          'fields' => %w{key path mode value predicate slug label merge},
           # Writes a value rather than adding a modifier: a feat that makes you trained in a skill, a
           # counter another rule's predicate asks about. `Pf2e::Paths` says which paths may be written
           # and what each mode does; a path it does not know is refused there.
@@ -111,6 +111,31 @@ module AresMUSH
               'path' => row['path'],
               'mode' => row['mode'].to_s,
               'value' => writable_value(row['value'], context) }
+          }
+        },
+        {
+          'key' => 'ChoiceSet',
+          'fields' => %w{key choices flag prompt rollOption predicate allowNoSelection slug label},
+          # Asks the player to choose, and other rules on the same thing read the answer: a Charm of
+          # Resistance asks which kind of damage it resists and its Resistance rule reads that choice.
+          #
+          # The answer is not stored here. A feat's choice is already recorded with the feat - it is what
+          # `cg/feat` and `advance/feat` write - so this says where the answer belongs and what the
+          # answers may be, and `Pf2e::Effects` reads the one the character made.
+          'contribute' => lambda { |row, source, _context|
+            { 'source' => source['name'],
+              'slug' => row['slug'] || Domains.slug(source['name']),
+              'flag' => row['flag'],
+              'roll_option' => row['rollOption'],
+              'choices' => choices_of_set(row),
+              'vocabulary' => query_of(row)['config'],
+              'filter' => query_of(row)['filter'],
+              'item_type' => query_of(row)['itemType'],
+              'when' => row['predicate'],
+              # What a candidate answer has to satisfy, which is how "any skill you are untrained in"
+              # is written: the set's own predicate, tested once per answer with `{choice|value}` filled
+              # in (`choice-set/rule-element.ts` `#choicesFromPath`).
+              'each' => query_of(row)['predicate'] }
           }
         },
         {
@@ -153,7 +178,7 @@ module AresMUSH
         },
         {
           'key' => 'DamageAlteration',
-          'fields' => %w{key property mode value selectors selector predicate slug label},
+          'fields' => %w{key property mode value selectors selector predicate slug label requiresEquipped},
           # Changes a damage roll after it is built rather than adding to it: the kind of damage it
           # deals, how many dice, or how large they are.
           'contribute' => lambda { |row, source, context|
@@ -167,7 +192,7 @@ module AresMUSH
         {
           'key' => 'Strike',
           'fields' => %w{key slug label category group baseType damage traits otherTags range
-                         predicate img fist},
+                         predicate fist},
           # An attack the character would not otherwise have: a shield's lion head, a torch swung as a
           # club, the claws a stance grants. It becomes an unarmed-style attack, described the same way
           # a catalogue weapon is, so everything that reads an attack reads this one too.
@@ -222,7 +247,7 @@ module AresMUSH
         {
           'key' => 'AdjustModifier',
           'fields' => %w{key selector selectors slug mode value suppress relabel damageType
-                         maxApplications predicate label priority},
+                         maxApplications predicate label requiresEquipped},
           # Changes a modifier that already exists rather than adding one: Intimidating Prowess raises
           # the Strength modifier on Intimidation, and a feat that says you need no crowbar suppresses
           # the penalty for not having one.
@@ -253,17 +278,17 @@ module AresMUSH
         },
         {
           'key' => 'Immunity',
-          'fields' => %w{key type value predicate label definition exceptions},
+          'fields' => %w{key type value predicate label definition exceptions slug},
           'contribute' => lambda { |row, source, context| declaration_of(row, source, context) }
         },
         {
           'key' => 'Weakness',
-          'fields' => %w{key type value predicate label definition exceptions},
+          'fields' => %w{key type value predicate label definition exceptions slug},
           'contribute' => lambda { |row, source, context| declaration_of(row, source, context) }
         },
         {
           'key' => 'Resistance',
-          'fields' => %w{key type value predicate label definition exceptions doubleVs},
+          'fields' => %w{key type value predicate label definition exceptions slug doubleVs},
           'contribute' => lambda { |row, source, context| declaration_of(row, source, context) }
         }
       ].freeze
@@ -273,14 +298,18 @@ module AresMUSH
       # that describes where a control sits in an interface we do not have is neither.
       # `placement` and `mergeable` position a toggle in Foundry's character sheet. `phase` and `priority`
       # order a rule against their data-preparation passes, which have no counterpart here: ours are
-      # ordered by mode where order matters and by when they are asked for otherwise.
+      # ordered by mode where order matters and by when they are asked for otherwise. `hideIfDisabled`
+      # keeps a modifier that is not applying off their sheet; a breakdown here lists it as conditional
+      # instead, so a player can see what they would need to claim it.
       PRESENTATION = { 'RollOption' => %w{placement mergeable phase priority},
                        'ActiveEffectLike' => %w{phase priority},
                        'AdjustModifier' => %w{priority},
-                       'FlatModifier' => %w{priority},
-                       'DamageDice' => %w{priority},
-                       'AdjustStrike' => %w{priority},
-                       'DamageAlteration' => %w{priority} }.freeze
+                       'FlatModifier' => %w{hideIfDisabled phase priority},
+                       'DamageDice' => %w{hideIfDisabled phase priority},
+                       'AdjustStrike' => %w{phase priority},
+                       'DamageAlteration' => %w{phase priority},
+                       'ChoiceSet' => %w{adjustName allowedDrops},
+                       'Strike' => %w{img} }.freeze
 
       BY_KEY = KINDS.each_with_object({}) { |row, out| out[row['key']] = row }.freeze
 
@@ -300,6 +329,24 @@ module AresMUSH
 
       # Only suboptions that say what they are. Their data has a few whose list is a string, which reads
       # as a list of single letters and means nothing.
+      # A set that describes its answers rather than listing them: a vocabulary to pick from, or a filter
+      # over a catalogue. `Pf2e::Choices` resolves either.
+      def self.query_of(row)
+        row['choices'].is_a?(Hash) ? row['choices'] : {}
+      end
+
+      # A set that lists its answers outright.
+      def self.choices_of_set(row)
+        Array(row['choices']).select { |one| one.is_a?(Hash) && one['value'] }
+                             .map { |one| { 'value' => one['value'].to_s, 'label' => one['label'],
+                                            'when' => one['predicate'] } }
+      end
+
+      # Every choice a source asks the character to make.
+      def self.choice_sets(source)
+        of_kind(source, 'ChoiceSet').map { |row| contribute(row, source, {}) }.compact
+      end
+
       def self.choices_of(row)
         Array(row['suboptions']).select { |one| one.is_a?(Hash) && one['value'] }
                                 .map { |one| { 'value' => one['value'].to_s, 'label' => one['label'] } }
@@ -337,15 +384,15 @@ module AresMUSH
 
       # Every declaration of a kind whose circumstances are met. Neither a modifier nor a write, so it
       # has no selector and no stacking: `Pf2e::IWR` decides which of them wins.
-      def self.declarations(sources, options, key)
+      def self.declarations(sources, options, key, context = {})
         return [] unless known?(key)
 
         Array(sources).flat_map do |source|
           held = Array(options) + Array(source['options'])
 
           of_kind(source, key).select { |row| Predicate.test(row['predicate'], held) }
-                             .map { |row| contribute(row, source, {}) }
-                             .compact
+                              .map { |row| contribute(row, source, context) }
+                              .compact
         end
       end
 
@@ -353,13 +400,13 @@ module AresMUSH
       # and an override last, so an override wins whatever else said (`ae-like.ts`).
       MODE_ORDER = %w{multiply add subtract remove downgrade upgrade override}.freeze
 
-      def self.writes(sources, options)
+      def self.writes(sources, options, context = {})
         gathered = Array(sources).flat_map do |source|
           held = Array(options) + Array(source['options'])
 
           of_kind(source, 'ActiveEffectLike')
             .select { |row| Predicate.test(row['predicate'], held) }
-            .map { |row| contribute(row, source, {}) }
+            .map { |row| contribute(row, source, context) }
             .compact
         end
 
@@ -422,6 +469,7 @@ module AresMUSH
           held = Array(options) + Array(source['options'])
 
           of_kind(source, 'DamageAlteration')
+            .map { |row| resolved(row, source, context) }
             .select { |row| Domains.matches?(selectors_of(row), domains) }
             .select { |row| Predicate.test(row['predicate'], held) }
             .map { |row| contribute(row, source, context) }
@@ -482,6 +530,7 @@ module AresMUSH
           held = Array(options) + Array(source['options'])
 
           of_kind(source, 'AdjustModifier')
+            .map { |row| resolved(row, source, context) }
             .select { |row| Domains.matches?(selectors_of(row), domains) }
             .map { |row| contribute(row, source, context)&.merge('when' => row['predicate'],
                                                                  'held' => held) }
@@ -507,7 +556,8 @@ module AresMUSH
         Array(sources).flat_map do |source|
           held = Array(options) + Array(source['options'])
 
-          of_kind(source, key).select { |row| Domains.matches?(selectors_of(row), domains) }
+          of_kind(source, key).map { |row| resolved(row, source, {}) }
+                              .select { |row| Domains.matches?(selectors_of(row), domains) }
                               .select { |row| Predicate.test(row['predicate'], held) }
                               .map { |row| yield(row) }
                               .compact
@@ -530,13 +580,76 @@ module AresMUSH
         Array(source['rules']).select { |row| row['key'].to_s == key.to_s }
       end
 
-      # What this row is worth, or nil when its kind is one we do not implement.
+      # What this row is worth - or nil when its kind is one we do not implement, or when it names a
+      # choice nobody has made.
       def self.contribute(row, source, context)
         kind = BY_KEY[row['key'].to_s]
 
         return nil unless kind
 
-        kind['contribute'].call(row, source, context)
+        filled = resolved(row, source, context)
+
+        filled && kind['contribute'].call(filled, source, context)
+      end
+
+      # What a rule may name by interpolation rather than outright: a charm resists the kind of damage
+      # its wearer chose, a feat trains the skill its taker named. The choice lives where Foundry's own
+      # path says it does, so the interpolation is theirs unchanged.
+      #
+      # The whole row is walked rather than a list of fields, which is what Foundry does
+      # (`rule-element/base.ts` `resolveInjectedProperties`): a predicate reads a choice the same way a
+      # path does, and Virtuosic Performer's bonus is written against
+      # `action:perform:{item|flags.system.rulesSelections.performanceType}`.
+      #
+      # Only the actor, the item and the rule are resolved here, which is the list Foundry resolves
+      # against unless a reader supplies more. `{choice|value}` is the other one their data uses: it
+      # belongs to a choice set testing a candidate answer, so it is left alone for `Pf2e::Choices`
+      # rather than counting as a path nothing holds.
+      INTERPOLATION = /\{(actor|item|rule)\|([^}]*)\}/
+
+      # A rule naming something the context does not hold is ignored, which is Foundry's own answer to
+      # it (`this.ignored = true`): a feat whose choice has not been made yet says nothing, rather than
+      # something other than what it says.
+      def self.resolved(row, source, context)
+        return row unless interpolated?(row)
+
+        filled = fill(row, Formula.flatten(context.merge('item' => source['item'] || {})))
+
+        interpolated?(filled) ? nil : filled
+      end
+
+      def self.interpolated?(held)
+        case held
+        when String then held.match?(INTERPOLATION)
+        when Array then held.any? { |one| interpolated?(one) }
+        when Hash then held.any? { |_key, one| interpolated?(one) }
+        else false
+        end
+      end
+
+      def self.fill(held, facts)
+        case held
+        when String then interpolate(held, facts)
+        when Array then held.map { |one| fill(one, facts) }
+        when Hash then held.each_with_object({}) { |(key, one), out| out[key] = fill(one, facts) }
+        else held
+        end
+      end
+
+      # A path the context does not hold leaves the interpolation as it stands, so `resolved` can tell
+      # a rule that resolved from one that did not.
+      def self.interpolate(text, facts)
+        text.gsub(INTERPOLATION) do
+          held = facts["#{Regexp.last_match(1)}.#{Regexp.last_match(2)}"]
+
+          held.nil? ? Regexp.last_match(0) : held.to_s
+        end
+      end
+
+      # Whether a rule needs its item worn. Foundry's default is that it does; a rule that says otherwise
+      # works from a pack, which is why those items are gathered at all.
+      def self.needs_wearing?(row)
+        row['requiresEquipped'] != false
       end
 
       # A field nobody reads is a rule that silently does something other than what it says, so it is

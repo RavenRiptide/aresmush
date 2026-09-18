@@ -317,6 +317,8 @@ pf2e_weapons:
       - key: "RollOption"
         option: "chaplains-cudgel:bow-to-a-higher-power"
         toggleable: true
+        disabledIf: [{"not": "deity"}]
+        disabledValue: false
         label: "PF2E.SpecificRule.Equipment.ChaplainsCudgel.BowToAHigherPowerLabel"
       - key: "RollOption"
         option: "chaplains-cudgel:two-action-spell"
@@ -325,15 +327,15 @@ pf2e_weapons:
         label: "PF2E.SpecificRule.Equipment.ChaplainsCudgel.CastTwoActionSpellLabel"
         predicate: ["chaplains-cudgel:bow-to-a-higher-power"]
       - key: "AdjustStrike"
+        mode: "add"
         property: "traits"
         definition: ["item:id:{item|_id}"]
-        mode: "add"
         value: "holy"
         predicate: ["chaplains-cudgel:bow-to-a-higher-power", "self:trait:holy"]
       - key: "AdjustStrike"
+        mode: "add"
         property: "traits"
         definition: ["item:id:{item|_id}"]
-        mode: "add"
         value: "unholy"
         predicate: ["chaplains-cudgel:bow-to-a-higher-power", "self:trait:unholy"]
       - key: "FlatModifier"
@@ -726,6 +728,28 @@ pf2e_weapons:
       - key: "RollOption"
         option: "gem-twist"
         toggleable: true
+        suboptions: [{"label": "PF2E.WeaponPropertyRune.flaming.Name", "value": "flaming"}, {"label": "PF2E.WeaponPropertyRune.frost.Name", "value": "frost"}, {"label": "PF2E.WeaponPropertyRune.shock.Name", "value": "shock"}]
+      - key: "DamageAlteration"
+        mode: "override"
+        property: "damage-type"
+        selectors: ["{item|id}-inline-damage"]
+        value: "fire"
+        requiresEquipped: false
+        predicate: ["gem-twist:flaming"]
+      - key: "DamageAlteration"
+        mode: "override"
+        property: "damage-type"
+        selectors: ["{item|id}-inline-damage"]
+        value: "cold"
+        requiresEquipped: false
+        predicate: ["gem-twist:frost"]
+      - key: "DamageAlteration"
+        mode: "override"
+        property: "damage-type"
+        selectors: ["{item|id}-inline-damage"]
+        value: "electricity"
+        requiresEquipped: false
+        predicate: ["gem-twist:shock"]
   Gauntlet:
     wp_type: melee
     category: simple

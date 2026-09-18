@@ -178,6 +178,17 @@ module AresMUSH
       end
     end
 
+    # Everything the character has on them, worn or not.
+    #
+    # Most of what an item does needs it worn, and `effective_items` is the list for that. Some rules say
+    # outright that they do not - a compass points north in your pack, a religious symbol is held rather
+    # than worn - and those rules are marked, so the item has to be reachable to read the mark.
+    def self.carried_items(char)
+      Inventory.categories.map { |c| Inventory.canonical(c) }.uniq.flat_map do |category|
+        Inventory.held(char, category).map { |item| [ category, item ] }
+      end
+    end
+
     # The catalogue row an item was made from, which is where its effects live - the same way a feat's
     # effects live in the feat catalogue rather than on the character.
     def self.catalogue_entry(category, item)

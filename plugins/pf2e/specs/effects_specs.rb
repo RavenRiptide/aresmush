@@ -148,25 +148,26 @@ module AresMUSH
       end
 
       # A selector may name the item carrying the rule, which is how a rune reaches the weapon it is on
-      # and nothing else. The statistic's domain is the resolved one.
+      # and nothing else. The item's own facts are what the interpolation reads, so the statistic's
+      # domain is the resolved one.
       describe "a selector naming the item itself" do
         it "should resolve to the item's own id" do
           row = flat('selector' => '{item|id}-damage', 'value' => 1)
-          sword = source([ row ]).merge('id' => 'sword7')
+          sword = source([ row ]).merge('item' => { 'id' => 'sword7', '_id' => 'sword7' })
 
           expect(Effects.modifiers([ sword ], [ 'sword7-damage' ], context).size).to eq 1
         end
 
         it "should not reach another item's damage" do
           row = flat('selector' => '{item|id}-damage', 'value' => 1)
-          sword = source([ row ]).merge('id' => 'sword7')
+          sword = source([ row ]).merge('item' => { 'id' => 'sword7', '_id' => 'sword7' })
 
           expect(Effects.modifiers([ sword ], [ 'axe9-damage' ], context)).to eq []
         end
 
         it "should read the underscored spelling their data also uses" do
           row = flat('selector' => '{item|_id}-damage', 'value' => 1)
-          sword = source([ row ]).merge('id' => 'sword7')
+          sword = source([ row ]).merge('item' => { 'id' => 'sword7', '_id' => 'sword7' })
 
           expect(Effects.modifiers([ sword ], [ 'sword7-damage' ], context).size).to eq 1
         end

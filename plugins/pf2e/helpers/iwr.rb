@@ -28,9 +28,10 @@ module AresMUSH
       def self.gather(char)
         sources = Effects.sources(char)
         options = Effects.options(char)
+        context = Effects.context(char)
 
         KINDS.each_with_object({}) do |kind, out|
-          out[kind.downcase] = Rules.declarations(sources, options, kind)
+          out[kind.downcase] = Rules.declarations(sources, options, kind, context)
         end
       end
 

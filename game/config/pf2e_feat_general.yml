@@ -10,6 +10,11 @@ pf2e_feats:
     shortdesc: You're fully immersed in another ancestry's culture and traditions, whether born into them, earned through rite of passage, or bonded through a deep friendship or romance. Choose a common ancestry or another ancestry to which you have access. You can select ancestry feats from the ancestry you chose, in addition to your character's own ancestry, as long as the ancestry feats don't require any physiological feature that you lack, as determined by the GM.
     prereq:
       level: 1
+    rules:
+      - key: "ChoiceSet"
+        flag: "ancestry"
+        prompt: "PF2E.SpecificRule.AdoptedAncestry.Prompt"
+        choices: {"filter": [{"not": "item:slug:{actor|system.details.ancestry.trait}"}], "itemType": "ancestry", "slugsAsValues": true}
   Armor Proficiency:
     repeatable: true
     feat_type:
@@ -51,6 +56,9 @@ pf2e_feats:
     shortdesc: "You become trained in light armor. If you already were trained in light armor, you gain training in medium armor. If you were trained in both, you become trained in heavy armor. If you are at least 13th level, you become an expert in this armor type.%r%r**Special** You can select this feat more than once. Each time, you become trained in the next type of armor, as detailed above."
     prereq:
       level: 1
+    rules:
+      - key: "ChoiceSet"
+        choices: [{"label": "PF2E.Actor.Character.Proficiency.Defense.LightShort", "predicate": ["defense:light:rank:0"], "value": "light"}, {"label": "PF2E.Actor.Character.Proficiency.Defense.MediumShort", "predicate": ["defense:medium:rank:0", {"not": "defense:light:rank:0"}], "value": "medium"}, {"label": "PF2E.Actor.Character.Proficiency.Defense.HeavyShort", "predicate": [{"nor": ["defense:light:rank:0", "defense:medium:rank:0"]}], "value": "heavy"}]
   Breath Control:
     feat_type:
       - General
@@ -118,6 +126,10 @@ pf2e_feats:
     shortdesc: Your avoidance or observation is beyond the ken of most in your profession. Choose Fortitude saves, Reflex saves, Will saves, or Perception. You become an expert in your choice. At 17th level, you become a master in your choice.
     prereq:
       level: 1
+    rules:
+      - key: "ChoiceSet"
+        flag: "cannyAcumen"
+        choices: [{"label": "PF2E.SavesFortitude", "value": "system.saves.fortitude.rank"}, {"label": "PF2E.SavesReflex", "value": "system.saves.reflex.rank"}, {"label": "PF2E.SavesWill", "value": "system.saves.will.rank"}, {"label": "PF2E.PerceptionLabel", "value": "system.perception.rank"}]
   Diehard:
     feat_type:
       - General
@@ -239,6 +251,11 @@ pf2e_feats:
     shortdesc: Whether through instinct, study, or magic, you feel a deeper connection to your ancestry. You gain a 1st-level ancestry feat.
     prereq:
       level: 3
+    rules:
+      - key: "ChoiceSet"
+        flag: "ancestralParagon"
+        prompt: "PF2E.SpecificRule.AncestralParagon.Prompt"
+        choices: {"filter": ["item:level:1", "item:category:ancestry", {"or": ["item:tag:universal", "item:trait:{actor|system.details.ancestry.trait}", "item:trait:{actor|system.details.ancestry.adopted}", "item:trait:{actor|system.details.ancestry.versatile}", "item:trait:{actor|system.details.heritage.trait}", "item:trait:ancestry"]}, {"not": "item:trait:lineage"}], "itemType": "feat"}
   Improvised Repair:
     feat_type:
       - General
@@ -256,6 +273,7 @@ pf2e_feats:
         mode: "upgrade"
         selector: "skill-check"
         value: "@actor.flags.system.followTheExpertProficiency+1"
+        slug: "follow-the-expert-circumstance"
         predicate: ["self:effect:follow-the-expert", {"or": ["follow-the-expert:proficiency:rank:2", "follow-the-expert:proficiency:rank:3"]}]
   Pick up the Pace:
     feat_type:
