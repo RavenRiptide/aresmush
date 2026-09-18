@@ -100,7 +100,7 @@ module AresMUSH
       # asked about by imported rules, and a predicate about a fact nobody supplies is a rule that is
       # read and does nothing - which is the failure this branch has hit more than once.
       def self.build_facts(char)
-        character_facts(char) +
+        with_traits(char, character_facts(char)) +
           armor_facts(char) +
           Size.facts(char) +
           named('self:condition', Pf2e.held_conditions(char).keys) +
@@ -120,6 +120,8 @@ module AresMUSH
 
         [ "self:level:#{char.pf2_level.to_i}" ] +
           named('self:trait', Array(char.pf2_traits)) +
+          mode_facts(Array(char.pf2_traits)) +
+          effect_facts(char) +
           named('heritage', [ info['heritage'] ]) +
           named('ancestry', [ info['ancestry'] ]) +
           named('class', [ info['charclass'] ]) +
@@ -129,6 +131,47 @@ module AresMUSH
           skill_facts(char) +
           proficiency_facts(char) +
           attribute_facts(char)
+      end
+
+      # The effects a character is under, as Foundry names them for a predicate: the effect's slug without
+      # the `effect-`, `spell-effect-` or `stance-` it opens with, so Effect: Rage is `self:effect:rage` -
+      # and with its counter after it where it has one (`abstract-effect/document.ts:121`). Reading these
+      # asks nothing but which effects there are, so it is safe while anything else is being built.
+      EFFECT_PREFIX = /\A(?:[a-z]+-)?(?:effect|stance)-/
+
+      def self.effect_facts(char)
+        ActiveEffects.on(char).flat_map do |effect|
+          slug = Domains.slug(effect.name).sub(EFFECT_PREFIX, '')
+
+          [ "self:effect:#{slug}", effect.badge ? "self:effect:#{slug}:#{effect.badge}" : nil ].compact
+        end
+      end
+
+      # Undead, a construct, or living: what a predicate about a mode of being asks, from the traits
+      # (`actor/base.ts` `modeOfBeing`).
+      def self.mode_facts(traits)
+        slugs = traits.map { |one| Domains.slug(one) }
+        mode = if slugs.include?('undead') then 'undead'
+               elsif slugs.include?('construct') then 'construct'
+               else 'living'
+               end
+
+        [ "self:mode:#{mode}" ]
+      end
+
+      # The character's traits as their effects leave them: Humanoid Form makes them humanoid, Soul Thief
+      # undead (`actor-traits.ts`). The traits and the mode of being they imply are replaced as a set,
+      # because taking a trait away has to take its fact with it.
+      def self.with_traits(char, facts)
+        changes = Rules.contributions(sources(char), 'ActorTraits', facts)
+
+        return facts if changes.empty?
+
+        base = Array(char.pf2_traits).map { |one| Domains.slug(one) }
+        traits = (base + changes.flat_map { |one| one['add'] }).uniq - changes.flat_map { |one| one['remove'] }
+
+        facts.reject { |one| one.start_with?('self:trait:', 'self:mode:') } +
+          named('self:trait', traits) + mode_facts(traits)
       end
 
       # What is true of the armour a character is wearing. Foundry's `armor:` options

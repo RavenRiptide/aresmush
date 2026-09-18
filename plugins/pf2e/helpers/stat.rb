@@ -146,8 +146,8 @@ module AresMUSH
         # A figure's own parts can have circumstances too: armour hampers a skill until its wearer is
         # strong enough for it, and a feat can waive that. One whose circumstances are unmet is reported
         # the same way an effect's is, rather than counted.
-        own, waived = row['intrinsic'].call(char, name).compact
-                         .partition { |one| Predicate.test(one['when'], held) }
+        own, waived = (row['intrinsic'].call(char, name) + [ multiple_attack(kind, name, sources, domains, held, context) ])
+                        .compact.partition { |one| Predicate.test(one['when'], held) }
 
         # A rule that changes a modifier is applied before anything is stacked, so the comparison that
         # decides which of them count is against the adjusted numbers.
@@ -256,6 +256,29 @@ module AresMUSH
 
         { 'source' => source, 'slug' => slug || Domains.slug(source), 'type' => 'item',
           'value' => value.to_i }
+      end
+
+      # The penalty for a second or third attack in a turn. Which attack it is comes from Foundry's own
+      # option, `map:increases:1` for the second and `:2` for the third, so whatever counts a turn's
+      # attacks says so and this does the arithmetic (`actor/helpers.ts` `calculateMAPs`): -5 and -10,
+      # -4 and -8 for an agile weapon, or the least severe a rule offers - Agile Grace's -3 - doubled for
+      # the third.
+      def self.multiple_attack(kind, attack, sources, domains, held, context)
+        return nil unless kind.to_s == 'attack' && attack.is_a?(Hash)
+
+        increases = held.map { |one| one.to_s[/\Amap:increases:(\d+)\z/, 1] }.compact.map(&:to_i).max.to_i
+
+        return nil unless increases.positive?
+
+        traits = Array(attack['traits']).map { |one| Domains.slug(one) }
+        base = traits.include?('agile') ? -4 : -5
+        offered = Rules.gather(sources, domains, held + traits, 'MultipleAttackPenalty') do |row, source|
+          Rules.contribute(row, source, context.merge('item' => source['item'] || {}))
+        end
+        each = ([ base ] + offered.map { |one| one['value'] }).max
+
+        { 'source' => 'multiple attack penalty', 'slug' => 'multiple-attack-penalty',
+          'type' => Modifiers::UNTYPED, 'value' => each * [ increases, 2 ].min }
       end
 
       # Their slug, because a feat that lets a character ignore armour's speed penalty names it

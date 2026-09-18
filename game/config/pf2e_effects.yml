@@ -613,6 +613,10 @@ pf2e_effects:
         flag: "tradition"
         prompt: "Select a tradition."
         choices: [{"label": "Arcane", "value": "arcana"}, {"label": "Divine", "value": "religion"}, {"label": "Occult", "value": "occultism"}, {"label": "Primal", "value": "nature"}]
+      - key: "FlatModifier"
+        selector: "{item|flags.system.rulesSelections.tradition}"
+        type: "item"
+        value: 2
   "Effect: Aeon Stone Resonance (Black Disc)":
     pack: "equipment-effects"
     level: 17
@@ -910,6 +914,11 @@ pf2e_effects:
     rules:
       - key: "GrantItem"
         uuid: "Compendium.pf2e.equipment-effects.Item.Effect: Ancestral Geometry (Save Type)"
+      - key: "SubstituteRoll"
+        selector: "{actor|flags.system.ancestralGeometry}"
+        value: "@item.badge.value"
+        slug: "ancestral-geometry"
+        removeAfterRoll: "if-enabled"
   "Effect: Ancestral Geometry (Save Type)":
     pack: "equipment-effects"
     level: 1
@@ -1863,6 +1872,12 @@ pf2e_effects:
     duration: {"unit": "unlimited", "value": -1, "expiry": null, "sustained": false}
     traits: []
     description: "Granted by Battle Planner%rRoll a Warfare Lore check. As long as the information was accurate and remains accurate when you roll initiative against those enemies, you can use the Warfare Lore result you previously rolled for your initiative roll."
+    rules:
+      - key: "SubstituteRoll"
+        selector: "warfare-lore"
+        value: "@item.badge.value"
+        removeAfterRoll: true
+        predicate: ["check:type:initiative"]
   "Effect: Be the Band":
     pack: "equipment-effects"
     level: 1
@@ -2661,6 +2676,9 @@ pf2e_effects:
     duration: {"unit": "rounds", "value": 0, "expiry": "turn-end", "sustained": false}
     traits: []
     description: "Granted by Blood Sovereignty%rYou lose Hit Points equal to twice the spell's rank."
+    rules:
+      - key: "LoseHitPoints"
+        value: "2*@item.level"
   "Effect: Blood and Spirit":
     pack: "feat-effects"
     level: 5
@@ -3116,6 +3134,8 @@ pf2e_effects:
       - key: "BaseSpeed"
         selector: "fly"
         value: 40
+      - key: "ActorTraits"
+        add: ["swarm"]
   "Effect: Bonebloom Rose":
     pack: "equipment-effects"
     level: 12
@@ -4041,6 +4061,12 @@ pf2e_effects:
       - key: "CreatureSize"
         value: "small"
         predicate: ["werecreature:wererat", "change-shape:animal"]
+      - key: "ActorTraits"
+        add: ["amphibious"]
+        predicate: ["werecreature:wereshark", "change-shape:hybrid"]
+      - key: "ActorTraits"
+        add: ["aquatic"]
+        predicate: ["werecreature:wereshark", "change-shape:animal"]
       - key: "BaseSpeed"
         selector: "swim"
         value: 35
@@ -5119,6 +5145,10 @@ pf2e_effects:
       - key: "ChoiceSet"
         flag: "skill"
         choices: {"config": "skills"}
+      - key: "FlatModifier"
+        selector: "{item|flags.system.rulesSelections.skill}"
+        type: "status"
+        value: 1
       - key: "GrantItem"
         uuid: "Compendium.pf2e.feat-effects.Item.Effect: Emboldened with Glorious Purpose"
         predicate: ["feat:emboldened-with-glorious-purpose"]
@@ -7013,6 +7043,20 @@ pf2e_effects:
         mode: "add"
         value: "fortune"
         predicate: ["target:mark:devise-a-stratagem", "devise-a-stratagem:attack", {"or": ["item:trait:agile", "item:trait:finesse", {"nor": ["item:melee", "item:thrown"]}]}]
+      - key: "SubstituteRoll"
+        required: true
+        selector: "strike-attack-roll"
+        value: "@item.badge.value"
+        slug: "devise-a-stratagem"
+        removeAfterRoll: "if-enabled"
+        predicate: ["devise-a-stratagem:attack", "target:mark:devise-a-stratagem", {"or": ["item:trait:agile", "item:trait:finesse", {"nor": ["item:melee", "item:thrown"]}]}]
+      - key: "SubstituteRoll"
+        required: true
+        selector: "athletics"
+        value: "@item.badge.value"
+        slug: "devise-a-strategem"
+        removeAfterRoll: "if-enabled"
+        predicate: ["devise-a-stratagem:attack", "feat:athletic-strategist", {"or": ["devise-a-stratagem", "target:mark:devise-a-stratagem"]}, {"or": ["action:disarm", "action:grapple", "action:shove", "action:trip"]}]
       - key: "FlatModifier"
         selector: ["perception", "cha-skill-check", "int-skill-check", "wis-skill-check"]
         type: "circumstance"
@@ -7736,6 +7780,8 @@ pf2e_effects:
     traits: []
     description: "Granted by Drakeheart Mutagen (Greater)%rBenefit You gain +6 item bonus to AC, a Dexterity cap of +2, and a +3 item bonus to Perception checks.%rDrawback You take a -1 penalty to Will saves, Reflex saves, and all skill checks to Recall Knowledge."
     rules:
+      - key: "DexterityModifierCap"
+        value: 2
       - key: "FlatModifier"
         selector: "ac"
         type: "item"
@@ -7758,6 +7804,8 @@ pf2e_effects:
     traits: []
     description: "Granted by Drakeheart Mutagen (Lesser)%rBenefit You gain +4 item bonus to AC, a Dexterity cap of +2, and a +1 item bonus to Perception checks.%rDrawback You take a -1 penalty to Will saves, Reflex saves, and all skill checks to Recall Knowledge."
     rules:
+      - key: "DexterityModifierCap"
+        value: 2
       - key: "FlatModifier"
         selector: "ac"
         type: "item"
@@ -7780,6 +7828,8 @@ pf2e_effects:
     traits: []
     description: "Granted by Drakeheart Mutagen (Major)%rBenefit You gain +7 item bonus to AC, a Dexterity cap of +2, and a +4 item bonus to Perception checks.%rDrawback You take a -1 penalty to Will saves, Reflex saves, and all skill checks to Recall Knowledge."
     rules:
+      - key: "DexterityModifierCap"
+        value: 2
       - key: "FlatModifier"
         selector: "ac"
         type: "item"
@@ -7802,6 +7852,8 @@ pf2e_effects:
     traits: []
     description: "Granted by Drakeheart Mutagen (Moderate)%rBenefit You gain +5 item bonus to AC, a Dexterity cap of +2, and a +2 item bonus to Perception checks.%rDrawback You take a -1 penalty to Will saves, Reflex saves, and all skill checks to Recall Knowledge."
     rules:
+      - key: "DexterityModifierCap"
+        value: 2
       - key: "FlatModifier"
         selector: "ac"
         type: "item"
@@ -8071,6 +8123,8 @@ pf2e_effects:
     traits: []
     description: "Granted by Ebon Fulcrum Lens%rYou gain the incorporeal trait, and are drained 2."
     rules:
+      - key: "ActorTraits"
+        add: ["incorporeal"]
       - key: "GrantItem"
         uuid: "Compendium.pf2e.conditionitems.Item.Drained"
         inMemoryOnly: true
@@ -8622,6 +8676,11 @@ pf2e_effects:
         choices: [{"label": "Aquatic", "value": {"bonus": 1, "selector": "fortitude", "terrain": "aquatic"}}, {"label": "Forest", "value": {"bonus": 2, "selector": "saving-throw", "terrain": "forest"}}, {"label": "Mountain", "value": {"bonus": 1, "selector": "reflex", "terrain": "mountain"}}, {"label": "Plains", "value": {"bonus": 1, "selector": "will", "terrain": "plains"}}, {"label": "Underground", "value": {"bonus": 1, "selector": "perception", "terrain": "underground"}}]
       - key: "RollOption"
         option: "endemic-herbs:{item|flags.system.rulesSelections.endemicHerbs.terrain}"
+      - key: "FlatModifier"
+        selector: "{item|flags.system.rulesSelections.endemicHerbs.selector}"
+        type: "circumstance"
+        value: "@item.flags.system.rulesSelections.endemicHerbs.bonus"
+        predicate: [{"or": [{"not": "endemic-herbs:forest"}, "item:trait:poison", "item:trait:disease"]}]
   "Effect: Endure the Onslaught":
     pack: "other-effects"
     level: 1
@@ -10223,6 +10282,16 @@ pf2e_effects:
         flag: "followTheExpertSkill"
         prompt: "Select a skill."
         choices: [{"label": "Acrobatics", "value": "acrobatics"}, {"label": "Arcana", "value": "arcana"}, {"label": "Athletics", "value": "athletics"}, {"label": "Crafting", "value": "crafting"}, {"label": "Deception", "value": "deception"}, {"label": "Diplomacy", "value": "diplomacy"}, {"label": "Intimidation", "value": "intimidation"}, {"label": "Medicine", "value": "medicine"}, {"label": "Nature", "value": "nature"}, {"label": "Occultism", "value": "occultism"}, {"label": "Performance", "value": "performance"}, {"label": "Religion", "value": "religion"}, {"label": "Society", "value": "society"}, {"label": "Stealth", "value": "stealth"}, {"label": "Survival", "value": "survival"}, {"label": "Thievery", "value": "thievery"}, {"label": "Lore", "value": "lore"}]
+      - key: "FlatModifier"
+        selector: "{item|flags.system.rulesSelections.followTheExpertSkill}"
+        type: "proficiency"
+        value: "@actor.level"
+        slug: "follow-the-expert-proficiency"
+      - key: "FlatModifier"
+        selector: "{item|flags.system.rulesSelections.followTheExpertSkill}"
+        type: "circumstance"
+        value: "@item.flags.system.rulesSelections.followTheExpertProficiency"
+        slug: "follow-the-expert-circumstance"
   "Effect: Force Fling":
     pack: "spell-effects"
     level: 1
@@ -10240,6 +10309,14 @@ pf2e_effects:
         option: "new-target"
         toggleable: true
         label: "Force Fling — Target is a creature you haven’t attacked yet this turn"
+      - key: "MultipleAttackPenalty"
+        selector: "attack"
+        value: -3
+        predicate: [{"not": "item:trait:unarmed"}, "agile", "item:melee", "item:damage:category:physical", "new-target"]
+      - key: "MultipleAttackPenalty"
+        selector: "attack"
+        value: -4
+        predicate: [{"nor": ["item:trait:unarmed", "agile"]}, "item:melee", "item:damage:category:physical", "new-target"]
   "Effect: Force Shield":
     pack: "equipment-effects"
     level: 9
@@ -11953,6 +12030,11 @@ pf2e_effects:
         flag: "save"
         choices: [{"label": "Fortitude", "value": "fortitude"}, {"label": "Reflex", "value": "reflex"}, {"label": "Will", "value": "will"}]
         predicate: ["harrow-chosen:true-match"]
+      - key: "FlatModifier"
+        selector: "{item|flags.system.rulesSelections.save}"
+        type: "circumstance"
+        value: 1
+        predicate: ["harrow-chosen:true-match"]
       - key: "ChoiceSet"
         flag: "resistance"
         prompt: "Select an energy type."
@@ -12872,6 +12954,10 @@ pf2e_effects:
       - key: "ChoiceSet"
         flag: "defense"
         choices: [{"label": "Armor Class", "value": "ac"}, {"label": "Saves", "value": "saving-throw"}]
+      - key: "FlatModifier"
+        selector: "{item|flags.system.rulesSelections.defense}"
+        type: "status"
+        value: 1
   "Effect: Impossible Cake":
     pack: "equipment-effects"
     level: 3
@@ -13067,6 +13153,24 @@ pf2e_effects:
         selectors: ["inline-damage"]
         value: 8
         predicate: ["certain-stratagem"]
+      - key: "FlatModifier"
+        selector: "{item|flags.system.rulesSelections.insightCoffee}"
+        type: "item"
+        value: 2
+        slug: "insight-coffee-bonus"
+        predicate: ["action:recall-knowledge"]
+      - key: "AdjustModifier"
+        mode: "upgrade"
+        selector: "{item|flags.system.rulesSelections.insightCoffee}"
+        value: 3
+        slug: "insight-coffee-bonus"
+        predicate: ["insight-coffee:insight-coffee-moderate"]
+      - key: "AdjustModifier"
+        mode: "upgrade"
+        selector: "{item|flags.system.rulesSelections.insightCoffee}"
+        value: 4
+        slug: "insight-coffee-bonus"
+        predicate: ["insight-coffee:insight-coffee-greater"]
   "Effect: Inspirational Salute":
     pack: "equipment-effects"
     level: 1
@@ -13127,6 +13231,10 @@ pf2e_effects:
         flag: "skill"
         prompt: "Select a skill."
         choices: {"config": "skills"}
+      - key: "FlatModifier"
+        selector: "{item|flags.system.rulesSelections.skill}"
+        type: "status"
+        value: "@actor.system.skills.performance.rank"
   "Effect: Inspiring Resilience":
     pack: "feat-effects"
     level: 1
@@ -17711,6 +17819,9 @@ pf2e_effects:
         selector: "land-speed"
         type: "status"
         value: 15
+      - key: "LoseHitPoints"
+        recoverable: false
+        value: "2*@actor.level"
   "Effect: Quicksilver Mutagen (Lesser)":
     pack: "equipment-effects"
     level: 1
@@ -17729,6 +17840,9 @@ pf2e_effects:
         selector: "land-speed"
         type: "status"
         value: 5
+      - key: "LoseHitPoints"
+        recoverable: false
+        value: "2*@actor.level"
   "Effect: Quicksilver Mutagen (Major)":
     pack: "equipment-effects"
     level: 17
@@ -17747,6 +17861,9 @@ pf2e_effects:
         selector: "land-speed"
         type: "status"
         value: 20
+      - key: "LoseHitPoints"
+        recoverable: false
+        value: "2*@actor.level"
   "Effect: Quicksilver Mutagen (Moderate)":
     pack: "equipment-effects"
     level: 3
@@ -17765,6 +17882,9 @@ pf2e_effects:
         selector: "land-speed"
         type: "status"
         value: 10
+      - key: "LoseHitPoints"
+        recoverable: false
+        value: "2*@actor.level"
   "Effect: Race the Skies":
     pack: "feat-effects"
     level: 1
@@ -19620,6 +19740,16 @@ pf2e_effects:
         option: "ignore-range-penalty:2"
         domain: "ranged-attack-roll"
         predicate: ["target:mark:share-hunters-edge"]
+      - key: "MultipleAttackPenalty"
+        selector: "attack"
+        value: -2
+        label: "Flurry"
+        predicate: ["item:trait:agile", "target:mark:share-hunters-edge"]
+      - key: "MultipleAttackPenalty"
+        selector: "attack"
+        value: -3
+        label: "Flurry"
+        predicate: ["target:mark:share-hunters-edge", {"not": "item:trait:agile"}]
   "Effect: Share Hunter's Edge (Flurry, Masterful)":
     pack: "feat-effects"
     level: 18
@@ -19643,6 +19773,16 @@ pf2e_effects:
         option: "ignore-range-penalty:3"
         domain: "ranged-attack-roll"
         predicate: ["target:mark:share-hunters-edge"]
+      - key: "MultipleAttackPenalty"
+        selector: "attack"
+        value: -1
+        label: "Flurry"
+        predicate: ["item:trait:agile", "target:mark:share-hunters-edge"]
+      - key: "MultipleAttackPenalty"
+        selector: "attack"
+        value: -2
+        label: "Flurry"
+        predicate: ["target:mark:share-hunters-edge", {"not": "item:trait:agile"}]
   "Effect: Share Hunter's Edge (Outwit)":
     pack: "feat-effects"
     level: 1
@@ -21043,6 +21183,9 @@ pf2e_effects:
     duration: {"unit": "unlimited", "value": -1, "expiry": null, "sustained": false}
     traits: []
     description: "Granted by Soul Thief%rYou gain the unholy and undead traits, and you gain void healing."
+    rules:
+      - key: "ActorTraits"
+        add: ["undead", "unholy"]
   "Effect: Soul Vessel Mount":
     pack: "feat-effects"
     level: 18
@@ -21711,6 +21854,10 @@ pf2e_effects:
         flag: "starstoneAspirant"
         prompt: "Select a skill."
         choices: {"config": "skills", "predicate": [{"lte": ["skill:{choice|value}:rank", 0]}]}
+      - key: "FlatModifier"
+        selector: ["{item|flags.system.rulesSelections.starstoneAspirant}"]
+        type: "circumstance"
+        value: "ternary(gte(@actor.level,15),3,ternary(gte(@actor.level,8),2,1))"
   "Effect: Static Muscular Relay":
     pack: "equipment-effects"
     level: 10
@@ -21930,6 +22077,9 @@ pf2e_effects:
     duration: {"unit": "rounds", "value": 1, "expiry": "turn-start", "sustained": false}
     traits: []
     description: "Granted by Strain Mind%rYou lose Hit Points equal to four times the spell rank of the amped psi cantrip."
+    rules:
+      - key: "LoseHitPoints"
+        value: "4*(@item.level)"
   "Effect: Strained Metabolism":
     pack: "feat-effects"
     level: 1
@@ -25743,6 +25893,8 @@ pf2e_effects:
     traits: []
     description: "Granted by Arcane Explosion%rYou gain the incorporeal trait, are immune to disease, poison, and precision damage, and gain resistance to all damage equal to your level (except force damage, spirit damage, and damage from Strikes with the ghost touch property rune), with double the resistance against non-magical damage."
     rules:
+      - key: "ActorTraits"
+        add: ["incorporeal"]
       - key: "Immunity"
         type: ["disease", "poison", "precision"]
       - key: "Resistance"
@@ -25932,6 +26084,10 @@ pf2e_effects:
         flag: "save"
         prompt: "Select a saving throw."
         choices: {"config": "saves"}
+      - key: "FlatModifier"
+        selector: ["{item|flags.system.rulesSelections.save}", "{item|flags.system.rulesSelections.skill}"]
+        type: "status"
+        value: "ternary(gte(@item.level,7),3,ternary(gte(@item.level,4),2,1))"
   "Spell Effect: Bestial Curse (Critical Failure)":
     pack: "spell-effects"
     level: 4
@@ -25974,6 +26130,10 @@ pf2e_effects:
     duration: {"unit": "days", "value": 1, "expiry": "turn-start", "sustained": false}
     traits: []
     description: "Granted by Bind Undead%rThe target mindless undead creature gains the minion trait."
+    rules:
+      - key: "ActorTraits"
+        add: ["minion"]
+        predicate: ["self:mode:undead", "self:trait:mindless", {"gte": ["{item|level}", "self:level"]}]
   "Spell Effect: Bit of Luck":
     pack: "spell-effects"
     level: 1
@@ -26018,6 +26178,10 @@ pf2e_effects:
         rollOption: "blessing-of-defiance-save"
         prompt: "Choose one saving throw."
         choices: [{"label": "Fortitude", "value": "fortitude"}, {"label": "Reflex", "value": "reflex"}, {"label": "Will", "value": "will"}]
+      - key: "FlatModifier"
+        selector: "{item|flags.system.rulesSelections.blessingOfDefianceSave}"
+        type: "status"
+        value: 4
       - key: "Resistance"
         type: "poison"
         value: 15
@@ -26180,6 +26344,8 @@ pf2e_effects:
       - key: "Weakness"
         type: "bludgeoning"
         value: 10
+      - key: "ActorTraits"
+        remove: ["incorporeal"]
   "Spell Effect: Calcification (Success)":
     pack: "spell-effects"
     level: 9
@@ -26193,6 +26359,8 @@ pf2e_effects:
       - key: "Weakness"
         type: "bludgeoning"
         value: 5
+      - key: "ActorTraits"
+        remove: ["incorporeal"]
   "Spell Effect: Call the Ten":
     pack: "spell-effects"
     level: 4
@@ -26878,6 +27046,11 @@ pf2e_effects:
         flag: "defense"
         prompt: "Select a defense."
         choices: [{"label": "Armor Class", "value": "ac"}, {"label": "Fortitude", "value": "fortitude"}, {"label": "Reflex", "value": "reflex"}, {"label": "Will", "value": "will"}]
+      - key: "FlatModifier"
+        selector: "{item|flags.system.rulesSelections.defense}"
+        type: "circumstance"
+        value: 2
+        removeAfterRoll: "if-enabled"
   "Spell Effect: Daemon Form":
     pack: "spell-effects"
     level: 6
@@ -28387,6 +28560,11 @@ pf2e_effects:
       - key: "ChoiceSet"
         flag: "skill"
         choices: [{"label": "Arcana", "value": "arcana"}, {"label": "Crafting", "value": "crafting"}, {"label": "Deception", "value": "deception"}, {"label": "Diplomacy", "value": "diplomacy"}, {"label": "Intimidation", "value": "intimidation"}, {"label": "Lore", "value": "lore-skill-check"}, {"label": "Medicine", "value": "medicine"}, {"label": "Nature", "value": "nature"}, {"label": "Occultism", "value": "occultism"}, {"label": "Performance", "value": "performance"}, {"label": "Religion", "value": "religion"}, {"label": "Society", "value": "society"}, {"label": "Survival", "value": "survival"}]
+      - key: "FlatModifier"
+        selector: ["saving-throw", "{item|flags.system.rulesSelections.skill}"]
+        type: "status"
+        value: "ternary(gte(@item.level,8),3,ternary(gte(@item.level,4),2,1))"
+        predicate: [{"or": ["item:trait:curse", "item:trait:death", "item:trait:emotion", "item:trait:fear", {"not": "check:type:saving-throw"}]}]
   "Spell Effect: Entropic Wheel":
     pack: "spell-effects"
     level: 1
@@ -28525,6 +28703,9 @@ pf2e_effects:
         range: 30
         selector: "scent"
         predicate: ["evolution-surge:scent"]
+      - key: "ActorTraits"
+        add: ["amphibious"]
+        predicate: ["evolution-surge:amphibious"]
       - key: "FlatModifier"
         selector: "all-speeds"
         type: "status"
@@ -29480,6 +29661,12 @@ pf2e_effects:
       - key: "ChoiceSet"
         flag: "suit"
         choices: [{"label": "Books", "value": "skill-check"}, {"label": "Crowns", "value": "perception"}, {"label": "Hammers", "value": "strike-attack-roll"}, {"label": "Keys", "value": "reflex"}, {"label": "Shields", "value": "fortitude"}, {"label": "Stars", "value": "will"}]
+      - key: "FlatModifier"
+        selector: "{item|flags.system.rulesSelections.suit}"
+        type: "status"
+        value: "@item.flags.system.rulesSelections.degreeOfSuccess"
+        removeAfterRoll: "if-enabled"
+        predicate: ["harrowing-reroll"]
       - key: "RollOption"
         option: "harrowing-reroll"
         toggleable: true
@@ -29637,6 +29824,9 @@ pf2e_effects:
         uuid: "Compendium.pf2e.conditionitems.Item.Clumsy"
         inMemoryOnly: true
         predicate: ["humanoid-form:large"]
+      - key: "ActorTraits"
+        add: ["humanoid"]
+        remove: []
       - key: "Sense"
         selector: "darkvision"
         predicate: ["vision-type:darkvision"]
@@ -29838,6 +30028,10 @@ pf2e_effects:
       - key: "ChoiceSet"
         flag: "infectiousEnthusiasm"
         choices: [{"label": "Attack", "value": "attack"}, {"label": "Will", "value": "will"}, {"label": "Charisma Check", "value": "cha-based"}]
+      - key: "FlatModifier"
+        selector: "{item|flags.system.rulesSelections.infectiousEnthusiasm}"
+        type: "status"
+        value: 1
   "Spell Effect: Infectious Melody (Critical Failure)":
     pack: "spell-effects"
     level: 4
@@ -31082,6 +31276,9 @@ pf2e_effects:
     duration: {"unit": "days", "value": 1, "expiry": "turn-start", "sustained": false}
     traits: []
     description: "Granted by Mystic Armor%rYou gain an item bonus to AC and a maximum Dexterity modifier of +5. At 4th rank or higher, you gain an item bonus to saving throws."
+    rules:
+      - key: "DexterityModifierCap"
+        value: 5
   "Spell Effect: Nature Incarnate":
     pack: "spell-effects"
     level: 10
@@ -31552,6 +31749,16 @@ pf2e_effects:
         flag: "skill"
         prompt: "Select a skill."
         choices: [{"label": "Arcana", "predicate": [{"gte": ["skill:arcana:rank", 1]}], "value": "arcana"}, {"label": "Crafting", "predicate": [{"gte": ["skill:crafting:rank", 1]}], "value": "crafting"}, {"label": "Medicine", "predicate": [{"gte": ["skill:medicine:rank", 1]}], "value": "medicine"}, {"label": "Nature", "predicate": [{"gte": ["skill:nature:rank", 1]}], "value": "nature"}, {"label": "Occultism", "predicate": [{"gte": ["skill:occultism:rank", 1]}], "value": "occultism"}, {"label": "Religion", "predicate": [{"gte": ["skill:religion:rank", 1]}], "value": "religion"}, {"label": "Society", "predicate": [{"gte": ["skill:society:rank", 1]}], "value": "society"}]
+      - key: "FlatModifier"
+        selector: "{item|flags.system.rulesSelections.skill}"
+        type: "status"
+        value: "1+floor(@item.level/3)"
+        predicate: ["action:recall-knowledge", "pocket-library", {"gte": ["hands-free", 1]}]
+      - key: "AdjustDegreeOfSuccess"
+        selector: "{item|flags.system.rulesSelections.skill}"
+        adjustment: {"criticalFailure": "one-degree-better"}
+        type: "skill"
+        predicate: ["action:recall-knowledge", "pocket-library", {"gte": ["hands-free", 1]}]
   "Spell Effect: Practice Makes Perfect":
     pack: "spell-effects"
     level: 1
@@ -32994,6 +33201,8 @@ pf2e_effects:
     traits: []
     description: "Granted by Swarm Form%rWhile in swarm form, you have the swarm trait and you gain resistance to slashing and piercing damage and weakness to area and splash damage."
     rules:
+      - key: "ActorTraits"
+        add: ["swarm"]
       - key: "Resistance"
         type: ["piercing", "slashing"]
         value: "max((floor(@item.level/2)-1)*5,5)"
@@ -34998,6 +35207,9 @@ pf2e_effects:
     traits: []
     description: "Granted by Mountain Stance%rThe only Strikes you can make are falling stone unarmed attacks. These deal 1d8 bludgeoning damage; are in the brawling group; and have the forceful, nonlethal, and unarmed traits.%rYou gain a +4 item bonus to AC and a +2 circumstance bonus to any defenses against being Shoved or Tripped. However, you have a Dexterity modifier cap to your AC of +0, meaning you don't add your Dexterity to your AC, and your Speeds are all reduced by 5 feet. The item bonus to AC from Mountain Stance is cumulative with armor potency runes on your explorer's clothing, mage armor, and…"
     rules:
+      - key: "DexterityModifierCap"
+        value: 0
+        predicate: [{"nor": ["feat:mountain-stronghold", "feat:mountain-quake"]}]
       - key: "AdjustModifier"
         mode: "add"
         selector: "ac"

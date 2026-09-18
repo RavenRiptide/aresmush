@@ -146,6 +146,21 @@ module AresMUSH
         @roll_twice || nil
       end
 
+      # A fixed number in place of the d20, where one is chosen for this roll: Assurance's 10. One the rule
+      # requires is always chosen; any other is chosen by the roller saying `substitute:<slug>`, which is
+      # Foundry's own option for it.
+      def substitution
+        offered = Rules.gather(Effects.sources(@char), @domains, @options, 'SubstituteRoll') do |row, source|
+          Rules.contribute(row, source, Effects.context(@char).merge('item' => source['item'] || {}))
+        end
+
+        offered.find { |one| one['required'] } ||
+          offered.find { |one| @options.include?("substitute:#{one['slug']}") }
+      end
+
+      # Which substitution the roll used, set by the roll path once it has decided.
+      attr_accessor :substituted
+
       # The roll has been made. What was spent on it is spent: Guidance's bonus, a fortune effect.
       def rolled!(total, dc = nil, die = nil)
         ActiveEffects.after_roll(@char, self, @options + rolled(total, dc, die))

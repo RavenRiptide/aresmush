@@ -137,6 +137,8 @@ module AresMUSH
 
       list = char.pf2_conditions || {}
       cv = list[condition] || {}
+      before = list.key?(condition) ? cv['value'] : nil
+      max_before = HitPointLoss.takes?(Global.read_config('pf2e_conditions', condition, 'rules')) ? HitPointLoss.max_hp(char) : nil
 
       cv['value'] = value if value
       # Held without a value, it still has to be held as something.
@@ -146,6 +148,8 @@ module AresMUSH
       list[condition] = cv
       char.update(pf2_conditions: list)
 
+      # Drained costs hit points as it arrives and more as it worsens.
+      HitPointLoss.condition_changed(char, condition, before, cv['value'], max_before)
       grant_stored_conditions(char, condition)
 
       # A condition may write as well as modify - Confused cannot flank - and what it writes is derived,

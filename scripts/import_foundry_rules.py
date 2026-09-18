@@ -48,6 +48,17 @@ KINDS = {
     # Text shown with a roll, for an outcome where it says: Revel in Retribution's reminder on a hit.
     'Note': {'key', 'selector', 'text', 'title', 'predicate', 'outcome', 'slug', 'label', 'visibility',
              'priority'},
+    # Traits an effect gives or takes away: Humanoid Form makes you humanoid, Soul Thief undead.
+    'ActorTraits': {'key', 'add', 'remove', 'predicate', 'priority', 'slug', 'label'},
+    # The most Dexterity counts towards AC: Mountain Stance, a mutagen.
+    'DexterityModifierCap': {'key', 'value', 'predicate', 'slug', 'label'},
+    # Hit points lost when an effect begins, and - where it says - not regained while it lasts.
+    'LoseHitPoints': {'key', 'value', 'recoverable', 'reevaluateOnUpdate', 'predicate', 'slug', 'label'},
+    # A fixed number in place of the d20: Assurance's 10.
+    'SubstituteRoll': {'key', 'selector', 'value', 'required', 'effectType', 'removeAfterRoll', 'predicate',
+                       'slug', 'label'},
+    # A multiple attack penalty other than the usual: Agile Grace's -3.
+    'MultipleAttackPenalty': {'key', 'selector', 'value', 'predicate', 'slug', 'label'},
     # How big the character is, and how far they reach.
     'CreatureSize': {'key', 'value', 'reach', 'resizeEquipment', 'maximumSize', 'minimumSize', 'predicate',
                      'slug', 'label'},
@@ -146,6 +157,8 @@ PRESENTATION = {
     # Resizing the character's equipment matters to how items look in Foundry's canvas, and to Bulk, which
     # a size here does not change. How an aura is drawn is the canvas's too.
     'CreatureSize': {'resizeEquipment'},
+    # Their priority orders a trait's arrival against their data preparation, which has no counterpart.
+    'ActorTraits': {'priority'},
     'Aura': {'appearance', 'priority', 'mergeExisting'},
     # Whether a form has hands, or can cast, is a question for the actions it allows, which this engine
     # does not police.
@@ -156,7 +169,7 @@ PRESENTATION = {
 
 # The order fields are written in, so a re-run produces the same file. A field of a kind that is not
 # named here still gets written, after these.
-ORDER = ['key', 'overrides', 'brackets', 'radius', 'effects', 'reach', 'maximumSize', 'minimumSize',
+ORDER = ['key', 'add', 'remove', 'recoverable', 'reevaluateOnUpdate', 'required', 'effectType', 'overrides', 'brackets', 'radius', 'effects', 'reach', 'maximumSize', 'minimumSize',
          'ownUnarmed', 'itemType', 'itemId', 'property', 'uuid', 'inMemoryOnly', 'allowDuplicate', 'onDeleteActions', 'alterations', 'option', 'domain', 'toggleable', 'alwaysActive', 'suboptions', 'selection',
          'disabledIf', 'disabledValue', 'flag', 'rollOption', 'prompt', 'choices',
          'allowNoSelection', 'path', 'mode', 'merge',
@@ -180,6 +193,7 @@ def written(key):
 # Neither of these reaches a statistic: one declares a circumstance and the other writes a value.
 SELECTORLESS = {'RollOption', 'ActiveEffectLike', 'Immunity', 'Weakness', 'Resistance', 'AdjustStrike', 'GrantItem',
                 'TempHP', 'ItemAlteration', 'FastHealing', 'CreatureSize', 'Aura', 'BattleForm',
+                'ActorTraits', 'DexterityModifierCap', 'LoseHitPoints',
                 'Strike', 'MartialProficiency', 'CriticalSpecialization', 'Sense', 'ChoiceSet'}
 
 # Senses this engine knows. One it does not would be a fact nothing could show or ask about.
@@ -350,6 +364,9 @@ def selector_ok(selector):
     # A selector naming the thing the player chose - `{item|flags.system.rulesSelections.weapon}-damage`
     # is the damage of the weapon they picked - is checked by shape, with the answer standing in.
     if INJECTED.search(slug):
+        # One that is nothing but the answer - Assurance's skill - names whatever the answer is.
+        if INTERPOLATION.fullmatch(slug):
+            return True
         return selector_ok(INTERPOLATION.sub('chosen', slug))
     if INTERPOLATION.search(slug):
         return False

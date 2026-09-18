@@ -57,7 +57,9 @@ module AresMUSH
           Pf2e.remove_condition(char, 'Dying')
         end
 
-        hp.update(damage: (existing_damage - amount).clamp(0,max_hp))
+        # What an effect took and says cannot be healed stays taken while the effect lasts.
+        floor = [ Pf2e::HitPointLoss.unrecoverable(char), max_hp ].min
+        hp.update(damage: (existing_damage - amount).clamp(floor, max_hp))
         return
       end
 

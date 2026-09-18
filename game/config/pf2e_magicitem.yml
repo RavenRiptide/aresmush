@@ -787,6 +787,8 @@ pf2e_magicitem:
         type: "item"
         value: 1
         slug: "bands-of-force"
+      - key: "DexterityModifierCap"
+        value: 5
       - key: "FlatModifier"
         selector: ["athletics"]
         value: 14
@@ -1614,6 +1616,8 @@ pf2e_magicitem:
         type: "item"
         value: 2
         slug: "bands-of-force"
+      - key: "DexterityModifierCap"
+        value: 5
       - key: "FlatModifier"
         selector: ["athletics"]
         value: 21
@@ -2288,6 +2292,8 @@ pf2e_magicitem:
         type: "item"
         value: 3
         slug: "bands-of-force"
+      - key: "DexterityModifierCap"
+        value: 5
       - key: "FlatModifier"
         selector: ["athletics"]
         value: 33

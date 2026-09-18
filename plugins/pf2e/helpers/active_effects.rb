@@ -164,6 +164,7 @@ module AresMUSH
         said['answers'] = owned_answers(char, name, said['answers'])
         duration = entry['duration'] || {}
         unit = UNITS.key?(duration['unit']) ? duration['unit'] : 'unlimited'
+        max_before = HitPointLoss.takes?(entry['rules']) ? HitPointLoss.max_hp(char) : nil
 
         effect = Pf2eEffect.create(
           :character => char, :name => name, :applied_by => applied_by,
@@ -184,6 +185,7 @@ module AresMUSH
         # anything reads it - Rage's temporary hit points are a number its own write leaves behind.
         Paths.apply_all!(char)
         give_temp_hp(char, effect, 'on_create')
+        HitPointLoss.effect_began(char, effect, max_before)
 
         Ok.new(:state => effect)
       end
@@ -353,6 +355,14 @@ module AresMUSH
 
           return true if spent == true
           return counted.include?(effect.id.to_s) if spent == 'if-enabled'
+
+          spent.is_a?(Array) && Predicate.test(spent, options)
+        when 'SubstituteRoll'
+          spent = row['removeAfterRoll']
+          used = check.respond_to?(:substituted) && check.substituted.to_s == (row['slug'] || Domains.slug(effect.name))
+
+          return true if spent == true
+          return used if spent == 'if-enabled'
 
           spent.is_a?(Array) && Predicate.test(spent, options)
         when 'RollTwice'

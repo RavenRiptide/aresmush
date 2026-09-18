@@ -337,6 +337,54 @@ module AresMUSH
           }
         },
         {
+          'key' => 'ActorTraits',
+          'fields' => %w{key add remove predicate slug label},
+          # Traits an effect gives or takes away while it lasts, as the facts a predicate reads.
+          'contribute' => lambda { |row, source, _context|
+            { 'source' => source['name'], 'add' => Array(row['add']).map { |one| Domains.slug(one) },
+              'remove' => Array(row['remove']).map { |one| Domains.slug(one) } }
+          }
+        },
+        {
+          'key' => 'DexterityModifierCap',
+          'fields' => %w{key value predicate slug label},
+          # The most Dexterity counts towards AC. The lowest cap from anywhere holds, armour's included.
+          'contribute' => lambda { |row, source, context|
+            { 'source' => source['name'], 'value' => Formula.value(row['value'], context).to_i }
+          }
+        },
+        {
+          'key' => 'LoseHitPoints',
+          'fields' => %w{key value recoverable reevaluateOnUpdate predicate slug label},
+          # Hit points lost as the effect begins; where it says they are not recoverable, they cannot be
+          # healed while it lasts. One reevaluated on update loses more as its value rises - Drained.
+          'contribute' => lambda { |row, source, context|
+            { 'source' => source['name'], 'value' => Formula.value(row['value'], context).to_i.abs,
+              'recoverable' => row['recoverable'] != false, 'again' => row['reevaluateOnUpdate'] == true }
+          }
+        },
+        {
+          'key' => 'SubstituteRoll',
+          'fields' => %w{key selector value required effectType removeAfterRoll predicate slug label},
+          # A fixed number in place of the d20 - Assurance's 10 - chosen by the roller unless it is required.
+          # It is fortune or misfortune, and cancels with the other the way rolling twice does.
+          'contribute' => lambda { |row, source, context|
+            { 'source' => source['name'], 'slug' => row['slug'] || Domains.slug(source['name']),
+              'value' => Formula.value(row['value'], context).to_i.clamp(1, 20),
+              'required' => row['required'] == true,
+              'effect_type' => (row['effectType'] || 'fortune').to_s,
+              'remove_after_roll' => row['removeAfterRoll'] }
+          }
+        },
+        {
+          'key' => 'MultipleAttackPenalty',
+          'fields' => %w{key selector value predicate slug label},
+          # A multiple attack penalty other than the usual, for the second attack; the third is twice it.
+          'contribute' => lambda { |row, source, context|
+            { 'source' => source['name'], 'value' => Formula.value(row['value'], context).to_i }
+          }
+        },
+        {
           'key' => 'CreatureSize',
           'fields' => %w{key value reach maximumSize minimumSize predicate slug label},
           # A size by name or one step up or down; `Pf2e::Size` reads it.
@@ -420,6 +468,7 @@ module AresMUSH
                        'Note' => %w{visibility priority},
                        'ItemAlteration' => %w{priority phase fromEquipment},
                        'CreatureSize' => %w{resizeEquipment},
+                       'ActorTraits' => %w{priority},
                        'Aura' => %w{appearance priority mergeExisting},
                        'BattleForm' => %w{hasHands canCast} }.freeze
 
@@ -673,6 +722,18 @@ module AresMUSH
             .map { |row| contribute(row, source, context)&.merge('when' => row['predicate'],
                                                                  'held' => held) }
             .compact
+        end
+      end
+
+      # Every contribution of a kind whose circumstances hold, each worked out against the thing it came
+      # from - an effect's rank, an item's level - for a kind that reaches no statistic.
+      def self.contributions(sources, key, options, context = {})
+        Array(sources).flat_map do |source|
+          held = Array(options) + Array(source['options'])
+
+          of_kind(source, key).select { |row| Predicate.test(row['predicate'], held) }
+                              .map { |row| contribute(row, source, context.merge('item' => source['item'] || {})) }
+                              .compact
         end
       end
 

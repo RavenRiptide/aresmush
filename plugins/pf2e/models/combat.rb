@@ -175,9 +175,13 @@ module AresMUSH
     # The attribute and the rune, typed so they stack like anything else. The attribute is offered as
     # an `ability` modifier rather than added to the base, so an effect that lets a character use some
     # other attribute for AC needs only to offer that one and the better of the two applies.
+    # The lowest cap on Dexterity holds, whether it is the armour's or an effect's: Mountain Stance caps it
+    # at nothing, and a mutagen at two (`character/document.ts:746`).
     def self.ac_modifiers(char)
       armor = Pf2e::Alterations.armor(char)
-      cap = armor ? armor.dex_cap : 99
+      caps = Pf2e::Rules.contributions(Pf2e::Effects.sources(char), 'DexterityModifierCap',
+                                       Pf2e::Effects.options(char), Pf2e::Effects.context(char))
+      cap = ([ armor ? armor.dex_cap : 99 ] + caps.map { |one| one['value'] }).min
 
       dex = Pf2e::Stat.ability_mod(char, 'Dexterity')
       dex['value'] = dex['value'].clamp(-99, cap)

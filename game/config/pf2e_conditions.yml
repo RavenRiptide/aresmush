@@ -85,6 +85,9 @@ pf2e_conditions:
         type: "status"
         value: "min(-1 * @actor.level,-1) * @item.badge.value"
         slug: "drained"
+      - key: "LoseHitPoints"
+        reevaluateOnUpdate: true
+        value: "max(1,@actor.level) * @item.badge.value"
   Dying:
     short_descr: You are close to death.
     value: true

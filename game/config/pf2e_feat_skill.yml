@@ -94,6 +94,15 @@ pf2e_feats:
         flag: "assurance"
         prompt: "Select a skill."
         choices: {"config": "skills", "predicate": [{"gte": ["skill:{choice|value}:rank", 1]}]}
+      - key: "SubstituteRoll"
+        selector: "{item|flags.system.rulesSelections.assurance}"
+        value: 10
+        slug: "assurance"
+        label: "Assurance"
+      - key: "AdjustModifier"
+        selector: "{item|flags.system.rulesSelections.assurance}"
+        suppress: true
+        predicate: ["substitute:assurance", {"not": "bonus:type:proficiency"}]
   Battle Medicine:
     feat_type:
       - Skill

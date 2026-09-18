@@ -215,9 +215,16 @@ module AresMUSH
     # Foundry spells an action `action:pick-a-lock` and a circumstance that is not an action as a bare
     # word - `visual` for a check that needs sight. A player should not have to know which, so a named
     # circumstance is offered as both.
+    #
+    # A word already spelled as one of their options - `substitute:assurance`, `map:increases:1` - is
+    # taken as that option, each part slugged, because that is what it is.
     def self.circumstances(words)
       Array(words).flat_map do |word|
-        slug = word.to_s.strip.downcase.gsub(/[^a-z0-9]+/, '-').gsub(/\A-|-\z/, '')
+        parts = word.to_s.strip.downcase.split(':').map { |part| part.gsub(/[^a-z0-9]+/, '-').gsub(/\A-|-\z/, '') }
+
+        next [ parts.join(':') ] if parts.size > 1 && parts.none?(&:empty?)
+
+        slug = parts.join('-')
 
         slug.empty? ? [] : [ slug, "action:#{slug}" ]
       end
@@ -298,6 +305,25 @@ module AresMUSH
 
       keep = roll_twice(checks)
       twice = nil
+      substitution = checks.map { |check| check.respond_to?(:substitution) ? check.substitution : nil }.compact.first
+
+      # Fortune and misfortune cancel, and a substitution is one or the other: with one of each, the d20
+      # is rolled once and nothing stands in for it (`check.ts:127`).
+      kinds = [ substitution && substitution['effect_type'],
+                { 'keep-higher' => 'fortune', 'keep-lower' => 'misfortune' }[keep] ].compact
+
+      if kinds.include?('fortune') && kinds.include?('misfortune')
+        keep = nil
+        substitution = nil
+      end
+
+      # A substitution is a number rather than a die, so it is the first term, and no natural 20 or 1.
+      if substitution && roll_list.first == '1d20'
+        roll_list[0] = substitution['value'].to_s
+        terms[0] = substitution['value']
+        keep = nil
+        checks.each { |check| check.substituted = substitution['slug'] if check.respond_to?(:substituted=) }
+      end
 
       result = roll_list.each_with_index.map do |e, index|
         next terms[index] unless e =~ dice_pattern

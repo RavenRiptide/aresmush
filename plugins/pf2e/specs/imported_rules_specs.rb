@@ -132,11 +132,12 @@ module AresMUSH
     # value, three describe damage, two describe an attack, one asks a question, one brings another
     # condition with it, one gives temporary hit points, one changes a thing the character has, one heals
     # as a turn starts, three change the character's body or what is around it - size, an aura, a battle
-    # form - and BaseSpeed names a kind of movement.
+    # form - three change the character themselves - their traits, how much Dexterity counts, their hit
+    # points - and BaseSpeed names a kind of movement.
     SELECTORLESS = %w{RollOption ActiveEffectLike Immunity Weakness Resistance AdjustStrike Strike
                       BaseSpeed Sense MartialProficiency CriticalSpecialization ChoiceSet
                       GrantItem TempHP ItemAlteration FastHealing CreatureSize Aura
-                      BattleForm}.freeze
+                      BattleForm ActorTraits DexterityModifierCap LoseHitPoints}.freeze
 
     # Of those, the two that still carry a `selector` - because a movement type and a sense are not
     # domains, they are the thing being granted.
@@ -308,11 +309,10 @@ module AresMUSH
       end
     end
 
-    # The nineteen that change a number, three read at a roll - a note, fortune and misfortune, and an
-    # alteration of what is rolled with - fast healing, read as a turn starts, and size, auras and
-    # battle forms.
-    it "should have all twenty-six kinds it reads" do
-      expect(rows.map { |_where, row| row['key'] }.uniq.size).to eq 26
+    # Every kind of rule on what we stock that is not about Foundry's canvas, crafting or a roll's target:
+    # thirty-one.
+    it "should have all thirty-one kinds it reads" do
+      expect(rows.map { |_where, row| row['key'] }.uniq.size).to eq 31
     end
 
     # An aura's effects have to be effects the catalogue holds, or it puts nothing on anyone.
