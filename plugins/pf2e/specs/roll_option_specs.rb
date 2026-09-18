@@ -139,6 +139,40 @@ module AresMUSH
       end
     end
 
+    # Some circumstances are a choice rather than a switch: a gem twisted to frost rather than flame.
+    # Rules are predicated on `<option>:<value>`, so the option holds twice.
+    describe "an option with a choice among values" do
+      def twisted
+        give('Four-Ways Dogslicer') rescue nil
+      end
+
+      def choice_option
+        { 'option' => 'gem-twist', 'source' => 'Something', 'slug' => 'something',
+          'choices' => [ { 'value' => 'flaming' }, { 'value' => 'frost' } ],
+          'selection' => nil, 'default' => true, 'locked_when' => nil, 'locked_to' => nil }
+      end
+
+      it "should hold as the first choice when nobody has said otherwise" do
+        expect(Pf2e::RollOptions.selected(choice_option, nil)).to eq 'flaming'
+      end
+
+      it "should hold as the rule's own selection when it names one" do
+        expect(Pf2e::RollOptions.selected(choice_option.merge('selection' => 'frost'), nil)).to eq 'frost'
+      end
+
+      it "should hold as what the player chose" do
+        expect(Pf2e::RollOptions.selected(choice_option, 'frost')).to eq 'frost'
+      end
+
+      it "should ignore a choice the option does not offer" do
+        expect(Pf2e::RollOptions.selected(choice_option, 'thunder')).to eq 'flaming'
+      end
+
+      it "should have no choice at all for a plain switch" do
+        expect(Pf2e::RollOptions.selected(choice_option.merge('choices' => []), nil)).to be_nil
+      end
+    end
+
     describe "naming one" do
       it "should find it however the player capitalises it" do
         char = give('Clandestine Cloak')

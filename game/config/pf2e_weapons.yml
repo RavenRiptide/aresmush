@@ -315,6 +315,10 @@ pf2e_weapons:
         power: 1
     rules:
       - key: "RollOption"
+        option: "chaplains-cudgel:bow-to-a-higher-power"
+        toggleable: true
+        label: "PF2E.SpecificRule.Equipment.ChaplainsCudgel.BowToAHigherPowerLabel"
+      - key: "RollOption"
         option: "chaplains-cudgel:two-action-spell"
         domain: "damage"
         toggleable: true
@@ -322,14 +326,14 @@ pf2e_weapons:
         predicate: ["chaplains-cudgel:bow-to-a-higher-power"]
       - key: "AdjustStrike"
         property: "traits"
-        mode: "add"
         definition: ["item:id:{item|_id}"]
+        mode: "add"
         value: "holy"
         predicate: ["chaplains-cudgel:bow-to-a-higher-power", "self:trait:holy"]
       - key: "AdjustStrike"
         property: "traits"
-        mode: "add"
         definition: ["item:id:{item|_id}"]
+        mode: "add"
         value: "unholy"
         predicate: ["chaplains-cudgel:bow-to-a-higher-power", "self:trait:unholy"]
       - key: "FlatModifier"
@@ -718,6 +722,10 @@ pf2e_weapons:
     reload: 0
     bulk: 0.1
     group: Sword
+    rules:
+      - key: "RollOption"
+        option: "gem-twist"
+        toggleable: true
   Gauntlet:
     wp_type: melee
     category: simple

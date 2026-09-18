@@ -700,6 +700,12 @@ pf2e_feats:
     prereq:
       level: 1
       skill: Acrobatics/trained
+    rules:
+      - key: "AdjustDegreeOfSuccess"
+        selector: "acrobatics"
+        adjustment: {"success": "one-degree-better"}
+        type: "skill"
+        predicate: ["action:balance"]
   Streetwise:
     feat_type:
       - Skill
@@ -1271,6 +1277,12 @@ pf2e_feats:
     prereq:
       level: 2
       skill: Lore/expert
+    rules:
+      - key: "AdjustDegreeOfSuccess"
+        selector: "lore-skill-check"
+        adjustment: {"criticalFailure": "one-degree-better"}
+        type: "skill"
+        predicate: ["action:recall-knowledge"]
   Unusual Treatment:
     feat_type:
       - Skill

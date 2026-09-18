@@ -18,6 +18,7 @@ aliases:
 `sheet/option <name>`: Turns one off, or back on.
 `sheet/option <name>=off` and `=on`: Says which, rather than flipping it.
 `sheet/option <name>=default`: Hands it back to whatever offers it.
+`sheet/option <name>=<value>`: Some circumstances are a choice rather than a switch - a gem twisted to frost rather than flame, a signet set to Fortitude rather than Reflex. `sheet/option` lists what each one can be set to.
 `sheet/show`: Shows what permissions you have granted to your sheet.
 `sheet/show <name>[=<section>]`: Shows optional <section> of your sheet to <name>. Depending on your game configuration, this command may have no effect.
 `sheet/unshow <name>`: Ends showing of all sections of your sheet to <name>. Depending on your game configuration, this command may have no effect.

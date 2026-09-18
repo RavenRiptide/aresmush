@@ -38,13 +38,14 @@ SOURCES = [
 # The kinds Pf2e::Rules implements, and the fields it reads for each.
 KINDS = {
     'FlatModifier': {'key', 'selector', 'value', 'type', 'ability', 'min', 'max', 'damageType',
-                     'damageCategory', 'critical', 'predicate', 'slug', 'label', 'hideIfDisabled'},
+                     'damageCategory', 'critical', 'predicate', 'slug', 'label', 'hideIfDisabled', 'priority', 'phase'},
     'DamageDice': {'key', 'selector', 'diceNumber', 'dieSize', 'damageType', 'category', 'critical',
-                   'predicate', 'slug', 'label', 'hideIfDisabled', 'override', 'tags'},
+                   'predicate', 'slug', 'label', 'hideIfDisabled', 'override', 'tags', 'priority', 'phase'},
     # placement and mergeable position a toggle in Foundry's character sheet, which is not a mechanic
     # and not an interface we have.
     'RollOption': {'key', 'option', 'domain', 'toggleable', 'value', 'predicate', 'slug', 'label',
-                   'placement', 'mergeable'},
+                   'suboptions', 'selection', 'alwaysActive', 'disabledIf', 'disabledValue',
+                   'placement', 'mergeable', 'phase', 'priority'},
     # phase and priority order writes against Foundry's data preparation, which has no counterpart here;
     # the modes are ordered instead, which is what the ordering is for.
     'ActiveEffectLike': {'key', 'path', 'mode', 'value', 'predicate', 'slug', 'label', 'phase',
@@ -52,20 +53,33 @@ KINDS = {
     # priority orders adjustments against Foundry's data preparation; ours are ordered by mode.
     'AdjustModifier': {'key', 'selector', 'selectors', 'slug', 'mode', 'value', 'suppress', 'relabel',
                        'damageType', 'maxApplications', 'predicate', 'label', 'priority'},
-    'AdjustDegreeOfSuccess': {'key', 'selector', 'adjustment', 'predicate', 'slug', 'label'},
+    'AdjustDegreeOfSuccess': {'key', 'selector', 'adjustment', 'predicate', 'type', 'slug', 'label'},
     'BaseSpeed': {'key', 'selector', 'value', 'predicate', 'slug', 'label'},
     # img is the icon their sheet shows; fist is a flag about replacing the default unarmed attack.
     'Strike': {'key', 'slug', 'label', 'category', 'group', 'baseType', 'damage', 'traits', 'otherTags',
                'range', 'predicate', 'img', 'fist'},
-    'AdjustStrike': {'key', 'property', 'mode', 'value', 'definition', 'predicate', 'slug', 'label'},
-    'Immunity': {'key', 'type', 'value', 'predicate', 'slug', 'label', 'exceptions'},
-    'Weakness': {'key', 'type', 'value', 'predicate', 'slug', 'label', 'exceptions'},
-    'Resistance': {'key', 'type', 'value', 'predicate', 'slug', 'label', 'exceptions', 'doubleVs'},
+    'MartialProficiency': {'key', 'slug', 'definition', 'sameAs', 'maxRank', 'label'},
+    'CriticalSpecialization': {'key', 'predicate', 'slug', 'label'},
+    'Sense': {'key', 'selector', 'acuity', 'range', 'predicate', 'slug', 'label'},
+    'DamageAlteration': {'key', 'property', 'mode', 'value', 'selectors', 'selector', 'predicate',
+                         'slug', 'label', 'priority', 'phase'},
+    'AdjustStrike': {'key', 'property', 'mode', 'value', 'definition', 'predicate', 'slug', 'label', 'priority', 'phase'},
+    'Immunity': {'key', 'type', 'value', 'predicate', 'definition', 'slug', 'label', 'exceptions'},
+    'Weakness': {'key', 'type', 'value', 'predicate', 'definition', 'slug', 'label', 'exceptions'},
+    'Resistance': {'key', 'type', 'value', 'predicate', 'definition', 'slug', 'label', 'exceptions', 'doubleVs'},
 }
 
 # Neither of these reaches a statistic: one declares a circumstance and the other writes a value.
 SELECTORLESS = {'RollOption', 'ActiveEffectLike', 'Immunity', 'Weakness', 'Resistance', 'AdjustStrike',
-                'Strike'}
+                'Strike', 'MartialProficiency', 'CriticalSpecialization', 'Sense'}
+
+# Senses this engine knows. One it does not would be a fact nothing could show or ask about.
+SENSES = {'darkvision', 'greater-darkvision', 'low-light-vision', 'scent', 'tremorsense', 'echolocation',
+          'lifesense', 'motion-sense', 'wavesense', 'thoughtsense', 'spiritsense', 'truesight'}
+
+# What a DamageAlteration may change and have it mean something: the kind of damage, how many dice, how
+# large they are. Anything else names a part of a damage roll this engine does not build.
+ALTERABLE = {'damage-type', 'dice-number', 'dice-faces'}
 
 # A BaseSpeed's selector is a kind of movement rather than a domain.
 MOVEMENT = {'land', 'burrow', 'climb', 'fly', 'swim'}
@@ -77,7 +91,10 @@ STRIKE_PROPERTIES = {'traits', 'weapon-traits'}
 # Paths Pf2e::Paths can write. Anything else is refused rather than written somewhere wrong.
 WRITABLE = [
     re.compile(r'^system\.skills\.[\w-]+\.rank$'),
+    re.compile(r'^system\.proficiencies\.(defenses|attacks)\.[\w-]+\.rank$'),
     re.compile(r'^system\.attributes\.dying\.recoveryDC$'),
+    re.compile(r'^system\.attributes\.(flanking\.canFlank|flanking\.canGangUp'
+               r'|familiarAbilities\.value)$'),
     re.compile(r'^inventory\.bulk\.(maxAddend|encumberedAfterAddend)$'),
     re.compile(r'^flags\.system\.[\w.]+$'),
 ]
@@ -110,6 +127,10 @@ DERIVED = re.compile(r'^[a-z0-9]+(?:-[a-z0-9]+)*-(?:damage|speed|attack|attack-r
                      r'|base-type-damage|strike-damage)$')
 
 INTERPOLATION = re.compile(r'\{[^}]*\}')
+
+# Foundry's own interpolation, as against a JSON object that merely has braces in it. A compound
+# predicate is `{"or": [...]}` and is not an interpolation.
+INJECTED = re.compile(r'\{(?:item|actor|choice|weapon|spell)\|')
 
 
 def selector_ok(selector):
@@ -180,6 +201,10 @@ def take(rule, refused):
 
     # A kind of damage we cannot resolve - a charm whose type the wearer chose - would resist nothing.
     if rule['key'] in ('Immunity', 'Weakness', 'Resistance'):
+        # One or the other: a kind of damage named, or a description of what it applies to.
+        if not rule.get('type') and not rule.get('definition'):
+            refused['iwr naming nothing'] += 1
+            return None
         if INTERPOLATION.search(str(rule.get('type') or '')):
             refused[f"iwr type {rule.get('type')!r}"] += 1
             return None
@@ -197,12 +222,30 @@ def take(rule, refused):
 
     strays = set(rule) - fields
     if strays:
-        refused[f'field {sorted(strays)}'] += 1
+        refused[f"{rule['key']} field {sorted(strays)}"] += 1
         return None
 
     if rule['key'] == 'BaseSpeed':
         if rule.get('selector') not in MOVEMENT:
             refused[f"movement {rule.get('selector')!r}"] += 1
+            return None
+    elif rule['key'] == 'Sense':
+        if rule.get('selector') not in SENSES:
+            refused[f"sense {rule.get('selector')!r}"] += 1
+            return None
+    elif rule['key'] == 'DamageAlteration':
+        if rule.get('property') not in ALTERABLE:
+            refused[f"alterable {rule.get('property')!r}"] += 1
+            return None
+        if INTERPOLATION.search(str(rule.get('value') or '')):
+            refused['alteration value is a choice we cannot read'] += 1
+            return None
+    elif rule['key'] == 'MartialProficiency':
+        if not rule.get('sameAs'):
+            refused['martial proficiency with nothing to copy'] += 1
+            return None
+        if INJECTED.search(json.dumps(rule.get('definition') or [])):
+            refused['martial proficiency over a choice we cannot read'] += 1
             return None
     elif rule['key'] == 'Strike':
         # An attack with no damage of its own is one we could not roll.
@@ -234,7 +277,9 @@ def take(rule, refused):
             return None
 
     # Keep only the fields we read, in a stable order, so a re-run produces the same file.
-    order = ['key', 'option', 'domain', 'toggleable', 'path', 'property', 'category', 'group',
+    order = ['key', 'option', 'domain', 'toggleable', 'path', 'property', 'definition', 'sameAs',
+             'maxRank',
+             'acuity', 'range', 'category', 'group',
              'baseType', 'damage', 'traits', 'range', 'mode', 'exceptions',
              'selector', 'selectors', 'definition', 'adjustment', 'suppress', 'relabel',
              'maxApplications', 'type', 'ability',

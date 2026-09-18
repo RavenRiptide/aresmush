@@ -224,7 +224,7 @@ module AresMUSH
       wp_cat = wp_info['category']
       wp_group = wp_info['group']
 
-      prof_list = [ 'untrained' ]
+      prof_list = [ 'untrained' ] + granted_weapon_prof(char, name, wp_info)
 
       case wp_cat
       when 'unarmed'
@@ -372,6 +372,44 @@ module AresMUSH
           'damage_type' => strike['damage_type'] || 'B', 'striking' => 0, 'rune' => 0
         })
       end
+    end
+
+    # What a weapon answers to when a rule asks which weapons it means: its category, its group, its
+    # base type and its traits, in Foundry's spelling.
+    def self.weapon_options(name, info)
+      info ||= weapon_info(name) || {}
+
+      [ "item:slug:#{Pf2e::Domains.slug(name)}",
+        "item:category:#{Pf2e::Domains.slug(info['category'])}",
+        "item:group:#{Pf2e::Domains.slug(info['group'])}",
+        "item:base:#{Pf2e::Domains.slug(info['base'] || name)}" ] +
+        Array(info['traits']).map { |trait| "item:trait:#{Pf2e::Domains.slug(trait)}" }
+    end
+
+    # Proficiencies a feat grants over a kind of weapon: "monk weapons count as your unarmed
+    # proficiency, up to master". The feat says which weapons and which proficiency to copy, so nothing
+    # here names a feat.
+    def self.granted_weapon_prof(char, name, info)
+      combat = char.combat
+
+      return [] unless combat
+
+      held = (combat.weapon_prof || {})
+      options = weapon_options(name, info)
+
+      Pf2e::Rules.martial_proficiencies(Pf2e::Effects.sources(char), Pf2e::Effects.options(char))
+                 .select { |one| Pf2e::Predicate.test(one['definition'], options) }
+                 .map { |one| capped(held[one['same_as']], one['max_rank']) }
+                 .compact
+    end
+
+    # A granted proficiency goes no higher than the feat says.
+    def self.capped(rank, ceiling)
+      return nil unless rank
+      return rank unless ceiling
+
+      [ Pf2e::Paths.rank_number(rank), Pf2e::Paths.rank_number(ceiling) ].min
+                                                                        .then { |n| Pf2e::Paths.rank_name(n) }
     end
 
     def self.attack_options(descriptor)

@@ -660,6 +660,9 @@ pf2e_armor:
         option: "terrain:moonlight"
         toggleable: true
         label: "PF2E.SkillVariant.Moonlight"
+      - key: "Sense"
+        selector: "low-light-vision"
+        predicate: ["terrain:moonlight"]
   Onslaught Hide:
     category: medium
     traits:

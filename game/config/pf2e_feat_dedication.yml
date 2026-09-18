@@ -37,6 +37,10 @@ pf2e_feats:
         path: "system.skills.crafting.rank"
         mode: "upgrade"
         value: 1
+      - key: "ActiveEffectLike"
+        path: "system.proficiencies.attacks.weapon-base-alchemical-bomb.rank"
+        mode: "upgrade"
+        value: 1
   Barbarian Dedication:
     assoc_archetype:
       - Barbarian Archetype
@@ -165,6 +169,21 @@ pf2e_feats:
         path: "flags.system.championDedicationCount"
         mode: "add"
         value: 1
+      - key: "ActiveEffectLike"
+        path: "system.proficiencies.defenses.light.rank"
+        mode: "upgrade"
+        value: "max(@actor.system.proficiencies.defenses.medium.rank,ternary(gte(@actor.level,13),min(@actor.system.proficiencies.defenses.unarmored.rank,2),1))"
+        predicate: ["champion-dedication:light-and-medium"]
+      - key: "ActiveEffectLike"
+        path: "system.proficiencies.defenses.medium.rank"
+        mode: "upgrade"
+        value: "max(@actor.system.proficiencies.defenses.light.rank,ternary(gte(@actor.level,13),min(@actor.system.proficiencies.defenses.unarmored.rank,2),1))"
+        predicate: ["champion-dedication:light-and-medium"]
+      - key: "ActiveEffectLike"
+        path: "system.proficiencies.defenses.heavy.rank"
+        mode: "upgrade"
+        value: "max(@actor.system.proficiencies.defenses.light.rank,@actor.system.proficiencies.defenses.medium.rank,ternary(gte(@actor.level,13),min(@actor.system.proficiencies.defenses.unarmored.rank,2),1))"
+        predicate: ["champion-dedication:heavy"]
   Cleric Dedication:
     assoc_archetype:
       - Cleric Archetype
@@ -273,6 +292,10 @@ pf2e_feats:
       - key: "ActiveEffectLike"
         path: "flags.system.fighterDedicationCount"
         mode: "add"
+        value: 1
+      - key: "ActiveEffectLike"
+        path: "system.proficiencies.attacks.simple.rank"
+        mode: "upgrade"
         value: 1
   Investigator Dedication:
     assoc_archetype:
@@ -1095,6 +1118,11 @@ pf2e_feats:
     shortdesc: You gain a 1st- or 2nd-level witch feat of your choice. You can select three familiar abilities for your familiar each day, instead of two.
     traits:
       - archetype
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.attributes.familiarAbilities.value"
+        mode: "upgrade"
+        value: 3
   Basic Wizard Spellcasting:
     assoc_archetype:
       - Wizard Archetype

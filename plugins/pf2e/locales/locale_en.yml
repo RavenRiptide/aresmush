@@ -241,6 +241,8 @@ en:
     option_on: "%{option} is on."
     option_off: "%{option} is off. It will stay off until you set it back with %xh%xcsheet/option %{option}=default%xn."
     option_default: "%{option} is back to following whatever offers it."
+    option_set_to: "%{option} is set to %{value}."
+    no_such_choice_for_option: "%{option} can be set to one of: %{choices}."
     no_such_figure: "There's no figure on the sheet called '%{figure}'. Try hp, ac, speed, perception, a save, class dc, or a skill or lore by name."
     condition_not_found: "That is not a valid condition. Valid options: %{options}"
     condition_needs_value: "This condition requires that a value be associated with it."

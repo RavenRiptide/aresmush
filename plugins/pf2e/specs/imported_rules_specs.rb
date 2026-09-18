@@ -122,10 +122,14 @@ module AresMUSH
     # Kinds that reach no statistic, so they name no domain: one declares a circumstance, one writes a
     # value, three describe damage, two describe an attack, and BaseSpeed names a kind of movement.
     SELECTORLESS = %w{RollOption ActiveEffectLike Immunity Weakness Resistance AdjustStrike Strike
-                      BaseSpeed}.freeze
+                      BaseSpeed Sense MartialProficiency CriticalSpecialization}.freeze
 
-    # Of those, the one that still carries a `selector` - because a movement type is not a domain.
-    NAMES_MOVEMENT = 'BaseSpeed'.freeze
+    # Of those, the two that still carry a `selector` - because a movement type and a sense are not
+    # domains, they are the thing being granted.
+    NAMES_ITS_OWN_THING = %w{BaseSpeed Sense}.freeze
+
+    # Kinds whose `value` is a word rather than arithmetic: a trait, a kind of damage, a sense.
+    NOT_ARITHMETIC = %w{ActiveEffectLike AdjustStrike Strike DamageAlteration}.freeze
     IWR_KINDS = %w{Immunity Weakness Resistance}.freeze
 
     # A row may name one selector or several, and their data uses both spellings.
@@ -134,7 +138,7 @@ module AresMUSH
 
       expect(reaching.reject { |_where, row| Pf2e::Rules.selectors_of(row).any? }
                      .map(&:first).uniq).to eq []
-      expect(apart.reject { |_where, row| row['key'] == NAMES_MOVEMENT }
+      expect(apart.reject { |_where, row| NAMES_ITS_OWN_THING.include?(row['key']) }
                   .select { |_where, row| Pf2e::Rules.selectors_of(row).any? }
                   .map(&:first).uniq).to eq []
     end
@@ -214,6 +218,45 @@ module AresMUSH
       expect(rows.count { |_where, row| row['key'] == 'AdjustDegreeOfSuccess' }).to be > 20
     end
 
+    # A sense is the thing being granted rather than a domain, and it has to be one we know.
+    it "should grant senses we know" do
+      senses = rows.select { |_where, row| row['key'] == 'Sense' }
+
+      strays = senses.reject { |_where, row| row['selector'].to_s.match?(/\A[a-z-]+\z/) }
+                     .map { |where, row| "#{where}: #{row['selector'].inspect}" }
+
+      expect(strays.uniq).to eq []
+    end
+
+    # A proficiency has to say what it copies, and a crit spec rule has to say when it applies.
+    it "should say what each granted proficiency copies" do
+      granted = rows.select { |_where, row| row['key'] == 'MartialProficiency' }
+
+      expect(granted.reject { |_where, row| row['sameAs'] && row['definition'] }
+                    .map(&:first).uniq).to eq []
+    end
+
+    it "should say when a critical specialisation applies" do
+      spec = rows.select { |_where, row| row['key'] == 'CriticalSpecialization' }
+
+      expect(spec.reject { |_where, row| row['predicate'] }.map(&:first).uniq).to eq []
+    end
+
+    # An alteration has to name a property the damage reader applies.
+    it "should alter damage only in ways the reader applies" do
+      altering = rows.select { |_where, row| row['key'] == 'DamageAlteration' }
+      known = %w{damage-type dice-number dice-faces}
+
+      strays = altering.reject { |_where, row| known.include?(row['property'].to_s) }
+                       .map { |where, row| "#{where}: #{row['property'].inspect}" }
+
+      expect(strays.uniq).to eq []
+    end
+
+    it "should have all sixteen kinds that change a number" do
+      expect(rows.map { |_where, row| row['key'] }.uniq.size).to eq 16
+    end
+
     # A granted speed names a kind of movement rather than a domain, and the kind has to be one that
     # exists.
     it "should grant speeds only of kinds of movement we have" do
@@ -289,10 +332,7 @@ module AresMUSH
       strays = rows.flat_map { |where, row|
         Pf2e::Rules::FORMULA_FIELDS
           .select { |field| row[field].is_a?(Numeric) || row[field].is_a?(String) }
-          .reject { |field|
-            Pf2e::Formula.parses?(row[field]) ||
-              %w{ActiveEffectLike AdjustStrike Strike}.include?(row['key'])
-          }
+          .reject { |field| Pf2e::Formula.parses?(row[field]) || NOT_ARITHMETIC.include?(row['key']) }
           .map { |field| "#{where}: #{field} #{row[field].inspect}" }
       }
 

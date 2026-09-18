@@ -55,6 +55,33 @@ module AresMUSH
           'read' => ->(char, which) { Paths.held(char, Domains.slug(which)) },
           'write' => ->(char, which, value) { Paths.store(char, Domains.slug(which), value) }
         },
+        # Armour proficiency, which is what AC reads. Written with `upgrade`, so two effects that both
+        # make you trained in heavy armour do not make you an expert.
+        {
+          'name' => 'armour proficiency',
+          'match' => %r{\Asystem\.proficiencies\.defenses\.([\w-]+)\.rank\z},
+          'read' => ->(char, category) { Paths.rank_number((char.combat&.armor_prof || {})[category]) },
+          'write' => ->(char, category, value) { Paths.write_armour(char, category, value) }
+        },
+        # Proficiency with a named kind of attack, which the attack reader consults by the same key.
+        {
+          'name' => 'attack proficiency',
+          'match' => %r{\Asystem\.proficiencies\.attacks\.([\w-]+)\.rank\z},
+          'read' => ->(char, key) { Paths.rank_number((char.combat&.weapon_prof || {})[key]) },
+          'write' => ->(char, key, value) { Paths.write_weapon_prof(char, key, value) }
+        },
+        # Facts about the character that no figure reads but a predicate does: whether they can flank
+        # alone, how many familiar abilities they have.
+        #
+        # Named one by one rather than matched by prefix. `system.attributes` is also where hit points and
+        # AC live, and those are assembled from the ledger and from effects - an effect writing one
+        # directly would be overwritten by the next fold, so the registry must not offer it.
+        {
+          'name' => 'fact',
+          'match' => %r{\Asystem\.attributes\.(flanking\.canFlank|flanking\.canGangUp|familiarAbilities\.value)\z},
+          'read' => ->(char, name) { Paths.held(char, Domains.slug(name)) },
+          'write' => ->(char, name, value) { Paths.store(char, Domains.slug(name), value) }
+        },
         # Counters and flags that exist so another rule can ask about them: how many dedications of a
         # class you have, how many forms you know. Nothing reads them but predicates, which is exactly
         # why they have to be written somewhere a predicate can see.
@@ -93,6 +120,22 @@ module AresMUSH
       def self.skill_named(slug)
         (Global.read_config('pf2e_skills') || {}).keys
           .find { |name| Domains.slug(name) == Domains.slug(slug) } || slug.to_s.capitalize
+      end
+
+      def self.write_weapon_prof(char, key, value)
+        combat = char.combat
+
+        return unless combat
+
+        combat.update(:weapon_prof => (combat.weapon_prof || {}).merge(key => rank_name(value)))
+      end
+
+      def self.write_armour(char, category, value)
+        combat = char.combat
+
+        return unless combat
+
+        combat.update(:armor_prof => (combat.armor_prof || {}).merge(category => rank_name(value)))
       end
 
       # Where a value nothing else owns is kept. One hash, because these are derived facts rather than

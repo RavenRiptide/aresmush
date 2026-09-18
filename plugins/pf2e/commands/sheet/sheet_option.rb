@@ -38,6 +38,18 @@ module AresMUSH
           return client.emit_success t('pf2e.option_default', :option => name)
         end
 
+        choice = Array(found['choices']).find { |one| one['value'].casecmp?(self.setting.to_s) }
+
+        if choice
+          Pf2e::RollOptions.set(enactor, name, choice['value'])
+          return client.emit_success t('pf2e.option_set_to', :option => name, :value => choice['value'])
+        end
+
+        if !self.setting.blank? && found['choices'].to_a.any? && !%w{on yes off no}.include?(self.setting)
+          return client.emit_failure t('pf2e.no_such_choice_for_option', :option => name,
+                                       :choices => found['choices'].map { |one| one['value'] }.join(', '))
+        end
+
         on = case self.setting
              when 'on', 'yes' then true
              when 'off', 'no' then false

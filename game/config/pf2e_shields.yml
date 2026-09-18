@@ -268,10 +268,10 @@ pf2e_shields:
       - magical
     rules:
       - key: "Strike"
+        range: null
         category: "martial"
         group: "shield"
         damage: {"base": {"damageType": "bludgeoning", "dice": 1, "die": "d6"}}
-        range: null
         label: "PF2E.SpecificRule.Equipment.LionsShield.LionsHeadLabel"
   Lodestone Shield:
     ac_bonus: 2

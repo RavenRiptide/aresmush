@@ -24,6 +24,10 @@ pf2e_conditions:
     value: false
     override: false
     rules:
+      - key: "ActiveEffectLike"
+        path: "system.attributes.flanking.canFlank"
+        mode: "override"
+        value: false
       - key: "RollOption"
         option: "target:ally"
         value: false
@@ -149,6 +153,11 @@ pf2e_conditions:
         value: -2
   Paralyzed:
     short_descr: You are frozen in place.
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.attributes.flanking.canFlank"
+        mode: "override"
+        value: false
   Persistent:
     short_descr: You are taking damage over time from a source.
     value: true
@@ -174,6 +183,11 @@ pf2e_conditions:
     short_descr: You are tied up and can barely move.
     value: false
     override: "Grabbed"
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.attributes.flanking.canFlank"
+        mode: "override"
+        value: false
   Sickened:
     short_descr: You feel ill.
     value: true

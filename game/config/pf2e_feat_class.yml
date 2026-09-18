@@ -11,6 +11,10 @@ pf2e_feats:
     shortdesc: When you are raging, your visual senses improve, granting you darkvision.
     traits:
       - barbarian
+    rules:
+      - key: "Sense"
+        selector: "darkvision"
+        predicate: ["self:effect:rage"]
   Adrenaline Rush:
     assoc_charclass:
       - Barbarian
@@ -60,6 +64,11 @@ pf2e_feats:
     shortdesc: You have used alchemy to create life, a simple creature formed from alchemical materials, reagents, and a bit of your own blood. You gain a familiar, which has the construct familiar ability; this is permanent, doesn't require the familiar to have the tough familiar ability, and doesn't count against your usual limit of familiar abilities (typically 2). The familiar uses your Intelligence modifier to determine its Perception, Acrobatics, and Stealth modifiers.
     traits:
       - alchemist
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.attributes.familiarAbilities.value"
+        mode: "upgrade"
+        value: 2
   Animal Companion:
     assoc_charclass:
       - Druid
@@ -278,6 +287,12 @@ pf2e_feats:
       - key: "RollOption"
         option: "divine-castigation"
         toggleable: true
+      - key: "DamageAlteration"
+        property: "damage-type"
+        mode: "override"
+        selectors: ["spell-damage"]
+        value: "spirit"
+        predicate: ["divine-castigation", {"or": ["self:trait:holy", "self:trait:unholy"]}, {"or": ["item:slug:harm", "item:slug:heal"]}]
   Domain Initiate:
     repeatable: true
     assoc_charclass:
@@ -461,6 +476,10 @@ pf2e_feats:
     shortdesc: You've collected a cross-section of information on various disciplines you can refer to when preparing for various tasks. During your daily preparations, you can cram on a certain subject to become temporarily trained in one skill of your choice. This proficiency lasts until you prepare again. As this proficiency is temporary, you can't use it as a prerequisite for a permanent character option like a skill increase or a feat.
     traits:
       - investigator
+    rules:
+      - key: "RollOption"
+        option: "flexible-studies"
+        toggleable: true
   Flying Blade:
     assoc_charclass:
       - Swashbuckler
@@ -644,6 +663,17 @@ pf2e_feats:
     traits:
       - monk
       - stance
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.proficiencies.attacks.monastic-archery.rank"
+        mode: "upgrade"
+        value: 2
+        predicate: ["feature:expert-strikes"]
+      - key: "ActiveEffectLike"
+        path: "system.proficiencies.attacks.monastic-archery.rank"
+        mode: "upgrade"
+        value: 3
+        predicate: ["feature:master-strikes"]
   Monastic Weaponry:
     assoc_charclass:
       - Monk
@@ -654,6 +684,13 @@ pf2e_feats:
     shortdesc: You have trained with the weaponry of your monastery or school. You gain access to uncommon weapons with the monk trait and become trained in simple and martial monk weapons. When your proficiency for unarmed attacks increases to expert or master, your proficiency rank for these weapons increases to expert or master as well. If you have familiarity with an agile or finesse weapon (such as from the Sildanyari Weapon Familiarity feat), that weapon also gains the monk trait for you. You can use melee monk weapons with any of your monk feats or monk abilities that normally require unarmed attacks, though not if the feat or ability requires you to use a single specific type of attack, such as Crane Stance. If you gain the critical specialization benefit for unarmed attacks—with the expert strikes class feature, for example—you also gain it with monk weapons.
     traits:
       - monk
+    rules:
+      - key: "MartialProficiency"
+        definition: ["item:trait:monk", {"or": ["item:category:simple", "item:category:martial"]}]
+        sameAs: "unarmed"
+        maxRank: "master"
+      - key: "CriticalSpecialization"
+        predicate: ["feature:expert-strikes", "item:trait:monk"]
   Monster Hunter:
     assoc_charclass:
       - Ranger
@@ -719,6 +756,10 @@ pf2e_feats:
       - healing
       - oracle
       - spirit
+    rules:
+      - key: "RollOption"
+        option: "nudge-the-scales"
+        toggleable: true
   One for All:
     assoc_charclass:
       - Swashbuckler
@@ -906,6 +947,11 @@ pf2e_feats:
       - spellshape
       - witch
       - wizard
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Reactive Shield:
     assoc_charclass:
       - Fighter
@@ -1221,6 +1267,11 @@ pf2e_feats:
       - spellshape
       - witch
       - wizard
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Witch's Armaments:
     assoc_charclass:
       - Witch
@@ -1233,29 +1284,29 @@ pf2e_feats:
       - witch
     rules:
       - key: "Strike"
+        range: null
         category: "unarmed"
         group: "brawling"
         baseType: "nails"
         damage: {"base": {"damageType": "slashing", "dice": 1, "die": "d6"}}
         traits: ["agile", "unarmed"]
-        range: null
         label: "PF2E.SpecificRule.Witch.WitchsArmaments.EldritchNails"
         predicate: ["witchs-armaments:nails"]
       - key: "Strike"
+        range: null
         category: "unarmed"
         group: "brawling"
         baseType: "jaws"
         damage: {"base": {"damageType": "piercing", "dice": 1, "die": "d8"}}
         traits: ["unarmed"]
-        range: null
         label: "PF2E.SpecificRule.Witch.WitchsArmaments.IronTeeth"
         predicate: ["witchs-armaments:teeth"]
       - key: "Strike"
+        range: null
         category: "unarmed"
         group: "brawling"
         damage: {"base": {"damageType": "bludgeoning", "dice": 1, "die": "d4"}}
         traits: ["agile", "disarm", "finesse", "trip", "unarmed"]
-        range: null
         label: "PF2E.SpecificRule.Witch.WitchsArmaments.LivingHair"
         predicate: ["witchs-armaments:hair"]
   Wolf Stance:
@@ -1302,6 +1353,12 @@ pf2e_feats:
     shortdesc: When your anger is heightened, your sense of smell improves. While you're raging, you gain imprecise scent with a range of 30 feet.
     traits:
       - barbarian
+    rules:
+      - key: "Sense"
+        acuity: "imprecise"
+        range: 30
+        selector: "scent"
+        predicate: ["self:effect:rage"]
   After You:
     assoc_charclass:
       - Swashbuckler
@@ -1595,6 +1652,11 @@ pf2e_feats:
       - spellshape
       - witch
       - wizard
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Crushing Grab:
     assoc_charclass:
       - Monk
@@ -1764,6 +1826,11 @@ pf2e_feats:
     traits:
       - spellshape
       - wizard
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Enhanced Familiar:
     assoc_charclass:
       - Druid
@@ -1783,6 +1850,11 @@ pf2e_feats:
       - sorcerer
       - witch
       - wizard
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.attributes.familiarAbilities.value"
+        mode: "upgrade"
+        value: 4
   Enjoy the Show:
     assoc_charclass:
       - Swashbuckler
@@ -2011,6 +2083,11 @@ pf2e_feats:
       - manipulate
       - spellshape
       - wizard
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Order Explorer:
     assoc_charclass:
       - Druid
@@ -2086,6 +2163,16 @@ pf2e_feats:
     shortdesc: "The force of your magic can be used to propel yourself or another. You know the following blood magic effect.%r%r**Blood Magic—Propelling Sorcery** You channel your magic outward into a rush of movement. Either you Step as a free action or move the target 5 feet in a direction of your choice."
     traits:
       - sorcerer
+    rules:
+      - key: "RollOption"
+        option: "blood-magic"
+        toggleable: true
+        label: "PF2E.SpecificRule.Sorcerer.Bloodline.BloodMagicDescription.Title"
+      - key: "RollOption"
+        option: "second-blood-magic"
+        toggleable: true
+        label: "PF2E.SpecificRule.Sorcerer.SecondBloodMagic"
+        predicate: [{"or": ["feat:blood-ascendancy", "feat:blood-sovereignty"]}]
   Quick Draw:
     assoc_charclass:
       - Ranger
@@ -2134,6 +2221,11 @@ pf2e_feats:
     traits:
       - finisher
       - swashbuckler
+    rules:
+      - key: "RollOption"
+        option: "finisher"
+        toggleable: true
+        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
   Revivifying Mutagen:
     assoc_charclass:
       - Alchemist
@@ -2311,6 +2403,11 @@ pf2e_feats:
     traits:
       - finisher
       - swashbuckler
+    rules:
+      - key: "RollOption"
+        option: "finisher"
+        toggleable: true
+        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
   Underhanded Assault:
     assoc_charclass:
       - Rogue
@@ -2381,6 +2478,11 @@ pf2e_feats:
     traits:
       - cleric
 # Level 4 Class Feats
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.proficiencies.defenses.heavy.rank"
+        mode: "upgrade"
+        value: "@actor.system.proficiencies.defenses.medium.rank"
   Advanced Warden:
     assoc_charclass:
       - Ranger
@@ -2540,6 +2642,11 @@ pf2e_feats:
       - concentrate
       - spellshape
     init_magic: true
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Dastardly Dash:
     assoc_charclass:
       - Swashbuckler
@@ -2636,6 +2743,11 @@ pf2e_feats:
       - cleric
       - concentrate
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Double Shot:
     assoc_charclass:
       - Fighter
@@ -2832,6 +2944,11 @@ pf2e_feats:
       - druid
       - manipulate
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Guarded Movement:
     assoc_charclass:
       - Monk
@@ -2916,6 +3033,11 @@ pf2e_feats:
     traits:
       - finisher
       - swashbuckler
+    rules:
+      - key: "RollOption"
+        option: "finisher"
+        toggleable: true
+        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
   In Tune:
     assoc_charclass:
       - Bard
@@ -2930,6 +3052,11 @@ pf2e_feats:
       - concentrate
       - spellshape
     init_magic: true
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Invigorating Elixir:
     assoc_charclass:
       - Alchemist
@@ -2956,6 +3083,11 @@ pf2e_feats:
       - cursebound
       - oracle
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Leading Dance:
     assoc_charclass:
       - Swashbuckler
@@ -2980,6 +3112,11 @@ pf2e_feats:
     shortdesc: The leaf order's secrets allow your familiar to take advantage of its leshy form. You can select one additional familiar ability each day, which must be one of the following leshy familiar abilities. You can't select more than one ability from this feat at a time.
     traits:
       - druid
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.attributes.familiarAbilities.value"
+        mode: "add"
+        value: 1
   Lie Detector:
     assoc_charclass:
       - Investigator
@@ -3047,6 +3184,11 @@ pf2e_feats:
       - concentrate
       - manipulate
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Mercy:
     assoc_charclass:
       - Champion
@@ -3435,6 +3577,11 @@ pf2e_feats:
       - druid
       - manipulate
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Spell Protection Array:
     assoc_charclass:
       - Wizard
@@ -3472,6 +3619,11 @@ pf2e_feats:
       - concentrate
       - sorcerer
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Stand Still:
     assoc_charclass:
       - Monk
@@ -3651,6 +3803,10 @@ pf2e_feats:
       - swashbuckler
     rules:
       - key: "RollOption"
+        option: "finisher"
+        toggleable: true
+        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
+      - key: "RollOption"
         option: "ignore-range-penalty:3"
         domain: "ranged-attack-roll"
         predicate: ["finisher:twirling-throw"]
@@ -3708,6 +3864,11 @@ pf2e_feats:
     shortdesc: Your rigorous training regimen allows you to wield complex weaponry with ease. For the purposes of proficiency, you treat advanced monk weapons as if they were martial monk weapons.
     traits:
       - monk
+    rules:
+      - key: "MartialProficiency"
+        definition: ["item:trait:monk", "item:category:advanced"]
+        sameAs: "martial"
+        label: "PF2E.SpecificRule.MartialProficiency.AdvancedMonasticWeaponry"
   Advanced Qi Spells:
     grants:
       grant_choice_once:
@@ -3917,6 +4078,11 @@ pf2e_feats:
       - cleric
       - concentrate
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Ceremonial Knife:
     assoc_charclass:
       - Witch
@@ -3996,6 +4162,9 @@ pf2e_feats:
     traits:
       - monk
     rules:
+      - key: "RollOption"
+        option: "crane-flutter"
+        toggleable: true
       - key: "FlatModifier"
         selector: "ac"
         type: "circumstance"
@@ -4017,6 +4186,11 @@ pf2e_feats:
       - concentrate
       - druid
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Dazing Blow:
     assoc_charclass:
       - Fighter
@@ -4068,6 +4242,11 @@ pf2e_feats:
       - bard
       - concentrate
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Directional Bombs:
     assoc_charclass:
       - Alchemist
@@ -4132,14 +4311,14 @@ pf2e_feats:
         toggleable: true
       - key: "AdjustStrike"
         property: "traits"
-        mode: "add"
         definition: ["item:deity-favored"]
+        mode: "add"
         value: "holy"
         predicate: ["divine-rebuttal", "self:trait:holy"]
       - key: "AdjustStrike"
         property: "traits"
-        mode: "add"
         definition: ["item:deity-favored"]
+        mode: "add"
         value: "unholy"
         predicate: ["divine-rebuttal", "self:trait:unholy"]
   Divine Weapon:
@@ -4169,6 +4348,10 @@ pf2e_feats:
       - mental
       - monk
     rules:
+      - key: "RollOption"
+        option: "dragon-roar"
+        toggleable: true
+        label: "PF2E.SpecificRule.Monk.DragonRoar.Label"
       - key: "FlatModifier"
         selector: "attack-damage"
         type: "circumstance"
@@ -4222,6 +4405,10 @@ pf2e_feats:
       - champion
       - concentrate
     rules:
+      - key: "RollOption"
+        option: "expand-aura"
+        toggleable: true
+        predicate: ["champions-aura"]
       - key: "ActiveEffectLike"
         path: "flags.system.champion.aura"
         mode: "upgrade"
@@ -4241,6 +4428,15 @@ pf2e_feats:
       - spellshape
       - wizard
     rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
+      - key: "RollOption"
+        option: "arrival-damage"
+        toggleable: true
+        label: "PF2E.SpecificRule.Wizard.ExplosiveArrival.Label"
+        predicate: ["spellshape:explosive-arrival"]
       - key: "ActiveEffectLike"
         path: "flags.system.spellshape.explosiveArrivalDamage"
         mode: "override"
@@ -4293,6 +4489,11 @@ pf2e_feats:
     shortdesc: You and your allies harry an opponent in concert. You can flank an enemy if it's within reach of both of you and an ally—you and your ally don't have to be on opposite sides. This benefits your allies as well as you, but only if they're flanking with you, not each other. The other requirements for flanking must still be met.
     traits:
       - rogue
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.attributes.flanking.canGangUp"
+        mode: "add"
+        value: true
   Giant's Stature:
     assoc_charclass:
       - Barbarian
@@ -4380,6 +4581,11 @@ pf2e_feats:
       - concentrate
       - manipulate
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Inner Strength:
     assoc_charclass:
       - Barbarian
@@ -4523,6 +4729,15 @@ pf2e_feats:
     traits:
       - barbarian
       - rage
+    rules:
+      - key: "Sense"
+        acuity: "imprecise"
+        range: 60
+        selector: "scent"
+        predicate: ["self:effect:rage"]
+      - key: "Sense"
+        selector: "darkvision"
+        predicate: ["self:effect:rage"]
   One-Inch Punch:
     assoc_charclass:
       - Monk
@@ -4534,6 +4749,9 @@ pf2e_feats:
     traits:
       - monk
     rules:
+      - key: "RollOption"
+        option: "one-inch-punch"
+        toggleable: true
       - key: "DamageDice"
         selector: ["melee-strike-damage", "ranged-strike-damage"]
         diceNumber: "ternary(gte(@actor.level, 18), 3, ternary(gte(@actor.level, 10), 2, 1))"
@@ -4642,6 +4860,11 @@ pf2e_feats:
       - concentrate
       - sorcerer
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Scouring Rage:
     assoc_charclass:
       - Barbarian
@@ -4779,6 +5002,10 @@ pf2e_feats:
       - barbarian
       - divine
       - rage
+    rules:
+      - key: "RollOption"
+        option: "spirits-interference"
+        toggleable: true
   Spiritual Sense:
     assoc_charclass:
       - Oracle
@@ -4893,6 +5120,9 @@ pf2e_feats:
     traits:
       - monk
     rules:
+      - key: "RollOption"
+        option: "tiger-slash"
+        toggleable: true
       - key: "DamageDice"
         selector: "tiger-claw-damage"
         diceNumber: "match(when(lte(@actor.level, 13), 2), when(gte(@actor.level, 14), 3))"
@@ -4916,6 +5146,10 @@ pf2e_feats:
     traits:
       - fighter
     rules:
+      - key: "RollOption"
+        option: "triple-shot"
+        domain: "ranged-attack-roll"
+        toggleable: true
       - key: "AdjustModifier"
         mode: "override"
         selector: "ranged-attack-roll"
@@ -5002,6 +5236,10 @@ pf2e_feats:
     traits:
       - monk
 # Level 8 Class Feats
+    rules:
+      - key: "RollOption"
+        option: "wolf-drag"
+        toggleable: true
   Accompany:
     assoc_charclass:
       - Bard
@@ -5100,6 +5338,10 @@ pf2e_feats:
       - finisher
       - swashbuckler
     rules:
+      - key: "RollOption"
+        option: "finisher"
+        toggleable: true
+        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
       - key: "DamageDice"
         category: "persistent"
         selector: "strike-damage"
@@ -5152,6 +5394,11 @@ pf2e_feats:
       - manipulate
       - spellshape
       - wizard
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Bullseye:
     assoc_charclass:
       - Rogue
@@ -5185,6 +5432,11 @@ pf2e_feats:
       - bard
       - concentrate
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Clinging Shadows Initiate:
     grants:
       grant_choice_once:
@@ -5355,6 +5607,10 @@ pf2e_feats:
       - swashbuckler
     rules:
       - key: "RollOption"
+        option: "finisher"
+        toggleable: true
+        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
+      - key: "RollOption"
         option: "dual-finisher-second"
         toggleable: true
         label: "PF2E.SpecificRule.Swashbuckler.Finisher.DualSecondAttackLabel"
@@ -5415,6 +5671,40 @@ pf2e_feats:
     shortdesc: "Your magic explodes. You know the following blood magic effect.%r%r**Blood Magic—Explosion of Power** Raw power explodes outward from you. Each creature within a 5-ft emanation takes 1d6 damage per rank of the spell you just cast (basic Reflex save). The type of damage depends on the tradition of your bloodline. If you cast arcane spells, you deal force damage. If you cast divine spells, you deal spirit damage. If you cast occult spells, you deal mental damage. If you cast primal spells, you deal fire damage."
     traits:
       - sorcerer
+    rules:
+      - key: "RollOption"
+        option: "blood-magic"
+        toggleable: true
+        label: "PF2E.SpecificRule.Sorcerer.Bloodline.BloodMagicDescription.Title"
+      - key: "RollOption"
+        option: "second-blood-magic"
+        toggleable: true
+        label: "PF2E.SpecificRule.Sorcerer.SecondBloodMagic"
+        predicate: [{"or": ["feat:blood-ascendancy", "feat:blood-sovereignty"]}]
+      - key: "DamageAlteration"
+        property: "damage-type"
+        mode: "override"
+        selectors: ["inline-damage"]
+        value: "force"
+        predicate: ["explosion-of-power", "feature:bloodline:tradition:arcane"]
+      - key: "DamageAlteration"
+        property: "damage-type"
+        mode: "override"
+        selectors: ["inline-damage"]
+        value: "spirit"
+        predicate: ["explosion-of-power", "feature:bloodline:tradition:divine"]
+      - key: "DamageAlteration"
+        property: "damage-type"
+        mode: "override"
+        selectors: ["inline-damage"]
+        value: "mental"
+        predicate: ["explosion-of-power", "feature:bloodline:tradition:occult"]
+      - key: "DamageAlteration"
+        property: "damage-type"
+        mode: "override"
+        selectors: ["inline-damage"]
+        value: "fire"
+        predicate: ["explosion-of-power", "feature:bloodline:tradition:primal"]
   Felling Strike:
     assoc_charclass:
       - Fighter
@@ -5692,6 +5982,11 @@ pf2e_feats:
     shortdesc: "**Witch** Your familiar is imbued with even more magic than other familiars.%r%rYou can select a base of six familiar or master abilities each day, instead of four.%r%r**Special** Add the bonus familiar abilities you gain for being a witch to this amount."
     traits:
       - witch
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.attributes.familiarAbilities.value"
+        mode: "upgrade"
+        value: 6
   Inspired Stratagem:
     assoc_charclass:
       - Rogue
@@ -5728,6 +6023,12 @@ pf2e_feats:
     shortdesc: Even the heaviest armors serve only to enhance your unbridled fury. You are trained in heavy armor. Whenever you gain a barbarian class feature that grants you expert or greater proficiency in medium armor, you also gain that proficiency in heavy armor. If you have the Quick-Tempered action, you can use it while wearing heavy armor.
     traits:
       - barbarian
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.proficiencies.defenses.heavy.rank"
+        mode: "upgrade"
+        value: "ternary(gte(@actor.level,19),3,ternary(gte(@actor.level,13),2,1))"
+        predicate: ["class:barbarian"]
   Ironblood Stance:
     assoc_charclass:
       - Monk
@@ -5760,6 +6061,11 @@ pf2e_feats:
     traits:
       - cleric
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Mixed Maneuver:
     assoc_charclass:
       - Monk
@@ -6133,6 +6439,11 @@ pf2e_feats:
     traits:
       - finisher
       - swashbuckler
+    rules:
+      - key: "RollOption"
+        option: "finisher"
+        toggleable: true
+        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
   Sudden Leap:
     assoc_charclass:
       - Barbarian
@@ -6168,6 +6479,11 @@ pf2e_feats:
       - manipulate
       - oracle
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Swipe Souvenir:
     assoc_charclass:
       - Rogue
@@ -6462,6 +6778,11 @@ pf2e_feats:
       - bard
       - concentrate
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Crashing Slam:
     assoc_charclass:
       - Fighter
@@ -6591,6 +6912,11 @@ pf2e_feats:
       - concentrate
       - sorcerer
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Expanded Splash:
     assoc_charclass:
       - Alchemist
@@ -6701,6 +7027,11 @@ pf2e_feats:
     traits:
       - druid
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Heroic Recovery:
     assoc_charclass:
       - Cleric
@@ -6715,6 +7046,11 @@ pf2e_feats:
       - cleric
       - concentrate
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   House of Imaginary Walls:
     assoc_charclass:
       - Bard
@@ -6916,6 +7252,11 @@ pf2e_feats:
       - sorcerer
       - spellshape
       - wizard
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Peerless Warden:
     assoc_charclass:
       - Ranger
@@ -7030,6 +7371,11 @@ pf2e_feats:
       - spellshape
       - witch
       - wizard
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Radiant Armament:
     assoc_charclass:
       - Champion
@@ -7150,6 +7496,11 @@ pf2e_feats:
     shortdesc: You and your animal companion fight in tandem, distracting your foes and keeping them off balance. Whenever you and your animal companion are adjacent to the same foe, you are both flanking that foe with each other, regardless of your actual positions.
     traits:
       - druid
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.attributes.flanking.canGangUp"
+        mode: "add"
+        value: "animal-companion"
   Signature Spell Expansion:
     assoc_charclass:
       - Sorcerer
@@ -7226,6 +7577,11 @@ pf2e_feats:
     traits:
       - finisher
       - swashbuckler
+    rules:
+      - key: "RollOption"
+        option: "finisher"
+        toggleable: true
+        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
   Suspect of Opportunity:
     assoc_charclass:
       - Investigator
@@ -7302,6 +7658,11 @@ pf2e_feats:
     traits:
       - finisher
       - swashbuckler
+    rules:
+      - key: "RollOption"
+        option: "finisher"
+        toggleable: true
+        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
   Terrifying Howl:
     assoc_charclass:
       - Barbarian
@@ -7342,6 +7703,11 @@ pf2e_feats:
       - druid
       - sonic
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Trial by Skyfire:
     assoc_charclass:
       - Oracle
@@ -7395,6 +7761,11 @@ pf2e_feats:
       - concentrate
       - manipulate
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Vicious Debilitations:
     assoc_charclass:
       - Rogue
@@ -7658,6 +8029,11 @@ pf2e_feats:
       - cleric
       - concentrate
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Disrupt Qi:
     assoc_charclass:
       - Monk
@@ -7701,6 +8077,9 @@ pf2e_feats:
     traits:
       - monk
     rules:
+      - key: "RollOption"
+        option: "dodging-roll"
+        toggleable: true
       - key: "Resistance"
         type: "all-damage"
         value: "@actor.level"
@@ -7921,6 +8300,12 @@ pf2e_feats:
       - manipulate
       - spellshape
       - wizard
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        value: true
+        label: "PF2E.TraitSpellshape"
   Foresee Danger:
     assoc_charclass:
       - Investigator
@@ -7967,6 +8352,11 @@ pf2e_feats:
       - druid
       - manipulate
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Get Used to Disappointment:
     assoc_charclass:
       - Swashbuckler
@@ -8166,6 +8556,11 @@ pf2e_feats:
     traits:
       - finisher
       - swashbuckler
+    rules:
+      - key: "RollOption"
+        option: "finisher"
+        toggleable: true
+        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
   Overwhelming Breath:
     assoc_charclass:
       - Monk
@@ -8180,6 +8575,11 @@ pf2e_feats:
       - concentrate
       - monk
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Predator's Pounce:
     assoc_charclass:
       - Barbarian
@@ -8350,6 +8750,11 @@ pf2e_feats:
     shortdesc: You and your animal companion fight in tandem. Whenever you and your animal companion are adjacent to the same foe, you are both flanking that foe with each other, regardless of your actual positions.
     traits:
       - ranger
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.attributes.flanking.canGangUp"
+        mode: "add"
+        value: "animal-companion"
   Spirit's Wrath:
     assoc_charclass:
       - Barbarian
@@ -8425,6 +8830,16 @@ pf2e_feats:
       - concentrate
       - earth
       - sorcerer
+    rules:
+      - key: "RollOption"
+        option: "blood-magic"
+        toggleable: true
+        label: "PF2E.SpecificRule.Sorcerer.Bloodline.BloodMagicDescription.Title"
+      - key: "RollOption"
+        option: "second-blood-magic"
+        toggleable: true
+        label: "PF2E.SpecificRule.Sorcerer.SecondBloodMagic"
+        predicate: [{"or": ["feat:blood-ascendancy", "feat:blood-sovereignty"]}]
   The Bigger They Are:
     assoc_charclass:
       - Swashbuckler
@@ -8707,6 +9122,11 @@ pf2e_feats:
       - cleric
       - concentrate
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Fast Channel:
     assoc_charclass:
       - Cleric
@@ -8803,6 +9223,10 @@ pf2e_feats:
     shortdesc: "Your ripostes can deflect attacks back at their source. You can use opportune riposte with a trigger of 'A foe outside of your reach critically fails an attack roll against you' in addition to its usual trigger.%r%rWhen you use opportune riposte with this new trigger against a ranged attack, your Strike deflects some of the triggering effect back toward its source. Compare the result of your attack roll to the AC of the triggering foe.%r%rOn a hit, you deal the normal amount of damage for your Strike, but the damage type changes to that of the triggering attack. For instance, if you used opportune riposte to deflect a *blazing bolt*, your Strike would deal fire damage instead of its normal damage type."
     traits:
       - swashbuckler
+    rules:
+      - key: "RollOption"
+        option: "impossible-riposte"
+        toggleable: true
   Improved Twin Riposte (Fighter):
     assoc_charclass:
       - Fighter
@@ -8839,6 +9263,11 @@ pf2e_feats:
     traits:
       - sorcerer
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Ironblood Surge:
     assoc_charclass:
       - Monk
@@ -8852,6 +9281,9 @@ pf2e_feats:
     traits:
       - monk
     rules:
+      - key: "RollOption"
+        option: "ironblood-surge"
+        toggleable: true
       - key: "FlatModifier"
         selector: "ac"
         type: "circumstance"
@@ -8985,6 +9417,11 @@ pf2e_feats:
       - finisher
       - fortune
       - swashbuckler
+    rules:
+      - key: "RollOption"
+        option: "finisher"
+        toggleable: true
+        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
   Plot the Future:
     assoc_charclass:
       - Investigator
@@ -9036,6 +9473,16 @@ pf2e_feats:
     shortdesc: "You can wrap your magic around you like a cloak that causes those who dare to target you with spells to suffer a similar fate. You know the following blood magic effect.%r%r**Blood Magic—Reflect Harm** Your blood ensures that those who harm you with magic are harmed in return. The first time you take damage from a spell before the beginning of your next turn, attempt spell attack roll against the creature who cast the triggering spell. On a hit, the creature takes the same amount and type of damage that you just took. If you critically hit, the creature takes twice the damage."
     traits:
       - sorcerer
+    rules:
+      - key: "RollOption"
+        option: "blood-magic"
+        toggleable: true
+        label: "PF2E.SpecificRule.Sorcerer.Bloodline.BloodMagicDescription.Title"
+      - key: "RollOption"
+        option: "second-blood-magic"
+        toggleable: true
+        label: "PF2E.SpecificRule.Sorcerer.SecondBloodMagic"
+        predicate: [{"or": ["feat:blood-ascendancy", "feat:blood-sovereignty"]}]
   Reflect Spell:
     assoc_charclass:
       - Sorcerer
@@ -9085,6 +9532,15 @@ pf2e_feats:
       - spellshape
       - wizard
     rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
+      - key: "RollOption"
+        option: "array-damage"
+        toggleable: true
+        label: "PF2E.SpecificRule.Prompt.DamageType"
+        predicate: ["spellshape:secondary-detonation-array"]
       - key: "ActiveEffectLike"
         path: "flags.system.spellshape.arrayDamage"
         mode: "override"
@@ -9159,6 +9615,11 @@ pf2e_feats:
       - concentrate
       - druid
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Specialized Companion (Druid):
     repeatable: 3
     assoc_charclass:
@@ -9184,6 +9645,11 @@ pf2e_feats:
       - concentrate
       - sorcerer
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Stay Down!:
     assoc_charclass:
       - Rogue
@@ -9361,6 +9827,11 @@ pf2e_feats:
       - bard
       - concentrate
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Warden's Guidance:
     assoc_charclass:
       - Ranger
@@ -9502,6 +9973,11 @@ pf2e_feats:
       - bard
       - concentrate
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Deadly Grace:
     assoc_charclass:
       - Swashbuckler
@@ -9512,6 +9988,13 @@ pf2e_feats:
     shortdesc: Your graceful attacks are especially powerful. When you score a critical hit with an agile or finesse melee weapon that has the deadly trait, you double the number of dice from that trait. When you wield an agile or finesse melee weapon that doesn't have the deadly trait, it gains the deadly d8 trait instead.
     traits:
       - swashbuckler
+    rules:
+      - key: "DamageAlteration"
+        property: "dice-number"
+        mode: "multiply"
+        selectors: ["strike-damage"]
+        value: 2
+        predicate: [{"not": "item:tag:deadly-from-deadly-grace"}, {"or": ["item:trait:agile", "item:trait:finesse"]}, {"or": ["dice:slug:deadly-d4", "dice:slug:deadly-d6", "dice:slug:deadly-d8", "dice:slug:deadly-d10", "dice:slug:deadly-d12"]}]
   Desperate Wrath:
     assoc_charclass:
       - Barbarian
@@ -9973,6 +10456,11 @@ pf2e_feats:
       - oracle
       - spellshape
       - visual
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Rebounding Smite:
     assoc_charclass:
       - Cleric
@@ -10010,6 +10498,11 @@ pf2e_feats:
       - cleric
       - concentrate
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Resounding Finale:
     assoc_charclass:
       - Bard
@@ -10043,6 +10536,11 @@ pf2e_feats:
     traits:
       - finisher
       - swashbuckler
+    rules:
+      - key: "RollOption"
+        option: "finisher"
+        toggleable: true
+        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
   Scintillating Spell:
     assoc_charclass:
       - Sorcerer
@@ -10058,6 +10556,11 @@ pf2e_feats:
       - sorcerer
       - spellshape
       - wizard
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Shattering Blows:
     assoc_charclass:
       - Barbarian
@@ -10238,6 +10741,12 @@ pf2e_feats:
     shortdesc: Your body hardens as you combine your attacks, making your finishing blows more damaging. Your unarmed attacks gain the forceful and deadly d10 traits. Any that already had one or both of these traits increase their weapon damage dice by one step.
     traits:
       - monk
+    rules:
+      - key: "DamageAlteration"
+        property: "dice-faces"
+        mode: "upgrade"
+        selectors: ["unarmed-damage"]
+        predicate: ["item:tag:diamond-fists-dice-upgrade"]
   Discordant Voice:
     assoc_charclass:
       - Bard
@@ -10286,6 +10795,11 @@ pf2e_feats:
       - cleric
       - concentrate
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Echoing Spell:
     assoc_charclass:
       - Sorcerer
@@ -10298,6 +10812,11 @@ pf2e_feats:
       - concentrate
       - sorcerer
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Eternal Composition:
     assoc_charclass:
       - Bard
@@ -10512,6 +11031,11 @@ pf2e_feats:
       - death
       - finisher
       - swashbuckler
+    rules:
+      - key: "RollOption"
+        option: "finisher"
+        toggleable: true
+        label: "PF2E.SpecificRule.Swashbuckler.Finisher.Label"
   Manifold Edge:
     assoc_charclass:
       - Ranger
@@ -10762,6 +11286,11 @@ pf2e_feats:
       - concentrate
       - spellshape
       - witch
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Swift Retribution:
     assoc_charclass:
       - Champion
@@ -10942,6 +11471,11 @@ pf2e_feats:
     traits:
       - sorcerer
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Bloodline Mutation:
     assoc_charclass:
       - Sorcerer
@@ -10953,6 +11487,12 @@ pf2e_feats:
     traits:
       - sorcerer
     rules:
+      - key: "Sense"
+        selector: "low-light-vision"
+        predicate: ["bloodline-mutation-sense:low-light-vision"]
+      - key: "Sense"
+        selector: "darkvision"
+        predicate: ["bloodline-mutation-sense:darkvision"]
       - key: "BaseSpeed"
         selector: "fly"
         value: "@actor.system.movement.speeds.land.value"
@@ -11096,6 +11636,9 @@ pf2e_feats:
       - flourish
       - swashbuckler
     rules:
+      - key: "RollOption"
+        option: "finisher:illimitable"
+        toggleable: true
       - key: "AdjustStrike"
         property: "traits"
         mode: "add"
@@ -11193,6 +11736,11 @@ pf2e_feats:
       - druid
       - manipulate
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Lightning Qi:
     assoc_charclass:
       - Monk
@@ -11237,6 +11785,11 @@ pf2e_feats:
       - cursebound
       - oracle
       - spellshape
+    rules:
+      - key: "RollOption"
+        option: "spellshape"
+        toggleable: true
+        label: "PF2E.TraitSpellshape"
   Oracular Providence:
     assoc_charclass:
       - Oracle
@@ -11338,6 +11891,24 @@ pf2e_feats:
     shortdesc: "You are a great warrior that can stand strong against the fiercest opponents to your cause. You gain resistance 5 to bludgeoning, piercing, and slashing damage.%r%rIf you're holy, this resistance increases to 10 against unholy creatures, and if you're unholy it increases to 10 against holy creatures.%r%rIn addition, creatures and effects that roll a natural 20 on an attack roll against you don't improve their result by one degree of success."
     traits:
       - champion
+    rules:
+      - key: "Resistance"
+        definition: [{"or": ["damage:type:bludgeoning", "damage:type:piercing", "damage:type:slashing"]}]
+        type: "custom"
+        value: 5
+        label: "PF2E.IWR.Custom.BludgeoningPiercingSlashing"
+      - key: "Resistance"
+        definition: [{"or": ["damage:type:bludgeoning", "damage:type:piercing", "damage:type:slashing"]}, "origin:trait:unholy"]
+        type: "custom"
+        value: 10
+        label: "PF2E.IWR.Custom.UnholyBludgeoningPiercingSlashing"
+        predicate: ["self:trait:holy"]
+      - key: "Resistance"
+        definition: [{"or": ["damage:type:bludgeoning", "damage:type:piercing", "damage:type:slashing"]}, "origin:trait:holy"]
+        type: "custom"
+        value: 10
+        label: "PF2E.IWR.Custom.HolyBludgeoningPiercingSlashing"
+        predicate: ["self:trait:unholy"]
   Shield Paragon:
     assoc_charclass:
       - Champion

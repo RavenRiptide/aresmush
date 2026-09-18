@@ -65,7 +65,8 @@ module AresMUSH
         # out before the rest are added up.
         overriding, adding = met_dice.partition { |row| row['override'] }
 
-        instances = assemble(char, attack, adding, met_flat, overriding)
+        instances = alter(assemble(char, attack, adding, met_flat, overriding),
+                          Rules.damage_alterations(sources, domains, held, context))
 
         { 'instances' => instances,
           'formula' => render(instances, false),
@@ -82,6 +83,49 @@ module AresMUSH
       end
 
       # ------------------------------------------------------------------------------
+
+      # Changes a roll has after it is built rather than additions to it: the kind of damage it deals,
+      # how many dice, or how large they are. A `dice-faces` upgrade with nothing to upgrade to means one
+      # step larger, which is the same step a DamageDice override takes.
+      ALTERATIONS = {
+        'damage-type' => ->(instance, one) { instance['damage_type'] = one['value'] if one['value'] },
+        'dice-number' => ->(instance, one) { instance['count'] = counted(instance, one) },
+        'dice-faces' => ->(instance, one) { instance['die'] = faces(instance, one) }
+      }.freeze
+
+      def self.alter(instances, alterations)
+        return instances if alterations.empty?
+
+        instances.each do |instance|
+          alterations.each do |one|
+            change = ALTERATIONS[one['property']]
+
+            next unless change
+
+            change.call(instance, one)
+          end
+
+          instance['dice'] = instance['die'] ? [ [ instance['count'].to_i, instance['die'] ] ] : []
+        end
+      end
+
+      def self.counted(instance, one)
+        current = instance['count'].to_i
+
+        case one['mode']
+        when 'multiply' then (current * one['value'].to_i)
+        when 'add' then current + one['value'].to_i
+        when 'upgrade' then [ current, one['value'].to_i ].max
+        else one['value'] ? one['value'].to_i : current
+        end
+      end
+
+      def self.faces(instance, one)
+        return step(instance['die'], 1) if one['value'].nil?
+        return one['value'] if one['mode'] == 'override'
+
+        one['mode'] == 'upgrade' ? step(instance['die'], 1) : instance['die']
+      end
 
       # The weapon's own dice, then everything else grouped by the kind of damage it deals. A row that
       # names no kind deals the weapon's kind, which is what makes a plain +2 a bonus to the whole hit

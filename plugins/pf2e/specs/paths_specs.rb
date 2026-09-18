@@ -77,10 +77,24 @@ module AresMUSH
           expect(Paths.for('flags.system.monkDedicationCount').first['name']).to eq 'counter'
         end
 
+        it "should recognise an armour proficiency, which AC reads" do
+          row, category = Paths.for('system.proficiencies.defenses.heavy.rank')
+
+          expect(row['name']).to eq 'armour proficiency'
+          expect(category).to eq 'heavy'
+        end
+
         # A path we cannot write is refused, because an effect that silently writes nothing is a sheet
         # that is quietly wrong and one that writes to the wrong place is worse.
         it "should refuse a path it cannot write" do
-          expect(Paths.for('system.attributes.hp.max')).to be_nil
+          expect(Paths.for('system.details.level.value')).to be_nil
+          expect(Paths.writable?('system.details.level.value')).to be false
+        end
+
+        # Hit points are assembled from the ledger and from effects that name the `hp` domain, so an
+        # effect writing the total directly would be overwritten by the next fold - which is why the
+        # registry does not offer it and a rule naming it is refused at import.
+        it "should refuse a path a figure already owns" do
           expect(Paths.writable?('system.attributes.hp.max')).to be false
         end
       end

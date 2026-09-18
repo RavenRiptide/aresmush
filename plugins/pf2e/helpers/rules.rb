@@ -73,7 +73,8 @@ module AresMUSH
         },
         {
           'key' => 'RollOption',
-          'fields' => %w{key option domain toggleable value predicate label slug},
+          'fields' => %w{key option domain toggleable value predicate label slug suboptions selection
+                         alwaysActive disabledIf disabledValue},
           # Declares a circumstance rather than a number. A rule on the same feat or item is then
           # predicated on it - a Clandestine Cloak declares `clandestine-cloak` and predicates its own
           # bonuses on it - so this contributes an option, not a modifier.
@@ -87,6 +88,14 @@ module AresMUSH
               'option' => row['option'],
               'domain' => row['domain'] || Domains::ALL,
               'label' => row['label'],
+              # A choice among values: a wand set to fire, a gem twisted to frost. Rules are predicated
+              # on `<option>:<value>`, so the option holds twice - once bare and once with the choice.
+              'choices' => choices_of(row),
+              'selection' => row['selection'],
+              # A toggle something else locks. While `locked_when` holds, the option reads as
+              # `locked_to` whatever the player said - a stance you cannot leave, a rune you cannot turn off.
+              'locked_when' => row['disabledIf'],
+              'locked_to' => row['disabledValue'],
               'default' => truthy(row['value'], context) }
           }
         },
@@ -102,6 +111,57 @@ module AresMUSH
               'path' => row['path'],
               'mode' => row['mode'].to_s,
               'value' => writable_value(row['value'], context) }
+          }
+        },
+        {
+          'key' => 'MartialProficiency',
+          'fields' => %w{key slug definition sameAs maxRank label},
+          # "Your proficiency with weapons like this is the same as your <sameAs> proficiency." Goblin
+          # Weapon Familiarity makes martial goblin weapons count as simple; Monastic Weaponry makes monk
+          # weapons count as your unarmed proficiency, up to master.
+          'contribute' => lambda { |row, source, _context|
+            { 'source' => source['name'],
+              'slug' => row['slug'] || Domains.slug(source['name']),
+              'definition' => row['definition'],
+              'same_as' => Domains.slug(row['sameAs']),
+              'max_rank' => row['maxRank'] }
+          }
+        },
+        {
+          'key' => 'CriticalSpecialization',
+          'fields' => %w{key predicate slug label},
+          # Grants the critical specialisation effect for the attacks its predicate describes. It carries
+          # no value: whether it applies is the whole of it.
+          'contribute' => lambda { |row, source, _context|
+            { 'source' => source['name'],
+              'slug' => row['slug'] || Domains.slug(source['name']),
+              'definition' => row['predicate'] }
+          }
+        },
+        {
+          'key' => 'Sense',
+          'fields' => %w{key selector acuity range predicate slug label},
+          # A sense the character would not otherwise have: darkvision from a blindfold, low-light vision
+          # from a cat's eyes. Not a figure, but a fact the sheet shows and a predicate can ask about.
+          'contribute' => lambda { |row, source, _context|
+            { 'source' => source['name'],
+              'slug' => row['slug'] || Domains.slug(source['name']),
+              'sense' => Domains.slug(row['selector']),
+              'acuity' => row['acuity'],
+              'range' => row['range'] }
+          }
+        },
+        {
+          'key' => 'DamageAlteration',
+          'fields' => %w{key property mode value selectors selector predicate slug label},
+          # Changes a damage roll after it is built rather than adding to it: the kind of damage it
+          # deals, how many dice, or how large they are.
+          'contribute' => lambda { |row, source, context|
+            { 'source' => source['name'],
+              'slug' => row['slug'] || Domains.slug(source['name']),
+              'property' => Domains.slug(row['property']),
+              'mode' => row['mode'].to_s,
+              'value' => alteration_value(row['value'], context) }
           }
         },
         {
@@ -181,13 +241,14 @@ module AresMUSH
         },
         {
           'key' => 'AdjustDegreeOfSuccess',
-          'fields' => %w{key selector adjustment predicate slug label},
+          'fields' => %w{key selector adjustment predicate type slug label},
           # Turns one outcome into another: Assurance makes a failure a success, Deafened drops an
           # auditory Perception check to a critical failure. `Pf2e::Degree` applies it.
           'contribute' => lambda { |row, source, _context|
             { 'source' => source['name'],
               'slug' => row['slug'] || Domains.slug(source['name']),
-              'adjustment' => row['adjustment'] }
+              'adjustment' => row['adjustment'],
+              'check' => row['type'] }
           }
         },
         {
@@ -210,7 +271,16 @@ module AresMUSH
       # Fields that position a toggle in Foundry's character sheet. They are neither read nor complained
       # about: a field we ignore that changes the mechanics is a sheet that is quietly wrong, and one
       # that describes where a control sits in an interface we do not have is neither.
-      PRESENTATION = { 'RollOption' => %w{placement mergeable} }.freeze
+      # `placement` and `mergeable` position a toggle in Foundry's character sheet. `phase` and `priority`
+      # order a rule against their data-preparation passes, which have no counterpart here: ours are
+      # ordered by mode where order matters and by when they are asked for otherwise.
+      PRESENTATION = { 'RollOption' => %w{placement mergeable phase priority},
+                       'ActiveEffectLike' => %w{phase priority},
+                       'AdjustModifier' => %w{priority},
+                       'FlatModifier' => %w{priority},
+                       'DamageDice' => %w{priority},
+                       'AdjustStrike' => %w{priority},
+                       'DamageAlteration' => %w{priority} }.freeze
 
       BY_KEY = KINDS.each_with_object({}) { |row, out| out[row['key']] = row }.freeze
 
@@ -226,6 +296,13 @@ module AresMUSH
         Formula.value(value, context)
       rescue StandardError
         value
+      end
+
+      # Only suboptions that say what they are. Their data has a few whose list is a string, which reads
+      # as a list of single letters and means nothing.
+      def self.choices_of(row)
+        Array(row['suboptions']).select { |one| one.is_a?(Hash) && one['value'] }
+                                .map { |one| { 'value' => one['value'].to_s, 'label' => one['label'] } }
       end
 
       def self.truthy(value, context)
@@ -252,6 +329,9 @@ module AresMUSH
         { 'source' => source['name'],
           'slug' => row['slug'] || Domains.slug(source['name']),
           'type' => row['type'],
+          # A resistance may describe what it resists rather than naming a kind: Sacred Defender resists
+          # physical damage from an unholy source. Tested against the damage's own facts.
+          'definition' => row['definition'],
           'value' => row['value'] ? Formula.value(row['value'], context) : nil }
       end
 
@@ -287,9 +367,66 @@ module AresMUSH
                 .sort_by { |write| MODE_ORDER.index(write['mode']) || MODE_ORDER.size }
       end
 
-      # Rules that change how a check turned out.
+      # Rules that change how a check turned out. A row may restrict itself to a kind of check - a save
+      # or a skill - which the check itself declares as `check:type:…`, so the restriction is read the
+      # same way any other circumstance is.
+      CHECK_TYPES = { 'save' => 'saving-throw', 'skill' => 'skill', 'perception' => 'perception',
+                      'attack' => 'attack-roll' }.freeze
+
       def self.adjustments(sources, domains, options)
-        gather(sources, domains, options, 'AdjustDegreeOfSuccess') { |row| row['adjustment'] }
+        gather(sources, domains, options, 'AdjustDegreeOfSuccess') do |row|
+          wanted = CHECK_TYPES[row['type'].to_s] || row['type']
+
+          next nil if row['type'] && !Array(options).include?("check:type:#{wanted}")
+
+          row['adjustment']
+        end
+      end
+
+      # A value on a damage alteration is a kind of damage, a number, or nothing at all - `dice-faces`
+      # with no value means "one step larger".
+      def self.alteration_value(value, context)
+        return nil if value.nil?
+        return value unless value.is_a?(Numeric) || value.to_s.match?(/\A[-\d@(]/)
+
+        Formula.value(value, context)
+      rescue StandardError
+        value
+      end
+
+      # Proficiencies a feat gives over a kind of weapon, each capped where it says.
+      def self.martial_proficiencies(sources, options)
+        declarations(sources, options, 'MartialProficiency')
+      end
+
+      # Whether anything grants the critical specialisation effect for an attack.
+      #
+      # The predicate is about the weapon as much as the character - "monk weapons, if you have Expert
+      # Strikes" - so it is tested once against both sets of facts rather than filtered against the
+      # character's first.
+      def self.critical_specialization?(sources, options, attack_options)
+        Array(sources).any? do |source|
+          held = Array(options) + Array(source['options']) + Array(attack_options)
+
+          of_kind(source, 'CriticalSpecialization').any? { |row| Predicate.test(row['predicate'], held) }
+        end
+      end
+
+      def self.senses(sources, options)
+        declarations(sources, options, 'Sense')
+      end
+
+      # Alterations to a damage roll that reaches these domains.
+      def self.damage_alterations(sources, domains, options, context = {})
+        Array(sources).flat_map do |source|
+          held = Array(options) + Array(source['options'])
+
+          of_kind(source, 'DamageAlteration')
+            .select { |row| Domains.matches?(selectors_of(row), domains) }
+            .select { |row| Predicate.test(row['predicate'], held) }
+            .map { |row| contribute(row, source, context) }
+            .compact
+        end
       end
 
       # Attacks something granted the character. Each is described the way a catalogue weapon is, so
@@ -379,6 +516,13 @@ module AresMUSH
 
       def self.known?(key)
         BY_KEY.key?(key.to_s)
+      end
+
+      # Every row of a kind across every source, whether or not its circumstances are met. For the one
+      # case that needs the unconditional list: a sense's own predicate is tested against the character's
+      # facts, and the senses are among those facts.
+      def self.of_kind_across(sources, key)
+        Array(sources).flat_map { |source| of_kind(source, key) }
       end
 
       # The rows of one kind that a source carries, whatever else it carries.

@@ -219,13 +219,13 @@ module AresMUSH
 
           expect(logger).to receive(:warn).with(/which nothing applies/)
 
-          Effects.source('Something', [ { 'key' => 'Sense', 'selector' => 'hp' } ])
+          Effects.source('Something', [ { 'key' => 'Aura', 'selector' => 'hp' } ])
         end
 
         it "should contribute nothing for it" do
           allow(Global).to receive(:logger).and_return(double(:warn => nil))
 
-          expect(Effects.modifiers([ source([ { 'key' => 'Sense', 'selector' => 'hp' } ]) ],
+          expect(Effects.modifiers([ source([ { 'key' => 'Aura', 'selector' => 'hp' } ]) ],
                                    [ 'hp' ], context)).to eq []
         end
 

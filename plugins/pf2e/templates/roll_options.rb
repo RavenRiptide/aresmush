@@ -26,8 +26,18 @@ module AresMUSH
         state = one['on'] ? "#{item_color}on%xn" : 'off'
         note = one['chosen'] ? ' (your choice)' : ''
         note = ' (needs something we cannot check)' if !one['reachable'] && !one['chosen']
+        note = ' (locked)' if one['locked']
 
-        "%b%b#{left(one['option'], 40)}#{left(state, 6)}#{one['source']}#{note}"
+        "%b%b#{left(one['option'], 40)}#{left(state, 6)}#{one['source']}#{note}#{choices(one)}"
+      end
+
+      # An option with a choice among values says which is set and what else it could be.
+      def choices(one)
+        values = Array(one['choices']).map { |each| each['value'] }
+
+        return '' if values.empty?
+
+        "\n%b%b%b%bset to #{item_color}#{one['selected']}%xn, of #{values.join(', ')}"
       end
     end
   end

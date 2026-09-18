@@ -87,8 +87,19 @@ module AresMUSH
       # also be a list - vitality or void - and then any of them matches.
       EVERYTHING = 'all-damage'.freeze
 
+      # An entry either names kinds of damage or describes them with a predicate, and one that does both
+      # has to satisfy both. The facts a description is tested against are the damage's own.
       def self.matching(entries, against)
-        Array(entries).select { |entry| names(entry).any? { |named| reaches?(named, against) } }
+        facts = against.map { |one| "damage:type:#{one}" }
+
+        Array(entries).select do |entry|
+          named = names(entry)
+
+          next Predicate.test(entry['definition'], facts) if named.empty?
+
+          named.any? { |one| reaches?(one, against) } &&
+            (entry['definition'].nil? || Predicate.test(entry['definition'], facts))
+        end
       end
 
       def self.names(entry)

@@ -151,6 +151,10 @@ pf2e_feats:
     shortdesc: You have accumulated a vast array of lived knowledge over the years. During your daily preparations, you can reflect upon your life experiences to gain the trained proficiency rank in one skill of your choice. This proficiency lasts until you prepare again. Since this proficiency is temporary, you can't use it as a prerequisite for a skill increase or a permanent character option like a feat.
     prereq:
       level: 1
+    rules:
+      - key: "RollOption"
+        option: "ancestral-longevity"
+        toggleable: true
   Ancestral Suspicion:
     feat_type:
       - Ancestry
@@ -349,6 +353,12 @@ pf2e_feats:
     shortdesc: Surviving in hostile terrain has given you a great talent for mobility. Whenever you roll a success on an Athletics check to Climb or Swim, you get a critical success instead.
     prereq:
       level: 5
+    rules:
+      - key: "AdjustDegreeOfSuccess"
+        selector: "athletics"
+        adjustment: {"success": "one-degree-better"}
+        type: "skill"
+        predicate: [{"or": ["action:climb", "action:swim"]}]
   Avenge Ally:
     feat_type:
       - Ancestry
@@ -483,6 +493,8 @@ pf2e_feats:
         traits: ["agile", "finesse", "unarmed"]
         label: "PF2E.BattleForm.Attack.Tail"
         predicate: ["bestial-manifestation:tail"]
+      - key: "CriticalSpecialization"
+        predicate: ["feat:bestial-brutality", "item:id:{item|id}"]
   Big Mouth:
     feat_type:
       - Ancestry
@@ -632,6 +644,12 @@ pf2e_feats:
     prereq:
       level: 1
       heritage: Changeling
+    rules:
+      - key: "AdjustDegreeOfSuccess"
+        selector: "athletics"
+        adjustment: {"success": "one-degree-better"}
+        type: "save"
+        predicate: ["action:swim"]
   Burn It!:
     feat_type:
       - Ancestry
@@ -701,6 +719,11 @@ pf2e_feats:
         type: "circumstance"
         value: 1
         predicate: ["mental"]
+      - key: "AdjustDegreeOfSuccess"
+        selector: "saving-throw"
+        adjustment: {"success": "one-degree-better"}
+        type: "save"
+        predicate: ["mental", "inflicts:controlled"]
   Callow May:
     feat_type:
       - Ancestry
@@ -1362,6 +1385,11 @@ pf2e_feats:
         path: "system.skills.performance.rank"
         mode: "upgrade"
         value: 1
+      - key: "AdjustDegreeOfSuccess"
+        selector: "performance"
+        adjustment: {"criticalFailure": "one-degree-better"}
+        type: "skill"
+        predicate: ["action:make-an-impression", "target:trait:elf"]
   Eat Fortune:
     feat_type:
       - Ancestry
@@ -1530,6 +1558,10 @@ pf2e_feats:
       level: 9
       feat:
         - Ancestral Longevity
+    rules:
+      - key: "RollOption"
+        option: "expert-longevity"
+        toggleable: true
   Extraplanar Supplication:
     feat_type:
       - Ancestry
@@ -1600,11 +1632,11 @@ pf2e_feats:
       heritage: Dar
     rules:
       - key: "Strike"
+        range: null
         category: "unarmed"
         group: "brawling"
         damage: {"base": {"damageType": "piercing", "dice": 1, "die": "d6"}}
         traits: ["grapple", "unarmed"]
-        range: null
         label: "PF2E.BattleForm.Attack.Fangs"
   Fell Rider:
     feat_type:
@@ -1714,6 +1746,11 @@ pf2e_feats:
         value: 1
         label: "Against emotion effects"
         predicate: ["emotion"]
+      - key: "AdjustDegreeOfSuccess"
+        selector: "saving-throw"
+        adjustment: {"success": "one-degree-better"}
+        type: "save"
+        predicate: ["emotion"]
   Form of the Bat:
     feat_type:
       - Ancestry
@@ -1818,8 +1855,8 @@ pf2e_feats:
         label: "PF2E.SpecificRule.TOTMToggle.Incorporeal"
       - key: "AdjustStrike"
         property: "weapon-traits"
-        mode: "add"
         definition: [{"not": "item:magical"}]
+        mode: "add"
         value: "magical"
         predicate: ["target:trait:incorporeal"]
   Gnome Obsession:
@@ -1848,6 +1885,17 @@ pf2e_feats:
     shortdesc: "You favor unusual weapons tied to your people, such as blades with curved and peculiar shapes. You gain access to kukris and all uncommon weapons with the gnome trait. You have familiarity with weapons with the gnome trait plus the glaive and kukri—for the purposes of proficiency, you treat any of these that are martial weapons as simple weapons and any that are advanced weapons as martial weapons.%r%rAt 5th level, whenever you get a critical hit with one of these weapons, you get its critical specialization effect."
     prereq:
       level: 1
+    rules:
+      - key: "MartialProficiency"
+        definition: [{"or": [{"and": ["item:trait:gnome", "item:category:martial"]}, "item:base:glaive", "item:base:kukri"]}]
+        sameAs: "simple"
+        label: "PF2E.SpecificRule.MartialProficiency.MartialGnomeWeapons"
+      - key: "MartialProficiency"
+        definition: ["item:trait:gnome", "item:category:advanced"]
+        sameAs: "martial"
+        label: "PF2E.SpecificRule.MartialProficiency.AdvancedGnomeWeapons"
+      - key: "CriticalSpecialization"
+        predicate: [{"gte": ["self:level", 5]}, {"or": ["item:trait:gnome", "item:base:glaive", "item:base:kukri"]}]
   Goblin Lore:
     feat_type:
       - Ancestry
@@ -1906,6 +1954,17 @@ pf2e_feats:
     shortdesc: "Others might look upon them with disdain, but you know that the weapons of your people are as effective as they are sharp. You gain access to all uncommon weapons with the goblin trait. You have familiarity with weapons with the goblin trait—for the purposes of proficiency, you treat any of these that are martial weapons as simple weapons and any that are advanced weapons as martial weapons.%r%rAt 5th level, whenever you get a critical hit with one of these weapons, you get its critical specialization effect."
     prereq:
       level: 1
+    rules:
+      - key: "MartialProficiency"
+        definition: ["item:trait:goblin", "item:category:martial"]
+        sameAs: "simple"
+        label: "PF2E.SpecificRule.MartialProficiency.MartialGoblinWeapons"
+      - key: "MartialProficiency"
+        definition: ["item:trait:goblin", "item:category:advanced"]
+        sameAs: "martial"
+        label: "PF2E.SpecificRule.MartialProficiency.AdvancedGoblinWeapons"
+      - key: "CriticalSpecialization"
+        predicate: [{"gte": ["self:level", 5]}, "item:trait:goblin"]
   Gravesight:
     feat_type:
       - Ancestry
@@ -2056,12 +2115,12 @@ pf2e_feats:
       heritage: Changeling
     rules:
       - key: "Strike"
+        range: null
         category: "unarmed"
         group: "brawling"
         baseType: "claw"
         damage: {"base": {"damageType": "slashing", "dice": 1, "die": "d4"}}
         traits: ["agile", "finesse", "unarmed"]
-        range: null
         label: "PF2E.Weapon.Base.claw"
   Hag Magic:
     feat_type:
@@ -2179,6 +2238,12 @@ pf2e_feats:
     shortdesc: Your powerful ego makes it harder for others to order you around. If you roll a success on a saving throw against a mental effect that attempts to directly control your actions, you critically succeed instead. If a creature rolls a failure on a check to Coerce you using Intimidation, it gets a critical failure instead (so it can't try to Coerce you again for 1 week).
     prereq:
       level: 1
+    rules:
+      - key: "AdjustDegreeOfSuccess"
+        selector: "will"
+        adjustment: {"success": "one-degree-better"}
+        type: "save"
+        predicate: ["mental", "inflicts:controlled"]
   Hellspawn:
     feat_type:
       - Ancestry
@@ -2511,6 +2576,11 @@ pf2e_feats:
         selector: "saving-throw"
         type: "circumstance"
         value: 1
+        predicate: ["emotion"]
+      - key: "AdjustDegreeOfSuccess"
+        selector: "saving-throw"
+        adjustment: {"success": "one-degree-better"}
+        type: "save"
         predicate: ["emotion"]
   Leech-Clip:
     feat_type:
@@ -3409,6 +3479,11 @@ pf2e_feats:
     shortdesc: You have a pet rat that has become magically bonded to you. You gain a familiar, and this familiar must be a rat. It still gets the benefits of familiar abilities, but its base form remains a rat.
     prereq:
       level: 1
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.attributes.familiarAbilities.value"
+        mode: "upgrade"
+        value: 2
   Rat Form:
     feat_type:
       - Ancestry
@@ -3546,6 +3621,12 @@ pf2e_feats:
     shortdesc: Your innate connection to stone makes you adept at moving across uneven surfaces. You can ignore difficult terrain caused by stone (such as rubble or gravel) and uneven ground made of stone and earth. In addition, when you use the Acrobatics skill to Balance on narrow surfaces or uneven ground made of stone or earth, you aren't off-guard, and when you roll a success at one of these Acrobatics checks, you get a critical success instead.
     prereq:
       level: 1
+    rules:
+      - key: "AdjustDegreeOfSuccess"
+        selector: "acrobatics"
+        adjustment: {"success": "one-degree-better"}
+        type: "save"
+        predicate: ["action:balance", {"or": ["terrain:stone", "terrain:earth"]}]
   Rough Rider:
     feat_type:
       - Ancestry
@@ -3965,6 +4046,11 @@ pf2e_feats:
     shortdesc: You are adept at working with your allies to surround an enemy. If an enemy is within reach of you and at least two of your allies, that enemy is Off-Guard to you.
     prereq:
       level: 9
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.attributes.flanking.canGangUp"
+        mode: "add"
+        value: 2
   Squawk!:
     feat_type:
       - Ancestry
@@ -4575,6 +4661,12 @@ pf2e_feats:
     shortdesc: "Your mystic control and meditations allow you to resist external influences upon your consciousness. Whenever you are affected by a mental effect that lasts at least 2 rounds, you can reduce the duration by 1 round.%r%rYou still require natural sleep, but you treat your saving throws against effects that would cause you to fall asleep as one degree of success better. This protects only against sleep effects, not against other forms of falling unconscious."
     prereq:
       level: 1
+    rules:
+      - key: "AdjustDegreeOfSuccess"
+        selector: "saving-throw"
+        adjustment: {"all": "one-degree-better"}
+        type: "save"
+        predicate: ["sleep"]
   Vampire Lore:
     feat_type:
       - Ancestry

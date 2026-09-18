@@ -40,18 +40,43 @@ module AresMUSH
         # left off rather than presumed.
         reachable = Predicate.test(row['predicate'], Effects.options_of(char, source))
 
-        held.merge('on' => chosen.key?(held['option']) ? chosen[held['option']] : (held['default'] && reachable),
+        said = chosen[held['option']]
+        on = chosen.key?(held['option']) ? !said.eql?(false) : (held['default'] && reachable)
+
+        # A locked toggle reads as whatever locked it, whatever the player said.
+        locked = held['locked_when'] && Predicate.test(held['locked_when'],
+                                                       Effects.options_of(char, source))
+        on = !!held['locked_to'] if locked
+
+        held.merge('on' => on,
+                   'locked' => !!locked,
+                   'selected' => selected(held, said),
                    'chosen' => chosen.key?(held['option']),
                    'reachable' => reachable)
       end
 
-      # The options that hold, as a predicate reads them.
-      def self.active(char)
-        declared(char).select { |one| one['on'] }.map { |one| one['option'] }.uniq
+      # Which of an option's choices holds. What the player said, if it is one of them; otherwise what
+      # the rule selected, or the first - because an option that is on has to be on as *something*.
+      def self.selected(held, said)
+        values = Array(held['choices']).map { |one| one['value'] }
+
+        return nil if values.empty?
+        return said if said.is_a?(String) && values.include?(said)
+
+        values.include?(held['selection'].to_s) ? held['selection'].to_s : values.first
       end
 
+      # The options that hold, as a predicate reads them. One with a choice holds twice: bare, and with the
+      # choice after a colon, which is how a rule names the choice it wants.
+      def self.active(char)
+        declared(char).select { |one| one['on'] }.flat_map do |one|
+          [ one['option'], one['selected'] ? "#{one['option']}:#{one['selected']}" : nil ]
+        end.compact.uniq
+      end
+
+      # `on` is true, false, or the value of one of the option's choices.
       def self.set(char, option, on)
-        held = (char.pf2_roll_options || {}).merge(option.to_s => !!on)
+        held = (char.pf2_roll_options || {}).merge(option.to_s => on.is_a?(String) ? on : !!on)
 
         char.update(:pf2_roll_options => held)
       end

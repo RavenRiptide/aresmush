@@ -117,7 +117,24 @@ module AresMUSH
           named('feature', (char.pf2_features || {}).values.flatten) +
           skill_facts(char) +
           proficiency_facts(char) +
-          attribute_facts(char)
+          attribute_facts(char) +
+          named('self:sense', granted_sense_names(char))
+      end
+
+      # Read from the rules directly rather than through `senses`, because a sense's own predicate is
+      # tested against these facts and asking for them while building them would not terminate.
+      def self.granted_sense_names(char)
+        Rules.of_kind_across(sources(char), 'Sense').map { |row| Domains.slug(row['selector']) }
+      end
+
+      # Senses something granted, as facts. A sense is not a figure, but the sheet shows it and a
+      # predicate can ask about it - Moonlit Chain grants low-light vision only in moonlight.
+      def self.senses(char)
+        SheetReads.memo(char, :senses) do
+          Rules.senses(sources(char), facts(char)).map do |one|
+            one.merge('name' => one['sense'])
+          end
+        end
       end
 
       def self.named(prefix, values)
