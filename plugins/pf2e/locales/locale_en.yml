@@ -247,6 +247,7 @@ en:
     condition_not_found: "That is not a valid condition. Valid options: %{options}"
     condition_needs_value: "This condition requires that a value be associated with it."
     condition_set_ok: "Condition %{condition} set on %{target}."
+    condition_restricted: "%{condition} cannot be cleared while %{granter} holds - it goes when %{granter} does."
     charclass_not_set: "You cannot set a specialty until you set your class."
     chargen_committed: "All set. Enter '%xwcg/review%xn%xg' to continue."
     class_deity_mismatch: "Your alignment is not valid for your deity and class."

@@ -79,9 +79,9 @@ module AresMUSH
         initiative = participant[0].to_i
         name = participant[1]
         pc = Character.find_one_by_name(name)
-        conditions = pc ? pc.pf2_conditions : []
+        conditions = pc ? Pf2e.condition_labels(pc, false) : []
 
-        "%b%b#{left(initiative, 5)}%b%b#{left(name, 25)}%b%b#{left(conditions.sort.join(","), 40)}"
+        "%b%b#{left(initiative, 5)}%b%b#{left(name, 25)}%b%b#{left(conditions.join(", "), 40)}"
       end
 
       def format_bonus_penalty_item(name, people_list)

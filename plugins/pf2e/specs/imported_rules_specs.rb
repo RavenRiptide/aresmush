@@ -129,10 +129,11 @@ module AresMUSH
     end
 
     # Kinds that reach no statistic, so they name no domain: one declares a circumstance, one writes a
-    # value, three describe damage, two describe an attack, one asks a question, and BaseSpeed names a
-    # kind of movement.
+    # value, three describe damage, two describe an attack, one asks a question, one brings another
+    # condition with it, and BaseSpeed names a kind of movement.
     SELECTORLESS = %w{RollOption ActiveEffectLike Immunity Weakness Resistance AdjustStrike Strike
-                      BaseSpeed Sense MartialProficiency CriticalSpecialization ChoiceSet}.freeze
+                      BaseSpeed Sense MartialProficiency CriticalSpecialization ChoiceSet
+                      GrantItem}.freeze
 
     # Of those, the two that still carry a `selector` - because a movement type and a sense are not
     # domains, they are the thing being granted.
@@ -302,8 +303,30 @@ module AresMUSH
       end
     end
 
-    it "should have all seventeen kinds that change a number" do
-      expect(rows.map { |_where, row| row['key'] }.uniq.size).to eq 17
+    it "should have all eighteen kinds that change a number" do
+      expect(rows.map { |_where, row| row['key'] }.uniq.size).to eq 18
+    end
+
+    # A grant has to name something a catalogue here holds, or it would bring nothing with it.
+    it "should grant only things a catalogue here holds" do
+      grants = rows.select { |_where, row| row['key'] == 'GrantItem' }
+
+      strays = grants.reject { |_where, row| Pf2e::Grants.target(row['uuid']) }
+                     .map { |where, row| "#{where}: #{row['uuid']}" }
+
+      expect(strays.uniq).to eq []
+    end
+
+    it "should grant conditions that exist" do
+      named = rows.select { |_where, row| row['key'] == 'GrantItem' }
+                  .map { |where, row| [ where, Pf2e::Grants.target(row['uuid']) ] }
+                  .select { |_where, (catalogue, _name)| catalogue == 'conditions' }
+
+      strays = named.reject { |_where, (_catalogue, name)|
+        Global.read_config('pf2e_conditions', Pf2e.canonical_condition(name))
+      }.map { |where, (_catalogue, name)| "#{where}: #{name}" }
+
+      expect(strays.uniq).to eq []
     end
 
     # A granted speed names a kind of movement rather than a domain, and the kind has to be one that

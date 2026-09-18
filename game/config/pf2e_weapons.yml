@@ -300,6 +300,11 @@ pf2e_weapons:
         property: "materials"
         definition: ["item:id:{item|id}"]
         value: "silver"
+      - key: "GrantItem"
+        uuid: "Compendium.pf2e.conditionitems.Item.Drained"
+        inMemoryOnly: true
+        alterations: [{"mode": "override", "property": "badge-value", "value": 2}]
+        predicate: ["self:trait:unholy"]
   Chaplain's Cudgel:
     wp_type: melee
     category: simple

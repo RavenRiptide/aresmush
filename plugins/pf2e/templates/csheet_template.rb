@@ -216,20 +216,12 @@ module AresMUSH
         AnsiFormatter.strip_ansi(formatted).length
       end
 
+      # Including the ones another brought with it, and saying which: a grabbed character is off-guard,
+      # and the sheet should say why.
       def conditions
-        cond = @char.pf2_conditions
-        if cond.empty?
-          value = "None active."
-        else
-          list = []
-          cond.each do |c,v|
-            list << format_condition(c,v)
-          end
+        labels = Pf2e.condition_labels(@char)
 
-          value = list.sort.join(", ")
-        end
-
-        value
+        labels.empty? ? "None active." : labels.join(", ")
       end
 
       def format_weapon(char,w,i)
@@ -283,13 +275,6 @@ module AresMUSH
         "#{item_color}#{atk_name}:%xn #{bonus} (#{p_str}) #{damage}\n#{item_color}Traits:%xn #{traits}%r"
       end
 
-      def format_condition(condition, value)
-        colors = Global.read_config('pf2e', 'condition_colors')
-        cond_color = colors[condition.to_s]
-        name = "#{cond_color}#{condition}"
-        value = value ? "%b#{value}" : ""
-        "#{name}#{value}%xn"
-      end
 
       def titleize_trait(trait)
         trait.to_s.split("_").map { |word| word.sub(/\A[a-z]/) { |c| c.upcase } }.join(" ")

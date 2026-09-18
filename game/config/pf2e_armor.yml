@@ -484,6 +484,11 @@ pf2e_armor:
         type: "item"
         value: 2
         predicate: [{"not": "target:trait:fiend"}]
+      - key: "GrantItem"
+        uuid: "Compendium.pf2e.conditionitems.Item.Drained"
+        inMemoryOnly: true
+        alterations: [{"mode": "override", "property": "badge-value", "value": 2}]
+        predicate: ["self:trait:unholy"]
   Impenetrable Scale:
     category: medium
     traits:
@@ -793,6 +798,11 @@ pf2e_armor:
         traits: ["deadly-d12", "unholy"]
         slug: "horns"
         label: "PF2E.BattleForm.Attack.Horns"
+      - key: "GrantItem"
+        uuid: "Compendium.pf2e.conditionitems.Item.Drained"
+        inMemoryOnly: true
+        alterations: [{"mode": "override", "property": "badge-value", "value": 2}]
+        predicate: ["self:trait:holy"]
   Warleader's Bulwark:
     category: medium
     traits:

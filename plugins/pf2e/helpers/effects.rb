@@ -98,7 +98,7 @@ module AresMUSH
         info = char.pf2_base_info || {}
 
         [ "self:level:#{char.pf2_level.to_i}" ] +
-          named('self:condition', (char.pf2_conditions || {}).keys) +
+          named('self:condition', Pf2e.held_conditions(char).keys) +
           named('self:trait', Array(char.pf2_traits)) +
           named('heritage', [ info['heritage'] ]) +
           named('ancestry', [ info['ancestry'] ]) +
@@ -179,15 +179,17 @@ module AresMUSH
       end
 
       # A condition's value is its badge, which is Foundry's word for the number a condition carries.
+      # Every condition the character has, including the ones another brought with it: a grabbed
+      # character is off-guard, and Off-Guard's own rule is what lowers their AC.
       def self.conditions(char)
-        (char.pf2_conditions || {}).map do |name, _held|
+        Pf2e.held_conditions(char).map do |name, held|
           info = Global.read_config('pf2e_conditions', name)
 
           next nil unless info && info['rules']
 
           source(name, info['rules'],
-                 'id' => Domains.slug(name),
-                 'item' => { 'badge' => { 'value' => Pf2e.condition_level(char, name) },
+                 'item' => { 'id' => Domains.slug(name),
+                             'badge' => { 'value' => held['value'].to_i },
                              'level' => char.pf2_level.to_i })
         end.compact
       end

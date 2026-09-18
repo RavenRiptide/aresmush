@@ -3836,6 +3836,9 @@ pf2e_feats:
         selector: "melee-strike-damage"
         type: "status"
         value: 2
+      - key: "GrantItem"
+        uuid: "Compendium.pf2e.conditionitems.Item.Clumsy"
+        inMemoryOnly: true
   Scion of Many Planes:
     feat_type:
       - Ancestry

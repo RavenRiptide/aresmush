@@ -36,6 +36,9 @@ pf2e_conditions:
       - key: "RollOption"
         option: "origin:ally"
         value: false
+      - key: "GrantItem"
+        uuid: "Compendium.pf2e.conditionitems.Item.Off-Guard"
+        inMemoryOnly: true
   Controlled:
     short_descr: You are no longer in control of your own actions.
     value: false
@@ -86,6 +89,10 @@ pf2e_conditions:
     short_descr: You are close to death.
     value: true
     override: false
+    rules:
+      - key: "GrantItem"
+        uuid: "Compendium.pf2e.conditionitems.Item.Unconscious"
+        onDeleteActions: {"grantee": "restrict"}
   Encumbered:
     short_descr: You are carrying too much.
     value: false
@@ -95,6 +102,9 @@ pf2e_conditions:
         selector: "all-speeds"
         value: -10
         slug: "encumbered"
+      - key: "GrantItem"
+        uuid: "Compendium.pf2e.conditionitems.Item.Clumsy"
+        inMemoryOnly: true
   Enfeebled:
     short_descr: You are physically weakened.
     value: true
@@ -144,6 +154,13 @@ pf2e_conditions:
     short_descr: You are being held by another creature.
     value: false
     override: false
+    rules:
+      - key: "GrantItem"
+        uuid: "Compendium.pf2e.conditionitems.Item.Off-Guard"
+        inMemoryOnly: true
+      - key: "GrantItem"
+        uuid: "Compendium.pf2e.conditionitems.Item.Immobilized"
+        inMemoryOnly: true
   Immobilized:
     short_descr: You are unable to move.
     value: false
@@ -169,6 +186,9 @@ pf2e_conditions:
         path: "system.attributes.flanking.canFlank"
         mode: "override"
         value: false
+      - key: "GrantItem"
+        uuid: "Compendium.pf2e.conditionitems.Item.Off-Guard"
+        inMemoryOnly: true
   Persistent:
     short_descr: You are taking damage over time from a source.
     value: true
@@ -187,6 +207,9 @@ pf2e_conditions:
         type: "circumstance"
         value: -2
         slug: "prone"
+      - key: "GrantItem"
+        uuid: "Compendium.pf2e.conditionitems.Item.Off-Guard"
+        inMemoryOnly: true
   Quickened:
     short_descr: You move faster than normal.
     value: false
@@ -200,6 +223,12 @@ pf2e_conditions:
         path: "system.attributes.flanking.canFlank"
         mode: "override"
         value: false
+      - key: "GrantItem"
+        uuid: "Compendium.pf2e.conditionitems.Item.Off-Guard"
+        inMemoryOnly: true
+      - key: "GrantItem"
+        uuid: "Compendium.pf2e.conditionitems.Item.Immobilized"
+        inMemoryOnly: true
   Sickened:
     short_descr: You feel ill.
     value: true
@@ -238,6 +267,16 @@ pf2e_conditions:
         type: "status"
         value: -4
         slug: "unconscious"
+      - key: "GrantItem"
+        uuid: "Compendium.pf2e.conditionitems.Item.Blinded"
+        onDeleteActions: {"grantee": "restrict"}
+      - key: "GrantItem"
+        uuid: "Compendium.pf2e.conditionitems.Item.Off-Guard"
+        inMemoryOnly: true
+      - key: "GrantItem"
+        uuid: "Compendium.pf2e.conditionitems.Item.Prone"
+        allowDuplicate: false
+        onDeleteActions: {"grantee": "restrict", "granter": "detach"}
   Wounded:
     short_descr: You have been seriously injured.
     value: true

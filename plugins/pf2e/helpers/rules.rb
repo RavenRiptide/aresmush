@@ -282,6 +282,19 @@ module AresMUSH
           }
         },
         {
+          'key' => 'GrantItem',
+          'fields' => %w{key uuid inMemoryOnly predicate onDeleteActions allowDuplicate alterations slug
+                         label},
+          # Brings another condition or effect with it: Grabbed makes you off-guard, Dying unconscious.
+          # What becomes of the granted one is the grant's to say, and `Pf2e::Grants` reads it -
+          # conditions through `Pf2e.held_conditions`, effects through `Pf2e::ActiveEffects`.
+          'contribute' => lambda { |row, source, _context|
+            read = Grants.read(row)
+
+            read && read.merge('source' => source['name'])
+          }
+        },
+        {
           'key' => 'Immunity',
           'fields' => %w{key type value predicate label definition exceptions slug},
           'contribute' => lambda { |row, source, context| declaration_of(row, source, context) }
@@ -314,7 +327,8 @@ module AresMUSH
                        'AdjustStrike' => %w{phase priority},
                        'DamageAlteration' => %w{phase priority},
                        'ChoiceSet' => %w{adjustName allowedDrops},
-                       'Strike' => %w{img} }.freeze
+                       'Strike' => %w{img},
+                       'GrantItem' => %w{priority} }.freeze
 
       BY_KEY = KINDS.each_with_object({}) { |row, out| out[row['key']] = row }.freeze
 

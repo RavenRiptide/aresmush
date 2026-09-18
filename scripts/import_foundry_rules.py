@@ -74,7 +74,21 @@ KINDS = {
     'Immunity': {'key', 'type', 'value', 'predicate', 'definition', 'slug', 'label', 'exceptions'},
     'Weakness': {'key', 'type', 'value', 'predicate', 'definition', 'slug', 'label', 'exceptions'},
     'Resistance': {'key', 'type', 'value', 'predicate', 'definition', 'slug', 'label', 'exceptions', 'doubleVs'},
+    # A condition or an effect that brings another with it: Grabbed makes you off-guard, Dying makes you
+    # unconscious. `uuid` names the other by compendium, and Pf2e::Grants resolves it to our catalogue.
+    'GrantItem': {'key', 'uuid', 'inMemoryOnly', 'predicate', 'onDeleteActions', 'allowDuplicate',
+                  'alterations', 'slug', 'label', 'priority'},
 }
+
+# The compendia a GrantItem may name that we hold as a catalogue of our own. A grant of anything else -
+# an action, a monster's ability - has nothing here to become.
+GRANTABLE = {'conditionitems', 'spell-effects', 'feat-effects', 'equipment-effects', 'other-effects'}
+LEDGER_PACKS = {'feats-srd', 'classfeatures', 'ancestryfeatures', 'heritages'}
+GRANT_UUID = re.compile(r'^Compendium\.pf2e\.([\w-]+)\.Item\.(.+)$')
+
+# What an alteration of a granted item may change. The badge is the one a condition carries: Encumbered
+# makes you clumsy 1.
+GRANT_ALTERATIONS = {'badge-value'}
 
 # Fields that position a control in Foundry's character sheet, or order a rule against their data
 # preparation passes. Accepted so a rule carrying one is not refused, and not written out, because
@@ -89,11 +103,12 @@ PRESENTATION = {
     'FlatModifier': {'priority', 'phase', 'hideIfDisabled'},
     'ChoiceSet': {'adjustName', 'allowedDrops'},
     'Strike': {'img'},
+    'GrantItem': {'priority'},
 }
 
 # The order fields are written in, so a re-run produces the same file. A field of a kind that is not
 # named here still gets written, after these.
-ORDER = ['key', 'option', 'domain', 'toggleable', 'alwaysActive', 'suboptions', 'selection',
+ORDER = ['key', 'uuid', 'inMemoryOnly', 'allowDuplicate', 'onDeleteActions', 'alterations', 'option', 'domain', 'toggleable', 'alwaysActive', 'suboptions', 'selection',
          'disabledIf', 'disabledValue', 'flag', 'rollOption', 'prompt', 'choices',
          'allowNoSelection', 'path', 'mode', 'merge',
          'property', 'definition', 'sameAs', 'maxRank',
@@ -114,7 +129,7 @@ def written(key):
 
 
 # Neither of these reaches a statistic: one declares a circumstance and the other writes a value.
-SELECTORLESS = {'RollOption', 'ActiveEffectLike', 'Immunity', 'Weakness', 'Resistance', 'AdjustStrike',
+SELECTORLESS = {'RollOption', 'ActiveEffectLike', 'Immunity', 'Weakness', 'Resistance', 'AdjustStrike', 'GrantItem',
                 'Strike', 'MartialProficiency', 'CriticalSpecialization', 'Sense', 'ChoiceSet'}
 
 # Senses this engine knows. One it does not would be a fact nothing could show or ask about.
@@ -219,9 +234,7 @@ def foundry(checkout, pack):
         for document in documents(doc):
             rules, options = found[document.get('name')]
             for rule in ((document.get('system') or {}).get('rules') or []):
-                if not isinstance(rule, dict):
-                    continue
-                if rule.get('key') in KINDS:
+                if isinstance(rule, dict):
                     rules.append(rule)
 
     return found
@@ -271,6 +284,21 @@ def take(rule, refused):
     if strays:
         refused[f"{rule['key']} field {sorted(strays)}"] += 1
         return None
+
+    if rule['key'] == 'GrantItem':
+        found = GRANT_UUID.match(str(rule.get('uuid') or ''))
+        # A feat or a class feature granted by another is a pick, and picks are the ledger's: a feat's
+        # own `grants:` records it as a grant of its own, so reading it here as well would give it twice.
+        if not found or found.group(1) in LEDGER_PACKS:
+            refused['a feat or feature it grants, which the ledger records as a grant of its own'] += 1
+            return None
+        if found.group(1) not in GRANTABLE:
+            refused[f'a grant from {found.group(1)}, which we hold no catalogue of'] += 1
+            return None
+        altered = rule.get('alterations') or []
+        if any((one or {}).get('property') not in GRANT_ALTERATIONS for one in altered):
+            refused['a grant altering something other than its badge'] += 1
+            return None
 
     if rule['key'] == 'BaseSpeed':
         if rule.get('selector') not in MOVEMENT:
@@ -361,6 +389,9 @@ def main():
 
     refused = collections.Counter()
     totals = collections.Counter()
+    # Kinds of rule element nothing here reads at all, on the things we stock. Counted so the refusals
+    # above are not the whole story: a kind we have not built is a larger gap than a rule we refused.
+    unread = collections.Counter()
 
     for pack, catalogues in SOURCES:
         theirs = foundry(args.checkout, pack)
@@ -377,7 +408,11 @@ def main():
             for item, (rules, declared) in theirs.items():
                 if not item or not re.search(rf'^  {re.escape(item)}:$', text, re.M):
                     continue
-                rows = [row for row in (take(rule, refused) for rule in rules) if row]
+                for rule in rules:
+                    if rule.get('key') not in KINDS:
+                        unread[rule.get('key')] += 1
+                rows = [row for row in (take(rule, refused) for rule in rules if rule.get('key') in KINDS)
+                        if row]
                 if not rows:
                     continue
                 additions[item] = (rows, [])
@@ -391,6 +426,9 @@ def main():
     print('written' if args.write else 'dry run')
     for pack, _ in SOURCES:
         print(f"  {pack}: {totals[pack]} entries, {totals[f'{pack} rows']} rules")
+    print('\nkinds of rule nothing here reads, on what we stock:')
+    for kind, count in unread.most_common(12):
+        print(f'  {count:5d}  {kind}')
     print('\nrules refused rather than flattened:')
     for why, count in refused.most_common(20):
         print(f'  {count:5d}  {why}')

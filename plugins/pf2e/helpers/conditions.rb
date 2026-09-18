@@ -3,7 +3,7 @@ module AresMUSH
 
     def self.get_condition_value(char, condition)
       # Returns 0 if that condition does not have a value, nil if that condition is not present.
-      c = char.pf2_conditions[condition]
+      c = held_conditions(char)[canonical_condition(condition)]
       return nil if !c
 
       v = c['value']
@@ -18,42 +18,175 @@ module AresMUSH
     # wants a number - the dying rules add and subtract three conditions at once, and one absent
     # condition there made it `1 + nil`.
     def self.condition_level(char, condition)
-      held = (char.pf2_conditions || {}).find { |name, _info| name.to_s.casecmp?(condition.to_s) }
+      held = held_conditions(char)[canonical_condition(condition)]
 
-      return 0 unless held
-
-      held.last.is_a?(Hash) ? held.last['value'].to_i : 0
+      held ? held['value'].to_i : 0
     end
 
-    def self.set_condition(char, condition, value=nil, duration=false)
-      list = char.pf2_conditions
+    # The catalogue's own spelling of a condition, whatever the caller typed. `Off-Guard` capitalised is
+    # `Off-guard`, and a grant naming `Off-Guard` has to find the one a player set.
+    def self.canonical_condition(condition)
+      wanted = Domains.slug(condition)
 
-      condition = condition.capitalize
+      (Global.read_config('pf2e_conditions') || {}).keys.find { |name| Domains.slug(name) == wanted } ||
+        condition.to_s
+    end
 
-      # Setting the value
-      if value.zero?
-        remove_condition(char, condition)
-        return
+    # Every condition a character has: the ones set on them, and the ones those bring with them.
+    #
+    #   { 'Off-Guard' => { 'value' => nil, 'granted_by' => 'Grabbed', 'derived' => true }, … }
+    #
+    # A derived one is never stored - it exists because its granter does, and goes when it goes - so it
+    # is worked out here each time rather than written anywhere. A condition held in its own right
+    # outranks one derived: being off-guard because someone flanked you does not stop when you are
+    # released from a grab.
+    def self.held_conditions(char)
+      held = (char.pf2_conditions || {}).each_with_object({}) do |(name, info), out|
+        info = {} unless info.is_a?(Hash)
+
+        out[name] = { 'value' => info['value'], 'granted_by' => info['granted_by'], 'derived' => false }
       end
 
+      derive_conditions(held, held.keys)
+    end
+
+    # The grants a set of granters bring, followed to the end: Unconscious brings Prone, and Prone
+    # brings Off-Guard.
+    def self.derive_conditions(held, granters)
+      pending = granters.dup
+      seen = {}
+
+      until pending.empty?
+        granter = pending.shift
+
+        next if seen[granter]
+
+        seen[granter] = true
+
+        condition_grants(granter).select { |grant| grant['derived'] }.each do |grant|
+          name = canonical_condition(grant['name'])
+
+          next if held.key?(name)
+          # Conditions on conditions are unconditional in their data; a grant asking about the
+          # character would need the character's facts, which are built from this list.
+          next unless grant['predicate'].nil?
+
+          held[name] = { 'value' => grant['value'] || default_condition_value(name),
+                         'granted_by' => granter, 'derived' => true }
+          pending << name
+        end
+      end
+
+      held
+    end
+
+    def self.condition_grants(name)
+      rules = Global.read_config('pf2e_conditions', canonical_condition(name), 'rules')
+
+      Grants.of(rules).select { |grant| grant['catalogue'] == 'conditions' }
+    end
+
+    # A valued condition granted without a value is at one, which is what Foundry's condition items
+    # carry until something changes them.
+    def self.default_condition_value(name)
+      Global.read_config('pf2e_conditions', name, 'value') ? 1 : nil
+    end
+
+    # Each condition as a sheet shows it: its value if it has one, and what brought it if something did.
+    # `Frightened 2`, `Off-Guard (Grabbed)`.
+    def self.condition_labels(char, colored = true)
+      colors = colored ? (Global.read_config('pf2e', 'condition_colors') || {}) : {}
+
+      held_conditions(char).sort.map do |name, held|
+        value = held['value'] ? " #{held['value']}" : ''
+        from = held['granted_by'] ? " (#{held['granted_by']})" : ''
+
+        "#{colors[name]}#{name}#{value}#{colored ? '%xn' : ''}#{from}"
+      end
+    end
+
+    # Sets a condition, and whatever it brings with it that is stored in its own right - Dying makes you
+    # unconscious, and unconsciousness puts you on the ground. `granted` records how it came to be
+    # there when another condition brought it (see `Pf2e::Grants::FIELDS`).
+    #
+    # A value of nothing clears it, the same as `remove_condition`, and answers the same way.
+    def self.set_condition(char, condition, value = nil, granted = {})
+      condition = canonical_condition(condition)
+
+      return remove_condition(char, condition) if value && value.zero?
+
+      list = char.pf2_conditions || {}
       cv = list[condition] || {}
 
       cv['value'] = value if value
-      cv['duration'] = duration if duration
-      # Placeholder so that if it doesn't have a value, it just exists on its own.
+      # Held without a value, it still has to be held as something.
       cv['status'] = true
+      cv.merge!(granted.slice(*Grants::FIELDS)) if granted.any? && !list.key?(condition)
 
       list[condition] = cv
-
       char.update(pf2_conditions: list)
+
+      grant_stored_conditions(char, condition)
+
+      Ok.new(:state => list)
     end
 
-    def self.remove_condition(char, condition)
-      list = char.pf2_conditions
+    def self.grant_stored_conditions(char, granter)
+      condition_grants(granter).reject { |grant| grant['derived'] }.each do |grant|
+        name = canonical_condition(grant['name'])
 
-      list.delete condition
+        # A condition already held is not granted again, and is not claimed by this granter either:
+        # someone who was prone before they fell unconscious is not stood up by waking.
+        next if (char.pf2_conditions || {}).key?(name)
+        next unless grant['predicate'].nil? || Predicate.test(grant['predicate'], Effects.facts(char))
 
+        set_condition(char, name, grant['value'] || default_condition_value(name),
+                      'granted_by' => granter,
+                      'when_granter_goes' => grant['when_granter_goes'],
+                      'restricted' => grant['restricted'])
+      end
+    end
+
+    # Takes a condition away, and with it whatever it granted that goes when it goes. A condition its
+    # granter restricts cannot be taken away while the granter holds: clear Dying, and Unconscious goes
+    # with it.
+    def self.remove_condition(char, condition, forced = false)
+      condition = canonical_condition(condition)
+      list = char.pf2_conditions || {}
+      held = list[condition]
+
+      return Ok.new(:state => list) unless held
+
+      granter = held.is_a?(Hash) ? held['granted_by'] : nil
+
+      if !forced && granter && held['restricted'] && list.key?(granter)
+        return Err.new(:restricted, 'pf2e.condition_restricted', 'condition' => condition,
+                       'granter' => granter)
+      end
+
+      list.delete(condition)
       char.update(pf2_conditions: list)
+
+      release_grants(char, condition)
+
+      Ok.new(:state => char.pf2_conditions)
+    end
+
+    # What becomes of the conditions this one granted, now that it has gone.
+    def self.release_grants(char, granter)
+      granted = (char.pf2_conditions || {}).select { |_name, info|
+        info.is_a?(Hash) && info['granted_by'] == granter
+      }
+
+      granted.each do |name, info|
+        if info['when_granter_goes'] == 'detach'
+          list = char.pf2_conditions
+          list[name] = info.reject { |field, _| Grants::FIELDS.include?(field) }
+          char.update(pf2_conditions: list)
+        else
+          remove_condition(char, name, true)
+        end
+      end
     end
 
   end

@@ -16,8 +16,10 @@ module AresMUSH
         [ self.target, self.condition ]
       end
 
+      # Matched the way a player types it, and held as the catalogue spells it.
       def check_valid_condition
         condition_list = Global.read_config('pf2e_conditions').keys
+        self.condition = Pf2e.canonical_condition(self.condition)
         return nil if condition_list.include? self.condition
         return t('pf2e.condition_not_found', :options => condition_list.sort.join(", "))
       end
@@ -68,13 +70,17 @@ module AresMUSH
         end
 
 
-        target_list.each do |char|
-          Pf2e.set_condition(char, self.condition, self.value)
+        # A condition another holds in place cannot be cleared on its own: Unconscious stays while Dying
+        # does. Each target answers for itself.
+        _refused, done = target_list.partition do |char|
+          Pf2e::CharState.emit_error!(client, Pf2e.set_condition(char, self.condition, self.value))
         end
+
+        return if done.empty?
 
         client.emit_success t('pf2e.condition_set_ok',
           :condition => self.condition,
-          :target => target_list.map { |t| t.name }.sort.join(", ")
+          :target => done.map { |t| t.name }.sort.join(", ")
         )
 
       end

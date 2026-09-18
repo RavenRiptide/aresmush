@@ -11099,6 +11099,10 @@ pf2e_feats:
     shortdesc: The world is a stage upon which you are always playing. You are permanently quickened; you can use your extra action only to cast a composition cantrip that requires 1 action to cast. While in exploration mode, you can declare that you are performing an eligible composition cantrip while using any exploration tactic. Even before your first turn in a combat encounter, that cantrip is active as if you had cast it on your previous turn.
     traits:
       - bard
+    rules:
+      - key: "GrantItem"
+        uuid: "Compendium.pf2e.conditionitems.Item.Quickened"
+        inMemoryOnly: true
   Grandmaster Qi Spells:
     grants:
       grant_choice_once:
@@ -11863,6 +11867,10 @@ pf2e_feats:
     shortdesc: "You move as fast and as high as the wind itself. You're permanently quickened.%r%rYou can use your extra action to Stride or Leap, to provide one of the actions needed for a High Jump or Long Jump"
     traits:
       - monk
+    rules:
+      - key: "GrantItem"
+        uuid: "Compendium.pf2e.conditionitems.Item.Quickened"
+        inMemoryOnly: true
   Everyone's a Suspect:
     assoc_charclass:
       - Investigator
@@ -12009,6 +12017,9 @@ pf2e_feats:
     traits:
       - investigator
     rules:
+      - key: "GrantItem"
+        uuid: "Compendium.pf2e.conditionitems.Item.Quickened"
+        inMemoryOnly: true
       - key: "AdjustDegreeOfSuccess"
         selector: "skill-check"
         adjustment: {"all": "one-degree-better"}
@@ -12119,6 +12130,10 @@ pf2e_feats:
     shortdesc: You find opportunities to perform stylish feats in the moments between others' heartbeats and eye blinks. You are permanently quickened. You can use the extra action only to perform a bravado action.
     traits:
       - swashbuckler
+    rules:
+      - key: "GrantItem"
+        uuid: "Compendium.pf2e.conditionitems.Item.Quickened"
+        inMemoryOnly: true
   Paradoxical Mystery:
     assoc_charclass:
       - Oracle
@@ -12285,6 +12300,10 @@ pf2e_feats:
     shortdesc: "The movement of you and your allies is swift and decisive as the judgment of your deity. If your ally starts a move action in your champion's aura, their movement during that action doesn't trigger reactions.%r%rIn addition, you're permanently quickened. You can use your extra action only to Step or Stride. If you have a fly Speed, add Fly to this list. If you have an animal companion and are mounted on it at the start of your turn, you can have your mount be quickened that turn instead of you."
     traits:
       - champion
+    rules:
+      - key: "GrantItem"
+        uuid: "Compendium.pf2e.conditionitems.Item.Quickened"
+        inMemoryOnly: true
   Symphony of the Muse:
     assoc_charclass:
       - Bard
@@ -12389,6 +12408,10 @@ pf2e_feats:
     shortdesc: Your skill with weapons bends the laws of reality, allowing you to continuously attack with speed that would normally require magical assistance. You're permanently quickened. You can use your extra action only to Strike.
     traits:
       - fighter
+    rules:
+      - key: "GrantItem"
+        uuid: "Compendium.pf2e.conditionitems.Item.Quickened"
+        inMemoryOnly: true
   Witch's Hut:
     assoc_charclass:
       - Witch
