@@ -31,6 +31,12 @@ module AresMUSH
     attribute :started_round, :type => DataType::Integer
     attribute :started_turn
 
+    # Whether it has to be sustained, and the round it was last sustained in. It ends at the end of the
+    # caster's next turn unless they sustain it again, which is the rule; its duration is only the most
+    # it can last. Held as a flag of its own because an unset round reads as nought.
+    attribute :sustained, :type => DataType::Boolean, :default => false
+    attribute :sustained_round, :type => DataType::Integer
+
     # Nights of rest still to come, for an effect measured in days.
     attribute :rests_left, :type => DataType::Integer
 

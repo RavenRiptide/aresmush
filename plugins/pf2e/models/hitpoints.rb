@@ -44,6 +44,7 @@ module AresMUSH
     # predicated on `action:treat-wounds`.
     def self.modify_damage(char, amount, healing=false, is_dm=false, kind=nil, options=[])
       amount = Pf2e::IWR.apply(Pf2e::IWR.of(char), amount, kind)['amount'] if kind && !healing
+      Pf2e::Turns.damaged(char, kind) if kind && !healing
       amount = healed(char, amount, options) if healing
 
       hp = get_hp_obj(char)

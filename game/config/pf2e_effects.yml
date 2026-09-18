@@ -3447,6 +3447,9 @@ pf2e_effects:
     duration: {"unit": "rounds", "value": 2, "expiry": "turn-start", "sustained": false}
     traits: []
     description: "Granted by Belt of Long Life%rYou recover 15 Hit Points at the start of your turn.%rNote: Adjust duration based on roll results."
+    rules:
+      - key: "FastHealing"
+        value: 15
   "Effect: Call to Arms":
     pack: "equipment-effects"
     level: 1
@@ -4556,6 +4559,10 @@ pf2e_effects:
     duration: {"unit": "rounds", "value": 4, "expiry": "turn-start", "sustained": false}
     traits: []
     description: "Granted by Codex of Destruction and Renewal%rYou gain regeneration 20."
+    rules:
+      - key: "FastHealing"
+        type: "regeneration"
+        value: 20
   "Effect: Codex of Unimpeded Sight (Greater)":
     pack: "equipment-effects"
     level: 12
@@ -5411,6 +5418,11 @@ pf2e_effects:
     duration: {"unit": "minutes", "value": 1, "expiry": "turn-start", "sustained": false}
     traits: []
     description: "Granted by Crimson Shroud%rYou gain fast healing equal to half your level. You gain the Swirl Crimson Shroud action."
+    rules:
+      - key: "FastHealing"
+        type: "fast-healing"
+        value: "floor(@actor.level/2)"
+        details: ""
   "Effect: Crimson Shroud (AC)":
     pack: "feat-effects"
     level: 6
@@ -5917,6 +5929,16 @@ pf2e_effects:
         value: 2
         slug: "battle-curse-damage"
         predicate: ["class:oracle", {"gte": ["parent:badge:value", 2]}]
+      - key: "FastHealing"
+        type: "fast-healing"
+        value: "floor(@actor.level/2)"
+        details: ""
+        predicate: ["class:oracle", "parent:badge:value:2", {"gt": ["encounter:threat", 0]}]
+      - key: "FastHealing"
+        type: "fast-healing"
+        value: "@actor.level"
+        details: ""
+        predicate: [{"gte": ["parent:badge:value", 3]}, {"gt": ["encounter:threat", 0]}]
       - key: "AdjustModifier"
         mode: "override"
         selectors: ["strike-damage"]
@@ -9186,6 +9208,9 @@ pf2e_effects:
     duration: {"unit": "minutes", "value": 1, "expiry": "turn-start", "sustained": false}
     traits: []
     description: "Granted by Amaranthine Visage%rYou gain fast healing 20."
+    rules:
+      - key: "FastHealing"
+        value: 20
   "Effect: Eternal Torch":
     pack: "feat-effects"
     level: 1
@@ -10179,6 +10204,8 @@ pf2e_effects:
         selector: ["ac", "saving-throw"]
         type: "status"
         value: 4
+      - key: "FastHealing"
+        value: 15
   "Effect: Form a Flock":
     pack: "feat-effects"
     level: 13
@@ -10659,6 +10686,11 @@ pf2e_effects:
     duration: {"unit": "minutes", "value": 1, "expiry": "turn-start", "sustained": false}
     traits: []
     description: "Granted by Gathering Moss%rYou gain fast healing equal to your level."
+    rules:
+      - key: "FastHealing"
+        type: "fast-healing"
+        value: "@actor.level"
+        details: ""
   "Effect: Gecko Potion":
     pack: "equipment-effects"
     level: 1
@@ -12612,6 +12644,8 @@ pf2e_effects:
     traits: []
     description: "Granted by Ichthyosis Mutagen%rBenefit For 1 minute, you gain fast healing 2 and automatically succeed at flat checks to recover from persistent bleed damage.%rDrawback You take a -2 penalty to Reflex saves for 1 minute."
     rules:
+      - key: "FastHealing"
+        value: 2
       - key: "FlatModifier"
         selector: "reflex"
         value: -2
@@ -14097,6 +14131,18 @@ pf2e_effects:
         rollOption: "life-boosting-oil"
         prompt: "Select an item variety."
         choices: [{"predicate": [{"or": ["parent:origin:item:slug:life-boosting-oil-lesser", {"not": "parent:origin:item"}]}], "value": "Compendium.pf2e.equipment-srd.Item.Life-Boosting Oil (Lesser)"}, {"predicate": [{"or": ["parent:origin:item:slug:life-boosting-oil-moderate", {"not": "parent:origin:item"}]}], "value": "Compendium.pf2e.equipment-srd.Item.Life-Boosting Oil (Moderate)"}, {"predicate": [{"or": ["parent:origin:item:slug:life-boosting-oil-greater", {"not": "parent:origin:item"}]}], "value": "Compendium.pf2e.equipment-srd.Item.Life-Boosting Oil (Greater)"}, {"predicate": [{"or": ["parent:origin:item:slug:life-boosting-oil-major", {"not": "parent:origin:item"}]}], "value": "Compendium.pf2e.equipment-srd.Item.Life-Boosting Oil (Major)"}]
+      - key: "FastHealing"
+        value: 3
+        predicate: ["life-boosting-oil:life-boosting-oil-lesser"]
+      - key: "FastHealing"
+        value: 6
+        predicate: ["life-boosting-oil:life-boosting-oil-moderate"]
+      - key: "FastHealing"
+        value: 10
+        predicate: ["life-boosting-oil:life-boosting-oil-greater"]
+      - key: "FastHealing"
+        value: 15
+        predicate: ["life-boosting-oil:life-boosting-oil-major"]
   "Effect: Life-Draining":
     pack: "feat-effects"
     level: 1
@@ -15537,6 +15583,8 @@ pf2e_effects:
     traits: []
     description: "Granted by One with the Spirits%rYou gain fast healing 5 and you become concealed. Your Strikes gain the benefits of a ghost touch property rune. Whenever you deal damage with a Strike, you can choose to have that Strike deal spirit damage, rather than its usual damage type."
     rules:
+      - key: "FastHealing"
+        value: 5
       - key: "GrantItem"
         uuid: "Compendium.pf2e.conditionitems.Item.Concealed"
         inMemoryOnly: true
@@ -15732,6 +15780,11 @@ pf2e_effects:
     duration: {"unit": "minutes", "value": 1, "expiry": "turn-start", "sustained": false}
     traits: []
     description: "Granted by Ouroboros Buckles%rYou gain regeneration 15; fire damage deactivates this regeneration."
+    rules:
+      - key: "FastHealing"
+        type: "regeneration"
+        value: 15
+        deactivatedBy: ["fire"]
   "Effect: Ouroboros Buckles (Swarm of Snakes)":
     pack: "equipment-effects"
     level: 19
@@ -15939,6 +15992,9 @@ pf2e_effects:
     duration: {"unit": "rounds", "value": 3, "expiry": "turn-start", "sustained": false}
     traits: []
     description: "Granted by Pact of the Final Breath%rYou gain fast healing equal to your level."
+    rules:
+      - key: "FastHealing"
+        value: "@actor.level"
   "Effect: Pain is Temporary":
     pack: "feat-effects"
     level: 13
@@ -17350,6 +17406,8 @@ pf2e_effects:
     traits: []
     description: "You gain fast healing 5 and a +1 status bonus to AC and saving throws against effects from creatures with the unholy trait for 1 minute."
     rules:
+      - key: "FastHealing"
+        value: 5
       - key: "FlatModifier"
         selector: ["ac", "saving-throw"]
         type: "status"
@@ -18075,6 +18133,11 @@ pf2e_effects:
     duration: {"unit": "minutes", "value": 1, "expiry": "turn-start", "sustained": false}
     traits: []
     description: "Granted by Repair Module%rYou gain fast healing equal to half your level."
+    rules:
+      - key: "FastHealing"
+        type: "fast-healing"
+        value: "floor(@actor.level / 2)"
+        details: ""
   "Effect: Repel Ambient Magic":
     pack: "feat-effects"
     level: 1
@@ -18263,6 +18326,9 @@ pf2e_effects:
     duration: {"unit": "minutes", "value": 1, "expiry": "turn-start", "sustained": false}
     traits: []
     description: "Granted by Resurrectionist%rYou gain fast healing 5."
+    rules:
+      - key: "FastHealing"
+        value: 5
   "Effect: Revitalizing Finisher":
     pack: "feat-effects"
     level: 16
@@ -20763,6 +20829,18 @@ pf2e_effects:
         rollOption: "soothing-tonic"
         prompt: "Select an item variety."
         choices: [{"predicate": [{"or": ["parent:origin:item:slug:soothing-tonic-lesser", {"not": "parent:origin:item"}]}], "value": "Compendium.pf2e.equipment-srd.Item.Soothing Tonic (Lesser)"}, {"predicate": [{"or": ["parent:origin:item:slug:soothing-tonic-moderate", {"not": "parent:origin:item"}]}], "value": "Compendium.pf2e.equipment-srd.Item.Soothing Tonic (Moderate)"}, {"predicate": [{"or": ["parent:origin:item:slug:soothing-tonic-greater", {"not": "parent:origin:item"}]}], "value": "Compendium.pf2e.equipment-srd.Item.Soothing Tonic (Greater)"}, {"predicate": [{"or": ["parent:origin:item:slug:soothing-tonic-major", {"not": "parent:origin:item"}]}], "value": "Compendium.pf2e.equipment-srd.Item.Soothing Tonic (Major)"}]
+      - key: "FastHealing"
+        value: 1
+        predicate: ["soothing-tonic:soothing-tonic-lesser"]
+      - key: "FastHealing"
+        value: 3
+        predicate: ["soothing-tonic:soothing-tonic-moderate"]
+      - key: "FastHealing"
+        value: 5
+        predicate: ["soothing-tonic:soothing-tonic-greater"]
+      - key: "FastHealing"
+        value: 10
+        predicate: ["soothing-tonic:soothing-tonic-major"]
   "Effect: Soothing Vials":
     pack: "feat-effects"
     level: 1
@@ -20782,6 +20860,9 @@ pf2e_effects:
     duration: {"unit": "hours", "value": 24, "expiry": "turn-start", "sustained": false}
     traits: []
     description: "Granted by Soul Oubliette%rYou gain fast healing 15."
+    rules:
+      - key: "FastHealing"
+        value: 15
   "Effect: Soul Thief":
     pack: "feat-effects"
     level: 20
@@ -21493,6 +21574,9 @@ pf2e_effects:
         option: "steal-death"
         toggleable: true
         label: "Steal Death — You and your mount are within 10 feet."
+      - key: "FastHealing"
+        value: "@item.badge.value"
+        predicate: ["steal-death"]
   "Effect: Steel Yourself!":
     pack: "feat-effects"
     level: 4
@@ -23563,6 +23647,9 @@ pf2e_effects:
         type: "{item|flags.system.rulesSelections.objectResistanceType}"
         value: 5
         predicate: ["change-shape:yaoguai", "self:heritage:born-of-item"]
+      - key: "FastHealing"
+        value: 5
+        predicate: ["change-shape:yaoguai", "self:heritage:born-of-vegetation"]
       - key: "GrantItem"
         uuid: "Compendium.pf2e.conditionitems.Item.Clumsy"
         inMemoryOnly: true
@@ -25356,6 +25443,8 @@ pf2e_effects:
     traits: []
     description: "Granted by Ash Form%rYou gain fast healing 3, resistance to piercing and slashing damage, and immunity to bleed, falling damage, and precision damage."
     rules:
+      - key: "FastHealing"
+        value: 3
       - key: "Resistance"
         type: ["piercing", "slashing"]
         value: "ternary(gte(@item.level,9),15,10)"
@@ -25621,6 +25710,9 @@ pf2e_effects:
     duration: {"unit": "rounds", "value": 3, "expiry": "turn-start", "sustained": false}
     traits: []
     description: "Granted by Blessing of Vigor%rYou gain fast healing."
+    rules:
+      - key: "FastHealing"
+        value: "@item.level*3"
   "Spell Effect: Blink Charge":
     pack: "spell-effects"
     level: 5
@@ -26999,6 +27091,9 @@ pf2e_effects:
     traits: []
     description: "All undead creatures in the ritual's area gain fast healing 3 and resistance 3 to holy."
     rules:
+      - key: "FastHealing"
+        value: 0
+        details: "3"
       - key: "Resistance"
         type: "holy"
         value: 3
@@ -29038,6 +29133,8 @@ pf2e_effects:
     traits: []
     description: "Granted by Hymn of Healing%rYou gain fast healing and temporary Hit Points."
     rules:
+      - key: "FastHealing"
+        value: "@item.level * 2"
       - key: "TempHP"
         value: "@item.level * 2"
       - key: "RollOption"
@@ -29642,6 +29739,9 @@ pf2e_effects:
     duration: {"unit": "rounds", "value": 4, "expiry": "turn-start", "sustained": false}
     traits: []
     description: "Granted by Life Boost.%rYou gain fast healing 2.%rHeightened (+1) The fast healing increases by 2."
+    rules:
+      - key: "FastHealing"
+        value: "@item.level * 2"
   "Spell Effect: Life Connection":
     pack: "spell-effects"
     level: 3
@@ -29689,6 +29789,9 @@ pf2e_effects:
     duration: {"unit": "rounds", "value": 4, "expiry": "turn-start", "sustained": false}
     traits: []
     description: "Granted by Lifelink Surge%rYou gain fast healing 4%rHeightened (+1) The fast healing increases by 2."
+    rules:
+      - key: "FastHealing"
+        value: "@item.level * 2"
   "Spell Effect: Lift Nature's Caul (Bonus)":
     pack: "spell-effects"
     level: 1
@@ -29846,6 +29949,9 @@ pf2e_effects:
     duration: {"unit": "minutes", "value": 1, "expiry": "turn-start", "sustained": false}
     traits: []
     description: "Granted by Malignant Sustenance%rYou gain fast healing 7%rHeightened (+1) The fast healing increases by 2."
+    rules:
+      - key: "FastHealing"
+        value: "@item.level * 2 - 1"
   "Spell Effect: Manifest Will":
     pack: "spell-effects"
     level: 1
@@ -30061,6 +30167,9 @@ pf2e_effects:
         alwaysActive: true
         suboptions: [{"label": "Evergreen Vitality", "predicate": [{"not": "unwavering-heart-first:evergreen-vitality"}], "value": "evergreen-vitality"}, {"label": "Overwhelming Perfume", "predicate": [{"not": "unwavering-heart-first:overwhelming-perfume"}], "value": "overwhelming-perfume"}, {"label": "Towering Trunk", "predicate": [{"not": "unwavering-heart-first:towering-trunk"}], "value": "towering-trunk"}, {"label": "Unyielding Will", "predicate": [{"not": "unwavering-heart-first:unyielding-will"}], "value": "unyielding-will"}]
         label: "Mantle of the Unwavering Heart — Second ability"
+      - key: "FastHealing"
+        value: 3
+        predicate: [{"or": ["unwavering-heart-first:evergreen-vitality", "unwavering-heart-second:evergreen-vitality"]}]
       - key: "FlatModifier"
         selector: "saving-throw"
         value: 2
@@ -31194,6 +31303,11 @@ pf2e_effects:
     duration: {"unit": "minutes", "value": 1, "expiry": "turn-end", "sustained": false}
     traits: []
     description: "Granted by Regenerate%rThe target gains regeneration, which restores Hit Points to it at the start of each of its turns."
+    rules:
+      - key: "FastHealing"
+        type: "regeneration"
+        value: "ternary(gte(@item.level,9),20,15)"
+        deactivatedBy: ["acid", "fire"]
   "Spell Effect: Reinforce Eidolon":
     pack: "spell-effects"
     level: 1
@@ -31869,6 +31983,9 @@ pf2e_effects:
     duration: {"unit": "minutes", "value": 1, "expiry": "turn-start", "sustained": false}
     traits: []
     description: "Granted by Song of the Soul%rYou gain fast healing."
+    rules:
+      - key: "FastHealing"
+        value: "@item.level"
   "Spell Effect: Soothe":
     pack: "spell-effects"
     level: 1
@@ -32045,6 +32162,9 @@ pf2e_effects:
     duration: {"unit": "rounds", "value": 4, "expiry": "turn-start", "sustained": false}
     traits: []
     description: "Granted by Spiritual Renewal%rYou gain fast healing."
+    rules:
+      - key: "FastHealing"
+        value: "2*@item.level"
   "Spell Effect: Sting of the Sea":
     pack: "spell-effects"
     level: 1
@@ -32671,6 +32791,9 @@ pf2e_effects:
     duration: {"unit": "minutes", "value": 1, "expiry": "turn-start", "sustained": true}
     traits: []
     description: "Granted by Trade Death for Life%rYou gain fast healing equal to the rank of the spell."
+    rules:
+      - key: "FastHealing"
+        value: "@item.level"
   "Spell Effect: Transmigrate (Encounter)":
     pack: "spell-effects"
     level: 4

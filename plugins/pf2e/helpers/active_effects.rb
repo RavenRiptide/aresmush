@@ -174,6 +174,7 @@ module AresMUSH
           :answers => said['answers'])
 
         effect.update(:granted_by => granted_by) if granted_by
+        effect.update(:sustained => true, :sustained_round => encounter.round.to_i) if duration['sustained'] && encounter
 
         grant_stored(char, effect, encounter)
 
@@ -380,33 +381,37 @@ module AresMUSH
         per ? per * effect.duration.to_i : nil
       end
 
-      # The order has moved on: one turn ended and the next began. Answers what ran out, as
-      # `[ character name, effect name ]` pairs.
-      def self.advanced(encounter, ending, ending_round, starting, starting_round)
-        ended = ending ? turn(encounter, 'turn-end', ending, ending_round) : []
-
-        ended + turn(encounter, 'turn-start', starting, starting_round)
+      # A turn has begun or ended. Anything whose time is up ends, and each one ended is answered as an
+      # event for whoever tells the room (`Pf2e::Turns`).
+      def self.expire(encounter, event, participant, round)
+        in_encounter(encounter).select { |effect| effect.character && due?(effect, event, participant, round) }
+                               .map { |effect| ended(effect) }
       end
 
-      # A turn has begun or ended. Anything whose time is up is ended, and anything that refreshes at
-      # the start of a turn does so. Answers the effects that ended, so the encounter can say so.
-      def self.turn(encounter, event, participant, round)
-        ended = []
+      # A sustained effect ends at the end of the caster's next turn unless they sustain it, which is the
+      # rule; its duration is only the most it can last. The round it was last sustained in is the one
+      # it began in until someone says otherwise.
+      def self.unsustained(encounter, participant, round)
+        in_encounter(encounter).select { |effect|
+          effect.character && effect.sustained && (effect.started_turn || effect.character.name) == participant &&
+            round.to_i > effect.sustained_round.to_i
+        }.map { |effect| ended(effect) }
+      end
 
-        in_encounter(encounter).each do |effect|
-          char = effect.character
+      # Keeps a sustained effect going through the caster's next turn.
+      def self.sustain(effect, encounter)
+        effect.update(:sustained_round => encounter.round.to_i)
 
-          next unless char
+        Ok.new(:state => effect)
+      end
 
-          if due?(effect, event, participant, round)
-            ended << [ char.name, effect.name ]
-            remove(char, effect)
-          elsif event == 'turn-start' && char.name == participant
-            give_temp_hp(char, effect, 'on_turn_start')
-          end
-        end
+      def self.ended(effect)
+        char = effect.character
+        name = effect.name
 
-        ended
+        remove(char, effect)
+
+        Turns.event('pf2e.effect_ended', 'effect' => name, 'name' => char.name)
       end
 
       # Foundry counts a duration from the turn it began on, and ends it as that turn starts again - or as
@@ -424,14 +429,8 @@ module AresMUSH
 
       # The encounter is over. Anything that could not outlast it ends with it.
       def self.encounter_ended(encounter)
-        in_encounter(encounter).map do |effect|
-          char = effect.character
-
-          next nil if UNITS[effect.unit]['outlasts_encounter'] || !char
-
-          remove(char, effect)
-          [ char.name, effect.name ]
-        end.compact
+        in_encounter(encounter).reject { |effect| UNITS[effect.unit]['outlasts_encounter'] || !effect.character }
+                               .map { |effect| ended(effect) }
       end
 
       # A night's rest. Anything shorter than a day ends, and a day-long effect counts the night.

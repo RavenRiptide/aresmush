@@ -324,6 +324,19 @@ module AresMUSH
           }
         },
         {
+          'key' => 'FastHealing',
+          'fields' => %w{key value type details deactivatedBy predicate slug label},
+          # Hit points regained as each of the character's turns starts. Regeneration is the same, except
+          # that damage of the kinds it names switches it off until their next turn (`fast-healing.ts`).
+          'contribute' => lambda { |row, source, context|
+            { 'source' => source['name'],
+              'value' => Formula.value(row['value'], context).to_i,
+              'type' => (row['type'] || 'fast-healing').to_s,
+              'deactivated_by' => Array(row['deactivatedBy']),
+              'details' => row['details'] }
+          }
+        },
+        {
           'key' => 'TempHP',
           'fields' => %w{key value predicate events slug label},
           # Temporary hit points an effect gives: when it begins, and again at the start of each turn

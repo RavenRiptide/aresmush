@@ -22,6 +22,12 @@ module AresMUSH
 
     attribute :pf2_archetypeinfo, :type => DataType::Hash, :default => { 'archetype1'=>"", 'archetype2'=>"", 'archetype3'=>"", 'archetype4'=>"", 'archetype_specialty1'=>"", 'archetype_specialty2'=>"", 'archetype_specialty3'=>"", 'archetype_specialty4'=>"", 'archetype_specialty_choice1'=>"", 'archetype_specialty_choice2'=>"", 'archetype_specialty_choice3'=>"", 'archetype_specialty_choice4'=>"" }
     attribute :pf2_conditions, :type => DataType::Hash, :default => {}
+    # Persistent damage the character is taking, one per kind of damage: its dice and the DC of the flat
+    # check that ends it.
+    attribute :pf2_persistent, :type => DataType::Array, :default => []
+    # What happened since the character's last turn that their next one needs to know: regeneration
+    # switched off by the damage that stops it.
+    attribute :pf2_turn_state, :type => DataType::Hash, :default => {}
 
     # Circumstances the player has deliberately switched on or off, by option name. An option nobody
     # has touched is absent, and follows whatever declared it.

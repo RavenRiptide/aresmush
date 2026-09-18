@@ -34,8 +34,8 @@ module AresMUSH
         encounter.update(is_active: false)
 
         # Whatever could not outlast the fight ends with it.
-        Pf2e::ActiveEffects.encounter_ended(encounter).each do |name, effect|
-          client.emit_ooc t('pf2e.effect_ended', :effect => effect, :name => name)
+        Pf2e::ActiveEffects.encounter_ended(encounter).each do |event|
+          client.emit_ooc t(event['key'], **Pf2e::CharState.symbolize(event['args']))
         end
 
         @message = t('pf2e.encounter_complete', :id => encounter.id)

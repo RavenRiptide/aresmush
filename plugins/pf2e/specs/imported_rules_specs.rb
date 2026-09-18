@@ -130,11 +130,11 @@ module AresMUSH
 
     # Kinds that reach no statistic, so they name no domain: one declares a circumstance, one writes a
     # value, three describe damage, two describe an attack, one asks a question, one brings another
-    # condition with it, one gives temporary hit points, one changes a thing the character has, and
-    # BaseSpeed names a kind of movement.
+    # condition with it, one gives temporary hit points, one changes a thing the character has, one heals
+    # as a turn starts, and BaseSpeed names a kind of movement.
     SELECTORLESS = %w{RollOption ActiveEffectLike Immunity Weakness Resistance AdjustStrike Strike
                       BaseSpeed Sense MartialProficiency CriticalSpecialization ChoiceSet
-                      GrantItem TempHP ItemAlteration}.freeze
+                      GrantItem TempHP ItemAlteration FastHealing}.freeze
 
     # Of those, the two that still carry a `selector` - because a movement type and a sense are not
     # domains, they are the thing being granted.
@@ -305,10 +305,10 @@ module AresMUSH
       end
     end
 
-    # The nineteen that change a number, and three read at a roll: a note, fortune and misfortune, and
-    # an alteration of what is rolled with.
-    it "should have all twenty-two kinds it reads" do
-      expect(rows.map { |_where, row| row['key'] }.uniq.size).to eq 22
+    # The nineteen that change a number, three read at a roll - a note, fortune and misfortune, and an
+    # alteration of what is rolled with - and fast healing, read as a turn starts.
+    it "should have all twenty-three kinds it reads" do
+      expect(rows.map { |_where, row| row['key'] }.uniq.size).to eq 23
     end
 
     # An alteration has to change something this engine models, on a kind of thing it has.

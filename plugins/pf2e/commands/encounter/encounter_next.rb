@@ -80,12 +80,10 @@ module AresMUSH
 
         encounter.update(next_init: next_init)
 
-        # Time has passed. What ran out ends, and the room is told.
-        ended = Pf2e::ActiveEffects.advanced(encounter, ending, ending_round,
-                                             initlist[this_init][1], moved.state['round'])
-
-        ended.each do |name, effect|
-          notice = t('pf2e.effect_ended', :effect => effect, :name => name)
+        # Time has passed: what ran out ends, what heals heals, what burns burns. The room is told each.
+        Pf2e::Turns.advanced(encounter, ending, ending_round, initlist[this_init][1],
+                             moved.state['round']).each do |event|
+          notice = t(event['key'], **Pf2e::CharState.symbolize(event['args']))
 
           enactor_room.emit notice
           PF2Encounter.send_to_encounter(encounter, notice)

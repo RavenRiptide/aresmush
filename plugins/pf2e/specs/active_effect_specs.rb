@@ -176,8 +176,7 @@ module AresMUSH
 
       encounter.update(:round => moved['round'], :next_init => moved['upcoming'])
 
-      Pf2e::ActiveEffects.advanced(encounter, ending, ending_round, order[moved['current']][1],
-                                   moved['round'])
+      Pf2e::Turns.advanced(encounter, ending, ending_round, order[moved['current']][1], moved['round'])
     end
 
     describe "keeping time in an encounter" do
@@ -212,7 +211,7 @@ module AresMUSH
         advance(fight)
         ended = advance(fight)
 
-        expect(ended).to eq [ [ @char.name, one_round ] ]
+        expect(ended).to eq [ Pf2e::Turns.event('pf2e.effect_ended', 'effect' => one_round, 'name' => @char.name) ]
         expect(Pf2e::ActiveEffects.on(reread)).to eq []
       end
 
@@ -225,7 +224,8 @@ module AresMUSH
         advance(fight)
 
         expect(Pf2e::ActiveEffects.on(reread).map(&:name)).to eq [ to_turn_end ]
-        expect(advance(fight)).to eq [ [ @char.name, to_turn_end ] ]
+        expect(advance(fight)).to eq [ Pf2e::Turns.event('pf2e.effect_ended', 'effect' => to_turn_end,
+                                                          'name' => @char.name) ]
       end
 
       it "should say how long it has left" do

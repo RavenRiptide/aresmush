@@ -48,6 +48,8 @@ KINDS = {
     # Text shown with a roll, for an outcome where it says: Revel in Retribution's reminder on a hit.
     'Note': {'key', 'selector', 'text', 'title', 'predicate', 'outcome', 'slug', 'label', 'visibility',
              'priority'},
+    # Hit points regained as each turn starts; regeneration is switched off by damage it names.
+    'FastHealing': {'key', 'value', 'type', 'details', 'deactivatedBy', 'predicate', 'slug', 'label'},
     # What an effect changes about one of the character's things while it lasts: Magic Weapon's runes.
     'ItemAlteration': {'key', 'itemType', 'itemId', 'mode', 'property', 'value', 'predicate', 'slug',
                        'label', 'priority', 'phase', 'fromEquipment'},
@@ -148,7 +150,7 @@ ORDER = ['key', 'itemType', 'itemId', 'property', 'uuid', 'inMemoryOnly', 'allow
          'maxApplications', 'type', 'ability',
          'value', 'min', 'max', 'diceNumber', 'dieSize', 'damageType', 'damageCategory',
          'critical', 'override', 'tags', 'hideIfDisabled', 'slug', 'requiresEquipped',
-         'events', 'keep', 'outcome', 'removeAfterRoll', 'title', 'text', 'label', 'predicate']
+         'events', 'deactivatedBy', 'details', 'keep', 'outcome', 'removeAfterRoll', 'title', 'text', 'label', 'predicate']
 
 
 def written(key):
@@ -160,7 +162,7 @@ def written(key):
 
 # Neither of these reaches a statistic: one declares a circumstance and the other writes a value.
 SELECTORLESS = {'RollOption', 'ActiveEffectLike', 'Immunity', 'Weakness', 'Resistance', 'AdjustStrike', 'GrantItem',
-                'TempHP', 'ItemAlteration',
+                'TempHP', 'ItemAlteration', 'FastHealing',
                 'Strike', 'MartialProficiency', 'CriticalSpecialization', 'Sense', 'ChoiceSet'}
 
 # Senses this engine knows. One it does not would be a fact nothing could show or ask about.
