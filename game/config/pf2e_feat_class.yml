@@ -2017,6 +2017,9 @@ pf2e_feats:
         type: "status"
         value: 1
         predicate: ["poison"]
+      - key: "Resistance"
+        type: "poison"
+        value: "floor(@actor.level/2)"
   Propelling Sorcery:
     assoc_charclass:
       - Sorcerer
@@ -3280,6 +3283,10 @@ pf2e_feats:
       - key: "RollOption"
         option: "scars-of-steel"
         toggleable: true
+      - key: "Resistance"
+        type: "all-damage"
+        value: "floor(@actor.level/2)+@actor.abilities.con.mod"
+        predicate: ["scars-of-steel"]
   Scoundrel's Surprise:
     assoc_charclass:
       - Rogue
@@ -5669,6 +5676,10 @@ pf2e_feats:
         type: "item"
         value: 1
         predicate: [{"or": ["self:effect:bestial-mutagen-lesser", "self:effect:bestial-mutagen-moderate", "self:effect:bestial-mutagen-greater", "self:effect:bestial-mutagen-major"]}]
+      - key: "Resistance"
+        type: "physical"
+        value: "floor(@actor.level/2)"
+        predicate: [{"or": ["self:effect:juggernaut-mutagen-lesser", "self:effect:juggernaut-mutagen-moderate", "self:effect:juggernaut-mutagen-greater", "self:effect:juggernaut-mutagen-major"]}]
   Nimble Roll:
     assoc_charclass:
       - Rogue
@@ -6411,6 +6422,11 @@ pf2e_feats:
     shortdesc: You understand the fundamental elements of nature such that you can imbue them into your body and manifest as a living embodiment of those elements. Add the shapes in *elemental form* to your *untamed form* list. Whenever you're polymorphed into another shape using *untamed form*, you gain resistance 5 to fire.
     traits:
       - druid
+    rules:
+      - key: "Resistance"
+        type: "fire"
+        value: 5
+        predicate: ["self:effect:untamed-form", {"not": "self:effect:elemental-form"}]
   Energy Fusion:
     assoc_charclass:
       - Sorcerer
@@ -6773,6 +6789,11 @@ pf2e_feats:
     shortdesc: "You can take the shape of a plant creature. If you don't have untamed form, you can cast *plant form* once per day, heightened to the same rank as your highest-rank druid spell slot.%r%rIf you do have Untamed Form, add the shapes listed in *plant form* to your *untamed form* list, and whenever you're polymorphed into another shape using untamed form, you gain resistance 5 to poison."
     traits:
       - druid
+    rules:
+      - key: "Resistance"
+        type: "poison"
+        value: 5
+        predicate: ["self:effect:untamed-form", {"not": "self:effect:plant-form"}]
   Precise Debilitations:
     assoc_charclass:
       - Rogue
@@ -7512,6 +7533,15 @@ pf2e_feats:
     shortdesc: "**Trigger** You take damage from an area effect that allows a Reflex save.%r%rYou dodge a blow at the last possible moment.%r%rYou Step and gain resistance to all damage equal to your level against the triggering effect. If your Step moves you out of the triggering effect's area, this resistance is instead equal to your level plus your Dexterity modifier."
     traits:
       - monk
+    rules:
+      - key: "Resistance"
+        type: "all-damage"
+        value: "@actor.level"
+        predicate: ["dodging-roll:in"]
+      - key: "Resistance"
+        type: "all-damage"
+        value: "@actor.level + @actor.abilities.dex.mod"
+        predicate: ["dodging-roll:out"]
   Domain Fluency:
     assoc_charclass:
       - Oracle
@@ -8660,6 +8690,10 @@ pf2e_feats:
         type: "circumstance"
         value: 1
         predicate: ["ironblood-surge"]
+      - key: "Resistance"
+        type: "all-damage"
+        value: "@actor.abilities.str.mod"
+        predicate: ["ironblood-surge"]
   Lasting Armament:
     assoc_charclass:
       - Cleric
@@ -9356,6 +9390,14 @@ pf2e_feats:
         option: "used-diverse-mystery"
         toggleable: true
         label: "PF2E.SpecificRule.Oracle.DiverseMystery.Toggle"
+      - key: "Weakness"
+        type: "spells"
+        value: 2
+        predicate: ["diverse-mystery:weapon-trance", "used-diverse-mystery", "self:condition:cursebound"]
+      - key: "Weakness"
+        type: ["vitality", "void"]
+        value: 2
+        predicate: ["diverse-mystery:soul-siphon", "used-diverse-mystery", "self:condition:cursebound"]
       - key: "FlatModifier"
         selector: "saving-throw"
         type: "status"
@@ -9366,6 +9408,10 @@ pf2e_feats:
         type: "status"
         value: -1
         predicate: ["self:condition:cursebound", "diverse-mystery:brain-drain", "used-diverse-mystery"]
+      - key: "Weakness"
+        type: "electricity"
+        value: 2
+        predicate: ["self:condition:cursebound", "diverse-mystery:tempest-touch", "used-diverse-mystery"]
   Dragon Transformation:
     assoc_charclass:
       - Barbarian
@@ -11253,6 +11299,10 @@ pf2e_feats:
     shortdesc: "You have become a brutal, unstoppable force of nature, able to shrug off mortal wounds with ease. You gain resistance equal to 3 + your Constitution modifier to all damage, and your resistance from raging increases to 8 + your Constitution modifier.%r%rIn addition, if you are reduced to 0 Hit Points while raging, you can end your rage as a reaction to stay at 1 Hit Point. If you do, you become wounded 2 (or increase your wounded condition by 2 if you are already wounded)."
     traits:
       - barbarian
+    rules:
+      - key: "Resistance"
+        type: "all-damage"
+        value: "@actor.abilities.con.mod+3"
   Weapon Supremacy:
     assoc_charclass:
       - Fighter

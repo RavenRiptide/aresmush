@@ -3409,6 +3409,10 @@ pf2e_feats:
     prereq:
       level: 13
       heritage: Ashen One
+    rules:
+      - key: "Resistance"
+        type: "void"
+        value: 5
   Rock Runner:
     feat_type:
       - Ancestry

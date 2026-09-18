@@ -103,6 +103,21 @@ module AresMUSH
               'mode' => row['mode'].to_s,
               'value' => writable_value(row['value'], context) }
           }
+        },
+        {
+          'key' => 'Immunity',
+          'fields' => %w{key type value predicate label definition exceptions},
+          'contribute' => lambda { |row, source, context| declaration_of(row, source, context) }
+        },
+        {
+          'key' => 'Weakness',
+          'fields' => %w{key type value predicate label definition exceptions},
+          'contribute' => lambda { |row, source, context| declaration_of(row, source, context) }
+        },
+        {
+          'key' => 'Resistance',
+          'fields' => %w{key type value predicate label definition exceptions doubleVs},
+          'contribute' => lambda { |row, source, context| declaration_of(row, source, context) }
         }
       ].freeze
 
@@ -144,6 +159,28 @@ module AresMUSH
         value = [ value, high ].min if high
 
         value
+      end
+
+      # An immunity, a weakness or a resistance: a kind of thing and, for the latter two, how much of it.
+      def self.declaration_of(row, source, context)
+        { 'source' => source['name'],
+          'slug' => row['slug'] || Domains.slug(source['name']),
+          'type' => row['type'],
+          'value' => row['value'] ? Formula.value(row['value'], context) : nil }
+      end
+
+      # Every declaration of a kind whose circumstances are met. Neither a modifier nor a write, so it
+      # has no selector and no stacking: `Pf2e::IWR` decides which of them wins.
+      def self.declarations(sources, options, key)
+        return [] unless known?(key)
+
+        Array(sources).flat_map do |source|
+          held = Array(options) + Array(source['options'])
+
+          of_kind(source, key).select { |row| Predicate.test(row['predicate'], held) }
+                             .map { |row| contribute(row, source, {}) }
+                             .compact
+        end
       end
 
       # Everything an effect writes, in the order the modes are meant to run: a multiply before an add,

@@ -1119,6 +1119,10 @@ pf2e_weapons:
         power: 2
       property:
         - Frost (Greater)
+    rules:
+      - key: "Resistance"
+        type: "fire"
+        value: 5
   Infiltrator's Accessory:
     wp_type: melee
     category: martial

@@ -3,13 +3,19 @@ module AresMUSH
     class PF2DamagePlayerCmd
       include CommandHandler
 
-      attr_accessor :target, :damage, :is_ndc
+      attr_accessor :target, :damage, :is_ndc, :kind
 
+      # `damage <who>=<how much>` or `<how much> <kind>`, so a resistance has something to resist. A
+      # kind nobody names is damage of no kind, which nothing resists.
       def parse_args
         args = cmd.parse_args(ArgParser.arg1_equals_arg2)
 
         self.target = list_arg(args.arg1)
-        self.damage = integer_arg(args.arg2)
+
+        amount, _, named = args.arg2.to_s.strip.partition(' ')
+
+        self.damage = integer_arg(amount)
+        self.kind = named.strip.empty? ? nil : named.strip.downcase
         self.is_ndc = cmd.switch_is?("ndc")
       end
 
@@ -64,7 +70,7 @@ module AresMUSH
           char = ClassTargetFinder.find(item, Character, enactor)
 
           if (char.found?)
-            Pf2eHP.modify_damage(char.target, self.damage, false, is_dc)
+            Pf2eHP.modify_damage(char.target, self.damage, false, is_dc, self.kind)
             ok_char_list << char.target.name
             Login.notify char.target,:pf2_damage, t('pf2e.you_took_damage', :amount => self.damage, :source => enactor.name), 0
           else

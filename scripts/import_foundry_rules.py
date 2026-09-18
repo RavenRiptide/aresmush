@@ -49,10 +49,13 @@ KINDS = {
     # the modes are ordered instead, which is what the ordering is for.
     'ActiveEffectLike': {'key', 'path', 'mode', 'value', 'predicate', 'slug', 'label', 'phase',
                          'priority', 'merge'},
+    'Immunity': {'key', 'type', 'value', 'predicate', 'slug', 'label', 'exceptions'},
+    'Weakness': {'key', 'type', 'value', 'predicate', 'slug', 'label', 'exceptions'},
+    'Resistance': {'key', 'type', 'value', 'predicate', 'slug', 'label', 'exceptions', 'doubleVs'},
 }
 
 # Neither of these reaches a statistic: one declares a circumstance and the other writes a value.
-SELECTORLESS = {'RollOption', 'ActiveEffectLike'}
+SELECTORLESS = {'RollOption', 'ActiveEffectLike', 'Immunity', 'Weakness', 'Resistance'}
 
 # Paths Pf2e::Paths can write. Anything else is refused rather than written somewhere wrong.
 WRITABLE = [
@@ -145,6 +148,12 @@ def take(rule, refused):
         refused['no selector'] += 1
         return None
 
+    # A kind of damage we cannot resolve - a charm whose type the wearer chose - would resist nothing.
+    if rule['key'] in ('Immunity', 'Weakness', 'Resistance'):
+        if INTERPOLATION.search(str(rule.get('type') or '')):
+            refused[f"iwr type {rule.get('type')!r}"] += 1
+            return None
+
     if rule['key'] == 'ActiveEffectLike':
         path = rule.get('path') or ''
         if not any(p.match(path) for p in WRITABLE):
@@ -177,7 +186,8 @@ def take(rule, refused):
             return None
 
     # Keep only the fields we read, in a stable order, so a re-run produces the same file.
-    order = ['key', 'option', 'domain', 'toggleable', 'path', 'mode', 'selector', 'type', 'ability',
+    order = ['key', 'option', 'domain', 'toggleable', 'path', 'mode', 'exceptions', 'selector', 'type',
+             'ability',
              'value', 'min',
              'max', 'diceNumber', 'dieSize', 'damageType', 'damageCategory', 'category', 'critical',
              'override', 'label', 'predicate']

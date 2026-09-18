@@ -190,6 +190,51 @@ module AresMUSH
       end
     end
 
+    # Damage has a kind now, so an item can say it shrugs some of it off.
+    describe "an item that resists damage" do
+      before(:each) do
+        @hp = Pf2eHP.create(:character => @char, :ancestry_hp => 8, :charclass_hp => 10)
+        @char.update(:hp => @hp)
+      end
+
+      after(:each) { @hp&.delete }
+
+      it "should hold what the item declares" do
+        give('Aeon Stone (Preserving)')
+        held = Pf2e::IWR.of(reread)
+
+        expect(held['resistance'].map { |one| one['type'] }).to include 'persistent-damage'
+      end
+
+      it "should take the resistance off damage of that kind" do
+        give('Aeon Stone (Preserving)')
+        Pf2eHP.modify_damage(reread, 8, false, true, 'persistent-damage')
+
+        expect(Pf2eHP[@hp.id].damage).to eq 5
+      end
+
+      it "should leave damage of another kind alone" do
+        give('Aeon Stone (Preserving)')
+        Pf2eHP.modify_damage(reread, 8, false, true, 'fire')
+
+        expect(Pf2eHP[@hp.id].damage).to eq 8
+      end
+
+      it "should leave damage of no kind alone, since nothing resists it" do
+        give('Aeon Stone (Preserving)')
+        Pf2eHP.modify_damage(reread, 8, false, true)
+
+        expect(Pf2eHP[@hp.id].damage).to eq 8
+      end
+
+      it "should do nothing while the stone is not invested" do
+        give('Aeon Stone (Preserving)', :invested => false)
+        Pf2eHP.modify_damage(reread, 8, false, true, 'persistent-damage')
+
+        expect(Pf2eHP[@hp.id].damage).to eq 8
+      end
+    end
+
     # A roll string says what the roller is doing, which is how a player claims one of these.
     describe "claiming one in a roll" do
       it "should count the bonus the action allows" do

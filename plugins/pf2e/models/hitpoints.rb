@@ -33,7 +33,11 @@ module AresMUSH
 
     end
 
-    def self.modify_damage(char, amount, healing=false, is_dm=false)
+    # `kind` is what the damage was: `fire`, `S`, whatever the attack dealt. Given one, the character's
+    # immunities, weaknesses and resistances are applied before any of it lands - which is the point of
+    # damage having a kind at all.
+    def self.modify_damage(char, amount, healing=false, is_dm=false, kind=nil)
+      amount = Pf2e::IWR.apply(Pf2e::IWR.of(char), amount, kind)['amount'] if kind && !healing
 
       hp = get_hp_obj(char)
       max_hp = get_max_hp(char)

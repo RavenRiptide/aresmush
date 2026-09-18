@@ -8,6 +8,8 @@ pf2e_conditions:
         selector: "perception"
         type: "status"
         value: -4
+      - key: "Immunity"
+        type: "visual"
   Clumsy:
     short_descr: Your movements become clumsy and inexact.
     value: true
@@ -46,6 +48,8 @@ pf2e_conditions:
         type: "status"
         value: -2
         predicate: [{"or": [{"and": ["check:type:skill", "item:trait:auditory"]}, {"and": ["check:statistic:base:perception", "check:statistic:initiative"]}]}]
+      - key: "Immunity"
+        type: "auditory"
   Doomed:
     short_descr: A powerful force is pulling you towards death.
     value: true

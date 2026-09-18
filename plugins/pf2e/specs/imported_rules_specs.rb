@@ -118,7 +118,8 @@ module AresMUSH
 
     # Neither a declaration nor a write reaches a statistic, so neither names a selector: one names an
     # option and the other a path.
-    SELECTORLESS = %w{RollOption ActiveEffectLike}.freeze
+    SELECTORLESS = %w{RollOption ActiveEffectLike Immunity Weakness Resistance}.freeze
+    IWR_KINDS = %w{Immunity Weakness Resistance}.freeze
 
     it "should have a selector on everything that reaches a statistic, and on nothing else" do
       reaching, apart = rows.partition { |_where, row| !SELECTORLESS.include?(row['key']) }
@@ -152,6 +153,26 @@ module AresMUSH
       expect(strays.uniq).to eq []
     end
 
+    # A kind of damage we cannot resolve would resist nothing, so the type has to be a plain word.
+    it "should resist only kinds of damage it can name" do
+      iwr = rows.select { |_where, row| IWR_KINDS.include?(row['key']) }
+
+      strays = iwr.reject { |_where, row| Array(row['type']).all? { |one| !one.to_s.include?('{') } }
+                  .map { |where, row| "#{where}: #{row['type'].inspect}" }
+
+      expect(strays.uniq).to eq []
+    end
+
+    it "should give a weakness and a resistance a value, since that is how much it is" do
+      valued = rows.select { |_where, row| %w{Weakness Resistance}.include?(row['key']) }
+
+      expect(valued.reject { |_where, row| row['value'] }.map(&:first).uniq).to eq []
+    end
+
+    it "should have immunities and resistances, which conditions and items both declare" do
+      expect(rows.count { |_where, row| IWR_KINDS.include?(row['key']) }).to be > 5
+    end
+
     it "should have writes, since that is the second half of some feats" do
       expect(rows.count { |_where, row| row['key'] == 'ActiveEffectLike' }).to be > 40
     end
@@ -171,10 +192,13 @@ module AresMUSH
       expect(rows.count { |_where, row| row['key'] == 'RollOption' }).to be > 50
     end
 
+    # Only a modifier's `type` is a stacking type. On an immunity or a resistance it is a kind of damage,
+    # which is a different vocabulary in the same field name.
     it "should name only modifier types the stacking rule knows" do
-      strays = rows.select { |_where, row| row['type'] }
-                   .reject { |_where, row| Pf2e::Modifiers::TYPES.include?(row['type'].to_s) }
-                   .map { |where, row| "#{where}: #{row['type'].inspect}" }
+      modifiers = rows.select { |_where, row| row['key'] == 'FlatModifier' && row['type'] }
+
+      strays = modifiers.reject { |_where, row| Pf2e::Modifiers::TYPES.include?(row['type'].to_s) }
+                        .map { |where, row| "#{where}: #{row['type'].inspect}" }
 
       expect(strays.uniq).to eq []
     end
