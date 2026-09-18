@@ -192,6 +192,11 @@ pf2e_feats:
     prereq:
       level: 1
       heritage: Aesa
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.skills.society.rank"
+        mode: "upgrade"
+        value: 1
   Animal Accomplice:
     feat_type:
       - Ancestry
@@ -413,6 +418,11 @@ pf2e_feats:
     shortdesc: You have an impressive innate ability to tame and command ferocious beasts. You become trained in the Nature skill and gain your choice of the Pet general feat or the Train Animal skill feat.
     prereq:
       level: 1
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.skills.nature.rank"
+        mode: "upgrade"
+        value: 1
   Bestial Manifestation:
     feat_type:
       - Ancestry
@@ -850,6 +860,15 @@ pf2e_feats:
     prereq:
       level: 1
       heritage: Changeling
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.skills.deception.rank"
+        mode: "upgrade"
+        value: 1
+      - key: "ActiveEffectLike"
+        path: "system.skills.occultism.rank"
+        mode: "upgrade"
+        value: 1
   Cheek Pouches:
     feat_type:
       - Ancestry
@@ -1080,6 +1099,16 @@ pf2e_feats:
       level: 5
       feat:
         - Oruch Ferocity
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.attributes.dying.recoveryDC"
+        mode: "downgrade"
+        value: 9
+      - key: "ActiveEffectLike"
+        path: "system.attributes.dying.recoveryDC"
+        mode: "downgrade"
+        value: 8
+        predicate: ["feat:toughness"]
   Defy the Darkness:
     feat_type:
       - Ancestry
@@ -1265,6 +1294,11 @@ pf2e_feats:
     prereq:
       level: 1
       heritage: Silyara
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.skills.performance.rank"
+        mode: "upgrade"
+        value: 1
   Eat Fortune:
     feat_type:
       - Ancestry
@@ -1745,6 +1779,15 @@ pf2e_feats:
     shortdesc: "You've picked up skills and tales from your goblin community. You gain the trained proficiency rank in Nature and Stealth. If you would automatically become trained in one of those skills (from your background or class, for example), you instead become trained in a skill of your choice.%r%rYou also gain the Additional Lore general feat for Goblin Lore."
     prereq:
       level: 1
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.skills.nature.rank"
+        mode: "upgrade"
+        value: 1
+      - key: "ActiveEffectLike"
+        path: "system.skills.stealth.rank"
+        mode: "upgrade"
+        value: 1
   Goblin Scuttle:
     feat_type:
       - Ancestry
@@ -2019,6 +2062,14 @@ pf2e_feats:
     prereq:
       level: 9
     rules:
+      - key: "ActiveEffectLike"
+        path: "inventory.bulk.encumberedAfterAddend"
+        mode: "add"
+        value: 1
+      - key: "ActiveEffectLike"
+        path: "inventory.bulk.maxAddend"
+        mode: "add"
+        value: 1
       - key: "FlatModifier"
         selector: "travel-speed"
         type: "circumstance"
@@ -2061,6 +2112,11 @@ pf2e_feats:
     prereq:
       level: 1
       heritage: Niasa
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.skills.deception.rank"
+        mode: "upgrade"
+        value: 1
   Heroic Presence:
     feat_type:
       - Ancestry
@@ -2548,6 +2604,16 @@ pf2e_feats:
       - key: "FlatModifier"
         selector: "hp"
         value: "@actor.level"
+      - key: "ActiveEffectLike"
+        path: "system.attributes.dying.recoveryDC"
+        mode: "downgrade"
+        value: 9
+        predicate: [{"not": "feat:toughness"}]
+      - key: "ActiveEffectLike"
+        path: "system.attributes.dying.recoveryDC"
+        mode: "downgrade"
+        value: 6
+        predicate: ["feat:toughness"]
   Multitalented:
     feat_type:
       - Ancestry
@@ -2713,6 +2779,11 @@ pf2e_feats:
       orheritage:
         - Aesa
         - Niasa
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.skills.religion.rank"
+        mode: "upgrade"
+        value: 1
   Nephilim Resistance:
     feat_type:
       - Ancestry
@@ -3025,6 +3096,11 @@ pf2e_feats:
     prereq:
       level: 1
       heritage: Niasa
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.skills.athletics.rank"
+        mode: "upgrade"
+        value: 1
   Prairie Rider:
     feat_type:
       - Ancestry
@@ -3039,6 +3115,10 @@ pf2e_feats:
     prereq:
       level: 1
     rules:
+      - key: "ActiveEffectLike"
+        path: "system.skills.nature.rank"
+        mode: "upgrade"
+        value: 1
       - key: "FlatModifier"
         selector: "nature"
         type: "circumstance"
@@ -3831,6 +3911,10 @@ pf2e_feats:
         type: "circumstance"
         value: 2
         predicate: ["action:seek", "terrain:unusual-stonework"]
+      - key: "ActiveEffectLike"
+        path: "system.skills.crafting.rank"
+        mode: "upgrade"
+        value: 1
   Stonewalker:
     feat_type:
       - Ancestry
@@ -4003,6 +4087,10 @@ pf2e_feats:
       level: 1
       heritage: Dar
     rules:
+      - key: "ActiveEffectLike"
+        path: "system.skills.diplomacy.rank"
+        mode: "upgrade"
+        value: 1
       - key: "FlatModifier"
         selector: "hp"
         value: "@actor.level"
@@ -4099,6 +4187,11 @@ pf2e_feats:
     shortdesc: You're trained in Crafting. If you are trained in Crafting from another source (from your background or class, for example), you instead become trained in a skill of your choice. You can Repair an item without using a repair toolkit without taking the –2 circumstance penalty, improvising tools from whatever you have at hand. You gain a +1 circumstance bonus to Crafting checks to Repair an item when you have a repair toolkit.
     prereq:
       level: 1
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.skills.crafting.rank"
+        mode: "upgrade"
+        value: 1
   Titan Slinger:
     feat_type:
       - Ancestry
@@ -4331,6 +4424,15 @@ pf2e_feats:
     prereq:
       level: 1
       heritage: Dar
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.skills.society.rank"
+        mode: "upgrade"
+        value: 1
+      - key: "ActiveEffectLike"
+        path: "system.skills.religion.rank"
+        mode: "upgrade"
+        value: 1
   Vandal:
     feat_type:
       - Ancestry
@@ -4344,6 +4446,11 @@ pf2e_feats:
     shortdesc: "You have a knack for breaking and dismantling things. Putting them back together is the boring part, so you largely don't bother with that. You become trained in Thievery. If you would automatically become trained in Thievery (from your background or class, for example), you instead become trained in a skill of your choice.%r%rIn addition, whenever you hit with a Strike against a trap or an unattended object, you ignore the first 5 points of the object's Hardness."
     prereq:
       level: 5
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.skills.thievery.rank"
+        mode: "upgrade"
+        value: 1
   Very Sneaky:
     feat_type:
       - Ancestry
@@ -4488,6 +4595,10 @@ pf2e_feats:
     prereq:
       level: 1
     rules:
+      - key: "ActiveEffectLike"
+        path: "system.skills.survival.rank"
+        mode: "upgrade"
+        value: 1
       - key: "RollOption"
         option: "compass-in-possession"
         domain: "skill-check"

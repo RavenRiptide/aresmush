@@ -45,10 +45,22 @@ KINDS = {
     # and not an interface we have.
     'RollOption': {'key', 'option', 'domain', 'toggleable', 'value', 'predicate', 'slug', 'label',
                    'placement', 'mergeable'},
+    # phase and priority order writes against Foundry's data preparation, which has no counterpart here;
+    # the modes are ordered instead, which is what the ordering is for.
+    'ActiveEffectLike': {'key', 'path', 'mode', 'value', 'predicate', 'slug', 'label', 'phase',
+                         'priority', 'merge'},
 }
 
-# A RollOption has no selector; it declares a circumstance rather than reaching a statistic.
-SELECTORLESS = {'RollOption'}
+# Neither of these reaches a statistic: one declares a circumstance and the other writes a value.
+SELECTORLESS = {'RollOption', 'ActiveEffectLike'}
+
+# Paths Pf2e::Paths can write. Anything else is refused rather than written somewhere wrong.
+WRITABLE = [
+    re.compile(r'^system\.skills\.[\w-]+\.rank$'),
+    re.compile(r'^system\.attributes\.dying\.recoveryDC$'),
+    re.compile(r'^inventory\.bulk\.(maxAddend|encumberedAfterAddend)$'),
+    re.compile(r'^flags\.system\.[\w.]+$'),
+]
 
 TYPES = {'item', 'circumstance', 'status', 'ability', 'proficiency', 'potency', 'untyped'}
 
@@ -133,6 +145,17 @@ def take(rule, refused):
         refused['no selector'] += 1
         return None
 
+    if rule['key'] == 'ActiveEffectLike':
+        path = rule.get('path') or ''
+        if not any(p.match(path) for p in WRITABLE):
+            refused[f'path {path!r}'] += 1
+            return None
+        # A value that is a list or an object is a list of Foundry documents - the shapes a druid knows,
+        # by compendium id. Nothing here can read one, so storing it would be noise rather than a rule.
+        if not isinstance(rule.get('value'), (int, float, str, bool)):
+            refused['value is a list of foundry documents'] += 1
+            return None
+
     strays = set(rule) - fields
     if strays:
         refused[f'field {sorted(strays)}'] += 1
@@ -154,7 +177,8 @@ def take(rule, refused):
             return None
 
     # Keep only the fields we read, in a stable order, so a re-run produces the same file.
-    order = ['key', 'option', 'domain', 'toggleable', 'selector', 'type', 'ability', 'value', 'min',
+    order = ['key', 'option', 'domain', 'toggleable', 'path', 'mode', 'selector', 'type', 'ability',
+             'value', 'min',
              'max', 'diceNumber', 'dieSize', 'damageType', 'damageCategory', 'category', 'critical',
              'override', 'label', 'predicate']
 

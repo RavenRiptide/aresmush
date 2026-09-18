@@ -308,6 +308,15 @@ pf2e_feats:
     prereq:
       level: 1
       skill: Athletics/trained
+    rules:
+      - key: "ActiveEffectLike"
+        path: "inventory.bulk.encumberedAfterAddend"
+        mode: "add"
+        value: 2
+      - key: "ActiveEffectLike"
+        path: "inventory.bulk.maxAddend"
+        mode: "add"
+        value: 2
   Hobnobber:
     feat_type:
       - Skill
@@ -387,6 +396,15 @@ pf2e_feats:
     prereq:
       level: 1
       skill: Society/trained
+    rules:
+      - key: "ActiveEffectLike"
+        path: "flags.system.multilingualTaken"
+        mode: "override"
+        value: 0
+      - key: "ActiveEffectLike"
+        path: "flags.system.multilingualTaken"
+        mode: "add"
+        value: 1
   Natural Medicine:
     feat_type:
       - Skill

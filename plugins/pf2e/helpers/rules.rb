@@ -89,6 +89,20 @@ module AresMUSH
               'label' => row['label'],
               'default' => truthy(row['value'], context) }
           }
+        },
+        {
+          'key' => 'ActiveEffectLike',
+          'fields' => %w{key path mode value predicate slug label priority phase merge},
+          # Writes a value rather than adding a modifier: a feat that makes you trained in a skill, a
+          # counter another rule's predicate asks about. `Pf2e::Paths` says which paths may be written
+          # and what each mode does; a path it does not know is refused there.
+          'contribute' => lambda { |row, source, context|
+            { 'source' => source['name'],
+              'slug' => row['slug'] || Domains.slug(source['name']),
+              'path' => row['path'],
+              'mode' => row['mode'].to_s,
+              'value' => writable_value(row['value'], context) }
+          }
         }
       ].freeze
 
@@ -102,6 +116,17 @@ module AresMUSH
       # A RollOption's `value` is a boolean or a formula, not a number: `true` and `false` mean what they
       # say, and anything else is read as arithmetic and true when it comes to something other than zero.
       # An option that says nothing is on, which is this game's default rather than Foundry's.
+      # A written value may be a flag, a word or a number. Only a number goes through the formula reader;
+      # anything else is what it says, since `override` writes words and flags as readily as numbers.
+      def self.writable_value(value, context)
+        return value unless value.is_a?(Numeric) || value.is_a?(String)
+        return value unless value.is_a?(Numeric) || value.match?(/[\d@(]/)
+
+        Formula.value(value, context)
+      rescue StandardError
+        value
+      end
+
       def self.truthy(value, context)
         return true if value.nil?
         return value if value == true || value == false
@@ -119,6 +144,24 @@ module AresMUSH
         value = [ value, high ].min if high
 
         value
+      end
+
+      # Everything an effect writes, in the order the modes are meant to run: a multiply before an add,
+      # and an override last, so an override wins whatever else said (`ae-like.ts`).
+      MODE_ORDER = %w{multiply add subtract remove downgrade upgrade override}.freeze
+
+      def self.writes(sources, options)
+        gathered = Array(sources).flat_map do |source|
+          held = Array(options) + Array(source['options'])
+
+          of_kind(source, 'ActiveEffectLike')
+            .select { |row| Predicate.test(row['predicate'], held) }
+            .map { |row| contribute(row, source, {}) }
+            .compact
+        end
+
+        gathered.select { |write| Paths.writable?(write['path']) }
+                .sort_by { |write| MODE_ORDER.index(write['mode']) || MODE_ORDER.size }
       end
 
       # Rules that change how a check turned out. `AdjustDegreeOfSuccess` is not implemented, so this is

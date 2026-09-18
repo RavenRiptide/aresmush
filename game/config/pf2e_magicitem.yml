@@ -340,6 +340,14 @@ pf2e_magicitem:
         selector: "athletics"
         type: "item"
         value: 1
+      - key: "ActiveEffectLike"
+        path: "inventory.bulk.encumberedAfterAddend"
+        mode: "add"
+        value: 1
+      - key: "ActiveEffectLike"
+        path: "inventory.bulk.maxAddend"
+        mode: "add"
+        value: 1
   Viper Arrow:
     traits:
       - consumable

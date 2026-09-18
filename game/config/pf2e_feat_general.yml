@@ -63,6 +63,10 @@ pf2e_feats:
         type: "circumstance"
         value: 1
         predicate: ["item:trait:inhaled"]
+      - key: "ActiveEffectLike"
+        path: "flags.system.remainingAir.rounds"
+        mode: "upgrade"
+        value: "25 * (5 + @actor.abilities.con.mod)"
   Canny Acumen:
     feat_type:
       - General
@@ -181,6 +185,10 @@ pf2e_feats:
       - key: "FlatModifier"
         selector: "hp"
         value: "@actor.level"
+      - key: "ActiveEffectLike"
+        path: "system.attributes.dying.recoveryDC"
+        mode: "subtract"
+        value: 1
   Weapon Proficiency:
     repeatable: true
     feat_type:

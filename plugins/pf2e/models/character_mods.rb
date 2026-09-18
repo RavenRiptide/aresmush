@@ -26,6 +26,11 @@ module AresMUSH
     # Circumstances the player has deliberately switched on or off, by option name. An option nobody
     # has touched is absent, and follows whatever declared it.
     attribute :pf2_roll_options, :type => DataType::Hash, :default => {}
+
+    # Values an effect wrote that nothing else owns: counters other rules ask about, a lowered recovery
+    # DC, extra carrying capacity. Derived rather than chosen, so it is rewritten whenever the effects
+    # that set it change. Pf2e::Paths is the registry of what may be written here and how.
+    attribute :pf2_derived, :type => DataType::Hash, :default => {}
     attribute :pf2_features, :type => DataType::Hash, :default => { 'charclass_features'=>[], 'archetype_features'=>[] }
     attribute :pf2_traits, :type => DataType::Array, :default => []
     attribute :pf2_feats, :type => DataType::Hash, :default => { "ancestry"=>[], "charclass"=>[], "skill"=>[], "general"=>[], "archetype" => [], "dedication" => [] }

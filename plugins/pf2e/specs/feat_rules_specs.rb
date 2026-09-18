@@ -66,6 +66,48 @@ module AresMUSH
       expect(sources).to include 'Toughness'
     end
 
+    # Some feats write a value rather than adding a modifier. Toughness is both: hit points equal to
+    # level, and a lower DC to recover from dying - the second half of the feat, which nothing read
+    # before the writable paths existed.
+    describe "a feat that writes a value" do
+      it "should lower the DC to recover from dying" do
+        with_feat('Toughness')
+
+        expect(Pf2e::Paths.apply_all!(reread)).to be > 0
+        expect(Pf2e::Paths.held(reread, 'dying_recovery_dc')).to eq(-1)
+      end
+
+      it "should write nothing for a character without the feat" do
+        Pf2e::Paths.apply_all!(reread)
+
+        expect(Pf2e::Paths.held(reread, 'dying_recovery_dc')).to be_nil
+      end
+
+      # Hefty Hauler writes two paths, and both are additions.
+      it "should add carrying capacity" do
+        with_feat('Hefty Hauler')
+        Pf2e::Paths.apply_all!(reread)
+
+        expect(Pf2e::Paths.held(reread, 'maxaddend')).to eq 2
+        expect(Pf2e::Paths.held(reread, 'encumberedafteraddend')).to eq 2
+      end
+
+      # Applied again on every fold, because the fold would otherwise take it off - which is why these
+      # are derived rather than written to the ledger. The store is emptied first, or an addition would
+      # count twice.
+      it "should come to the same thing applied twice" do
+        with_feat('Hefty Hauler')
+        Pf2e::Paths.apply_all!(reread)
+        Pf2e::Paths.apply_all!(reread)
+
+        expect(Pf2e::Paths.held(reread, 'maxaddend')).to eq 2
+      end
+
+      it "should refuse a path the registry does not know" do
+        expect(Pf2e::Paths.apply!(reread, 'system.attributes.hp.max', 'add', 10)).to be false
+      end
+    end
+
     # Initiative is a Perception check that also answers to `initiative`, so a feat written against
     # initiative reaches it without anything here knowing the feat exists.
     describe "initiative" do

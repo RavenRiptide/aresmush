@@ -116,13 +116,55 @@ module AresMUSH
       expect(strays.uniq).to eq []
     end
 
-    # A declaration reaches no statistic, so it names no selector and must name an option instead.
-    it "should have an option on every declaration and a selector on nothing else" do
-      declarations, reaching = rows.partition { |_where, row| row['key'] == 'RollOption' }
+    # Neither a declaration nor a write reaches a statistic, so neither names a selector: one names an
+    # option and the other a path.
+    SELECTORLESS = %w{RollOption ActiveEffectLike}.freeze
+
+    it "should have a selector on everything that reaches a statistic, and on nothing else" do
+      reaching, apart = rows.partition { |_where, row| !SELECTORLESS.include?(row['key']) }
+
+      expect(reaching.reject { |_where, row| row['selector'] }.map(&:first).uniq).to eq []
+      expect(apart.select { |_where, row| row['selector'] }.map(&:first).uniq).to eq []
+    end
+
+    it "should have an option on every declaration" do
+      declarations = rows.select { |_where, row| row['key'] == 'RollOption' }
 
       expect(declarations.reject { |_where, row| row['option'] }.map(&:first).uniq).to eq []
-      expect(declarations.select { |_where, row| row['selector'] }.map(&:first).uniq).to eq []
-      expect(reaching.reject { |_where, row| row['selector'] }.map(&:first).uniq).to eq []
+    end
+
+    # A path the registry cannot write would be an effect that silently does nothing.
+    it "should write only paths the registry knows" do
+      writes = rows.select { |_where, row| row['key'] == 'ActiveEffectLike' }
+
+      strays = writes.reject { |_where, row| Pf2e::Paths.writable?(row['path']) }
+                     .map { |where, row| "#{where}: #{row['path']}" }
+
+      expect(strays.uniq).to eq []
+    end
+
+    it "should write with only the modes the registry applies" do
+      writes = rows.select { |_where, row| row['key'] == 'ActiveEffectLike' }
+
+      strays = writes.reject { |_where, row| Pf2e::Paths::MODES.key?(row['mode'].to_s) }
+                     .map { |where, row| "#{where}: #{row['mode'].inspect}" }
+
+      expect(strays.uniq).to eq []
+    end
+
+    it "should have writes, since that is the second half of some feats" do
+      expect(rows.count { |_where, row| row['key'] == 'ActiveEffectLike' }).to be > 40
+    end
+
+    # A write's value is stored as it stands, so it has to be something we can store and read back.
+    it "should write only values we can hold" do
+      writes = rows.select { |_where, row| row['key'] == 'ActiveEffectLike' }
+
+      strays = writes.reject { |_where, row|
+        [ String, Integer, Float, TrueClass, FalseClass ].any? { |kind| row['value'].is_a?(kind) }
+      }.map { |where, row| "#{where}: #{row['value'].class}" }
+
+      expect(strays.uniq).to eq []
     end
 
     it "should have declarations, since most of what an item offers is one" do
@@ -137,12 +179,28 @@ module AresMUSH
       expect(strays.uniq).to eq []
     end
 
+    # A value that is a number or an expression has to be readable. A write's value may be neither - a
+    # list of forms, a word - and those are written as they stand rather than evaluated.
     it "should carry values the formula reader can read" do
       strays = rows.flat_map { |where, row|
-        Pf2e::Rules::FORMULA_FIELDS.select { |field| row[field] }
-                                   .reject { |field| Pf2e::Formula.parses?(row[field]) }
-                                   .map { |field| "#{where}: #{field} #{row[field].inspect}" }
+        Pf2e::Rules::FORMULA_FIELDS
+          .select { |field| row[field].is_a?(Numeric) || row[field].is_a?(String) }
+          .reject { |field| Pf2e::Formula.parses?(row[field]) || row['key'] == 'ActiveEffectLike' }
+          .map { |field| "#{where}: #{field} #{row[field].inspect}" }
       }
+
+      expect(strays.uniq).to eq []
+    end
+
+    # A write's value, where it is arithmetic, still has to be readable: Breath Control's is
+    # `25 * (5 + @actor.abilities.con.mod)`.
+    it "should carry writable arithmetic the formula reader can read" do
+      writes = rows.select { |_where, row| row['key'] == 'ActiveEffectLike' }
+
+      strays = writes.select { |_where, row| row['value'].is_a?(String) }
+                     .select { |_where, row| row['value'].match?(/[@(]/) }
+                     .reject { |_where, row| Pf2e::Formula.parses?(row['value']) }
+                     .map { |where, row| "#{where}: #{row['value'].inspect}" }
 
       expect(strays.uniq).to eq []
     end

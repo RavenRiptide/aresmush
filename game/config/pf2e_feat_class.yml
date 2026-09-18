@@ -29,6 +29,16 @@ pf2e_feats:
         value: 1
         label: "PF2E.SkillVariant.EscapeForceOpenOrLift"
         predicate: ["self:effect:rage", {"or": ["action:escape", "action:force-open", "action:lift-heavy-object"]}]
+      - key: "ActiveEffectLike"
+        path: "inventory.bulk.encumberedAfterAddend"
+        mode: "add"
+        value: 2
+        predicate: ["self:effect:rage"]
+      - key: "ActiveEffectLike"
+        path: "inventory.bulk.maxAddend"
+        mode: "add"
+        value: 2
+        predicate: ["self:effect:rage"]
   Alchemical Assessment:
     assoc_charclass:
       - Alchemist
@@ -280,6 +290,11 @@ pf2e_feats:
     traits:
       - cleric
     init_magic: true
+    rules:
+      - key: "ActiveEffectLike"
+        path: "flags.system.soulWarden.featCount"
+        mode: "add"
+        value: 1
   Double Slice:
     assoc_charclass:
       - Fighter
@@ -3732,6 +3747,16 @@ pf2e_feats:
       - barbarian
       - morph
       - primal
+    rules:
+      - key: "ActiveEffectLike"
+        path: "flags.system.animalSkinBonus"
+        mode: "upgrade"
+        value: 2
+      - key: "ActiveEffectLike"
+        path: "flags.system.animalSkinBonus"
+        mode: "upgrade"
+        value: 3
+        predicate: ["feature:greater-juggernaut"]
   Anticipate Ambush:
     assoc_charclass:
       - Rogue
@@ -4070,6 +4095,12 @@ pf2e_feats:
     traits:
       - champion
       - concentrate
+    rules:
+      - key: "ActiveEffectLike"
+        path: "flags.system.champion.aura"
+        mode: "upgrade"
+        value: 30
+        predicate: ["expand-aura"]
   Explosive Arrival:
     assoc_charclass:
       - Wizard
@@ -4083,6 +4114,11 @@ pf2e_feats:
       - manipulate
       - spellshape
       - wizard
+    rules:
+      - key: "ActiveEffectLike"
+        path: "flags.system.spellshape.explosiveArrivalDamage"
+        mode: "override"
+        value: "{item|flags.system.rulesSelections.arrivalDamage}"
   Far Throw:
     assoc_charclass:
       - Rogue
@@ -4866,6 +4902,11 @@ pf2e_feats:
     traits:
       - cleric
     init_magic: true
+    rules:
+      - key: "ActiveEffectLike"
+        path: "flags.system.soulWarden.featCount"
+        mode: "add"
+        value: 1
   Advanced School Spell:
     feat_choice:
       auto: subclass_spell
@@ -8838,6 +8879,11 @@ pf2e_feats:
       - manipulate
       - spellshape
       - wizard
+    rules:
+      - key: "ActiveEffectLike"
+        path: "flags.system.spellshape.arrayDamage"
+        mode: "override"
+        value: "{item|flags.system.rulesSelections.arrayDamage}"
   Sense the Unseen:
     assoc_charclass:
       - Investigator
