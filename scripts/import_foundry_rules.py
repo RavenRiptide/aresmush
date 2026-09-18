@@ -130,7 +130,10 @@ MOVEMENT = {'land', 'burrow', 'climb', 'fly', 'swim'}
 
 # What an AdjustStrike may change and have it mean something here. A trait changes numbers; a material,
 # a range increment and a property rune name things this engine does not model.
-STRIKE_PROPERTIES = {'traits', 'weapon-traits'}
+STRIKE_PROPERTIES = {'traits', 'weapon-traits', 'property-runes', 'materials', 'range-increment'}
+
+# What an adjustment may do to one of those. A word is only ever added; a range increment is arithmetic.
+STRIKE_MODES = {'add', 'multiply', 'upgrade', 'downgrade', 'override'}
 
 # Paths Pf2e::Paths can write. Anything else is refused rather than written somewhere wrong.
 WRITABLE = [
@@ -314,8 +317,10 @@ def take(rule, refused):
         if rule.get('property') not in STRIKE_PROPERTIES:
             refused[f"strike property {rule.get('property')!r}"] += 1
             return None
-        if rule.get('mode') != 'add':
-            refused[f"strike mode {rule.get('mode')!r}"] += 1
+        listed = rule.get('property') in ('traits', 'weapon-traits', 'property-runes', 'materials')
+        allowed = {'add'} if listed else STRIKE_MODES
+        if rule.get('mode') not in allowed:
+            refused[f"strike mode {rule.get('mode')!r} on {rule.get('property')}"] += 1
             return None
     elif rule['key'] not in SELECTORLESS:
         named = rule.get('selector') or rule.get('selectors')

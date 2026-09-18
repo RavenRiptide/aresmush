@@ -449,6 +449,12 @@ pf2e_feats:
     shortdesc: You've learned how to throw a longer distance. When you throw an alchemical bomb, it has a range increment of 30 feet instead of the usual 20 feet.
     traits:
       - alchemist
+    rules:
+      - key: "AdjustStrike"
+        mode: "upgrade"
+        property: "range-increment"
+        definition: ["item:base:alchemical-bomb"]
+        value: 30
   Flashy Dodge:
     assoc_charclass:
       - Swashbuckler
@@ -2410,6 +2416,12 @@ pf2e_feats:
     shortdesc: When you Strike with a thrown weapon, the weapon's range increment increases by 10 feet.
     traits:
       - rogue
+    rules:
+      - key: "AdjustStrike"
+        mode: "add"
+        property: "range-increment"
+        definition: ["item:thrown"]
+        value: 10
   Stunning Blows:
     assoc_charclass:
       - Monk
@@ -2933,6 +2945,12 @@ pf2e_feats:
     shortdesc: Your experience in the field has taught you how to focus your aim at a distance, increasing your accuracy. Double your weapons' range increments.
     traits:
       - ranger
+    rules:
+      - key: "AdjustStrike"
+        mode: "multiply"
+        property: "range-increment"
+        definition: ["item:ranged"]
+        value: 2
   Favored Prey:
     assoc_charclass:
       - Ranger
@@ -7522,6 +7540,17 @@ pf2e_feats:
     shortdesc: Your verdant weapon can cut through the resistances of magical creatures. The weapon is treated as cold iron and silver. If you critically hit a creature that has a weakness to cold iron or silver, the target takes 1d6 persistent bleed damage as the primal energies within your weapon slow its natural healing.
     traits:
       - druid
+    rules:
+      - key: "AdjustStrike"
+        mode: "add"
+        property: "materials"
+        definition: ["item:tag:verdant-weapon"]
+        value: "cold-iron"
+      - key: "AdjustStrike"
+        mode: "add"
+        property: "materials"
+        definition: ["item:tag:verdant-weapon"]
+        value: "silver"
   Quickened Casting:
     assoc_charclass:
       - Bard
@@ -9082,6 +9111,12 @@ pf2e_feats:
     shortdesc: You lob bombs unerringly, despite obstructions or distance. When you throw an alchemical item with the bomb trait, its range increment increases to 60 feet, you reduce any circumstance bonus to the target's AC from cover by 1, and you automatically succeed at the flat check when targeting a concealed creature.
     traits:
       - alchemist
+    rules:
+      - key: "AdjustStrike"
+        mode: "upgrade"
+        property: "range-increment"
+        definition: ["item:base:alchemical-bomb"]
+        value: 60
   Uplifting Winds:
     assoc_charclass:
       - Druid

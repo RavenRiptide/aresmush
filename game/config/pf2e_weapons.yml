@@ -294,6 +294,12 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Sword
+    rules:
+      - key: "AdjustStrike"
+        mode: "add"
+        property: "materials"
+        definition: ["item:id:{item|id}"]
+        value: "silver"
   Chaplain's Cudgel:
     wp_type: melee
     category: simple
@@ -729,6 +735,12 @@ pf2e_weapons:
         option: "gem-twist"
         toggleable: true
         suboptions: [{"label": "PF2E.WeaponPropertyRune.flaming.Name", "value": "flaming"}, {"label": "PF2E.WeaponPropertyRune.frost.Name", "value": "frost"}, {"label": "PF2E.WeaponPropertyRune.shock.Name", "value": "shock"}]
+      - key: "AdjustStrike"
+        mode: "add"
+        property: "property-runes"
+        definition: ["item:id:{item|id}"]
+        value: "{item|flags.system.rulesSelections.gemTwist}"
+        predicate: ["gem-twist"]
       - key: "DamageAlteration"
         mode: "override"
         property: "damage-type"
@@ -1142,6 +1154,13 @@ pf2e_weapons:
       fundamental:
         potency: 2
         power: 1
+    rules:
+      - key: "AdjustStrike"
+        mode: "add"
+        property: "property-runes"
+        definition: ["item:id:{item|_id}"]
+        value: "thundering"
+        predicate: [{"or": ["feat:ranger-dedication", "feat:bounty-hunter-dedication", "feat:game-hunter-dedication", "feature:avenger", "feature:hunt-prey"]}, "target:mark:hunted-prey"]
   Icicle:
     wp_type: melee
     category: simple

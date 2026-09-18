@@ -1912,6 +1912,12 @@ pf2e_feats:
         label: "PF2E.SpecificRule.TOTMToggle.Incorporeal"
       - key: "AdjustStrike"
         mode: "add"
+        property: "property-runes"
+        definition: ["item:magical"]
+        value: "ghost-touch"
+        predicate: ["target:trait:incorporeal"]
+      - key: "AdjustStrike"
+        mode: "add"
         property: "weapon-traits"
         definition: [{"not": "item:magical"}]
         value: "magical"
@@ -4043,6 +4049,11 @@ pf2e_feats:
         traits: ["grapple"]
         slug: "slag-may-claw"
         label: "PF2E.Weapon.Base.claw"
+      - key: "AdjustStrike"
+        mode: "add"
+        property: "materials"
+        definition: ["item:slug:slag-may-claw"]
+        value: "cold-iron"
   Slip Sideways:
     feat_type:
       - Ancestry

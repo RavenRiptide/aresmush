@@ -327,13 +327,18 @@ module AresMUSH
       expect(strays.uniq).to eq []
     end
 
-    # A trait changes numbers; the other properties an AdjustStrike can change name things this engine
-    # does not model, so they are refused rather than read and ignored.
+    # Everything an AdjustStrike can change has to be something the descriptor carries, and a list of
+    # words is only ever added to.
     it "should adjust attacks only in ways that change something" do
       adjusting = rows.select { |_where, row| row['key'] == 'AdjustStrike' }
 
       strays = adjusting.reject { |_where, row|
-        Pf2e::Rules::TRAIT_PROPERTIES.include?(row['property'].to_s) && row['mode'].to_s == 'add'
+        field = Pf2e::Rules::STRIKE_PROPERTIES[row['property'].to_s]
+
+        next false unless field
+        next row['mode'].to_s == 'add' if Pf2e::Rules::STRIKE_LISTS.include?(field)
+
+        Pf2e::Paths::MODES.key?(row['mode'].to_s)
       }.map { |where, row| "#{where}: #{row['property']} #{row['mode']}" }
 
       expect(strays.uniq).to eq []

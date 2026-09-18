@@ -191,6 +191,12 @@ module AresMUSH
 
     # The catalogue row an item was made from, which is where its effects live - the same way a feat's
     # effects live in the feat catalogue rather than on the character.
+    # The property runes etched on an item, as slugs. `etch/property` keeps them as a list on the item,
+    # which is where Foundry keeps them too.
+    def self.property_runes(item)
+      Array(item.runes&.dig('property', 'list')).map { |one| Pf2e::Domains.slug(one) }
+    end
+
     def self.catalogue_entry(category, item)
       catalogue = Inventory.config(category)
 

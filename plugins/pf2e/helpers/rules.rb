@@ -82,6 +82,11 @@ module AresMUSH
           # `value` decides whether it holds without being asked for. Foundry defaults a toggleable one
           # to off and everything else to on; here an option a character has is on unless they turn it
           # off, because an item you are wearing should do what it says.
+          #
+          # Except where the circumstance is about someone else. A declaration marked `totm` - Foundry's
+          # own marker for what only the table knows - or one naming a fact about the target is off until
+          # the player says it holds: "your weapon counts as ghost touch against something incorporeal"
+          # must not read as "against everything".
           'contribute' => lambda { |row, source, context|
             { 'source' => source['name'],
               'slug' => row['slug'] || Domains.slug(source['name']),
@@ -96,7 +101,7 @@ module AresMUSH
               # `locked_to` whatever the player said - a stance you cannot leave, a rune you cannot turn off.
               'locked_when' => row['disabledIf'],
               'locked_to' => row['disabledValue'],
-              'default' => truthy(row['value'], context) }
+              'default' => row['value'].nil? ? !about_target?(row) : truthy(row['value'], context) }
           }
         },
         {
@@ -227,7 +232,7 @@ module AresMUSH
               'slug' => row['slug'] || Domains.slug(source['name']),
               'property' => Domains.slug(row['property']),
               'mode' => row['mode'].to_s,
-              'trait' => Domains.slug(row['value']),
+              'value' => row['value'],
               'definition' => row['definition'] }
           }
         },
@@ -350,6 +355,13 @@ module AresMUSH
       def self.choices_of(row)
         Array(row['suboptions']).select { |one| one.is_a?(Hash) && one['value'] }
                                 .map { |one| { 'value' => one['value'].to_s, 'label' => one['label'] } }
+      end
+
+      # Whether a declaration is about the target rather than about the character.
+      TABLE_ONLY = 'totm'.freeze
+
+      def self.about_target?(row)
+        row['toggleable'].to_s == TABLE_ONLY || row['option'].to_s.start_with?('target:')
       end
 
       def self.truthy(value, context)
@@ -491,9 +503,20 @@ module AresMUSH
 
       # Traits an effect adds to an attack. `definition` is a predicate over the attack's own options, so a
       # rune reaches the weapon it is on and a feat reaches every weapon of a base type.
-      TRAIT_PROPERTIES = %w{traits weapon-traits}.freeze
+      # What an `AdjustStrike` can change about an attack, and what each of them is on the descriptor.
+      # A trait changes numbers - `finesse` lets Dexterity attack with it, `thrown` adds Strength to its
+      # damage - a material and a property rune are what the attack counts as, and a range increment is
+      # how far it reaches.
+      STRIKE_PROPERTIES = { 'traits' => 'traits', 'weapon-traits' => 'traits',
+                            'property-runes' => 'runes', 'materials' => 'materials',
+                            'range-increment' => 'range' }.freeze
 
-      def self.strike_traits(sources, options, attack_options)
+      # Which of those is a list of words rather than a number.
+      STRIKE_LISTS = %w{traits runes materials}.freeze
+
+      # Every change to this attack whose circumstances are met. `definition` says which attacks a rule
+      # is about, and is tested against that attack's own facts rather than the character's.
+      def self.strike_adjustments(sources, options, attack_options)
         Array(sources).flat_map do |source|
           held = Array(options) + Array(source['options'])
 
@@ -501,10 +524,9 @@ module AresMUSH
             .select { |row| Predicate.test(row['predicate'], held) }
             .map { |row| contribute(row, source, {}) }
             .compact
-            .select { |one| TRAIT_PROPERTIES.include?(one['property']) && one['mode'] == 'add' }
+            .select { |one| STRIKE_PROPERTIES.key?(one['property']) }
             .select { |one| Predicate.test(one['definition'], attack_options) }
-            .map { |one| one['trait'] }
-        end.uniq
+        end
       end
 
       # Speeds a character has because something gave them one, by kind of movement. The highest for a

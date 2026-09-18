@@ -234,14 +234,33 @@ module AresMUSH
 
       def format_weapon(char,w,i)
         name = w.nickname ? "#{w.nickname} (#{w.name})" : w.name
+        strike = Pf2eCombat.attack_descriptor(char, w)
         bonus = Pf2eCombat.get_wpattack_bonus(char, w)
         prof = Pf2eCombat.get_weapon_prof(char, w.name)[0].upcase
         breakdown = Pf2eCombat.damage_breakdown(char, w.name, w)
         traits = w.traits.map { |t| titleize_trait(t) }.join(", ")
 
         "%b%b#{left(i, 3)}%b#{left(name, 40)}%b#{left("#{bonus} (#{prof})",10)}%b#{left(breakdown['formula'], 22)}" \
-          "\n%b%b#{item_color}Critical:%xn #{breakdown['critical']}" \
-          "\n%b%b#{item_color}Traits:%xn #{traits}"
+          "\n%b%b#{item_color}Critical:%xn #{breakdown['critical']}#{reach(strike)}" \
+          "\n%b%b#{item_color}Traits:%xn #{traits}#{etched(strike)}"
+      end
+
+      # How far the attack throws, which a feat can extend: Far Shot doubles a range increment and
+      # Strong Arm adds ten feet to a thrown weapon's.
+      def reach(strike)
+        return '' unless strike['range'].to_i.positive?
+
+        "  #{item_color}Range:%xn #{strike['range']} ft."
+      end
+
+      # Property runes the attack has the effects of, which is not the same list as the ones etched on
+      # it: Ghost Hunter's magical weapon counts as having *ghost touch* against something incorporeal.
+      def etched(strike)
+        runes = Array(strike['runes'])
+
+        return '' if runes.empty?
+
+        "\n%b%b#{item_color}Runes:%xn #{runes.map { |one| titleize_trait(one) }.join(', ')}"
       end
 
       def format_save(char,name)

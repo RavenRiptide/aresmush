@@ -355,20 +355,20 @@ module AresMUSH
     # `{item|id}-damage` reaches this weapon and nothing else, and a feat that says
     # `sword-weapon-group-damage` reaches every sword.
     # What an attack answers to when a rule asks which attack it is: its id, its name, its base type and
-    # its traits, in Foundry's spelling, so a `definition` copied from their data reads the same facts.
     # Attacks a feat or an item granted, as descriptors the rest of the attack code already reads.
     #
     # A granted attack is proficient as an unarmed attack of its category, which is what the rules say of
     # the ones that exist - a stance's claws use your unarmed proficiency.
     def self.granted_strikes(char)
       Pf2e::Rules.strikes(Pf2e::Effects.sources(char), Pf2e::Effects.options(char)).map do |strike|
-        with_added_traits(char, {
+        adjusted_strike(char, {
           'id' => nil, 'name' => strike['name'], 'source' => strike['source'],
           'prof' => get_unarmed_prof(char, strike['name']),
           'group' => strike['group'], 'base' => strike['base'],
           'traits' => strike['traits'], 'ranged' => !strike['range'].nil?,
           'unarmed' => strike['category'].to_s != 'martial',
           'bomb' => false, 'die' => strike['die'], 'dice' => strike['dice'],
+          'range' => strike['range'].to_i, 'materials' => [], 'runes' => [],
           'damage_type' => strike['damage_type'] || 'B', 'striking' => 0, 'rune' => 0
         })
       end
@@ -412,36 +412,101 @@ module AresMUSH
                                                                         .then { |n| Pf2e::Paths.rank_name(n) }
     end
 
-    def self.attack_options(descriptor)
+    # Damage a weapon does is recorded by initial here, and a predicate names it in full.
+    DAMAGE_WORDS = { 'b' => 'bludgeoning', 'p' => 'piercing', 's' => 'slashing' }.freeze
+    PHYSICAL = DAMAGE_WORDS.values.freeze
+
+    # What an attack answers to when a rule asks which attacks it means, in Foundry's spelling - the
+    # vocabulary their `definition` and their predicates are written in. Reading it off the descriptor
+    # rather than the weapon is what lets a granted attack answer the same questions.
+    def self.attack_options(descriptor, char = nil)
+      damage = Pf2e::Domains.slug(DAMAGE_WORDS[descriptor['damage_type'].to_s.downcase] ||
+                                  descriptor['damage_type'])
+      thrown = Pf2e.has_trait?(descriptor['traits'], 'thrown')
+
       [ "item:id:#{descriptor['id']}",
         "item:slug:#{Pf2e::Domains.slug(descriptor['name'])}",
-        "item:base:#{Pf2e::Domains.slug(descriptor['base'])}" ] +
-        Array(descriptor['traits']).map { |trait| "item:trait:#{Pf2e::Domains.slug(trait)}" }
+        "item:base:#{Pf2e::Domains.slug(descriptor['base'])}",
+        "item:group:#{Pf2e::Domains.slug(descriptor['group'])}",
+        descriptor['ranged'] ? 'item:ranged' : 'item:melee',
+        thrown ? 'item:thrown' : nil,
+        thrown && !descriptor['ranged'] ? 'item:thrown-melee' : nil,
+        magical?(descriptor) ? 'item:magical' : nil,
+        "item:damage:type:#{damage}",
+        PHYSICAL.include?(damage) ? 'item:damage:category:physical' : nil,
+        "item:hands-held:#{[ descriptor['hands'].to_i, 1 ].max}",
+        "item:reload:#{descriptor['reload'].to_i}",
+        "item:proficiency:rank:#{Pf2e::Paths.rank_number(descriptor['prof'])}",
+        favored?(char, descriptor) ? 'item:deity-favored' : nil ].compact +
+        Array(descriptor['traits']).map { |trait| "item:trait:#{Pf2e::Domains.slug(trait)}" } +
+        Array(descriptor['materials']).map { |one| "item:material:#{Pf2e::Domains.slug(one)}" } +
+        Array(descriptor['runes']).map { |one| "item:rune:property:#{Pf2e::Domains.slug(one)}" }
     end
 
-    # Traits an effect adds to this attack. A trait changes numbers - `finesse` lets Dexterity attack
-    # with it, `thrown` adds Strength to its damage - so they are added before anything reads the
-    # descriptor.
-    def self.with_added_traits(char, descriptor)
-      added = Pf2e::Rules.strike_traits(Pf2e::Effects.sources(char), Pf2e::Effects.options(char),
-                                        attack_options(descriptor))
+    # Magical because it says so, or because someone etched it: a potency or striking rune makes a
+    # weapon magical, which is what lets it hurt something only magic can.
+    def self.magical?(descriptor)
+      Pf2e.has_trait?(descriptor['traits'], 'magical') ||
+        descriptor['rune'].to_i.positive? || descriptor['striking'].to_i.positive? ||
+        Array(descriptor['runes']).any?
+    end
 
-      return descriptor if added.empty?
+    # The weapon a character's deity favours, which several feats and a champion's cause ask about.
+    def self.favored?(char, descriptor)
+      return false unless char
 
-      descriptor.merge('traits' => (Array(descriptor['traits']) + added).uniq)
+      deity = (char.pf2_faith || {})['deity']
+      favored = deity.blank? ? nil : Global.read_config('pf2e_deities', deity, 'fav_weapon')
+
+      return false if favored.blank?
+
+      [ descriptor['name'], descriptor['base'] ].compact.any? { |one|
+        Pf2e::Domains.slug(one) == Pf2e::Domains.slug(favored)
+      }
+    end
+
+    # What an effect changes about this attack before anything reads it: the traits it counts as
+    # (`finesse` lets Dexterity attack with it, `thrown` adds Strength to its damage), what it is made
+    # of, the property runes it has the effects of, and how far it throws.
+    def self.adjusted_strike(char, descriptor)
+      changes = Pf2e::Rules.strike_adjustments(Pf2e::Effects.sources(char),
+                                               Pf2e::Effects.options(char),
+                                               attack_options(descriptor, char))
+
+      changes.each_with_object(descriptor.dup) { |change, out| adjust_strike!(out, change) }
+    end
+
+    def self.adjust_strike!(descriptor, change)
+      field = Pf2e::Rules::STRIKE_PROPERTIES[change['property']]
+      held = descriptor[field]
+
+      if Pf2e::Rules::STRIKE_LISTS.include?(field)
+        # A word is only ever added to a list: nothing in their data takes a trait or a rune away.
+        return unless change['mode'] == 'add'
+
+        descriptor[field] = (Array(held) + [ Pf2e::Domains.slug(change['value']) ]).uniq
+      else
+        mode = Pf2e::Paths::MODES[change['mode']]
+
+        descriptor[field] = mode.call(held.to_i, change['value'].to_i) if mode
+      end
     end
 
     def self.attack_descriptor(char, weapon, twohand = false)
       info = weapon_info(weapon.name) || {}
       damage = twohand && weapon.wp_damage_2h ? weapon.wp_damage_2h : weapon.wp_damage
 
-      with_added_traits(char, { 'id' => weapon.id.to_s, 'name' => weapon.name,
+      adjusted_strike(char, { 'id' => weapon.id.to_s, 'name' => weapon.name,
         'prof' => get_weapon_prof(char, weapon.name),
         'group' => info['group'], 'base' => info['base'] || weapon.name,
         'traits' => weapon.traits, 'ranged' => weapon.wp_type == 'ranged',
         'unarmed' => Pf2e.has_trait?(weapon.traits, 'unarmed'),
         'bomb' => bomb?(info),
         'die' => damage, 'damage_type' => weapon.wp_damage_type,
+        'range' => weapon.range.to_i, 'reload' => weapon.reload.to_i,
+        'hands' => twohand ? 2 : weapon.hands.to_i,
+        'materials' => Array(info['materials']),
+        'runes' => Pf2egear.property_runes(weapon),
         'striking' => Pf2egear.get_rune_value(weapon, 'fundamental', 'power'),
         'rune' => Pf2egear.get_rune_value(weapon, 'fundamental', 'potency') })
     end
@@ -449,10 +514,11 @@ module AresMUSH
     def self.unarmed_descriptor(name, info, prof, char = nil)
       descriptor = { 'id' => nil, 'name' => name, 'prof' => prof, 'group' => info['group'],
                      'base' => name, 'traits' => info['traits'], 'ranged' => false, 'unarmed' => true,
-                     'bomb' => false, 'die' => info['damage'],
+                     'bomb' => false, 'die' => info['damage'], 'range' => 0,
+                     'materials' => [], 'runes' => [],
                      'damage_type' => info['damage_type'] || 'B', 'striking' => 0, 'rune' => 0 }
 
-      char ? with_added_traits(char, descriptor) : descriptor
+      char ? adjusted_strike(char, descriptor) : descriptor
     end
 
     def self.get_wpattack_bonus(char, weapon, options = [])
