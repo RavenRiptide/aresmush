@@ -99,12 +99,12 @@ module AresMUSH
           'base' => ->(char, caster) { Pf2e.get_prof_bonus(char, caster['prof_level']) },
           'intrinsic' => ->(char, caster) { [ ability_mod(char, caster['spell_abil']) ] } },
 
+        # `name` is nothing for the character's own class DC, and an archetype's proficiency and key
+        # attribute when an archetype has one of its own. Both are the same figure with different inputs.
         { 'name' => 'class_dc',
-          'ability' => ->(char, _name) { char.combat&.key_abil || 'Strength' },
-          'base' => ->(char, _name) { 10 + Pf2e.get_prof_bonus(char, char.combat&.class_dc) },
-          'intrinsic' => ->(char, _name) {
-            [ ability_mod(char, char.combat&.key_abil || 'Strength') ]
-          } }
+          'ability' => ->(char, named) { class_attribute(char, named) },
+          'base' => ->(char, named) { 10 + Pf2e.get_prof_bonus(char, class_proficiency(char, named)) },
+          'intrinsic' => ->(char, named) { [ ability_mod(char, class_attribute(char, named)) ] } }
       ].freeze
 
       BY_KIND = KINDS.each_with_object({}) { |row, out| out[row['name']] = row }.freeze
@@ -190,6 +190,14 @@ module AresMUSH
 
         { 'source' => source || ability, 'slug' => Domains.abbreviation(ability),
           'type' => Modifiers::ABILITY, 'value' => Pf2e.ability_mod(char, ability) }
+      end
+
+      def self.class_attribute(char, named)
+        (named.is_a?(Hash) ? named['key_abil'] : nil) || char.combat&.key_abil || 'Strength'
+      end
+
+      def self.class_proficiency(char, named)
+        (named.is_a?(Hash) ? named['prof'] : nil) || char.combat&.class_dc
       end
 
       def self.attack_abilities(attack)

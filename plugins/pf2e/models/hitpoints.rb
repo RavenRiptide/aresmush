@@ -107,6 +107,13 @@ module AresMUSH
       char.hp
     end
 
+    # The DC to recover from dying: 10 plus the dying value, less whatever an effect took off it.
+    # Toughness and Defy Death both lower it, and both say so themselves as a write, so nothing here
+    # names either.
+    def self.recovery_dc(char)
+      10 + Pf2e.condition_level(char, 'Dying') + Pf2e::Paths.held(char, 'dying_recovery_dc').to_i
+    end
+
     # Hit points before anything modifies them. Constitution belongs here rather than in a modifier
     # because it is counted per level; Drained's own row multiplies by level to match.
     #

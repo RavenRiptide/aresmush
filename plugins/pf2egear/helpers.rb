@@ -76,6 +76,18 @@ module AresMUSH
       list.filter { |item| !(item.bag) }
     end
 
+    # What a character can carry, and the point at which it tells.
+    #
+    # PF2e sets these at 10 + Strength and 5 + Strength, and a feat raises them - Hefty Hauler by two
+    # each. The feat says so itself, as an `inventory.bulk` write, so nothing here names the feat.
+    def self.max_bulk(char)
+      10 + Pf2e.ability_mod(char, 'Strength') + Pf2e::Paths.held(char, 'maxaddend').to_i
+    end
+
+    def self.encumbered_at(char)
+      5 + Pf2e.ability_mod(char, 'Strength') + Pf2e::Paths.held(char, 'encumberedafteraddend').to_i
+    end
+
     def self.bag_effective_bulk(bag, load)
       capacity_bonus = bag.bulk_bonus ? bag.bulk_bonus : 0
       bag_bulk = bag.bulk

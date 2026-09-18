@@ -192,6 +192,37 @@ module AresMUSH
       end
     end
 
+    # An archetype's class DC is the same figure as the character's own with different inputs, so it takes
+    # the same modifiers: Frightened reduces it, because it is a DC.
+    describe "an archetype's class DC" do
+      def archetype
+        { 'prof' => 'expert', 'key_abil' => 'Charisma' }
+      end
+
+      it "should be ten plus the archetype's proficiency and attribute" do
+        score('Charisma', 18)
+
+        expect(Pf2e::Stat.total(reread, 'class_dc', archetype)).to eq 10 + (4 + 5) + 4
+      end
+
+      it "should read the archetype's attribute rather than the character's own class attribute" do
+        @combat.update(:key_abil => 'Strength', :class_dc => 'trained')
+        score('Charisma', 18)
+        score('Strength', 10)
+
+        expect(Pf2e::Stat.total(reread, 'class_dc', archetype))
+          .to be > Pf2e::Stat.total(reread, 'class_dc')
+      end
+
+      it "should take a penalty written against every check and DC" do
+        before = Pf2e::Stat.total(reread, 'class_dc', archetype)
+
+        condition('Frightened', 2)
+
+        expect(Pf2e::Stat.total(reread, 'class_dc', archetype)).to eq before - 2
+      end
+    end
+
     # Spell DCs and spell attacks read the casting attribute, so Stupefied reaches them by naming the
     # attribute rather than by naming spellcasting.
     describe "spellcasting" do

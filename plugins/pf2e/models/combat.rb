@@ -151,11 +151,10 @@ module AresMUSH
         next if prof.to_s.strip.empty?
         next if key_ability.to_s.strip.empty?
 
-        prof_bonus = Pf2e.get_prof_bonus(char, prof)
-        abil_mod = Pf2eAbilities.abilmod(Pf2eAbilities.get_score(char, key_ability))
-
+        # Through the same reader as the class DC itself, so an archetype's DC takes the modifiers a
+        # class DC takes: Frightened reduces it, because it is a DC.
         dc_hash[archetype] = {
-          'dc' => 10 + prof_bonus + abil_mod,
+          'dc' => Pf2e::Stat.total(char, 'class_dc', { 'prof' => prof, 'key_abil' => key_ability }),
           'prof' => prof,
           'key_abil' => key_ability
         }

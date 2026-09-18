@@ -64,7 +64,9 @@ module AresMUSH
 
       def statistic_slug
         return BUILT_ON if @extra_domains.include?(BUILT_ON)
-        return Domains.slug(@name['name']) if @name.is_a?(Hash)
+        # A descriptor names the thing being rolled where it has a name - a weapon does, an archetype's
+        # class DC does not, and then the kind of statistic is what it is called.
+        return Domains.slug(@name['name'] || @kind) if @name.is_a?(Hash)
 
         @name ? Domains.slug(domain_name) : Domains.slug(@kind)
       end

@@ -103,6 +103,35 @@ module AresMUSH
         expect(Pf2e::Paths.held(reread, 'maxaddend')).to eq 2
       end
 
+      # The write reached a figure. Toughness lowers the DC to recover from dying, and the dying path
+      # reads it - which is the difference between a value being addressable and its being used.
+      it "should lower the DC to recover from dying, where the dying rules read it" do
+        plain = Pf2eHP.recovery_dc(reread)
+
+        with_feat('Toughness')
+        Pf2e::Paths.apply_all!(reread)
+
+        expect(Pf2eHP.recovery_dc(reread)).to eq plain - 1
+      end
+
+      it "should rise with the dying value, as the rules say" do
+        @char.update(:pf2_conditions => { 'Dying' => { 'value' => 2, 'status' => true } })
+
+        expect(Pf2eHP.recovery_dc(reread)).to eq 12
+      end
+
+      # Hefty Hauler's two bulk reach what a character can carry, for the same reason.
+      it "should raise what a character can carry" do
+        plain = Pf2egear.max_bulk(reread)
+        before = Pf2egear.encumbered_at(reread)
+
+        with_feat('Hefty Hauler')
+        Pf2e::Paths.apply_all!(reread)
+
+        expect(Pf2egear.max_bulk(reread)).to eq plain + 2
+        expect(Pf2egear.encumbered_at(reread)).to eq before + 2
+      end
+
       it "should refuse a path the registry does not know" do
         expect(Pf2e::Paths.apply!(reread, 'system.attributes.hp.max', 'add', 10)).to be false
       end
