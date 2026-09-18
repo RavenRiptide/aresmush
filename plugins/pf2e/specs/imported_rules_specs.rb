@@ -42,7 +42,7 @@ module AresMUSH
       skills = (Global.read_config('pf2e_skills') || {}).flat_map { |name, info|
         Pf2e::Domains.for(Pf2eSkills.lore?(name) ? 'lore' : 'skill', name, info['key_abil'])
       }
-      plain = %w{hp ac perception class_dc spell_dc spell_attack initiative}.flat_map { |kind|
+      plain = %w{hp ac perception class_dc spell_dc spell_attack initiative healing}.flat_map { |kind|
         Pf2e::ABILITIES.flat_map { |ability| Pf2e::Domains.for(kind, nil, ability) }
       }
       speeds = Pf2e::Domains::MOVEMENT.flat_map { |type| Pf2e::Domains.for('speed', type) }

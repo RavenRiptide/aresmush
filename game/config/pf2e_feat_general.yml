@@ -144,6 +144,11 @@ pf2e_feats:
       level: 1
       ability:
         - Constitution/14
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.attributes.hp.recoveryMultiplier"
+        mode: "add"
+        value: 1
   Feather Step:
     feat_type:
       - General
@@ -295,6 +300,12 @@ pf2e_feats:
     shortdesc: Your physiology responds well to first aid. You gain a circumstance bonus to the number of Hit Points you regain equal to your level from a successful attempt to Treat your Wounds or use Battle Medicine on you. After you or an ally use Battle Medicine on you, you become temporarily immune to that Battle Medicine for only 1 hour, instead of 1 day.
     prereq:
       level: 3
+    rules:
+      - key: "FlatModifier"
+        selector: "healing-received"
+        type: "circumstance"
+        value: "@actor.level"
+        predicate: [{"or": ["action:battle-medicine", "action:treat-wounds"]}]
   Skitter:
     feat_type:
       - General

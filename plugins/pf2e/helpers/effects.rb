@@ -71,12 +71,11 @@ module AresMUSH
 
       # What is true about the character, as the options a predicate is tested against. Foundry's own
       # spelling, so a predicate lifted from their data reads the same facts.
-      def self.options(char)
-        SheetReads.memo(char, :effect_options) { build_options(char) }
-      end
-
-      def self.build_options(char)
-        facts(char) + RollOptions.active(char)
+      # What is true of the character, for a statistic with these domains. A declared circumstance may be
+      # about some statistics and not others, so the domains asking decide which of them hold; nothing
+      # asking without domains sees a scoped one.
+      def self.options(char, domains = nil)
+        facts(char) + RollOptions.active(char, domains)
       end
 
       # What is true about the character whatever anyone has switched on. Kept apart from the switched-on
@@ -108,7 +107,22 @@ module AresMUSH
           skill_facts(char) +
           proficiency_facts(char) +
           attribute_facts(char) +
+          armor_facts(char) +
           named('self:sense', granted_sense_names(char))
+      end
+
+      # What is true of the armour a character is wearing. Foundry's `armor:` options
+      # (`character/document.ts:427`), which is what a rule about armour is written against: the
+      # penalties armour carries are waived for a character strong enough to wear it, and a feat that
+      # waives one of them says so by name.
+      def self.armor_facts(char)
+        armor = Pf2eCombat.get_equipped_armor(char)
+
+        return [] unless armor
+
+        [ Stat.strong_enough?(char, armor) ? 'armor:strength-requirement-met' : nil ].compact +
+          named('armor:trait', Array(armor.traits)) +
+          [ "armor:category:#{Domains.slug(armor.category)}" ]
       end
 
       # Read from the rules directly rather than through `senses`, because a sense's own predicate is
@@ -287,9 +301,32 @@ module AresMUSH
         # The land speed is here because a granted speed is usually written as a fraction of it - a Ring
         # of Swimming gives half. Only the base is exposed, not the figure: a granted speed that read the
         # finished land speed would have to be assembled while the land speed was being assembled.
+        #
+        # Ranks are here because effects are written against them: Armored Stealth reduces the armour
+        # penalty by your Stealth rank less one, and Specialty Crafting scales with Crafting. A rank is a
+        # proficiency rather than a figure, so reading one assembles nothing.
         { 'actor' => { 'level' => char.pf2_level.to_i, 'abilities' => mods,
                        'system' => { 'movement' => { 'speeds' =>
-                         { 'land' => { 'value' => Pf2e.ancestry_speed(char) } } } } } }
+                                       { 'land' => { 'value' => Pf2e.ancestry_speed(char) } } },
+                                     'skills' => skill_ranks(char),
+                                     'proficiencies' => { 'defenses' => armour_ranks(char) },
+                                     'attributes' => { 'shield' => { 'ac' => shield_ac(char) } } } } }
+      end
+
+      def self.skill_ranks(char)
+        SheetReads.rows(char, :skills).each_with_object({}) do |skill, out|
+          out[Domains.slug(skill.name)] = { 'rank' => Paths.rank_number(skill.prof_level) }
+        end
+      end
+
+      def self.armour_ranks(char)
+        (char.combat&.armor_prof || {}).each_with_object({}) do |(category, rank), out|
+          out[Domains.slug(category)] = { 'rank' => Paths.rank_number(rank) }
+        end
+      end
+
+      def self.shield_ac(char)
+        Pf2eCombat.get_equipped_shield(char)&.ac_bonus.to_i
       end
 
       def self.for_stat(char, kind, name = nil, ability = nil, options = [])

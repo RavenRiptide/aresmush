@@ -36,8 +36,12 @@ module AresMUSH
     # `kind` is what the damage was: `fire`, `S`, whatever the attack dealt. Given one, the character's
     # immunities, weaknesses and resistances are applied before any of it lands - which is the point of
     # damage having a kind at all.
-    def self.modify_damage(char, amount, healing=false, is_dm=false, kind=nil)
+    # `options` are the circumstances of what is being done, which is how a bonus to healing from
+    # Treat Wounds applies to that and not to every point of healing: Robust Health's own rule is
+    # predicated on `action:treat-wounds`.
+    def self.modify_damage(char, amount, healing=false, is_dm=false, kind=nil, options=[])
       amount = Pf2e::IWR.apply(Pf2e::IWR.of(char), amount, kind)['amount'] if kind && !healing
+      amount = healed(char, amount, options) if healing
 
       hp = get_hp_obj(char)
       max_hp = get_max_hp(char)
@@ -101,6 +105,12 @@ module AresMUSH
         hp.damage = new_damage
         hp.save
       end
+    end
+
+    # What the character recovers, given what they were given. Theirs rather than the healer's - Robust
+    # Health recovers more from Treat Wounds whoever is doing the treating - and never below nothing.
+    def self.healed(char, amount, options)
+      (amount + Pf2e::Stat.total(char, 'healing', nil, options)).clamp(0, nil)
     end
 
     def self.get_hp_obj(char)

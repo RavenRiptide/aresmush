@@ -68,7 +68,9 @@ module AresMUSH
         { 'name' => 'skill',
           'ability' => ->(_char, name) { Pf2eSkills.get_linked_attr(name) },
           'base' => ->(char, name) { Pf2e.get_prof_bonus(char, Pf2eSkills.get_skill_prof(char, name)) },
-          'intrinsic' => ->(char, name) { [ ability_mod(char, Pf2eSkills.get_linked_attr(name)) ] } },
+          'intrinsic' => ->(char, name) {
+            [ ability_mod(char, Pf2eSkills.get_linked_attr(name)), armor_check_penalty(char, name) ]
+          } },
 
         { 'name' => 'lore',
           'ability' => ->(_char, _name) { 'Intelligence' },
@@ -106,7 +108,14 @@ module AresMUSH
         { 'name' => 'class_dc',
           'ability' => ->(char, named) { class_attribute(char, named) },
           'base' => ->(char, named) { 10 + Pf2e.get_prof_bonus(char, class_proficiency(char, named)) },
-          'intrinsic' => ->(char, named) { [ ability_mod(char, class_attribute(char, named)) ] } }
+          'intrinsic' => ->(char, named) { [ ability_mod(char, class_attribute(char, named)) ] } },
+
+        # How much more a character recovers than they were given. Not a figure on a sheet: the base is
+        # nothing, so the total is whatever the effects come to - which is what a bonus to healing is.
+        { 'name' => 'healing',
+          'ability' => ->(_char, _name) { nil },
+          'base' => ->(_char, _name) { 0 },
+          'intrinsic' => ->(_char, _name) { [] } }
       ].freeze
 
       BY_KIND = KINDS.each_with_object({}) { |row, out| out[row['name']] = row }.freeze
@@ -129,20 +138,26 @@ module AresMUSH
 
         sources = Effects.sources(char)
         context = Effects.context(char)
-        held = Effects.options(char) + Array(options)
+        held = Effects.options(char, domains) + Array(options)
 
         effects = Effects.modifiers(sources, domains, context, held)
         met, unmet = effects.partition { |effect| effect['met'] }
 
+        # A figure's own parts can have circumstances too: armour hampers a skill until its wearer is
+        # strong enough for it, and a feat can waive that. One whose circumstances are unmet is reported
+        # the same way an effect's is, rather than counted.
+        own, waived = row['intrinsic'].call(char, name).compact
+                         .partition { |one| Predicate.test(one['when'], held) }
+
         # A rule that changes a modifier is applied before anything is stacked, so the comparison that
         # decides which of them count is against the adjusted numbers.
-        adjusted = Modifiers.adjust(row['intrinsic'].call(char, name).compact + met,
+        adjusted = Modifiers.adjust(own + met,
                                     Rules.modifier_adjustments(sources, domains, held, context))
 
         # An unmet row is kept out of the stacking, so it cannot override one that applies, but it is
         # still reported: "+2, but only while picking a lock" is what a player wants to know.
         Modifiers.breakdown(row['base'].call(char, name).to_i, adjusted)
-                 .merge('conditional' => unmet)
+                 .merge('conditional' => unmet + waived)
       end
 
       def self.total(char, kind, name = nil, options = [], extra = [])
@@ -211,7 +226,9 @@ module AresMUSH
 
         return [ Pf2e.ancestry_speed(char), known ].max if kind == LAND
 
-        granted = Rules.speeds(Effects.sources(char), Effects.options(char), Effects.context(char))[kind]
+        granted = Rules.speeds(Effects.sources(char),
+                               Effects.options(char, Domains.for('speed', kind)),
+                               Effects.context(char))[kind]
 
         [ known, granted ? granted['value'].to_i : 0 ].max
       end
@@ -238,15 +255,61 @@ module AresMUSH
       end
 
       # Their slug, because a feat that lets a character ignore armour's speed penalty names it
-      # (`character/document.ts:933`).
+      # (`character/document.ts:933`). A character strong enough for the armour is slowed five feet
+      # less by it, and never sped up.
       def self.armor_penalty(char)
         armor = Pf2eCombat.get_equipped_armor(char)
         penalty = armor ? armor.speed_penalty.to_i : 0
+        penalty = [ penalty + 5, 0 ].min if armor && strong_enough?(char, armor)
 
         return nil if penalty.zero?
 
         { 'source' => armor.name, 'slug' => 'armor-speed-penalty', 'type' => Modifiers::UNTYPED,
-          'value' => penalty }
+          'value' => penalty, 'when' => [ { 'nor' => [ 'armor:ignore-speed-penalty' ] } ] }
+      end
+
+      # Armour hampers a Strength- or Dexterity-based skill until you are strong enough to wear it
+      # (`character/document.ts:848`). Their predicate, unchanged: Acrobatics and Athletics are waived
+      # by flexible armour as well as by strength, Stealth in noisy armour needs both, and a feat that
+      # waives the penalty outright names it.
+      ARMOR_SKILLS = %w{Strength Dexterity}.freeze
+      NIMBLE = %w{Acrobatics Athletics}.freeze
+
+      def self.armor_check_penalty(char, name)
+        return nil unless ARMOR_SKILLS.include?(Pf2eSkills.get_linked_attr(name).to_s)
+
+        armor = Pf2eCombat.get_equipped_armor(char)
+        penalty = armor ? armor.check_penalty.to_i : 0
+
+        return nil unless penalty.negative?
+
+        { 'source' => armor.name, 'slug' => 'armor-check-penalty', 'type' => Modifiers::UNTYPED,
+          'value' => penalty, 'when' => penalty_when(name, armor) }
+      end
+
+      def self.penalty_when(name, armor)
+        waived = if NIMBLE.include?(Domains.slug(name).capitalize) || NIMBLE.include?(name.to_s)
+                   { 'nor' => [ 'armor:strength-requirement-met', 'armor:trait:flexible' ] }
+                 elsif name.to_s.casecmp?('Stealth') && noisy?(armor)
+                   { 'nand' => [ 'armor:strength-requirement-met', 'armor:ignore-noisy-penalty' ] }
+                 else
+                   { 'not' => 'armor:strength-requirement-met' }
+                 end
+
+        # A predicate is a list of statements, all of which have to hold - which is how Foundry pushes
+        # the second one onto the first.
+        [ { 'nor' => %w{attack armor:ignore-check-penalty} }, waived ]
+      end
+
+      def self.noisy?(armor)
+        Array(armor.traits).any? { |trait| Domains.slug(trait) == 'noisy' }
+      end
+
+      # Armour asks a minimum Strength of whoever wears it comfortably. This game's catalogue records
+      # that as a score, so it is compared against one.
+      def self.strong_enough?(char, armor)
+        armor.min_str.to_i.positive? &&
+          Pf2eAbilities.get_score(char, 'Strength').to_i >= armor.min_str.to_i
       end
 
       # This game's armour carries `potency` for AC and `power` for saves. The save rune is what the

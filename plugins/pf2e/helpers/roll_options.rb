@@ -68,10 +68,21 @@ module AresMUSH
 
       # The options that hold, as a predicate reads them. One with a choice holds twice: bare, and with the
       # choice after a colon, which is how a rule names the choice it wants.
-      def self.active(char)
-        declared(char).select { |one| one['on'] }.flat_map do |one|
+      #
+      # A declaration may say which statistics it is about, and most of the scoped ones are about attacks
+      # or damage: Foundry keeps those under the domain they name and a statistic sees only its own
+      # (`rule-element/roll-option.ts`). So a figure asks for the options its domains reach, and anything
+      # asking without saying - a write, a resistance - sees only what was declared for everything.
+      def self.active(char, domains = nil)
+        declared(char).select { |one| one['on'] && about?(one['domain'], domains) }.flat_map do |one|
           [ one['option'], one['selected'] ? "#{one['option']}:#{one['selected']}" : nil ]
         end.compact.uniq
+      end
+
+      def self.about?(domain, domains)
+        return true if domain.nil? || domain.to_s == Domains::ALL
+
+        Domains.matches?(domain, Array(domains))
       end
 
       # `on` is true, false, or the value of one of the option's choices.

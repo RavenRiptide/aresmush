@@ -10280,6 +10280,11 @@ pf2e_feats:
         value: -1
         predicate: ["diverse-mystery:spray-of-stars", "used-diverse-mystery", "self:condition:cursebound", "forced-movement"]
       - key: "FlatModifier"
+        selector: "healing-received"
+        type: "status"
+        value: "-@actor.level"
+        predicate: ["self:condition:cursebound", "item:magical", "diverse-mystery:life-link", "used-diverse-mystery"]
+      - key: "FlatModifier"
         selector: ["perception", "will"]
         type: "status"
         value: -1

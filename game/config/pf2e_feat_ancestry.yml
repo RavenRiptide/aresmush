@@ -1394,6 +1394,10 @@ pf2e_feats:
         type: "circumstance"
         value: 2
         predicate: [{"or": ["sleep", "dream"]}]
+      - key: "ActiveEffectLike"
+        path: "system.attributes.hp.recoveryMultiplier"
+        mode: "add"
+        value: 1
   Earned Glory:
     feat_type:
       - Ancestry

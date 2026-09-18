@@ -910,6 +910,17 @@ pf2e_feats:
       - key: "RollOption"
         option: "armor:ignore-noisy-penalty"
         domain: "stealth"
+      - key: "AdjustModifier"
+        mode: "add"
+        selector: "stealth-check"
+        value: "max(@actor.system.skills.stealth.rank - 1, 0)"
+        slug: "armor-check-penalty"
+        predicate: [{"not": "armor:trait:noisy"}]
+      - key: "AdjustModifier"
+        mode: "downgrade"
+        selector: "stealth-check"
+        value: 0
+        slug: "armor-check-penalty"
   Assured Identification:
     feat_type:
       - Skill

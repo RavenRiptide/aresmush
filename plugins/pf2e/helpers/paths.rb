@@ -48,6 +48,14 @@ module AresMUSH
           'read' => ->(char, _name) { Paths.held(char, 'dying_recovery_dc') },
           'write' => ->(char, _name, value) { Paths.store(char, 'dying_recovery_dc', value) }
         },
+        # How much of a night's rest a character gets, which Fast Recovery doubles. Foundry's default is
+        # one and their rules add to it, so `Pf2e::DailyHelpers` reads it as one more than what is here.
+        {
+          'name' => 'recovery multiplier',
+          'match' => %r{\Asystem\.attributes\.hp\.recoveryMultiplier\z},
+          'read' => ->(char, _name) { Paths.held(char, 'recovery_multiplier') },
+          'write' => ->(char, _name, value) { Paths.store(char, 'recovery_multiplier', value) }
+        },
         # How much a character can carry before it tells, which Hefty Hauler and its like raise.
         {
           'name' => 'carrying capacity',

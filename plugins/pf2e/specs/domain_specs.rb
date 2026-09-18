@@ -53,9 +53,26 @@ module AresMUSH
       # Foundry's own lists for these two carry no attribute domain, so an effect reaches them by
       # naming them rather than by naming an attribute.
       it "should give perception and a lore the lists Foundry gives them" do
-        expect(Domains.for('perception')).to eq [ 'perception', 'all' ]
+        expect(Domains.for('perception')).to eq [ 'perception', 'all', 'check', 'perception-check' ]
         expect(Domains.for('lore', 'Dragon Lore'))
-          .to eq [ 'dragon-lore', 'skill-check', 'lore-skill-check', 'int-skill-check', 'all' ]
+          .to eq [ 'dragon-lore', 'skill-check', 'lore-skill-check', 'int-skill-check', 'all',
+                   'check', 'dragon-lore-check' ]
+      end
+
+      # A roll is not a figure, and a rule may name either: Armored Stealth adjusts the armour penalty
+      # on `stealth-check`, which is what their data says (`statistic/statistic.ts:314`).
+      it "should give a check its own name with -check after it" do
+        expect(Domains.for('skill', 'Stealth', 'Dexterity')).to include 'check', 'stealth-check'
+      end
+
+      it "should give a save one too" do
+        expect(Domains.for('save', 'Fortitude', 'Constitution')).to include 'check', 'fortitude-check'
+      end
+
+      # Hit points and a speed are not rolled, so neither is a check.
+      it "should not make a figure answer to a check" do
+        expect(Domains.for('hp')).to_not include 'check'
+        expect(Domains.for('speed')).to_not include 'check'
       end
 
       # An attack's domains come off the weapon, so an effect can reach one sword, every sword of a

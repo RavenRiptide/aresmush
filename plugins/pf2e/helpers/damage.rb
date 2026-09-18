@@ -53,7 +53,7 @@ module AresMUSH
         domains = Domains.for('damage', attack, damage_attribute(char, attack))
         sources = Effects.sources(char)
         context = Effects.context(char)
-        held = Effects.options(char) + Array(options)
+        held = Effects.options(char, domains) + Array(options)
 
         dice = Effects.damage_dice(sources, domains, context, held)
         flat = Effects.modifiers(sources, domains, context, held)

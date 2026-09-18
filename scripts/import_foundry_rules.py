@@ -137,6 +137,7 @@ WRITABLE = [
     re.compile(r'^system\.skills\.(?:[\w-]+|\{[^}]*\})\.rank$'),
     re.compile(r'^system\.proficiencies\.(defenses|attacks)\.[\w-]+\.rank$'),
     re.compile(r'^system\.attributes\.dying\.recoveryDC$'),
+    re.compile(r'^system\.attributes\.hp\.recoveryMultiplier$'),
     re.compile(r'^system\.attributes\.(flanking\.canFlank|flanking\.canGangUp'
                r'|familiarAbilities\.value)$'),
     re.compile(r'^inventory\.bulk\.(maxAddend|encumberedAfterAddend)$'),
@@ -154,7 +155,8 @@ ATTRIBUTES = {'str', 'dex', 'con', 'int', 'wis', 'cha'}
 # Domains Pf2e::Domains can produce that are not derived from a name.
 PLAIN = ({'hp', 'ac', 'perception', 'saving-throw', 'fortitude', 'reflex', 'will', 'skill-check',
           'lore-skill-check', 'class-dc', 'class', 'spell-dc', 'spell-attack', 'all', 'check',
-          'attack', 'attack-roll', 'strike-attack-roll', 'all-speeds', 'initiative'}
+          'attack', 'attack-roll', 'strike-attack-roll', 'all-speeds', 'initiative',
+          'healing-received'}
          | SKILLS
          | {f'{a}-based' for a in ATTRIBUTES}
          | {f'{a}-skill-check' for a in ATTRIBUTES}
@@ -166,7 +168,7 @@ SELF_REFERENCE = re.compile(r'^\{item\|_?id\}(-.*)?$')
 
 # A selector naming something off the weapon: its name, its group, its base type. These are domains
 # we produce, so they are taken; an interpolation we cannot resolve is not.
-DERIVED = re.compile(r'^[a-z0-9]+(?:-[a-z0-9]+)*-(?:damage|speed|attack|attack-roll'
+DERIVED = re.compile(r'^[a-z0-9]+(?:-[a-z0-9]+)*-(?:damage|speed|attack|attack-roll|check'
                      r'|base-attack-roll|group-attack-roll|weapon-group-damage|base-damage'
                      r'|base-type-damage|strike-damage)$')
 

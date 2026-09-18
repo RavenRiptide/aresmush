@@ -3,14 +3,20 @@ module AresMUSH
     class PF2HealPlayerCmd
       include CommandHandler
 
-      attr_accessor :target, :damage
+      attr_accessor :target, :damage, :action
 
+      # `heal <who>=<how much>` or `<how much> <what you did>`. What the healer was doing decides
+      # whether a bonus to healing applies - Robust Health recovers more from Treat Wounds than from a
+      # potion - the same way a kind of damage decides what resists it.
       def parse_args
         args = cmd.parse_args(ArgParser.arg1_equals_arg2)
 
         self.target = trimmed_list_arg(args.arg1)
-        self.damage = integer_arg(args.arg2)
 
+        amount, _, named = args.arg2.to_s.strip.partition(' ')
+
+        self.damage = integer_arg(amount)
+        self.action = named.strip.empty? ? nil : named.strip
       end
 
       def required_args
@@ -39,7 +45,8 @@ module AresMUSH
           char = ClassTargetFinder.find(item, Character, enactor)
 
           if (char.found?)
-            Pf2eHP.modify_damage(char.target, self.damage, true)
+            Pf2eHP.modify_damage(char.target, self.damage, true, false, nil,
+                                 Pf2e.circumstances([ self.action ].compact))
             ok_char_list << char.target.name
           else
             bad_char_list << item

@@ -40,24 +40,31 @@ module AresMUSH
 
         { 'name' => 'ac', 'domains' => ->(_name, _ability) { [ ALL, 'ac', 'dex-based' ] } },
 
-        # `character/document.ts:585`, which is the whole list.
-        { 'name' => 'perception', 'domains' => ->(_name, _ability) { [ 'perception', ALL ] } },
+        # `character/document.ts:585`, which is the whole list, plus the domains the roll itself has.
+        { 'name' => 'perception',
+          'domains' => ->(_name, _ability) { [ 'perception', ALL ] + rolled('perception') } },
 
         { 'name' => 'save',
-          'domains' => ->(name, ability) { [ slug(name), 'saving-throw', ALL ] + based(ability) } },
+          'domains' => ->(name, ability) {
+            [ slug(name), 'saving-throw', ALL ] + based(ability) + rolled(name)
+          } },
 
         # `character/document.ts:845`.
         { 'name' => 'skill',
           'domains' => ->(name, ability) {
-            [ slug(name), 'skill-check', ALL ] + based(ability) + skill_check(ability)
+            [ slug(name), 'skill-check', ALL ] + based(ability) + skill_check(ability) + rolled(name)
           } },
 
         # `character/document.ts:903`. A lore's attribute is always Intelligence and the list says
         # `int-skill-check` without `int-based`.
         { 'name' => 'lore',
           'domains' => ->(name, _ability) {
-            [ slug(name), 'skill-check', 'lore-skill-check', 'int-skill-check', ALL ]
+            [ slug(name), 'skill-check', 'lore-skill-check', 'int-skill-check', ALL ] + rolled(name)
           } },
+
+        # Healing a character receives, which is theirs rather than the healer's: Robust Health recovers
+        # more from Treat Wounds, whoever is doing the treating.
+        { 'name' => 'healing', 'domains' => ->(_name, _ability) { [ 'healing-received' ] } },
 
         { 'name' => 'class_dc', 'domains' => ->(_name, _ability) { [ 'class-dc', 'class', ALL ] } },
         { 'name' => 'spell_dc', 'domains' => ->(_name, _ability) { [ 'spell-dc', ALL ] } },
@@ -86,10 +93,17 @@ module AresMUSH
       # the name in front of it. Anything else has to be in a list some statistic actually declares.
       DERIVED_SUFFIXES = %w{-damage -base-damage -base-type-damage -weapon-group-damage -strike-damage
                             -speed -attack -attack-roll -base-attack-roll -group-attack-roll
-                            -skill-check -based -lore}.freeze
+                            -skill-check -check -based -lore}.freeze
 
       def self.derived?(selector)
         DERIVED_SUFFIXES.any? { |suffix| selector.to_s.end_with?(suffix) }
+      end
+
+      # What a check answers to because it is a check rather than a figure: `check` and its own name
+      # with `-check` after it (`statistic/statistic.ts:314`). Armored Stealth adjusts the armour
+      # penalty on `stealth-check`, which is the roll, and would reach nothing named `stealth`.
+      def self.rolled(name)
+        [ 'check', "#{slug(name)}-check" ]
       end
 
       # The kinds of movement a creature can have, which is what a speed's own domain is built from

@@ -37,7 +37,7 @@ module AresMUSH
 
         @breakdown = Stat.of(char, @kind, name, Array(options) + own_options, @extra_domains)
         @domains = Domains.for(@kind, domain_name, ability) + @extra_domains
-        @options = Effects.options(char) + Array(options) + own_options
+        @options = Effects.options(char, @domains) + Array(options) + own_options
       end
 
       def total
@@ -105,15 +105,15 @@ module AresMUSH
         Degree.adjusted(Degree.of(total, dc, die), adjustments)
       end
 
-      # Rules that change the outcome of this check. Nothing produces them yet - `AdjustDegreeOfSuccess`
-      # is the next kind to read - but the outcome is asked for through them so that adding the kind
-      # changes one table rather than this.
+      # Rules that turn one outcome into another: Assurance makes a failure a success, Deafened drops an
+      # auditory Perception check to a critical failure.
       def adjustments
         Rules.adjustments(Effects.sources(@char), @domains, @options)
       end
 
-      # Text to show with the roll. Same shape and the same reason: `Note` is a kind we do not read yet,
-      # and asking for notes here is what makes reading it a change to the table.
+      # Text to show with the roll. `Note` is the one kind of rule element attached to a roll that is not
+      # read yet, and asking for notes here is what makes reading it a change to one table rather than
+      # to this.
       def notes
         Rules.notes(Effects.sources(@char), @domains, @options)
       end
