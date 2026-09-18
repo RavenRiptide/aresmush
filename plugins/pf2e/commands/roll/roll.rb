@@ -43,7 +43,7 @@ module AresMUSH
         total = roll['total']
 
         # Determine degree of success if DC is given
-        degree = self.dc ? Pf2e.get_degree(list, result, total, self.dc, roll['adjustments']) : ""
+        degree = self.dc ? Pf2e.get_degree(list, result, total, self.dc, roll['checks']) : ""
 
         dc_string = self.dc ? "against DC #{self.dc} " : ""
         doing_string = self.doing.any? ? " (#{self.doing.join(', ')})" : ""

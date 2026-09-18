@@ -453,7 +453,7 @@ module AresMUSH
 
     # The weapon a character's deity favours, which several feats and a champion's cause ask about.
     def self.favored?(char, descriptor)
-      return false unless char
+      return false unless char.respond_to?(:pf2_faith)
 
       deity = (char.pf2_faith || {})['deity']
       favored = deity.blank? ? nil : Global.read_config('pf2e_deities', deity, 'fav_weapon')

@@ -53,7 +53,10 @@ module AresMUSH
         domains = Domains.for('damage', attack, damage_attribute(char, attack))
         sources = Effects.sources(char)
         context = Effects.context(char)
-        held = Effects.options(char, domains) + Array(options)
+        # The attack's own facts are part of what a rule about this damage is tested against: a
+        # shockwave rune's splash is for a melee weapon dealing bludgeoning damage, and the weapon is
+        # what knows both.
+        held = Effects.options(char, domains) + Pf2eCombat.attack_options(attack, char) + Array(options)
 
         dice = Effects.damage_dice(sources, domains, context, held)
         flat = Effects.modifiers(sources, domains, context, held)

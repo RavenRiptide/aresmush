@@ -56,7 +56,9 @@ module AresMUSH
       # ------------------------------------------------------------------------------
 
       def self.sources(char)
-        SheetReads.memo(char, :effect_sources) { conditions(char) + feats(char) + items(char) }
+        SheetReads.memo(char, :effect_sources) do
+          conditions(char) + feats(char) + items(char) + runes(char)
+        end
       end
 
       # A source, with its rules held against what we implement. Checked here rather than where a row
@@ -274,6 +276,42 @@ module AresMUSH
                  'item' => { 'id' => item.id.to_s, '_id' => item.id.to_s, 'level' => item_level(item) },
                  'options' => item_options(item))
         end.compact
+      end
+
+      # The property runes etched on what a character is carrying, each as a source of its own.
+      #
+      # A rune is not an item: it is something done to one, and what it does belongs to the thing it is
+      # etched on. So the source carries the *weapon's* id, which is what its rules name - a flaming
+      # rune's fire is written against `{item|id}-damage` and reaches that weapon's damage and no other.
+      def self.runes(char)
+        Pf2egear.carried_items(char).flat_map do |_category, item|
+          next [] unless item.respond_to?(:runes)
+
+          Pf2egear.property_runes(item).map { |slug| rune_source(item, slug) }.compact
+        end
+      end
+
+      def self.rune_source(item, slug)
+        info = Pf2egear.rune_entry(slug)
+        rules = Array(info && info['rules'])
+
+        return nil if rules.empty?
+
+        source(Pf2egear.rune_named(slug), rules,
+               'item' => { 'id' => item.id.to_s, '_id' => item.id.to_s,
+                           'level' => info['level'].to_i,
+                           # `@item.baseDamage.dice` is what a shockwave rune's splash is worth.
+                           'baseDamage' => { 'dice' => damage_dice_count(item) } },
+               'options' => Array(info['traits']).map { |trait| "item:trait:#{Domains.slug(trait)}" })
+      end
+
+      # How many dice the weapon itself rolls: `2d6` is two, and `d8` is one.
+      def self.damage_dice_count(item)
+        found = item.respond_to?(:wp_damage) ? item.wp_damage.to_s.match(/\A(\d*)d/) : nil
+
+        return 0 unless found
+
+        found[1].empty? ? 1 : found[1].to_i
       end
 
       def self.item_level(item)

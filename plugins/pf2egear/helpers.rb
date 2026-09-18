@@ -197,6 +197,37 @@ module AresMUSH
       Array(item.runes&.dig('property', 'list')).map { |one| Pf2e::Domains.slug(one) }
     end
 
+    # The catalogue of property runes, keyed by the slug a rule names. Foundry keeps what a rune does in
+    # their code rather than their packs, so `scripts/import_foundry_runes.py` reads that table and
+    # writes it here as `rules:` like every other catalogue.
+    def self.runes
+      (Global.read_config('pf2e_runes') || {})
+    end
+
+    # A rune answers to its name as a player types it and to the slug their data calls it, which are not
+    # the same word: `giantKilling` slugs to one word and "Giant Killing" to two.
+    def self.rune_row(name)
+      wanted = Pf2e::Domains.slug(name)
+
+      runes.find do |held, info|
+        [ held, info['slug'] ].compact.any? { |one| Pf2e::Domains.slug(one) == wanted }
+      end
+    end
+
+    def self.rune_entry(name)
+      rune_row(name)&.last
+    end
+
+    def self.rune_named(name)
+      rune_row(name)&.first
+    end
+
+    # How many property runes an item can hold: as many as its potency rune is worth, which is the
+    # rule as written.
+    def self.rune_slots(item)
+      get_rune_value(item, 'fundamental', 'potency').to_i
+    end
+
     def self.catalogue_entry(category, item)
       catalogue = Inventory.config(category)
 

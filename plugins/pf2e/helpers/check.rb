@@ -45,9 +45,18 @@ module AresMUSH
       end
 
       # The circumstances the roll itself establishes, which are true of no figure and of no character.
+      #
+      # An attack carries the weapon's own facts too, because a rule about the attack is written against
+      # them: a keen rune turns a near miss into a critical hit for a slashing or piercing weapon.
       def own_options
         @own_options ||= [ "check:statistic:#{statistic_slug}",
-                           "check:type:#{check_type}" ] + base_statistic_options
+                           "check:type:#{check_type}" ] + base_statistic_options + attack_facts
+      end
+
+      def attack_facts
+        return [] unless @name.is_a?(Hash)
+
+        Pf2eCombat.attack_options(@name, @char)
       end
 
       # `skill`, `perception`, `saving-throw`, `attack-roll`: what kind of check this is, which is what
@@ -102,13 +111,22 @@ module AresMUSH
       def outcome(total, dc, die = nil)
         return nil unless dc
 
-        Degree.adjusted(Degree.of(total, dc, die), adjustments)
+        Degree.adjusted(Degree.of(total, dc, die), adjustments(rolled(total, dc, die)))
+      end
+
+      # What the roll itself establishes once it has been rolled, which is what a rule about a near miss
+      # asks about: a keen weapon turns a 19 into a critical hit. Their spelling (`check/check.ts:187`).
+      def rolled(total, dc, die)
+        [ "check:total:#{total}",
+          die ? "check:total:natural:#{die}" : nil,
+          die ? "check:roll:total:natural:#{die}" : nil,
+          dc ? "check:total:delta:#{total - dc}" : nil ].compact
       end
 
       # Rules that turn one outcome into another: Assurance makes a failure a success, Deafened drops an
       # auditory Perception check to a critical failure.
-      def adjustments
-        Rules.adjustments(Effects.sources(@char), @domains, @options)
+      def adjustments(rolled = [])
+        Rules.adjustments(Effects.sources(@char), @domains, @options + Array(rolled))
       end
 
       # Text to show with the roll. `Note` is the one kind of rule element attached to a roll that is not

@@ -71,14 +71,17 @@ module AresMUSH
         expect(Pf2e.get_keyword_value(char, 'perception')).to eq 9
       end
 
-      # What changes the outcome comes back with the number, so the roll can hand it to the degree.
-      it "should collect what the check says changes its outcome" do
-        allow(Pf2e::Check).to receive(:of).and_return(a_check(9, [ { 'all' => 'one-degree-better' } ]))
+      # The check itself comes back with the number, so the roll can ask it what the outcome should be
+      # once the die is known: a keen weapon turns a natural 19 into a critical hit, and nothing before
+      # the roll can say whether that happened.
+      it "should collect the check the word resolved to" do
+        held = a_check(9, [ { 'all' => 'one-degree-better' } ])
+        allow(Pf2e::Check).to receive(:of).and_return(held)
         collected = []
 
         Pf2e.get_keyword_value(char, 'perception', [], collected)
 
-        expect(collected).to eq [ { 'all' => 'one-degree-better' } ]
+        expect(collected).to eq [ held ]
       end
 
       it "should give nothing for an attack keyword, which only picks the linked ability" do

@@ -185,8 +185,11 @@ module AresMUSH
     ].freeze
 
     # A word that names a check answers with the check rather than a number, so the roll can ask it what
-    # it is worth *and* what changes its outcome. `collect` is where the latter goes; a caller that only
-    # wants the number leaves it out.
+    # it is worth *and* what changes its outcome. `collect` is where the check itself goes; a caller that
+    # only wants the number leaves it out.
+    #
+    # The check rather than its adjustments, because some of them depend on how the die came up: a keen
+    # weapon turns a natural 19 into a critical hit, and that is not knowable until it is rolled.
     def self.get_keyword_value(char, word, options = [], collect = nil)
       downcased = word.to_s.downcase
       keyword = KEYWORDS.find { |k| k['match'].call(downcased) }
@@ -197,7 +200,7 @@ module AresMUSH
       # dice, or with a check.
       return held unless held.respond_to?(:total) && held.respond_to?(:adjustments)
 
-      collect&.concat(held.adjustments)
+      collect&.push(held)
 
       held.total
     end
@@ -281,7 +284,7 @@ module AresMUSH
       roll_list.unshift('1d20') if find_dice.empty?
 
       result = []
-      adjustments = []
+      checks = []
 
       roll_list.map do |e|
         if e =~ dice_pattern
@@ -290,7 +293,7 @@ module AresMUSH
           sides = dice[1].to_i
           result << Pf2e.roll_dice(amount, sides)
         elsif e.to_i == 0
-          result << Pf2e.get_keyword_value(target, e, options, adjustments)
+          result << Pf2e.get_keyword_value(target, e, options, checks)
         else
           result << e.to_i
         end
@@ -310,8 +313,10 @@ module AresMUSH
       return_hash['result'] = fmt_result
       return_hash['total'] = result.flatten.sum
       return_hash['options'] = options
-      # What the statistics rolled say about the outcome, so the degree of success is theirs to change.
-      return_hash['adjustments'] = adjustments
+      # The statistics rolled, which is what the outcome is theirs to change through. Kept as the checks
+      # themselves so a rule about how the die came up can be asked once the die is known.
+      return_hash['checks'] = checks
+      return_hash['adjustments'] = checks.flat_map(&:adjustments)
 
       return return_hash
     end
@@ -323,11 +328,19 @@ module AresMUSH
                       "(%xgSUCCESS!%xn)",
                       "(%xh%xmCRITICAL SUCCESS!%xn)" ].freeze
 
-    def self.get_degree(list, result, total, dc, adjustments = [])
+    # `held` are the checks that were rolled, or the adjustments they hold. A check is the better answer,
+    # because only a check can say what a rule about a natural 19 makes of the die that was rolled.
+    def self.get_degree(list, result, total, dc, held = [])
       die = natural_die(list, result)
-      degree = Degree.adjusted(Degree.of(total, dc, die), adjustments)
+      degree = Degree.adjusted(Degree.of(total, dc, die), outcome_adjustments(held, total, dc, die))
 
       DEGREE_LABELS[degree] + (die == 1 ? t('pf2e.whirldice') : "")
+    end
+
+    def self.outcome_adjustments(held, total, dc, die)
+      Array(held).flat_map do |one|
+        one.respond_to?(:rolled) ? one.adjustments(one.rolled(total, dc, die)) : one
+      end
     end
 
     # The face the d20 came up, when the roll opened with one. A natural twenty or one shifts the
