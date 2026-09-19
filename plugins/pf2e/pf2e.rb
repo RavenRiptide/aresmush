@@ -166,6 +166,9 @@ module AresMUSH
       when "effects"
         return PF2EffectListCmd
       when "action"
+        # `action/available/combat` arrives as one switch.
+        return PF2ActionAvailableCmd if cmd.switch.to_s.start_with?('available')
+
         case cmd.switch
         when "use"
           return PF2ActionUseCmd

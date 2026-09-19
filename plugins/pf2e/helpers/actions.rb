@@ -38,10 +38,18 @@ module AresMUSH
         Err.new(:ambiguous, 'pf2e.action_ambiguous', 'action' => term, 'options' => close.first(8).join(', '))
       end
 
+      # An exploration or downtime activity costs no actions - Foundry files it as passive - but it is
+      # something a character does, so it is an activity rather than nothing.
       def self.cost(name)
         entry = info(name)
 
+        return 'activity' if entry['type'] == 'passive' && activity?(entry)
+
         TYPES[entry['type']] || COSTS[entry['cost'].to_i] || 'one action'
+      end
+
+      def self.activity?(entry)
+        exploration?(entry) || downtime?(entry)
       end
 
       # ------------------------------------------------------------------------------
@@ -64,6 +72,47 @@ module AresMUSH
         held = (char.pf2_feats || {}).values.flatten + (char.pf2_features || {}).values.flatten
 
         held.any? { |one| Domains.slug(one) == wanted }
+      end
+
+      # ------------------------------------------------------------------------------
+      # What a character has
+
+      # The modes of play an action belongs to, by the traits Foundry gives it: an exploration activity
+      # and a downtime activity say so, and anything else that costs actions is for an encounter.
+      MODES = {
+        'combat' => ->(entry) { !exploration?(entry) && !downtime?(entry) },
+        'exploration' => ->(entry) { exploration?(entry) },
+        'downtime' => ->(entry) { downtime?(entry) },
+        'reactions' => ->(entry) { entry['type'] == 'reaction' }
+      }.freeze
+
+      # What a player may call a mode, onto the mode.
+      ALIASES = { 'encounter' => 'combat', 'reaction' => 'reactions' }.freeze
+
+      def self.mode(named)
+        return nil if named.to_s.strip.empty?
+
+        wanted = named.to_s.strip.downcase
+
+        MODES.key?(wanted) ? wanted : ALIASES[wanted]
+      end
+
+      def self.exploration?(entry)
+        Array(entry['traits']).include?('exploration')
+      end
+
+      def self.downtime?(entry)
+        Array(entry['traits']).include?('downtime')
+      end
+
+      # Every action the character can use, in a mode of play or in all of them, by name. Something passive
+      # is not used, so it is not listed - unless it is an exploration or downtime activity, which is.
+      def self.available(char, mode = nil)
+        keep = mode ? MODES[mode] : ->(_entry) { true }
+
+        catalogue.select { |name, entry|
+          (entry['type'] != 'passive' || activity?(entry)) && keep.call(entry) && usable(char, name).ok?
+        }.keys.sort
       end
 
       # ------------------------------------------------------------------------------

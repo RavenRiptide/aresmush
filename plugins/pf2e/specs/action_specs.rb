@@ -142,6 +142,82 @@ module AresMUSH
         end
       end
 
+      # What a character can use, by mode of play.
+      describe "what is available" do
+        def available(mode = nil)
+          Actions.available(reread, mode)
+        end
+
+        it "should list everyone's actions for anyone" do
+          expect(available).to include 'Take Cover', 'Stride'
+        end
+
+        it "should not list what the character does not have" do
+          expect(available).to_not include 'Rage'
+        end
+
+        it "should list what their features give them" do
+          barbarian!
+
+          expect(available).to include 'Rage'
+        end
+
+        it "should leave out what is passive, since it is not used" do
+          passive = Actions.catalogue.find { |_name, info|
+            info['type'] == 'passive' && info['for'] == 'everyone' && !Actions.activity?(info)
+          }
+
+          expect(passive).to_not be_nil
+          expect(available).to_not include passive.first
+        end
+
+        # Foundry files an exploration activity as passive, because it costs no actions.
+        it "should list an activity, which is used though it costs no actions" do
+          expect(Actions.cost('Avoid Notice')).to eq 'activity'
+          expect(available).to include 'Avoid Notice'
+        end
+
+        it "should keep exploration to exploration activities" do
+          expect(available('exploration')).to include 'Avoid Notice'
+          expect(available('exploration')).to_not include 'Stride'
+        end
+
+        it "should keep combat to what is not exploration or downtime" do
+          expect(available('combat')).to include 'Stride'
+          expect(available('combat')).to_not include 'Avoid Notice', 'Earn Income'
+        end
+
+        it "should keep downtime to downtime activities" do
+          expect(available('downtime')).to include 'Earn Income'
+        end
+
+        it "should keep reactions to reactions" do
+          expect(available('reactions').map { |name| Actions.info(name)['type'] }.uniq).to eq [ 'reaction' ]
+        end
+
+        # `action/available/combat` arrives as one switch, `available/combat`.
+        it "should take the mode from a second switch or from the argument" do
+          run(PF2ActionAvailableCmd, "action/available/exploration")
+          run(PF2ActionAvailableCmd, "action/available downtime")
+
+          expect(@client.failures).to eq []
+          expect(@client.said.first).to include 'Exploration Actions', 'Avoid Notice'
+          expect(@client.said.last).to include 'Downtime Actions', 'Earn Income'
+        end
+
+        it "should say what modes there are for one it does not know" do
+          run(PF2ActionAvailableCmd, "action/available/naptime")
+
+          expect(@client.failures.join).to include 'exploration'
+        end
+
+        it "should mark what puts an effect on the character" do
+          run(PF2ActionAvailableCmd, "action/available combat")
+
+          expect(@client.said.first).to include 'Take Cover*'
+        end
+      end
+
       describe "the display" do
         def shown(name)
           PF2ActionViewTemplate.new(reread, name).render

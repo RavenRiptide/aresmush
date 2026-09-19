@@ -266,6 +266,7 @@ en:
     action_used: "%{name} uses %{action} (%{cost})."
     action_used_effect: "%{name} uses %{action} (%{cost}), and is now under %{effect} - %{lasts}."
     action_search_found: "Actions: %{list}"
+    action_mode_unknown: "%{mode} is not a mode of play. Try one of: %{modes}."
     aura_not_found: "%{name} projects no aura called %{aura}."
     persistent_dealt: "%{name} takes %{amount} persistent %{type} damage."
     persistent_ended: "%{name}'s persistent %{type} damage ends (%{die} against DC %{dc})."

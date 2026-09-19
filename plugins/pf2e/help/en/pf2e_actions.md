@@ -15,6 +15,9 @@ action - so an action is here under the name you would expect.
 `action <name>` - What an action costs, how often it can be used, and what it does. Where using it puts
 an effect on you, the display names the effect, how long it lasts, and the command that takes it on.
 `action/search <words>` - The actions whose names hold all of those words.
+`action/available [<mode>]` - The actions you can use, grouped by what they cost. Name a mode to see only
+that one: `combat` (or `encounter`), `exploration`, `downtime`, or `reactions`. `action/available/combat`
+works as well. An action marked `*` puts an effect on you when you use it.
 
 ### Using them
 `action/use <name>[/<option>...]` - Use an action. The room is told, and where the action puts an effect

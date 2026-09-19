@@ -98,3 +98,33 @@ module AresMUSH
     end
   end
 end
+
+module AresMUSH
+  module Pf2e
+
+    # `action/available [<mode>]` or `action/available/<mode>` - the actions this character can use, in
+    # one mode of play - combat, exploration, downtime, or just their reactions - or in all of them.
+    class PF2ActionAvailableCmd
+      include CommandHandler
+
+      attr_accessor :mode
+
+      def parse_args
+        named = cmd.switch.to_s.split('/', 2)[1] || cmd.args
+
+        @named = named.to_s.strip
+        self.mode = Actions.mode(@named)
+      end
+
+      def check_mode
+        return nil if @named.empty? || self.mode
+
+        t('pf2e.action_mode_unknown', :mode => @named, :modes => Actions::MODES.keys.join(', '))
+      end
+
+      def handle
+        client.emit PF2ActionAvailableTemplate.new(enactor, self.mode).render
+      end
+    end
+  end
+end
