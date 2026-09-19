@@ -270,7 +270,7 @@ LANG_KEY = re.compile(r'\APF2E\.[\w.-]+\Z')
 # The fields of a rule that are words for a player rather than mechanics.
 WORDED = {'text', 'title', 'label', 'prompt'}
 
-ENRICHER = re.compile(r'@(\w+)\[([^\]]*)\](?:\{([^}]*)\})?')
+ENRICHER_START = re.compile(r'@(\w+)\[')
 TAG = re.compile(r'<[^>]+>')
 
 
@@ -302,22 +302,87 @@ def flatten(node, prefix, out):
             out[path] = held
 
 
-def enriched(found):
-    """What an enricher reads as: its label, or for a link with none, the name of what it links to."""
-    kind, target, label = found.groups()
+def closing(text, start):
+    """Where the bracket opened at `start` closes, counting the brackets nested inside it -
+    `@Damage[1d6[bludgeoning]]` holds a pair of its own."""
+    depth = 0
 
-    if label:
-        return label
+    for index in range(start, len(text)):
+        if text[index] == '[':
+            depth += 1
+        elif text[index] == ']':
+            depth -= 1
+            if depth == 0:
+                return index
+
+    return -1
+
+
+def spoken(kind, target):
+    """What an enricher without a label reads as. A link is the name of what it links to; damage is
+    its formula and type; a check is the statistic, with its DC where it has one."""
     if kind == 'UUID':
         return target.split('.Item.')[-1].split('.')[-1]
+    if kind == 'Damage':
+        return re.sub(r'\[([\w,-]+)\]', lambda found: ' ' + found.group(1).replace(',', ' '), target).strip()
+    if kind == 'Check':
+        parts = target.split('|')
+        dc = next((part.split(':', 1)[1] for part in parts if part.startswith('dc:')), None)
+        named = parts[0].replace('-', ' ').title()
+        return f'DC {dc} {named}' if dc and dc.isdigit() else named
+    if kind == 'Template':
+        fields = dict(part.split(':', 1) for part in target.split('|') if ':' in part)
+        return f"{fields.get('distance', '')}-foot {fields.get('type', '')}".strip()
 
     return ''
+
+
+def enrich(text):
+    """Every enricher as the words it shows: `@UUID[...]{Prone}` is Prone, `@Damage[1d6[bludgeoning]]`
+    is 1d6 bludgeoning, and an inline roll `[[/act trip]]{Athletics}` is its label or its formula."""
+    out = []
+    index = 0
+
+    while index < len(text):
+        found = ENRICHER_START.match(text, index)
+        inline = text.startswith('[[', index)
+
+        if found or inline:
+            opened = found.end() - 1 if found else index
+            shut = closing(text, opened)
+
+            if shut < 0:
+                out.append(text[index])
+                index += 1
+                continue
+
+            label_end = shut + 1
+            label = None
+            if text.startswith('{', label_end):
+                ends = text.find('}', label_end)
+                if ends > 0:
+                    label = text[label_end + 1:ends]
+                    label_end = ends + 1
+
+            if found:
+                out.append(label if label is not None else spoken(found.group(1), text[opened + 1:shut]))
+            else:
+                formula = text[index + 2:shut - 1].split(' ', 1)
+                out.append(label if label is not None else (formula[1] if len(formula) > 1 else '').strip('{} '))
+
+            index = label_end
+            continue
+
+        out.append(text[index])
+        index += 1
+
+    return ''.join(out)
 
 
 def plain(text, limit=None):
     """Their HTML as a line a player can read, with a paragraph as `%r`, which is how our config breaks
     a line."""
-    text = ENRICHER.sub(enriched, text or '')
+    text = enrich(text or '')
     text = re.sub(r'</p>|<hr\s*/?>|<br\s*/?>', '\x00', text)
     text = TAG.sub(' ', text)
     text = html.unescape(re.sub(r'\s+', ' ', text)).strip()
