@@ -2,7 +2,7 @@ module AresMUSH
   module Pf2e
 
     # Persistent damage: a burn, a bleed, acid eating away. It is dealt at the end of each of the
-    # character's turns, and then a flat check against its DC decides whether it stops.
+    # character's or creature's turns, and then a flat check against its DC decides whether it stops.
     #
     # Foundry keeps one condition per kind of damage and ends every one of that kind on a successful
     # recovery (`actor/base.ts` `decreaseCondition`); the rules say the same kind does not stack, and the
@@ -56,7 +56,7 @@ module AresMUSH
         held(char).flat_map do |one|
           dealt = Pf2e.roll_formula(one['formula'])
 
-          Pf2eHP.modify_damage(char, dealt, false, true, one['type'])
+          Harm.damage(char, dealt, one['type'], :is_dm => true)
 
           check = recovery(char, one)
           events = [ Turns.event('pf2e.persistent_dealt', 'name' => char.name, 'amount' => dealt,

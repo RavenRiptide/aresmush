@@ -34,4 +34,6 @@ The basic, skill, exploration and downtime actions are everyone's. Any other - a
 archetype's, a heritage's, and any feat that is an action - is yours if you have the feat or feature it
 comes from: a barbarian has Rage because they have the Rage class feature.
 
-How often an action can be used is shown but not yet kept count of.
+In an encounter, `+e/act` does all of this and more: it rolls an action's check against its target
+and applies what the outcome does. See `help encounter actions`. How often an action has been used is
+counted there, and shown rather than refused.

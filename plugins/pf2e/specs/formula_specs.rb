@@ -73,6 +73,12 @@ module AresMUSH
           expect(Formula.value('@actor.abilities.con.mod', ctx)).to eq 3
         end
 
+        it "should read a choice answered as a number in text" do
+          chosen = { 'item' => { 'flags' => { 'system' => { 'rulesSelections' => { 'aidBonus' => '-1' } } } } }
+
+          expect(Formula.value('@item.flags.system.rulesSelections.aidBonus', chosen)).to eq(-1)
+        end
+
         it "should do arithmetic on a reference" do
           expect(Formula.value('18 + @actor.level', ctx)).to eq 23
         end

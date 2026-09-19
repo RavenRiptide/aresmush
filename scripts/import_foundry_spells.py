@@ -45,12 +45,20 @@ UNTIL = [(re.compile(r'until the end of (?:your|the caster\'s) next turn', re.I)
 
 def effects_in(effects_text):
     """What one outcome's paragraph leaves on the one who rolled: each condition it links, at the value
-    its label gives, and each effect."""
+    its label gives, and each effect. A duration belongs to the condition it directly follows."""
     found = []
-    until = next((key(found) for pattern, key in UNTIL for found in [pattern.search(effects_text)] if found),
-                 None)
+    durations = sorted((match.start(), key(match)) for pattern, key in UNTIL for match in pattern.finditer(effects_text))
+    links = list(LINK.finditer(effects_text))
 
-    for pack, label in LINK.findall(effects_text):
+    for index, link in enumerate(links):
+        pack, label = link.groups()
+        following = links[index + 1].start() if index + 1 < len(links) else len(effects_text)
+        # Only a duration straight after the condition: "frightened 3 and fleeing for 1 round" puts the
+        # round on the fleeing, which the text names without linking.
+        until = next((key for at, key in durations
+                      if link.end() <= at < following and not re.search(r'\band\b|,', effects_text[link.end():at])),
+                     None)
+
         if pack == 'conditionitems':
             named = re.match(r'(.+?)(?:\s+(\d+))?\Z', label.strip())
             one = {'condition': named.group(1).strip().title().replace('Off-guard', 'Off-Guard')}
@@ -112,6 +120,10 @@ def mechanics_of(doc):
     entry = {'rank': 0 if 'cantrip' in traits else (system.get('level') or {}).get('value', 1),
              'traits': traits}
 
+    # How long it takes to cast: `2`, `1 to 3`, `reaction`, `10 minutes`.
+    time = (system.get('time') or {}).get('value')
+    if time:
+        entry['time'] = str(time)
     if 'attack' in traits:
         entry['attack'] = True
     if save and save.get('statistic'):

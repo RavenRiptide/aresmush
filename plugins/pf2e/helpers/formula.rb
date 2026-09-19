@@ -181,6 +181,8 @@ module AresMUSH
 
       # What the context holds for one reference. An interpolation inside a path resolves first and
       # becomes a segment of it: `@actor.skills.{item|…}.rank` is two lookups, not one.
+      NUMBER = /\A[+-]?\d+(?:\.\d+)?\z/
+
       def self.held(name, flat, missing)
         key = if name.start_with?('{')
                 source, _, inner = name[1..-2].partition('|')
@@ -190,6 +192,8 @@ module AresMUSH
               end
 
         return flat[key] if flat[key].is_a?(Numeric)
+        # A choice's answer is kept as the text it was chosen as, so Aid's `-1` arrives as a string.
+        return flat[key].include?('.') ? flat[key].to_f : flat[key].to_i if flat[key].to_s.match?(NUMBER)
 
         missing << key
 

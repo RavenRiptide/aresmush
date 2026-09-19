@@ -47,7 +47,7 @@ module AresMUSH
 
       # The origin an effect records when an aura put it there, so the aura can find it again.
       def self.origin(emitter, aura)
-        "#{emitter.id}:#{aura['slug']}"
+        "#{Pf2e.holder_key(emitter)}:#{aura['slug']}"
       end
 
       # Someone is inside one of the emitter's auras. `relation` is `ally` or `enemy`; the emitter
@@ -57,7 +57,7 @@ module AresMUSH
 
         return Err.new(:no_aura, 'pf2e.aura_not_found', 'aura' => slug, 'name' => emitter.name) unless aura
 
-        mine = emitter.id == target.id
+        mine = Pf2e.holder_key(emitter) == Pf2e.holder_key(target)
         facts = Effects.character_facts(target)
 
         applied = aura['effects'].select { |one|
@@ -79,7 +79,7 @@ module AresMUSH
         leaving = aura ? aura['effects'].select { |one| one['leaves_on_exit'] }.map { |one| one['name'] } : []
 
         ended = ActiveEffects.on(target).select { |effect|
-          effect.aura_of == (aura ? origin(emitter, aura) : "#{emitter.id}:#{slug}") &&
+          effect.aura_of == (aura ? origin(emitter, aura) : "#{Pf2e.holder_key(emitter)}:#{slug}") &&
             (aura.nil? || leaving.include?(effect.name))
         }
 
@@ -97,8 +97,8 @@ module AresMUSH
         slugs = Array(ActiveEffects.info(effect.name)['rules']).select { |row| row['key'] == 'Aura' }
                                                                .map { |row| row['slug'] || Domains.slug(effect.name) }
 
-        slugs.flat_map { |slug| Pf2eEffect.find(:aura_of => "#{emitter.id}:#{slug}").to_a }.each do |one|
-          ActiveEffects.remove(one.character, one) if one.character
+        slugs.flat_map { |slug| Pf2eEffect.find(:aura_of => "#{Pf2e.holder_key(emitter)}:#{slug}").to_a }.each do |one|
+          ActiveEffects.remove(one.holder, one) if one.holder
         end
       end
     end

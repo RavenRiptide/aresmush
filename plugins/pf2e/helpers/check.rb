@@ -1,7 +1,8 @@
 module AresMUSH
   module Pf2e
 
-    # One check: what is being rolled, against what, and how it went.
+    # One check: what is being rolled, against what, and how it went - a character's, or a creature's in
+    # an encounter.
     #
     # Everything up to now has assembled *figures* - a number on a sheet. A roll is not a figure: it has
     # a die in it, a DC it is measured against, an outcome, and circumstances of its own. Three kinds of
@@ -35,7 +36,12 @@ module AresMUSH
         @name = name
         @extra_domains = Array(extra_domains)
 
-        @breakdown = Stat.of(char, @kind, name, Array(options) + own_options, @extra_domains)
+        # A creature's figure is its stat block's, with what it is under; a character's is built.
+        @breakdown = if Pf2e.npc?(char)
+                       Npcs.stat(char, @kind, name, Array(options) + own_options)
+                     else
+                       Stat.of(char, @kind, name, Array(options) + own_options, @extra_domains)
+                     end
         @domains = Domains.for(@kind, domain_name, ability) + @extra_domains
         @options = Effects.options(char, @domains) + Array(options) + own_options
       end

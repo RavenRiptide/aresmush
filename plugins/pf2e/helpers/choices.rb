@@ -69,7 +69,8 @@ module AresMUSH
       # weapon chosen is `{item|flags.system.rulesSelections.weapon}-damage`, which is that weapon's own
       # damage domain. Handwraps of mighty blows stand for the unarmed attack, whose domain is `unarmed`.
       def self.owned(set, char)
-        return {} unless char
+        # A creature in an encounter carries nothing a set could choose from.
+        return {} unless char && !Pf2e.npc?(char)
 
         categories = Array(set['owned']).map { |kind| OWNED[kind] }.compact.uniq
 
@@ -98,6 +99,8 @@ module AresMUSH
       # What a player typed for one of their own things, as the id the answer is: the weapon's name or its
       # nickname, whichever they used.
       def self.owned_answer(set, char, typed)
+        return nil if Pf2e.npc?(char)
+
         wanted = Domains.slug(typed)
 
         return 'unarmed' if wanted == 'unarmed' && owned(set, char).key?('unarmed')
@@ -122,11 +125,31 @@ module AresMUSH
         wanted = Domains.slug(answer)
         listed = Array(set['choices'])
 
-        return listed.any? { |one| one['value'].to_s == wanted } if listed.any?
+        return !listed_answer(set, answer).nil? if listed.any?
         return owned(set, char).key?(answer.to_s) if set['owned']
         return from_vocabulary(set, nil).include?(wanted) if set['vocabulary']
 
         from_filter(set, []).include?(wanted)
+      end
+
+      # The value a listed choice records for what someone answered. A number is matched as a number, so
+      # `-1` is not `+1`; a word by its slug; and failing both, the choice's own label - Bon Mot's
+      # `Critical Success`, whose value is `-3`. Tried in that order, because labels like `+1` and `-1`
+      # slug alike.
+      NUMBER = /\A[+-]?\d+\z/
+
+      def self.listed_answer(set, answer)
+        typed = answer.to_s.strip
+        listed = Array(set['choices'])
+        numeric = typed.match?(NUMBER)
+
+        found = listed.find { |one| one['value'].to_s == typed } ||
+                (numeric && listed.find { |one| one['value'].to_s.match?(NUMBER) && one['value'].to_i == typed.to_i }) ||
+                (!numeric && listed.find { |one| one['value'].to_s == Domains.slug(typed) }) ||
+                listed.find { |one| one['label'].to_s.casecmp?(typed) } ||
+                (!numeric && listed.find { |one| Domains.slug(one['label']) == Domains.slug(typed) })
+
+        found ? found['value'].to_s : nil
       end
 
       # A vocabulary may come with one condition covering every answer in it, written with the answer

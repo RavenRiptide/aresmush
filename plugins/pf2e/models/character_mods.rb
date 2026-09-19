@@ -95,7 +95,7 @@ module AresMUSH
       self.spellcasting_entries.each { |e| e.delete } if self.respond_to?(:spellcasting_entries)
       self.sheet_caches.each { |c| c.delete }
       self.pf2_effects.each { |e| e.delete }
-      self.encounters.each {|e| e.delete self}
+      self.encounters.each { |e| e.characters.delete(self) }
     end
 
   end

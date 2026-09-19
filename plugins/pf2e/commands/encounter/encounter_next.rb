@@ -89,6 +89,14 @@ module AresMUSH
           PF2Encounter.send_to_encounter(encounter, notice)
         end
 
+        # The one whose turn it is hears what matters to it; a creature's reminder goes to the GM.
+        holder = Pf2e::Combatants.holder_named(encounter, initlist[this_init][1])
+
+        if holder
+          reminder = Pf2e::Turns.reminder(holder, moved.state['round'])
+          Pf2e.npc?(holder) ? client.emit_ooc(reminder) : Login.emit_ooc_if_logged_in(holder, reminder)
+        end
+
       end
 
 

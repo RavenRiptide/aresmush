@@ -38,23 +38,13 @@ module AresMUSH
         # This command does not check to see if players are capable of healing.
         # It may be necessary to lock this command if players are in an encounter.
 
-        ok_char_list = []
-        bad_char_list = []
+        targets = ActiveEffects.targets(client, enactor, self.target)
 
-        target.each do |item|
-          char = ClassTargetFinder.find(item, Character, enactor)
+        return if targets.empty?
 
-          if (char.found?)
-            Pf2eHP.modify_damage(char.target, self.damage, true, false, nil,
-                                 Pf2e.circumstances([ self.action ].compact))
-            ok_char_list << char.target.name
-          else
-            bad_char_list << item
-          end
-        end
-
-        if !(bad_char_list.empty?)
-          client.emit_ooc t('pf2e.bad_value_in_list', :items => 'characters', :list => bad_char_list.sort.join(", "))
+        ok_char_list = targets.map do |holder|
+          Pf2e::Harm.heal(holder, self.damage, Pf2e.circumstances([ self.action ].compact))
+          holder.name
         end
 
         client.emit_success t('pf2e.healing_applied_ok', :list => ok_char_list.sort.join(", "), :amount => self.damage)

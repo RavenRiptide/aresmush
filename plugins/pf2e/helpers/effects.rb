@@ -57,7 +57,10 @@ module AresMUSH
 
       # ------------------------------------------------------------------------------
 
+      # A creature in an encounter has only its conditions and effects; `Npcs` gathers those.
       def self.sources(char)
+        return Npcs.sources(char) if Pf2e.npc?(char)
+
         SheetReads.memo(char, :effect_sources) do
           conditions(char) + feats(char) + items(char) + runes(char) + ActiveEffects.sources(char)
         end
@@ -82,6 +85,8 @@ module AresMUSH
       # about some statistics and not others, so the domains asking decide which of them hold; nothing
       # asking without domains sees a scoped one.
       def self.options(char, domains = nil)
+        return Npcs.facts(char) if Pf2e.npc?(char)
+
         facts(char) + RollOptions.active(char, domains)
       end
 
@@ -89,6 +94,8 @@ module AresMUSH
       # options because the store asks for these while working out what is switched on, and asking it
       # for its own answer would not terminate.
       def self.facts(char)
+        return Npcs.facts(char) if Pf2e.npc?(char)
+
         SheetReads.memo(char, :effect_facts) { build_facts(char) }
       end
 
@@ -112,6 +119,8 @@ module AresMUSH
       # which conditions a character has and what their armour counts as are themselves among the things
       # the full list of facts is built from.
       def self.character_facts(char)
+        return [ "self:level:#{char.pf2_level}" ] + named('self:trait', char.pf2_traits) if Pf2e.npc?(char)
+
         SheetReads.memo(char, :character_facts) { build_character_facts(char) }
       end
 
@@ -318,6 +327,9 @@ module AresMUSH
                  chosen.map { |one| Choices.owned_answer(set, char, one) }.compact.first
         end
 
+        # A listed choice records its own value for the answer, which may not be the answer's slug.
+        return chosen.map { |one| Choices.listed_answer(set, one) }.compact.first if Array(set['choices']).any?
+
         chosen.map { |one| Domains.slug(one) }.find { |one| Choices.includes?(set, one) }
       end
 
@@ -400,6 +412,8 @@ module AresMUSH
       end
 
       def self.context(char)
+        return Npcs.context(char) if Pf2e.npc?(char)
+
         SheetReads.memo(char, :effect_context) { build_context(char) }
       end
 

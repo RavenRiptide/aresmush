@@ -211,7 +211,10 @@ module AresMUSH
       # feats twice without clearing would count Hefty Hauler's two bulk twice - which is the difference
       # between rebuilding derived data and mutating it. A skill rank is not cleared, because a rank is
       # written with `upgrade` and taking the better of a rank and itself is the rank.
+      # A creature in an encounter has no sheet to write to: its figures are its stat block's.
       def self.apply_all!(char)
+        return 0 if Pf2e.npc?(char)
+
         char.update(:pf2_derived => {})
 
         writes = Rules.writes(Effects.sources(char), Effects.options(char), Effects.context(char))

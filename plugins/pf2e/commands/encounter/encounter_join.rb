@@ -66,6 +66,7 @@ module AresMUSH
         initiative = Pf2e.parse_roll_string(enactor, roll)['total']
 
         PF2Encounter.add_to_initiative(encounter, enactor.name, initiative)
+        Pf2e::Combatants.number(encounter, enactor.name)
 
         # Set management for later use.
 

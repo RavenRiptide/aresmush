@@ -38,6 +38,14 @@ module AresMUSH
           client.emit_ooc t(event['key'], **Pf2e::CharState.symbolize(event['args']))
         end
 
+        # So do the turn's counts, what may be used once an encounter, a trust given for this fight, and
+        # the cover and concealment set on its combatants.
+        Pf2e::Turns.holders(encounter).each do |holder|
+          Pf2e::TurnState.reset(holder, 'encounter')
+          Pf2e::TurnState.write(holder, 'turn' => {})
+        end
+        encounter.update(:trusted => [], :cover => {}, :concealment => {})
+
         @message = t('pf2e.encounter_complete', :id => encounter.id)
 
         # Emit to the room.

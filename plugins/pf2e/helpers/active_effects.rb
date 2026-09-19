@@ -1,7 +1,7 @@
 module AresMUSH
   module Pf2e
 
-    # Effects a character is under: applying one, reading it, and ending it.
+    # Effects a character or a creature in an encounter is under: applying one, reading it, and ending it.
     #
     # What an effect does is its catalogue entry's rules, read by the same machinery as a feat's, so an
     # effect is one more source in `Effects.sources` and every derived figure picks it up. What this adds
@@ -167,7 +167,7 @@ module AresMUSH
         max_before = HitPointLoss.takes?(entry['rules']) ? HitPointLoss.max_hp(char) : nil
 
         effect = Pf2eEffect.create(
-          :character => char, :name => name, :applied_by => applied_by,
+          (Pf2e.npc?(char) ? :npc : :character) => char, :name => name, :applied_by => applied_by,
           :level => said['level'] || entry['level'] || 1,
           :badge => said['badge'] || (entry['badge'] || {})['value'],
           :unit => unit, :duration => duration['value'].to_i, :expiry => duration['expiry'],
@@ -313,17 +313,15 @@ module AresMUSH
         Ok.new(:state => found.state)
       end
 
-      # The characters a command names, saying which names found nobody.
+      # Whoever a command names - a character, or a combatant by its id - saying which names found nobody.
       def self.targets(client, enactor, names)
-        found, missing = Array(names).map { |name| [ name, ClassTargetFinder.find(name, Character, enactor) ] }
-                                     .partition { |_name, result| result.found? }
+        found, missing = Combatants.resolve_all(enactor, names, Combatants.encounter_here(enactor))
 
         unless missing.empty?
-          client.emit_ooc t('pf2e.bad_value_in_list', :items => 'names',
-                                                      :list => missing.map(&:first).join(', '))
+          client.emit_ooc t('pf2e.bad_value_in_list', :items => 'names', :list => missing.join(', '))
         end
 
-        found.map { |_name, result| result.target }
+        found.map(&:holder)
       end
 
       # ------------------------------------------------------------------------------
@@ -399,7 +397,7 @@ module AresMUSH
       # A turn has begun or ended. Anything whose time is up ends, and each one ended is answered as an
       # event for whoever tells the room (`Pf2e::Turns`).
       def self.expire(encounter, event, participant, round)
-        in_encounter(encounter).select { |effect| effect.character && due?(effect, event, participant, round) }
+        in_encounter(encounter).select { |effect| effect.holder && due?(effect, event, participant, round) }
                                .map { |effect| ended(effect) }
       end
 
@@ -408,7 +406,7 @@ module AresMUSH
       # it began in until someone says otherwise.
       def self.unsustained(encounter, participant, round)
         in_encounter(encounter).select { |effect|
-          effect.character && effect.sustained && (effect.started_turn || effect.character.name) == participant &&
+          effect.holder && effect.sustained && (effect.started_turn || effect.holder.name) == participant &&
             round.to_i > effect.sustained_round.to_i
         }.map { |effect| ended(effect) }
       end
@@ -421,7 +419,7 @@ module AresMUSH
       end
 
       def self.ended(effect)
-        char = effect.character
+        char = effect.holder
         name = effect.name
 
         remove(char, effect)
@@ -437,14 +435,14 @@ module AresMUSH
         return false unless total && effect.started_round
 
         expiry = effect.expiry.to_s.empty? ? 'turn-start' : effect.expiry.to_s
-        owner = effect.started_turn || effect.character&.name
+        owner = effect.started_turn || effect.holder&.name
 
         expiry == event && owner == participant && round.to_i >= effect.started_round.to_i + total
       end
 
       # The encounter is over. Anything that could not outlast it ends with it.
       def self.encounter_ended(encounter)
-        in_encounter(encounter).reject { |effect| UNITS[effect.unit]['outlasts_encounter'] || !effect.character }
+        in_encounter(encounter).reject { |effect| UNITS[effect.unit]['outlasts_encounter'] || !effect.holder }
                                .map { |effect| ended(effect) }
       end
 

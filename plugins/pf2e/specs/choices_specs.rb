@@ -131,6 +131,32 @@ module AresMUSH
           expect(Choices.facts_of('Something', nil, 'feat')).to include 'item:level:1'
         end
       end
+
+      describe "the answer a listed set records" do
+        def aid
+          set('choices' => [ -1, 1, 2, 3, 4 ].map { |one| { 'label' => format('%+d', one), 'value' => one } })
+        end
+
+        it "should read a negative number as itself" do
+          expect(Choices.listed_answer(aid, '-1')).to eq '-1'
+          expect(Choices.listed_answer(aid, '+1')).to eq '1'
+        end
+
+        it "should read a word by its slug" do
+          expect(Choices.listed_answer(listed('acid', 'cold'), 'Cold')).to eq 'cold'
+        end
+
+        it "should read a choice by its label when nothing else matches" do
+          bon_mot = set('choices' => [ { 'label' => 'Critical Success', 'value' => -3 },
+                                       { 'label' => 'Success', 'value' => -2 } ])
+
+          expect(Choices.listed_answer(bon_mot, 'Critical Success')).to eq '-3'
+        end
+
+        it "should read nothing it does not offer" do
+          expect(Choices.listed_answer(aid, '+7')).to be_nil
+        end
+      end
     end
   end
 end

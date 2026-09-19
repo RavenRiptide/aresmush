@@ -53,8 +53,14 @@ module AresMUSH
     # resists. Keyed by the choice set's flag, as Foundry keys them.
     attribute :answers, :type => DataType::Array, :default => []
 
+    # Who is under it: a character, or a creature in an encounter.
     reference :character, "AresMUSH::Character"
+    reference :npc, "AresMUSH::Pf2eNpc"
     reference :encounter, "AresMUSH::PF2Encounter"
+
+    def holder
+      self.character || self.npc
+    end
 
     index :name
     index :aura_of

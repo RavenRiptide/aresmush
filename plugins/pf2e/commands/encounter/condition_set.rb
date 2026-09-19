@@ -33,16 +33,16 @@ module AresMUSH
 
       def handle
 
-        # You must be either a DM / staffer or the organizer of an active encounter in which the targets are participating.
+        # Staff, or the GM of the encounter the targets are in. A target may be a combatant's id.
+        encounter = Pf2e::Combatants.encounter_here(enactor)
+        target_list = ActiveEffects.targets(client, enactor, self.target)
 
-        can_damage_pc = Pf2e.can_damage_pc?(enactor, self.target)
+        return if target_list.empty?
 
-        if !can_damage_pc
+        unless Pf2e.can_damage_pc?(enactor, target_list.map(&:name), encounter&.id)
           client.emit_failure t('pf2e.cannot_damage_pc')
           return
         end
-
-        # This should already be nil-checked in the checks above, so I don't bother.
 
         condition_details = Global.read_config('pf2e_conditions', self.condition)
 
@@ -50,25 +50,6 @@ module AresMUSH
           client.emit_failure t('pf2e.condition_needs_value')
           return
         end
-
-        # Do all of the targets exist as PC's?
-
-        target_list = []
-        not_found_list = []
-
-        self.target.each do |char|
-          result = ClassTargetFinder.find(char, Character, enactor)
-          if result.found?
-            target_list << result.target
-          else
-            not_found_list << char
-          end
-        end
-
-        if !not_found_list.empty?
-          client.emit_ooc t('pf2e.bad_value_in_list', :items => 'names', :list => not_found_list.join(', '))
-        end
-
 
         # A condition another holds in place cannot be cleared on its own: Unconscious stays while Dying
         # does. Each target answers for itself.
