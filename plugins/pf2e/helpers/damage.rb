@@ -79,8 +79,57 @@ module AresMUSH
 
         { 'instances' => instances,
           'formula' => render(instances, false),
-          'critical' => render(instances, true),
+          'critical' => render(critical_instances(instances, attack), true),
           'conditional' => unmet_dice + unmet_flat }
+      end
+
+      # ------------------------------------------------------------------------------
+      # What a critical hit adds beyond doubling
+
+      # A trait that carries a die, whichever way it is spelled: a creature's stat block writes
+      # `deadly-d10`, this game's catalogue `Deadly (d10)`, and a deadly trait may name more than one
+      # die (`deadly-2d10`). `[ count, faces ]`, or nothing.
+      def self.trait_dice(attack, name)
+        found = Array(attack['traits']).map { |one| Domains.slug(one) }
+                                       .map { |one| one.match(/\A#{name}-(\d)?d(\d{1,2})\z/) }.compact.first
+
+        found ? [ (found[1] || 1).to_i, found[2].to_i ] : nil
+      end
+
+      def self.trait_die(attack, name)
+        trait_dice(attack, name)&.last
+      end
+
+      # `weapon.ts:268`. Deadly adds its dice on a critical hit, undoubled - as many times over as the
+      # striking rune adds dice, once it adds more than one. Fatal rolls the weapon's own dice at its
+      # size, which are doubled with the rest, and adds one more of that size, which is not.
+      def self.critical_extras(attack)
+        extras = []
+
+        if (deadly = trait_dice(attack, 'deadly'))
+          striking = attack['striking'].to_i
+          extras << [ striking > 1 ? striking * deadly.first : deadly.first, "d#{deadly.last}" ]
+        end
+
+        fatal = trait_die(attack, 'fatal')
+        extras << [ 1, "d#{fatal}" ] if fatal
+
+        extras
+      end
+
+      # The weapon's instance as a critical hit leaves it: its own dice at the fatal size, and the
+      # critical-only dice added.
+      def self.critical_instances(instances, attack)
+        return instances if instances.empty?
+
+        base = instances.first.transform_values { |value| value.is_a?(Array) ? value.dup : value }
+        fatal = trait_die(attack, 'fatal')
+        weapon = base['dice'].index { |_count, die| die.to_s == base['die'].to_s }
+
+        base['dice'][weapon] = [ base['dice'][weapon].first, "d#{fatal}" ] if fatal && weapon
+        base['crit_only_dice'] = Array(base['crit_only_dice']) + critical_extras(attack)
+
+        [ base ] + instances.drop(1)
       end
 
       def self.formula(char, attack, options = [])

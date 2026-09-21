@@ -10,9 +10,8 @@ module AresMUSH
     #   [ { 'type' => 'slashing', 'category' => nil, 'amount' => 9, 'formula' => '1d8+4' } ]
     #
     # A critical hit doubles, which is the rule's default: the doubling pile's total twice, then what
-    # never doubles, then what only a critical adds. A deadly weapon adds its die on a critical and a
-    # fatal one raises its dice and adds one more (`weapon.ts`), which a character's and a creature's
-    # weapon both do.
+    # never doubles, then what only a critical adds. What deadly and fatal add is `Damage`'s to say, for
+    # a character's weapon and a creature's alike, so the roll and the sheet's critical line agree.
     module DamageRoll
 
       WORDS = { 'b' => 'bludgeoning', 'p' => 'piercing', 's' => 'slashing' }.freeze
@@ -23,7 +22,7 @@ module AresMUSH
 
       # A character's attack: `instances` as `Damage.of` built them.
       def self.of_instances(instances, critical, attack = {})
-        instances = fatal(instances, attack) if critical
+        instances = Damage.critical_instances(instances, attack) if critical
 
         rows = instances.map do |instance|
           doubling = throw_dice(instance['dice']) + [ instance['modifier'].to_i ]
@@ -37,24 +36,31 @@ module AresMUSH
             'amount' => [ amount, 0 ].max, 'formula' => critical ? doubled(formula) : formula }
         end
 
-        rows += deadly(attack, rows.first) if critical
-
         merged(rows)
       end
 
       # A creature's Strike or a spell: `[ [ '1d6+2', 'slashing', category ] ]`.
       def self.of_formulas(formulas, critical, attack = {})
-        rows = Array(formulas).map do |formula, type, category|
-          formula = fatal_formula(formula, attack) if critical
+        rows = Array(formulas).each_with_index.map do |(formula, type, category), index|
+          # Fatal upsizes the weapon's own dice, which are the first formula's.
+          formula = fatal_formula(formula, attack) if critical && index.zero?
 
           { 'type' => kind(type), 'category' => category,
             'amount' => [ Pf2e.roll_formula(formula) * (critical ? 2 : 1), 0 ].max,
             'formula' => critical ? doubled(formula) : formula.to_s }
         end
 
-        rows += deadly(attack, rows.first) if critical
+        rows += critical_extra_rows(attack, rows.first) if critical
 
         merged(rows)
+      end
+
+      # Deadly's and fatal's critical-only dice, undoubled, of the weapon's own kind of damage.
+      def self.critical_extra_rows(attack, weapon_row)
+        Damage.critical_extras(attack).map do |count, die|
+          { 'type' => weapon_row ? weapon_row['type'] : kind(attack['damage_type']), 'category' => nil,
+            'amount' => Pf2e.roll_dice(count, die.delete('d').to_i).sum, 'formula' => "#{count}#{die}" }
+        end
       end
 
       # A basic save's outcome: half on a success, double on a critical failure, nothing on a critical
@@ -71,44 +77,14 @@ module AresMUSH
         Array(dice).flat_map { |count, die| Pf2e.roll_dice(count.to_i, die.to_s.delete('d').to_i) }
       end
 
-      # A deadly weapon's extra die on a critical: one, two with greater striking, three with major. It
-      # deals the weapon's own kind of damage, which is the first row's.
-      def self.deadly(attack, weapon_row)
-        die = trait_die(attack, 'deadly')
-
-        return [] unless die
-
-        count = [ attack['striking'].to_i, 1 ].max
-
-        [ { 'type' => weapon_row ? weapon_row['type'] : kind(attack['damage_type']), 'category' => nil,
-            'amount' => Pf2e.roll_dice(count, die).sum, 'formula' => "#{count}d#{die}" } ]
-      end
-
-      # A fatal weapon's dice become the fatal size on a critical, and it rolls one more of them.
-      def self.fatal(instances, attack)
-        die = trait_die(attack, 'fatal')
-
-        return instances unless die && instances.first
-
-        base = instances.first.dup
-        count = base['dice'].to_a.sum { |one| one.first.to_i }
-        base['dice'] = [ [ count + 1, "d#{die}" ] ]
-
-        [ base ] + instances.drop(1)
-      end
-
+      # The weapon's dice at the fatal size: `1d8+4` is `1d12+4`. The extra fatal die is added apart,
+      # undoubled, with deadly's.
       def self.fatal_formula(formula, attack)
-        die = trait_die(attack, 'fatal')
+        die = Damage.trait_die(attack, 'fatal')
 
         return formula unless die
 
-        formula.to_s.sub(/(\d*)d(\d+)/) { "#{($1.empty? ? 1 : $1.to_i) + 1}d#{die}" }
-      end
-
-      def self.trait_die(attack, name)
-        found = Array(attack['traits']).map(&:to_s).find { |one| one.start_with?("#{name}-") }
-
-        found ? found[/d(\d+)\z/, 1].to_i : nil
+        formula.to_s.sub(/(\d*)d(\d+)/) { "#{$1.empty? ? 1 : $1}d#{die}" }
       end
 
       # A pile of dice and a flat amount as a formula: `2d6+4`.

@@ -293,6 +293,40 @@ module AresMUSH
           expect(Damage.formula(char, sword('die' => nil))).to eq '4 S'
         end
       end
+
+      # A deadly weapon adds a die on a critical hit - two with greater striking, three with major -
+      # and a fatal one rolls its dice at the fatal size with one more of them. The catalogue spells
+      # the traits `Deadly (d10)`, and a creature's stat block `deadly-d10`; both have to be read, or
+      # the sheet's critical line and the roll leave the die out.
+      describe "a critical hit with deadly and fatal weapons" do
+        it "should show a deadly die on the sheet's critical line" do
+          expect(Damage.critical(char, sword('traits' => [ 'Deadly (d10)' ]))).to include '1d10'
+        end
+
+        it "should add a second deadly die with greater striking" do
+          expect(Damage.critical(char, sword('traits' => [ 'Deadly (d10)' ], 'striking' => 2))).to include '2d10'
+        end
+
+        # The weapon's own dice are upsized and doubled; the extra die is critical-only and is not
+        # (`weapon.ts`: `critical: true`, `override: { dieSize }`).
+        it "should roll a fatal weapon's dice at the fatal size, and add one undoubled" do
+          expect(Damage.critical(char, sword('traits' => [ 'Fatal (d12)' ]))).to eq '(1d12+4)x2+1d12 S'
+        end
+
+        it "should read a creature's spelling of the trait too" do
+          expect(Damage.trait_die({ 'traits' => [ 'deadly-d10' ] }, 'deadly')).to eq 10
+          expect(Damage.trait_die({ 'traits' => [ 'Deadly (d10)' ] }, 'deadly')).to eq 10
+        end
+
+        it "should roll what the sheet shows" do
+          allow(Pf2e).to receive(:roll_dice) { |amount = 1, sides = 20| [ sides.to_i ] * amount.to_i }
+          attack = sword('traits' => [ 'Deadly (d10)' ])
+          rows = DamageRoll.of_instances(Damage.of(char, attack)['instances'], true, attack)
+
+          # (1d8+4)x2 and an undoubled d10: (8 + 4) x 2 + 10.
+          expect(rows.sum { |row| row['amount'] }).to eq 34
+        end
+      end
     end
   end
 end
