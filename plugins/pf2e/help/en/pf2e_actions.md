@@ -20,9 +20,10 @@ that one: `combat` (or `encounter`), `exploration`, `downtime`, or `reactions`. 
 works as well. An action marked `*` puts an effect on you when you use it.
 
 ### Using them
-`action/use <name>[/<option>...]` - Use an action. The room is told, and where the action puts an effect
-on you - Rage, Take Cover, a stance - you are now under it, and it lasts and ends the way `effects`
-describes.
+`action/use <name>[/<option>...]` - Use an action. It is the same command as `+e/act`: the room is told,
+an action that puts an effect on you - Rage, Take Cover, a stance - puts you under it, and in an
+encounter what it costs is counted against your turn. An action that rolls a check against someone
+wants a target, which is `+e/act <name>=<target>` (see `help encounter actions`).
 
 The options after the name are what only you know about the effect, the same as `effect/add` takes:
 `rank <n>`, `value <n>`, or an answer to what the effect asks.

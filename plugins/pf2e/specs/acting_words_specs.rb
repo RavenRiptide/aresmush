@@ -45,6 +45,16 @@ module AresMUSH
         end
       end
 
+      # What a player says after an action's name that is about its effect - the rank it is at, a
+      # counter, an answer to what it asks - reaches the effect, as `effect/add` takes them.
+      describe "what is said about an action's effect" do
+        it "should pass the rank, a counter and an answer to the effect" do
+          said = Acting.said([ 'rank 6', 'value 3', 'fire' ], false)
+
+          expect(Acting.effect_options(said)).to eq [ 'rank 6', 'value 3', 'fire' ]
+        end
+      end
+
       describe "damage" do
         it "should double a formula" do
           expect(DamageRoll.doubled('1d6+1')).to eq '2d6+2'

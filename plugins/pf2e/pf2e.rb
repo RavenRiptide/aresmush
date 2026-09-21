@@ -170,8 +170,9 @@ module AresMUSH
         return PF2ActionAvailableCmd if cmd.switch.to_s.start_with?('available')
 
         case cmd.switch
+        # Using an action is acting: the same command whether or not an encounter is running.
         when "use"
-          return PF2ActionUseCmd
+          return PF2EncounterActCmd
         when "search"
           return PF2ActionSearchCmd
         when nil

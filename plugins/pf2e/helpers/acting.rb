@@ -105,7 +105,7 @@ module AresMUSH
         if entry['check']
           check_action(scene, name, entry, said, out)
         elsif entry['self_effect']
-          self_action(scene, name, entry, out)
+          self_action(scene, name, entry, said, out)
         else
           out['lines'] << t('pf2e.act_announced', :actor => scene.actor.label, :action => name,
                                                   :cost => Actions.cost(name), :target => target_phrase(scene))
@@ -163,8 +163,11 @@ module AresMUSH
       end
 
       # An action that puts an effect on whoever uses it: Rage, Take Cover, a stance.
-      def self.self_action(scene, name, entry, out)
-        applied = ActiveEffects.apply(scene.actor.holder, entry['self_effect'], :applied_by => scene.actor.label,
+      # What is said after the action's name reaches its effect: the rank it is at, a counter, an answer
+      # to what it asks - `action/use rage` and `+e/act raise a shield` are the same command.
+      def self.self_action(scene, name, entry, said, out)
+        applied = ActiveEffects.apply(scene.actor.holder, entry['self_effect'], :options => effect_options(said),
+                                                                                :applied_by => scene.actor.label,
                                                                                 :encounter => scene.encounter)
 
         if applied.err?
@@ -178,6 +181,12 @@ module AresMUSH
                                                   :cost => Actions.cost(name), :effect => effect.name,
                                                   :lasts => ActiveEffects.remaining(effect))
         out['lines'] << undo_line("effect/remove #{scene.actor.ref}=#{effect.name}")
+      end
+
+      # What was said about an effect, in the words `ActiveEffects.apply` takes: `rank 6`, `value 3`, and
+      # an answer to what it asks.
+      def self.effect_options(said)
+        (said['rank'] ? [ "rank #{said['rank']}" ] : []) + said['words']
       end
 
       # An action whose check is rolled against something: a target's defence, or a DC.

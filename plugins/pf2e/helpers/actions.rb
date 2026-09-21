@@ -4,9 +4,9 @@ module AresMUSH
     # Things a character can do: Take Cover, Rage, a monk's stance.
     #
     # The catalogue (`pf2e_actions.yml`, from Foundry's actions pack and the feats that are actions) says
-    # what each costs and what it puts on whoever uses it - Foundry's `selfEffect`. Using one that has
-    # an effect puts the character under it, through `ActiveEffects` like any other effect, so everything
-    # the effect does and how long it lasts is already handled.
+    # what each costs, what it puts on whoever uses it - Foundry's `selfEffect` - and, for one that rolls,
+    # what the check is. This says which a character may use; using one is `Acting.act`, which
+    # `action/use` and `+e/act` both are.
     module Actions
 
       # What an action costs, as a sheet says it.
@@ -122,35 +122,6 @@ module AresMUSH
         catalogue.select { |name, entry|
           (entry['type'] != 'passive' || activity?(entry)) && keep.call(entry) && usable(char, name).ok?
         }.keys.sort
-      end
-
-      # ------------------------------------------------------------------------------
-      # Using one
-
-      # The character uses an action. Where it puts an effect on them, they are now under it; `options` are
-      # what they say about that effect, as `ActiveEffects.apply` takes them.
-      #
-      #   Ok state: { 'action' => name, 'effect' => the effect put on them, or nil }
-      def self.use(char, term, options: [], encounter: nil)
-        found = find(term)
-
-        return found if found.err?
-
-        name = found.state
-        allowed = usable(char, name)
-
-        return allowed if allowed.err?
-
-        effect_name = info(name)['self_effect']
-
-        return Ok.new(:state => { 'action' => name, 'effect' => nil }) unless effect_name
-
-        applied = ActiveEffects.apply(char, effect_name, :options => options, :applied_by => char.name,
-                                                         :encounter => encounter)
-
-        return applied if applied.err?
-
-        Ok.new(:state => { 'action' => name, 'effect' => applied.state })
       end
     end
   end

@@ -264,8 +264,6 @@ en:
     action_not_found: "There is no action called %{action}. `action/search <words>` finds one."
     action_ambiguous: "%{action} could be any of: %{options}. Say which."
     action_not_yours: "You do not have %{action}: it comes from a feat or feature you have not taken."
-    action_used: "%{name} uses %{action} (%{cost})."
-    action_used_effect: "%{name} uses %{action} (%{cost}), and is now under %{effect} - %{lasts}."
     action_search_found: "Actions: %{list}"
     action_mode_unknown: "%{mode} is not a mode of play. Try one of: %{modes}."
     aura_not_found: "%{name} projects no aura called %{aura}."

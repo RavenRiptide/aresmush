@@ -25,47 +25,6 @@ module AresMUSH
       end
     end
 
-    # `action/use <name>[/<option>...]` - use an action. One that puts an effect on its user does so, and
-    # the options are what `effect/add` takes after the effect's name: `rank 6`, `value 2`, an answer.
-    class PF2ActionUseCmd
-      include CommandHandler
-
-      attr_accessor :action, :options
-
-      def parse_args
-        parts = cmd.args.to_s.split('/').map(&:strip)
-
-        self.action = parts.shift
-        self.options = parts
-      end
-
-      def required_args
-        [ self.action ]
-      end
-
-      def handle
-        scene = enactor_room.scene
-        encounter = scene ? PF2Encounter.scene_active_encounter(scene) : nil
-        used = Actions.use(enactor, self.action, :options => self.options, :encounter => encounter)
-
-        return if CharState.emit_error!(client, used)
-
-        name = used.state['action']
-        effect = used.state['effect']
-        message = if effect
-                    t('pf2e.action_used_effect', :name => enactor.name, :action => name, :cost => Actions.cost(name),
-                                                 :effect => effect.name,
-                                                 :lasts => ActiveEffects.remaining(effect))
-                  else
-                    t('pf2e.action_used', :name => enactor.name, :action => name, :cost => Actions.cost(name))
-                  end
-
-        enactor_room.emit message
-        Scenes.add_to_scene(scene, message) if scene
-        PF2Encounter.send_to_encounter(encounter, message) if encounter
-      end
-    end
-
     # `action/search <words>` - the actions whose names hold all of them.
     class PF2ActionSearchCmd
       include CommandHandler

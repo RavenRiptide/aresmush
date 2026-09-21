@@ -61,6 +61,11 @@ module AresMUSH
         cmd_class.new(@client, Command.new(text), reread).on_command
       end
 
+      # Whatever `action/use` is dispatched to: it is `+e/act` by another name.
+      def use(text)
+        run(Pf2e.get_cmd_handler(@client, Command.new(text), reread), text)
+      end
+
       def barbarian!
         @char.update(:pf2_base_info => { 'charclass' => 'Barbarian' },
                      :pf2_features => { 'charclass_features' => [ 'Rage' ], 'archetype_features' => [] })
@@ -134,7 +139,7 @@ module AresMUSH
         it "should put its effect on the one who uses it" do
           barbarian!
 
-          run(PF2ActionUseCmd, "action/use rage")
+          use("action/use rage")
 
           expect(@client.failures).to eq []
           expect(ActiveEffects.on(reread).map(&:name)).to eq [ 'Effect: Rage' ]
@@ -144,26 +149,33 @@ module AresMUSH
         it "should bring everything the effect does" do
           barbarian!
 
-          run(PF2ActionUseCmd, "action/use rage")
+          use("action/use rage")
 
           expect(Pf2eHP[@hp.id].temp_hp).to eq 3 + 1
         end
 
         it "should refuse an action the character does not have, and put nothing on them" do
-          run(PF2ActionUseCmd, "action/use rage")
+          use("action/use rage")
 
           expect(@client.failures.join).to include 'Rage'
           expect(ActiveEffects.on(reread)).to eq []
         end
 
         it "should let anyone use a basic action and take on its effect" do
-          run(PF2ActionUseCmd, "action/use take cover")
+          use("action/use take cover")
 
           expect(ActiveEffects.on(reread).map(&:name)).to eq [ 'Effect: Cover' ]
         end
 
-        it "should say so for an action with no effect of its own" do
-          expect(Actions.use(reread, 'Stride').state).to eq('action' => 'Stride', 'effect' => nil)
+        it "should announce an action with no effect of its own" do
+          use("action/use stride")
+
+          expect(@client.failures).to eq []
+          expect(ActiveEffects.on(reread)).to eq []
+        end
+
+        it "should be the same command as +e/act" do
+          expect(Pf2e.get_cmd_handler(nil, Command.new('action/use rage'), nil)).to eq PF2EncounterActCmd
         end
       end
 
