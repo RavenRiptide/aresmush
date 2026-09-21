@@ -83,6 +83,52 @@ module AresMUSH
         end
       end
 
+      describe "casting one way or another" do
+        def heal
+          Acting.spell_mechanics('Heal').last
+        end
+
+        it "should read how many actions it is cast with" do
+          expect(Acting.said([ 'actions 2' ], false)['actions']).to eq 2
+        end
+
+        it "should take Heal's two-action form, which heals more at range" do
+          chosen = Acting.variant(heal, Acting.said([ 'actions 2' ], false))
+
+          expect(chosen['damage'].first['formula']).to eq '1d8+8'
+          expect(chosen['range']).to eq '30 feet'
+        end
+
+        it "should keep a spell as it is when no variant is asked for" do
+          expect(Acting.variant(heal, Acting.said([], false))['damage'].first['formula']).to eq '1d8'
+        end
+
+        it "should find a variant by a word of its name" do
+          darts = Acting.spell_mechanics('Needle Darts').last
+
+          expect(Acting.variant(darts, Acting.said([ 'silver' ], false))['name']).to include 'Silver'
+        end
+      end
+
+      # A save that is not basic says in its own text what each outcome does to the damage.
+      describe "how much of a spell's damage an outcome deals" do
+        it "should scale a basic save the basic way" do
+          expect(Acting.damage_factor({ 'basic' => true }, Degree::SUCCESS)).to eq 0.5
+        end
+
+        it "should scale another save by the spell's own words" do
+          combustion = Acting.spell_mechanics('Combustion').last
+
+          expect(Acting.damage_factor(combustion, Degree::SUCCESS)).to eq 0.5
+          expect(Acting.damage_factor(combustion, Degree::CRITICAL_FAILURE)).to eq 2
+        end
+
+        it "should leave an outcome its text says nothing about to the GM" do
+          expect(Acting.damage_factor({ 'basic' => false, 'damage_scale' => { 'criticalSuccess' => 0 } },
+                                      Degree::FAILURE)).to be_nil
+        end
+      end
+
       describe "a creature described by its numbers" do
         it "should read the numbers off a stat block" do
           described = Combatants.described('Bandit', 'AC 15 Fort +6 Ref 8 Will 4 Perception 5 HP 20')

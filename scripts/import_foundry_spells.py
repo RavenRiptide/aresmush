@@ -84,6 +84,69 @@ def outcomes_of(description):
     return out
 
 
+# How much of the damage an outcome deals, by what the spell's own paragraph for it says. Most saves
+# that are not basic still say "unaffected", "half", "full" and "double"; where a paragraph says none of
+# these, the scale is left out and the GM applies the damage by the text.
+#
+# The amounts are tried before the refusals, because "takes half damage and takes no persistent damage"
+# is half damage.
+SCALES = [(re.compile(r'\bhalf (?:the )?damage\b', re.I), 0.5),
+          (re.compile(r'\bdouble (?:the )?damage\b', re.I), 2),
+          (re.compile(r'\bfull damage\b|\btakes? (?:the )?damage\b', re.I), 1),
+          (re.compile(r'\bunaffected\b|\bno damage\b|\btakes? no\b[^.]*\bdamage\b', re.I), 0)]
+
+
+def damage_scale_of(description):
+    out = {}
+
+    for label, text in PARAGRAPH.findall(description or ''):
+        plain = re.sub(r'<[^>]+>', ' ', text)
+        factor = next((factor for pattern, factor in SCALES if pattern.search(plain)), None)
+        if factor is not None:
+            out[OUTCOMES[label]] = factor
+
+    return out
+
+
+def variant_of(overlay, base):
+    """A spell cast another way - Heal with two actions, or against the undead - as the fields it changes."""
+    system = overlay.get('system') or {}
+    variant = {'name': overlay.get('name')}
+
+    time = (system.get('time') or {}).get('value')
+    if time:
+        variant['time'] = str(time)
+    for field in ('range', 'target'):
+        value = (system.get(field) or {}).get(field == 'range' and 'value' or 'value')
+        if value:
+            variant[field] = value
+    area = system.get('area')
+    if isinstance(area, dict) and area.get('value'):
+        variant['area'] = f"{area.get('value')}-foot {area.get('type')}"
+    if 'defense' in system:
+        save = (system.get('defense') or {}).get('save') if isinstance(system.get('defense'), dict) else None
+        variant['save'] = save.get('statistic') if save else None
+        variant['basic'] = bool(save.get('basic')) if save else False
+
+    damage = system.get('damage') or {}
+    if damage:
+        merged = []
+        for key, one in (base.get('damage') or {}).items():
+            if not one.get('formula'):
+                continue
+            change = damage.get(key) or {}
+            merged.append({'formula': change.get('formula', one.get('formula')), 'type': change.get('type', one.get('type')),
+                           'category': change.get('category', one.get('category')),
+                           'kinds': change.get('kinds', one.get('kinds') or ['damage'])})
+        variant['damage'] = merged
+        heightening = (system.get('heightening') or {}).get('damage')
+        if heightening:
+            variant['heightening'] = {'interval': (base.get('heightening') or {}).get('interval', 1),
+                                      'damage': [heightening.get(key) for key in damage]}
+
+    return variant
+
+
 def damage_of(system):
     return [{'formula': one.get('formula'), 'type': one.get('type'), 'category': one.get('category'),
              'kinds': one.get('kinds') or ['damage']}
@@ -145,9 +208,20 @@ def mechanics_of(doc):
         if value:
             entry[field] = value
 
-    outcomes = outcomes_of((system.get('description') or {}).get('value'))
+    description = (system.get('description') or {}).get('value')
+    outcomes = outcomes_of(description)
     if outcomes:
         entry['outcomes'] = outcomes
+    if save and not save.get('basic') and damage:
+        scale = damage_scale_of(description)
+        if scale:
+            entry['damage_scale'] = scale
+
+    overlays = sorted((system.get('overlays') or {}).values(), key=lambda one: one.get('sort', 0))
+    variants = [variant_of(one, system) for one in overlays if one.get('overlayType') == 'override']
+    variants = [one for one in variants if len(one) > 1]
+    if variants:
+        entry['variants'] = variants
 
     return entry
 

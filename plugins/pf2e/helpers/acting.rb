@@ -42,6 +42,7 @@ module AresMUSH
           if lower.match?(/\A\d+\z/) then out['dc'] = lower.to_i
           elsif (found = lower.match(/\Arange\s+(\d+)\z/)) then out['range'] = found[1].to_i
           elsif (found = lower.match(/\Arank\s+(\d+)\z/)) then out['rank'] = found[1].to_i
+          elsif (found = lower.match(/\Aactions?\s+(\d+)\z/)) then out['actions'] = found[1].to_i
           elsif (found = lower.match(/\Aclass\s+(.+)\z/)) then out['class'] = found[1].strip
           elsif %w{flanking flanked flank}.include?(lower) then out['flanking'] = true
           elsif COVER_WORDS.key?(lower)
@@ -542,6 +543,7 @@ module AresMUSH
         out = report
         refused(out, said)
         spell, mechanics = spell_mechanics(spell)
+        mechanics = variant(mechanics, said) if mechanics
         rank = spell_rank(scene.actor.holder, spell, mechanics, said, cast)
         casting = scene.actor.npc? ? Npcs.casting(scene.actor.holder, spell) : cast
 
@@ -576,6 +578,29 @@ module AresMUSH
         spend_casting(scene.actor.holder, spell, mechanics['time'], attack)
 
         Ok.new(:state => out)
+      end
+
+      # A spell cast another way - Heal with two actions and at range, Needle Darts of silver - as the
+      # spell with that way's fields over its own. Chosen by how many actions it is cast with
+      # (`/actions 2`), or by a word of the variant's name; without either, the spell as it stands.
+      def self.variant(mechanics, said)
+        variants = Array(mechanics['variants'])
+
+        chosen = variants.find { |one| said['actions'] && one['time'].to_s == said['actions'].to_s } ||
+                 variants.find { |one| said['words'].any? { |word| Domains.slug(one['name']).include?(Domains.slug(word)) } }
+
+        return mechanics unless chosen
+
+        mechanics.merge(chosen.reject { |field, _| field == 'name' }).merge('name' => chosen['name'])
+      end
+
+      # How much of a spell's damage an outcome deals. A basic save is the basic scale; any other save
+      # says in its own text what each outcome does, and an outcome whose text says nothing is the GM's
+      # to apply.
+      def self.damage_factor(mechanics, degree)
+        return DamageRoll::BASIC.fetch(degree, 1) if mechanics['basic']
+
+        (mechanics['damage_scale'] || {})[Degree::NAMES[degree]]
       end
 
       # The spell by its own name, and what it does: `[ 'Fear', { … } ]`, or the name as typed and nothing.
@@ -703,8 +728,15 @@ module AresMUSH
           return
         end
 
+        factor = degree ? damage_factor(mechanics, degree) : 1
+
+        if factor.nil?
+          shown = formulas.map { |formula, type, *_| "#{formula} #{type}" }.join(' + ')
+          return out['lines'] << t('pf2e.act_spell_damage_gm', :target => scene.target.label, :damage => shown)
+        end
+
         rows = DamageRoll.of_formulas(formulas.map { |f, type, category, _| [ f, type, category ] }, false)
-        rows = DamageRoll.scaled(rows, degree) if degree
+        rows = rows.map { |row| row.merge('amount' => (row['amount'] * factor).floor) }
         deal(scene, scene.target, rows, out)
       end
 

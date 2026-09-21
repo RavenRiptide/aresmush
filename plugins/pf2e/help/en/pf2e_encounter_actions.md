@@ -52,6 +52,11 @@ a save is rolled by each target against your DC, a basic save halving and doubli
 what an outcome leaves - Fear's frightened, Slow's slowed - is left on them.
     +e/cast fear=#3
     +e/cast fireball=#3,#4,#5/rank 4
+    +e/cast heal=#2/actions 2
+A spell that can be cast more than one way takes the way you name: `/actions 2` for Heal's two-action
+form, which heals more at range, or a word of the variant's name - `/silver` for silver Needle Darts.
+A save that is not basic deals what the spell's own text says for each outcome; where it says nothing
+about the damage, the room is shown the damage for the GM to settle.
 
 ## Circumstances
 
