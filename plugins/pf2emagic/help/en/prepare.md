@@ -11,7 +11,7 @@ aliases:
 
 Some classes record spells and cantrips in a spellbook, or otherwise 'prepare' spells for the day.
 
-**Important!** After preparing spells, input `rest` to refresh your spells and make them available for casting. See `help rest` for more information.
+**Important!** What you prepare is what you have to cast in your next encounter: it starts you with it, and each rest the GM gives you there prepares it again. See `help rest`.
 
 **Commands**:
 `prepare <caster class>/<level> = <spell name>`: Prepares `<spell name>` at the defined level, optionally at a higher `<level>` than its default level. Preparing at a higher level than a spell's base level heightens the spell to that level. (You can't prepare a spell lower than its default level.) Omitting the `<level>` switch will prepare the spell at its base level.

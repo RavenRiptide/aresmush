@@ -6,7 +6,6 @@ module AresMUSH
     # spells live on Pf2eSpellcastingEntry rows, one per focus type per granting source, because a
     # bucket per type cannot say whose the spells are.
     attribute :focus_pool, :type => DataType::Hash, :default => { "max"=>0, "current"=>0 }
-    attribute :last_refocus, :type => DataType::Time
     # A list of grants rather than a map keyed by spell name, because two sources can grant the same
     # innate spell and a map holds only one of them. Charm comes from Enthralling Allure at rank 4
     # divine and Supernatural Charm at rank 1 arcane; Interplanar Teleport is divine from one source
@@ -473,7 +472,6 @@ module AresMUSH
       # Attributes with no declared default that a reset should still clear.
       magic.divine_font = nil
       magic.revelation_locked = nil
-      magic.last_refocus = nil
 
       magic.save
 

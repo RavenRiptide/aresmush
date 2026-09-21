@@ -1,21 +1,26 @@
 ---
 toc: Pathfinder Second Edition
-summary: Pathfinder 2E daily preparation-related commands.
+summary: Resting and the day's preparations, in an encounter.
 aliases:
-- refresh
 - rest
-- autorest
+- refocus
+- daily
 ---
 
-# Daily Preparation Commands
+# Resting
 
-These commands manage daily preparation code. Please note that daily refresh can only be run once every 24 hours. If you need to refresh more often (e.g. for a plot), you'll need to contact staff.
+Time in a story is the story's, not the clock's: a scene can cover a minute or a year. So a night's rest
+happens when the GM says it does, in an encounter.
 
-`rest`: Performs a manual daily reset of spells, condition recovery attempts, HP, and other items prepared during daily preparations.
-`autorest`: Toggles automatic daily refresh. If set to ON, automatic daily refresh will be performed at 7 AM server time.
+`+e/rest [<who>,<who>...]` - The GM says a night has passed for everyone in the encounter here, or for
+those named. Each recovers a night's Hit Points, has their once-a-day uses back, a full focus pool, the
+day's spells from what they have prepared, their reagents, and what they invest; anything lasting less
+than a day ends, and anything measured in days is a night shorter. The GM may rest people as often as
+the story needs, and takes a mistaken rest back with `+e/undo`.
 
-## Staff Command
+`+e/refocus [<who>]` - Refocus: a Focus Point back, or more where your feats say so, while your pool is
+short of full. The GM may refocus anyone.
 
-This command may only be run by game admins.
-
-`refresh <character>`: Removes the refresh timer from <character> and allows them to refresh again.
+An encounter can carry on from an earlier one (`help encounter`): whoever was in both starts the new one
+as they left the old, so a day of several encounters is one day until the GM rests it. Your own sheet
+never changes when you rest - what a rest restores is what an encounter spent.

@@ -118,8 +118,3 @@ pf2e:
     - general
     - archetype
     - dedication
-  daily_prep_cron:
-    hour: 
-      - 10
-    minute:
-      - 03

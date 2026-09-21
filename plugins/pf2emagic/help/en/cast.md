@@ -3,57 +3,29 @@ toc: Magic In Pathfinder 2e
 summary: Commands used to cast spells.
 aliases:
 - cast
-- refocus
 - casting
 - spellcasting
 ---
 
 # Casting Spells in Pathfinder 2e
 
-Casting a spell in Pathfinder 2e depends on what type of spell it is. Spellcasters, both prepared and spontaneous, cast spells from their daily allotment of spells. Some characters who are not technically spellcasters may have certain spells available to them as innate spells granted by a feat or by ancestry, and/or may have focus spells granted by their class or by a feat.
+Spells are cast in an encounter, from what a rest there gave you: the day's slots, your focus points, and
+your innate spells' uses. Outside an encounter there is nothing to cast from. See `help encounter actions`
+for the whole grammar.
 
-## Casting Spells and Cantrips
-**Commands:**
-`cast <casting class>/<level> = <spell name>/<target>`
+`+e/cast <spell>[=<target>,<target>...][/rank <n>][/class <class>][/<how>]`
 
-`<casting class>`: The character class associated with the spell.
-`<level>`: The level associated with the spell. This switch is optional, although omitting the switch will default the spell's casting to its default level. `0` can be interchanged with `cantrip`.
-`<spell name>`: The spell name associated with the spell.
-`<target>`: The target(s) of the spell. This switch is optional.
+`<spell>`: The spell's name.
+`<target>`: Whoever it is cast at, by id or name: `+e/cast fear=#3`.
+`rank <n>`: The rank to cast it at, where it can be heightened. Without one, its own.
+`class <class>`: Which of your casting classes casts it, where you have more than one.
+`<how>`: `focus` for a focus spell, `focusc` for a focus cantrip, `signature` for a signature spell at a
+higher rank, `innate` for an innate spell.
 
-For example, inputting `cast sorcerer/2=Glitterdust/Sandy` will cast a sorcerer's level 2 Glitterdust spell at Sandy.
-
-## Casting Focus Spells and Cantrips
-**Commands**:
-Focus cantrip: `cast/focusc <casting class> = <spell name>/<target>`
-Focus spells: `cast/focus <casting class> = <spell name>/<target>`
-
-`<casting class>`: The character class associated with the spell.
-`<spell name>`: The spell name associated with the spell.
-`<target>`: The target(s) of the spell. This switch is optional.
-
-## Casting Signature Spells
-**Commands:**
-`cast/signature <casting class>/<level> = <spell name>/<target>`
-
-`<casting class>`: The character class associated with the spell.
-`<level>`: The level associated with the spell. This switch is optional, although omitting the switch will default to casting the signature spell at your highest available spell slot.
-`<spell name>`: The spell name associated with the spell.
-`<target>`: The target(s) of the spell. This switch is optional.
-
-## Casting Innate Spells and Cantrips
-**Commands:**
-`cast/innate <tradition>/<level>=<spell name>/<target>`
-
-`<tradition>`: The tradition associated with the spell.
-`<level>`: The level associated with the spell. This switch is optional, although omitting the switch will default the spell's casting to its default level. `0` can be interchanged with `cantrip`.
-`<spell name>`: The spell name associated with the spell.
-`<target>`: The target(s) of the spell. This switch is optional.
-
-For example, inputting `cast/innate primal/2=Glitterdust/Sandy` will cast a level 2 innate spell Glitterdust at Sandy.
+    +e/cast glitterdust=#3,#4/rank 2
+    +e/cast lay on hands=Bram/focus
+    +e/cast daze=#2/innate
 
 ## Refocusing
-**Commands:**
-`refocus`: Runs the code for the Refocus activity. This may be done only if your focus pool is zero, and then only once an hour in OOC time.
 
-Admins can refocus a character by inputting `refocus <character>`. Admins may do this at any time, without time or pool size restrictions. 
+`+e/refocus` - Refocus in the encounter: see `help rest`.

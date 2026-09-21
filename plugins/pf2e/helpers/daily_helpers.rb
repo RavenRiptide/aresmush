@@ -1,56 +1,25 @@
 module AresMUSH
   module Pf2e
 
-    def self.do_daily_prep(char)
-      return t('pf2e.not_approved') unless char.is_approved?
+    # A night's rest and the day's preparations, for someone as they stand in an encounter: the night's
+    # Hit Points, an end to what lasts less than a day, the day's once-a-day uses, a full focus pool, the
+    # day's spells from what they have prepared, reagents, and what they invest. The GM rests them with
+    # `+e/rest`, as often as the story says a night has passed.
+    def self.rest(holder)
+      Pf2eHP.modify_damage(holder, get_daily_healing(holder), true)
+      ActiveEffects.rested(holder)
+      TurnState.reset(holder, 'rest')
 
-      # Check for 24h since last refresh
-      last_refresh = char.pf2_last_refresh
-      # The first time a character rests, this value is not set, so check for that.
-      last_refresh = Time.at(0) unless last_refresh
-      current_time = Time.now
+      magic = holder.magic
 
-      elapsed = (current_time - last_refresh).to_i
-
-      # Using one minute less than 24 hours to avoid a race condition w/ the autorest cron
-      if elapsed < 86340
-        next_refresh = OOCTime.local_long_timestr(char, Time.at(last_refresh + 86400))
-
-        return t('pf2e.cannot_rest_time', :next => next_refresh)
+      if magic
+        daily_refresh_focus_pool(magic)
+        Pf2emagic.generate_spells_today(holder)
+        magic.update(revelation_locked: false)
       end
 
-      magic = char.magic
-
-      # Healing
-      healing = get_daily_healing(char)
-      Pf2eHP.modify_damage(char, healing, true)
-
-      # A night has passed: anything shorter than a day is over, and a day-long effect counts it.
-      ActiveEffects.rested(char)
-
-      # So is a once-a-day or once-an-hour limit on an action.
-      TurnState.reset(char, 'rest')
-
-      # Focus Pool
-      daily_refresh_focus_pool(magic) if magic
-
-      # Reagents
-      daily_refresh_reagents(char)
-
-      # Spells
-      Pf2emagic.generate_spells_today(char) if magic
-
-      # Handle Swaps
-
-      # Invest items
-      do_daily_investiture(char)
-
-      # Reset revelations
-      magic.update(revelation_locked: false) if magic
-
-      char.update(pf2_last_refresh: Time.now)
-
-      return nil
+      daily_refresh_reagents(holder)
+      do_daily_investiture(holder)
     end
 
     # A full night's rest recovers Constitution modifier times level, doubled by Fast Recovery and its
@@ -66,11 +35,7 @@ module AresMUSH
       1 + Pf2e::Paths.held(char, 'recovery_multiplier').to_i
     end
 
-    def self.do_refresh(char)
-      reset = Time.at(0)
-
-      char.update(pf2_last_refresh: reset)
-    end
+    SNARES_BY_RANK = { 'expert' => 4, 'master' => 6, 'legendary' => 8 }.freeze
 
     def self.daily_refresh_reagents(char)
       # Reagents structure:
@@ -96,12 +61,8 @@ module AresMUSH
         reagents['alchemist'] = [ total, allocated, (total - allocated) ]
 
       elsif snares
-        crafting_prof = get_skill_prof(char, Crafting)
-
-        proflist = [ expert, master, legendary ]
-        quick_snares = [ 4, 6, 8 ]
-
-        snares_today = quick_snares[proflist.index(crafting_prof)]
+        # Snares prepared each day, by Crafting: 4 for an expert, 6 for a master, 8 for a legend.
+        snares_today = SNARES_BY_RANK[Pf2eSkills.get_skill_prof(char, 'Crafting').to_s.downcase].to_i
 
         reagents['snares'] = [ snares_today, snares_today ]
       end
@@ -118,14 +79,6 @@ module AresMUSH
       fp['current'] = current
 
       magic.update(focus_pool: fp)
-    end
-
-    def self.toggle_auto_refresh(char)
-      autorest = !char.pf2_auto_refresh
-
-      char.update(pf2_auto_refresh: autorest)
-
-      autorest
     end
 
     def self.do_daily_investiture(char)

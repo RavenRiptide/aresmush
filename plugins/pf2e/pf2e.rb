@@ -210,6 +210,10 @@ module AresMUSH
           return PF2EncounterSheetCmd
         when "undo", "redo"
           return PF2EncounterUndoCmd
+        when "rest"
+          return PF2EncounterRestCmd
+        when "refocus"
+          return PF2EncounterRefocusCmd
         when "history"
           return PF2EncounterHistoryCmd
         when "start"
@@ -287,10 +291,6 @@ module AresMUSH
         end
       when "listxp"
         return PF2ListXPCmd
-      when "refresh"
-        return PF2ForceRefreshCmd
-      when "rest"
-        return PF2DailyPrepCmd
       when "formulas"
         case cmd.switch
         when "add"
@@ -300,8 +300,6 @@ module AresMUSH
         when nil
           return PF2DisplayFormulasCmd
         end
-      when "autorest"
-        return PF2AutoDailyPrepCmd
       when "cnote"
         case cmd.switch
         when "add"
