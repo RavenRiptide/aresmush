@@ -53,10 +53,10 @@ module AresMUSH
         # If they specified an init stat, error if invalid, otherwise use the one
         # specified by the organizer.
 
-        init_stat = self.init_stat ? self.init_stat : encounter.init_stat
+        init_stat = Pf2e.initiative_stat(self.init_stat || encounter.init_stat)
 
-        if !Pf2e.is_valid_init_stat?(init_stat)
-          client.emit_failure t('pf2e.not_unique')
+        unless init_stat
+          client.emit_failure t('pf2e.bad_initiative_stat', :stat => self.init_stat || encounter.init_stat)
           return
         end
 

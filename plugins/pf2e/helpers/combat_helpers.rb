@@ -1,20 +1,23 @@
 module AresMUSH
   module Pf2e
 
-    def self.is_valid_init_stat?(stat)
+    # The statistic initiative is rolled on, by its own name, from what a player typed: Perception, a skill
+    # or an ability, in any case, an ability's three letters, or the start of a name only one of them has.
+    # Nil when it names none of them, or several.
+    def self.initiative_stat(term)
+      wanted = term.to_s.strip.downcase
 
-      abilities = [ 'Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma' ]
-      skills = Global.read_config('pf2e_skills').keys
-      combat_stats = ['Perception']
+      return nil if wanted.empty?
+      return ABILITY_BY_WORD[wanted] if ABILITY_BY_WORD.key?(wanted)
 
-      valid_init_stat = abilities + skills + combat_stats
+      names = [ 'Perception' ] + ABILITIES + Global.read_config('pf2e_skills').keys
+      exact = names.find { |name| name.downcase == wanted }
 
-      # Is there a unique match? Error if no match or multiple matches
+      return exact if exact
 
-      usable_init_stat = valid_init_stat.select { |s| s.match? stat }
+      starting = names.select { |name| name.downcase.start_with?(wanted) }
 
-      return false unless usable_init_stat.size == 1
-      return true
+      starting.size == 1 ? starting.first : nil
     end
 
     # What a character adds to an initiative roll.

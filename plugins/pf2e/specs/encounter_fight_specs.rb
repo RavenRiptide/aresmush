@@ -64,6 +64,8 @@ module AresMUSH
         allow(Scenes).to receive(:add_to_scene)
         allow(Global).to receive(:notifier).and_return(double(:notify_ooc => nil))
         allow(Login).to receive(:notify)
+        allow_any_instance_of(Character).to receive(:has_permission?).and_call_original
+        allow_any_instance_of(Character).to receive(:has_permission?).with('run_encounters') { |char, _| char.name == @gm.name }
 
         @reminded = []
         allow(Login).to receive(:emit_ooc_if_logged_in) { |char, message| @reminded << [ char.name, message ] }
@@ -102,8 +104,15 @@ module AresMUSH
       end
 
       it "should run from the first turn to the end" do
+        # A player cannot start one; the GM can.
+        run(PF2InitiateCombatCmd, 'encounter', @hero)
+        expect(@client.failures.pop).to eq t('pf2e.encounter_start_gm_only')
+
         run(PF2InitiateCombatCmd, 'encounter')
-        run(PF2InitJoinCmd, "encounter/join #{encounter.id}", @hero)
+        # The hero joins on the statistic they name, in any case: `dex` is Dexterity.
+        run(PF2InitJoinCmd, "encounter/join #{encounter.id}=stealthy", @hero)
+        expect(@client.failures.pop).to eq t('pf2e.bad_initiative_stat', :stat => 'stealthy')
+        run(PF2InitJoinCmd, "encounter/join #{encounter.id}=dex", @hero)
         run(PF2EncounterAddCmd, 'e/add 2 goblin warrior')
 
         expect(@client.failures).to eq []

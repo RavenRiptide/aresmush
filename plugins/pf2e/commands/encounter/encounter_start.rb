@@ -16,6 +16,13 @@ module AresMUSH
         self.from = from.strip.delete_prefix('#').empty? ? nil : from.strip.delete_prefix('#')
       end
 
+      # Only a GM starts an encounter: staff, or anyone whose role may run them.
+      def check_is_gm
+        return nil if enactor.is_admin? || enactor.has_permission?('run_encounters')
+
+        t('pf2e.encounter_start_gm_only')
+      end
+
       def check_from
         return nil unless self.from
         return nil if PF2Encounter[self.from]
@@ -47,13 +54,11 @@ module AresMUSH
           return
         end
 
-        # If no argument, initiative is based on Perception.
-        init_stat = self.init ? self.init : 'Perception'
+        # Initiative is Perception unless the GM names something else.
+        init_stat = Pf2e.initiative_stat(self.init || 'Perception')
 
-        valid_init_stat = Pf2e.is_valid_init_stat?(init_stat)
-
-        if !valid_init_stat
-          client.emit_failure t('pf2e.not_unique')
+        unless init_stat
+          client.emit_failure t('pf2e.bad_initiative_stat', :stat => self.init)
           return
         end
 

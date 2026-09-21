@@ -383,6 +383,8 @@ en:
     not_minimum_level: "You must be level %{level} to raise that further."
     not_organizer: "You are not the organizer for the encounter in question."
     not_unique: "The selected argument is not valid or has more than one valid match."
+    encounter_start_gm_only: "Only a GM starts an encounter. Ask staff for the run_encounters permission."
+    bad_initiative_stat: "Initiative is rolled on Perception, a skill or an ability: %{stat} is none of those, or could be several. Give more of its name."
     nothing_to_relock: "Your skills are already locked. 'commit featskills' is only needed after a feat gives you a skill you already had, which hands back a free skill to assign."
     nothing_to_display: "No %{elements} matched your search."
     nothing_to_do: "Nothing to do."
