@@ -175,6 +175,22 @@ module AresMUSH
         run(PF2EncounterUndoCmd, 'e/undo')
         expect(@client.failures.pop).to eq t('pf2e.no_encounter_here')
 
+        # Two goblin warriors (level -1) for one 1st-level hero: 20 + 20 XP against a budget of 20 for one.
+        # Staff see PF2e's recommendation, and pay what they decide.
+        allow_any_instance_of(Character).to receive(:is_admin?) { |char| char.name == @gm.name }
+        id = encounter.id
+        @client.said.clear
+        run(PF2EncounterAwardCmd, "e/award #{id}")
+        expect(@client.said.join).to include('Extreme: 40 XP of 40 for a party of 1 at level 1', 'Nobody has been paid')
+
+        xp = Character[@hero.id].pf2_xp
+        run(PF2EncounterAwardCmd, "e/award #{id}=#{@hero.name}=40/5 gp")
+        expect(Character[@hero.id].pf2_xp).to eq xp + 40
+        expect(PF2Encounter[id].awarded[@hero.name]).to eq('xp' => 40, 'money' => 500)
+
+        run(PF2EncounterAwardCmd, "e/award #{id}=#{@hero.name}=40/5 gp", @hero)
+        expect(@client.failures.pop).to eq t('dispatcher.not_allowed')
+
         expect(encounter.is_active).to be false
         expect(encounter.trusted).to eq []
         expect(@client.failures).to eq []

@@ -33,6 +33,12 @@ module AresMUSH
     collection :npcs, "AresMUSH::Pf2eNpc", :encounter
     collection :states, "AresMUSH::Pf2eCombatantState", :encounter
 
+    # The party's level for its difficulty, where the GM set one; otherwise the characters' average.
+    attribute :party_level, :type => DataType::Integer
+
+    # What staff paid each character for it, by name: `{ 'Aria' => { 'xp' => 80, 'money' => 13500 } }`.
+    attribute :awarded, :type => DataType::Hash, :default => {}
+
     # How many of its history's entries are in effect: undo steps back, redo forward (`Pf2e::History`).
     attribute :history_at, :type => DataType::Integer, :default => 0
     collection :entries, "AresMUSH::Pf2eEncounterEntry", :encounter

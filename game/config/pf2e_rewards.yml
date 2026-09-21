@@ -1,191 +1,70 @@
----
+# PF2e's standard rewards, which an encounter shows staff as a recommendation (`+e/award`). Staff pay what
+# they decide. Every figure is GM Core's, checked against Archives of Nethys:
+#   creature_xp, threats         GM Core p. 75, Encounter Budget and Creature XP and Role
+#   award_as_four                GM Core p. 76: an encounter's XP award is always that of a group of four
+#   accomplishment_xp            GM Core p. 57, XP Awards
+#   treasure_by_encounter        GM Core p. 81, Treasure by Encounter (gp, for four characters)
+#   currency_per_additional_pc   GM Core p. 59, Party Treasure by Level (gp, per level)
 pf2e_rewards:
-  prp_reward_types:
-    standard_player: prp_reward_normal
-    standard_runner: prp_reward_bonus30
-    dc_player: prp_reward_bonus30
-    dc_runner: prp_reward_bonus60
-  prp_reward_normal:
-    1:
-      xp: 30
-      money: 1800
-    2: 
-      xp: 30
-      money: 3000
-    3: 
-      xp: 30
-      money: 5000
-    4: 
-      xp: 30
-      money: 8500
-    5: 
-      xp: 30
-      money: 13500
-    6: 
-      xp: 30
-      money: 20000
-    7: 
-      xp: 30
-      money: 29000
-    8: 
-      xp: 30
-      money: 40000
-    9: 
-      xp: 30
-      money: 57000
-    10: 
-      xp: 30
-      money: 80000
-    11: 
-      xp: 30
-      money: 115000
-    12: 
-      xp: 30
-      money: 165000
-    13: 
-      xp: 30
-      money: 250000
-    14: 
-      xp: 30
-      money: 40000  
-    15:
-      xp: 30
-      money: 545000
-    16:
-      xp: 30
-      money: 825000
-    17:
-      xp: 30
-      money: 1280000
-    18:
-      xp: 30
-      money: 2080000
-    19:
-      xp: 30
-      money: 3550000
-    20: 
-      xp: 30
-      money: 4900000
-  prp_reward_bonus30:
-    1:
-      xp: 40
-      money: 2340
-    2:
-      xp: 40
-      money: 3900
-    3:
-      xp: 40
-      money: 6500
-    4:
-      xp: 40
-      money: 11050
-    5:
-      xp: 40
-      money: 17550
-    6:
-      xp: 40
-      money: 26000
-    7:
-      xp: 40
-      money: 37700
-    8:
-      xp: 40
-      money: 52000
-    9:
-      xp: 40
-      money: 74100
-    10:
-      xp: 40
-      money: 104000
-    11:
-      xp: 40
-      money: 149500
-    12:
-      xp: 40
-      money: 214500
-    13:
-      xp: 40
-      money: 325000
-    14:
-      xp: 40
-      money: 474500
-    15:
-      xp: 40
-      money: 708500
-    16:
-      xp: 40
-      money: 1072500
-    17:
-      xp: 40
-      money: 1664000
-    18:
-      xp: 40
-      money: 2704000
-    19:
-      xp: 40
-      money: 4615000
-    20:
-      xp: 40
-      money: 6370000
-  prp_reward_bonus60:
-    1:
-      xp: 50
-      money: 2988
-    2: 
-      xp: 50
-      money: 4980
-    3:
-      xp: 50
-      money: 8300
-    4: 
-      xp: 50
-      money: 14110
-    5:
-      xp: 50
-      money: 22410
-    6:
-      xp: 50
-      money: 33200
-    7:
-      xp: 50
-      money: 48140
-    8: 
-      xp: 50
-      money: 66400
-    9:
-      xp: 50
-      money: 94620
-    10:
-      xp: 50
-      money: 132800
-    11:
-      xp: 50
-      money: 190900
-    12: 
-      xp: 50
-      money: 273900
-    13: 
-      xp: 50
-      money: 415000
-    14: 
-      xp: 50
-      money: 605900
-    15: 
-      xp: 50
-      money: 904700
-    16: 
-      xp: 50
-      money: 1369500
-    17: 
-      xp: 50
-      money: 2124800
-    18:
-      xp: 50
-      money: 3452800
-    19: 
-      xp: 50
-      money: 5893000
-    20: 
-      xp: 50
-      money: 8134000
-      
+  creature_xp:
+    -4: 10
+    -3: 15
+    -2: 20
+    -1: 30
+    0: 40
+    1: 60
+    2: 80
+    3: 120
+    4: 160
+  threats:
+    - { name: trivial, budget: 40, adjustment: 10 }
+    - { name: low, budget: 60, adjustment: 20 }
+    - { name: moderate, budget: 80, adjustment: 20 }
+    - { name: severe, budget: 120, adjustment: 30 }
+    - { name: extreme, budget: 160, adjustment: 40 }
+  accomplishment_xp:
+    minor: 10
+    moderate: 30
+    major: 80
+  treasure_by_encounter:
+    1: { low: 13, moderate: 18, severe: 26, extreme: 35 }
+    2: { low: 23, moderate: 30, severe: 45, extreme: 60 }
+    3: { low: 38, moderate: 50, severe: 75, extreme: 100 }
+    4: { low: 65, moderate: 85, severe: 130, extreme: 170 }
+    5: { low: 100, moderate: 135, severe: 200, extreme: 270 }
+    6: { low: 150, moderate: 200, severe: 300, extreme: 400 }
+    7: { low: 220, moderate: 290, severe: 440, extreme: 580 }
+    8: { low: 300, moderate: 400, severe: 600, extreme: 800 }
+    9: { low: 430, moderate: 570, severe: 860, extreme: 1140 }
+    10: { low: 600, moderate: 800, severe: 1200, extreme: 1600 }
+    11: { low: 865, moderate: 1150, severe: 1725, extreme: 2300 }
+    12: { low: 1250, moderate: 1650, severe: 2475, extreme: 3300 }
+    13: { low: 1875, moderate: 2500, severe: 3750, extreme: 5000 }
+    14: { low: 2750, moderate: 3650, severe: 5500, extreme: 7300 }
+    15: { low: 4100, moderate: 5450, severe: 8200, extreme: 10900 }
+    16: { low: 6200, moderate: 8250, severe: 12400, extreme: 16500 }
+    17: { low: 9600, moderate: 12800, severe: 19200, extreme: 25600 }
+    18: { low: 15600, moderate: 20800, severe: 31200, extreme: 41600 }
+    19: { low: 26600, moderate: 35500, severe: 53250, extreme: 71000 }
+    20: { low: 36800, moderate: 49000, severe: 73500, extreme: 98000 }
+  currency_per_additional_pc:
+    1: 10
+    2: 18
+    3: 30
+    4: 50
+    5: 80
+    6: 125
+    7: 180
+    8: 250
+    9: 350
+    10: 500
+    11: 700
+    12: 1000
+    13: 1500
+    14: 2250
+    15: 3250
+    16: 5000
+    17: 7500
+    18: 12000
+    19: 20000
+    20: 35000

@@ -42,6 +42,7 @@ a name only one combatant has. Acting in an encounter - actions, Strikes, spells
 `encounter/next`: Moves the initiative forward one turn. (Alias: `ninit`)
 `encounter/prev`: Moves the initiative backwards one turn. (Alias: `pinit`)
 `encounter/scan`: Allows the organizer to view details on all player characters who have joined the encounter. (Alias: `tscan`)
+`+e/level <n>`: Sets the party's level for the encounter's difficulty, which is otherwise the characters' average. `+e/level 0` goes back to the average. `+e/view` shows the difficulty: the threat, from trivial to extreme, and the XP behind it, by GM Core's encounter budget.
 `encounter/end <encounter ID>`: Ends an encounter. Trust given for it, the cover and concealment set in it, and what may be used once an encounter all end with it.
 `encounter/restart <encounter ID>`: Restarts an encounter, so long as the scene has not ended.
 
@@ -54,3 +55,8 @@ on its own. See `help effects`. A combatant can be named by its id: `effect/add 
 ## Healing and Damage Commands
 
 Damage, healing and conditions happen to a character as they stand in the encounter: `help heal`.
+
+## Rewards, for staff
+
+`+e/award [<encounter ID>]`: What PF2e recommends for an encounter - its XP, as for a party of four, the accomplishments staff may add, and GM Core's treasure for its threat - and what has been paid for it. A recommendation only.
+`+e/award [<encounter ID>=]<character>=<xp>/<amount> <coin>`: Pays a character what staff decide for the encounter: `+e/award 12=Aria=80/135 gp`. It is recorded against the encounter and in the character's XP and money history.

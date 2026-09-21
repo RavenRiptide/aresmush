@@ -212,6 +212,10 @@ module AresMUSH
           return PF2EncounterUndoCmd
         when "rest"
           return PF2EncounterRestCmd
+        when "level"
+          return PF2EncounterLevelCmd
+        when "award"
+          return PF2EncounterAwardCmd
         when "refocus"
           return PF2EncounterRefocusCmd
         when "history"

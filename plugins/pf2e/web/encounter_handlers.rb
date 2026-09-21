@@ -48,7 +48,7 @@ module AresMUSH
 
         { id: encounter.id, round: encounter.round.to_i, active: encounter.is_active,
           current: ActiveEffects.current_turn(encounter), organizer: encounter.organizer, gm: gm,
-          trusted: Array(encounter.trusted),
+          trusted: Array(encounter.trusted), difficulty: EncounterWeb.plain(Difficulty.shown(encounter)),
           combatants: listed.map { |one| EncounterWeb.combatant(encounter, one, enactor, gm) },
           log: Array(encounter.messages).last(30).map { |_time, message| EncounterWeb.plain(message) } }
       end

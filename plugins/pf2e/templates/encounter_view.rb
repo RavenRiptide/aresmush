@@ -51,6 +51,10 @@ module AresMUSH
         "%b#{left("##{number}", 4)}#{left(initiative, 5)}%b#{left(name, 24)}%b#{left(said.join(", "), 40)}"
       end
 
+      def difficulty
+        Pf2e::Difficulty.shown(@encounter)
+      end
+
       def trusted
         Array(@encounter.trusted)
       end
