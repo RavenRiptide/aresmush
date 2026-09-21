@@ -35,9 +35,7 @@ module AresMUSH
       end
 
       def self.from_abilities(char)
-        return [] unless Pf2e.npc?(char)
-
-        Npcs.ability_sources(char).flat_map do |source|
+        Actors.of(char).ability_sources.flat_map do |source|
           read(char, source['name'], source['rules'], source['item'])
             .map { |aura| aura.merge('effect' => nil, 'encounter' => char.encounter, 'level' => char.pf2_level) }
         end

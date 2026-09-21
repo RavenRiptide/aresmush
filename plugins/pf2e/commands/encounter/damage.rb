@@ -55,9 +55,7 @@ module AresMUSH
         ok_char_list = targets.map do |holder|
           Pf2e::Harm.damage(holder, self.damage, self.kind, :is_dm => is_dc)
 
-          unless Pf2e.npc?(holder)
-            Login.notify holder, :pf2_damage, t('pf2e.you_took_damage', :amount => self.damage, :source => enactor.name), 0
-          end
+          Pf2e::Actors.of(holder).notify_damage(self.damage, enactor.name)
 
           holder.name
         end

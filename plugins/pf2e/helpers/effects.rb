@@ -57,10 +57,13 @@ module AresMUSH
 
       # ------------------------------------------------------------------------------
 
-      # A creature in an encounter has only its conditions and effects; `Npcs` gathers those.
+      # Whatever carries a rule the actor is under: a character's conditions, feats, gear and effects, or a
+      # creature's conditions, abilities and effects. Each actor answers for its own (`Pf2e::Actors`).
       def self.sources(char)
-        return Npcs.sources(char) if Pf2e.npc?(char)
+        Actors.of(char).sources
+      end
 
+      def self.sheet_sources(char)
         SheetReads.memo(char, :effect_sources) do
           conditions(char) + feats(char) + items(char) + runes(char) + ActiveEffects.sources(char)
         end
@@ -85,17 +88,17 @@ module AresMUSH
       # about some statistics and not others, so the domains asking decide which of them hold; nothing
       # asking without domains sees a scoped one.
       def self.options(char, domains = nil)
-        return Npcs.options(char, domains) if Pf2e.npc?(char)
-
-        facts(char) + RollOptions.active(char, domains)
+        Actors.of(char).options(domains)
       end
 
       # What is true about the character whatever anyone has switched on. Kept apart from the switched-on
       # options because the store asks for these while working out what is switched on, and asking it
       # for its own answer would not terminate.
       def self.facts(char)
-        return Npcs.facts(char) if Pf2e.npc?(char)
+        Actors.of(char).facts
+      end
 
+      def self.sheet_facts(char)
         SheetReads.memo(char, :effect_facts) { build_facts(char) }
       end
 
@@ -119,8 +122,10 @@ module AresMUSH
       # which conditions a character has and what their armour counts as are themselves among the things
       # the full list of facts is built from.
       def self.character_facts(char)
-        return [ "self:level:#{char.pf2_level}" ] + named('self:trait', char.pf2_traits) if Pf2e.npc?(char)
+        Actors.of(char).base_facts
+      end
 
+      def self.sheet_character_facts(char)
         SheetReads.memo(char, :character_facts) { build_character_facts(char) }
       end
 
@@ -412,8 +417,10 @@ module AresMUSH
       end
 
       def self.context(char)
-        return Npcs.context(char) if Pf2e.npc?(char)
+        Actors.of(char).context
+      end
 
+      def self.sheet_context(char)
         SheetReads.memo(char, :effect_context) { build_context(char) }
       end
 

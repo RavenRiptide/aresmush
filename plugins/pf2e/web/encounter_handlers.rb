@@ -13,7 +13,7 @@ module AresMUSH
         holder = one.holder
         number = one.number.to_s
 
-        { id: one.number, name: one.label, initiative: init.to_i, creature: one.npc?,
+        { id: one.number, name: one.label, initiative: init.to_i, creature: one.creature?,
           conditions: holder ? Pf2e.condition_labels(holder, false) : [],
           effects: holder ? ActiveEffects.on(holder).map { |effect| "#{effect.name} (#{plain(ActiveEffects.remaining(effect))})" } : [],
           cover: (encounter.cover || {})[number], concealment: (encounter.concealment || {})[number],
@@ -26,7 +26,7 @@ module AresMUSH
       def self.hit_points_seen(holder, viewer, gm)
         return nil unless holder
         return Harm.hit_points(holder) if gm
-        return nil if Pf2e.npc?(holder) || viewer.nil?
+        return nil if Actors.of(holder).creature? || viewer.nil?
 
         Sheet.viewable?(viewer, holder, 'combat').ok? ? Harm.hit_points(holder) : nil
       end

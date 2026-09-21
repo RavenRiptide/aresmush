@@ -10,8 +10,8 @@ module AresMUSH
     module Combatants
 
       Combatant = Struct.new(:holder, :label, :number) do
-        def npc?
-          Pf2e.npc?(holder)
+        def creature?
+          Actors.of(holder).creature?
         end
 
         def ref

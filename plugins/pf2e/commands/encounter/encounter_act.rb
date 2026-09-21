@@ -179,7 +179,7 @@ module AresMUSH
           return
         end
 
-        cast = actor.state.npc? ? nil : spend_the_spell(actor.state.holder)
+        cast = Actors.of(actor.state.holder).spends_spells? ? spend_the_spell(actor.state.holder) : nil
 
         if cast.is_a?(String)
           client.emit_failure cast

@@ -73,11 +73,7 @@ module AresMUSH
       # gives the defender - cover, or the off-guard of being flanked.
       def self.defence(holder, against, options: [], extra: [])
         kind, name = defence_figure(against)
-        figure = if Pf2e.npc?(holder)
-                   Npcs.stat(holder, kind, name, options)
-                 else
-                   Stat.of(holder, kind, name, options)
-                 end
+        figure = Actors.of(holder).figure(kind, name, options)
 
         return nil unless figure
 

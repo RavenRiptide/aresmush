@@ -93,7 +93,7 @@ module AresMUSH
         if encounter
           found = Combatants.find(encounter, self.term)
 
-          if found.ok? && found.state.npc?
+          if found.ok? && found.state.creature?
             npc = found.state.holder
             return client.emit(StatBlock.lines(npc.name, npc.stat_block, :npc => npc, :gm => gm).join('%r'))
           end

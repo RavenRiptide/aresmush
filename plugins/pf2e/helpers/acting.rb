@@ -86,7 +86,7 @@ module AresMUSH
       # Actions
 
       def self.act(scene, term, words)
-        follow = scene.actor.npc? ? FOLLOW_UPS[Domains.slug(term)] : nil
+        follow = Actors.of(scene.actor.holder).follow_up(term)
         name = follow ? follow['action'] : action_named(scene, term)
 
         return name if name.is_a?(Err)
@@ -127,25 +127,23 @@ module AresMUSH
       # The action the actor means: one of the catalogue's they may use, or - for a creature - one of its
       # own abilities by name.
       def self.action_named(scene, term)
-        if scene.actor.npc?
-          own = Array(scene.actor.holder.stat_block['actions']).find { |one| one['name'].casecmp?(term.to_s.strip) }
+        actor = Actors.of(scene.actor.holder)
+        own = actor.own_ability(term)
 
-          return own['name'] if own
-        end
+        return own['name'] if own
 
         found = Actions.find(term)
 
         return found if found.err?
-        return found.state if scene.actor.npc?
 
-        allowed = Actions.usable(scene.actor.holder, found.state)
+        allowed = actor.may_use(found.state)
 
         allowed.err? ? allowed : found.state
       end
 
       # A creature's ability that no catalogue holds: its stat block's words, for the GM to run.
       def self.announce_ability(scene, name, out)
-        own = Array(scene.actor.holder.stat_block['actions']).find { |one| one['name'] == name } || {}
+        own = Actors.of(scene.actor.holder).own_ability(name) || {}
         cost = own['type'] == 'action' ? Actions::COSTS[own['cost'].to_i] || 'one action' : Actions::TYPES[own['type']]
 
         out['lines'] << t('pf2e.act_announced', :actor => scene.actor.label, :action => name, :cost => cost,
@@ -283,11 +281,9 @@ module AresMUSH
       def self.weapon_bonus(holder, check)
         wanted = Array(check['weapon_traits'])
 
-        return [] if wanted.empty? || Pf2e.npc?(holder)
+        return [] if wanted.empty?
 
-        weapon = Pf2egear::Inventory.held(holder, 'weapons').select(&:equipped).find do |one|
-          (Array(one.traits).map { |trait| Domains.slug(trait) } & wanted).any?
-        end
+        weapon = Actors.of(holder).weapons_with_traits(wanted).first
 
         return [] unless weapon
 
@@ -311,9 +307,7 @@ module AresMUSH
       end
 
       def self.rank_of(holder, kind, name)
-        return 'trained' if Pf2e.npc?(holder) || kind != 'skill'
-
-        Pf2eSkills.get_skill_prof(holder, name).to_s.downcase
+        Actors.of(holder).proficiency(kind, name)
       end
 
       # ------------------------------------------------------------------------------
@@ -396,20 +390,13 @@ module AresMUSH
       # What a Strike does when it hits.
       def self.hit(scene, attack, check, result, out)
         critical = result['degree'] == Degree::CRITICAL_SUCCESS
-        rows = if scene.actor.npc?
-                 extras = Npcs.strike_damage(scene.actor.holder, attack, check.options)
-                 DamageRoll.merged(DamageRoll.of_formulas(attack['damage'], critical, attack) +
-                                   DamageRoll.of_extras(extras, critical))
-               else
-                 instances = Damage.of(scene.actor.holder, attack, check.options + [ "check:outcome:#{Degree::SLUGS[result['degree']]}" ])['instances']
-                 DamageRoll.of_instances(instances, critical, attack)
-               end
+        rows = Actors.of(scene.actor.holder).strike_damage(attack, check, critical)
 
         deal(scene, scene.target, rows, out)
 
         follow_ups(scene, attack, out)
 
-        critical_specialization(scene, attack, out) if critical && !scene.actor.npc?
+        critical_specialization(scene, attack, out) if critical
       end
 
       # What a creature's Strike lets it do next, where the stat block lists it: Grab, Knockdown and Push
@@ -440,7 +427,7 @@ module AresMUSH
       # A critical hit with a weapon whose critical specialization effect the character has. What the
       # engine can do it does; what is movement on the map, or a judgement, is shown for the GM.
       def self.critical_specialization(scene, attack, out)
-        found = Pf2e.crit_spec_consequences(scene.actor.holder, attack)
+        found = Actors.of(scene.actor.holder).critical_specialization(attack)
 
         return unless found
 
@@ -520,17 +507,7 @@ module AresMUSH
       # A character's attacks by what they would call them: the weapons they have equipped, their
       # unarmed attacks, and what a feat or an item granted. A creature's are its Strikes.
       def self.attacks_of(holder)
-        return Npcs.strikes(holder).map { |one| [ [ one['name'] ], one ] } if Pf2e.npc?(holder)
-
-        weapons = Pf2egear::Inventory.held(holder, 'weapons').select(&:equipped).map do |weapon|
-          [ [ weapon.name, weapon.nickname ].compact, Pf2eCombat.attack_descriptor(holder, weapon) ]
-        end
-
-        unarmed = (holder.combat&.unarmed_attacks || {}).map do |name, info|
-          [ [ name ], Pf2eCombat.unarmed_descriptor(name, info, Pf2eCombat.get_unarmed_prof(holder, name, info), holder) ]
-        end
-
-        weapons + unarmed + Pf2eCombat.granted_strikes(holder).map { |one| [ [ one['name'] ], one ] }
+        Actors.of(holder).attacks
       end
 
       def self.attack_for(holder, term)
@@ -556,7 +533,7 @@ module AresMUSH
         spell, mechanics = spell_mechanics(spell)
         mechanics = variant(mechanics, said) if mechanics
         rank = spell_rank(scene.actor.holder, spell, mechanics, said, cast)
-        casting = scene.actor.npc? ? Npcs.casting(scene.actor.holder, spell) : cast
+        casting = Actors.of(scene.actor.holder).casting(spell, cast)
 
         out['lines'] << t('pf2e.act_cast', :actor => scene.actor.label, :spell => spell, :rank => rank,
                                            :targets => targets.map(&:label).join(', ').then { |one| one.empty? ? '' : " at #{one}" })
@@ -640,12 +617,8 @@ module AresMUSH
         return slot.split('/').last.to_i if slot && slot.include?('/')
         return slot.to_i if slot && slot.to_i.positive?
 
-        if Pf2e.npc?(holder)
-          listed = Npcs.casting(holder, spell)
-          rank = (listed && listed['spells'] || {}).find { |_rank, names| names.any? { |one| one.casecmp?(spell) } }&.first
-          return (holder.pf2_level / 2.0).ceil.clamp(1, 10) if rank.to_s == '0'
-          return rank.to_i if rank
-        end
+        listed = Actors.of(holder).listed_spell_rank(spell)
+        return listed if listed
 
         return (holder.pf2_level / 2.0).ceil.clamp(1, 10) if mechanics && mechanics['rank'].to_i.zero?
 
@@ -677,7 +650,7 @@ module AresMUSH
       end
 
       def self.spell_figure(holder, kind, casting)
-        figure = Pf2e.npc?(holder) ? Npcs.stat(holder, kind, casting) : Stat.of(holder, kind, casting)
+        figure = Actors.of(holder).figure(kind, casting)
 
         figure ? figure['total'].to_i : nil
       end

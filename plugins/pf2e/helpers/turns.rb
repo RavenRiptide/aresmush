@@ -72,10 +72,7 @@ module AresMUSH
           lines << t('pf2e.turn_aura', :aura => aura['slug'], :radius => aura['radius'])
         end
 
-        if Pf2e.npc?(holder)
-          strikes = Npcs.strikes(holder).map { |one| "#{one['name']} #{StatBlock.signed(one['bonus'])}" }
-          lines << t('pf2e.turn_npc_strikes', :strikes => strikes.join(', '), :ref => "##{holder.number}") if strikes.any?
-        end
+        lines += Actors.of(holder).reminder_lines
 
         lines.join('%r')
       end
@@ -131,16 +128,7 @@ module AresMUSH
       # What heals the character as their turn starts, from any source: a spell's effect, a feat, an
       # item. Regeneration does nothing on a turn after damage of a kind that switches it off.
       def self.healing(char)
-        return Npcs.healing(char) if Pf2e.npc?(char)
-
-        context = Effects.context(char)
-        options = Effects.options(char)
-
-        Effects.sources(char).flat_map do |source|
-          Rules.of_kind(source, 'FastHealing').select { |row| Predicate.test(row['predicate'], options) }
-                                              .map { |row| Rules.contribute(row, source, context.merge('item' => source['item'] || {})) }
-                                              .compact
-        end
+        Actors.of(char).turn_healing
       end
 
       def self.heal(char)

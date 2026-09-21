@@ -37,11 +37,7 @@ module AresMUSH
         @extra_domains = Array(extra_domains)
 
         # A creature's figure is its stat block's, with what it is under; a character's is built.
-        @breakdown = if Pf2e.npc?(char)
-                       Npcs.stat(char, @kind, name, Array(options) + own_options)
-                     else
-                       Stat.of(char, @kind, name, Array(options) + own_options, @extra_domains)
-                     end
+        @breakdown = Actors.of(char).figure(@kind, name, Array(options) + own_options, @extra_domains)
         @domains = Domains.for(@kind, domain_name, ability) + @extra_domains
         @options = Effects.options(char, @domains) + Array(options) + own_options
       end

@@ -150,7 +150,7 @@ module AresMUSH
 
         found.each do |target|
           if entering
-            relation = emitter.npc? == target.npc? ? 'ally' : 'enemy'
+            relation = Actors.of(emitter.holder).side == Actors.of(target.holder).side ? 'ally' : 'enemy'
             done = Auras.enter(emitter.holder, target.holder, self.aura, relation)
             return if CharState.emit_error!(client, done)
 

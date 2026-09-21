@@ -7,8 +7,8 @@ module AresMUSH
   #
   # It answers to the handful of names the condition and effect code reads off a character -
   # `pf2_conditions`, `pf2_effects`, `pf2_level` - so a creature is frightened, prone or blessed by the
-  # same code a character is. Where that code would go on to something only a character has, it asks
-  # `Pf2e.npc?` first.
+  # same code a character is. Where the engine needs something only one kind of actor has, it asks the
+  # actor (`Pf2e::Actors`), which knows which kind it is.
   class Pf2eNpc < Ohm::Model
     include ObjectModel
 

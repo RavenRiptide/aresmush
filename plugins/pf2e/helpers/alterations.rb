@@ -49,8 +49,7 @@ module AresMUSH
       # which conditions a character has is where that value is read.
       def self.rows(char, kind)
         SheetReads.memo(char, :"alterations_#{kind}") do
-          # A creature in an encounter carries nothing and has no feats; only what it is under alters.
-          sources = (Pf2e.npc?(char) ? [] : Effects.feats(char) + Effects.items(char)) + ActiveEffects.sources(char)
+          sources = Actors.of(char).alteration_sources + ActiveEffects.sources(char)
 
           context = Effects.context(char)
 

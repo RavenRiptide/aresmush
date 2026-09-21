@@ -69,8 +69,8 @@ module AresMUSH
       # weapon chosen is `{item|flags.system.rulesSelections.weapon}-damage`, which is that weapon's own
       # damage domain. Handwraps of mighty blows stand for the unarmed attack, whose domain is `unarmed`.
       def self.owned(set, char)
-        # A creature in an encounter carries nothing a set could choose from.
-        return {} unless char && !Pf2e.npc?(char)
+        # Only an actor that carries things has anything a set could choose from.
+        return {} unless char && Actors.of(char).carries_items?
 
         categories = Array(set['owned']).map { |kind| OWNED[kind] }.compact.uniq
 
@@ -99,7 +99,7 @@ module AresMUSH
       # What a player typed for one of their own things, as the id the answer is: the weapon's name or its
       # nickname, whichever they used.
       def self.owned_answer(set, char, typed)
-        return nil if Pf2e.npc?(char)
+        return nil unless Actors.of(char).carries_items?
 
         wanted = Domains.slug(typed)
 

@@ -94,7 +94,7 @@ module AresMUSH
 
         if holder
           reminder = Pf2e::Turns.reminder(holder, moved.state['round'])
-          Pf2e.npc?(holder) ? client.emit_ooc(reminder) : Login.emit_ooc_if_logged_in(holder, reminder)
+          Pf2e::Actors.of(holder).hears_own_turn? ? Login.emit_ooc_if_logged_in(holder, reminder) : client.emit_ooc(reminder)
         end
 
       end

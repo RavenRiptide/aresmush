@@ -1,15 +1,10 @@
 module AresMUSH
   module Pf2e
 
-    # Whether someone is a creature in an encounter rather than a character.
-    def self.npc?(holder)
-      holder.is_a?(Pf2eNpc)
-    end
-
     # A key for someone that no character and creature share, since both are numbered by their own
     # tables: an aura's effects record whose aura put them there.
     def self.holder_key(holder)
-      npc?(holder) ? "npc-#{holder.id}" : holder.id.to_s
+      Actors.of(holder).creature? ? "npc-#{holder.id}" : holder.id.to_s
     end
 
     # What a creature in an encounter is worth to the rules engine.

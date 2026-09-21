@@ -167,7 +167,7 @@ module AresMUSH
         max_before = HitPointLoss.takes?(entry['rules']) ? HitPointLoss.max_hp(char) : nil
 
         effect = Pf2eEffect.create(
-          (Pf2e.npc?(char) ? :npc : :character) => char, :name => name, :applied_by => applied_by,
+          Actors.of(char).effect_owner_field => char, :name => name, :applied_by => applied_by,
           :level => said['level'] || entry['level'] || 1,
           :badge => said['badge'] || (entry['badge'] || {})['value'],
           :unit => unit, :duration => duration['value'].to_i, :expiry => duration['expiry'],
