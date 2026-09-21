@@ -9,7 +9,7 @@ module AresMUSH
         AnsiFormatter.strip_ansi(MushFormatter.format(text.to_s)).gsub(/\r?\n/, "\n")
       end
 
-      def self.combatant(encounter, init, one, gm)
+      def self.combatant(encounter, init, one, viewer, gm)
         holder = one.holder
         number = one.number.to_s
 
@@ -17,8 +17,18 @@ module AresMUSH
           conditions: holder ? Pf2e.condition_labels(holder, false) : [],
           effects: holder ? ActiveEffects.on(holder).map { |effect| "#{effect.name} (#{plain(ActiveEffects.remaining(effect))})" } : [],
           cover: (encounter.cover || {})[number], concealment: (encounter.concealment || {})[number],
-          hp: gm || (holder && !one.npc?) ? (holder ? Harm.hit_points(holder) : nil) : nil,
+          hp: hit_points_seen(holder, viewer, gm),
           turn: holder ? plain(TurnState.summary(holder)) : nil }
+      end
+
+      # The GM sees everyone's. A creature's are the GM's alone. A character's are on their combat sheet,
+      # so whoever may see that - the sheet's own rule, `Sheet.viewable?` - may see them here.
+      def self.hit_points_seen(holder, viewer, gm)
+        return nil unless holder
+        return Harm.hit_points(holder) if gm
+        return nil if Pf2e.npc?(holder) || viewer.nil?
+
+        Sheet.viewable?(viewer, holder, 'combat').ok? ? Harm.hit_points(holder) : nil
       end
     end
 
@@ -40,7 +50,7 @@ module AresMUSH
         { id: encounter.id, round: encounter.round.to_i, active: encounter.is_active,
           current: ActiveEffects.current_turn(encounter), organizer: encounter.organizer, gm: gm,
           trusted: Array(encounter.trusted),
-          combatants: listed.each_with_index.map { |one, index| EncounterWeb.combatant(encounter, order[index][0], one, gm) },
+          combatants: listed.each_with_index.map { |one, index| EncounterWeb.combatant(encounter, order[index][0], one, enactor, gm) },
           log: Array(encounter.messages).last(30).map { |_time, message| EncounterWeb.plain(message) } }
       end
     end

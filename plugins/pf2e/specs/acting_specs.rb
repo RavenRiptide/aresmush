@@ -339,6 +339,28 @@ module AresMUSH
           expect(PF2EncounterHandler.new.handle(request(@gm, 'id' => @encounter.id))[:combatants].last[:hp]).to eq '6 / 6'
         end
 
+        # The same rule the sheet keeps: a character's hit points are on their combat sheet, and whoever
+        # may not see that may not see them here either.
+        it "should show a character's hit points only to whoever may see their sheet" do
+          allow(Global).to receive(:read_config).and_call_original
+          allow(Global).to receive(:read_config).with('pf2e', 'open_sheets').and_return(false)
+          other = Character.create(:name => "Bram#{rand(1000000)}", :room => @room)
+          other_hp = Pf2eHP.create(:character => other, :ancestry_hp => 8, :charclass_hp => 10)
+          other.update(:hp => other_hp, :pf2_level => 1)
+          PF2Encounter.add_to_initiative(@encounter, other.name, 25)
+          Combatants.number(@encounter, other.name)
+
+          seen = PF2EncounterHandler.new.handle(request(@hero, 'id' => @encounter.id))[:combatants]
+          mine = seen.find { |one| one[:name] == @hero.name }
+          theirs = seen.find { |one| one[:name] == other.name }
+
+          expect(mine[:hp]).to_not be_nil
+          expect(theirs[:hp]).to be_nil
+        ensure
+          other_hp&.delete
+          other&.delete
+        end
+
         it "should list the viewer's actions by mode, with what each rolls" do
           trip = PF2ActionsHandler.new.handle(request(@hero))[:modes]['combat'].find { |one| one[:name] == 'Trip' }
 
