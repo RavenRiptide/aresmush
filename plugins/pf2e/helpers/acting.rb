@@ -384,6 +384,62 @@ module AresMUSH
 
         effects = Array(attack['effects'])
         out['lines'] << t('pf2e.act_attack_effects', :effects => effects.join(', ')) if effects.any?
+
+        critical_specialization(scene, attack, out) if critical && !scene.actor.npc?
+      end
+
+      # A critical hit with a weapon whose critical specialization effect the character has. What the
+      # engine can do it does; what is movement on the map, or a judgement, is shown for the GM.
+      def self.critical_specialization(scene, attack, out)
+        found = Pf2e.crit_spec_consequences(scene.actor.holder, attack)
+
+        return unless found
+
+        out['lines'] << t('pf2e.act_crit_spec', :group => found['group'])
+
+        return out['lines'] << "    #{found['text']}" if found['effects'].empty?
+
+        found['effects'].each do |one|
+          if one['save'] then crit_spec_save(scene, one, out)
+          elsif one['persistent'] then crit_spec_bleed(scene, attack, one, out)
+          elsif one['damage_per_die'] then crit_spec_damage(scene, attack, one, out)
+          elsif one['condition'] then condition_consequence(scene, scene.target, one, out)
+          end
+        end
+      end
+
+      # Persistent damage, with the weapon's potency rune added where the effect says so: a +1 knife's
+      # bleed is 1d6+1.
+      def self.crit_spec_bleed(scene, attack, one, out)
+        bonus = one['potency'] ? attack['rune'].to_i : 0
+        formula = bonus.positive? ? "#{one['persistent']}+#{bonus}" : one['persistent']
+
+        PersistentDamage.add(scene.target.holder, formula, one['type'])
+        out['lines'] << t('pf2e.act_damage', :target => scene.target.label,
+                                             :damage => t('pf2e.act_persistent', :formula => formula, :type => one['type']))
+      end
+
+      # More damage of the weapon's own kind for each of its damage dice: a pick's 2 per die.
+      def self.crit_spec_damage(scene, attack, one, out)
+        dice = (attack['dice'] || 1).to_i + attack['striking'].to_i
+        kind = DamageRoll.kind(attack['damage_type'])
+
+        deal(scene, scene.target, [ { 'amount' => one['damage_per_die'].to_i * dice, 'type' => kind } ], out)
+      end
+
+      # The target saves against the attacker's DC, and a failure does what the effect says.
+      def self.crit_spec_save(scene, one, out)
+        dc = Stat.total(scene.actor.holder, one['against'] == 'class_dc' ? 'class_dc' : one['against'])
+        check = Check.of(scene.target.holder, 'save', one['save'], Resolve.seen_as(scene.actor.holder, 'origin'))
+        result = Resolve.roll(check, :dc => dc)
+
+        out['lines'] << t('pf2e.act_save_line', :target => scene.target.label, :save => one['save'].capitalize,
+                                                :roll => shown_roll(result), :dc => dc,
+                                                :degree => degree_word(result['degree'], false))
+
+        return if Degree.success?(result['degree'])
+
+        consequences(scene, Array(one['failure']).map { |effect| effect.merge('on' => 'target') }, out)
       end
 
       # Damage landing on someone: persistent damage is set to burn, the rest dealt after what they

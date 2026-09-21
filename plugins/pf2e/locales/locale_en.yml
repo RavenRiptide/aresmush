@@ -474,6 +474,7 @@ en:
     act_persistent: "%{formula} persistent %{type}"
     act_persistent_ended: "  %{target} no longer takes persistent %{type} damage."
     act_hp_left: "%{target}: %{hp} HP."
+    act_crit_spec: "  Critical specialization (%{group}):"
     act_attack_effects: "  On a hit, the Strike also allows: %{effects} - the GM runs it."
     act_now: "  %{target} is now %{condition}%{until}."
     act_now_under: "  %{target} is now under %{effect} - %{lasts}."

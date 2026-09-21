@@ -82,6 +82,20 @@ module AresMUSH
       access
     end
 
+    # What a critical hit with this attack does beyond its damage, where the character has the critical
+    # specialization effect with it: the group, its text, and the effects the engine applies
+    # (`crit_spec_effects` in the weapon groups). Nothing when they do not have it.
+    def self.crit_spec_consequences(char, attack)
+      group = canonical_crit_spec_group(attack['group'])
+
+      return nil unless group
+      return nil unless Array(crit_spec_access(char)[group]).include?(attack['name'])
+
+      info = Global.read_config('pf2e_weapon_groups', group) || {}
+
+      { 'group' => group, 'text' => info['crit_spec'], 'effects' => Array(info['crit_spec_effects']) }
+    end
+
     # What is granting access, for the header line. Feature and feat names only, since those are proper nouns rather than prose.
     def self.crit_spec_sources(char)
       sources = []

@@ -224,6 +224,51 @@ module AresMUSH
           expect(npc(3).damage).to be > 0
         end
 
+        # A critical hit with a weapon whose critical specialization the character has applies it: a
+        # hammer knocks the target prone. Without the access, a critical hit is only double damage.
+        describe "critical specialization" do
+          before(:each) do
+            @combat.update(:unarmed_attacks => { 'Fist' => { 'damage' => 'd4', 'damage_type' => 'B', 'group' => 'Hammer',
+                                                              'traits' => %w{agile finesse nonlethal unarmed} } })
+            @dice = 1.0
+          end
+
+          it "should apply the group's effect for an attack the character has it with" do
+            allow(Pf2e).to receive(:crit_spec_access).and_return('Hammer' => [ 'Fist' ])
+            run(PF2EncounterStrikeCmd, 'e/strike #3=fist', @hero)
+
+            expect(said).to include('Critical specialization')
+            expect(npc(3).pf2_conditions).to have_key('Prone')
+            expect(said).to include('undo: condition/set #3=Prone/0')
+          end
+
+          it "should do nothing more for an attack the character does not have it with" do
+            allow(Pf2e).to receive(:crit_spec_access).and_return({})
+            run(PF2EncounterStrikeCmd, 'e/strike #3=fist', @hero)
+
+            expect(said).to_not include('Critical specialization')
+            expect(npc(3).pf2_conditions).to_not have_key('Prone')
+          end
+
+          it "should set a knife's bleed burning" do
+            @combat.update(:unarmed_attacks => { 'Fist' => { 'damage' => 'd4', 'damage_type' => 'P', 'group' => 'Knife',
+                                                              'traits' => %w{agile unarmed} } })
+            allow(Pf2e).to receive(:crit_spec_access).and_return('Knife' => [ 'Fist' ])
+            run(PF2EncounterStrikeCmd, 'e/strike #3=fist', @hero)
+
+            expect(PersistentDamage.held(npc(3)).map { |one| [ one['formula'], one['type'] ] }).to eq [ [ '1d6', 'bleed' ] ]
+          end
+
+          it "should show a group's text where its effect is the GM's to apply" do
+            @combat.update(:unarmed_attacks => { 'Fist' => { 'damage' => 'd4', 'damage_type' => 'B', 'group' => 'Club',
+                                                              'traits' => %w{agile unarmed} } })
+            allow(Pf2e).to receive(:crit_spec_access).and_return('Club' => [ 'Fist' ])
+            run(PF2EncounterStrikeCmd, 'e/strike #3=fist', @hero)
+
+            expect(said).to include('forced movement')
+          end
+        end
+
         it "should miss a hidden target that fails its flat check" do
           @encounter.update(:concealment => { '3' => 'hidden' })
           @dice = 0.25
