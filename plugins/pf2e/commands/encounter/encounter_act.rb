@@ -31,7 +31,12 @@ module AresMUSH
 
         found = Combatants.find(encounter, enactor.name)
 
-        found.ok? ? found : Err.new(:not_in_encounter, 'pf2e.act_join_first', 'id' => encounter.id)
+        return Err.new(:not_in_encounter, 'pf2e.act_join_first', 'id' => encounter.id) unless found.ok?
+
+        # The enactor's own object, not a second copy of them: Ohm saves every attribute of an object it
+        # updates, so a copy read before the action and saved after it would put back the turn's counts
+        # the action had just written.
+        Ok.new(:state => Combatants::Combatant.new(enactor, found.state.label, found.state.number))
       end
 
       def scene_for(encounter, actor, target)
@@ -51,7 +56,7 @@ module AresMUSH
 
         tell_gm(encounter, out['gm'])
 
-        enactor.update(:pf2_turn_state => TurnState.of(enactor).merge('why' => out['detail']))
+        enactor.update(:pf2_last_roll => out['detail'])
       end
 
       def tell_gm(encounter, lines)
@@ -266,7 +271,7 @@ module AresMUSH
       include CommandHandler
 
       def handle
-        lines = TurnState.of(enactor)['why'] || []
+        lines = Array(enactor.pf2_last_roll)
 
         return client.emit_ooc(t('pf2e.why_nothing')) if lines.empty?
 

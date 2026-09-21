@@ -29,6 +29,12 @@ module AresMUSH
     # switched off by the damage that stops it.
     attribute :pf2_turn_state, :type => DataType::Hash, :default => {}
 
+    # Every modifier of the last roll this player made or made for someone, for `+e/why`. Its own
+    # attribute rather than a key of the turn's state: the one who types a command is often the one it
+    # changed, and writing this back into that hash from the copy read before the command would put
+    # the turn's counts back as they were.
+    attribute :pf2_last_roll, :type => DataType::Array, :default => []
+
     # Circumstances the player has deliberately switched on or off, by option name. An option nobody
     # has touched is absent, and follows whatever declared it.
     attribute :pf2_roll_options, :type => DataType::Hash, :default => {}

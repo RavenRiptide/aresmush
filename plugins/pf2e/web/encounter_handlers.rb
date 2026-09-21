@@ -84,7 +84,7 @@ module AresMUSH
         error = Website.check_login(request)
         return error if error
 
-        { lines: Array(TurnState.of(request.enactor)['why']).map { |line| EncounterWeb.plain(line) } }
+        { lines: Array(request.enactor.pf2_last_roll).map { |line| EncounterWeb.plain(line) } }
       end
     end
   end
