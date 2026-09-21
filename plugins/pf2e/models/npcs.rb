@@ -57,8 +57,9 @@ module AresMUSH
       Array(stat_block['traits'])
     end
 
+    # The stat block's hit points as its conditions leave them: Drained lowers the maximum.
     def max_hp
-      stat_block['hp'].to_i
+      (Pf2e::Npcs.stat(self, 'hp') || {})['total'] || stat_block['hp'].to_i
     end
 
     def hp_left

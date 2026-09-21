@@ -23,6 +23,9 @@ module AresMUSH
       # One row per kind of figure: the stat block's number for it, and the attribute it is based on,
       # which is what decides the `dex-based` domain Clumsy reaches.
       KINDS = {
+        # Maximum hit points: Drained's own rule lowers them.
+        'hp' => { 'base' => ->(block, _name) { block['hp'] },
+                  'ability' => ->(_name) { nil } },
         'ac' => { 'base' => ->(block, _name) { block['ac'] },
                   'ability' => ->(_name) { 'Dexterity' } },
         'perception' => { 'base' => ->(block, _name) { block['perception'] },

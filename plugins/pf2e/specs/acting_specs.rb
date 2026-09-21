@@ -290,6 +290,17 @@ module AresMUSH
       # A creature's abilities and Strikes carry rule elements the way a feat does, and they reach its
       # figures, its damage, its auras and its turn.
       describe "a creature's own rules" do
+        # Drained's own rule lowers maximum hit points by its value times the level, as it does a
+        # character's.
+        it "should lose maximum hit points to Drained" do
+          add('zombie brute')
+          full = npc(2).max_hp
+
+          Pf2e.set_condition(npc(2), 'Drained', 1)
+
+          expect(npc(2).max_hp).to eq full - [ npc(2).pf2_level, 1 ].max
+        end
+
         it "should add an ability's bonus to its saves" do
           add('shade (dreamlands)')
 
