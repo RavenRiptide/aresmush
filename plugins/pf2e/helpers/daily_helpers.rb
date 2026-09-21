@@ -28,6 +28,9 @@ module AresMUSH
       # A night has passed: anything shorter than a day is over, and a day-long effect counts it.
       ActiveEffects.rested(char)
 
+      # So is a once-a-day or once-an-hour limit on an action.
+      TurnState.reset(char, 'rest')
+
       # Focus Pool
       daily_refresh_focus_pool(magic) if magic
 
