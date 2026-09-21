@@ -16,9 +16,9 @@ carries, and the note for each outcome. The macros are code, but every one hands
 to `SingleCheckAction`, so the literal is read as data.
 
 What an outcome does to someone - Trip's success knocks the target prone - is in the note as words, and
-the words are not regular enough to act on: Grapple's critical failure lets the target choose. So the
-consequences the engine applies are the `CONSEQUENCES` table below, written from those notes, and only
-the unconditional ones.
+the words are not regular enough to act on: Grapple's critical failure lets the target choose. So what
+the engine applies lives in `game/config/pf2e_action_consequences.yml`, written from those notes, where a
+GM can change it without running this.
 
 The rules an action carries for as long as a character owns it are counted rather than written: they
 belong with how a use of it becomes a roll - Power Attack's extra die.
@@ -54,73 +54,6 @@ COMMON = {'basic', 'skill', 'exploration', 'downtime'}
 
 
 MACROS = 'src/module/system/action-macros'
-
-# What each outcome of a check does, by the action's slug, written from the note Foundry shows for it.
-# Only what happens whatever anyone decides: Grapple's critical failure, where the target chooses, and
-# Shove's push, which is movement on the other app's map, are left to the note.
-#
-#   on         whom it happens to: the target, or the one acting
-#   condition  a condition set at a value, or taken away with `remove`
-#   until      when a condition set here ends, counted from the actor's turn: `turn-end` is the end of
-#              this turn, `next-turn-start` and `next-turn-end` the start or end of their next
-#   effect     an effect put on them, with the answer it asks for where it asks one
-#   damage     damage they take, as a formula and a type
-#   persistent persistent damage of this type ended
-CONSEQUENCES = {
-    'trip': {
-        'criticalSuccess': [{'on': 'target', 'condition': 'Prone'},
-                            {'on': 'target', 'damage': '1d6', 'type': 'bludgeoning'}],
-        'success': [{'on': 'target', 'condition': 'Prone'}],
-        'criticalFailure': [{'on': 'actor', 'condition': 'Prone'}],
-    },
-    'grapple': {
-        'criticalSuccess': [{'on': 'target', 'condition': 'Restrained', 'until': 'next-turn-end'}],
-        'success': [{'on': 'target', 'condition': 'Grabbed', 'until': 'next-turn-end'}],
-        'failure': [{'on': 'target', 'remove': ['Grabbed', 'Restrained']}],
-        'criticalFailure': [{'on': 'target', 'remove': ['Grabbed', 'Restrained']}],
-    },
-    'shove': {
-        'criticalFailure': [{'on': 'actor', 'condition': 'Prone'}],
-    },
-    'reposition': {},
-    'disarm': {
-        'success': [{'on': 'target', 'effect': 'Effect: Disarm (Success)'}],
-        'criticalFailure': [{'on': 'actor', 'condition': 'Off-Guard', 'until': 'next-turn-start'}],
-    },
-    'demoralize': {
-        'criticalSuccess': [{'on': 'target', 'condition': 'Frightened', 'value': 2}],
-        'success': [{'on': 'target', 'condition': 'Frightened', 'value': 1}],
-    },
-    'feint': {
-        'criticalSuccess': [{'on': 'target', 'condition': 'Off-Guard', 'until': 'next-turn-end'}],
-        'success': [{'on': 'target', 'condition': 'Off-Guard', 'until': 'turn-end'}],
-        'criticalFailure': [{'on': 'actor', 'condition': 'Off-Guard', 'until': 'next-turn-end'}],
-    },
-    'escape': {
-        'criticalSuccess': [{'on': 'actor', 'remove': ['Grabbed', 'Immobilized', 'Restrained']}],
-        'success': [{'on': 'actor', 'remove': ['Grabbed', 'Immobilized', 'Restrained']}],
-    },
-    'bon-mot': {
-        'criticalSuccess': [{'on': 'target', 'effect': 'Effect: Bon Mot', 'answer': 'Critical Success'}],
-        'success': [{'on': 'target', 'effect': 'Effect: Bon Mot', 'answer': 'Success'}],
-        'criticalFailure': [{'on': 'actor', 'effect': 'Effect: Bon Mot', 'answer': 'Critical Failure'}],
-    },
-    # Aid's bonus grows with the aider's proficiency in what they rolled.
-    'aid': {
-        'criticalSuccess': [{'on': 'target', 'effect': 'Effect: Aid',
-                             'answer': {'default': '+2', 'master': '+3', 'legendary': '+4'}}],
-        'success': [{'on': 'target', 'effect': 'Effect: Aid', 'answer': '+1'}],
-        'criticalFailure': [{'on': 'target', 'effect': 'Effect: Aid', 'answer': '-1'}],
-    },
-    'administer-first-aid:stabilize': {
-        'criticalSuccess': [{'on': 'target', 'remove': ['Dying']}],
-        'success': [{'on': 'target', 'remove': ['Dying']}],
-    },
-    'administer-first-aid:stop-bleeding': {
-        'criticalSuccess': [{'on': 'target', 'persistent': 'bleed'}],
-        'success': [{'on': 'target', 'persistent': 'bleed'}],
-    },
-}
 
 OUTCOMES = ['criticalSuccess', 'success', 'failure', 'criticalFailure']
 
@@ -245,10 +178,6 @@ def check_of(data, found, weapon_traits):
     if notes:
         check['notes'] = notes
 
-    consequences = CONSEQUENCES.get(data.get('slug'))
-    if consequences:
-        check['consequences'] = consequences
-
     variants = {}
     for variant in data.get('variants') or []:
         own = {'name': rules.translated(variant.get('name'), found)}
@@ -256,8 +185,6 @@ def check_of(data, found, weapon_traits):
             own['statistic'] = variant['statistic']
         if notes_of(variant.get('notes'), found):
             own['notes'] = notes_of(variant.get('notes'), found)
-        if CONSEQUENCES.get(f"{data.get('slug')}:{variant.get('slug')}"):
-            own['consequences'] = CONSEQUENCES[f"{data.get('slug')}:{variant.get('slug')}"]
         variants[variant.get('slug')] = own
     if variants:
         check['variants'] = variants

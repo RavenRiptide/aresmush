@@ -227,17 +227,19 @@ module AresMUSH
 
         rolled_check.notes(result['degree']).each { |one| out['lines'] << "  #{one['text']}" if one['text'] }
 
-        consequences(scene, Array((check['consequences'] || {})[outcome]), out,
+        consequences(scene, Array(Actions.consequences(slug, check['variant'])[outcome]), out,
                      :rank => rank_of(scene.actor.holder, kind, stat_name))
       end
 
+      # The way of doing the action the actor named - `stabilize` for First Aid - or its first. The
+      # variant's slug is kept, because what its outcomes do is keyed by it.
       def self.variant_of(check, said)
         variants = check['variants'] || {}
 
         found = said['words'].map { |word| Domains.slug(word) }.find { |word| variants.key?(word) } ||
                 variants.keys.first
 
-        found ? variants[found].reject { |field, _| field == 'name' } : nil
+        found ? variants[found].reject { |field, _| field == 'name' }.merge('variant' => found) : nil
       end
 
       # Which figure the action rolls. One statistic is that one; a choice of several is the one the

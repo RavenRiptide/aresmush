@@ -80,6 +80,31 @@ module AresMUSH
         end
       end
 
+      # What an outcome does is game config (`pf2e_action_consequences.yml`), so a GM can change what
+      # Trip does without editing the importer.
+      describe "what an outcome does" do
+        it "should read Trip's consequences from config" do
+          expect(Actions.consequences('trip')['success']).to eq [ { 'on' => 'target', 'condition' => 'Prone' } ]
+        end
+
+        it "should read a variant's by the action and the variant" do
+          expect(Actions.consequences('administer-first-aid', 'stabilize')['success'].first['remove']).to eq [ 'Dying' ]
+        end
+
+        it "should key every entry on an action the catalogue holds" do
+          slugs = Actions.catalogue.values.map { |one| (one['check'] || {})['slug'] }.compact
+          strays = (Global.read_config('pf2e_action_consequences') || {}).keys.map { |key| key.split(':').first } - slugs
+
+          expect(strays).to eq []
+        end
+
+        it "should not also carry them in the imported catalogue" do
+          carrying = Actions.catalogue.select { |_name, one| (one['check'] || {}).key?('consequences') }
+
+          expect(carrying.keys).to eq []
+        end
+      end
+
       describe "whose it is" do
         it "should be everyone's for a basic action" do
           expect(Actions.usable(reread, 'Take Cover').ok?).to be true

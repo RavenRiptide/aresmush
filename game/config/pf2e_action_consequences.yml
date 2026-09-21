@@ -1,0 +1,55 @@
+---
+# What each outcome of an action's check does, applied by +e/act. Written from the note Foundry shows
+# for each outcome, and only what happens whatever anyone decides: Grapple's critical failure, where
+# the target chooses, and Shove's push, which is movement on the map, are left to the note.
+#
+# Keyed by the action's slug, or `<action>:<variant>` for one way of doing it. Each outcome -
+# criticalSuccess, success, failure, criticalFailure - lists what happens:
+#
+#   on         whom it happens to: target, or actor
+#   condition  a condition set, at `value`; `remove` takes a list away instead
+#   until      how long a condition set here lasts, from the actor's turn: turn-end, next-turn-start,
+#              next-turn-end, or rounds:N
+#   effect     an effect put on them, with the `answer` it asks for where it asks one - or answers by
+#              the actor's proficiency in what they rolled (default, master, legendary)
+#   damage     damage they take, as a formula and a `type`
+#   persistent persistent damage of this type ended
+pf2e_action_consequences:
+  "trip":
+    criticalSuccess: [{"on": "target", "condition": "Prone"}, {"on": "target", "damage": "1d6", "type": "bludgeoning"}]
+    success: [{"on": "target", "condition": "Prone"}]
+    criticalFailure: [{"on": "actor", "condition": "Prone"}]
+  "grapple":
+    criticalSuccess: [{"on": "target", "condition": "Restrained", "until": "next-turn-end"}]
+    success: [{"on": "target", "condition": "Grabbed", "until": "next-turn-end"}]
+    failure: [{"on": "target", "remove": ["Grabbed", "Restrained"]}]
+    criticalFailure: [{"on": "target", "remove": ["Grabbed", "Restrained"]}]
+  "shove":
+    criticalFailure: [{"on": "actor", "condition": "Prone"}]
+  "disarm":
+    success: [{"on": "target", "effect": "Effect: Disarm (Success)"}]
+    criticalFailure: [{"on": "actor", "condition": "Off-Guard", "until": "next-turn-start"}]
+  "demoralize":
+    criticalSuccess: [{"on": "target", "condition": "Frightened", "value": 2}]
+    success: [{"on": "target", "condition": "Frightened", "value": 1}]
+  "feint":
+    criticalSuccess: [{"on": "target", "condition": "Off-Guard", "until": "next-turn-end"}]
+    success: [{"on": "target", "condition": "Off-Guard", "until": "turn-end"}]
+    criticalFailure: [{"on": "actor", "condition": "Off-Guard", "until": "next-turn-end"}]
+  "escape":
+    criticalSuccess: [{"on": "actor", "remove": ["Grabbed", "Immobilized", "Restrained"]}]
+    success: [{"on": "actor", "remove": ["Grabbed", "Immobilized", "Restrained"]}]
+  "bon-mot":
+    criticalSuccess: [{"on": "target", "effect": "Effect: Bon Mot", "answer": "Critical Success"}]
+    success: [{"on": "target", "effect": "Effect: Bon Mot", "answer": "Success"}]
+    criticalFailure: [{"on": "actor", "effect": "Effect: Bon Mot", "answer": "Critical Failure"}]
+  "aid":
+    criticalSuccess: [{"on": "target", "effect": "Effect: Aid", "answer": {"default": "+2", "master": "+3", "legendary": "+4"}}]
+    success: [{"on": "target", "effect": "Effect: Aid", "answer": "+1"}]
+    criticalFailure: [{"on": "target", "effect": "Effect: Aid", "answer": "-1"}]
+  "administer-first-aid:stabilize":
+    criticalSuccess: [{"on": "target", "remove": ["Dying"]}]
+    success: [{"on": "target", "remove": ["Dying"]}]
+  "administer-first-aid:stop-bleeding":
+    criticalSuccess: [{"on": "target", "persistent": "bleed"}]
+    success: [{"on": "target", "persistent": "bleed"}]

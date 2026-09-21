@@ -21,6 +21,15 @@ module AresMUSH
         catalogue[name] || {}
       end
 
+      # What each outcome of an action's check does, by the action's slug and the way of doing it where
+      # it has more than one: `{ 'success' => [ { 'on' => 'target', 'condition' => 'Prone' } ] }`. Game
+      # config (`pf2e_action_consequences.yml`), so a GM can change what Trip does.
+      def self.consequences(slug, variant = nil)
+        held = Global.read_config('pf2e_action_consequences') || {}
+
+        (variant && held["#{slug}:#{variant}"]) || held[slug.to_s] || {}
+      end
+
       # The action a player means, by the name they typed.
       def self.find(term)
         wanted = Domains.slug(term)
