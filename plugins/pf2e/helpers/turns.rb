@@ -92,8 +92,9 @@ module AresMUSH
         end
       end
 
+      # Everyone in the encounter, as they stand in it: its creatures, and its characters' states there.
       def self.holders(encounter)
-        encounter.npcs.to_a + encounter.characters.to_a
+        encounter.npcs.to_a + encounter.states.to_a
       end
 
       def self.conditions_ended(encounter, event, participant, round)

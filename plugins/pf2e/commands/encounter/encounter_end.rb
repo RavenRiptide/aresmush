@@ -29,23 +29,11 @@ module AresMUSH
           return
         end
 
-        # Do it.
-
-        encounter.update(is_active: false)
-
-        # Whatever could not outlast the fight ends with it.
-        Pf2e::ActiveEffects.encounter_ended(encounter).each do |event|
-          client.emit_ooc t(event['key'], **Pf2e::CharState.symbolize(event['args']))
+        Pf2e::Encounters::Ending.end!(encounter).each do |event|
+          client.emit_ooc Pf2e::Telling.render(event)
         end
 
-        # So do the turn's counts, what may be used once an encounter, a trust given for this fight, and
-        # the cover and concealment set on its combatants.
-        Pf2e::Turns.holders(encounter).each do |holder|
-          Pf2e::TurnState.reset(holder, 'encounter')
-          Pf2e::TurnState.write(holder, 'turn' => {})
-        end
-        encounter.update(:trusted => [], :cover => {}, :concealment => {})
-
+        encounter = PF2Encounter[encounter.id]
         @message = t('pf2e.encounter_complete', :id => encounter.id)
 
         # Emit to the room.

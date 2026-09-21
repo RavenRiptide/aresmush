@@ -92,6 +92,16 @@ module AresMUSH
         expect(client).to have_received(:emit_failure).with(t('pf2e.no_encounter_here'))
       end
 
+      it "should end a condition timed to a turn on the character as they stand in the encounter" do
+        state = joined(@first)
+        state.update(:pf2_conditions => { 'Off-Guard' => { 'expires' => Turns.expiry('turn-end', @hero.name, 1) } })
+
+        ended = Turns.conditions_ended(PF2Encounter[@first.id], 'turn-end', @hero.name, 1)
+
+        expect(ended.map { |one| one['args']['condition'] }).to eq [ 'Off-Guard' ]
+        expect(Pf2eCombatantState[state.id].pf2_conditions).to eq({})
+      end
+
       it "should keep their state when they join the same encounter again" do
         state = joined(@first)
 

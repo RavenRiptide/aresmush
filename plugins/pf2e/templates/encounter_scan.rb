@@ -22,7 +22,8 @@ module AresMUSH
       def player_list
         list = []
 
-        @encounter.characters.sort{ |a, b| a.name <=> b.name }.each do |char|
+        # As they stand in the encounter: its damage, and the conditions and effects that move their figures.
+        @encounter.states.to_a.sort_by(&:name).each do |char|
           list << format_player(char)
         end
 
