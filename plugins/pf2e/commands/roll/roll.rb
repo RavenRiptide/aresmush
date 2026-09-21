@@ -38,12 +38,11 @@ module AresMUSH
       def handle
 
         roll = Pf2e.parse_roll_string(enactor, self.mods, Pf2e.circumstances(self.doing))
-        list = roll['list']
         result = roll['result']
         total = roll['total']
 
         # Determine degree of success if DC is given
-        degree = self.dc ? Pf2e.get_degree(list, result, total, self.dc, roll['checks']) : ""
+        degree = self.dc ? Pf2e.roll_degree(roll, self.dc) : ""
 
         dc_string = self.dc ? "against DC #{self.dc} " : ""
         doing_string = self.doing.any? ? " (#{self.doing.join(', ')})" : ""

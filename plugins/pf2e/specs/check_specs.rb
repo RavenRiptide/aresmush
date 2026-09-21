@@ -232,16 +232,14 @@ module AresMUSH
       it "should make the roll read as a critical failure however well it went" do
         parsed = Pf2e.parse_roll_string(Character[@char.id], [ '0d1', '40', 'perception' ],
                                         [ 'item:trait:auditory' ])
-        shown = Pf2e.get_degree(parsed['list'], parsed['result'], parsed['total'], 15,
-                                parsed['adjustments'])
+        shown = Pf2e.roll_degree(parsed, 15)
 
         expect(shown).to match(/CRITICAL FAILURE/)
       end
 
       it "should leave a roll it does not apply to as it was" do
         parsed = Pf2e.parse_roll_string(Character[@char.id], [ '0d1', '40', 'perception' ])
-        shown = Pf2e.get_degree(parsed['list'], parsed['result'], parsed['total'], 15,
-                                parsed['adjustments'])
+        shown = Pf2e.roll_degree(parsed, 15)
 
         expect(shown).to match(/CRITICAL SUCCESS/)
       end

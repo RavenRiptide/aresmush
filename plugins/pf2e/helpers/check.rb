@@ -111,9 +111,7 @@ module AresMUSH
       # How the roll went. `die` is the face of the d20, which shifts the outcome by a degree either
       # way; `dc` is what it was measured against, and without one there is no outcome to speak of.
       def outcome(total, dc, die = nil)
-        return nil unless dc
-
-        Degree.adjusted(Degree.of(total, dc, die), adjustments(rolled(total, dc, die)))
+        Resolve.degree([ self ], total, dc, die)
       end
 
       # What the roll itself establishes once it has been rolled, which is what a rule about a near miss

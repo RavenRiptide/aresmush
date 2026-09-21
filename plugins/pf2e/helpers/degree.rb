@@ -3,9 +3,8 @@ module AresMUSH
 
     # How well a check went, as something that can be reasoned about rather than a coloured string.
     #
-    # `get_degree` decided the outcome and formatted it in one breath, which is fine for printing a roll
-    # and no use to anything that has to *change* the outcome. A hundred and fifty rule elements in
-    # Foundry's data do exactly that - Assurance turns a failure into a success, a Deafened character's
+    # An outcome has to be something a rule can change, not only something printed. A hundred and fifty
+    # rule elements in Foundry's data do exactly that - Assurance turns a failure into a success, a Deafened character's
     # auditory Perception check drops to a critical failure - so the outcome has to exist as a value
     # before any of them can be read.
     #

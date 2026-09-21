@@ -14,28 +14,62 @@ module AresMUSH
       # action carries does not stack with one the character already has.
       def self.roll(check, dc: nil, extra: [])
         breakdown = restacked(check.breakdown, extra)
-        substitution = check.substitution
-        keep = substitution ? nil : check.roll_twice
+        rolled = d20([ check ])
+        total = rolled['face'] + breakdown['total'].to_i
 
-        if substitution
-          check.substituted = substitution['slug']
-          dice = []
-          natural = nil
-          face = substitution['value'].to_i
-        else
-          dice = Pf2e.roll_dice(keep ? 2 : 1, 20)
-          natural = keep == 'keep-lower' ? dice.min : dice.max
-          face = natural
+        check.rolled!(total, dc, rolled['die'])
+
+        rolled.except('face').merge('modifier' => breakdown['total'].to_i, 'total' => total, 'dc' => dc,
+                                    'degree' => degree([ check ], total, dc, rolled['die']), 'breakdown' => breakdown)
+      end
+
+      FORTUNE = { 'keep-higher' => 'fortune', 'keep-lower' => 'misfortune' }.freeze
+
+      # The d20 of a roll that holds these checks. Fortune rolls it twice and keeps the higher,
+      # misfortune the lower, and one of each cancels. A substitution - Assurance's 10 - stands in for
+      # the die and is itself fortune or misfortune, so it cancels with the other too
+      # (`check.ts:127`). `die` is the natural face, which a substitution has none of.
+      def self.d20(checks)
+        checks = Array(checks)
+        keep = roll_twice(checks)
+        substitution = checks.map { |check| check.respond_to?(:substitution) ? check.substitution : nil }.compact.first
+
+        if [ substitution && substitution['effect_type'], FORTUNE[keep] ].compact.sort == %w{fortune misfortune}
+          keep = nil
+          substitution = nil
         end
 
-        total = face + breakdown['total'].to_i
-        degree = dc ? Degree.adjusted(Degree.of(total, dc, natural), check.adjustments(check.rolled(total, dc, natural))) : nil
+        if substitution
+          checks.each { |check| check.substituted = substitution['slug'] if check.respond_to?(:substituted=) }
 
-        check.rolled!(total, dc, natural)
+          return { 'die' => nil, 'dice' => [], 'kept' => nil, 'substitution' => substitution,
+                   'face' => substitution['value'].to_i }
+        end
 
-        { 'die' => natural, 'dice' => dice, 'kept' => keep, 'substitution' => substitution,
-          'modifier' => breakdown['total'].to_i, 'total' => total, 'dc' => dc, 'degree' => degree,
-          'breakdown' => breakdown }
+        dice = keep ? [ Pf2e.roll_dice(1, 20).first, Pf2e.roll_dice(1, 20).first ] : Pf2e.roll_dice(1, 20)
+        natural = keep == 'keep-lower' ? dice.min : dice.max
+
+        { 'die' => natural, 'dice' => dice, 'kept' => keep, 'substitution' => nil, 'face' => natural }
+      end
+
+      # Fortune or misfortune on a roll, from the checks in it: one of each cancels.
+      def self.roll_twice(checks)
+        keeps = Array(checks).map { |check| check.respond_to?(:roll_twice) ? check.roll_twice : nil }.compact.uniq
+
+        keeps.size == 1 ? keeps.first : nil
+      end
+
+      # How a roll went against a DC, once every rule the checks in it hold about the outcome has had its
+      # say: Assurance's failure made a success, a keen weapon's 19 made a critical hit. `held` are the
+      # checks, or adjustments already read off them.
+      def self.degree(held, total, dc, die)
+        return nil unless dc
+
+        adjustments = Array(held).flat_map do |one|
+          one.respond_to?(:rolled) ? one.adjustments(one.rolled(total, dc, die)) : one
+        end
+
+        Degree.adjusted(Degree.of(total, dc, die), adjustments)
       end
 
       # A figure's modifiers with more added, stacked again.

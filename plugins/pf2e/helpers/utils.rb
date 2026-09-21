@@ -303,39 +303,22 @@ module AresMUSH
         end
       end
 
-      keep = roll_twice(checks)
-      twice = nil
-      substitution = checks.map { |check| check.respond_to?(:substitution) ? check.substitution : nil }.compact.first
+      # A roll opening with a d20 is a check, and its d20 is rolled the way any check's is. A
+      # substitution is a number rather than a die, so it takes the die's place, with no natural 20 or 1.
+      d20 = roll_list.first == '1d20' ? Resolve.d20(checks) : nil
 
-      # Fortune and misfortune cancel, and a substitution is one or the other: with one of each, the d20
-      # is rolled once and nothing stands in for it (`check.ts:127`).
-      kinds = [ substitution && substitution['effect_type'],
-                { 'keep-higher' => 'fortune', 'keep-lower' => 'misfortune' }[keep] ].compact
-
-      if kinds.include?('fortune') && kinds.include?('misfortune')
-        keep = nil
-        substitution = nil
-      end
-
-      # A substitution is a number rather than a die, so it is the first term, and no natural 20 or 1.
-      if substitution && roll_list.first == '1d20'
-        roll_list[0] = substitution['value'].to_s
-        terms[0] = substitution['value']
-        keep = nil
-        checks.each { |check| check.substituted = substitution['slug'] if check.respond_to?(:substituted=) }
+      if d20 && d20['substitution']
+        roll_list[0] = d20['face'].to_s
+        terms[0] = d20['face']
       end
 
       result = roll_list.each_with_index.map do |e, index|
         next terms[index] unless e =~ dice_pattern
+        next [ d20['face'] ] if d20 && index.zero?
 
         dice = e.gsub("d"," ").split
         amount = dice[0].to_i > 0 ? dice[0].to_i : 1
         sides = dice[1].to_i
-
-        if keep && index.zero? && e == '1d20'
-          twice = { 'keep' => keep, 'rolls' => [ Pf2e.roll_dice(1, 20).first, Pf2e.roll_dice(1, 20).first ] }
-          next [ keep == 'keep-higher' ? twice['rolls'].max : twice['rolls'].min ]
-        end
 
         Pf2e.roll_dice(amount, sides)
       end
@@ -359,20 +342,14 @@ module AresMUSH
       return_hash['checks'] = checks
       return_hash['adjustments'] = checks.flat_map(&:adjustments)
       # Both dice, where the d20 was rolled twice, and which was kept.
-      return_hash['rolled_twice'] = twice
+      return_hash['rolled_twice'] = d20 && d20['kept'] ? { 'keep' => d20['kept'], 'rolls' => d20['dice'] } : nil
+      # The natural face of the d20, which shifts the outcome a degree either way.
+      return_hash['die'] = d20 && d20['die']
 
       # What the roll spent is spent: Guidance's bonus, a fortune effect.
-      die = natural_die(roll_list, fmt_result)
-      checks.each { |check| check.rolled!(return_hash['total'], nil, die) if check.respond_to?(:rolled!) }
+      checks.each { |check| check.rolled!(return_hash['total'], nil, return_hash['die']) if check.respond_to?(:rolled!) }
 
       return return_hash
-    end
-
-    # Fortune or misfortune on this roll, from the checks in it: one of each cancels, which is the rule.
-    def self.roll_twice(checks)
-      keeps = checks.map { |check| check.respond_to?(:roll_twice) ? check.roll_twice : nil }.compact.uniq
-
-      keeps.size == 1 ? keeps.first : nil
     end
 
     # How the roll is shown. The outcome itself is `Pf2e::Degree`'s, so anything that has to change an
@@ -382,27 +359,14 @@ module AresMUSH
                       "(%xgSUCCESS!%xn)",
                       "(%xh%xmCRITICAL SUCCESS!%xn)" ].freeze
 
-    # `held` are the checks that were rolled, or the adjustments they hold. A check is the better answer,
-    # because only a check can say what a rule about a natural 19 makes of the die that was rolled.
-    def self.get_degree(list, result, total, dc, held = [])
-      die = natural_die(list, result)
-      degree = Degree.adjusted(Degree.of(total, dc, die), outcome_adjustments(held, total, dc, die))
+    # How a parsed roll went against a DC, as the roll commands show it. The outcome is `Resolve`'s, the
+    # same one an encounter's checks come to.
+    def self.roll_degree(roll, dc)
+      degree_label(Resolve.degree(roll['checks'], roll['total'], dc, roll['die']), roll['die'])
+    end
 
+    def self.degree_label(degree, die = nil)
       DEGREE_LABELS[degree] + (die == 1 ? t('pf2e.whirldice') : "")
-    end
-
-    def self.outcome_adjustments(held, total, dc, die)
-      Array(held).flat_map do |one|
-        one.respond_to?(:rolled) ? one.adjustments(one.rolled(total, dc, die)) : one
-      end
-    end
-
-    # The face the d20 came up, when the roll opened with one. A natural twenty or one shifts the
-    # outcome, and only the first term being a d20 makes the roll a check at all.
-    def self.natural_die(list, result)
-      return nil unless list.to_a.first == '1d20'
-
-      result.to_a.first.to_s.delete_prefix("(%xc").delete_suffix("%xn)").to_i
     end
 
     def self.pretty_string(string)
