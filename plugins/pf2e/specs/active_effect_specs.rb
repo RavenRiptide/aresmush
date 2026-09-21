@@ -168,7 +168,7 @@ module AresMUSH
     end
 
     def advance(encounter)
-      order = encounter.participants
+      order = Pf2e::Combatants.all(encounter)
       ending = Pf2e::ActiveEffects.current_turn(encounter)
       ending_round = encounter.round
       moved = Pf2e::Encounters::Turn.move('next', :size => order.size, :at => encounter.next_init,
@@ -176,7 +176,7 @@ module AresMUSH
 
       encounter.update(:round => moved['round'], :next_init => moved['upcoming'])
 
-      Pf2e::Turns.advanced(encounter, ending, ending_round, order[moved['current']][1], moved['round'])
+      Pf2e::Turns.advanced(encounter, ending, ending_round, order[moved['current']].label, moved['round'])
     end
 
     describe "keeping time in an encounter" do

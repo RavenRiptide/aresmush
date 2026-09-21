@@ -29,7 +29,7 @@ module AresMUSH
           return
         end
 
-        initlist = encounter.participants
+        initlist = Pf2e::Combatants.all(encounter)
 
         # Whose turn is ending, before the order moves: an effect that lasts until the end of someone's
         # turn ends now.
@@ -50,9 +50,9 @@ module AresMUSH
         round_text = new_round ? t('pf2e.new_round', :round => moved.state['round']) : t(moved.state['label'])
 
         @message = t('pf2e.advance_init',
-          :current => initlist[this_init][1],
-          :next => initlist[next_init][1],
-          :init => initlist[this_init][0].to_i,
+          :current => initlist[this_init].label,
+          :next => initlist[next_init].label,
+          :init => initlist[this_init].init.to_i,
           :round => round_text
         )
 
@@ -67,7 +67,8 @@ module AresMUSH
 
         # If the current initiative is a PC, shoot them a global notifier.
 
-        current_is_char = Character.named(initlist[this_init][1])
+        holder = initlist[this_init].holder
+        current_is_char = holder && !initlist[this_init].creature? ? holder : nil
 
         if current_is_char
           @init_msg = t('pf2e.your_init', :id => encounter.id)
@@ -81,7 +82,7 @@ module AresMUSH
         encounter.update(next_init: next_init)
 
         # Time has passed: what ran out ends, what heals heals, what burns burns. The room is told each.
-        Pf2e::Turns.advanced(encounter, ending, ending_round, initlist[this_init][1],
+        Pf2e::Turns.advanced(encounter, ending, ending_round, initlist[this_init].label,
                              moved.state['round']).each do |event|
           notice = t(event['key'], **Pf2e::CharState.symbolize(event['args']))
 
@@ -90,8 +91,6 @@ module AresMUSH
         end
 
         # The one whose turn it is hears what matters to it; a creature's reminder goes to the GM.
-        holder = Pf2e::Combatants.holder_named(encounter, initlist[this_init][1])
-
         if holder
           reminder = Pf2e::Turns.reminder(holder, moved.state['round'])
           Pf2e::Actors.of(holder).hears_own_turn? ? Login.emit_ooc_if_logged_in(holder, reminder) : client.emit_ooc(reminder)

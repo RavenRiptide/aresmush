@@ -67,7 +67,7 @@ module AresMUSH
 
       return false unless encounter
 
-      participants = encounter.participants.collect { |p| p[1] }
+      participants = Combatants.rows(encounter).map { |row| row['name'] }
       targets_in_encounter = target_list.all? { |t| participants.include? t }
 
       PF2Encounter.is_organizer?(char, encounter) && targets_in_encounter

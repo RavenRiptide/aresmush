@@ -12,8 +12,8 @@ module AresMUSH
         # If only one arg is given, encounter_id is the nil.
         args.unshift(nil) unless args[1]
 
-        self.encounter_id = args[0] ? integer_arg(args[0]) : args
-        self.name = downcase_arg(args[1])
+        self.encounter_id = args[0] ? integer_arg(args[0]) : nil
+        self.name = args[1]
       end
 
       def required_args
@@ -38,24 +38,18 @@ module AresMUSH
           return
         end
 
-        initlist = encounter.participants
+        found = Pf2e::Combatants.find(encounter, self.name)
 
-        index = initlist.index { |i| i[1].downcase.match? self.name }
+        return if Pf2e::CharState.emit_error!(client, found)
 
-        if !index
-          client.emit_failure t('pf2e.not_found')
-          return
-        end
+        leaving = found.state
 
-        PF2Encounter.remove_from_initiative(encounter, index)
+        Pf2e::Combatants.leave(encounter, leaving.number)
 
         # A creature removed from the fight is gone, with whatever it was under.
-        encounter.npcs.to_a.select { |npc| npc.name == initlist[index][1] }.each(&:delete)
+        leaving.holder.delete if leaving.creature?
 
-        client.emit_success t('pf2e.encounter_remove_ok',
-          :encounter => encounter.id,
-          :name => initlist[index][1]
-        )
+        client.emit_success t('pf2e.encounter_remove_ok', :encounter => encounter.id, :name => leaving.label)
 
       end
 

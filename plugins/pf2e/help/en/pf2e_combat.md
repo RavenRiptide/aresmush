@@ -36,7 +36,8 @@ a name only one combatant has. Acting in an encounter - actions, Strikes, spells
 `+e/add <name>=ac <n> fort <n> ref <n> will <n> perception <n> hp <n>`: Adds a creature the bestiary lacks, from the numbers on its stat block. It has no Strikes of its own; roll its attacks with `roll`.
 `+e/bestiary <words>[/<level>]`: Creatures whose names hold the words, at a level if one is given.
 `+e/creature <creature>`: A creature's stat block from the bestiary.
-`encounter/mod <encounter ID>=<name>=<new init>`: Sets name's initiative to the new initiative.
+`encounter/mod [<encounter ID>=]<#id or name>=<new init>`: Sets a combatant's initiative. Whoever's turn it is keeps it.
+`encounter/remove [<encounter ID>=]<#id or name>`: Takes a combatant out of the order; a creature removed is gone. (Alias: `rminit`)
 `encounter/next`: Moves the initiative forward one turn. (Alias: `ninit`)
 `encounter/prev`: Moves the initiative backwards one turn. (Alias: `pinit`)
 `encounter/scan`: Allows the organizer to view details on all player characters who have joined the encounter. (Alias: `tscan`)

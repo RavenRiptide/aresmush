@@ -29,10 +29,8 @@ module AresMUSH
 
         list = []
 
-        return list if @encounter.participants.empty?
-
-        @encounter.participants.each do |p|
-          list << format_init_list_item(p)
+        Pf2e::Combatants.all(@encounter).each do |one|
+          list << format_init_list_item(one)
         end
 
         list
@@ -40,11 +38,11 @@ module AresMUSH
       end
 
       # A combatant's id, what it is under, and the cover and concealment set on it.
-      def format_init_list_item(participant)
-        initiative = participant[0].to_i
-        name = participant[1]
-        holder = Pf2e::Combatants.holder_named(@encounter, name)
-        number = Pf2e::Combatants.number(@encounter, name)
+      def format_init_list_item(one)
+        initiative = one.init.to_i
+        name = one.label
+        holder = one.holder
+        number = one.number
         conditions = holder ? Pf2e.condition_labels(holder, false) : []
         cover = (@encounter.cover || {})[number.to_s]
         concealment = (@encounter.concealment || {})[number.to_s]

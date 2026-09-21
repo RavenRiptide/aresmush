@@ -9,11 +9,11 @@ module AresMUSH
         AnsiFormatter.strip_ansi(MushFormatter.format(text.to_s)).gsub(/\r?\n/, "\n")
       end
 
-      def self.combatant(encounter, init, one, viewer, gm)
+      def self.combatant(encounter, one, viewer, gm)
         holder = one.holder
         number = one.number.to_s
 
-        { id: one.number, name: one.label, initiative: init.to_i, creature: one.creature?,
+        { id: one.number, name: one.label, initiative: one.init.to_i, creature: one.creature?,
           conditions: holder ? Pf2e.condition_labels(holder, false) : [],
           effects: holder ? ActiveEffects.on(holder).map { |effect| "#{effect.name} (#{plain(ActiveEffects.remaining(effect))})" } : [],
           cover: (encounter.cover || {})[number], concealment: (encounter.concealment || {})[number],
@@ -44,13 +44,12 @@ module AresMUSH
 
         enactor = request.enactor
         gm = enactor ? Combatants.gm?(enactor, encounter) : false
-        order = encounter.participants || []
         listed = Combatants.all(encounter)
 
         { id: encounter.id, round: encounter.round.to_i, active: encounter.is_active,
           current: ActiveEffects.current_turn(encounter), organizer: encounter.organizer, gm: gm,
           trusted: Array(encounter.trusted),
-          combatants: listed.each_with_index.map { |one, index| EncounterWeb.combatant(encounter, order[index][0], one, enactor, gm) },
+          combatants: listed.map { |one| EncounterWeb.combatant(encounter, one, enactor, gm) },
           log: Array(encounter.messages).last(30).map { |_time, message| EncounterWeb.plain(message) } }
       end
     end

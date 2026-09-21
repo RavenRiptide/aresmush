@@ -4,10 +4,8 @@ module AresMUSH
 
       # Whose turn it is, and what moving through the order does to the round.
       #
-      # The arithmetic was written twice, forwards in `encounter/next` and backwards in
-      # `encounter/prev`, and the backwards copy was wrong in two ways: it read a round counter it
-      # had never assigned, and it indexed one past the end of the order. Both raised
-      # `NoMethodError`, so backing up into the previous round could not work.
+      # `at` is the encounter's `next_init`: one past whoever's turn it is, so the turn is `at - 1`. Moving
+      # on makes `at` the turn; backing up makes the one before the turn the turn.
       #
       # Pure: a list size, a position and a round number in, the new position and round out.
       module Turn
@@ -23,11 +21,10 @@ module AresMUSH
           },
           'prev' => {
             'label' => 'pf2e.init_backs_up',
-            'wraps' => lambda { |ctx| ctx[:at].zero? },
+            # Backing up from the round's first turn lands on the last one of the round before.
+            'wraps' => lambda { |ctx| ((ctx[:at] - 1) % ctx[:size]).zero? },
             'round' => lambda { |ctx| ctx[:round].to_i - 1 },
-            # Backing up from the top of the order lands on the last participant, which is the one
-            # before this round's first.
-            'current' => lambda { |ctx| ctx[:at].zero? ? ctx[:size] - 1 : ctx[:at] - 1 }
+            'current' => lambda { |ctx| (ctx[:at] - 2) % ctx[:size] }
           }
         }.freeze
 

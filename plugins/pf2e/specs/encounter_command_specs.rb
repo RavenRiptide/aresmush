@@ -3,11 +3,7 @@ require "plugin_test_loader"
 module AresMUSH
   module Pf2e
 
-    # `encounter/next`, through the command a DM types.
-    #
-    # It raised on a name nothing defined after announcing the turn and before saving where the order
-    # stood, so the order never moved: every `encounter/next` announced the same turn again. It is also
-    # where time passes for an effect, so both are held here against the real command.
+    # `encounter/next`, through the command a DM types: the order moves, and time passes for an effect.
     describe "moving an encounter on", :dbtest => true do
 
       class TurnClient

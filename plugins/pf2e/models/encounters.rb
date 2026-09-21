@@ -3,6 +3,7 @@ module AresMUSH
     include ObjectModel
 
     attribute :name
+    # The initiative order, one row per combatant; `Pf2e::Combatants` reads and writes it.
     attribute :participants, :type => DataType::Array, :default => []
     attribute :next_init, :type => DataType::Integer, :default => 0
     attribute :organizer
@@ -12,10 +13,8 @@ module AresMUSH
     attribute :messages, :type => DataType::Array, :default => []
     attribute :init_stat
 
-    # Each combatant's id in the initiative, by the name the order holds: `{ 'Aria' => 1, 'Goblin
-    # Warrior #2' => 2 }`. An id is never reused within an encounter, so `#2` means the same creature
-    # all fight long.
-    attribute :numbers, :type => DataType::Hash, :default => {}
+    # The last combatant id given. An id is never reused within an encounter, so `#2` means the same
+    # creature all fight long.
     attribute :last_number, :type => DataType::Integer, :default => 0
 
     # Players the GM has trusted with setting cover and concealment, for this encounter only.
@@ -58,30 +57,6 @@ module AresMUSH
       message_list = enc.messages
       message_list << [ Time.now, msg ]
       enc.update(messages: message_list)
-    end
-
-    def self.add_to_initiative(encounter, name, roll, is_adversary=false)
-      list = encounter.participants || []
-
-        # Float is used here to account for the Paizo RAW that if a PC and an adversary tie, tie adversary goes first.
-      adversary_mod = is_adversary ? 0.2 : 0
-
-      init = (roll + adversary_mod).to_f
-
-      list << [ init, name ]
-
-      list_sort = list.sort_by { |p| -p[0] }
-
-      encounter.update(participants: list_sort)
-    end
-
-    def self.remove_from_initiative(encounter,index)
-
-      list = encounter.participants
-
-      list.delete_at(index)
-
-      encounter.update(participants: list)
     end
 
     def self.is_organizer?(char, encounter)

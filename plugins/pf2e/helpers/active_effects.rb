@@ -381,11 +381,11 @@ module AresMUSH
 
       # Whose turn it is in an encounter, by name, or nil before the first turn.
       def self.current_turn(encounter)
-        order = encounter.participants || []
+        order = Combatants.rows(encounter)
 
         return nil if order.empty? || encounter.round.to_i.zero?
 
-        order[(encounter.next_init.to_i - 1) % order.size]&.last
+        order[(encounter.next_init.to_i - 1) % order.size]['name']
       end
 
       def self.rounds_long(effect)

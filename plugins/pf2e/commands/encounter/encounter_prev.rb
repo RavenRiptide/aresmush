@@ -28,7 +28,7 @@ module AresMUSH
           return
         end
 
-        initlist = encounter.participants
+        initlist = Pf2e::Combatants.all(encounter)
         moved = Pf2e::Encounters::Turn.move('prev', :size => initlist.size,
                                             :at => encounter.next_init, :round => encounter.round)
 
@@ -40,9 +40,9 @@ module AresMUSH
         encounter.update(:round => moved.state['round']) if moved.state['new_round']
 
         @message = t('pf2e.advance_init',
-          :current => initlist[this_init][1],
-          :next => initlist[next_init][1],
-          :init => initlist[this_init][0].to_i,
+          :current => initlist[this_init].label,
+          :next => initlist[next_init].label,
+          :init => initlist[this_init].init.to_i,
           :round => t(moved.state['label'])
         )
 
@@ -56,12 +56,13 @@ module AresMUSH
 
         # If the current initiative is a PC, shoot them a global notifier.
 
-        current_is_char = Character.named(initlist[this_init][1])
+        holder = initlist[this_init].holder
+        current_is_char = holder && !initlist[this_init].creature? ? holder : nil
 
         if current_is_char
           @init_msg = t('pf2e.your_init', :id => encounter.id)
           Global.notifier.notify_ooc(:char_init, @init_msg) do |c|
-            c & c == current_is_char
+            c && c == current_is_char
           end
         end
 

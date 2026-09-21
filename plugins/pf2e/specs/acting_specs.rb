@@ -54,11 +54,10 @@ module AresMUSH
                      :pf2_derived => {}, :pf2_feats => {}, :pf2_base_info => { 'charclass' => 'Fighter' },
                      :pf2_features => { 'charclass_features' => [], 'archetype_features' => [] })
         @abilities = Pf2e::ABILITIES.map { |name| Pf2eAbilities.create(:character => @hero, :name => name, :base_val => 14) }
-        @encounter = PF2Encounter.create(:scene => @scene, :organizer => @gm.name, :round => 1,
-                                         :participants => [ [ 30.0, @hero.name ] ], :is_active => true)
+        @encounter = PF2Encounter.create(:scene => @scene, :organizer => @gm.name, :round => 1, :is_active => true)
         @hero.encounters.add @encounter
         @encounter.characters.add @hero
-        Combatants.number(@encounter, @hero.name)
+        Combatants.join(@encounter, @hero.name, 30, :holder => @hero)
 
         @dice = 0.5
         allow(Pf2e).to receive(:roll_dice) { |amount = 1, sides = 20| [ [ (sides.to_i * @dice).ceil, 1 ].max ] * amount.to_i }
@@ -99,7 +98,7 @@ module AresMUSH
 
           expect(@client.failures).to eq []
           expect(@encounter.npcs.to_a.map(&:number).sort).to eq [ 2, 3 ]
-          expect(@encounter.participants.map(&:last)).to include('Goblin Warrior #2', 'Goblin Warrior #3')
+          expect(@encounter.participants.map { |row| row['name'] }).to include('Goblin Warrior #2', 'Goblin Warrior #3')
           expect(npc(2).max_hp).to eq 6
         end
 
@@ -467,8 +466,7 @@ module AresMUSH
           other = Character.create(:name => "Bram#{rand(1000000)}", :room => @room)
           other_hp = Pf2eHP.create(:character => other, :ancestry_hp => 8, :charclass_hp => 10)
           other.update(:hp => other_hp, :pf2_level => 1)
-          PF2Encounter.add_to_initiative(@encounter, other.name, 25)
-          Combatants.number(@encounter, other.name)
+          Combatants.join(@encounter, other.name, 25, :holder => other)
 
           seen = PF2EncounterHandler.new.handle(request(@hero, 'id' => @encounter.id))[:combatants]
           mine = seen.find { |one| one[:name] == @hero.name }
