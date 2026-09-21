@@ -208,6 +208,10 @@ module AresMUSH
           return PF2EncounterOptionCmd
         when "sheet"
           return PF2EncounterSheetCmd
+        when "undo", "redo"
+          return PF2EncounterUndoCmd
+        when "history"
+          return PF2EncounterHistoryCmd
         when "start"
           return PF2InitiateCombatCmd
         when "view"

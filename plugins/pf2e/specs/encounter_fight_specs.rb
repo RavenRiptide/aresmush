@@ -115,7 +115,16 @@ module AresMUSH
 
         full = Pf2eHP.get_current_hp(hero)
         run(PF2EncounterAsCmd, "e/as #2=strike #{@hero.name}")
-        expect(Pf2eHP.get_current_hp(hero)).to be < full
+        struck = Pf2eHP.get_current_hp(hero)
+        expect(struck).to be < full
+
+        # Only the GM takes it back; taking it back and putting it back leaves it as the Strike did.
+        run(PF2EncounterUndoCmd, 'e/undo', @hero)
+        expect(@client.failures.pop).to eq t('pf2e.not_organizer')
+        run(PF2EncounterUndoCmd, 'e/undo')
+        expect(Pf2eHP.get_current_hp(hero)).to eq full
+        run(PF2EncounterUndoCmd, "e/redo")
+        expect(Pf2eHP.get_current_hp(hero)).to eq struck
 
         # The wound is the fight's: the hero's own sheet is untouched, and their sheet in the fight shows it.
         expect(Pf2eHP.get_current_hp(Character[@hero.id])).to eq full
@@ -149,8 +158,14 @@ module AresMUSH
         expect(TurnState.turn(hero)['attacks']).to eq 0
         expect(npc(3).pf2_conditions).to_not have_key('Frightened')
 
+        @client.said.clear
+        run(PF2EncounterHistoryCmd, 'e/history')
+        expect(@client.said.join).to include("e/as #2=strike #{@hero.name}", 'e/strike #3=fist')
+
         run(PF2EncounterTrustCmd, "e/trust #{@hero.name}")
         run(PF2EncounterEndCmd, "encounter/end #{encounter.id}")
+        run(PF2EncounterUndoCmd, 'e/undo')
+        expect(@client.failures.pop).to eq t('pf2e.no_encounter_here')
 
         expect(encounter.is_active).to be false
         expect(encounter.trusted).to eq []

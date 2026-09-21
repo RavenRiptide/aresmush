@@ -7,7 +7,7 @@ module AresMUSH
     # its id, `flanking`, `range 2` - and the engine does the arithmetic from there: the check against the
     # target's real defence, the multiple attack penalty from the attacks already made this turn, cover
     # and concealment set on the target, and whatever the outcome does. A consequence an action states
-    # outright happens, and the line that says so carries the command that reverses it.
+    # outright happens; the GM takes it back with `+e/undo`, like any other change in an encounter.
     #
     # Each entry point answers a report for the command to tell, each part a list of events (`Telling`)
     # that the room, `+e/why` and the portal each render their own way:
@@ -179,7 +179,6 @@ module AresMUSH
         out['lines'] << told('pf2e.act_self_effect', :actor => scene.actor.label, :action => name,
                                                   :cost => Actions.cost(name), :effect => effect.name,
                                                   :lasts => ActiveEffects.remaining(effect))
-        out['lines'] << undo_line("effect/remove #{scene.actor.ref}=#{effect.name}")
       end
 
       # What was said about an effect, in the words `ActiveEffects.apply` takes: `rank 6`, `value 3`, and
@@ -483,12 +482,10 @@ module AresMUSH
       # resist, and the room is told what they took.
       def self.deal(scene, whom, rows, out)
         immediate, persistent = rows.partition { |row| row['category'].to_s != 'persistent' }
-        taken = 0
         shown = []
 
         immediate.each do |row|
           held = Harm.damage(whom.holder, row['amount'], row['type'])
-          taken += held['amount'].to_i
           resisted = Array(held['applied']).map { |one| "#{one['category']} #{one['adjustment']}" }
           shown << "#{held['amount']} #{row['type']}#{resisted.empty? ? '' : " (#{resisted.join(', ')})"}"
         end
@@ -501,7 +498,6 @@ module AresMUSH
         return if shown.empty?
 
         out['lines'] << told('pf2e.act_damage', :damage => shown.join(' + '), :target => whom.label)
-        out['lines'] << undo_line("heal #{whom.ref}=#{taken}") if taken.positive?
         out['gm'] << told('pf2e.act_hp_left', :target => whom.label, :hp => Harm.hit_points(whom.holder))
       end
 
@@ -745,7 +741,6 @@ module AresMUSH
 
         out['lines'] << told('pf2e.act_now_under', :target => whom.label, :effect => found,
                                                 :lasts => ActiveEffects.remaining(applied.state))
-        out['lines'] << undo_line("effect/remove #{whom.ref}=#{found}")
       end
 
       # ------------------------------------------------------------------------------
@@ -791,7 +786,6 @@ module AresMUSH
         shown = value ? "#{name} #{value}" : name
         out['lines'] << told('pf2e.act_now', :target => whom.label, :condition => shown,
                                           :until => ends ? until_phrase(one['until'], scene.actor.label) : '')
-        out['lines'] << undo_line("condition/set #{whom.ref}=#{name}/#{before_value.to_i}")
       end
 
       # ` until the end of Aria's next turn`, ` for 10 rounds`.
@@ -822,7 +816,6 @@ module AresMUSH
           next out['lines'] << told(removed.key, removed.args) if removed.err?
 
           out['lines'] << told('pf2e.act_no_longer', :target => whom.label, :condition => name)
-          out['lines'] << undo_line("condition/set #{whom.ref}=#{name}#{value ? "/#{value}" : ''}")
         end
       end
 
@@ -836,7 +829,6 @@ module AresMUSH
 
         out['lines'] << told('pf2e.act_now_under', :target => whom.label, :effect => applied.state.name,
                                                 :lasts => ActiveEffects.remaining(applied.state))
-        out['lines'] << undo_line("effect/remove #{whom.ref}=#{applied.state.name}")
       end
 
       # ------------------------------------------------------------------------------
@@ -865,9 +857,6 @@ module AresMUSH
         out['lines'] << told('pf2e.act_cover_refused', :words => said['refused'].join(', '))
       end
 
-      def self.undo_line(command)
-        told('pf2e.act_undo', :command => command)
-      end
 
       def self.check_line(scene, name, statistic, result, check, defence, dc)
         roll = Telling.roll(result)

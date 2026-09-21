@@ -120,14 +120,13 @@ module AresMUSH
       describe "an action with a check" do
         before(:each) { add('2 goblin warrior') }
 
-        it "should knock the target prone on a success, and say how to undo it" do
+        it "should knock the target prone on a success" do
           @dice = 0.75
           run(PF2EncounterAsCmd, 'e/as #2=act trip=#3')
 
           expect(@client.failures).to eq []
           expect(npc(3).pf2_conditions).to have_key('Prone')
           expect(said).to include('Reflex DC')
-          expect(said).to include('undo: condition/set #3=Prone/0')
         end
 
         it "should put the tripper down on a critical failure" do
@@ -143,13 +142,12 @@ module AresMUSH
           run(PF2EncounterAsCmd, 'e/as #2=act trip=#3')
 
           expect(npc(3).damage).to eq 6
-          expect(said).to include('undo: heal #3=6')
         end
 
-        it "should reverse with the command it printed" do
+        it "should be taken back by the GM" do
           @dice = 0.75
           run(PF2EncounterAsCmd, 'e/as #2=act trip=#3')
-          run(PF2ConditionSetCmd, 'condition/set #3=Prone/0')
+          run(PF2EncounterUndoCmd, 'e/undo')
 
           expect(@client.failures).to eq []
           expect(npc(3).pf2_conditions).not_to have_key('Prone')
@@ -238,7 +236,6 @@ module AresMUSH
 
             expect(said).to include('Critical specialization')
             expect(npc(3).pf2_conditions).to have_key('Prone')
-            expect(said).to include('undo: condition/set #3=Prone/0')
           end
 
           it "should do nothing more for an attack the character does not have it with" do

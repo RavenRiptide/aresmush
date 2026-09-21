@@ -70,11 +70,21 @@ like `stabilize`.
 ## What happens
 
 A consequence the action states outright happens: a successful Trip knocks the target prone, a
-Demoralize leaves them frightened. Every change prints the command that reverses it:
+Demoralize leaves them frightened.
 
     Aria uses Trip on Goblin Warrior #3: Athletics 23 (15 +8) vs Reflex DC 17 - success.
       Goblin Warrior #3 is now Prone.
-        (undo: condition/set #3=Prone/0)
+
+## Taking it back
+
+Every change in an encounter goes on its history, and the GM can take changes back and put them back,
+one at a time. Nothing is rolled again: putting a change back puts back what happened.
+
+`+e/undo` - The GM takes back the last change.
+`+e/redo` - The GM puts back the change they last took back. Anything new that happens first ends it.
+`+e/history [<encounter id>]` - Every change in the encounter, and where undo and redo stand.
+
+An encounter's history ends with it: once it has ended, nothing in it can be taken back.
 
 A condition that lasts only a while - Feint's off-guard, Slow's slowed - ends on its own at the right
 turn. Frightened eases by one at the end of each of its holder's turns.

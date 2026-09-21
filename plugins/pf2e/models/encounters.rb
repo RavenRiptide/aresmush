@@ -33,11 +33,16 @@ module AresMUSH
     collection :npcs, "AresMUSH::Pf2eNpc", :encounter
     collection :states, "AresMUSH::Pf2eCombatantState", :encounter
 
+    # How many of its history's entries are in effect: undo steps back, redo forward (`Pf2e::History`).
+    attribute :history_at, :type => DataType::Integer, :default => 0
+    collection :entries, "AresMUSH::Pf2eEncounterEntry", :encounter
+
     before_delete :delete_combatants
 
     def delete_combatants
       self.npcs.each(&:delete)
       self.states.each(&:delete)
+      self.entries.each(&:delete)
     end
 
     ##### CLASS METHODS #####
