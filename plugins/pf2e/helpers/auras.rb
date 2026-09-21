@@ -15,25 +15,48 @@ module AresMUSH
       # Whom an aura's effect reaches, by how the one inside stands to the one projecting it.
       AFFECTS = { 'allies' => %w{ally}, 'enemies' => %w{enemy}, 'all' => %w{ally enemy} }.freeze
 
-      # Every aura the character projects: its slug, its radius, and the effects it puts on others.
+      # Every aura the character or creature projects: its slug, its radius, and the effects it puts on
+      # others. An effect it is under can project one - Silence, a champion's aura - and so can one of a
+      # creature's own abilities, which lasts as long as the creature does.
+      #
+      # Each carries the encounter and rank its effects are applied with: an effect's own, or for a
+      # creature's ability, the creature's encounter and level.
       def self.of(char)
-        options = Effects.character_facts(char)
-        context = Effects.context(char)
+        from_effects(char) + from_abilities(char)
+      end
 
+      def self.from_effects(char)
         ActiveEffects.on(char).flat_map do |effect|
           item = ActiveEffects.instance_item(effect)
 
-          Array(ActiveEffects.info(effect.name)['rules']).select { |row| row['key'] == 'Aura' }.map do |row|
-            row = Rules.resolved(row, Effects.source(effect.name, [], 'item' => item), context)
-
-            next nil unless row && Predicate.test(row['predicate'], options)
-
-            { 'slug' => row['slug'] || Domains.slug(effect.name), 'effect' => effect,
-              'radius' => Formula.value(row['radius'] || 0, context.merge('item' => item)).to_i,
-              'traits' => Array(row['traits']),
-              'effects' => Array(row['effects']).map { |one| reach(one) }.compact }
-          end.compact
+          read(char, effect.name, ActiveEffects.info(effect.name)['rules'], item)
+            .map { |aura| aura.merge('effect' => effect, 'encounter' => effect.encounter, 'level' => effect.level) }
         end
+      end
+
+      def self.from_abilities(char)
+        return [] unless Pf2e.npc?(char)
+
+        Npcs.ability_sources(char).flat_map do |source|
+          read(char, source['name'], source['rules'], source['item'])
+            .map { |aura| aura.merge('effect' => nil, 'encounter' => char.encounter, 'level' => char.pf2_level) }
+        end
+      end
+
+      def self.read(char, name, rules, item)
+        options = Effects.character_facts(char)
+        context = Effects.context(char)
+
+        Array(rules).select { |row| row['key'] == 'Aura' }.map do |row|
+          row = Rules.resolved(row, Effects.source(name, [], 'item' => item), context)
+
+          next nil unless row && Predicate.test(row['predicate'], options)
+
+          { 'slug' => row['slug'] || Domains.slug(name),
+            'radius' => Formula.value(row['radius'] || 0, context.merge('item' => item)).to_i,
+            'traits' => Array(row['traits']),
+            'effects' => Array(row['effects']).map { |one| reach(one) }.compact }
+        end.compact
       end
 
       def self.reach(one)
@@ -65,8 +88,8 @@ module AresMUSH
             Predicate.test(one['predicate'], facts)
         }.reject { |one| inside?(target, one['name'], origin(emitter, aura)) }.map do |one|
           effect = ActiveEffects.apply(target, one['name'], :applied_by => emitter.name,
-                                                             :encounter => aura['effect'].encounter).state
-          effect.update(:aura_of => origin(emitter, aura), :level => aura['effect'].level)
+                                                             :encounter => aura['encounter']).state
+          effect.update(:aura_of => origin(emitter, aura), :level => aura['level'])
           effect
         end
 

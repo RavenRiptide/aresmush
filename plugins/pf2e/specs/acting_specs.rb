@@ -287,6 +287,70 @@ module AresMUSH
         end
       end
 
+      # A creature's abilities and Strikes carry rule elements the way a feat does, and they reach its
+      # figures, its damage, its auras and its turn.
+      describe "a creature's own rules" do
+        it "should add an ability's bonus to its saves" do
+          add('shade (dreamlands)')
+
+          expect(Resolve.defence(npc(2), 'reflex')['dc']).to eq 10 + 7 + 1
+        end
+
+        it "should project an ability's aura" do
+          add('choral')
+
+          aura = Auras.of(npc(2)).find { |one| one['slug'] == 'harmonizing-aura' }
+
+          expect(aura['radius']).to eq 20
+          expect(aura['effects'].map { |one| one['name'] }).to include('Effect: Harmonizing Aura (Allies)')
+        end
+
+        # A toggle is on until someone says otherwise, as a character's is (`RollOptions`): Air Scamp's
+        # fast healing holds in open air, and the GM switches it off when the scamp is not.
+        it "should heal by its ability's rule, which the GM can switch off" do
+          add('air scamp')
+          expect(Turns.healing(npc(2)).sum { |one| one['value'] }).to eq 2
+
+          run(PF2EncounterOptionCmd, 'e/option #2=fast-healing/off')
+
+          expect(@client.failures).to eq []
+          expect(Turns.healing(npc(2)).sum { |one| one['value'] }).to eq 0
+        end
+
+        it "should add an ability's damage to a critical Strike" do
+          add('aesra')
+          add('goblin warrior')
+          @dice = 1.0
+          run(PF2EncounterAsCmd, 'e/as #2=strike #3')
+
+          expect(PersistentDamage.held(npc(3)).map { |one| one['type'] }).to include('fire')
+        end
+
+        # Knockdown is its own action after a Strike that lists it: a Trip that neither takes nor adds to
+        # the multiple attack penalty.
+        it "should knock down after a Strike, without counting toward the multiple attack penalty" do
+          add('wolf')
+          add('goblin warrior')
+          @dice = 0.75
+          run(PF2EncounterAsCmd, 'e/as #2=strike #3')
+          run(PF2EncounterAsCmd, 'e/as #2=act knockdown=#3')
+
+          expect(@client.failures).to eq []
+          expect(said).to include('Knockdown')
+          expect(npc(3).pf2_conditions).to have_key('Prone')
+          expect(TurnState.turn(npc(2))['attacks']).to eq 1
+        end
+
+        it "should name the follow-up on a hit" do
+          add('wolf')
+          add('goblin warrior')
+          @dice = 0.75
+          run(PF2EncounterAsCmd, 'e/as #2=strike #3')
+
+          expect(said).to include('+e/as #2=act knockdown=#3')
+        end
+      end
+
       describe "cover and trust" do
         before(:each) { add('goblin warrior') }
 

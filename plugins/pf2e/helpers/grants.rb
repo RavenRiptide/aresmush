@@ -22,7 +22,12 @@ module AresMUSH
       # The compendia a grant may name, onto the catalogue here that holds the same things.
       CATALOGUES = { 'conditionitems' => 'conditions', 'spell-effects' => 'effects',
                      'feat-effects' => 'effects', 'equipment-effects' => 'effects',
-                     'other-effects' => 'effects' }.freeze
+                     'other-effects' => 'effects', 'bestiary-effects' => 'effects' }.freeze
+
+      # A creature's effect that shares a player effect's name is catalogued as `<name> (Creature)`
+      # (`scripts/import_foundry_effects.py`), so the player's keeps the plain name.
+      CREATURE_PACK = 'bestiary-effects'.freeze
+      CREATURE_SUFFIX = ' (Creature)'.freeze
 
       # What becomes of a stored grant when its granter goes. Foundry defaults a granted condition or
       # effect to going with it; only a physical item stays by default, and those are not granted here.
@@ -65,7 +70,11 @@ module AresMUSH
 
         return nil unless found && CATALOGUES[found[1]]
 
-        [ CATALOGUES[found[1]], found[2] ]
+        name = found[2]
+        creature = "#{name}#{CREATURE_SUFFIX}"
+        name = creature if found[1] == CREATURE_PACK && ActiveEffects.catalogue.key?(creature)
+
+        [ CATALOGUES[found[1]], name ]
       end
 
       # The value a grant gives what it grants, where it says: Encumbered's clumsy is clumsy 1 unless an

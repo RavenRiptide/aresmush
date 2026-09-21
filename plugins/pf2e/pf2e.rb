@@ -203,6 +203,8 @@ module AresMUSH
           return PF2EncounterBestiaryCmd
         when "enter", "leave"
           return PF2EncounterAuraCmd
+        when "option"
+          return PF2EncounterOptionCmd
         when "start"
           return PF2InitiateCombatCmd
         when "view"

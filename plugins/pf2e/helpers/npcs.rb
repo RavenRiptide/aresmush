@@ -68,7 +68,7 @@ module AresMUSH
         domains = Domains.for(kind, kind.to_s == 'save' ? Pf2e.canonical_save(name) : name, ability)
         sources = sources(npc)
         context = context(npc)
-        held = facts(npc) + Array(options)
+        held = options(npc, domains) + Array(options)
 
         met = Effects.modifiers(sources, domains, context, held).select { |one| one['met'] }
         own = [ Stat.multiple_attack(kind, name, sources, domains, held, context) ].compact
@@ -81,7 +81,33 @@ module AresMUSH
       # What the rules engine reads
 
       def self.sources(npc)
-        SheetReads.memo(npc, :effect_sources) { Effects.conditions(npc) + ActiveEffects.sources(npc) }
+        SheetReads.memo(npc, :effect_sources) do
+          Effects.conditions(npc) + ability_sources(npc) + ActiveEffects.sources(npc)
+        end
+      end
+
+      # Its abilities and Strikes, each a source of the rules it carries - an aura, fast healing, a bonus
+      # to its saves, extra damage on a Strike. A Strike's source carries the Strike's id, which is what
+      # a rule about that Strike names (`{item|_id}-damage`).
+      def self.ability_sources(npc)
+        block = npc.stat_block
+        owned = Array(block['actions']).map { |one| [ one, Domains.slug(one['name']) ] } +
+                Array(block['strikes']).map { |one| [ one, strike_id(one) ] }
+
+        owned.reject { |one, _id| Array(one['rules']).empty? }.map do |one, id|
+          Effects.source(one['name'], one['rules'],
+                         'item' => { 'id' => id, '_id' => id, 'level' => npc.pf2_level })
+        end
+      end
+
+      def self.strike_id(strike)
+        "strike-#{Domains.slug(strike['name'])}"
+      end
+
+      # What is true of it and what has been switched on for it: a toggle its abilities declare, off
+      # until a GM says otherwise.
+      def self.options(npc, domains = nil)
+        facts(npc) + RollOptions.active(npc, domains)
       end
 
       # What is true of the creature, in Foundry's spelling: its level, its traits and the mode of being
@@ -114,7 +140,7 @@ module AresMUSH
       # whether it is ranged, which is what its range says.
       def self.strikes(npc)
         Array(npc.stat_block['strikes']).map do |strike|
-          { 'name' => strike['name'], 'base' => strike['name'], 'bonus' => strike['bonus'].to_i,
+          { 'id' => strike_id(strike), 'name' => strike['name'], 'base' => strike['name'], 'bonus' => strike['bonus'].to_i,
             'traits' => Array(strike['traits']), 'ranged' => strike['range'].to_i.positive?,
             'range' => strike['range'].to_i, 'unarmed' => false,
             'damage' => Array(strike['damage']), 'effects' => Array(strike['effects']) }
@@ -171,16 +197,58 @@ module AresMUSH
         held
       end
 
-      # A stat block says a creature heals in its hit point details: `regeneration 20 (deactivated by acid
-      # or fire)`, `fast healing 5`. Read in the shape a FastHealing rule contributes.
+      # What heals it as its turn starts. Its abilities' FastHealing rules where it has any - they carry
+      # the circumstances too, like Air Scamp's only in open air - and otherwise what its hit point
+      # details say: `regeneration 20 (deactivated by acid or fire)`, `fast healing 5`.
       HEALING = /(regeneration|fast healing)\s+(\d+)(?:\s*\(deactivated by ([^)]*)\))?/i
 
       def self.healing(npc)
+        ruled = ability_sources(npc).any? { |source| Rules.of_kind(source, 'FastHealing').any? }
+
+        return healing_from_rules(npc) if ruled
+
         npc.stat_block['hp_details'].to_s.scan(HEALING).map do |kind, value, stops|
           { 'type' => kind.downcase == 'regeneration' ? 'regeneration' : 'fast-healing', 'value' => value.to_i,
             'source' => npc.stat_block['hp_details'],
             'deactivated_by' => stops.to_s.split(/,|\bor\b|\band\b/).map(&:strip).reject(&:empty?) }
         end
+      end
+
+      def self.healing_from_rules(npc)
+        context = context(npc)
+        held = options(npc)
+
+        sources(npc).flat_map do |source|
+          Rules.of_kind(source, 'FastHealing').select { |row| Predicate.test(row['predicate'], held + Array(source['options'])) }
+                                              .map { |row| Rules.contribute(row, source, context.merge('item' => source['item'] || {})) }
+                                              .compact
+        end
+      end
+
+      # What its rules add to a Strike's damage, beyond the stat block's own formula: an ability's
+      # extra dice, a flat bonus. `[ { 'formula', 'type', 'category', 'bucket' } ]`, where the bucket is
+      # how a critical hit treats it - doubled with the rest, fixed, or only on a critical.
+      def self.strike_damage(npc, strike, options = [])
+        domains = Domains.for('damage', strike, nil)
+        sources = sources(npc)
+        context = context(npc)
+        held = options(npc, domains) + Pf2eCombat.attack_options(strike) + Array(options)
+        base = Array(strike['damage']).first
+        kind = base ? base[1] : nil
+
+        dice = Effects.damage_dice(sources, domains, context, held).select { |row| row['met'] && !row['override'] }
+                      .map do |row|
+          { 'formula' => "#{row['dice']}#{row['die']}", 'type' => row['damage_type'] || kind,
+            'category' => row['category'], 'bucket' => Damage::BUCKETS.fetch(row['critical'], 'doubling') }
+        end
+
+        flat = Effects.modifiers(sources, domains, context, held).select { |row| row['met'] && row['value'].to_i != 0 }
+                      .map do |row|
+          { 'formula' => row['value'].to_i.to_s, 'type' => row['damage_type'] || kind,
+            'category' => row['category'], 'bucket' => Damage::BUCKETS.fetch(row['critical'], 'doubling') }
+        end
+
+        dice + flat
       end
 
       def self.heal(npc, amount)

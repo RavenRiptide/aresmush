@@ -12,6 +12,10 @@ and before every database spec, and a creature is only read when a GM names it.
 What is kept is what play reads. The prose of an ability is kept, shortened, because a GM reads it to run
 the ability; the lore of the creature is not.
 
+An ability's and a Strike's rule elements are kept too - an aura, fast healing, a bonus to its saves
+against magic, extra damage on a Strike - through `import_foundry_rules.take`, the same gate every other
+catalogue here goes through, so a creature's rules read the way a feat's do.
+
 Usage: scripts/import_foundry_npcs.py /path/to/foundryvtt-pf2e [--write]
 """
 
@@ -63,7 +67,26 @@ def titled(slug):
     return ' '.join(part.capitalize() for part in str(slug).split('-'))
 
 
-def strike_of(item):
+def rules_of(item, refused, words):
+    """The rule elements on one of the creature's items, as the rules catalogue writes them."""
+    taken = []
+
+    for rule in item['system'].get('rules') or []:
+        if not isinstance(rule, dict):
+            continue
+        if rule.get('key') not in rules.KINDS:
+            refused[f"not read: {rule.get('key')}"] += 1
+            continue
+
+        row = rules.take(rule, refused)
+
+        if row:
+            taken.append(rules.worded(row, words))
+
+    return taken
+
+
+def strike_of(item, refused, words):
     system = item['system']
     rolls = system.get('damageRolls') or {}
     ranged = system.get('range') or {}
@@ -79,11 +102,14 @@ def strike_of(item):
     effects = (system.get('attackEffects') or {}).get('value') or []
     if effects:
         strike['effects'] = [titled(one) for one in effects]
+    taken = rules_of(item, refused, words)
+    if taken:
+        strike['rules'] = taken
 
     return strike
 
 
-def ability_of(item):
+def ability_of(item, refused, words):
     system = item['system']
     kind = ((system.get('actionType') or {}).get('value')) or 'passive'
     cost = (system.get('actions') or {}).get('value')
@@ -96,6 +122,9 @@ def ability_of(item):
     text = rules.plain((system.get('description') or {}).get('value'), ABILITY_TEXT)
     if text:
         ability['text'] = text
+    taken = rules_of(item, refused, words)
+    if taken:
+        ability['rules'] = taken
 
     return ability
 
@@ -119,7 +148,7 @@ def casting_of(item, spells):
             'spells': {rank: sorted(set(names)) for rank, names in sorted(ranks.items(), key=lambda one: int(one[0]))}}
 
 
-def npc_of(doc, pack):
+def npc_of(doc, pack, refused, words):
     system = doc['system']
     attributes = system.get('attributes') or {}
     traits = system.get('traits') or {}
@@ -161,10 +190,10 @@ def npc_of(doc, pack):
         if held:
             npc[field] = held
 
-    strikes = [strike_of(one) for one in items if one['type'] == 'melee']
+    strikes = [strike_of(one, refused, words) for one in items if one['type'] == 'melee']
     if strikes:
         npc['strikes'] = strikes
-    abilities = [ability_of(one) for one in items if one['type'] == 'action']
+    abilities = [ability_of(one, refused, words) for one in items if one['type'] == 'action']
     if abilities:
         npc['actions'] = abilities
 
@@ -208,6 +237,8 @@ def main():
 
     by_pack = collections.defaultdict(dict)
     repeated = 0
+    refused = collections.Counter()
+    words = rules.strings(args.checkout)
 
     for path, body in blobs(args.checkout):
         if b'"type": "npc"' not in body and b'"type":"npc"' not in body:
@@ -230,7 +261,7 @@ def main():
             repeated += 1
             continue
 
-        by_pack[pack][name] = npc_of(doc, pack)
+        by_pack[pack][name] = npc_of(doc, pack, refused, words)
 
     if args.write:
         os.makedirs(BESTIARY, exist_ok=True)
@@ -246,6 +277,12 @@ def main():
     print(f'  {total} creatures in {len(by_pack)} packs; {repeated} repeats of a name already read')
     for pack, entries in sorted(by_pack.items(), key=lambda one: -len(one[1]))[:12]:
         print(f'  {len(entries):5d}  {pack}')
+
+    kept = sum(len(one.get('rules', [])) for entries in by_pack.values() for entry in entries.values()
+               for one in entry.get('actions', []) + entry.get('strikes', []))
+    print(f'\n  {kept} rules kept on abilities and Strikes; not kept:')
+    for why, count in refused.most_common(12):
+        print(f'  {count:6d}  {why}')
 
 
 if __name__ == '__main__':

@@ -85,13 +85,15 @@ module AresMUSH
       # Actions
 
       def self.act(scene, term, words)
-        name = action_named(scene, term)
+        follow = scene.actor.npc? ? FOLLOW_UPS[Domains.slug(term)] : nil
+        name = follow ? follow['action'] : action_named(scene, term)
 
         return name if name.is_a?(Err)
 
         return strike(scene, nil, words) if name == 'Strike'
 
         entry = Actions.info(name)
+        entry = follow_up_entry(entry, follow, term) if follow
         said = said(words, scene.permitted)
         out = report
         refused(out, said)
@@ -111,6 +113,14 @@ module AresMUSH
         spend(scene, name, entry, out)
 
         Ok.new(:state => out)
+      end
+
+      # A follow-up is the action it attempts, named for the ability, costing what the ability costs, and
+      # outside the multiple attack penalty.
+      def self.follow_up_entry(entry, follow, term)
+        label = Domains.slug(term).split('-').map(&:capitalize).join(' ')
+
+        entry.merge('type' => follow['type'], 'cost' => follow['cost'], 'no_map' => true, 'label' => label)
       end
 
       # The action the actor means: one of the catalogue's they may use, or - for a creature - one of its
@@ -184,7 +194,8 @@ module AresMUSH
         end
 
         kind, stat_name = figure
-        attack = Array(entry['traits']).include?('attack')
+        attack = Array(entry['traits']).include?('attack') && !entry['no_map']
+        name = entry['label'] || name
         options = Array(check['options']) + options_for(scene, said, slug) +
                   (attack ? TurnState.map_options(scene.actor.holder) : [])
         rolled_check = Check.of(scene.actor.holder, kind, stat_name, options)
@@ -374,7 +385,9 @@ module AresMUSH
       def self.hit(scene, attack, check, result, out)
         critical = result['degree'] == Degree::CRITICAL_SUCCESS
         rows = if scene.actor.npc?
-                 DamageRoll.of_formulas(attack['damage'], critical, attack)
+                 extras = Npcs.strike_damage(scene.actor.holder, attack, check.options)
+                 DamageRoll.merged(DamageRoll.of_formulas(attack['damage'], critical, attack) +
+                                   DamageRoll.of_extras(extras, critical))
                else
                  instances = Damage.of(scene.actor.holder, attack, check.options + [ "check:outcome:#{Degree::SLUGS[result['degree']]}" ])['instances']
                  DamageRoll.of_instances(instances, critical, attack)
@@ -382,11 +395,35 @@ module AresMUSH
 
         deal(scene, scene.target, rows, out)
 
-        effects = Array(attack['effects'])
-        out['lines'] << t('pf2e.act_attack_effects', :effects => effects.join(', ')) if effects.any?
+        follow_ups(scene, attack, out)
 
         critical_specialization(scene, attack, out) if critical && !scene.actor.npc?
       end
+
+      # What a creature's Strike lets it do next, where the stat block lists it: Grab, Knockdown and Push
+      # are actions of their own that attempt a Grapple, Trip or Shove, and the line names the command.
+      # Any other attack effect is the GM's to run.
+      def self.follow_ups(scene, attack, out)
+        Array(attack['effects']).each do |effect|
+          if FOLLOW_UPS.key?(Domains.slug(effect))
+            out['lines'] << t('pf2e.act_follow_up', :effect => effect,
+                                                    :command => "+e/as #{scene.actor.ref}=act #{Domains.slug(effect).tr('-', ' ')}=#{scene.target.ref}")
+          else
+            out['lines'] << t('pf2e.act_attack_effects', :effects => effect)
+          end
+        end
+      end
+
+      # A creature's follow-up after a Strike that lists it: the action it attempts, and what it costs.
+      # It neither takes nor adds to the multiple attack penalty; the improved form is a free action.
+      FOLLOW_UPS = {
+        'grab' => { 'action' => 'Grapple', 'type' => 'action', 'cost' => 1 },
+        'improved-grab' => { 'action' => 'Grapple', 'type' => 'free', 'cost' => 0 },
+        'knockdown' => { 'action' => 'Trip', 'type' => 'action', 'cost' => 1 },
+        'improved-knockdown' => { 'action' => 'Trip', 'type' => 'free', 'cost' => 0 },
+        'push' => { 'action' => 'Shove', 'type' => 'action', 'cost' => 1 },
+        'improved-push' => { 'action' => 'Shove', 'type' => 'free', 'cost' => 0 }
+      }.freeze
 
       # A critical hit with a weapon whose critical specialization effect the character has. What the
       # engine can do it does; what is movement on the map, or a judgement, is shown for the GM.
@@ -795,8 +832,9 @@ module AresMUSH
         frequency = entry['frequency']
         before = TurnState.used(holder, name)
 
-        TurnState.spend(holder, name, :cost => entry['cost'] || 1, :type => entry['type'] || 'action',
-                                      :attack => Array(entry['traits']).include?('attack'), :frequency => frequency)
+        TurnState.spend(holder, entry['label'] || name, :cost => entry['cost'] || 1, :type => entry['type'] || 'action',
+                                      :attack => Array(entry['traits']).include?('attack') && !entry['no_map'],
+                                      :frequency => frequency)
 
         return unless frequency && before >= frequency['max'].to_i
 

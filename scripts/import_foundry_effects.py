@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Foundry's effects, as a catalogue of things a character can be under for a while.
 
-An effect is what a spell, a feat or an item leaves behind: Heroism's status bonus for ten minutes,
-Rage until the end of the encounter, a potion's resistance for an hour. Their packs carry 2,172 of them
-a character can have, each with rules in the same vocabulary our other catalogues use, and a duration.
+An effect is what a spell, a feat, an item or a creature leaves behind: Heroism's status bonus for ten
+minutes, Rage until the end of the encounter, a potion's resistance for an hour, a creature aura's hold
+on whoever stands in it. Each carries rules in the same vocabulary our other catalogues use, and a
+duration.
 
 The rules go through `import_foundry_rules.take` - the same gate every other catalogue here was
 imported through - so a rule this engine cannot read is refused and counted rather than flattened.
@@ -32,9 +33,12 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG = os.path.join(ROOT, 'game', 'config')
 OUT = 'pf2e_effects.yml'
 
-# The packs of effects a player character can be under. Bestiary and campaign effects are a monster's
-# or one adventure's, and belong with those if they are ever wanted.
-PACKS = ['spell-effects', 'feat-effects', 'equipment-effects', 'other-effects']
+# The packs of effects a character or a creature can be under. `bestiary-effects` is what a creature's
+# auras and abilities put on whoever they reach: Harmonizing Aura's hold on allies and on enemies.
+# Campaign effects are one adventure's, and belong with it if they are ever wanted.
+PACKS = ['spell-effects', 'feat-effects', 'equipment-effects', 'other-effects', 'bestiary-effects']
+CREATURE_PACK = 'bestiary-effects'
+CREATURE_SUFFIX = ' (Creature)'
 
 # The packs a grant may name by id, so an id can be turned into the name our catalogues use.
 NAMED_BY_ID = PACKS + ['conditionitems']
@@ -168,7 +172,14 @@ def main():
 
     for pack in PACKS:
         for doc in documents(args.checkout, pack):
-            entries[doc['name']] = entry_of(doc, pack, ids, refused, unread, words)
+            # A creature's effect can share a name with a player's - a champion's Aura of Righteousness
+            # and a creature's. The player's keeps the name; the creature's is `<name> (Creature)`, and
+            # a reference into bestiary-effects finds it there (`Pf2e::Grants.target`).
+            name = doc['name']
+            if pack == CREATURE_PACK and name in entries:
+                name = f'{name}{CREATURE_SUFFIX}'
+
+            entries[name] = entry_of(doc, pack, ids, refused, unread, words)
             per_pack[pack] += 1
 
     if args.write:

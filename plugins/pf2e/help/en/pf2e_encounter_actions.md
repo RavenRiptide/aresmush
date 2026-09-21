@@ -107,5 +107,15 @@ encounter, with the same commands:
     +e/as #3=strike aria=shortbow/range 2
     +e/as #5=act demoralize=aria
     +e/as #6=cast fear=aria
-A creature's own abilities are used by name: `+e/as #3=act goblin scuttle`.
+A creature's own abilities are used by name: `+e/as #3=act goblin scuttle`. Its abilities' rules
+apply by themselves - a bonus to its saves, extra damage on a Strike, fast healing, an aura to place
+with `+e/as #3=enter <aura>=<ids>`.
+
+Where a creature's Strike lists Grab, Knockdown or Push, a hit says so and names the command:
+`+e/as #3=act knockdown=#1`. Each is a Grapple, Trip or Shove of its own that neither takes nor adds
+to the multiple attack penalty; the Improved form is a free action.
+
+`+e/option <combatant>=<option>[/on|off|default]` - A circumstance a creature's own rules declare, such
+as Air Scamp's fast healing only in open air. Each is on until you switch it off. With no option
+named, lists them.
 A creature's turn reminder, and its hit points after it is hurt, go to you alone.

@@ -63,6 +63,22 @@ module AresMUSH
         end
       end
 
+      # A creature's damage beyond its Strike's own formula - an ability's dice, a flat bonus - each in
+      # the pile a critical hit treats it by: doubled with the rest, never doubled, or only on a critical.
+      def self.of_extras(extras, critical)
+        rows = Array(extras).map do |one|
+          next nil if one['bucket'] == 'crit_only' && !critical
+
+          times = critical && one['bucket'] == 'doubling' ? 2 : 1
+          formula = times == 2 ? doubled(one['formula']) : one['formula'].to_s
+
+          { 'type' => kind(one['type']), 'category' => one['category'],
+            'amount' => [ Pf2e.roll_formula(one['formula']) * times, 0 ].max, 'formula' => formula }
+        end
+
+        rows.compact
+      end
+
       # A basic save's outcome: half on a success, double on a critical failure, nothing on a critical
       # success. Rolled once, then scaled, which is the rule.
       BASIC = { 3 => 0, 2 => 0.5, 1 => 1, 0 => 2 }.freeze

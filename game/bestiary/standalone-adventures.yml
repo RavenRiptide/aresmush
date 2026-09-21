@@ -30,7 +30,7 @@
   senses: ["darkvision"]
   skills: {"Acrobatics": 7, "Athletics": 6}
   strikes: [{"name": "Mandibles", "bonus": 8, "damage": [["1d6+3", "piercing", null]], "traits": [], "effects": ["Stinging Bite"]}]
-  actions: [{"name": "Avoid the Swat", "type": "reaction", "traits": [], "text": "Trigger The giant fly is targeted with a melee or ranged attack by an attacker it can see%rEffect The giant fly gains a +2 circumstance bonus to AC against the triggering attack. If the attack misses, the giant fly can move up to its fly Speed."}, {"name": "Stinging Bite", "type": "passive", "traits": ["disease"], "text": "The bite of a giant swamp fly spreads irritating toxin into the wound. A PC who is bitten by a giant swamp fly must attempt a DC 16 Fortitude save. On a failure, they become Sickened 1, or Sickened 2 on a critical failure."}]
+  actions: [{"name": "Avoid the Swat", "type": "reaction", "traits": [], "text": "Trigger The giant fly is targeted with a melee or ranged attack by an attacker it can see%rEffect The giant fly gains a +2 circumstance bonus to AC against the triggering attack. If the attack misses, the giant fly can move up to its fly Speed.", "rules": [{"key": "RollOption", "option": "avoid-the-swat", "toggleable": true}, {"key": "FlatModifier", "selector": "ac", "type": "circumstance", "value": 2, "predicate": ["avoid-the-swat"]}]}, {"name": "Stinging Bite", "type": "passive", "traits": ["disease"], "text": "The bite of a giant swamp fly spreads irritating toxin into the wound. A PC who is bitten by a giant swamp fly must attempt a DC 16 Fortitude save. On a failure, they become Sickened 1, or Sickened 2 on a critical failure."}]
 "Leather Cap":
   pack: "standalone-adventures"
   level: 2
@@ -77,7 +77,7 @@
   senses: ["darkvision"]
   skills: {"Acrobatics": 6, "Athletics": 8, "Stealth": 5}
   strikes: [{"name": "Tusks", "bonus": 11, "damage": [["1d8+4", "piercing", null]], "traits": ["deadly-d10"]}, {"name": "Slime Squirt", "bonus": 9, "damage": [], "traits": [], "range": 30, "effects": ["Entangling Slime"]}]
-  actions: [{"name": "+2 to Fortitude Saves vs. Grapple", "type": "passive", "traits": []}, {"name": "Belly Grease", "type": "action", "traits": [], "cost": 3, "text": "Two Tusk extrudes a slippery grease from his ventral glands to coat the barge under him and in a 5-foot, turning the affected area into uneven ground for 10 minutes, after which it dries to a putrid crust. The DC to balance dc=18 across the grease is 18."}, {"name": "Entangling Slime", "type": "passive", "traits": [], "text": "A creature struck by Two Tusk's slime squirt becomes Clumsy 1 and takes a –5-foot penalty to Speed for 1 hour or until the slime is removed. A PC can use an Interact action to splash swamp water on themself to wash away the stuff and remove this penalty.%rEffect: Entangling Slime"}]
+  actions: [{"name": "+2 to Fortitude Saves vs. Grapple", "type": "passive", "traits": [], "rules": [{"key": "FlatModifier", "selector": "fortitude", "value": 2, "predicate": ["action:grapple"]}]}, {"name": "Belly Grease", "type": "action", "traits": [], "cost": 3, "text": "Two Tusk extrudes a slippery grease from his ventral glands to coat the barge under him and in a 5-foot, turning the affected area into uneven ground for 10 minutes, after which it dries to a putrid crust. The DC to balance dc=18 across the grease is 18."}, {"name": "Entangling Slime", "type": "passive", "traits": [], "text": "A creature struck by Two Tusk's slime squirt becomes Clumsy 1 and takes a –5-foot penalty to Speed for 1 hour or until the slime is removed. A PC can use an Interact action to splash swamp water on themself to wash away the stuff and remove this penalty.%rEffect: Entangling Slime"}]
 "Young Monitor Lizard":
   pack: "standalone-adventures"
   level: 1
@@ -93,7 +93,7 @@
   senses: ["low-light-vision", "scent"]
   skills: {"Acrobatics": 5, "Athletics": 7, "Stealth": 5}
   strikes: [{"name": "Jaws", "bonus": 7, "damage": [["1d4+2", "piercing", null]], "traits": [], "effects": ["Young Monitor Lizard Venom"]}]
-  actions: [{"name": "Lurching Charge", "type": "action", "traits": [], "cost": 2, "text": "The young monitor lizard Strides twice and then makes a jaws Strike. If it moves at least 20 feet from where it started, it gets a +2 circumstance bonus on the attack roll."}, {"name": "Young Monitor Lizard Venom", "type": "passive", "traits": ["poison"], "text": "Saving Throw DC 15 Fortitude%rMaximum Duration 4 rounds%rStage 1 1d4 poison damage%rStage 2 1d6 poison damage"}]
+  actions: [{"name": "Lurching Charge", "type": "action", "traits": [], "cost": 2, "text": "The young monitor lizard Strides twice and then makes a jaws Strike. If it moves at least 20 feet from where it started, it gets a +2 circumstance bonus on the attack roll.", "rules": [{"key": "FlatModifier", "selector": "jaws-attack", "type": "circumstance", "value": 2, "predicate": ["lurching-charge"]}, {"key": "RollOption", "option": "lurching-charge", "domain": "attack", "toggleable": true}]}, {"name": "Young Monitor Lizard Venom", "type": "passive", "traits": ["poison"], "text": "Saving Throw DC 15 Fortitude%rMaximum Duration 4 rounds%rStage 1 1d4 poison damage%rStage 2 1d6 poison damage"}]
 "Zungur":
   pack: "standalone-adventures"
   level: 3

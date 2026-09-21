@@ -28,6 +28,9 @@ module AresMUSH
     attribute :temp_hp, :type => DataType::Integer, :default => 0
 
     attribute :pf2_conditions, :type => DataType::Hash, :default => {}
+
+    # The circumstances a GM has switched on or off for it - Air Scamp's fast healing in open air.
+    attribute :pf2_roll_options, :type => DataType::Hash, :default => {}
     attribute :pf2_persistent, :type => DataType::Array, :default => []
     attribute :pf2_turn_state, :type => DataType::Hash, :default => {}
 
@@ -67,7 +70,6 @@ module AresMUSH
     def pf2_features; {}; end
     def pf2_base_info; {}; end
     def pf2_level_tracker; {}; end
-    def pf2_roll_options; {}; end
     def pf2_roll_aliases; {}; end
     def hp; nil; end
     def combat; nil; end

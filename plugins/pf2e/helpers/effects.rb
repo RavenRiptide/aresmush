@@ -85,7 +85,7 @@ module AresMUSH
       # about some statistics and not others, so the domains asking decide which of them hold; nothing
       # asking without domains sees a scoped one.
       def self.options(char, domains = nil)
-        return Npcs.facts(char) if Pf2e.npc?(char)
+        return Npcs.options(char, domains) if Pf2e.npc?(char)
 
         facts(char) + RollOptions.active(char, domains)
       end
