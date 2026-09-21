@@ -66,7 +66,7 @@ module AresMUSH
 
         t('pf2e.difficulty_line', :threat => rated['threat'].capitalize, :xp => rated['xp'], :budget => rated['budget'],
                                   :size => rated['party_size'], :level => rated['party_level'],
-                                  :set => encounter.party_level ? t('pf2e.difficulty_set') : '')
+                                  :set => encounter.party_level.to_i.positive? ? t('pf2e.difficulty_set') : '')
       end
 
       # What PF2e recommends for the encounter, and what staff have paid.

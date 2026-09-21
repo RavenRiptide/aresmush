@@ -9,6 +9,13 @@ module AresMUSH
         AnsiFormatter.strip_ansi(MushFormatter.format(text.to_s)).gsub(/\r?\n/, "\n")
       end
 
+      # Every change in the encounter, with whether it has been taken back.
+      def self.history(encounter)
+        at = History.at(encounter)
+
+        History.entries(encounter).map { |entry| { seq: entry.seq, said: entry.said, undone: entry.seq > at } }
+      end
+
       def self.combatant(encounter, one, viewer, gm)
         holder = one.holder
         number = one.number.to_s
@@ -48,7 +55,8 @@ module AresMUSH
 
         { id: encounter.id, round: encounter.round.to_i, active: encounter.is_active,
           current: ActiveEffects.current_turn(encounter), organizer: encounter.organizer, gm: gm,
-          trusted: Array(encounter.trusted), difficulty: EncounterWeb.plain(Difficulty.shown(encounter)),
+          trusted: Array(encounter.trusted), difficulty: EncounterWeb.plain(Difficulty.shown(encounter)).strip,
+          history: EncounterWeb.history(encounter),
           combatants: listed.map { |one| EncounterWeb.combatant(encounter, one, enactor, gm) },
           log: Array(encounter.messages).last(30).map { |_time, message| EncounterWeb.plain(message) } }
       end
