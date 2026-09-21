@@ -103,6 +103,11 @@ Reflex save against an area too.
 first: DC 5 concealed, DC 11 hidden or undetected. Against an undetected target, the GM says whether
 you guessed its square.
 
+Concealment is set on the target for everyone, where the rules make it a matter of who is looking: a
+creature hidden from one character can be in plain sight of another who has darkvision. When that
+matters, leave the target's concealment unset and let the one it is hidden from say so for their own
+attack - the GM or a trusted player can add `/hidden` to a single roll.
+
 ## For the GM
 
 `+e/trust <name>`, `+e/untrust <name>` - Who may set cover and concealment. Trust lasts the encounter.
