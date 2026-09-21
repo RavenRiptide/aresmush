@@ -39,42 +39,6 @@ module AresMUSH
 
       end
 
-      def bonuses
-        bonus_list = @encounter.bonuses
-
-        return [] if bonus_list.empty?
-
-        list = []
-
-        bonus_list.each_pair do |bonus, people|
-          list << format_bonus_penalty_item(bonus, people)
-        end
-
-        list
-      end
-
-      def has_bonuses
-        !(bonuses.empty?)
-      end
-
-      def penalties
-        penalty_list = @encounter.penalties
-
-        return [] if penalty_list.empty?
-
-        list = []
-
-        penalty_list.each_pair do |penalty, people|
-          list << format_bonus_penalty_item(penalty, people)
-        end
-
-        list
-      end
-
-      def has_penalties
-        !(penalties.empty?)
-      end
-
       # A combatant's id, what it is under, and the cover and concealment set on it.
       def format_init_list_item(participant)
         initiative = participant[0].to_i
@@ -91,10 +55,6 @@ module AresMUSH
 
       def trusted
         Array(@encounter.trusted)
-      end
-
-      def format_bonus_penalty_item(name, people_list)
-        "%b%b#{item_color}#{name.capitalize}:%xn #{people_list}"
       end
 
     end

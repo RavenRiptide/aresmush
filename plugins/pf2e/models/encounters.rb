@@ -11,8 +11,6 @@ module AresMUSH
     attribute :current
     attribute :messages, :type => DataType::Array, :default => []
     attribute :init_stat
-    attribute :bonuses, :type => DataType::Hash, :default => {}
-    attribute :penalties, :type => DataType::Hash, :default => {}
 
     # Each combatant's id in the initiative, by the name the order holds: `{ 'Aria' => 1, 'Goblin
     # Warrior #2' => 2 }`. An id is never reused within an encounter, so `#2` means the same creature

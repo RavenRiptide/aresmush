@@ -43,12 +43,11 @@ a name only one combatant has. Acting in an encounter - actions, Strikes, spells
 `encounter/end <encounter ID>`: Ends an encounter. Trust given for it, the cover and concealment set in it, and what may be used once an encounter all end with it.
 `encounter/restart <encounter ID>`: Restarts an encounter, so long as the scene has not ended.
 
-## Tracking bonuses and penalties
-`encounter/bonus <encounter ID> = <bonus description>/<comma-separated list of people to whom it applies>`: Records a bonus that is available to players in the list. Helps keep track of buffs. 
-`encounter/penalty <encounter ID> = <penalty description>/<comma-separated list of people to whom it applies>`: Records penalties applicable to players in the list. 
-`encounter/expire <description>`: Clears all bonuses and penalties whose descriptions match `<description>`.
+## Bonuses and penalties
 
-**TIP** Consider including the name of the spell that invoked the bonus or penalty in the description. That way, `encounter/expire` can clear all bonuses / penalties associated to the spell with one command. 
+A bonus or penalty that lasts a while is an effect: `effect/add <who>=<effect>` puts someone under it -
+Bless, Heroism, a potion - and its numbers reach every roll it applies to, and it ends at the right turn
+on its own. See `help effects`. A combatant can be named by its id: `effect/add #3=bless`.
 
 ## Healing and Damage Commands
 
