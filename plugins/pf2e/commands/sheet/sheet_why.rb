@@ -30,10 +30,7 @@ module AresMUSH
 
         outcome = Pf2e::Sheet.viewable?(enactor, char, 'combat')
 
-        if outcome.err?
-          client.emit_failure t(outcome.key, outcome.args.transform_keys(&:to_sym))
-          return
-        end
+        return if Pf2e::CharState.emit_error!(client, outcome)
 
         found = Pf2e::Stat.identify(self.figure)
 
