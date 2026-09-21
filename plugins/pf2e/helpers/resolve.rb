@@ -118,15 +118,6 @@ module AresMUSH
         degree ? WORDS[degree] : nil
       end
 
-      # The modifiers that counted, as a player reads them.
-      def self.explained(breakdown)
-        Array(breakdown['modifiers']).map do |row|
-          value = row['value'].to_i
-          shown = "#{value.negative? ? '' : '+'}#{value} #{row['type']} (#{row['source']})"
-
-          row['enabled'] ? shown : "#{shown} - does not count"
-        end
-      end
     end
   end
 end

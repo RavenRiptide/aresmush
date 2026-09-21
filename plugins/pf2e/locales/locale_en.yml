@@ -499,7 +499,15 @@ en:
     until_one_round: " for 1 round"
     why_roll: "%{what} - %{statistic} %{roll} (base %{base}):"
     why_defence: "  against %{dc} (base %{base}):"
+    why_modifier: "    %{value} %{type} (%{source})"
+    why_modifier_off: "    %{value} %{type} (%{source}) - does not count"
     why_nothing: "You have made no roll to explain yet."
+    act_note: "  %{text}"
+    act_crit_spec_text: "    %{text}"
+    act_circumstances: " (%{list})"
+    act_flanking: "flanking"
+    act_range: "range %{range}"
+    act_cover_level: "%{level} cover"
 
     # Combatants
     no_combatant: "Nobody in this encounter answers to %{target}. +e/view shows each combatant's id."

@@ -9,7 +9,8 @@ module AresMUSH
     # and concealment set on the target, and whatever the outcome does. A consequence an action states
     # outright happens, and the line that says so carries the command that reverses it.
     #
-    # Each entry point answers a report for the command to tell:
+    # Each entry point answers a report for the command to tell, each part a list of events (`Telling`)
+    # that the room, `+e/why` and the portal each render their own way:
     #
     #   'lines'   what the room sees, the rolls in it
     #   'gm'      what only the GM sees: a creature's hit points
@@ -107,7 +108,7 @@ module AresMUSH
         elsif entry['self_effect']
           self_action(scene, name, entry, said, out)
         else
-          out['lines'] << t('pf2e.act_announced', :actor => scene.actor.label, :action => name,
+          out['lines'] << told('pf2e.act_announced', :actor => scene.actor.label, :action => name,
                                                   :cost => Actions.cost(name), :target => target_phrase(scene))
         end
 
@@ -146,9 +147,9 @@ module AresMUSH
         own = Actors.of(scene.actor.holder).own_ability(name) || {}
         cost = own['type'] == 'action' ? Actions::COSTS[own['cost'].to_i] || 'one action' : Actions::TYPES[own['type']]
 
-        out['lines'] << t('pf2e.act_announced', :actor => scene.actor.label, :action => name, :cost => cost,
+        out['lines'] << told('pf2e.act_announced', :actor => scene.actor.label, :action => name, :cost => cost,
                                                 :target => target_phrase(scene))
-        out['lines'] << "  #{own['text']}" if own['text']
+        out['lines'] << told('pf2e.act_note', :text => own['text']) if own['text']
 
         TurnState.spend(scene.actor.holder, name, :cost => own['cost'] || 1, :type => own['type'] || 'action',
                                                   :attack => Array(own['traits']).include?('attack'))
@@ -157,7 +158,7 @@ module AresMUSH
       end
 
       def self.target_phrase(scene)
-        scene.target ? t('pf2e.act_at', :target => scene.target.label) : ''
+        scene.target ? told('pf2e.act_at', :target => scene.target.label) : ''
       end
 
       # An action that puts an effect on whoever uses it: Rage, Take Cover, a stance.
@@ -169,13 +170,13 @@ module AresMUSH
                                                                                 :encounter => scene.encounter)
 
         if applied.err?
-          out['lines'] << t(applied.key, **CharState.symbolize(applied.args))
+          out['lines'] << told(applied.key, applied.args)
           return
         end
 
         effect = applied.state
 
-        out['lines'] << t('pf2e.act_self_effect', :actor => scene.actor.label, :action => name,
+        out['lines'] << told('pf2e.act_self_effect', :actor => scene.actor.label, :action => name,
                                                   :cost => Actions.cost(name), :effect => effect.name,
                                                   :lasts => ActiveEffects.remaining(effect))
         out['lines'] << undo_line("effect/remove #{scene.actor.ref}=#{effect.name}")
@@ -197,7 +198,7 @@ module AresMUSH
         figure = statistic_for(scene.actor.holder, check['statistic'], said)
 
         if figure.is_a?(Err)
-          out['lines'] << t(figure.key, **CharState.symbolize(figure.args))
+          out['lines'] << told(figure.key, figure.args)
           return
         end
 
@@ -230,9 +231,9 @@ module AresMUSH
 
         outcome = Degree::NAMES[result['degree']]
         note = (check['notes'] || {})[outcome]
-        out['lines'] << "  #{note}" if note
+        out['lines'] << told('pf2e.act_note', :text => note) if note
 
-        rolled_check.notes(result['degree']).each { |one| out['lines'] << "  #{one['text']}" if one['text'] }
+        rolled_check.notes(result['degree']).each { |one| out['lines'] << told('pf2e.act_note', :text => one['text']) if one['text'] }
 
         consequences(scene, Array(Actions.consequences(slug, check['variant'])[outcome]), out,
                      :rank => rank_of(scene.actor.holder, kind, stat_name))
@@ -352,7 +353,7 @@ module AresMUSH
 
         if flat && !flat['success']
           return { 'hit' => false,
-                   'line' => t('pf2e.act_concealed_miss', :actor => scene.actor.label, :target => scene.target.label,
+                   'line' => told('pf2e.act_concealed_miss', :actor => scene.actor.label, :target => scene.target.label,
                                                           :attack => attack['name'], :concealment => concealment,
                                                           :die => flat['die'], :dc => flat['dc']) }
         end
@@ -362,12 +363,12 @@ module AresMUSH
         result = Resolve.roll(check, :dc => defence['dc'], :extra => extra)
 
         out['detail'] += detail_lines(attack['name'], 'attack', result, defence)
-        out['detail'] << t('pf2e.act_flat_passed', :concealment => concealment, :die => flat['die'], :dc => flat['dc']) if flat
+        out['detail'] << told('pf2e.act_flat_passed', :concealment => concealment, :die => flat['die'], :dc => flat['dc']) if flat
 
-        line = t('pf2e.act_strike_line', :actor => scene.actor.label, :target => scene.target.label,
+        line = told('pf2e.act_strike_line', :actor => scene.actor.label, :target => scene.target.label,
                                          :attack => attack['name'], :circumstances => circumstance_phrase(scene, said),
-                                         :roll => shown_roll(result), :ac => defence['dc'],
-                                         :degree => degree_word(result['degree'], true))
+                                         :roll => Telling.roll(result), :ac => defence['dc'],
+                                         :degree => Telling.degree(result['degree'], true))
 
         { 'line' => line, 'result' => result, 'hit' => Degree.success?(result['degree']) }
       end
@@ -376,15 +377,15 @@ module AresMUSH
       def self.circumstance_phrase(scene, said)
         attacks = TurnState.turn(scene.actor.holder)['attacks'].to_i
         parts = []
-        parts << t('pf2e.act_nth_attack', :nth => [ attacks + 1, 3 ].min == 2 ? '2nd' : '3rd') if attacks.positive?
-        parts << 'flanking' if said['flanking']
-        parts << "range #{said['range']}" if said['range'].to_i > 1
+        parts << told('pf2e.act_nth_attack', :nth => [ attacks + 1, 3 ].min == 2 ? '2nd' : '3rd') if attacks.positive?
+        parts << told('pf2e.act_flanking') if said['flanking']
+        parts << told('pf2e.act_range', :range => said['range']) if said['range'].to_i > 1
         cover = cover_of(scene, said)
-        parts << "#{cover} cover" if cover
+        parts << told('pf2e.act_cover_level', :level => cover) if cover
         concealment = concealment_of(scene, said)
         parts << concealment if concealment
 
-        parts.empty? ? '' : " (#{parts.join(', ')})"
+        parts.empty? ? '' : told('pf2e.act_circumstances', :list => parts)
       end
 
       # What a Strike does when it hits.
@@ -405,10 +406,10 @@ module AresMUSH
       def self.follow_ups(scene, attack, out)
         Array(attack['effects']).each do |effect|
           if FOLLOW_UPS.key?(Domains.slug(effect))
-            out['lines'] << t('pf2e.act_follow_up', :effect => effect,
+            out['lines'] << told('pf2e.act_follow_up', :effect => effect,
                                                     :command => "+e/as #{scene.actor.ref}=act #{Domains.slug(effect).tr('-', ' ')}=#{scene.target.ref}")
           else
-            out['lines'] << t('pf2e.act_attack_effects', :effects => effect)
+            out['lines'] << told('pf2e.act_attack_effects', :effects => effect)
           end
         end
       end
@@ -431,9 +432,9 @@ module AresMUSH
 
         return unless found
 
-        out['lines'] << t('pf2e.act_crit_spec', :group => found['group'])
+        out['lines'] << told('pf2e.act_crit_spec', :group => found['group'])
 
-        return out['lines'] << "    #{found['text']}" if found['effects'].empty?
+        return out['lines'] << told('pf2e.act_crit_spec_text', :text => found['text']) if found['effects'].empty?
 
         found['effects'].each do |one|
           if one['save'] then crit_spec_save(scene, one, out)
@@ -451,8 +452,8 @@ module AresMUSH
         formula = bonus.positive? ? "#{one['persistent']}+#{bonus}" : one['persistent']
 
         PersistentDamage.add(scene.target.holder, formula, one['type'])
-        out['lines'] << t('pf2e.act_damage', :target => scene.target.label,
-                                             :damage => t('pf2e.act_persistent', :formula => formula, :type => one['type']))
+        out['lines'] << told('pf2e.act_damage', :target => scene.target.label,
+                                             :damage => told('pf2e.act_persistent', :formula => formula, :type => one['type']))
       end
 
       # More damage of the weapon's own kind for each of its damage dice: a pick's 2 per die.
@@ -469,9 +470,9 @@ module AresMUSH
         check = Check.of(scene.target.holder, 'save', one['save'], Resolve.seen_as(scene.actor.holder, 'origin'))
         result = Resolve.roll(check, :dc => dc)
 
-        out['lines'] << t('pf2e.act_save_line', :target => scene.target.label, :save => one['save'].capitalize,
-                                                :roll => shown_roll(result), :dc => dc,
-                                                :degree => degree_word(result['degree'], false))
+        out['lines'] << told('pf2e.act_save_line', :target => scene.target.label, :save => one['save'].capitalize,
+                                                :roll => Telling.roll(result), :dc => dc,
+                                                :degree => Telling.degree(result['degree'], false))
 
         return if Degree.success?(result['degree'])
 
@@ -494,14 +495,14 @@ module AresMUSH
 
         persistent.each do |row|
           PersistentDamage.add(whom.holder, row['formula'], row['type'])
-          shown << t('pf2e.act_persistent', :formula => row['formula'], :type => row['type'])
+          shown << told('pf2e.act_persistent', :formula => row['formula'], :type => row['type'])
         end
 
         return if shown.empty?
 
-        out['lines'] << t('pf2e.act_damage', :damage => shown.join(' + '), :target => whom.label)
+        out['lines'] << told('pf2e.act_damage', :damage => shown.join(' + '), :target => whom.label)
         out['lines'] << undo_line("heal #{whom.ref}=#{taken}") if taken.positive?
-        out['gm'] << t('pf2e.act_hp_left', :target => whom.label, :hp => Harm.hit_points(whom.holder))
+        out['gm'] << told('pf2e.act_hp_left', :target => whom.label, :hp => Harm.hit_points(whom.holder))
       end
 
       # A character's attacks by what they would call them: the weapons they have equipped, their
@@ -535,11 +536,11 @@ module AresMUSH
         rank = spell_rank(scene.actor.holder, spell, mechanics, said, cast)
         casting = Actors.of(scene.actor.holder).casting(spell, cast)
 
-        out['lines'] << t('pf2e.act_cast', :actor => scene.actor.label, :spell => spell, :rank => rank,
+        out['lines'] << told('pf2e.act_cast', :actor => scene.actor.label, :spell => spell, :rank => rank,
                                            :targets => targets.map(&:label).join(', ').then { |one| one.empty? ? '' : " at #{one}" })
 
         unless mechanics
-          out['lines'] << t('pf2e.act_spell_gm')
+          out['lines'] << told('pf2e.act_spell_gm')
           return Ok.new(:state => out)
         end
 
@@ -677,7 +678,7 @@ module AresMUSH
         save = mechanics['save']
 
         unless dc
-          out['lines'] << t('pf2e.act_save_gm', :target => target.label, :save => save.capitalize)
+          out['lines'] << told('pf2e.act_save_gm', :target => target.label, :save => save.capitalize)
           return
         end
 
@@ -686,9 +687,9 @@ module AresMUSH
         extra = save == 'reflex' && mechanics['area'] ? [ Resolve.cover_modifier(cover_of(scene, {}), 'reflex') ].compact : []
         result = Resolve.roll(check, :dc => dc, :extra => extra)
 
-        out['lines'] << t('pf2e.act_save_line', :target => target.label, :save => save.capitalize,
-                                                :roll => shown_roll(result), :dc => dc,
-                                                :degree => degree_word(result['degree'], false))
+        out['lines'] << told('pf2e.act_save_line', :target => target.label, :save => save.capitalize,
+                                                :roll => Telling.roll(result), :dc => dc,
+                                                :degree => Telling.degree(result['degree'], false))
         out['detail'] += detail_lines("#{target.label}'s #{save}", save, result, nil)
 
         heal_or_hurt(scene, mechanics, formulas, result['degree'], out) if formulas.any?
@@ -708,7 +709,7 @@ module AresMUSH
         if heals.any? && !hurts_this
           amount = heals.sum { |formula, *_| Pf2e.roll_formula(formula) }
           Harm.heal(scene.target.holder, amount)
-          out['lines'] << t('pf2e.act_healed', :target => scene.target.label, :amount => amount)
+          out['lines'] << told('pf2e.act_healed', :target => scene.target.label, :amount => amount)
           return
         end
 
@@ -716,7 +717,7 @@ module AresMUSH
 
         if factor.nil?
           shown = formulas.map { |formula, type, *_| "#{formula} #{type}" }.join(' + ')
-          return out['lines'] << t('pf2e.act_spell_damage_gm', :target => scene.target.label, :damage => shown)
+          return out['lines'] << told('pf2e.act_spell_damage_gm', :target => scene.target.label, :damage => shown)
         end
 
         rows = DamageRoll.of_formulas(formulas.map { |f, type, category, _| [ f, type, category ] }, false)
@@ -734,7 +735,7 @@ module AresMUSH
       def self.spell_effect(scene, spell, rank, out)
         found = ActiveEffects.catalogue.key?("Spell Effect: #{spell}") ? "Spell Effect: #{spell}" : nil
 
-        return out['lines'] << t('pf2e.act_spell_gm') unless found
+        return out['lines'] << told('pf2e.act_spell_gm') unless found
 
         whom = scene.target || scene.actor
         applied = ActiveEffects.apply(whom.holder, found, :options => [ "rank #{rank}" ], :applied_by => scene.actor.label,
@@ -742,7 +743,7 @@ module AresMUSH
 
         return if applied.err?
 
-        out['lines'] << t('pf2e.act_now_under', :target => whom.label, :effect => found,
+        out['lines'] << told('pf2e.act_now_under', :target => whom.label, :effect => found,
                                                 :lasts => ActiveEffects.remaining(applied.state))
         out['lines'] << undo_line("effect/remove #{whom.ref}=#{found}")
       end
@@ -766,7 +767,7 @@ module AresMUSH
                                   'formula' => one['damage'] } ], out)
           elsif one['persistent']
             PersistentDamage.remove(whom.holder, one['persistent'])
-            out['lines'] << t('pf2e.act_persistent_ended', :target => whom.label, :type => one['persistent'])
+            out['lines'] << told('pf2e.act_persistent_ended', :target => whom.label, :type => one['persistent'])
           end
         end
       end
@@ -782,13 +783,13 @@ module AresMUSH
         return if before && (value.nil? || value == before_value.to_i)
 
         set = Pf2e.set_condition(whom.holder, name, value || Pf2e.default_condition_value(name))
-        return out['lines'] << t(set.key, **CharState.symbolize(set.args)) if set.err?
+        return out['lines'] << told(set.key, set.args) if set.err?
 
         ends = scene.encounter && one['until'] ? Turns.expiry(one['until'], scene.actor.label, scene.encounter.round) : nil
         expire_at(whom.holder, name, ends) if ends
 
         shown = value ? "#{name} #{value}" : name
-        out['lines'] << t('pf2e.act_now', :target => whom.label, :condition => shown,
+        out['lines'] << told('pf2e.act_now', :target => whom.label, :condition => shown,
                                           :until => ends ? until_phrase(one['until'], scene.actor.label) : '')
         out['lines'] << undo_line("condition/set #{whom.ref}=#{name}/#{before_value.to_i}")
       end
@@ -797,9 +798,9 @@ module AresMUSH
       def self.until_phrase(until_when, actor)
         rounds = until_when.to_s[/\Arounds:(\d+)\z/, 1]
 
-        return t(rounds == '1' ? 'pf2e.until_one_round' : 'pf2e.until_rounds', :rounds => rounds) if rounds
+        return told(rounds == '1' ? 'pf2e.until_one_round' : 'pf2e.until_rounds', :rounds => rounds) if rounds
 
-        t("pf2e.until_#{until_when.to_s.tr('-', '_')}", :actor => actor)
+        told("pf2e.until_#{until_when.to_s.tr('-', '_')}", :actor => actor)
       end
 
       def self.expire_at(holder, name, ends)
@@ -818,9 +819,9 @@ module AresMUSH
           value = held[name].is_a?(Hash) ? held[name]['value'] : nil
           removed = Pf2e.remove_condition(whom.holder, name)
 
-          next out['lines'] << t(removed.key, **CharState.symbolize(removed.args)) if removed.err?
+          next out['lines'] << told(removed.key, removed.args) if removed.err?
 
-          out['lines'] << t('pf2e.act_no_longer', :target => whom.label, :condition => name)
+          out['lines'] << told('pf2e.act_no_longer', :target => whom.label, :condition => name)
           out['lines'] << undo_line("condition/set #{whom.ref}=#{name}#{value ? "/#{value}" : ''}")
         end
       end
@@ -831,9 +832,9 @@ module AresMUSH
                                                                   :applied_by => scene.actor.label,
                                                                   :encounter => scene.encounter)
 
-        return out['lines'] << t(applied.key, **CharState.symbolize(applied.args)) if applied.err?
+        return out['lines'] << told(applied.key, applied.args) if applied.err?
 
-        out['lines'] << t('pf2e.act_now_under', :target => whom.label, :effect => applied.state.name,
+        out['lines'] << told('pf2e.act_now_under', :target => whom.label, :effect => applied.state.name,
                                                 :lasts => ActiveEffects.remaining(applied.state))
         out['lines'] << undo_line("effect/remove #{whom.ref}=#{applied.state.name}")
       end
@@ -854,36 +855,36 @@ module AresMUSH
 
         return unless frequency && before >= frequency['max'].to_i
 
-        out['lines'] << t('pf2e.act_frequency_reached', :action => name, :max => frequency['max'],
+        out['lines'] << told('pf2e.act_frequency_reached', :action => name, :max => frequency['max'],
                                                         :per => frequency['per'], :used => before + 1)
       end
 
       def self.refused(out, said)
         return if said['refused'].empty?
 
-        out['lines'] << t('pf2e.act_cover_refused', :words => said['refused'].join(', '))
+        out['lines'] << told('pf2e.act_cover_refused', :words => said['refused'].join(', '))
       end
 
       def self.undo_line(command)
-        t('pf2e.act_undo', :command => command)
+        told('pf2e.act_undo', :command => command)
       end
 
       def self.check_line(scene, name, statistic, result, check, defence, dc)
-        roll = shown_roll(result)
+        roll = Telling.roll(result)
 
         if defence
-          t('pf2e.act_check_line', :actor => scene.actor.label, :action => name, :target => scene.target.label,
+          told('pf2e.act_check_line', :actor => scene.actor.label, :action => name, :target => scene.target.label,
                                    :statistic => statistic, :roll => roll, :defence => defence_name(check['against']),
-                                   :dc => dc, :degree => degree_word(result['degree'], false))
+                                   :dc => dc, :degree => Telling.degree(result['degree'], false))
         elsif dc
-          t('pf2e.act_check_dc_line', :actor => scene.actor.label, :action => name, :statistic => statistic,
-                                      :roll => roll, :dc => dc, :degree => degree_word(result['degree'], false),
+          told('pf2e.act_check_dc_line', :actor => scene.actor.label, :action => name, :statistic => statistic,
+                                      :roll => roll, :dc => dc, :degree => Telling.degree(result['degree'], false),
                                       :target => target_phrase(scene))
         elsif check['against']
-          t('pf2e.act_check_gm_line', :actor => scene.actor.label, :action => name, :statistic => statistic,
+          told('pf2e.act_check_gm_line', :actor => scene.actor.label, :action => name, :statistic => statistic,
                                       :roll => roll, :defence => defence_name(check['against']))
         else
-          t('pf2e.act_check_open_line', :actor => scene.actor.label, :action => name, :statistic => statistic,
+          told('pf2e.act_check_open_line', :actor => scene.actor.label, :action => name, :statistic => statistic,
                                         :roll => roll)
         end
       end
@@ -892,39 +893,32 @@ module AresMUSH
         against.to_s.downcase == 'ac' ? 'AC' : "#{against.to_s.capitalize} DC"
       end
 
-      # `23 (15 +8)`, `23 (fortune: 15, 7 +8)`, `18 (Assurance 10 +8)`.
-      def self.shown_roll(result)
-        modifier = result['modifier']
-        sign = modifier.negative? ? '' : '+'
-
-        rolled = if result['substitution'] then "#{result['substitution']['label'] || result['substitution']['slug']} #{result['total'] - modifier}"
-                 elsif result['kept'] then "#{result['kept'] == 'keep-higher' ? 'fortune' : 'misfortune'}: #{result['dice'].join(', ')}"
-                 else result['die'].to_s
-                 end
-
-        "#{result['total']} (#{rolled} #{sign}#{modifier})"
-      end
-
-      DEGREE_COLORS = [ '%xr', '%xy', '%xg', '%xh%xm' ].freeze
-      HIT_WORDS = [ 'critical miss', 'miss', 'hit', 'critical hit' ].freeze
-
-      def self.degree_word(degree, attack)
-        return '' unless degree
-
-        "#{DEGREE_COLORS[degree]}#{(attack ? HIT_WORDS : Resolve::WORDS)[degree]}%xn"
-      end
-
+      # Every modifier of a roll and of the defence it was against, for `+e/why`.
       def self.detail_lines(what, statistic, result, defence)
-        lines = [ t('pf2e.why_roll', :what => what, :statistic => statistic, :roll => shown_roll(result),
-                                     :base => result['breakdown']['base']) ]
-        lines += Resolve.explained(result['breakdown']).map { |one| "    #{one}" }
+        lines = [ told('pf2e.why_roll', :what => what, :statistic => statistic, :roll => Telling.roll(result),
+                                        :base => result['breakdown']['base']) ]
+        lines += modifier_lines(result['breakdown'])
 
         if defence
-          lines << t('pf2e.why_defence', :dc => defence['dc'], :base => defence['breakdown']['base'])
-          lines += Resolve.explained(defence['breakdown']).map { |one| "    #{one}" }
+          lines << told('pf2e.why_defence', :dc => defence['dc'], :base => defence['breakdown']['base'])
+          lines += modifier_lines(defence['breakdown'])
         end
 
         lines
+      end
+
+      def self.modifier_lines(breakdown)
+        Array(breakdown['modifiers']).map do |row|
+          value = row['value'].to_i
+
+          told(row['enabled'] ? 'pf2e.why_modifier' : 'pf2e.why_modifier_off',
+               :value => "#{value.negative? ? '' : '+'}#{value}", :type => row['type'], :source => row['source'])
+        end
+      end
+
+      # What happened, as an event: a locale key and its arguments, for whoever tells it to render.
+      def self.told(key, args = {})
+        Telling.event(key, args)
       end
     end
   end

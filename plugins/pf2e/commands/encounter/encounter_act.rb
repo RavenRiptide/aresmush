@@ -45,7 +45,7 @@ module AresMUSH
 
       # Tells the room and records it in the encounter and the scene. What only the GM sees goes to them.
       def tell(encounter, out)
-        message = out['lines'].join('%r')
+        message = Telling.lines(out['lines']).join('%r')
 
         enactor_room.emit message
 
@@ -62,7 +62,7 @@ module AresMUSH
       def tell_gm(encounter, lines)
         return if lines.empty?
 
-        message = lines.join('%r')
+        message = Telling.lines(lines).join('%r')
         gm = encounter && Character.named(encounter.organizer.to_s)
 
         if gm && gm != enactor
@@ -271,11 +271,11 @@ module AresMUSH
       include CommandHandler
 
       def handle
-        lines = Array(enactor.pf2_last_roll)
+        events = Array(enactor.pf2_last_roll)
 
-        return client.emit_ooc(t('pf2e.why_nothing')) if lines.empty?
+        return client.emit_ooc(t('pf2e.why_nothing')) if events.empty?
 
-        client.emit lines.join('%r')
+        client.emit Telling.lines(events).join('%r')
       end
     end
 
