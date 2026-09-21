@@ -84,6 +84,10 @@ one at a time. Nothing is rolled again: putting a change back puts back what hap
 `+e/redo` - The GM puts back the change they last took back. Anything new that happens first ends it.
 `+e/history [<encounter id>]` - Every change in the encounter, and where undo and redo stand.
 
+An item used or money paid in an encounter leaves your inventory at once, and is on the history like
+anything else: the GM can give it back. Once it has moved on outside the encounter - sold, traded, paid
+away - it can no longer be given back as it was, and the GM is told which item.
+
 An encounter's history ends with it: once it has ended, nothing in it can be taken back.
 
 A condition that lasts only a while - Feint's off-guard, Slow's slowed - ends on its own at the right

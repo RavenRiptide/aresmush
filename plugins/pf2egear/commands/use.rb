@@ -95,16 +95,16 @@ module AresMUSH
           return
         end
 
-        if !(uses.include? self.use_option)
+        if self.use_option && !uses.include?(self.use_option)
           client.emit_failure t('pf2egear.bad_use', :options => uses.sort.join(", "))
           return
         end
 
-        selected_use = self.use_option ? uses[self.use_option] : uses.first
+        selected_use = self.use_option || uses.first
 
         details = use[selected_use]
 
-        base_msg = t('pf2egear.item_use_ok', :name => char.name, :item => item.name)
+        base_msg = t('pf2egear.item_use_ok', :name => enactor.name, :item => item.name)
         use_option_msg = t('pf2egear.use_option', :use => selected_use)
 
         message = base_msg + "%b" + use_option_msg

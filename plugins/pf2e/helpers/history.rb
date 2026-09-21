@@ -8,7 +8,12 @@ module AresMUSH
     # A change is recorded as the whole encounter before and after it - its order, turn, cover and
     # concealment, each character's state in it, each creature, each effect - so taking one back is
     # putting the before back, whatever the change touched, and putting it back again is putting the after
-    # back, with no die rolled twice. The history is one line: `history_at` is how many of its entries are
+    # back, with no die rolled twice.
+    #
+    # What its people carry is recorded too: their items and their money, which an encounter changes at
+    # once because they are the characters' own. Those are the one thing a change outside the encounter
+    # can move, so they go back only if they are still as the change left them, and money goes back by a
+    # payment the audit records rather than by writing a balance. The history is one line: `history_at` is how many of its entries are
     # in effect, and recording a new one drops any past that point, which could only have been redone.
     #
     # An ended encounter's history is frozen.
@@ -27,9 +32,11 @@ module AresMUSH
 
       KEY = :pf2e_recording
 
-      def self.snapshot(encounter)
+      def self.snapshot(encounter, people = [])
         encounter = PF2Encounter[encounter.id]
         held = { 'encounter' => plain(FIELDS.to_h { |field| [ field, encounter.public_send(field) ] }) }
+
+        held.merge!(goods(people(encounter, people)))
 
         owned.each do |name, (_model, members)|
           held[name] = members.call(encounter).to_h do |one|
@@ -70,15 +77,84 @@ module AresMUSH
       end
 
       # ------------------------------------------------------------------------------
+      # What its people carry
+
+      # Every character in the encounter, and anyone else a change reaches: whoever typed it, whoever
+      # they paid.
+      def self.people(encounter, extra = [])
+        ids = Combatants.rows(encounter).map { |row| row['char'] }.compact + Array(extra).map { |one| one.respond_to?(:id) ? one.id : one }
+
+        ids.map(&:to_s).uniq.map { |id| Character[id] }.compact
+      end
+
+      def self.goods(people)
+        items = people.each_with_object({}) do |char, out|
+          Pf2egear::Inventory::CATEGORIES.each do |row|
+            char.public_send(row['collection']).to_a.each do |item|
+              out["#{row['model']}:#{item.id}"] = plain(item.attributes.except(:created_at, :updated_at))
+            end
+          end
+        end
+
+        { 'people' => people.map { |char| char.id.to_s }, 'items' => items,
+          'money' => people.to_h { |char| [ char.id.to_s, char.pf2_money.to_i ] } }
+      end
+
+      # What of theirs has moved since the change being taken back or put back: the first item or purse
+      # that is no longer as the history expects, or nil.
+      def self.moved(expected)
+        people = Array(expected['people']).map { |id| Character[id] }.compact
+        now = goods(people)
+
+        changed = (now['items'].keys | Array(expected['items']&.keys)).find { |key| now['items'][key] != expected['items'][key] }
+        return (now['items'][changed] || expected['items'][changed])['name'] if changed
+
+        poorer = people.find { |char| now['money'][char.id.to_s] != expected['money'][char.id.to_s] }
+        poorer ? t('pf2e.history_money_of', :name => poorer.name) : nil
+      end
+
+      def self.restore_goods(held, said)
+        people = Array(held['people']).map { |id| Character[id] }.compact
+        now = goods(people)
+
+        (now['items'].keys - held['items'].keys).each { |key| item_at(key)&.delete }
+
+        held['items'].each do |key, attributes|
+          model, id = key.split(':')
+          attributes = attributes.transform_keys(&:to_sym)
+          found = item_at(key)
+
+          if found
+            found.update_attributes(attributes)
+            found.save
+          else
+            AresMUSH.const_get(model).new(attributes.merge(:id => id)).save
+          end
+        end
+
+        people.each do |char|
+          owed = held['money'][char.id.to_s].to_i - now['money'][char.id.to_s].to_i
+
+          Pf2egear.pay_player(char, owed, 'Encounter', said) unless owed.zero?
+        end
+      end
+
+      def self.item_at(key)
+        model, id = key.split(':')
+
+        AresMUSH.const_get(model)[id]
+      end
+
+      # ------------------------------------------------------------------------------
       # Recording
 
       # Runs a change and records it, if it changed anything. A change inside another - `+e/as` running
       # a Strike - is part of the outer one.
-      def self.recording(encounter, said)
+      def self.recording(encounter, said, people = [])
         return yield if encounter.nil? || !encounter.is_active || Thread.current[KEY]
 
         Thread.current[KEY] = true
-        before = snapshot(encounter)
+        before = snapshot(encounter, people)
 
         begin
           yield
@@ -86,7 +162,7 @@ module AresMUSH
           Thread.current[KEY] = nil
         end
 
-        after = snapshot(encounter)
+        after = snapshot(encounter, people)
         append(encounter, said, before, after) unless before == after
       end
 
@@ -117,7 +193,11 @@ module AresMUSH
 
         return Err.new(:nothing_to_undo, 'pf2e.history_nothing_to_undo') unless entry
 
+        moved = moved(entry.after)
+        return Err.new(:moved, 'pf2e.history_moved', 'what' => moved) if moved
+
         restore(encounter, entry.before)
+        restore_goods(entry.before, t('pf2e.history_undone', :name => 'GM', :said => entry.said))
         PF2Encounter[encounter.id].update(:history_at => entry.seq - 1)
 
         Ok.new(:state => entry)
@@ -130,7 +210,11 @@ module AresMUSH
 
         return Err.new(:nothing_to_redo, 'pf2e.history_nothing_to_redo') unless entry
 
+        moved = moved(entry.before)
+        return Err.new(:moved, 'pf2e.history_moved', 'what' => moved) if moved
+
         restore(encounter, entry.after)
+        restore_goods(entry.after, t('pf2e.history_redone', :name => 'GM', :said => entry.said))
         PF2Encounter[encounter.id].update(:history_at => entry.seq)
 
         Ok.new(:state => entry)

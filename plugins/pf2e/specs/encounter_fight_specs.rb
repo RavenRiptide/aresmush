@@ -158,6 +158,14 @@ module AresMUSH
         expect(TurnState.turn(hero)['attacks']).to eq 0
         expect(npc(3).pf2_conditions).to_not have_key('Frightened')
 
+        # A potion drunk mid-fight is gone at once, and the GM can give it back.
+        potion = PF2Consumable.create(:name => 'Minor Healing Potion', :quantity => 1, :character => Character[@hero.id])
+        run(Pf2egear::PF2UseItemCmd, 'use consumable=0', @hero)
+        expect(PF2Consumable[potion.id]).to be_nil
+        run(PF2EncounterUndoCmd, 'e/undo')
+        expect(PF2Consumable[potion.id].quantity).to eq 1
+        PF2Consumable[potion.id].delete
+
         @client.said.clear
         run(PF2EncounterHistoryCmd, 'e/history')
         expect(@client.said.join).to include("e/as #2=strike #{@hero.name}", 'e/strike #3=fist')

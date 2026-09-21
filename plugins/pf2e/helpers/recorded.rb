@@ -6,8 +6,12 @@ module AresMUSH
     # Its handler runs inside `History.recording`, in the encounter it names by id or else the one here,
     # and the entry says who typed what.
     module Recorded
+      # Whoever typed it is recorded with the encounter's own, and anyone else a command names in
+      # `recorded_people` - whoever it pays.
       def handle
-        History.recording(recorded_encounter, "#{enactor.name}: #{cmd.raw}") { super }
+        people = [ enactor ] + (respond_to?(:recorded_people) ? recorded_people : [])
+
+        History.recording(recorded_encounter, "#{enactor.name}: #{cmd.raw}", people) { super }
       end
 
       def recorded_encounter

@@ -511,6 +511,8 @@ en:
     rest_done: "%{name} says a night has passed. Rested and prepared: %{who}."
     rest_nobody: "There is nobody in this encounter to rest."
     rest_creature: "%{ref} is a creature, and does not prepare. Heal it with heal."
+    history_moved: "%{what} has changed since, outside the encounter; it cannot be put back as it was."
+    history_money_of: "%{name}'s money"
     no_encounter_here: "There is no encounter running here, and nothing happens to a character outside one."
     encounter_sheet_creature: "%{ref} is a creature: +e/creature %{ref} shows it."
     act_note: "  %{text}"
