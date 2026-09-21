@@ -24,14 +24,20 @@ module AresMUSH
     attribute :cover, :type => DataType::Hash, :default => {}
     attribute :concealment, :type => DataType::Hash, :default => {}
 
+    # The encounter its characters carry on from, if the GM named one when starting it: whoever was in
+    # that one starts this one as they left it. Anyone else starts fresh.
+    attribute :carries_on_from
+
     set :characters, "AresMUSH::Character"
     reference :scene, "AresMUSH::Scene"
     collection :npcs, "AresMUSH::Pf2eNpc", :encounter
+    collection :states, "AresMUSH::Pf2eCombatantState", :encounter
 
-    before_delete :delete_npcs
+    before_delete :delete_combatants
 
-    def delete_npcs
-      self.npcs.each { |npc| npc.delete }
+    def delete_combatants
+      self.npcs.each(&:delete)
+      self.states.each(&:delete)
     end
 
     ##### CLASS METHODS #####

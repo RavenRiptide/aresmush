@@ -206,6 +206,8 @@ module AresMUSH
           return PF2EncounterAuraCmd
         when "option"
           return PF2EncounterOptionCmd
+        when "sheet"
+          return PF2EncounterSheetCmd
         when "start"
           return PF2InitiateCombatCmd
         when "view"

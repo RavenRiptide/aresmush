@@ -44,5 +44,50 @@ module AresMUSH
         expect(rendered_for(nil).class_features).to eq 'None'
       end
     end
+
+    # `sheet/<section>` shows that section and no other.
+    describe "a sheet's sections" do
+
+      # The template's own words, with every value it asks for stubbed.
+      class SectionSheet
+        LISTS = %i{abilities skills saves known_for spell_dcs}.freeze
+
+        attr_reader :section
+
+        def initialize(section)
+          @section = section
+        end
+
+        def section_line(title)
+          "== #{title}"
+        end
+
+        def method_missing(name, *_args)
+          LISTS.include?(name) ? [] : ''
+        end
+
+        def respond_to_missing?(*)
+          true
+        end
+      end
+
+      def shown(section)
+        erb = File.read(File.join(Pf2e.plugin_dir, 'templates', 'sheet_template.erb'))
+
+        Erubis::Eruby.new(erb, :bufvar => '@output').evaluate(SectionSheet.new(section)).scan(/^== (.+)$/).flatten
+      end
+
+      it "should show only the section asked for" do
+        expect(shown('skills')).to eq []
+        expect(shown('info')).to eq [ 'Basic Information', 'Traits' ]
+        expect(shown('languages')).to eq [ 'Languages' ]
+        expect(shown('magic')).to eq [ 'Magic' ]
+        expect(shown('combat')).to include('Stats', 'Conditions')
+      end
+
+      it "should show every section for all" do
+        expect(shown('all')).to include('Basic Information', 'Abilities', 'Stats', 'Skills', 'Languages', 'Feats', 'Magic')
+      end
+    end
   end
 end

@@ -135,14 +135,40 @@ module AresMUSH
         end
       end
 
+      it "should do nothing outside an encounter" do
+        use("action/use take cover")
+
+        expect(@client.failures).to eq [ t('pf2e.no_encounter_here') ]
+      end
+
+      # In an encounter, on the user as they stand in it.
       describe "using one" do
+        before(:each) do
+          @scene = Scene.create(:room => @room)
+          @room.update(:scene => @scene)
+          @encounter = PF2Encounter.create(:scene => @scene, :organizer => 'GM', :round => 1, :is_active => true)
+          Combatants.join(@encounter, @char.name, 10, :holder => reread)
+
+          allow(Scenes).to receive(:add_to_scene)
+        end
+
+        after(:each) do
+          @encounter&.delete
+          @scene&.delete
+        end
+
+        def standing
+          CombatantStates.of(@encounter, reread)
+        end
+
         it "should put its effect on the one who uses it" do
           barbarian!
 
           use("action/use rage")
 
           expect(@client.failures).to eq []
-          expect(ActiveEffects.on(reread).map(&:name)).to eq [ 'Effect: Rage' ]
+          expect(ActiveEffects.on(standing).map(&:name)).to eq [ 'Effect: Rage' ]
+          expect(ActiveEffects.on(reread)).to eq []
         end
 
         # Rage's temporary hit points are its effect's, and come with it.
@@ -151,27 +177,27 @@ module AresMUSH
 
           use("action/use rage")
 
-          expect(Pf2eHP[@hp.id].temp_hp).to eq 3 + 1
+          expect(standing.temp_hp).to eq 3 + 1
         end
 
         it "should refuse an action the character does not have, and put nothing on them" do
           use("action/use rage")
 
           expect(@client.failures.join).to include 'Rage'
-          expect(ActiveEffects.on(reread)).to eq []
+          expect(ActiveEffects.on(standing)).to eq []
         end
 
         it "should let anyone use a basic action and take on its effect" do
           use("action/use take cover")
 
-          expect(ActiveEffects.on(reread).map(&:name)).to eq [ 'Effect: Cover' ]
+          expect(ActiveEffects.on(standing).map(&:name)).to eq [ 'Effect: Cover' ]
         end
 
         it "should announce an action with no effect of its own" do
           use("action/use stride")
 
           expect(@client.failures).to eq []
-          expect(ActiveEffects.on(reread)).to eq []
+          expect(ActiveEffects.on(standing)).to eq []
         end
 
         it "should be the same command as +e/act" do

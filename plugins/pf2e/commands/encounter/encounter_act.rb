@@ -23,20 +23,17 @@ module AresMUSH
         [ head.strip, tail.strip, parts.reject(&:empty?) ]
       end
 
-      # The one acting: the combatant the enactor plays, or - outside an encounter - the enactor.
+      # The one acting: the combatant the enactor plays, as they stand in the encounter. Nothing is done
+      # outside one.
       def acting_as(encounter, actor = nil)
         return Ok.new(:state => actor) if actor
-
-        return Ok.new(:state => Combatants::Combatant.new(enactor, enactor.name, nil)) unless encounter
+        return Err.new(:no_encounter, 'pf2e.no_encounter_here') unless encounter
 
         found = Combatants.find(encounter, enactor.name)
 
         return Err.new(:not_in_encounter, 'pf2e.act_join_first', 'id' => encounter.id) unless found.ok?
 
-        # The enactor's own object, not a second copy of them: Ohm saves every attribute of an object it
-        # updates, so a copy read before the action and saved after it would put back the turn's counts
-        # the action had just written.
-        Ok.new(:state => Combatants::Combatant.new(enactor, found.state.label, found.state.number))
+        found
       end
 
       def scene_for(encounter, actor, target)

@@ -6,10 +6,11 @@ module AresMUSH
     # The initiative order is a list of rows, one per combatant, highest initiative first:
     #
     #   { 'id' => 3, 'init' => 18.2, 'name' => 'Goblin Warrior #3', 'npc' => '41' }
-    #   { 'id' => 1, 'init' => 15.0, 'name' => 'Aria', 'char' => '12' }
+    #   { 'id' => 1, 'init' => 15.0, 'name' => 'Aria', 'char' => '12', 'state' => '7' }
     #
-    # A row names its holder - a character, or a `Pf2eNpc` the GM added - by database id, so nothing has
-    # to guess from a name which of them it is. Its id is given when it joins and never reused, so `#3`
+    # A row names its holder by database id, so nothing has to guess from a name which of them it is: a
+    # creature's `Pf2eNpc`, or a character's state in this encounter (`Pf2eCombatantState`) with the
+    # character beside it. Its id is given when it joins and never reused, so `#3`
     # names the same goblin all fight long whatever the order does - which is what a player types to
     # target it, since three goblins share a name. A row with neither holder is a name the GM put in the
     # order and nothing more.
@@ -31,27 +32,47 @@ module AresMUSH
 
       ID = /\A#?(\d+)\z/
 
-      # The order's rows. An order written as `[ initiative, name ]` pairs is read as rows once, and kept.
+      # The order's rows. An order written as `[ initiative, name ]` pairs, or naming a character with no
+      # state of their own in it, is read once into rows that hold one, and kept.
       def self.rows(encounter)
         held = Array(encounter.participants)
 
-        return held if held.all? { |one| one.is_a?(Hash) }
+        return held if read?(held)
+
+        # A copy of the encounter read before another one converted its order would convert it again.
+        stored = PF2Encounter[encounter.id]
+
+        if stored && read?(stored.participants)
+          encounter.participants = stored.participants
+          encounter.last_number = stored.last_number
+          return stored.participants
+        end
 
         last = encounter.last_number.to_i
         read = held.map do |one|
-          next one if one.is_a?(Hash)
+          unless one.is_a?(Hash)
+            last += 1
+            char = Character.named(one[1].to_s)
+            one = { 'id' => last, 'init' => one[0].to_f, 'name' => one[1].to_s, 'char' => char&.id }.compact
+          end
 
-          last += 1
-          char = Character.named(one[1].to_s)
-          { 'id' => last, 'init' => one[0].to_f, 'name' => one[1].to_s, 'char' => char&.id }.compact
+          next one unless one['char'] && !one['state']
+
+          char = Character[one['char']]
+          char ? one.merge('state' => CombatantStates.adopted(encounter, char).id) : one
         end
 
         encounter.update(:participants => read, :last_number => last)
         read
       end
 
+      def self.read?(held)
+        Array(held).all? { |one| one.is_a?(Hash) && (!one['char'] || one['state']) }
+      end
+
       def self.holder_of(row)
         return Pf2eNpc[row['npc']] if row['npc']
+        return Pf2eCombatantState[row['state']] if row['state']
         return Character[row['char']] if row['char']
 
         nil
@@ -91,7 +112,12 @@ module AresMUSH
         id = encounter.last_number.to_i + 1
         row = { 'id' => id, 'name' => name }
 
-        row[Actors.of(holder).creature? ? 'npc' : 'char'] = holder.id if holder
+        if holder && Actors.of(holder).creature?
+          row['npc'] = holder.id
+        elsif holder
+          row.merge!('char' => holder.id, 'state' => CombatantStates.for_join(encounter, holder).id)
+        end
+
         row['init'] = placed(row, init)
 
         encounter.update(:last_number => id)

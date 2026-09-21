@@ -24,7 +24,8 @@ feat leaves behind are already here under the name you would expect.
 `effect/add <names>=<effect>[/<option>...]` - Put one or more characters under an effect.
 `effect/remove <names>=<effect>` - End it early.
 
-These are for a DM, or the organizer of the encounter the characters are in.
+These are for a DM, or the GM of the encounter here, and work on whoever is in it. An effect is on a
+character as they stand in that encounter; their own sheet never carries one.
 
 The options after an effect's name are what only the one applying it knows:
 
@@ -36,14 +37,12 @@ The options after an effect's name are what only the one applying it knows:
     effect/add Bram=resist energy/rank 4/fire
 
 ### How long they last
-An effect applied during an encounter keeps time with it. A round is a turn of the order, a minute is
+An effect keeps time with its encounter. A round is a turn of the order, a minute is
 ten rounds, and the count runs from the turn it was applied on - so "until the start of your next turn"
 is the turn of whoever applied it, as the rules say. An effect that could not outlast the fight - one
 measured in rounds, in minutes, or "until the end of the encounter" - ends when the encounter does.
 
-A night's rest ends anything shorter than a day, and counts a night off anything measured in days. An
-effect applied outside an encounter has no clock to run on, so it lasts until the next rest or until
-someone ends it.
+A night's rest ends anything shorter than a day, and counts a night off anything measured in days.
 
 ### What an effect brings with it
 Some effects make you something as well - off-guard, prone, clumsy - and some conditions do too: a

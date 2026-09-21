@@ -14,7 +14,10 @@ module AresMUSH
     module Actors
 
       def self.of(holder)
-        holder.is_a?(Pf2eNpc) ? CreatureActor.new(holder) : CharacterActor.new(holder)
+        return CreatureActor.new(holder) if holder.is_a?(Pf2eNpc)
+        return EncounterCharacterActor.new(holder) if holder.is_a?(Pf2eCombatantState)
+
+        CharacterActor.new(holder)
       end
     end
 
@@ -153,7 +156,17 @@ module AresMUSH
       end
 
       def notify_damage(amount, source)
-        Login.notify @holder, :pf2_damage, t('pf2e.you_took_damage', :amount => amount, :source => source), 0
+        Login.notify person, :pf2_damage, t('pf2e.you_took_damage', :amount => amount, :source => source), 0
+      end
+
+      # The player behind it, who is told things.
+      def person
+        @holder
+      end
+
+      # What names it among everyone an aura or a rule might mean.
+      def key
+        @holder.id.to_s
       end
 
       def reminder_lines
@@ -216,6 +229,22 @@ module AresMUSH
       # Which record an effect it is under belongs to.
       def effect_owner_field
         :character
+      end
+    end
+
+    # A character as they stand in an encounter: the character, with the encounter's state in place of
+    # their own (`Pf2eCombatantState`).
+    class EncounterCharacterActor < CharacterActor
+      def person
+        @holder.character
+      end
+
+      def key
+        "state-#{@holder.id}"
+      end
+
+      def effect_owner_field
+        :state
       end
     end
 
@@ -300,6 +329,15 @@ module AresMUSH
       end
 
       def notify_damage(_amount, _source)
+      end
+
+      # Nobody plays a creature; the GM hears for it.
+      def person
+        nil
+      end
+
+      def key
+        "npc-#{@holder.id}"
       end
 
       # Its Strikes, and the command that makes one.

@@ -31,8 +31,7 @@ module AresMUSH
 
       return 'untrained' if !char.combat
 
-      save_list = combat.saves
-      save_list[save]
+      (combat.saves || {})[save] || 'untrained'
     end
 
     def self.get_create_combat_obj(char)

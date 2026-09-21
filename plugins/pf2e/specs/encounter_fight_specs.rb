@@ -52,7 +52,7 @@ module AresMUSH
                                     :unarmed_attacks => { 'Fist' => { 'damage' => 'd4', 'damage_type' => 'B', 'group' => 'Brawling',
                                                                       'traits' => %w{agile finesse nonlethal unarmed} } })
         @hp = Pf2eHP.create(:character => @hero, :ancestry_hp => 8, :charclass_hp => 10)
-        @hero.update(:combat => @combat, :hp => @hp, :pf2_level => 1, :pf2_conditions => {}, :pf2_traits => [],
+        @hero.update(:combat => @combat, :hp => @hp, :pf2_level => 1, :pf2_conditions => {}, :pf2_traits => [], :pf2_baseinfo_locked => true,
                      :pf2_derived => {}, :pf2_feats => {}, :pf2_base_info => { 'charclass' => 'Fighter' },
                      :pf2_features => { 'charclass_features' => [], 'archetype_features' => [] })
         @abilities = Pf2e::ABILITIES.map { |name| Pf2eAbilities.create(:character => @hero, :name => name, :base_val => 14) }
@@ -88,8 +88,9 @@ module AresMUSH
         encounter.npcs.to_a.find { |one| one.number == number }
       end
 
+      # The hero as they stand in the fight.
       def hero
-        Character[@hero.id]
+        CombatantStates.of(encounter, Character[@hero.id])
       end
 
       def advance
@@ -115,6 +116,14 @@ module AresMUSH
         full = Pf2eHP.get_current_hp(hero)
         run(PF2EncounterAsCmd, "e/as #2=strike #{@hero.name}")
         expect(Pf2eHP.get_current_hp(hero)).to be < full
+
+        # The wound is the fight's: the hero's own sheet is untouched, and their sheet in the fight shows it.
+        expect(Pf2eHP.get_current_hp(Character[@hero.id])).to eq full
+
+        @client.said.clear
+        run(PF2EncounterSheetCmd, 'e/sheet', @hero)
+        expect(@client.failures).to eq []
+        expect(@client.said.join("\n")).to include("#{Pf2eHP.get_current_hp(hero)}")
 
         advance
         advance

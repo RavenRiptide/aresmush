@@ -34,12 +34,13 @@ module AresMUSH
       @char&.delete
     end
 
+    # The character as they stand in the fight, which is what a turn works on.
     def reread
-      Character[@char.id]
+      Pf2e::Combatants.holder_named(PF2Encounter[@fight.id], @char.name)
     end
 
     def damage
-      Pf2eHP[@hp.id].damage
+      reread.hp.damage
     end
 
     def hurt(amount, kind = nil)

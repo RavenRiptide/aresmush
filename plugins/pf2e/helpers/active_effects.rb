@@ -314,14 +314,24 @@ module AresMUSH
       end
 
       # Whoever a command names - a character, or a combatant by its id - saying which names found nobody.
+      # Whoever a command that changes someone names: combatants in the encounter here, as they stand in
+      # it. Nothing changes a character outside an encounter, so without one there is nobody to name.
       def self.targets(client, enactor, names)
-        found, missing = Combatants.resolve_all(enactor, names, Combatants.encounter_here(enactor))
+        encounter = Combatants.encounter_here(enactor)
 
-        unless missing.empty?
-          client.emit_ooc t('pf2e.bad_value_in_list', :items => 'names', :list => missing.join(', '))
+        unless encounter
+          client.emit_failure t('pf2e.no_encounter_here')
+          return []
         end
 
-        found.map(&:holder)
+        found, missing = Array(names).map { |term| [ term, Combatants.find(encounter, term) ] }
+                                     .partition { |_term, result| result.ok? && result.state.holder }
+
+        unless missing.empty?
+          client.emit_ooc t('pf2e.bad_value_in_list', :items => 'names', :list => missing.map(&:first).join(', '))
+        end
+
+        found.map { |_term, result| result.state.holder }
       end
 
       # ------------------------------------------------------------------------------

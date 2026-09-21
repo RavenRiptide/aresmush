@@ -4,7 +4,7 @@ module AresMUSH
     # A key for someone that no character and creature share, since both are numbered by their own
     # tables: an aura's effects record whose aura put them there.
     def self.holder_key(holder)
-      Actors.of(holder).creature? ? "npc-#{holder.id}" : holder.id.to_s
+      Actors.of(holder).key
     end
 
     # What a creature in an encounter is worth to the rules engine.

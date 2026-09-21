@@ -26,12 +26,13 @@ a name only one combatant has. Acting in an encounter - actions, Strikes, spells
 ## Encounter commands for participants
 
 `encounter/join <encounter ID>[=<stat>]`: Joins an encounter in progress, using the stat specified by the organizer by default. If the organizer tells you that you should use a different stat, specify <stat>. 
+`+e/sheet[ <#id or name>][/<section>]`: A character's sheet as they stand in this encounter: their Hit Points, conditions and what they are under, which `sheet` does not show. Sections are those of `sheet`.
 `encounter/view [<encounter ID>]`: View the initiative table for the encounter in question: each combatant's id, initiative, conditions, and the cover and concealment set on them. (Alias `tinit <encounter ID>`)
 `+e/creature <#id>`: A creature's name and conditions. The GM sees its whole stat block and hit points.
 
 ## Encounter commands for plot runners
 
-`encounter <stat>`: If an encounter is not active in the scene, this command starts an encounter, with you as the organizer. `<stat>` is optional and will default to Perception if not specified.
+`encounter [<stat>][=<encounter ID>]`: Starts an encounter in the scene, with you as its GM, rolling initiative on `<stat>` (Perception unless you say otherwise). Name an earlier encounter and whoever was in it carries on as they left it: their wounds, conditions, effects and spent spells. Anyone else starts fresh - their own sheet, rested.
 `+e/add [<count>] <creature>[=<name>]`: Adds creatures from the bestiary - Foundry's bestiaries, six thousand of them - each with its own id, hit points and conditions, and its initiative rolled on its Perception. `+e/add 3 goblin warrior` adds three; `+e/add goblin warrior=Grik` names one. Player characters join with `encounter/join`. (Alias: `jinit`)
 `+e/add <name>=ac <n> fort <n> ref <n> will <n> perception <n> hp <n>`: Adds a creature the bestiary lacks, from the numbers on its stat block. It has no Strikes of its own; roll its attacks with `roll`.
 `+e/bestiary <words>[/<level>]`: Creatures whose names hold the words, at a level if one is given.
@@ -52,11 +53,4 @@ on its own. See `help effects`. A combatant can be named by its id: `effect/add 
 
 ## Healing and Damage Commands
 
-Any approved player may use a heal command at any time. To damage a player, you must be a Plotmaster, game admin, or the organizer of an encounter to which the targets are joined.
-
-A target in any of these may be a combatant's id: `damage #3=5 fire`.
-
-`heal <player list> = <amount>`: Heals each character in `<player list>` for `<amount>`, up to their maximum HP.
-`damage[/ndc] <player list> = <amount>[ <type>]`: Damages each character in `<player list>` for `<amount>`, after what they resist. The optional `/ndc` is for DM's and admins only, and disables the check to see if a character is dead. It has no effect for organizers without admin or Plotmaster roles.
-`condition/set <player>=<condition>[/<value>]`: Sets `<condition>` on `<player>`. `<value>` can be 1-5 to set it. Setting value to 0 for any condition clears it. 
-
+Damage, healing and conditions happen to a character as they stand in the encounter: `help heal`.

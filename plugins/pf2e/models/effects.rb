@@ -53,13 +53,15 @@ module AresMUSH
     # resists. Keyed by the choice set's flag, as Foundry keys them.
     attribute :answers, :type => DataType::Array, :default => []
 
-    # Who is under it: a character, or a creature in an encounter.
+    # Who is under it: a character in an encounter, or a creature in one. `character` is a character
+    # outside any encounter, which only an effect from before encounters held their own state can be.
     reference :character, "AresMUSH::Character"
     reference :npc, "AresMUSH::Pf2eNpc"
+    reference :state, "AresMUSH::Pf2eCombatantState"
     reference :encounter, "AresMUSH::PF2Encounter"
 
     def holder
-      self.character || self.npc
+      self.state || self.npc || self.character
     end
 
     index :name

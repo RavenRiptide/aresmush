@@ -1,13 +1,26 @@
 module AresMUSH
   module Pf2e
 
+    # `+e/start [<stat>][=<encounter id>]` - starts an encounter in the scene, rolling initiative on the
+    # stat, and carrying on from the encounter named: whoever was in that one starts this one as they left
+    # it.
     class PF2InitiateCombatCmd
       include CommandHandler
 
-      attr_accessor :init
+      attr_accessor :init, :from
 
       def parse_args
-        self.init = titlecase_arg(cmd.args)
+        stat, _, from = cmd.args.to_s.partition('=')
+
+        self.init = titlecase_arg(stat.strip.empty? ? nil : stat.strip)
+        self.from = from.strip.delete_prefix('#').empty? ? nil : from.strip.delete_prefix('#')
+      end
+
+      def check_from
+        return nil unless self.from
+        return nil if PF2Encounter[self.from]
+
+        t('pf2e.bad_id', :type => 'encounter')
       end
 
       def check_is_approved
@@ -49,7 +62,8 @@ module AresMUSH
         encounter = PF2Encounter.create(
           organizer: enactor.name,
           scene: scene,
-          init_stat: init_stat
+          init_stat: init_stat,
+          carries_on_from: self.from
         )
 
 

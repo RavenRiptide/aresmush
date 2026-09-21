@@ -30,15 +30,8 @@ module AresMUSH
 
       def handle
 
-        # Staff can damage anyone, anytime; a GM, whoever is in their encounter. A target may be a
-        # combatant's id.
+        # Staff, or the GM of the encounter here, damage whoever is in it. A target may be a combatant's id.
         encounter = Pf2e::Combatants.encounter_here(enactor)
-
-        if !enactor.is_admin? && !encounter
-          client.emit_failure t('pf2e.bad_id', :type => 'encounter')
-          return
-        end
-
         targets = ActiveEffects.targets(client, enactor, self.target)
 
         return if targets.empty?

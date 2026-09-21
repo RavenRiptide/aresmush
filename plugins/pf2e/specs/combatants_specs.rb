@@ -32,7 +32,8 @@ module AresMUSH
 
         holders = Combatants.all(PF2Encounter[@encounter.id]).map(&:holder)
 
-        expect(holders).to eq [ npc, @hero ]
+        expect(holders.first).to eq npc
+        expect(holders.last.character).to eq @hero
         npc.delete
       end
 
@@ -84,7 +85,9 @@ module AresMUSH
 
         listed = Combatants.all(@encounter)
 
-        expect(listed.map { |one| [ one.number, one.label, one.holder ] }).to eq [ [ 1, @hero.name, @hero ], [ 2, 'Goblin', nil ] ]
+        expect(listed.map { |one| [ one.number, one.label ] }).to eq [ [ 1, @hero.name ], [ 2, 'Goblin' ] ]
+        expect(listed.first.holder.character).to eq @hero
+        expect(listed.last.holder).to be_nil
         expect(PF2Encounter[@encounter.id].participants.first).to include('id' => 1, 'char' => @hero.id)
       end
     end

@@ -502,6 +502,8 @@ en:
     why_modifier: "    %{value} %{type} (%{source})"
     why_modifier_off: "    %{value} %{type} (%{source}) - does not count"
     why_nothing: "You have made no roll to explain yet."
+    no_encounter_here: "There is no encounter running here, and nothing happens to a character outside one."
+    encounter_sheet_creature: "%{ref} is a creature: +e/creature %{ref} shows it."
     act_note: "  %{text}"
     act_crit_spec_text: "    %{text}"
     act_circumstances: " (%{list})"

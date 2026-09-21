@@ -35,9 +35,7 @@ module AresMUSH
 
       def handle
 
-        # This command does not check to see if players are capable of healing.
-        # It may be necessary to lock this command if players are in an encounter.
-
+        # Anyone in the encounter here may be healed by anyone; whether they could is the table's to say.
         targets = ActiveEffects.targets(client, enactor, self.target)
 
         return if targets.empty?
