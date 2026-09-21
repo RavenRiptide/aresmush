@@ -28,7 +28,7 @@ module AresMUSH
       it "should be the only place that asks" do
         root = File.expand_path('../..', __dir__)
         asking = Dir[File.join(root, '**', '*.rb')].reject { |path| path.include?('/specs/') }
-                                                   .select { |path| File.read(path).match?(/is_a\?\(Pf2eNpc\)|Pf2e\.npc\?/) }
+                                                   .select { |path| File.read(path).match?(/is_a\?\((Pf2eNpc|Pf2eCombatantState)\)|Pf2e\.npc\?/) }
 
         expect(asking.map { |path| File.basename(path) }).to eq [ 'actors.rb' ]
       end
