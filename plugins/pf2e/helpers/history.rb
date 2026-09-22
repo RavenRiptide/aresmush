@@ -50,6 +50,7 @@ module AresMUSH
       # The encounter as it was: what was there then is put back as it was, including what the change
       # deleted, and what the change created is gone.
       def self.restore(encounter, held)
+        held = without_the_deleted(held)
         encounter = PF2Encounter[encounter.id]
         encounter.update(held['encounter'].transform_keys(&:to_sym))
 
@@ -76,6 +77,20 @@ module AresMUSH
         JSON.parse(JSON.dump(value))
       end
 
+      # A copy with nobody in it who has been deleted since: their place in the order, their state and the
+      # effects on it, and what they carried. Taking a change back never brings a deleted character back.
+      def self.without_the_deleted(held)
+        gone = lambda { |id| id && !Character[id] }
+        states = (held['states'] || {}).reject { |_id, one| gone.call(one['character_id']) }
+        order = Array(held['encounter']['participants']).reject { |row| row.is_a?(Hash) && gone.call(row['char']) }
+
+        held.merge('encounter' => held['encounter'].merge('participants' => order), 'states' => states,
+                   'effects' => (held['effects'] || {}).select { |_id, one| !one['state_id'] || states.key?(one['state_id'].to_s) },
+                   'people' => Array(held['people']).reject { |id| gone.call(id) },
+                   'items' => (held['items'] || {}).reject { |_key, one| gone.call(one['character_id']) },
+                   'money' => (held['money'] || {}).reject { |id, _| gone.call(id) })
+      end
+
       # ------------------------------------------------------------------------------
       # What its people carry
 
@@ -100,43 +115,60 @@ module AresMUSH
           'money' => people.to_h { |char| [ char.id.to_s, char.pf2_money.to_i ] } }
       end
 
-      # What of theirs has moved since the change being taken back or put back: the first item or purse
-      # that is no longer as the history expects, or nil.
-      def self.moved(expected)
-        people = Array(expected['people']).map { |id| Character[id] }.compact
-        now = goods(people)
+      # What a change did to its people's goods: the items it changed, and whose money.
+      def self.touched(before, after)
+        items = ((before['items'] || {}).keys | (after['items'] || {}).keys).reject { |key| before['items'][key] == after['items'][key] }
+        money = ((before['money'] || {}).keys | (after['money'] || {}).keys).reject { |id| before['money'][id] == after['money'][id] }
 
-        changed = (now['items'].keys | Array(expected['items']&.keys)).find { |key| now['items'][key] != expected['items'][key] }
-        return (now['items'][changed] || expected['items'][changed])['name'] if changed
-
-        poorer = people.find { |char| now['money'][char.id.to_s] != expected['money'][char.id.to_s] }
-        poorer ? t('pf2e.history_money_of', :name => poorer.name) : nil
+        [ items, money ]
       end
 
-      def self.restore_goods(held, said)
-        people = Array(held['people']).map { |id| Character[id] }.compact
-        now = goods(people)
+      # What the change touched that has moved on since, outside the encounter: the first item or purse no
+      # longer as the change left it, or nil. Anything it did not touch may have moved freely.
+      def self.moved(from, to)
+        from = without_the_deleted(from)
+        items, money = touched(from, without_the_deleted(to))
+        now = goods(people_of(from, to))
 
-        (now['items'].keys - held['items'].keys).each { |key| item_at(key)&.delete }
+        changed = items.find { |key| now['items'][key] != from['items'][key] }
+        return (now['items'][changed] || from['items'][changed])['name'] if changed
 
-        held['items'].each do |key, attributes|
-          model, id = key.split(':')
-          attributes = attributes.transform_keys(&:to_sym)
+        poorer = money.find { |id| now['money'][id] != from['money'][id] }
+        poorer ? t('pf2e.history_money_of', :name => Character[poorer].name) : nil
+      end
+
+      # Puts back what the change touched, as `to` has it.
+      def self.restore_goods(from, to, said)
+        from = without_the_deleted(from)
+        to = without_the_deleted(to)
+        items, money = touched(from, to)
+        now = goods(people_of(from, to))
+
+        items.each do |key|
+          wanted = to['items'][key]
           found = item_at(key)
+
+          next found&.delete unless wanted
+
+          attributes = wanted.transform_keys(&:to_sym)
 
           if found
             found.update_attributes(attributes)
             found.save
           else
-            AresMUSH.const_get(model).new(attributes.merge(:id => id)).save
+            AresMUSH.const_get(key.split(':').first).new(attributes.merge(:id => key.split(':').last)).save
           end
         end
 
-        people.each do |char|
-          owed = held['money'][char.id.to_s].to_i - now['money'][char.id.to_s].to_i
+        money.each do |id|
+          owed = to['money'][id].to_i - now['money'][id].to_i
 
-          Pf2egear.pay_player(char, owed, 'Encounter', said) unless owed.zero?
+          Pf2egear.pay_player(Character[id], owed, 'Encounter', said) unless owed.zero?
         end
+      end
+
+      def self.people_of(*held)
+        held.flat_map { |one| Array(one['people']) }.uniq.map { |id| Character[id] }.compact
       end
 
       def self.item_at(key)
@@ -193,11 +225,11 @@ module AresMUSH
 
         return Err.new(:nothing_to_undo, 'pf2e.history_nothing_to_undo') unless entry
 
-        moved = moved(entry.after)
+        moved = moved(entry.after, entry.before)
         return Err.new(:moved, 'pf2e.history_moved', 'what' => moved) if moved
 
         restore(encounter, entry.before)
-        restore_goods(entry.before, t('pf2e.history_undone', :name => 'GM', :said => entry.said))
+        restore_goods(entry.after, entry.before, t('pf2e.history_undone', :name => 'GM', :said => entry.said))
         PF2Encounter[encounter.id].update(:history_at => entry.seq - 1)
 
         Ok.new(:state => entry)
@@ -210,11 +242,11 @@ module AresMUSH
 
         return Err.new(:nothing_to_redo, 'pf2e.history_nothing_to_redo') unless entry
 
-        moved = moved(entry.before)
+        moved = moved(entry.before, entry.after)
         return Err.new(:moved, 'pf2e.history_moved', 'what' => moved) if moved
 
         restore(encounter, entry.after)
-        restore_goods(entry.after, t('pf2e.history_redone', :name => 'GM', :said => entry.said))
+        restore_goods(entry.before, entry.after, t('pf2e.history_redone', :name => 'GM', :said => entry.said))
         PF2Encounter[encounter.id].update(:history_at => entry.seq)
 
         Ok.new(:state => entry)

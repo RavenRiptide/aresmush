@@ -102,6 +102,45 @@ module AresMUSH
         expect(Pf2eCombatantState[state.id].pf2_conditions).to eq({})
       end
 
+      describe "when a character is deleted" do
+        before(:each) do
+          joined(@first)
+          @second = Character.create(:name => "Second#{rand(1000000)}", :pf2_level => 3)
+          @second.update(:hp => Pf2eHP.create(:character => @second, :ancestry_hp => 8, :charclass_hp => 10))
+          Combatants.join(@first, @second.name, 5, :holder => Character[@second.id])
+          @first.update(:round => 1)
+          History.recording(PF2Encounter[@first.id], 'GM: damage') do
+            Pf2eHP.modify_damage(CombatantStates.of(PF2Encounter[@first.id], Character[@second.id]), 1)
+          end
+          @state = CombatantStates.of(PF2Encounter[@first.id], Character[@second.id])
+          @potion = PF2Consumable.create(:name => 'Potion', :character => hero)
+        end
+
+        after(:each) { PF2Consumable[@potion.id]&.delete if @potion }
+
+        it "should take them out of every encounter they are in" do
+          Character[@second.id].delete
+
+          expect(Combatants.all(PF2Encounter[@first.id]).map(&:label)).to eq [ @hero.name ]
+          expect(Pf2eCombatantState[@state.id]).to be_nil
+        end
+
+        it "should leave the encounter working without them" do
+          Character[@second.id].delete
+
+          expect(Difficulty.shown(PF2Encounter[@first.id])).to start_with('Trivial')
+          expect { Turns.turn_started(PF2Encounter[@first.id], @hero.name, 1) }.not_to raise_error
+        end
+
+        it "should not bring them back when a change from before is taken back" do
+          Character[@second.id].delete
+
+          expect(History.undo(PF2Encounter[@first.id]).ok?).to be true
+          expect(Combatants.all(PF2Encounter[@first.id]).map(&:label)).to eq [ @hero.name ]
+          expect(PF2Encounter[@first.id].states.to_a.map(&:character_id)).to eq [ @hero.id ]
+        end
+      end
+
       it "should keep their state when they join the same encounter again" do
         state = joined(@first)
 

@@ -80,6 +80,17 @@ module AresMUSH
         state
       end
 
+      # A character is being deleted: they leave every encounter they are in, and their state in each goes.
+      def self.character_deleted(char)
+        Pf2eCombatantState.find(:character_id => char.id).to_a.each do |state|
+          encounter = state.encounter
+          row = encounter && Combatants.rows(encounter).find { |one| one['state'].to_s == state.id.to_s }
+
+          Combatants.leave(encounter, row['id']) if row
+          state.delete
+        end
+      end
+
       # Every character's own sheet made neutral, once encounters hold what happens to them: whoever is in
       # a running encounter first takes what they carry into it. A player's roll options are theirs, and
       # a death is the story's, so both stay. Answers the characters it could not, with why: one bad row

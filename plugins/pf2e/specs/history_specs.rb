@@ -144,6 +144,17 @@ module AresMUSH
           expect(PF2Consumable[@potion.id].character).to eq Character[@hero.id]
         end
 
+        it "should leave alone what they gained since, which the change never touched" do
+          drink
+          found = PF2Consumable.create(:name => 'Rope', :character => Character[@hero.id])
+
+          expect(History.undo(encounter).ok?).to be true
+          expect(PF2Consumable[@potion.id].quantity).to eq 2
+          expect(PF2Consumable[found.id]).not_to be_nil
+
+          found.delete
+        end
+
         it "should refuse to take it back once it has moved on outside the encounter" do
           drink
           PF2Consumable[@potion.id].update(:quantity => 5)

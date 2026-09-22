@@ -101,6 +101,7 @@ module AresMUSH
       self.sheet_caches.each { |c| c.delete }
       self.pf2_effects.each { |e| e.delete }
       self.encounters.each { |e| e.characters.delete(self) }
+      Pf2e::CombatantStates.character_deleted(self)
     end
 
   end
