@@ -6,9 +6,14 @@ module AresMUSH
     #
     # Everything in the encounter - their sheet there, their Strikes and AC, what they use - reads and
     # changes the copy, so what they buy or sell outside meanwhile is no part of it. A character carrying on
-    # from an earlier encounter carries that one's copy on. When the encounter ends, only what they used up
-    # of their own consumables comes off their own inventory; the rest of the copy - their money, and
-    # anything the encounter gave them - stays with the encounter.
+    # from an earlier encounter carries that one's copy on. When the encounter ends, what they used up of
+    # their own consumables comes off their own inventory, and their money and anything that lasts no longer
+    # than the encounter stay with it.
+    #
+    # An item that something made rather than the character owning it says so: `granted_by` what made it,
+    # and `expires` when it goes - `encounter` for what the encounter gave out, `rest` for what lasts until
+    # the next daily preparations, nothing for what they keep. An alchemist's preparations and ammunition
+    # will be made this way; see `docs/plans/2026-09-22-made-and-granted-items.md`.
     module Equipment
 
       # The kinds of item, by the collection a holder keeps each in. Bags first, so an item in one can be
@@ -21,6 +26,24 @@ module AresMUSH
 
       # The links between items, which a copy points at the other copies.
       LINKS = %w{bag shield weapon}.freeze
+
+      # Something made an item for whoever holds it: the encounter gave it out, a rest prepared it, a
+      # character crafted it. `expires` says how long it lasts.
+      def self.grant!(holder, category, name, quantity, info, granted_by:, expires: nil)
+        item = Pf2egear.create_item(holder, category, name, quantity, info)
+
+        item.update(:granted_by => granted_by, :expires => expires)
+
+        item
+      end
+
+      # What lasts no longer than this, gone: the day's preparations at the next rest, what an encounter
+      # gave out when it ends.
+      def self.lapse!(holder, expires)
+        kinds.each do |collection, _model|
+          holder.public_send(collection).to_a.select { |item| item.expires == expires }.each(&:delete)
+        end
+      end
 
       def self.copies(state)
         kinds.flat_map { |collection, _model| state.public_send(collection).to_a }
@@ -55,6 +78,15 @@ module AresMUSH
       # The encounter has ended: what it did to the character's own consumables happens to them. What it
       # gave out was the encounter's, and goes no further. Answers what it could not do - an item they no
       # longer have - as events, for whoever tells it.
+      # What of the copy becomes the character's own when the encounter ends: anything it made that outlasts
+      # it. What it gave out for the encounter alone goes with it.
+      def self.kept(state)
+        kinds.flat_map do |collection, model|
+          state.public_send(collection).to_a.reject(&:copied_from).reject { |one| one.expires == 'encounter' }
+               .map { |one| [ model, one ] }
+        end
+      end
+
       def self.settle!(state)
         char = state.character
 
@@ -70,6 +102,13 @@ module AresMUSH
           next unless used.positive?
 
           missed << used_up(char, source, started['name'], used)
+        end
+
+        kept(state).each do |model, gained|
+          own = gained.attributes.except(:character_id, :state_id, :created_at, :updated_at, :copied_from,
+                                         *LINKS.map { |link| :"#{link}_id" })
+
+          gained.update(:copied_from => model.create(own.merge(:character => char)).id)
         end
 
         # Settled up to here: an encounter restarted and ended again settles only what happened since.

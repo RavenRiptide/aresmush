@@ -73,7 +73,8 @@ module AresMUSH
     end
 
     def self.items_in_inventory(list)
-      list.filter { |item| !(item.bag) }
+      # A bag is carried rather than kept in one, and has no bag of its own to ask about.
+      list.filter { |item| !(item.respond_to?(:bag) && item.bag) }
     end
 
     # What a character can carry, and the point at which it tells.

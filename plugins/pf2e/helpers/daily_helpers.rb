@@ -6,6 +6,8 @@ module AresMUSH
     # day's spells from what they have prepared, reagents, and what they invest. The GM rests them with
     # `+e/rest`, as often as the story says a night has passed.
     def self.rest(holder)
+      # What the last day's preparations made lapses before this day's are made.
+      Equipment.lapse!(holder, 'rest')
       Pf2eHP.modify_damage(holder, get_daily_healing(holder), true)
       ActiveEffects.rested(holder)
       TurnState.reset(holder, 'rest')

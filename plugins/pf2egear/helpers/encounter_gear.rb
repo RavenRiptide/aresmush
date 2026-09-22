@@ -107,7 +107,8 @@ module AresMUSH
 
         return client.emit_failure(t('pf2egear.not_found')) unless name
 
-        Pf2egear.create_item(found.state.holder, self.category, name, self.quantity, info)
+        Pf2e::Equipment.grant!(found.state.holder, self.category, name, self.quantity, info,
+                               :granted_by => 'loot', :expires => 'encounter')
 
         message = t('pf2e.loot_given', :name => enactor.name, :item => name, :many => self.quantity, :who => found.state.label)
 

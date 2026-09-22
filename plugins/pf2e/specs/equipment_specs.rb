@@ -13,6 +13,8 @@ module AresMUSH
         bootstrapper.db.load_config
 
         @hero = Character.create(:name => "Hero#{rand(1000000)}", :pf2_level => 3, :pf2_money => 900)
+        @hp = Pf2eHP.create(:character => @hero, :ancestry_hp => 8, :charclass_hp => 10)
+        @hero.update(:hp => @hp)
         @sword = PF2Weapon.create(:name => 'Longsword', :equipped => true, :character => @hero)
         @bag = PF2Bag.create(:name => 'Backpack', :character => @hero)
         @rope = PF2Gear.create(:name => 'Rope', :character => @hero, :bag => @bag)
@@ -24,6 +26,7 @@ module AresMUSH
       after(:each) do
         @encounters.each { |one| PF2Encounter[one.id]&.delete }
         [ PF2Weapon, PF2Bag, PF2Gear, PF2Consumable ].each { |model| model.find(:character_id => @hero.id).each(&:delete) }
+        @hp.delete
         @hero.delete
       end
 
@@ -81,12 +84,34 @@ module AresMUSH
       end
 
       it "should keep what the encounter gave them to the encounter" do
-        PF2Consumable.create(:name => 'Elixir of Life', :quantity => 1, :state => standing)
+        PF2Consumable.create(:name => 'Elixir of Life', :quantity => 1, :state => standing,
+                             :granted_by => 'loot', :expires => 'encounter')
 
         finish
 
         expect(PF2Consumable.find(:character_id => @hero.id).map(&:name)).to eq [ 'Minor Healing Potion' ]
         expect(standing.consumables.to_a.map(&:name)).to include('Elixir of Life')
+      end
+
+      # What a rest makes - an alchemist's preparations - lasts the day, so it leaves the encounter with them.
+      it "should give them what it made that outlasts it, until their next preparations" do
+        PF2Consumable.create(:name => "Alchemist's Fire (Lesser)", :quantity => 2, :state => standing,
+                             :granted_by => 'advanced alchemy', :expires => 'rest')
+
+        finish
+
+        kept = PF2Consumable.find(:character_id => @hero.id).to_a.find { |one| one.expires == 'rest' }
+        expect(kept&.name).to eq "Alchemist's Fire (Lesser)"
+        expect(kept.granted_by).to eq 'advanced alchemy'
+      end
+
+      it "should let what a day's preparations made lapse at the next rest" do
+        PF2Consumable.create(:name => "Alchemist's Fire (Lesser)", :quantity => 2, :state => standing,
+                             :granted_by => 'advanced alchemy', :expires => 'rest')
+
+        Pf2e.rest(standing)
+
+        expect(standing.consumables.to_a.map(&:name)).to eq [ 'Minor Healing Potion' ]
       end
 
       it "should leave their other gear and money as they are" do
@@ -173,6 +198,7 @@ module AresMUSH
           expect(@client.failures).to eq []
           given = standing.consumables.to_a.find { |one| one.name.start_with?('Healing Potion') }
           expect(given.quantity).to eq 2
+          expect([ given.granted_by, given.expires ]).to eq [ 'loot', 'encounter' ]
           expect(PF2Consumable.find(:character_id => @hero.id).map(&:name)).to eq [ 'Minor Healing Potion' ]
         end
 
