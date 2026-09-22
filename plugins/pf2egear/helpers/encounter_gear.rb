@@ -61,9 +61,10 @@ module AresMUSH
       end
     end
 
-    # `+e/loot <combatant>=<category> <item>[/<quantity>]` - gives someone an item in the encounter here,
+    # `+e/loot <combatant>=<consumable>[/<quantity>]` - gives someone a consumable in the encounter here,
     # from the catalogue, at no cost. Staff, and the trusted GMs an admin gives `trusted_gm` to; an
-    # encounter's own GM does not give things out. What it gives becomes theirs when the encounter ends.
+    # encounter's own GM does not give things out. What it gives is the encounter's: it is theirs to use
+    # there, and goes no further when the encounter ends.
     class PF2EncounterLootCmd
       include CommandHandler
 
@@ -75,9 +76,8 @@ module AresMUSH
         named = what.strip if named.empty?
 
         self.who = who.strip
-        self.category, _, item_name = named.strip.partition(' ')
-        self.category = Pf2egear::Inventory.canonical(self.category.downcase).to_s
-        self.item_name = item_name.strip.downcase
+        self.category = 'consumables'
+        self.item_name = named.strip.downcase
         self.quantity = quantity.to_i.positive? ? quantity.to_i : 1
       end
 
@@ -90,12 +90,6 @@ module AresMUSH
         return t('pf2e.loot_not_trusted') unless enactor.has_permission?('trusted_gm')
 
         nil
-      end
-
-      def check_valid_category
-        return nil if Pf2egear::Inventory.categories.include?(self.category)
-
-        t('pf2egear.bad_category')
       end
 
       def handle
@@ -113,10 +107,9 @@ module AresMUSH
 
         return client.emit_failure(t('pf2egear.not_found')) unless name
 
-        many = Pf2egear::Inventory.stackable?(self.category) ? self.quantity : 1
-        Pf2egear.create_item(found.state.holder, self.category, name, many, info)
+        Pf2egear.create_item(found.state.holder, self.category, name, self.quantity, info)
 
-        message = t('pf2e.loot_given', :name => enactor.name, :item => name, :many => many, :who => found.state.label)
+        message = t('pf2e.loot_given', :name => enactor.name, :item => name, :many => self.quantity, :who => found.state.label)
 
         client.emit_success message
         enactor_room.emit_ooc message

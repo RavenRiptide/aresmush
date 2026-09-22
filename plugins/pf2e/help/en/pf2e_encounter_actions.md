@@ -151,9 +151,9 @@ Strikes and AC, what you use - so what you buy or sell outside meanwhile is no p
 `+e/equip <category>=<number>` - Draw a weapon, put on armour, strap on a shield.
 `+e/unequip <category>=<number>` - Stow it again.
 
-`+e/loot <who>=<category> <item>[/<quantity>]` - Staff, and the trusted GMs an admin has named, give
-someone an item from the catalogue. An encounter's own GM does not give things out.
+`+e/loot <who>=<consumable>[/<quantity>]` - Staff, and the trusted GMs an admin has named, give someone a
+consumable from the catalogue, for this encounter. An encounter's own GM does not give things out.
 
-The numbers are the ones `+e/gear` shows. When the encounter ends, the consumables you used come off your
-own inventory, and anything it gave you becomes yours; everything else in the copy, your money included,
+The numbers are the ones `+e/gear` shows. When the encounter ends, the consumables you used of your own
+come off your own inventory. The rest of the copy - your money, and anything the encounter gave you -
 stays with the encounter. An encounter that carries on from another carries its copy on.

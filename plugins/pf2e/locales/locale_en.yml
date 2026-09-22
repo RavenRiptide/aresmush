@@ -529,7 +529,7 @@ en:
     award_paid: "%{name} is paid %{xp} XP and %{money} for encounter %{id}."
     award_reason: "Encounter %{id}"
     loot_not_trusted: "Only staff, and the trusted GMs an admin has named, give things out in an encounter."
-    loot_given: "%{name} gives %{who} %{many} %{item}."
+    loot_given: "%{name} gives %{who} %{many} %{item}, for this encounter."
     encounter_gear_not_in: "You are not in the encounter here. Outside an encounter, gear, use and equip work on your own things."
     settle_missing: "%{name} used %{item} in the encounter, but no longer has it; nothing came off their inventory for it."
     no_encounter_here: "There is no encounter running here, and nothing happens to a character outside one."

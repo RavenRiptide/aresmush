@@ -6,9 +6,9 @@ module AresMUSH
     #
     # Everything in the encounter - their sheet there, their Strikes and AC, what they use - reads and
     # changes the copy, so what they buy or sell outside meanwhile is no part of it. A character carrying on
-    # from an earlier encounter carries that one's copy on. When the encounter ends, what they used up of
-    # their consumables comes off their own inventory and what the encounter gave them becomes theirs;
-    # everything else in the copy, their money included, stays with the encounter.
+    # from an earlier encounter carries that one's copy on. When the encounter ends, only what they used up
+    # of their own consumables comes off their own inventory; the rest of the copy - their money, and
+    # anything the encounter gave them - stays with the encounter.
     module Equipment
 
       # The kinds of item, by the collection a holder keeps each in. Bags first, so an item in one can be
@@ -52,9 +52,9 @@ module AresMUSH
         state.update(:pf2_money => from.pf2_money.to_i, :consumables_at_start => started_with(state))
       end
 
-      # The encounter has ended: what it did to the character's consumables happens to their own, and what
-      # it gave them is theirs. Answers what it could not do - an item they no longer have - as events, for
-      # whoever tells it.
+      # The encounter has ended: what it did to the character's own consumables happens to them. What it
+      # gave out was the encounter's, and goes no further. Answers what it could not do - an item they no
+      # longer have - as events, for whoever tells it.
       def self.settle!(state)
         char = state.character
 
@@ -72,29 +72,17 @@ module AresMUSH
           missed << used_up(char, source, started['name'], used)
         end
 
-        given!(state, char)
-
         # Settled up to here: an encounter restarted and ended again settles only what happened since.
         state.update(:consumables_at_start => started_with(state))
 
         missed.compact
       end
 
-      # What the encounter gave them, of any kind, becomes theirs. The copy then points at it, so ending the
-      # encounter again gives nothing twice.
-      def self.given!(state, char)
-        kinds.each do |collection, model|
-          state.public_send(collection).to_a.reject(&:copied_from).each do |gained|
-            own = gained.attributes.except(:character_id, :state_id, :created_at, :updated_at, :copied_from,
-                                           *LINKS.map { |link| :"#{link}_id" })
-
-            gained.update(:copied_from => model.create(own.merge(:character => char)).id)
-          end
-        end
-      end
-
+      # What they came in with, by the item of their own each copy was taken from. What the encounter gave
+      # them has none, and settles nothing.
       def self.started_with(state)
-        state.consumables.to_a.to_h { |one| [ one.copied_from.to_s, { 'quantity' => one.quantity.to_i, 'name' => one.name } ] }
+        state.consumables.to_a.select(&:copied_from)
+             .to_h { |one| [ one.copied_from.to_s, { 'quantity' => one.quantity.to_i, 'name' => one.name } ] }
       end
 
       def self.used_up(char, source, name, used)

@@ -4,7 +4,7 @@ module AresMUSH
   module Pf2e
 
     # What a character carries in an encounter: a copy of their gear and money as they entered it. When it
-    # ends, the consumables they used come off their own and what it gave them becomes theirs.
+    # ends, only the consumables they used of their own come off their own inventory.
     describe Equipment, :dbtest => true do
 
       before(:each) do
@@ -80,12 +80,13 @@ module AresMUSH
         expect(PF2Consumable[@potions.id]).to be_nil
       end
 
-      it "should give them a consumable the encounter gave them" do
+      it "should keep what the encounter gave them to the encounter" do
         PF2Consumable.create(:name => 'Elixir of Life', :quantity => 1, :state => standing)
 
         finish
 
-        expect(PF2Consumable.find(:character_id => @hero.id).map(&:name)).to include('Elixir of Life')
+        expect(PF2Consumable.find(:character_id => @hero.id).map(&:name)).to eq [ 'Minor Healing Potion' ]
+        expect(standing.consumables.to_a.map(&:name)).to include('Elixir of Life')
       end
 
       it "should leave their other gear and money as they are" do
@@ -152,7 +153,7 @@ module AresMUSH
           [ @gm, @scene, @room ].each { |one| one&.delete }
         end
 
-        def loot(text = "e/loot #{@hero.name}=consumables healing potion (minor)/2", who = @gm)
+        def loot(text = "e/loot #{@hero.name}=healing potion (minor)/2", who = @gm)
           Pf2egear::PF2EncounterLootCmd.new(@client, Command.new(text), Character[who.id]).on_command
         end
 
@@ -175,13 +176,14 @@ module AresMUSH
           expect(PF2Consumable.find(:character_id => @hero.id).map(&:name)).to eq [ 'Minor Healing Potion' ]
         end
 
-        it "should let staff give it, and it is theirs when the encounter ends" do
+        it "should let staff give it, and it stays with the encounter when it ends" do
           allow_any_instance_of(Character).to receive(:is_admin?) { |char| char.name == @gm.name }
 
           loot
           finish
 
-          expect(PF2Consumable.find(:character_id => @hero.id).map(&:name)).to include('Healing Potion (Minor)')
+          expect(PF2Consumable.find(:character_id => @hero.id).map(&:name)).to eq [ 'Minor Healing Potion' ]
+          expect(standing.consumables.to_a.map(&:name)).to include('Healing Potion (Minor)')
         end
       end
 
