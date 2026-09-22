@@ -224,6 +224,8 @@ module AresMUSH
           return Pf2egear::PF2EncounterEquipCmd
         when "unequip"
           return Pf2egear::PF2EncounterUnequipCmd
+        when "loot"
+          return Pf2egear::PF2EncounterLootCmd
         when "owner"
           return PF2EncounterOwnerCmd
         when "award"

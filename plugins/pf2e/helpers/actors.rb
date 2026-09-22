@@ -230,6 +230,11 @@ module AresMUSH
       def effect_owner_field
         :character
       end
+
+      # And which an item it carries belongs to.
+      def item_owner_field
+        :character
+      end
     end
 
     # A character as they stand in an encounter: the character, with the encounter's state in place of
@@ -244,6 +249,10 @@ module AresMUSH
       end
 
       def effect_owner_field
+        :state
+      end
+
+      def item_owner_field
         :state
       end
     end
@@ -329,6 +338,11 @@ module AresMUSH
       end
 
       def notify_damage(_amount, _source)
+      end
+
+      # A creature carries nothing of its own; what it has is its stat block's.
+      def item_owner_field
+        :character
       end
 
       # Nobody plays a creature; the GM hears for it.

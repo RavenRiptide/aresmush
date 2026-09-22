@@ -3,8 +3,8 @@ require "plugin_test_loader"
 module AresMUSH
   module Pf2e
 
-    # What a character carries in an encounter: a copy of their gear and money as they entered it, of which
-    # only the consumables settle back when it ends.
+    # What a character carries in an encounter: a copy of their gear and money as they entered it. When it
+    # ends, the consumables they used come off their own and what it gave them becomes theirs.
     describe Equipment, :dbtest => true do
 
       before(:each) do
@@ -114,6 +114,75 @@ module AresMUSH
         finish
 
         expect(PF2Consumable[@potions.id].quantity).to eq 2
+      end
+
+      describe "what a GM gives out" do
+        class LootClient
+          attr_reader :failures, :said
+
+          def initialize
+            @failures = []
+            @said = []
+          end
+
+          def logged_in?
+            true
+          end
+
+          def emit_failure(message)
+            @failures << message.to_s
+          end
+
+          %w{emit_success emit emit_ooc}.each { |name| define_method(name) { |message| @said << message.to_s } }
+        end
+
+        before(:each) do
+          @client = LootClient.new
+          @room = Room.create(:name => "Vault#{rand(1000000)}")
+          @scene = Scene.create(:room => @room)
+          @room.update(:scene => @scene)
+          @gm = Character.create(:name => "Gm#{rand(1000000)}", :room => @room)
+          PF2Encounter[@encounter.id].update(:scene => @scene, :owner => @gm, :organizer => @gm.name)
+
+          allow_any_instance_of(Room).to receive(:emit_ooc)
+        end
+
+        after(:each) do
+          PF2Consumable.find(:character_id => @hero.id).each(&:delete)
+          [ @gm, @scene, @room ].each { |one| one&.delete }
+        end
+
+        def loot(text = "e/loot #{@hero.name}=consumables healing potion (minor)/2", who = @gm)
+          Pf2egear::PF2EncounterLootCmd.new(@client, Command.new(text), Character[who.id]).on_command
+        end
+
+        it "should refuse a GM who is not trusted" do
+          loot
+
+          expect(@client.failures).to eq [ t('pf2e.loot_not_trusted') ]
+          expect(standing.consumables.to_a.size).to eq 1
+        end
+
+        it "should let a trusted GM give it, in the encounter" do
+          allow_any_instance_of(Character).to receive(:has_permission?).and_call_original
+          allow_any_instance_of(Character).to receive(:has_permission?).with('trusted_gm') { |char, _| char.name == @gm.name }
+
+          loot
+
+          expect(@client.failures).to eq []
+          given = standing.consumables.to_a.find { |one| one.name.start_with?('Healing Potion') }
+          expect(given.quantity).to eq 2
+          expect(PF2Consumable.find(:character_id => @hero.id).map(&:name)).to eq [ 'Minor Healing Potion' ]
+        end
+
+        it "should let staff give it, and it is theirs when the encounter ends" do
+          allow_any_instance_of(Character).to receive(:is_admin?) { |char| char.name == @gm.name }
+
+          loot
+          finish
+
+          expect(PF2Consumable.find(:character_id => @hero.id).map(&:name)).to include('Healing Potion (Minor)')
+        end
       end
 
       it "should carry the copy on to an encounter that carries on, and settle only what that one used" do

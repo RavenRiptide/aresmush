@@ -131,7 +131,7 @@ module AresMUSH
     # space and freeze a catalogue we edit constantly.
     def self.build_item(char, category, name, item_info)
       model = Inventory.model(category)
-      item = model.create(:character => char, :name => name)
+      item = model.create(Pf2e::Actors.of(char).item_owner_field => char, :name => name)
       known = model.attributes.map(&:to_s)
 
       (item_info || {}).each_pair do |key, value|

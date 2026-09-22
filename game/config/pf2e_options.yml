@@ -100,6 +100,7 @@ pf2e:
     view_sheets: View other people's character sheets (if sheets are closed).
     kill_pc: (Associated to DM role) Has the ability to inflict Drained, Doomed, and Dead conditions on PC's.
     run_encounters: (Associated to DM role) Starts encounters, and runs the ones they start.
+    trusted_gm: (Set by an admin) Gives characters items in an encounter they run, with +e/loot.
   prof_progression:
     - untrained
     - trained
