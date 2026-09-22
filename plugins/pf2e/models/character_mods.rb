@@ -31,6 +31,9 @@ module AresMUSH
     # the turn's counts back as they were.
     attribute :pf2_last_roll, :type => DataType::Array, :default => []
 
+    # The encounter a GM's `+e` commands address while they are away from its scene (`+e/focus`).
+    attribute :pf2_encounter_focus
+
     # Circumstances the player has deliberately switched on or off, by option name. An option nobody
     # has touched is absent, and follows whatever declared it.
     attribute :pf2_roll_options, :type => DataType::Hash, :default => {}

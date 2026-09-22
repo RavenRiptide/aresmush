@@ -60,7 +60,7 @@ module AresMUSH
         return if lines.empty?
 
         message = Telling.lines(lines).join('%r')
-        gm = encounter && Character.named(encounter.organizer.to_s)
+        gm = encounter && PF2Encounter.gm_of(encounter)
 
         if gm && gm != enactor
           Login.emit_ooc_if_logged_in(gm, message)

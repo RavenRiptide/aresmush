@@ -210,11 +210,24 @@ module AresMUSH
         [ found.map { |_term, result| result.state }, missing.map(&:first) ]
       end
 
-      # The active encounter in the room the enactor is in, if there is one.
+      # The encounter a command addresses: the one running in the enactor's scene, or - for a GM away from
+      # theirs - the one they run.
       def self.encounter_here(enactor)
         scene = enactor.room&.scene
 
-        scene ? PF2Encounter.scene_active_encounter(scene) : nil
+        (scene ? PF2Encounter.scene_active_encounter(scene) : nil) || encounter_run_by(enactor)
+      end
+
+      # The encounter a GM runs from wherever they are: the one they chose with `+e/focus`, or the only one
+      # they own.
+      def self.encounter_run_by(char)
+        focused = char.pf2_encounter_focus ? PF2Encounter[char.pf2_encounter_focus] : nil
+
+        return focused if focused&.is_active && gm?(char, focused)
+
+        running = PF2Encounter.find(:owner_id => char.id).select(&:is_active)
+
+        running.size == 1 ? running.first : nil
       end
 
       # ------------------------------------------------------------------------------

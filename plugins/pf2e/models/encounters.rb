@@ -6,6 +6,9 @@ module AresMUSH
     # The initiative order, one row per combatant; `Pf2e::Combatants` reads and writes it.
     attribute :participants, :type => DataType::Array, :default => []
     attribute :next_init, :type => DataType::Integer, :default => 0
+    # Its GM: whoever started it, or whoever they handed it to. Held by the character, so a rename keeps
+    # it theirs; `organizer` is their name as it was, for an encounter from before owners were held.
+    reference :owner, "AresMUSH::Character"
     attribute :organizer
     attribute :is_active, :type => DataType::Boolean, :default => true
     attribute :round, :type => DataType::Integer, :default => 0
@@ -76,8 +79,21 @@ module AresMUSH
       enc.update(messages: message_list)
     end
 
+    # Its GM, or staff: admins run every encounter.
     def self.is_organizer?(char, encounter)
-      char.is_admin? || (char.name == encounter.organizer)
+      char.is_admin? || owned_by?(char, encounter)
+    end
+
+    def self.owned_by?(char, encounter)
+      encounter.owner_id ? encounter.owner_id == char.id : char.name == encounter.organizer
+    end
+
+    def self.gm_of(encounter)
+      encounter.owner || Character.named(encounter.organizer.to_s)
+    end
+
+    def self.hand_to(encounter, char)
+      encounter.update(:owner => char, :organizer => char.name)
     end
 
   end

@@ -54,7 +54,7 @@ module AresMUSH
         listed = Combatants.all(encounter)
 
         { id: encounter.id, round: encounter.round.to_i, active: encounter.is_active,
-          current: ActiveEffects.current_turn(encounter), organizer: encounter.organizer, gm: gm,
+          current: ActiveEffects.current_turn(encounter), organizer: PF2Encounter.gm_of(encounter)&.name || encounter.organizer, gm: gm,
           trusted: Array(encounter.trusted), difficulty: EncounterWeb.plain(Difficulty.shown(encounter)).strip,
           history: EncounterWeb.history(encounter),
           combatants: listed.map { |one| EncounterWeb.combatant(encounter, one, enactor, gm) },

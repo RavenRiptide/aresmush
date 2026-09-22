@@ -214,6 +214,10 @@ module AresMUSH
           return PF2EncounterRestCmd
         when "level"
           return PF2EncounterLevelCmd
+        when "focus"
+          return PF2EncounterFocusCmd
+        when "owner"
+          return PF2EncounterOwnerCmd
         when "award"
           return PF2EncounterAwardCmd
         when "refocus"

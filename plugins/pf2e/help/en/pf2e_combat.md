@@ -32,6 +32,13 @@ a name only one combatant has. Acting in an encounter - actions, Strikes, spells
 
 ## Encounter commands for plot runners
 
+An encounter's GM is whoever started it, or whoever it was handed to; staff can run any encounter. A GM's
+commands reach their encounter from anywhere: in its scene they address it, and away from it they
+address the one encounter the GM runs, or the one chosen with `+e/focus`.
+
+`+e/focus [<encounter ID>]`: Which of the encounters you run your commands address while you are away from its scene. With no ID, the only one you run.
+`+e/owner [<encounter ID>=]<character>`: Hands the encounter to someone else, who is its GM from then on.
+
 `encounter [<stat>][=<encounter ID>]`: For a GM - staff, or a role with the `run_encounters` permission. Starts an encounter in the scene, with you as its GM, rolling initiative on `<stat>` (Perception unless you say otherwise). Name an earlier encounter and whoever was in it carries on as they left it: their wounds, conditions, effects and spent spells. Anyone else starts fresh - their own sheet, rested.
 `+e/add [<count>] <creature>[=<name>]`: Adds creatures from the bestiary - Foundry's bestiaries, six thousand of them - each with its own id, hit points and conditions, and its initiative rolled on its Perception. `+e/add 3 goblin warrior` adds three; `+e/add goblin warrior=Grik` names one. Player characters join with `encounter/join`. (Alias: `jinit`)
 `+e/add <name>=ac <n> fort <n> ref <n> will <n> perception <n> hp <n>`: Adds a creature the bestiary lacks, from the numbers on its stat block. It has no Strikes of its own; roll its attacks with `roll`.
