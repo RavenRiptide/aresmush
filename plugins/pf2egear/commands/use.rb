@@ -20,6 +20,11 @@ module AresMUSH
         [ self.category, self.item_num ]
       end
 
+      # Whose things these are: the enactor's own. In an encounter, their copy there.
+      def holder
+        enactor
+      end
+
       def check_valid_category
         return nil if [ "weapons", "weapon", "armor", "magicitem", "consumable", "consumables" ].include?(self.category)
         return t('pf2egear.bad_category')
@@ -33,7 +38,7 @@ module AresMUSH
       def handle
         # Start by finding the item to be used.
 
-        found = Pf2egear::Inventory.item(enactor, self.category, self.item_num)
+        found = Pf2egear::Inventory.item(holder, self.category, self.item_num)
 
         return if Pf2e::CharState.emit_error!(client, found)
 

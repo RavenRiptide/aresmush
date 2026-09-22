@@ -84,10 +84,6 @@ one at a time. Nothing is rolled again: putting a change back puts back what hap
 `+e/redo` - The GM puts back the change they last took back. Anything new that happens first ends it.
 `+e/history [<encounter id>]` - Every change in the encounter, and where undo and redo stand.
 
-An item used or money paid in an encounter leaves your inventory at once, and is on the history like
-anything else: the GM can give it back. Once it has moved on outside the encounter - sold, traded, paid
-away - it can no longer be given back as it was, and the GM is told which item.
-
 An encounter's history ends with it: once it has ended, nothing in it can be taken back.
 
 A condition that lasts only a while - Feint's off-guard, Slow's slowed - ends on its own at the right
@@ -143,3 +139,18 @@ to the multiple attack penalty; the Improved form is a free action.
 as Air Scamp's fast healing only in open air. Each is on until you switch it off. With no option
 named, lists them.
 A creature's turn reminder, and its hit points after it is hurt, go to you alone.
+
+## What you carry
+
+As you enter an encounter, it takes a copy of what you carry: your gear, what you wear, wield and have
+invested, and your money. Everything in the encounter works from that copy - your sheet there, your
+Strikes and AC, what you use - so what you buy or sell outside meanwhile is no part of it.
+
+`+e/gear [<who>]` - What you carry in the encounter here.
+`+e/use <category>=<number>[/<use>]` - Use an item you carry there: drink a potion, spend a charge.
+`+e/equip <category>=<number>` - Draw a weapon, put on armour, strap on a shield.
+`+e/unequip <category>=<number>` - Stow it again.
+
+The numbers are the ones `+e/gear` shows. When the encounter ends, the consumables you used come off your
+own inventory, and any it gave you go on; everything else in the copy stays with the encounter. An
+encounter that carries on from another carries its copy on.

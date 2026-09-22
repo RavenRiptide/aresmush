@@ -6,7 +6,9 @@ module AresMUSH
       #
       # Whatever could not outlast the fight ends with it; so do the turn's counts, what may be used once
       # an encounter, a trust given for this fight, and the cover and concealment set on its combatants.
-      # Its history is frozen from here. Answers what ended, as events for whoever tells it.
+      # What its characters used of their consumables comes off their own inventories, and what it gave
+      # them goes on (`Equipment.settle!`). Its history is frozen from here. Answers what ended, and what
+      # could not be settled, as events for whoever tells it.
       module Ending
         def self.end!(encounter)
           PF2Encounter[encounter.id].update(:is_active => false)
@@ -20,7 +22,7 @@ module AresMUSH
 
           PF2Encounter[encounter.id].update(:trusted => [], :cover => {}, :concealment => {})
 
-          ended
+          ended + PF2Encounter[encounter.id].states.to_a.flat_map { |state| Equipment.settle!(state) }
         end
       end
     end

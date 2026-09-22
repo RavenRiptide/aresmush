@@ -113,10 +113,7 @@ module AresMUSH
             Pf2eHP.modify_damage(CombatantStates.of(PF2Encounter[@first.id], Character[@second.id]), 1)
           end
           @state = CombatantStates.of(PF2Encounter[@first.id], Character[@second.id])
-          @potion = PF2Consumable.create(:name => 'Potion', :character => hero)
         end
-
-        after(:each) { PF2Consumable[@potion.id]&.delete if @potion }
 
         it "should take them out of every encounter they are in" do
           Character[@second.id].delete

@@ -109,6 +109,9 @@ module AresMUSH
         expect(@client.failures.pop).to eq t('pf2e.encounter_start_gm_only')
 
         run(PF2InitiateCombatCmd, 'encounter')
+        # What the hero carries as they join is what they carry in the fight.
+        potion = PF2Consumable.create(:name => 'Minor Healing Potion', :quantity => 1, :character => Character[@hero.id])
+
         # The hero joins on the statistic they name, in any case: `dex` is Dexterity.
         run(PF2InitJoinCmd, "encounter/join #{encounter.id}=stealthy", @hero)
         expect(@client.failures.pop).to eq t('pf2e.bad_initiative_stat', :stat => 'stealthy')
@@ -167,13 +170,18 @@ module AresMUSH
         expect(TurnState.turn(hero)['attacks']).to eq 0
         expect(npc(3).pf2_conditions).to_not have_key('Frightened')
 
-        # A potion drunk mid-fight is gone at once, and the GM can give it back.
-        potion = PF2Consumable.create(:name => 'Minor Healing Potion', :quantity => 1, :character => Character[@hero.id])
-        run(Pf2egear::PF2UseItemCmd, 'use consumable=0', @hero)
-        expect(PF2Consumable[potion.id]).to be_nil
+        # A potion drunk mid-fight is gone from what they carry there, and the GM can give it back. Their own
+        # potion is untouched until the fight ends, and what they buy meanwhile is no part of it.
+        run(Pf2egear::PF2EncounterUseCmd, 'e/use consumable=0', @hero)
+        expect(hero.consumables.to_a).to eq []
+        expect(PF2Consumable[potion.id]).not_to be_nil
         run(PF2EncounterUndoCmd, 'e/undo')
-        expect(PF2Consumable[potion.id].quantity).to eq 1
-        PF2Consumable[potion.id].delete
+        expect(hero.consumables.to_a.map(&:quantity)).to eq [ 1 ]
+        run(PF2EncounterUndoCmd, 'e/redo')
+        dagger = PF2Weapon.create(:name => 'Dagger', :character => Character[@hero.id])
+        @client.said.clear
+        run(Pf2egear::PF2EncounterGearCmd, 'e/gear', @hero)
+        expect(@client.said.join).not_to include('Dagger')
 
         @client.said.clear
         run(PF2EncounterHistoryCmd, 'e/history')
@@ -181,6 +189,11 @@ module AresMUSH
 
         run(PF2EncounterTrustCmd, "e/trust #{@hero.name}")
         run(PF2EncounterEndCmd, "encounter/end #{encounter.id}")
+
+        # The potion drunk in the fight comes off their own inventory as it ends; the dagger they bought stays.
+        expect(PF2Consumable[potion.id]).to be_nil
+        expect(PF2Weapon[dagger.id]).not_to be_nil
+        dagger.delete
         run(PF2EncounterUndoCmd, 'e/undo')
         expect(@client.failures.pop).to eq t('pf2e.no_encounter_here')
 

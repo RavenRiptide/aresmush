@@ -109,71 +109,55 @@ module AresMUSH
         expect(ActiveEffects.on(standing)).to eq []
       end
 
-      describe "what its people carry" do
+      describe "what its characters carry" do
+        def carried_potion
+          standing.consumables.to_a.first
+        end
+
         before(:each) do
           @potion = PF2Consumable.create(:name => 'Minor Healing Potion', :quantity => 2, :character => @hero)
+          @encounter.states.each(&:delete)
+          @encounter.update(:participants => [])
+          Combatants.join(PF2Encounter[@encounter.id], @hero.name, 10, :holder => Character[@hero.id])
         end
 
         after(:each) { PF2Consumable[@potion.id]&.delete }
 
         def drink
-          History.recording(encounter, 'Hero: use consumable=1') do
-            left = PF2Consumable[@potion.id].quantity - 1
-            left.zero? ? PF2Consumable[@potion.id].delete : PF2Consumable[@potion.id].update(:quantity => left)
+          History.recording(encounter, 'Hero: +e/use consumable=0') do
+            left = carried_potion.quantity - 1
+            left.zero? ? carried_potion.delete : carried_potion.update(:quantity => left)
           end
         end
 
-        it "should give back an item used, and take it again" do
+        it "should give back an item used, and take it again, in the encounter's copy only" do
           drink
 
           History.undo(encounter)
-          expect(PF2Consumable[@potion.id].quantity).to eq 2
+          expect(carried_potion.quantity).to eq 2
 
           History.redo(encounter)
-          expect(PF2Consumable[@potion.id].quantity).to eq 1
+          expect(carried_potion.quantity).to eq 1
+          expect(PF2Consumable[@potion.id].quantity).to eq 2
         end
 
         it "should bring back the last of an item, used up" do
           drink
           drink
-          expect(PF2Consumable[@potion.id]).to be_nil
+          expect(carried_potion).to be_nil
 
           History.undo(encounter)
 
-          expect(PF2Consumable[@potion.id].quantity).to eq 1
-          expect(PF2Consumable[@potion.id].character).to eq Character[@hero.id]
+          expect(carried_potion.quantity).to eq 1
         end
 
-        it "should leave alone what they gained since, which the change never touched" do
-          drink
-          found = PF2Consumable.create(:name => 'Rope', :character => Character[@hero.id])
-
-          expect(History.undo(encounter).ok?).to be true
-          expect(PF2Consumable[@potion.id].quantity).to eq 2
-          expect(PF2Consumable[found.id]).not_to be_nil
-
-          found.delete
-        end
-
-        it "should refuse to take it back once it has moved on outside the encounter" do
+        it "should be untouched by what happens to the character's own things outside" do
           drink
           PF2Consumable[@potion.id].update(:quantity => 5)
 
-          undone = History.undo(encounter)
-
-          expect(undone.code).to eq :moved
-          expect(undone.args['what']).to eq 'Minor Healing Potion'
+          expect(History.undo(encounter).ok?).to be true
+          expect(carried_potion.quantity).to eq 2
           expect(PF2Consumable[@potion.id].quantity).to eq 5
-        end
-
-        it "should give back money spent, through the audit" do
-          start = Character[@hero.id].pf2_money
-          History.recording(encounter, 'Hero: pay') { Pf2egear.pay_player(Character[@hero.id], -30, 'Hero', 'bribe') }
-
-          History.undo(encounter)
-
-          expect(Character[@hero.id].pf2_money).to eq start
-          expect(Pf2e::Audit.consistent?(Character[@hero.id], 'money')).to be true
         end
       end
 

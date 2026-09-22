@@ -18,6 +18,11 @@ module AresMUSH
         [ self.category, self.item_num ]
       end
 
+      # Whose things these are: the enactor's own. In an encounter, their copy there.
+      def holder
+        enactor
+      end
+
       # What can be taken off again: the same list equipping accepts.
       def check_valid_category
         return nil if PF2GearEquipCmd::EQUIPPABLE.include?(self.category)
@@ -31,7 +36,7 @@ module AresMUSH
       end
 
       def handle
-        found = Pf2egear::Inventory.item(enactor, self.category, self.item_num)
+        found = Pf2egear::Inventory.item(holder, self.category, self.item_num)
 
         return if Pf2e::CharState.emit_error!(client, found)
 

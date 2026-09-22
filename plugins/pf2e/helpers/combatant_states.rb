@@ -37,6 +37,7 @@ module AresMUSH
 
         state.update(:focus_current => pool)
         Pf2emagic.generate_spells_today(state) if char.magic
+        Equipment.copy!(state, char)
 
         state
       end
@@ -50,6 +51,8 @@ module AresMUSH
 
           Pf2eEffect.create(own.merge(:state => state, :encounter => encounter))
         end
+
+        Equipment.copy!(state, prior)
 
         state
       end
@@ -76,6 +79,7 @@ module AresMUSH
         state = Pf2eCombatantState.create(held.compact.transform_keys(&:to_sym).merge(:character => char, :encounter => encounter))
 
         char.pf2_effects.each { |effect| effect.update(:state => state, :character => nil, :encounter => encounter) }
+        Equipment.copy!(state, char)
 
         state
       end

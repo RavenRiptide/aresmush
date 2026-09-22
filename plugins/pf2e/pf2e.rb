@@ -216,6 +216,14 @@ module AresMUSH
           return PF2EncounterLevelCmd
         when "focus"
           return PF2EncounterFocusCmd
+        when "gear"
+          return Pf2egear::PF2EncounterGearCmd
+        when "use"
+          return Pf2egear::PF2EncounterUseCmd
+        when "equip"
+          return Pf2egear::PF2EncounterEquipCmd
+        when "unequip"
+          return Pf2egear::PF2EncounterUnequipCmd
         when "owner"
           return PF2EncounterOwnerCmd
         when "award"

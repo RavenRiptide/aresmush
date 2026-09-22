@@ -13,6 +13,10 @@ module AresMUSH
     attribute :nickname
 
     reference :character, "AresMUSH::Character"
+    # An encounter's copy of a character's item, taken as they entered it: the encounter reads and changes
+    # this, never the item itself. `copied_from` is the character's own item.
+    reference :state, "AresMUSH::Pf2eCombatantState"
+    attribute :copied_from
     collection :weapons, "AresMUSH::PF2Weapon", :bag
     collection :armor, "AresMUSH::PF2Armor", :bag
     collection :shields, "AresMUSH::PF2Shield", :bag

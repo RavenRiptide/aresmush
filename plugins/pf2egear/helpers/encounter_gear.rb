@@ -1,0 +1,66 @@
+module AresMUSH
+  module Pf2egear
+
+    # The gear commands in an encounter, on what a character carries there: the encounter's copy of their
+    # gear, taken as they entered it (`Pf2e::Equipment`). Outside, the same commands work on their own.
+    # Held here rather than in commands/ because each extends a command defined there, which loads first.
+    module EncounterGear
+      def holder
+        return @holder if defined?(@holder)
+
+        encounter = Pf2e::Combatants.encounter_here(enactor)
+        @holder = encounter ? Pf2e::CombatantStates.of(encounter, enactor) : nil
+      end
+
+      def check_in_encounter
+        holder ? nil : t('pf2e.encounter_gear_not_in')
+      end
+    end
+
+    # `+e/use <category>=<number>[/<use>]`
+    class PF2EncounterUseCmd < PF2UseItemCmd
+      include EncounterGear
+    end
+
+    # `+e/equip <category>=<number>` - draw a weapon, put on armour, strap on a shield.
+    class PF2EncounterEquipCmd < PF2GearEquipCmd
+      include EncounterGear
+    end
+
+    # `+e/unequip <category>=<number>` - stow it again.
+    class PF2EncounterUnequipCmd < PF2GearUnequipCmd
+      include EncounterGear
+    end
+
+    # `+e/gear [<combatant>]` - what a character carries in the encounter here.
+    class PF2EncounterGearCmd
+      include CommandHandler
+
+      attr_accessor :who
+
+      def parse_args
+        self.who = trim_arg(cmd.args)
+      end
+
+      def handle
+        encounter = Pf2e::Combatants.encounter_here(enactor)
+
+        return client.emit_failure(t('pf2e.no_encounter_here')) unless encounter
+
+        found = Pf2e::Combatants.find(encounter, self.who || enactor.name)
+
+        return if Pf2e::CharState.emit_error!(client, found)
+        return client.emit_failure(t('pf2e.encounter_sheet_creature', :ref => found.state.ref)) if found.state.creature?
+
+        char = Pf2e::Actors.of(found.state.holder).person
+        allowed = Pf2e::Sheet.viewable?(enactor, char, 'combat')
+
+        return if Pf2e::CharState.emit_error!(client, allowed)
+
+        client.emit Pf2eDisplayGearTemplate.new(found.state.holder, client).render
+      end
+    end
+
+    [ PF2EncounterUseCmd, PF2EncounterEquipCmd, PF2EncounterUnequipCmd ].each { |command| command.prepend(Pf2e::Recorded) }
+  end
+end

@@ -33,9 +33,21 @@ module AresMUSH
     attribute :focus_current, :type => DataType::Integer, :default => 0
     attribute :revelation_locked, :type => DataType::Boolean, :default => false
 
+    # What they carry in the encounter: a copy of their own gear and money as they entered it
+    # (`Pf2e::Equipment`), which is all the encounter reads or changes.
+    attribute :pf2_money, :type => DataType::Integer, :default => 0
+    attribute :consumables_at_start, :type => DataType::Hash, :default => {}
+
     reference :character, "AresMUSH::Character"
     reference :encounter, "AresMUSH::PF2Encounter"
     collection :pf2_effects, "AresMUSH::Pf2eEffect", :state
+    collection :weapons, "AresMUSH::PF2Weapon", :state
+    collection :armor, "AresMUSH::PF2Armor", :state
+    collection :shields, "AresMUSH::PF2Shield", :state
+    collection :magic_items, "AresMUSH::PF2MagicItem", :state
+    collection :consumables, "AresMUSH::PF2Consumable", :state
+    collection :gear, "AresMUSH::PF2Gear", :state
+    collection :bags, "AresMUSH::PF2Bag", :state
 
     index :character_id
     index :encounter_id
@@ -44,10 +56,12 @@ module AresMUSH
 
     # Its own fields; everything else is the character's.
     OWN = (Pf2e::StateHP::FIELDS + %w{pf2_conditions pf2_persistent pf2_turn_state pf2_derived
-                          pf2_is_dead pf2_reagents spells_today focus_current revelation_locked}).freeze
+                          pf2_is_dead pf2_reagents spells_today focus_current revelation_locked pf2_money
+                          consumables_at_start}).freeze
 
     def delete_effects
       self.pf2_effects.each(&:delete)
+      Pf2e::Equipment.copies(self).each(&:delete)
     end
 
     def name
