@@ -37,9 +37,11 @@ module AresMUSH
         item
       end
 
-      # What lasts no longer than this, gone: the day's preparations at the next rest, what an encounter
-      # gave out when it ends.
+      # What lasts no longer than this, gone: the day's preparations at the next rest, what Quick Alchemy
+      # made at the maker's next turn. A creature carries nothing of its own, so it has none of this.
       def self.lapse!(holder, expires)
+        return unless Actors.of(holder).carries_items?
+
         kinds.each do |collection, _model|
           holder.public_send(collection).to_a.select { |item| item.expires == expires }.each(&:delete)
         end

@@ -94,6 +94,11 @@ module AresMUSH
             Ledger.add_to_list(by_rank[p['rank'].to_s] ||= [], p['spell'])
           }
         },
+        # A formula a character knows, by the kind of thing it makes: bought, crafted, or given by staff.
+        'grant_formula' => {
+          'key' => 'formula', 'sheet' => 'formulas', 'sync' => 'bucketed', 'default_bucket' => 'consumables',
+          'apply' => lambda { |sheet, p| Ledger.add_to_bucket(sheet['formulas'], p['category'] || 'consumables', p['formula']) }
+        },
         'set_prof' => {
           'key' => 'key', 'sheet' => 'profs',
           'apply' => lambda { |sheet, p| (sheet['profs'][p['group']] ||= {})[p['key']] = p['to'] }
@@ -147,6 +152,7 @@ module AresMUSH
           'specials' => [],
           'spells' => {},
           'profs' => {},
+          'formulas' => {},
           'unsupported' => []
         }
       end
@@ -202,6 +208,7 @@ module AresMUSH
         'pf2_special' => 'specials',
         'pf2_lang' => 'languages',
         'pf2_boosts' => 'boosts',
+        'pf2_formula_book' => 'formulas',
         'pf2_level_tracker' => nil # kept for the old readers; filled by the store
       }.freeze
 

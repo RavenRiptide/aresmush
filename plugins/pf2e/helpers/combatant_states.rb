@@ -35,7 +35,7 @@ module AresMUSH
         state = Pf2eCombatantState.create(:character => char, :encounter => encounter)
         pool = char.magic ? (char.magic.focus_pool || {})['max'].to_i : 0
 
-        state.update(:focus_current => pool)
+        state.update(:focus_current => pool, :pf2_reagents => char.pf2_reagents || {})
         Pf2emagic.generate_spells_today(state) if char.magic
         Equipment.copy!(state, char)
 

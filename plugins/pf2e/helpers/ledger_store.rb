@@ -148,6 +148,7 @@ module AresMUSH
           'specials' => char.pf2_special,
           'languages' => char.pf2_lang,
           'boosts' => char.pf2_boosts,
+          'formulas' => char.pf2_formula_book,
           'spells' => Pf2emagic::Entries.known_lists(char),
           # What the derived scores are compared against.
           'ability_scores' => char.abilities.each_with_object({}) { |a, h| h[a.name] = a.base_val }
@@ -429,6 +430,7 @@ module AresMUSH
         },
         'add_trait' => lambda { |char, p| char.update(:pf2_traits => (Array(char.pf2_traits) + [ p['trait'] ]).uniq) },
         'add_special' => lambda { |char, p| char.update(:pf2_special => (Array(char.pf2_special) + [ p['special'] ]).uniq) },
+        'grant_formula' => lambda { |char, p| Pf2e::Crafting.write_formula(char, p['category'], p['formula']) },
         'set_ability_score' => lambda { |char, p| Ledger.apply_ability_score(char, p['ability'], p['to'].to_i) },
         'spell_access' => lambda { |char, p|
           known = Pf2emagic::Entries.known(char.magic, p['source'])
@@ -453,6 +455,7 @@ module AresMUSH
           char.update(:pf2_features => features)
         },
         'add_trait' => lambda { |char, match| char.update(:pf2_traits => Array(char.pf2_traits).reject { |t| t.to_s.casecmp?(match['trait'].to_s) }) },
+        'grant_formula' => lambda { |char, match| Pf2e::Crafting.write_formula(char, match['category'], match['formula'], :remove => true) },
         'add_special' => lambda { |char, match| char.update(:pf2_special => Array(char.pf2_special).reject { |s| s.to_s.casecmp?(match['special'].to_s) }) },
         'spell_access' => lambda { |char, match|
           known = Pf2emagic::Entries.known(char.magic, match['source'])

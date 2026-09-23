@@ -33,6 +33,7 @@ module AresMUSH
         return events unless holder
 
         TurnState.started(holder, round)
+        Equipment.lapse!(holder, 'turn')
         ActiveEffects.on(holder).each { |effect| ActiveEffects.give_temp_hp(holder, effect, 'on_turn_start') }
 
         events + heal(holder)

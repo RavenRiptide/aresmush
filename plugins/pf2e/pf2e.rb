@@ -226,6 +226,8 @@ module AresMUSH
           return Pf2egear::PF2EncounterUnequipCmd
         when "loot"
           return Pf2egear::PF2EncounterLootCmd
+        when "alchemy"
+          return PF2EncounterAlchemyCmd
         when "owner"
           return PF2EncounterOwnerCmd
         when "award"
@@ -309,12 +311,25 @@ module AresMUSH
         end
       when "listxp"
         return PF2ListXPCmd
-      when "formulas"
+      when "alchemy"
+        case cmd.switch
+        when "prepare"
+          return PF2AlchemyPrepareCmd
+        when "clear"
+          return PF2AlchemyClearCmd
+        when nil
+          return PF2AlchemyViewCmd
+        end
+      when "formula", "formulas"
         case cmd.switch
         when "add"
           return PF2FormulaAddCmd
         when "remove"
           return PF2FormulaRemoveCmd
+        when "buy"
+          return PF2FormulaBuyCmd
+        when "reverse"
+          return PF2FormulaReverseCmd
         when nil
           return PF2DisplayFormulasCmd
         end

@@ -63,6 +63,9 @@ module AresMUSH
     attribute :pf2_formula_book, :type => DataType::Hash, :default => {}
     attribute :pf2_reagents, :type => DataType::Hash, :default => {}
     attribute :pf2_alloc_reagents, :type => DataType::Integer, :default => 0
+
+    # What an alchemist will make of their reagents at their next preparations: `{ item => how many }`.
+    attribute :pf2_alchemy_plan, :type => DataType::Hash, :default => {}
     attribute :pf2_cnotes, :type => DataType::Hash, :default => {}
 
     collection :abilities, "AresMUSH::Pf2eAbilities"

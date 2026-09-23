@@ -22,6 +22,9 @@ module AresMUSH
 
       daily_refresh_reagents(holder)
       do_daily_investiture(holder)
+
+      # Their reagents are refreshed before what they prepared is made of them.
+      Alchemy.at_rest!(holder)
     end
 
     # A full night's rest recovers Constitution modifier times level, doubled by Fast Recovery and its
