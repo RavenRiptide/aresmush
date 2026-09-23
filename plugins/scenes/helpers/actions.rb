@@ -104,10 +104,9 @@ module AresMUSH
       scene.update(completed: true)
       scene.update(date_completed: Time.now)
 
-      # CUSTOM CODE ADD FOR EMBLEM OF EA: Stop all active encounters in the scene.
-      scene.encounters.each do |e|
-        e.update(is_active: nil)
-      end
+      # CUSTOM CODE ADD FOR EMBLEM OF EA: an encounter still running ends with its scene, as if its GM
+      # had ended it.
+      scene.encounters.select(&:is_active).each { |encounter| Pf2e::Encounters::Ending.end!(encounter) }
 
       # Can't use the regular notify method because of watcher race condition
       web_msg = "#{scene.id}||#{:status_changed}|"

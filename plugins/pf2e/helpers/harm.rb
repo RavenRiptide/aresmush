@@ -1,0 +1,24 @@
+module AresMUSH
+  module Pf2e
+
+    # Damage and healing, for whoever takes it. Each actor keeps its own hit points - a character's are
+    # `Pf2eHP`, which knows about dying, wounds and temporary hit points; a creature's are its stat
+    # block's maximum less what it has taken - and works out what it resists before anything lands.
+    module Harm
+
+      # `{ 'amount' => what they took after resistances, 'applied' => the resistances that counted }`
+      def self.damage(holder, amount, kind = nil, is_dm: false)
+        Actors.of(holder).damage(amount, kind, :is_dm => is_dm)
+      end
+
+      def self.heal(holder, amount, options = [])
+        Actors.of(holder).heal(amount, options)
+      end
+
+      # `12 / 20`, for whoever may see it.
+      def self.hit_points(holder)
+        Actors.of(holder).hit_points
+      end
+    end
+  end
+end

@@ -8,24 +8,17 @@ aliases:
 ---
 # Pathfinder 2E - Damage and Healing
 
-As part of normal Pathfinder 2e gameplay, Emblem of Ea tracks damage dealt to a character, and healing given to a character, on a dynamic and manual basis.
+Damage, healing and conditions happen in an encounter, to a character as they stand in it. A character's
+own sheet stays whole: `sheet` shows them as they are, and `+e/sheet` shows them in the encounter here,
+with what it has done to them. Outside an encounter these commands have nobody to change.
 
-## Player commands
+A target may be a combatant's id from `+e/view`: `damage #3=5 fire`.
 
-These commands will only work in the context of a scene, unless you are a game admin.
+## Anyone in the encounter
 
-`heal <player list> = <amount>`: Heals each character in `<player list>` for `<amount>`, up to their maximum HP.
+`heal <list>=<amount>[ <action>]`: Heals each of them for `<amount>`, up to their maximum Hit Points. Name the action - `treat wounds` - and a bonus to healing from it applies.
 
-## Organizer Commands
+## The GM
 
-These commands will only work if you are running an encounter inside a scene, or are a DM or game admin. A DM can use these only within context of a scene.
-
-`damage[/ndc] <player list> = <amount>`: Damages each character in `<player list>` for `<amount>`. The optional `/ndc` is for Plotmasters and admins only, and disables the check to see if a character is dead. It has no effect for organizers without admin or Plotmaster roles.
-`damage/reset`: Usable in encounter mode only, and only by the organizer. Clears all damage for all participants in the encounter.
-`condition/set <player>=<condition>[/<value>]`: Sets <condition> on <player>.
-`condition/unset <player>=<condition>`: Removes <condition> from <player>.
-
-## For Game Admins
-
-`condition/clear <player>`: Clears all conditions from a player sheet.
-`damage/clear <player list>`: Clears all damage from a player sheet.
+`damage[/ndc] <list>=<amount>[ <kind>]`: Damages each of them for `<amount>`. Naming the kind - `fire`, `cold`, `persistent-damage` - lets anything they are immune to, weak to, or resistant to apply before the damage lands; without one, nothing resists it. `/ndc` is for Plotmasters and admins, and stops the damage bringing on death.
+`condition/set <list>=<condition>[/<value>]`: Sets `<condition>` on each of them. `<value>` is 1-5; 0 clears the condition.

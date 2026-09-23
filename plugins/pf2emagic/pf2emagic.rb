@@ -32,16 +32,12 @@ module AresMUSH
         end
       when "magic"
         return PF2MagicDisplayCmd
-      when "refocus"
-        return PF2RefocusCmd
       when "spellbook"
         return PF2MagicSpellbookCmd
       when "repertoire"
         return PF2MagicRepertoireCmd
       when 'dfont'
         return PF2DivineFontCmd
-      when "cast"
-        return PF2CastSpellsCmd
       end
     end
 

@@ -18,6 +18,11 @@ module AresMUSH
         [ self.category, self.item_num ]
       end
 
+      # Whose things these are: the enactor's own. In an encounter, their copy there.
+      def holder
+        enactor
+      end
+
       # Only what can be worn or wielded. A bag is carried, and gear is not equipped at all.
       EQUIPPABLE = %w{weapons weapon armor shields shield}.freeze
 
@@ -35,12 +40,12 @@ module AresMUSH
       def handle
         # Armour and a shield are worn one at a time, which Inventory says rather than this command.
         if Pf2egear::Inventory.single?(self.category) &&
-           Pf2egear::Inventory.held(enactor, self.category).any? { |item| item.equipped }
+           Pf2egear::Inventory.held(holder, self.category).any? { |item| item.equipped }
           client.emit_failure t('pf2egear.already_equipped')
           return
         end
 
-        found = Pf2egear::Inventory.item(enactor, self.category, self.item_num)
+        found = Pf2egear::Inventory.item(holder, self.category, self.item_num)
 
         return if Pf2e::CharState.emit_error!(client, found)
 

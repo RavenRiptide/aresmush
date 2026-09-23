@@ -1,13 +1,33 @@
 module AresMUSH
   module Pf2e
 
+    # `+e/start [<stat>][=<encounter id>]` - starts an encounter in the scene, rolling initiative on the
+    # stat, and carrying on from the encounter named: whoever was in that one starts this one as they left
+    # it.
     class PF2InitiateCombatCmd
       include CommandHandler
 
-      attr_accessor :init
+      attr_accessor :init, :from
 
       def parse_args
-        self.init = titlecase_arg(cmd.args)
+        stat, _, from = cmd.args.to_s.partition('=')
+
+        self.init = titlecase_arg(stat.strip.empty? ? nil : stat.strip)
+        self.from = from.strip.delete_prefix('#').empty? ? nil : from.strip.delete_prefix('#')
+      end
+
+      # Only a GM starts an encounter: staff, or anyone whose role may run them.
+      def check_is_gm
+        return nil if enactor.is_admin? || enactor.has_permission?('run_encounters')
+
+        t('pf2e.encounter_start_gm_only')
+      end
+
+      def check_from
+        return nil unless self.from
+        return nil if PF2Encounter[self.from]
+
+        t('pf2e.bad_id', :type => 'encounter')
       end
 
       def check_is_approved
@@ -34,22 +54,22 @@ module AresMUSH
           return
         end
 
-        # If no argument, initiative is based on Perception.
-        init_stat = self.init ? self.init : 'Perception'
+        # Initiative is Perception unless the GM names something else.
+        init_stat = Pf2e.initiative_stat(self.init || 'Perception')
 
-        valid_init_stat = Pf2e.is_valid_init_stat?(init_stat)
-
-        if !valid_init_stat
-          client.emit_failure t('pf2e.not_unique')
+        unless init_stat
+          client.emit_failure t('pf2e.bad_initiative_stat', :stat => self.init)
           return
         end
 
         # Do it.
 
         encounter = PF2Encounter.create(
+          owner: enactor,
           organizer: enactor.name,
           scene: scene,
-          init_stat: init_stat
+          init_stat: init_stat,
+          carries_on_from: self.from
         )
 
 

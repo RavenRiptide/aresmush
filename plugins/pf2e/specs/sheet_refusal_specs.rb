@@ -97,6 +97,14 @@ module AresMUSH
         end
       end
 
+      describe PF2StatBreakdownCmd do
+        it "should refuse a viewer who may not see the figure" do
+          client = run(PF2StatBreakdownCmd, caster_less('Shown'), 'sheet/why ac=Shown', :enactor => viewer)
+
+          expect(client.failures.size).to eq 1
+        end
+      end
+
       describe PF2ShowSheetCmd do
         it "should refuse to share a section the sharer has not got" do
           other = caster_less('Someone')

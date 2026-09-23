@@ -1,4 +1,15 @@
 ---
+# `crit_spec` is the critical specialization effect as a player reads it. `crit_spec_effects` is what
+# the engine applies on a critical hit with a weapon of the group, where the effect is something it
+# can do rather than movement on the map - read by `Pf2e.crit_spec_consequences`:
+#
+#   condition   set on the target, at `value`, `until` a turn counted from the attacker's
+#   persistent  persistent damage of `type`, plus the weapon's potency rune where `potency` says so
+#   damage_per_die  more damage of the weapon's own kind, per weapon damage die
+#   save        the target saves against the attacker's `against` DC; `failure` is what a failure does
+#
+# A group with only `crit_spec` - Axe, Bow, Club, Polearm, Shield, Bomb - is movement or a judgement
+# the GM makes, and its text is shown for them to apply.
 pf2e_weapon_groups:
   Axe:
     crit_spec: "Choose one creature adjacent to the initial target and within reach. If its AC is lower than your attack roll result for the critical hit, you deal damage to that creature equal to the result of the weapon damage die you rolled (including extra dice for its striking rune, if any). This amount isn't doubled, and no bonuses or other additional dice apply to this damage."
@@ -8,27 +19,37 @@ pf2e_weapon_groups:
     crit_spec: "If the target of the critical hit is adjacent to a surface, it gets stuck to that surface by the missile. The target is immobilized and must spend an Interact action to attempt a DC 10 Athletics check to pull the missile free; it can't move from its space until it succeeds. The creature doesn't become stuck if it is incorporeal, is liquid (like a water elemental or some oozes), or could otherwise escape without effort."
   Brawling:
     crit_spec: "The target must succeed at a Fortitude save against your class DC or be slowed 1 until the end of your next turn."
+    crit_spec_effects: [{"save": "fortitude", "against": "class_dc", "failure": [{"condition": "Slowed", "value": 1, "until": "next-turn-end"}]}]
   Club:
     crit_spec: "You knock the target away from you up to 10 feet (you choose the distance). This is forced movement."
   Crossbow:
     crit_spec: "The target takes 1d8 persistent bleed damage. You gain an item bonus to this bleed damage equal to the weapon's item bonus to attack rolls."
+    crit_spec_effects: [{"persistent": "1d8", "type": "bleed", "potency": true}]
   Dart:
     crit_spec: "The target takes 1d6 persistent bleed damage. You gain an item bonus to this bleed damage equal to the weapon's item bonus to attack rolls."
+    crit_spec_effects: [{"persistent": "1d6", "type": "bleed", "potency": true}]
   Flail:
     crit_spec: "The target is knocked prone."
+    crit_spec_effects: [{"condition": "Prone"}]
   Hammer:
     crit_spec: "The target is knocked prone."
+    crit_spec_effects: [{"condition": "Prone"}]
   Knife:
     crit_spec: "The target takes 1d6 persistent bleed damage. You gain an item bonus to this bleed damage equal to the weapon's item bonus to attack rolls."
+    crit_spec_effects: [{"persistent": "1d6", "type": "bleed", "potency": true}]
   Pick:
     crit_spec: "The weapon viciously pierces the target, who takes 2 additional damage per weapon damage die."
+    crit_spec_effects: [{"damage_per_die": 2}]
   Polearm:
     crit_spec: "The target is moved 5 feet in a direction of your choice. This is forced movement."
   Shield:
     crit_spec: "You knock the target back from you 5 feet. This is forced movement."
   Sling:
     crit_spec: "The target must succeed at a Fortitude save against your class DC or be stunned 1."
+    crit_spec_effects: [{"save": "fortitude", "against": "class_dc", "failure": [{"condition": "Stunned", "value": 1}]}]
   Spear:
     crit_spec: "The weapon pierces the target, weakening its attacks. The target is clumsy 1 until the start of your next turn."
+    crit_spec_effects: [{"condition": "Clumsy", "value": 1, "until": "next-turn-start"}]
   Sword:
     crit_spec: "The target is made off-balance by your attack, becoming flat-footed until the start of your next turn."
+    crit_spec_effects: [{"condition": "Off-Guard", "until": "next-turn-start"}]

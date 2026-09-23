@@ -29,10 +29,11 @@ module AresMUSH
           return
         end
 
-        # Do it.
+        Pf2e::Encounters::Ending.end!(encounter).each do |event|
+          client.emit_ooc Pf2e::Telling.render(event)
+        end
 
-        encounter.update(is_active: false)
-
+        encounter = PF2Encounter[encounter.id]
         @message = t('pf2e.encounter_complete', :id => encounter.id)
 
         # Emit to the room.

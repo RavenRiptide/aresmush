@@ -60,6 +60,10 @@ module AresMUSH
           return PF2ShowSheetCmd
         when "combat"
           return PF2DisplayCombatSheetCmd
+        when "why"
+          return PF2StatBreakdownCmd
+        when "option", "options"
+          return PF2RollOptionCmd
         else
           return PF2DisplaySheetCmd
         end
@@ -148,8 +152,90 @@ module AresMUSH
         when "set"
           return PF2ConditionSetCmd
         end
-      when "encounter", "initiative", "init"
+      when "effect"
         case cmd.switch
+        when "add"
+          return PF2EffectAddCmd
+        when "remove"
+          return PF2EffectRemoveCmd
+        when "view"
+          return PF2EffectViewCmd
+        when "search"
+          return PF2EffectSearchCmd
+        end
+      when "effects"
+        return PF2EffectListCmd
+      when "action"
+        # `action/available/combat` arrives as one switch.
+        return PF2ActionAvailableCmd if cmd.switch.to_s.start_with?('available')
+
+        case cmd.switch
+        # Using an action is acting: the same command whether or not an encounter is running.
+        when "use"
+          return PF2EncounterActCmd
+        when "search"
+          return PF2ActionSearchCmd
+        when nil
+          return PF2ActionViewCmd
+        end
+      when "encounter", "initiative", "init", "e"
+        case cmd.switch
+        when "act"
+          return PF2EncounterActCmd
+        when "strike"
+          return PF2EncounterStrikeCmd
+        when "cast"
+          return PF2EncounterCastCmd
+        when "as"
+          return PF2EncounterAsCmd
+        when "why"
+          return PF2EncounterWhyCmd
+        when "turn"
+          return PF2EncounterTurnCmd
+        when "cover"
+          return PF2EncounterCoverCmd
+        when "conceal"
+          return PF2EncounterConcealCmd
+        when "trust", "untrust"
+          return PF2EncounterTrustCmd
+        when "creature"
+          return PF2EncounterCreatureCmd
+        when "bestiary"
+          return PF2EncounterBestiaryCmd
+        when "enter", "leave"
+          return PF2EncounterAuraCmd
+        when "option"
+          return PF2EncounterOptionCmd
+        when "sheet"
+          return PF2EncounterSheetCmd
+        when "undo", "redo"
+          return PF2EncounterUndoCmd
+        when "rest"
+          return PF2EncounterRestCmd
+        when "level"
+          return PF2EncounterLevelCmd
+        when "focus"
+          return PF2EncounterFocusCmd
+        when "gear"
+          return Pf2egear::PF2EncounterGearCmd
+        when "use"
+          return Pf2egear::PF2EncounterUseCmd
+        when "equip"
+          return Pf2egear::PF2EncounterEquipCmd
+        when "unequip"
+          return Pf2egear::PF2EncounterUnequipCmd
+        when "loot"
+          return Pf2egear::PF2EncounterLootCmd
+        when "alchemy"
+          return PF2EncounterAlchemyCmd
+        when "owner"
+          return PF2EncounterOwnerCmd
+        when "award"
+          return PF2EncounterAwardCmd
+        when "refocus"
+          return PF2EncounterRefocusCmd
+        when "history"
+          return PF2EncounterHistoryCmd
         when "start"
           return PF2InitiateCombatCmd
         when "view"
@@ -170,10 +256,6 @@ module AresMUSH
           return PF2EncounterEndCmd
         when "restart"
           return PF2EncounterRestartCmd
-        when "bonus", "penalty"
-          return PF2EncounterBonusPenaltyCmd
-        when "expire"
-          return PF2EncounterExpireBonusesCmd
         when "remove"
           return PF2EncounterRemoveCmd
         when nil
@@ -229,21 +311,28 @@ module AresMUSH
         end
       when "listxp"
         return PF2ListXPCmd
-      when "refresh"
-        return PF2ForceRefreshCmd
-      when "rest"
-        return PF2DailyPrepCmd
-      when "formulas"
+      when "alchemy"
+        case cmd.switch
+        when "prepare"
+          return PF2AlchemyPrepareCmd
+        when "clear"
+          return PF2AlchemyClearCmd
+        when nil
+          return PF2AlchemyViewCmd
+        end
+      when "formula", "formulas"
         case cmd.switch
         when "add"
           return PF2FormulaAddCmd
         when "remove"
           return PF2FormulaRemoveCmd
+        when "buy"
+          return PF2FormulaBuyCmd
+        when "reverse"
+          return PF2FormulaReverseCmd
         when nil
           return PF2DisplayFormulasCmd
         end
-      when "autorest"
-        return PF2AutoDailyPrepCmd
       when "cnote"
         case cmd.switch
         when "add"
@@ -285,6 +374,12 @@ module AresMUSH
         return PF2SkillFeatsHandler
       when "pf2DedicationFeats"
         return PF2DedicationFeatsHandler
+      when "pf2Encounter"
+        return PF2EncounterHandler
+      when "pf2Actions"
+        return PF2ActionsHandler
+      when "pf2LastRoll"
+        return PF2LastRollHandler
       end
 
       nil

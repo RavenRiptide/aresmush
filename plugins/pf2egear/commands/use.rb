@@ -20,6 +20,11 @@ module AresMUSH
         [ self.category, self.item_num ]
       end
 
+      # Whose things these are: the enactor's own. In an encounter, their copy there.
+      def holder
+        enactor
+      end
+
       def check_valid_category
         return nil if [ "weapons", "weapon", "armor", "magicitem", "consumable", "consumables" ].include?(self.category)
         return t('pf2egear.bad_category')
@@ -33,7 +38,7 @@ module AresMUSH
       def handle
         # Start by finding the item to be used.
 
-        found = Pf2egear::Inventory.item(enactor, self.category, self.item_num)
+        found = Pf2egear::Inventory.item(holder, self.category, self.item_num)
 
         return if Pf2e::CharState.emit_error!(client, found)
 
@@ -95,16 +100,16 @@ module AresMUSH
           return
         end
 
-        if !(uses.include? self.use_option)
+        if self.use_option && !uses.include?(self.use_option)
           client.emit_failure t('pf2egear.bad_use', :options => uses.sort.join(", "))
           return
         end
 
-        selected_use = self.use_option ? uses[self.use_option] : uses.first
+        selected_use = self.use_option || uses.first
 
         details = use[selected_use]
 
-        base_msg = t('pf2egear.item_use_ok', :name => char.name, :item => item.name)
+        base_msg = t('pf2egear.item_use_ok', :name => enactor.name, :item => item.name)
         use_option_msg = t('pf2egear.use_option', :use => selected_use)
 
         message = base_msg + "%b" + use_option_msg

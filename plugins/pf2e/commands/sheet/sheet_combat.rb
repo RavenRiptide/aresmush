@@ -23,7 +23,9 @@ module AresMUSH
 
         return if Pf2e::CharState.emit_error!(client, outcome)
 
-        client.emit PF2CombatSheetTemplate.new(char, client).render
+        rendered = Pf2e::SheetReads.holding(char) { PF2CombatSheetTemplate.new(char, client).render }
+
+        client.emit rendered
       end
 
     end

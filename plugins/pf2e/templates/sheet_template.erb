@@ -1,7 +1,7 @@
 <%= header %>
 <%= center("#{title_color}Pathfinder 2E: #{name}", 78) %>%xn
 <%= divider %>
-<% if section == "info" || "all" %>
+<% if [ "info", "all" ].include?(section) %>
 <%= section_line("Basic Information") %>
 <%= left("#{item_color}Ancestry%xn: #{ancestry}", 39) -%>
 <%= left("#{item_color}Heritage%xn: #{heritage}", 39) %>
@@ -23,13 +23,13 @@
 <% if section == "all" %>
 <%= section_line("Abilities") -%>
 <% end %>
-<% if section == "ability" || "all" -%>
+<% if [ "ability", "all" ].include?(section) -%>
 <% abilities.each do |a| -%>
 <%= a -%>
 <% end %>
 
 <% end %>
-<% if section == "all" %>
+<% if [ "combat", "all" ].include?(section) %>
 <%= section_line("Stats") %>
 <%= left("#{item_color}HP%xn: #{hp}",39) -%>
 <%= left("#{item_color}Temp HP%xn: #{temp_hp}",39) %>
@@ -63,25 +63,27 @@
 <% if section == "all" %>
 <%= section_line("Skills") -%>
 <% end %>
-<% if section == "skills" || "all" %>
+<% if [ "skills", "all" ].include?(section) %>
 <% skills.each do |s| %>
 <%= s -%>
 <% end %>
 <% end %>
 
+<% if [ "languages", "all" ].include?(section) %>
 <%= section_line("Languages") %>
 <%= languages %>
+<% end %>
 <% if section == "all" %>
 <%= section_line("Class & Archetype Features") %>
 <% end %>
-<% if section == "features" || "all" %>
+<% if [ "features", "all" ].include?(section) %>
 <%= "#{item_color}Class Feature(s)%xn: #{class_features}" %>
 <%= "#{item_color}Archetype Feature(s)%xn: #{archetype_features}" %>
 <% end %>
 <% if section == "all" %>
 <%= section_line("Feats") %>
 <% end %>
-<% if section == "feats" || "all" %>
+<% if [ "feats", "all" ].include?(section) %>
 <%= feats %>
 <% end %>
 <% if section == "all" %>
@@ -90,7 +92,8 @@
 <%= kf -%>
 <% end %>
 
-<% if section == "all" || "magic" %>
+<% end %>
+<% if [ "magic", "all" ].include?(section) %>
 <%= section_line("Magic") %>
 <% if magic_stats %>
 <%= magic_header %>
@@ -100,7 +103,6 @@
 <%= "%rDetails of spells can be found using %x172magic%xn." %>
 <% else %>
 <%= no_magic_msg %>
-<% end %>
 <% end %>
 <% end %>
 <%= footer %>

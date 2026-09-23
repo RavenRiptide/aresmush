@@ -25,7 +25,7 @@ module AresMUSH
       end
 
       def organizer
-        @encounter.organizer
+        PF2Encounter.gm_of(@encounter)&.name || @encounter.organizer
       end
 
       def roll_init_cmd

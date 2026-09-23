@@ -33,12 +33,16 @@ module AresMUSH
           return
         end
 
-        msg = PF2e.update_formula(char, self.category, self.name)
+        found = Pf2e::Crafting.entry(self.category, self.name)
 
-        if msg
-          client.emit_failure msg
-          return
-        end
+        return if Pf2e::CharState.emit_error!(client, found)
+
+        named = found.state.first
+
+        return client.emit_failure(t('pf2e.formula_known', :formula => named)) if Pf2e::Crafting.known?(char, self.category, named)
+
+        Pf2e::Crafting.learn!(char, self.category, named, :source_type => 'staff', :source_ref => "formula: #{named}",
+                                                          :granted_by => enactor.name)
 
         client.emit_success t('pf2e.updated_ok', :element => 'Formulas', :char => char.name)
       end

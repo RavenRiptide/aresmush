@@ -7,10 +7,6 @@ module AresMUSH
     attribute :pf2_reset, :type => DataType::Boolean
     attribute :advancing, :type => DataType::Boolean
 
-    # Used for daily refresh
-    attribute :pf2_last_refresh, :type => DataType::Time
-    attribute :pf2_auto_refresh, :type => DataType::Boolean
-
     attribute :pf2_base_info, :type => DataType::Hash, :default => { 'ancestry'=>"", 'heritage'=>"", 'background'=>"", 'charclass'=>"", "specialize"=>"", 'specialize_info'=>"" }
     attribute :pf2_level, :type => DataType::Integer, :default => 1
     attribute :pf2_xp, :type => DataType::Integer, :default => 0
@@ -22,6 +18,30 @@ module AresMUSH
 
     attribute :pf2_archetypeinfo, :type => DataType::Hash, :default => { 'archetype1'=>"", 'archetype2'=>"", 'archetype3'=>"", 'archetype4'=>"", 'archetype_specialty1'=>"", 'archetype_specialty2'=>"", 'archetype_specialty3'=>"", 'archetype_specialty4'=>"", 'archetype_specialty_choice1'=>"", 'archetype_specialty_choice2'=>"", 'archetype_specialty_choice3'=>"", 'archetype_specialty_choice4'=>"" }
     attribute :pf2_conditions, :type => DataType::Hash, :default => {}
+    # Persistent damage the character is taking, one per kind of damage: its dice and the DC of the flat
+    # check that ends it.
+    attribute :pf2_persistent, :type => DataType::Array, :default => []
+    # What happened since the character's last turn that their next one needs to know: regeneration
+    # switched off by the damage that stops it.
+    attribute :pf2_turn_state, :type => DataType::Hash, :default => {}
+
+    # Every modifier of the last roll this player made or made for someone, for `+e/why`. Its own
+    # attribute rather than a key of the turn's state: the one who types a command is often the one it
+    # changed, and writing this back into that hash from the copy read before the command would put
+    # the turn's counts back as they were.
+    attribute :pf2_last_roll, :type => DataType::Array, :default => []
+
+    # The encounter a GM's `+e` commands address while they are away from its scene (`+e/focus`).
+    attribute :pf2_encounter_focus
+
+    # Circumstances the player has deliberately switched on or off, by option name. An option nobody
+    # has touched is absent, and follows whatever declared it.
+    attribute :pf2_roll_options, :type => DataType::Hash, :default => {}
+
+    # Values an effect wrote that nothing else owns: counters other rules ask about, a lowered recovery
+    # DC, extra carrying capacity. Derived rather than chosen, so it is rewritten whenever the effects
+    # that set it change. Pf2e::Paths is the registry of what may be written here and how.
+    attribute :pf2_derived, :type => DataType::Hash, :default => {}
     attribute :pf2_features, :type => DataType::Hash, :default => { 'charclass_features'=>[], 'archetype_features'=>[] }
     attribute :pf2_traits, :type => DataType::Array, :default => []
     attribute :pf2_feats, :type => DataType::Hash, :default => { "ancestry"=>[], "charclass"=>[], "skill"=>[], "general"=>[], "archetype" => [], "dedication" => [] }
@@ -43,6 +63,9 @@ module AresMUSH
     attribute :pf2_formula_book, :type => DataType::Hash, :default => {}
     attribute :pf2_reagents, :type => DataType::Hash, :default => {}
     attribute :pf2_alloc_reagents, :type => DataType::Integer, :default => 0
+
+    # What an alchemist will make of their reagents at their next preparations: `{ item => how many }`.
+    attribute :pf2_alchemy_plan, :type => DataType::Hash, :default => {}
     attribute :pf2_cnotes, :type => DataType::Hash, :default => {}
 
     collection :abilities, "AresMUSH::Pf2eAbilities"
@@ -60,6 +83,9 @@ module AresMUSH
     collection :pf2_ledger_entries, "AresMUSH::Pf2eLedgerEntry"
     collection :sheet_caches, "AresMUSH::Pf2eSheetCache"
 
+    # What the character is under for a while - Heroism, Rage, a potion. Live state, not sheet state.
+    collection :pf2_effects, "AresMUSH::Pf2eEffect"
+
     # The steps of an open draft, which exist only until it commits.
     collection :draft_steps, "AresMUSH::Pf2eDraftStep"
     collection :chargen_checkpoints, "AresMUSH::Pf2eChargenCheckpoint"
@@ -76,7 +102,9 @@ module AresMUSH
       Pf2e::Audit.delete_all!(self)
       self.spellcasting_entries.each { |e| e.delete } if self.respond_to?(:spellcasting_entries)
       self.sheet_caches.each { |c| c.delete }
-      self.encounters.each {|e| e.delete self}
+      self.pf2_effects.each { |e| e.delete }
+      self.encounters.each { |e| e.characters.delete(self) }
+      Pf2e::CombatantStates.character_deleted(self)
     end
 
   end

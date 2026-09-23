@@ -109,6 +109,9 @@ module AresMUSH
       delete_poses_and_log
       Scenes.find_all_scene_links(self).each { |s| s.delete }
       self.plot_links.each { |p| p.delete }
+
+      # CUSTOM CODE ADD FOR EMBLEM OF EA: a scene's encounters go with it.
+      self.encounters.each { |e| e.delete }
     end
     
     def all_info_set?

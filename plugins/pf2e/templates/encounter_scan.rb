@@ -22,7 +22,8 @@ module AresMUSH
       def player_list
         list = []
 
-        @encounter.characters.sort{ |a, b| a.name <=> b.name }.each do |char|
+        # As they stand in the encounter: its damage, and the conditions and effects that move their figures.
+        @encounter.states.to_a.sort_by(&:name).each do |char|
           list << format_player(char)
         end
 
@@ -30,7 +31,13 @@ module AresMUSH
 
       end
 
+      # One read block per character, because the figures below all ask the same questions about the
+      # same one.
       def format_player(char)
+        AresMUSH::Pf2e::SheetReads.holding(char) { player_row(char) }
+      end
+
+      def player_row(char)
         name = char.name
         charclass = char.pf2_base_info['charclass']
         hp = Pf2eHP.display_character_hp(char)
