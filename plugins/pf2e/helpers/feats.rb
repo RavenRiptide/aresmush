@@ -1987,23 +1987,7 @@ module AresMUSH
     def self.choice_lore_pool(char, filter)
       filter = {} unless filter.is_a?(Hash)
 
-      skills = Global.read_config('pf2e_skills') || {}
-
-      list = skills.keys.select do |name|
-        details = skills[name]
-
-        lore_skill?(name, details) && !(details.is_a?(Hash) && details['hidden'])
-      end
-
-      if filter['group']
-        wanted = Array(filter['group']).compact.map { |g| g.to_s.downcase }
-
-        list = list.select do |name|
-          groups = Array(skills[name]['lore_groups']).compact.map { |g| g.to_s.downcase }
-
-          wanted.any? { |w| groups.include?(w) }
-        end
-      end
+      list = lore_skills(filter['group'])
 
       trained = char.skills.reject { |s| s.prof_level.to_s.casecmp?('untrained') }.map { |s| s.name.to_s.downcase }
 
@@ -2015,6 +1999,110 @@ module AresMUSH
       return true if details.is_a?(Hash) && !Array(details['lore_groups']).empty?
 
       name.to_s.strip =~ /\bLore\z/i ? true : false
+    end
+
+    # Lore skills from pf2e_skills.yml, sorted, leaving out any marked hidden. Given groups, only
+    # the lores tagged with at least one of them.
+    def self.lore_skills(groups = nil)
+      skills = Global.read_config('pf2e_skills') || {}
+
+      list = skills.keys.select do |name|
+        details = skills[name]
+
+        lore_skill?(name, details) && !(details.is_a?(Hash) && details['hidden'])
+      end
+
+      unless groups.nil?
+        wanted = Array(groups).compact.map { |g| g.to_s.downcase }
+
+        list = list.select { |name| (lore_groups_of(skills[name]) & wanted).any? }
+      end
+
+      list.sort
+    end
+
+    # A skill entry's lore_groups tags, downcased.
+    def self.lore_groups_of(details)
+      return [] unless details.is_a?(Hash)
+
+      Array(details['lore_groups']).compact.map { |g| g.to_s.downcase }
+    end
+
+    # The lore groups skills/lore lists, from pf2e_options.yml, keyed by group name.
+    def self.lore_group_lists
+      Global.read_config('pf2e', 'lore_group_lists') || {}
+    end
+
+    # The lore group a player typed, by its name or one of its aliases. Nil when it is neither.
+    def self.find_lore_group(input)
+      wanted = input.to_s.strip.downcase
+
+      lore_group_lists.keys.find do |group|
+        details = lore_group_lists[group] || {}
+
+        group.to_s.downcase == wanted || Array(details['aliases']).any? { |a| a.to_s.downcase == wanted }
+      end
+    end
+
+    # How a lore group is shown: its configured name, or its key with each word capitalized.
+    def self.lore_group_display_name(group)
+      name = (lore_group_lists[group] || {})['name']
+      return name.to_s unless name.to_s.strip.empty?
+
+      group.to_s.split(' ').map(&:capitalize).join(' ')
+    end
+
+    # Every lore group's display name, in the order listed, for the skills/lore index.
+    def self.lore_group_index
+      lore_group_lists.keys.map { |group| lore_group_display_name(group) }
+    end
+
+    # One line per alias, for the skills/lore index. An alias that only repeats the group's
+    # display name - crafting, for Crafting - says nothing, so it is left out.
+    def self.lore_group_alias_lines
+      lore_group_lists.flat_map do |group, details|
+        name = lore_group_display_name(group)
+
+        Array((details || {})['aliases']).reject { |a| a.to_s.casecmp?(name) }.map do |a|
+          t('pf2e.lore_group_alias', :alias => a.to_s.split(' ').map(&:capitalize).join(' '), :group => name)
+        end
+      end
+    end
+
+    # A lore group's lores as [heading, lores] pairs. A group without sections is one list with no
+    # heading. A group with sections is split by those tags in the order they are listed, and any
+    # lore that fits none of them trails under "Other" rather than disappearing.
+    def self.lore_group_sections(group)
+      details = lore_group_lists[group] || {}
+      lores = lore_skills(group) - Array(Global.read_config('pf2e', 'hidden_options'))
+      sections = details['sections']
+
+      return [ [ nil, lores ] ] unless sections.is_a?(Hash) && !sections.empty?
+
+      skills = Global.read_config('pf2e_skills') || {}
+      placed = []
+
+      result = sections.map do |tag, heading|
+        in_section = lores.select { |name| lore_groups_of(skills[name]).include?(tag.to_s.downcase) }
+        placed.concat(in_section)
+
+        [ heading, in_section ]
+      end
+
+      leftover = lores - placed
+      result << [ t('pf2e.lore_group_other'), leftover ] unless leftover.empty?
+
+      result.reject { |_, list| list.empty? }
+    end
+
+    # One page of a lore group's sections. A group with sections_per_page is paged by whole
+    # sections, so a region never splits across two pages; any other group is a single page.
+    def self.lore_group_page(group, page)
+      sections = lore_group_sections(group)
+      per_page = (lore_group_lists[group] || {})['sections_per_page'].to_i
+      per_page = sections.size if per_page < 1
+
+      Paginator.paginate(sections, page, [ per_page, 1 ].max)
     end
 
     # Weapons matching a from_weapons filter, drawn from pf2e_weapons.yml.

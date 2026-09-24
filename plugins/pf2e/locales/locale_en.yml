@@ -295,7 +295,6 @@ en:
     advancement_feat_grants_addl: "This feat grants an additional %{element}. See '%xwadvance/review%xn%xc' for more information."
     cg_feat_grants_addl: "This feat grants an additional %{element}. See '%xwcg/review%xn%xr' for more information."
     feat_type_missing: "You must specify a feat type. Example: '%xwcg/feat skill=Recognize Spell%xn%xc'."
-    feat_search_next_page: "To advance to the next page, use '%xw%{command}%xn%xc'"
     feat_set_ok: "Feat %{name} added to list %{type}."
     swapspell_limit: "You can only swap one repertoire spell per advancement."
     swapspell_locked: "That spell is granted by your class and cannot be swapped."
@@ -315,6 +314,12 @@ en:
 
     lang_issues: "You still have %{count} language(s) to assign."
 
+    lore_group_alias: "%xc%{alias}%xn is an alias for %{group} Lores."
+    lore_group_aliases_heading: "Aliases"
+    lore_group_not_found: "There is no lore group called '%{group}'. Type '%xwskills/lore%xn%xr' to see the lore groups."
+    lore_group_other: "Other"
+    lore_group_title: "%{group} Lores"
+    lore_groups_title: "Lore Groups"
     lock_info_first: "This command cannot be used until you you have set all Basic Information. Please check '%xwcg/review%xn%xr' and run '%xwcommit info%xn%xr' after making any remaining selections. Basic Information includes Ancestry, Heritage, Background, Class, Specialty, and a Specialty Detail (if one is available for your chosen specialty)."
     lock_abil_first: "This command cannot be used until you have set and committed your attribute scores."
     lock_skills_first: "This command cannot be used until you have set and committed your skills."
@@ -336,6 +341,7 @@ en:
     must_be_word: "The first character of your alias must be a letter."
     must_confirm: "Enter '%xwcg/reset confirm%xn%xc' to confirm that you want to wipe your sheet."
 
+    next_page_hint: "To see the next page, type '%xc%{command}%xn'."
     no_cginfo_available: "The option you chose for %{prereq} does not have options for %{element}."
     no_double_mojo: "%xrYou may take one restricted option, and you have taken more than one: %{options}. Change all but one of them to a common option.%xn"
     no_duplicate_boosts: "The boosts for a given category must all be assigned to different stats."
@@ -391,6 +397,7 @@ en:
 
     scene_has_active_encounter: "This scene already has encounter %{id} active. Please end this encounter before starting another."
     skill_issues: "Your skills are not yet complete. Use '%xwcg/review%xn%xr' to see what is missing."
+    skills_list_lore_note: "Look up Lore skill groups and subcategories with the '%xcskills/lore%xn' command.%rSee '%xchelp skills%xn' for more information."
     skills_list_title: "Skills Available on Emblem of Ea"
     specialty_not_set: "You have not yet chosen a specialty."
     specialty_no_info: "Your specialty does not have further options, this command is not needed."

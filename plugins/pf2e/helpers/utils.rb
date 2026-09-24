@@ -501,5 +501,21 @@ module AresMUSH
       ary - scrubs
     end
 
+    # The line under a page footer that says how to see the next page, built from the command as
+    # dispatched: 'skills/lore city' on page 1 gives 'skills/lore2 city'. Shortcuts have already
+    # been applied by then, so a player's shortcut comes back as the full command, which still
+    # works. Nil on the last page, or when everything fits on one.
+    def self.next_page_hint(cmd, paginator)
+      return nil unless cmd && paginator
+      return nil unless paginator.current_page < paginator.total_pages
+
+      page = paginator.current_page + 1
+      command = "#{cmd.prefix}#{cmd.root}"
+      command << (cmd.switch ? "/#{cmd.switch}#{page}" : page.to_s)
+      command << " #{cmd.args}" unless cmd.args.to_s.strip.empty?
+
+      t('pf2e.next_page_hint', :command => command)
+    end
+
   end
 end
