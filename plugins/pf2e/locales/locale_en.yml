@@ -341,7 +341,7 @@ en:
     must_be_word: "The first character of your alias must be a letter."
     must_confirm: "Enter '%xwcg/reset confirm%xn%xc' to confirm that you want to wipe your sheet."
 
-    next_page_hint: "To see the next page, type '%xc%{command}%xn'."
+    next_page_hint: "To see the next page, enter '%xc%{command}%xn'."
     no_cginfo_available: "The option you chose for %{prereq} does not have options for %{element}."
     no_double_mojo: "%xrYou may take one restricted option, and you have taken more than one: %{options}. Change all but one of them to a common option.%xn"
     no_duplicate_boosts: "The boosts for a given category must all be assigned to different stats."
