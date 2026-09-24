@@ -81,7 +81,7 @@ module AresMUSH
       has_focus_magic = Entries.focus?(magic)
 
       if max.zero?
-        recalculated_max = get_max_focus_pool(target, 0)
+        recalculated_max = expected_focus_pool(target)
         recalculated_max = 1 if recalculated_max.zero? && has_focus_magic
 
         if recalculated_max.zero?
@@ -186,43 +186,79 @@ module AresMUSH
       current.to_i + value.strip.to_i
     end
 
-    def self.get_max_focus_pool(char, change)
-      magic = char.magic
+    # The focus pool a character's sources add up to, capped at three as PF2e caps it.
+    def self.expected_focus_pool(char)
+      focus_pool_sources(char).sum { |_source, points| points }.clamp(0, 3)
+    end
 
-      return 0 unless magic
+    # Every source of focus points a character holds, as [ source, points ] pairs:
+    #
+    # - the class, whose chargen block the specialty's and then the specialty option's replace,
+    #   as chargen merges them; then the class's and specialty's level blocks up to their level
+    # - each feat held, from its magic_stats, plus one for a feat whose choice is the subclass's
+    #   focus spell
+    # - each archetype held, its specialty, and that specialty's choice
+    def self.focus_pool_sources(char)
+      base = char.pf2_base_info || {}
+      charclass = base['charclass'].to_s
+      class_info = Global.read_config('pf2e_class', charclass) || {}
+      specialty_info = (Global.read_config('pf2e_specialty', charclass) || {})[base['specialize'].to_s] || {}
+      option_info = ((specialty_info['choose'] || {})['options'] || {})[base['specialize_info'].to_s] || {}
 
-      # Calculate all the focus pool points that the character could have available.
-      # From character class
+      sources = []
 
-      mstat_class = Global.read_config('pf2e_class', char.pf2_base_info['charclass'], 'chargen')['magic_stats']
+      chargen = [ class_info, specialty_info, option_info ].map { |info| focus_points_in(info['chargen']) }.compact.last
+      sources << [ charclass, chargen ] if chargen
 
-      if mstat_class
-        fp_from_charclass = mstat_class['focus_pool'] ? mstat_class['focus_pool'] : 0
-      else
-        fp_from_charclass = 0
+      [ class_info, specialty_info ].each do |info|
+        (info['advance'] || {}).each_pair do |level, block|
+          points = focus_points_in(block)
+          sources << [ "#{charclass} level #{level}", points ] if points && level.to_i <= char.pf2_level.to_i
+        end
       end
 
-      # From feats
-      all_feats = Pf2e::DraftSheet.of(char).feats_by_bucket.values.flatten.uniq
-
-      values = []
-
-      all_feats.each do |feat|
+      Pf2e::DraftSheet.of(char).feats_by_bucket.values.flatten.each do |feat|
         details = Pf2e.get_feat_details(feat)
-        (values << 0 && next) if details.is_a? String
+        next if details.is_a?(String)
 
-        mstats = details[1]['magic_stats']
-        (values << 0 && next) unless mstats
+        name, info = details
+        choice = info['feat_choice'].is_a?(Hash) ? info['feat_choice'] : {}
+        points = focus_points_in(info).to_i + (choice['from'].to_s == 'subclass_spell' ? 1 : 0)
 
-        feat_fp = mstats['focus_pool']
-        (values << 0 && next) unless feat_fp
-
-        values << feat_fp
+        sources << [ name, points ] if points > 0
       end
 
-      fp_from_feats = values.sum
+      archetypes = char.pf2_archetypeinfo || {}
 
-      (fp_from_charclass + fp_from_feats + change).clamp(0,3)
+      (1..4).each do |slot|
+        archetype = archetypes["archetype#{slot}"].to_s
+        next if archetype.blank?
+
+        specialty = archetypes["archetype_specialty#{slot}"].to_s
+        choice = archetypes["archetype_specialty_choice#{slot}"].to_s
+        spec_info = specialty.blank? ? {} : (Global.read_config('pf2e_archetype_specialty', archetype, specialty) || {})
+        choice_info = choice.blank? ? {} : (((spec_info['choose'] || {})['options'] || {})[choice] || {})
+
+        [
+          [ archetype, Global.read_config('pf2e_archetype', archetype) || {} ],
+          [ "#{archetype} (#{specialty})", spec_info ],
+          [ "#{archetype} (#{choice})", choice_info ]
+        ].each do |source, info|
+          points = focus_points_in(info['initial_dedication'])
+          sources << [ source, points ] if points
+        end
+      end
+
+      sources
+    end
+
+    # The focus_pool a block's magic_stats name, or nil when they name none.
+    def self.focus_points_in(block)
+      return nil unless block.is_a?(Hash) && block['magic_stats'].is_a?(Hash)
+
+      points = block['magic_stats']['focus_pool']
+
+      points.nil? ? nil : points.to_i
     end
 
     def self.get_spell_details(term)

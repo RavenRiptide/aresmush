@@ -132,7 +132,10 @@ module AresMUSH
       added.each_with_object(existing.dup) do |(key, value), merged|
         current = merged[key]
 
-        merged[key] = if current.is_a?(Hash) && value.is_a?(Hash)
+        # Focus points are counted per source, so two sources in one level add up.
+        merged[key] = if key.to_s == 'focus_pool' && !current.nil?
+          current.to_i + value.to_i
+        elsif current.is_a?(Hash) && value.is_a?(Hash)
           current.merge(value)
         elsif current.is_a?(Array) && value.is_a?(Array)
           current + value

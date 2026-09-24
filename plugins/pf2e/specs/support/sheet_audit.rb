@@ -200,12 +200,12 @@ module AresMUSH
           'name' => 'focus pool',
           'check' => lambda { |ctx|
             char, cc, want, level = ctx.values_at('char', 'charclass', 'want', 'level')
-            return [] if want['focus_pool'].zero?
 
             held = (char.magic&.focus_pool || {})['max'].to_i
+            # The class tables give the class's points; the feats the build took add their own.
             # PF2e caps a focus pool at three however many sources feed it.
-            wanted = [ want['focus_pool'], 3 ].min
-            return [] if held >= wanted
+            wanted = [ want['focus_pool'] + SheetAudit.feat_focus_points(char), 3 ].min
+            return [] if held == wanted
 
             [ "focus pool maximum is #{held}, not #{wanted}" ]
           }
@@ -413,6 +413,21 @@ module AresMUSH
 
       def self.known_count(char, charclass)
         known_by_rank(char, charclass).values.sum(&:size)
+      end
+
+      # Focus points from held feats: one from a feat whose magic_stats name a focus_pool, and one
+      # from a feat whose choice is the subclass's focus spell.
+      def self.feat_focus_points(char)
+        feats = Global.read_config('pf2e_feats') || {}
+
+        all_feats(char).sum do |name|
+          info = feats[name]
+          next 0 unless info.is_a?(Hash)
+
+          choice = info['feat_choice'].is_a?(Hash) ? info['feat_choice'] : {}
+
+          (info['magic_stats'] || {})['focus_pool'].to_i + (choice['from'].to_s == 'subclass_spell' ? 1 : 0)
+        end
       end
 
       # feat name (downcased) => the types the game says it is.

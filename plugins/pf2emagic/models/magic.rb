@@ -212,12 +212,14 @@ module AresMUSH
           to_assign["repertoire"] = assignment_list
 
         when "focus_pool"
+          # Each source adds its points to the pool once, as it is granted. PF2e caps the pool at
+          # three however many sources feed it.
           pool = magic.focus_pool
 
           old_max_pool = pool["max"].to_i
           old_current_pool = pool["current"].to_i
 
-          new_max_pool = Pf2emagic.get_max_focus_pool(char, value)
+          new_max_pool = (old_max_pool + value.to_i).clamp(0, 3)
           pool["max"] = new_max_pool
 
           new_current_pool = if old_max_pool.zero? && old_current_pool.zero?
