@@ -138,100 +138,6 @@ pf2e_specialty:
                 - trip
                 - unarmed
       instinct_ability: Bestial Rage
-      rage_ability:
-        Ape:
-          attack:
-            Ape Fist:
-              damage: d12
-              damage_type: B
-              traits:
-              - grapple
-              - unarmed
-        Bear:
-          attack:
-            Bear Jaws:
-              damage: d12
-              damage_type: P
-              traits:
-              - unarmed
-            Bear Claws:
-              damage: d8
-              damage_type: S
-              traits:
-              - agile
-              - unarmed
-        Bull:
-          attack:
-            Bull Horn:
-              damage: d12
-              damage_type: P
-              traits:
-              - shove
-              - unarmed
-        Cat:
-          attack:
-            Cat Jaws:
-              damage: d12
-              damage_type: P
-              traits:
-              - unarmed
-            Cat Claws:
-              damage: d8
-              damage_type: S
-              traits:
-              - agile
-              - unarmed
-        Deer:
-          attack:
-            Deer Antler:
-              damage: d10
-              damage_type: P
-              traits:
-              - charge
-              - unarmed
-              reach: 10
-        Frog:
-          attack:
-            Frog Jaws:
-              damage: d12
-              damage_type: B
-              traits:
-              - unarmed
-            Frog Tongue:
-              damage: d6
-              damage_type: B
-              traits:
-              - agile
-              - unarmed
-              reach: 10
-        Shark:
-          attack:
-            Shark Jaws:
-              damage: d12
-              damage_type: P
-              traits:
-              - grapple
-              - unarmed
-        Snake:
-          attack:
-            Snake Fangs:
-              damage: d12
-              damage_type: P
-              traits:
-              - grapple
-              - unarmed
-        Wolf:
-          attack:
-            Wolf Jaws:
-              damage: d12
-              damage_type: P
-              traits:
-              - trip
-              - unarmed
-      rage_resistance:
-        damage_type:
-        - S
-        - P
     Dragon:
       chargen:
         action: []
@@ -260,21 +166,12 @@ pf2e_specialty:
           Terra:
           Umbral:
       instinct_ability: Draconic Rage
-      rage_resistance:
-        damage_type:
-        - P
     Fury:
       choose_feat:
       - charclass
-      rage_ability: Fury Rage
-      rage_resistance: Fury Resistance
+      instinct_ability: Unstoppable Frenzy
     Giant:
-      anathema:
-      - Fail to face a personal challenge of strength.
       instinct_ability: Titan Mauler
-      rage_resistance:
-        damage_type:
-        - B
       choose:
         choice_name: Rage Resistance Element
         choice_description: Choose the element to which your rage resistance applies.
@@ -293,9 +190,10 @@ pf2e_specialty:
                 fire: 1
     Spirit:
       instinct_ability: Spirit Rage
-      rage_resistance:
-        damage_type: negative
-        damage_from: undead
+    Superstition:
+      anathema:
+      - "Your deep superstition means it's anathema for you to learn or Cast a Spell, or to wield or use an item that can be activated to Cast a Spell."
+      instinct_ability: Superstitious Resilience
   Bard:
     Enigma:
       chargen:
@@ -509,6 +407,8 @@ pf2e_specialty:
               deity: master
   Druid:
     Animal:
+      anathema:
+      - "Commit wanton cruelty to animals or kill animals unnecessarily. (This doesn't prevent you from defending yourself against animals or killing them cleanly for food.)"
       chargen:
         action: []
         reaction: []
@@ -516,8 +416,6 @@ pf2e_specialty:
         - Athletics
         feat:
         - Animal Companion
-        anathema:
-        - Commit wanton cruelty to animals or kill animals unnecessarily.
         magic_stats:
           focus_pool: 1
           focus_spell:
@@ -525,6 +423,8 @@ pf2e_specialty:
             - Heal Animal
         companion: any
     Leaf:
+      anathema:
+      - "Commit wanton cruelty to plants or fungi or kill them unnecessarily. (This doesn't prevent you from defending yourself or harvesting them for survival.)"
       chargen:
         action: []
         reaction: []
@@ -537,10 +437,10 @@ pf2e_specialty:
             order:
             - Cornucopia
           focus_pool: 1
-        anathema:
-        - Commit wanton cruelty to plants or fungi or kill them unnecessarily.
         familiar: Leshy
     Storm:
+      anathema:
+      - "Pollute the air, allow those who cause major air pollution or climate shifts to go unpunished. (This doesn't force you to take action against merely potential environmental harm or to sacrifice yourself against an obviously superior foe.)"
       chargen:
         action: []
         reaction: []
@@ -553,10 +453,9 @@ pf2e_specialty:
           focus_spell:
             order:
             - Tempest Surge
-        anathema:
-        - Pollute the air, allow those who cause major air pollution or climate shifts
-          to go unpunished.
     Untamed:
+      anathema:
+      - "Become fully domesticated by the temptations of civilization. (This doesn't prevent you from buying and using processed goods or staying in a city for an adventure, but you can never come to rely on these conveniences or truly call such a place your permanent home.)"
       chargen:
         action: []
         reaction: []
@@ -569,8 +468,6 @@ pf2e_specialty:
           focus_spell:
             order:
             - Untamed Shift
-        anathema:
-        - Become fully domesticated by the temptations of civilization.
   Fighter: {}
   Investigator:
     Alchemical Sciences:

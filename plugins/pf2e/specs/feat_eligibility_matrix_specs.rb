@@ -44,6 +44,10 @@ module AresMUSH
           'Devoted' => { 'feat_type' => [ 'General' ], 'prereq' => { 'focus_spell' => [ 'Lay on Hands' ] } },
           'Healer' => { 'feat_type' => [ 'General' ], 'prereq' => { 'divine_font' => [ 'heal' ] } },
           'Watchful' => { 'feat_type' => [ 'General' ], 'prereq' => { 'combat_stats' => 'Perception/expert' } },
+          'Evasive' => { 'feat_type' => [ 'General' ], 'prereq' => { 'combat_stats' => 'Reflex/expert' } },
+          'Armed' => { 'feat_type' => [ 'General' ], 'prereq' => { 'combat_stats' => 'Weapon/expert' } },
+          'Hardy' => { 'feat_type' => [ 'General' ], 'prereq' => { 'max_class_hp' => 8 } },
+          'Unknowable' => { 'feat_type' => [ 'General' ], 'prereq' => { 'combat_stats' => 'Luck/expert' } },
           'TraditionSkilled' => { 'feat_type' => [ 'General' ], 'prereq' => { 'tradition_skill' => [ 'Sorcerer Archetype/master' ] } },
 
           # Gates that are not prereq entries: the feat's own type decides who may take it.
@@ -62,6 +66,8 @@ module AresMUSH
         matrix_focus([])
         allow(Global).to receive(:read_config).with('pf2e_magic', 'tradition_skills')
           .and_return('arcane' => 'Arcana', 'divine' => 'Religion', 'occult' => 'Occultism', 'primal' => 'Nature')
+        allow(Global).to receive(:read_config).with('pf2e_class', 'Fighter', 'HP').and_return(10)
+        allow(Global).to receive(:read_config).with('pf2e_class', 'Wizard', 'HP').and_return(6)
       end
 
       # feat => the mutation that satisfies its prerequisite. Everything else stays at the axis
@@ -86,6 +92,10 @@ module AresMUSH
         'Focused' => { :focus_pool => 1 },
         'Healer' => { :divine_font => 'heal' },
         'Watchful' => { :perception => 'expert' },
+        'Evasive' => { :saves => { 'reflex' => 'expert' } },
+        'Armed' => { :weapon_prof => { 'martial' => 'expert' } },
+        # The default Fighter gains 10 Hit Points a level; a Wizard gains 6.
+        'Hardy' => { :charclass => 'Wizard' },
         # The skill follows the archetype's tradition, so both have to move.
         'TraditionSkilled' => { :traditions => { 'Sorcerer Archetype' => [ 'divine', 'trained' ] },
                                 :skills => { 'Religion' => 'master' } },
@@ -196,6 +206,24 @@ module AresMUSH
             .and_return('magic_stats' => { 'Sorcerer Archetype' => { 'tradition' => { 'primal' => 'trained' } } })
 
           expect(matrix_allows?(char, 'TraditionSkilled')).to be true
+        end
+      end
+
+      describe "a combat stat" do
+        it "should refuse a factor it does not know rather than letting it through" do
+          expect(matrix_allows?(matrix_char(:saves => { 'reflex' => 'legendary' }), 'Unknowable')).to be false
+        end
+
+        it "should read the save it names and not another" do
+          expect(matrix_allows?(matrix_char(:saves => { 'fortitude' => 'master' }), 'Evasive')).to be false
+        end
+
+        it "should count an unarmed attack as a weapon" do
+          expect(matrix_allows?(matrix_char(:weapon_prof => { 'unarmed' => 'expert' }), 'Armed')).to be true
+        end
+
+        it "should not count a weapon below the rank asked for" do
+          expect(matrix_allows?(matrix_char(:weapon_prof => { 'simple' => 'trained' }), 'Armed')).to be false
         end
       end
 

@@ -203,6 +203,16 @@ module AresMUSH
               Pf2e.magic_option_messages(options.keys).map { |msg| [ nil, msg ] }
             }
           },
+          # Edicts and anathema the archetype binds the character to. Staged in the draft and joined
+          # to the character's own at advance/done, so only taking the Dedication binds them.
+          {
+            'key' => 'edicts',
+            'apply' => lambda { |ctx| Onboarding.bind(ctx, 'edicts') }
+          },
+          {
+            'key' => 'anathema',
+            'apply' => lambda { |ctx| Onboarding.bind(ctx, 'anathema') }
+          },
           # Features the archetype grants. Recorded in the draft as well as on the sheet, so
           # advance/reset knows which ones it put there.
           {
@@ -259,8 +269,32 @@ module AresMUSH
         def self.apply(char, archetype, to_assign, advancement)
           info = Global.read_config('pf2e_archetype', archetype) || {}
 
-          apply_payload(char, archetype, info['initial_dedication'], to_assign, advancement,
+          apply_payload(char, archetype, with_faith(info['initial_dedication'], info), to_assign, advancement,
             :info => info, :source => 'archetype', :name => archetype)
+        end
+
+        FAITH_KEYS = %w(edicts anathema).freeze
+
+        # A dedication block with the edicts and anathema written beside it folded in. The Druid
+        # Archetype and a Champion's causes carry theirs at the top of their entry, a Druid's orders
+        # inside the block; both bind the same way.
+        def self.with_faith(payload, info)
+          FAITH_KEYS.each_with_object((payload || {}).dup) do |key, merged|
+            outside = names((info || {})[key])
+            next if outside.empty?
+
+            merged[key] = (names(merged[key]) + outside).uniq
+          end
+        end
+
+        def self.bind(ctx, key)
+          wanted = names(ctx[:payload][key])
+
+          return [] if wanted.empty?
+
+          ctx[:advancement].replace(Slots.apply(ctx[:advancement], [ Slots.add("archetype_#{key}", wanted) ]))
+
+          [ [ "pf2e.adv_archetype_#{key}_bound", { :name => ctx[:name], :list => wanted.join(" ") } ] ]
         end
 
         # One `initial_dedication` block, applied. The archetype's own arrives through `apply`;

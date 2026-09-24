@@ -105,6 +105,13 @@ module AresMUSH
           'archetype_deity' => {
             'apply' => lambda { |ctx| Apply.set_faith(ctx[:char], 'deity', ctx[:value]) }
           },
+          # Joined to what chargen and earlier archetypes left, never replacing it.
+          'archetype_edicts' => {
+            'apply' => lambda { |ctx| Apply.add_faith(ctx[:char], 'edicts', ctx[:value]) }
+          },
+          'archetype_anathema' => {
+            'apply' => lambda { |ctx| Apply.add_faith(ctx[:char], 'anathema', ctx[:value]) }
+          },
           'archetype_sanctification' => {
             'apply' => lambda { |ctx| Apply.sanctify(ctx[:char], ctx[:value]) }
           },
@@ -210,6 +217,14 @@ module AresMUSH
         def self.set_faith(char, key, value)
           faith = char.pf2_faith
           faith[key] = value
+          char.pf2_faith = faith
+
+          []
+        end
+
+        def self.add_faith(char, key, value)
+          faith = char.pf2_faith
+          faith[key] = (Array(faith[key]) + Array(value)).uniq
           char.pf2_faith = faith
 
           []

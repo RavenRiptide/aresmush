@@ -62,6 +62,10 @@ module AresMUSH
     # `merge` keys hold a hash of name => proficiency and take the block's entries one at a time.
     # `set` keys hold a single value. A key absent from this table is logged, because a proficiency
     # a class never receives leaves nothing on the sheet to notice.
+    #
+    # A proficiency is never lowered. A class table names a rank at the level the class raises it,
+    # and a feat may have raised it further in between. A value that is not a rank - a key ability,
+    # sneak attack dice, an unarmed attack - is replaced as given.
     STAT_WRITERS = {
       'saves' => 'merge',
       'armor_prof' => 'merge',
@@ -91,10 +95,10 @@ module AresMUSH
         case STAT_WRITERS[name]
         when 'merge'
           existing = combat.send(name) || {}
-          (value || {}).each_pair { |item, new_value| existing[item] = new_value }
+          (value || {}).each_pair { |item, new_value| existing[item] = Pf2e.higher_prof(existing[item], new_value) }
           combat.update(name.to_sym => existing)
         when 'set'
-          combat.update(name.to_sym => value)
+          combat.update(name.to_sym => Pf2e.higher_prof(combat.send(name), value))
         else
           Global.logger.error "Unknown combat stat '#{name}' for #{char.name}; it was not applied."
         end

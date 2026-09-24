@@ -535,6 +535,8 @@ pf2e_feats:
     traits:
       - archetype
   Barbarian Resiliency:
+    hp_bonus:
+      per_archetype_feat: 3
     assoc_archetype:
       - Barbarian Archetype
     feat_type:
@@ -544,7 +546,7 @@ pf2e_feats:
       level: 4
       feat:
         - Barbarian Dedication
-        - class granting no more Hit Points per level than 10 + your Constitution modifier
+      max_class_hp: 10
     shortdesc: You gain 3 additional Hit Points for each barbarian archetype class feat you have. As you continue selecting barbarian archetype class feats, you continue to gain additional Hit Points in this way.
     traits:
       - archetype
@@ -1121,6 +1123,8 @@ pf2e_feats:
     traits:
       - archetype
   Champion Resiliency:
+    hp_bonus:
+      per_archetype_feat: 3
     assoc_archetype:
       - Champion Archetype
     feat_type:
@@ -1130,7 +1134,7 @@ pf2e_feats:
       level: 4
       feat:
         - Champion Dedication
-        - class granting no more Hit Points per level than 8 + your Constitution modifier
+      max_class_hp: 8
     shortdesc: You gain 3 additional Hit Points for each champion archetype class feat you have. As you continue selecting champion archetype class feats, you continue to gain additional Hit Points in this way.
     traits:
       - archetype
@@ -1151,6 +1155,8 @@ pf2e_feats:
     traits:
       - archetype
   Fighter Resiliency:
+    hp_bonus:
+      per_archetype_feat: 3
     assoc_archetype:
       - Fighter Archetype
     feat_type:
@@ -1160,7 +1166,7 @@ pf2e_feats:
       level: 4
       feat:
         - Fighter Dedication
-        - class granting no more Hit Points per level than 8 + your Constitution modifier
+      max_class_hp: 8
     shortdesc: You gain 3 additional Hit Points for each fighter archetype class feat you have. As you continue selecting fighter archetype class feats, you continue to gain additional Hit Points in this way.
     traits:
       - archetype
@@ -1209,6 +1215,8 @@ pf2e_feats:
     traits:
       - archetype
   Monk Resiliency:
+    hp_bonus:
+      per_archetype_feat: 3
     assoc_archetype:
       - Monk Archetype
     feat_type:
@@ -1218,7 +1226,7 @@ pf2e_feats:
       level: 4
       feat:
         - Monk Dedication
-        - class granting no more Hit Points per level than 8 + your Constitution modifier
+      max_class_hp: 8
     shortdesc: You gain 3 additional Hit Points for each monk archetype class feat you have. As you continue selecting monk archetype class feats, you continue to gain additional Hit Points in this way.
     traits:
       - archetype
@@ -1241,6 +1249,8 @@ pf2e_feats:
     traits:
       - archetype
   Ranger Resiliency:
+    hp_bonus:
+      per_archetype_feat: 3
     assoc_archetype:
       - Ranger Archetype
     feat_type:
@@ -1250,7 +1260,7 @@ pf2e_feats:
       level: 4
       feat:
         - Ranger Dedication
-        - class granting no more Hit Points per level than 8 + your Constitution modifier
+      max_class_hp: 8
     shortdesc: You gain 3 additional Hit Points for each ranger archetype class feat you have. As you continue selecting ranger archetype class feats, you continue to gain additional Hit Points in this way.
     traits:
       - archetype
@@ -1268,6 +1278,13 @@ pf2e_feats:
     traits:
       - archetype
   Sneak Attacker:
+    grants:
+      combat_stats:
+        sneak_attack: 1d4
+    at_level:
+      6:
+        combat_stats:
+          sneak_attack: 1d6
     assoc_archetype:
       - Rogue Archetype
     feat_type:
@@ -1633,6 +1650,25 @@ pf2e_feats:
     traits:
       - archetype
   Champion's Reaction:
+    feat_choice:
+      summary: the reaction of your cause
+      options:
+        Flash of Grandeur:
+          prereq:
+            specialize:
+              - Beacon
+        Retributive Strike:
+          prereq:
+            specialize:
+              - Justiciar
+        Glimpse of Redemption:
+          prereq:
+            specialize:
+              - Redeemer
+        Liberating Step:
+          prereq:
+            specialize:
+              - Liberator
     assoc_archetype:
       - Champion Archetype
     feat_type:
@@ -1664,6 +1700,12 @@ pf2e_feats:
     traits:
       - archetype
   Devout Blessing:
+    feat_choice:
+      summary: a blessing of the devoted
+      options:
+        Blessed Armament: {}
+        Blessed Shield: {}
+        Blessed Swiftness: {}
     assoc_archetype:
       - Champion Archetype
     feat_type:
@@ -1734,6 +1776,10 @@ pf2e_feats:
       - archetype
   # Level 8 Archetype Feats
   Anthemic Performance:
+    magic_stats:
+      focus_cantrip:
+        composition:
+          - Courageous Anthem
     assoc_archetype:
       - Bard Archetype
     feat_type:
@@ -1868,6 +1914,29 @@ pf2e_feats:
     traits:
       - archetype
   Skill Mastery (Investigator):
+    feat_choice:
+      summary: a skill in which you are an expert, to become a master
+      from_skills:
+        min_prof: expert
+        max_prof: expert
+      allow_duplicates: true
+      grants:
+        raise_skill:
+          - chosen
+      then_choose:
+        summary: a skill in which you are trained, to become an expert
+        from_skills:
+          min_prof: trained
+          max_prof: trained
+        allow_duplicates: true
+        grants:
+          raise_skill:
+            - chosen
+        then_choose:
+          summary: a skill feat for either skill you chose
+          from_feats:
+            feat_type: Skill
+            assoc_skill: from_prior_steps
     repeatable: 5
     assoc_archetype:
       - Investigator Archetype
@@ -1885,6 +1954,29 @@ pf2e_feats:
     traits:
       - archetype
   Skill Mastery (Rogue):
+    feat_choice:
+      summary: a skill in which you are an expert, to become a master
+      from_skills:
+        min_prof: expert
+        max_prof: expert
+      allow_duplicates: true
+      grants:
+        raise_skill:
+          - chosen
+      then_choose:
+        summary: a skill in which you are trained, to become an expert
+        from_skills:
+          min_prof: trained
+          max_prof: trained
+        allow_duplicates: true
+        grants:
+          raise_skill:
+            - chosen
+        then_choose:
+          summary: a skill feat for either skill you chose
+          from_feats:
+            feat_type: Skill
+            assoc_skill: from_prior_steps
     repeatable: 5
     assoc_archetype:
       - Rogue Archetype
@@ -1957,6 +2049,12 @@ pf2e_feats:
     traits:
       - archetype
   Diverse Weapon Expert:
+    grants:
+      combat_stats:
+        weapon_prof:
+          simple: expert
+          martial: expert
+          advanced: trained
     assoc_archetype:
       - Fighter Archetype
     feat_type:
@@ -1966,11 +2064,15 @@ pf2e_feats:
       level: 12
       feat:
         - Fighter Dedication
-        - expert in any kind of weapon or unarmed attacks
+      combat_stats: Weapon/expert
     shortdesc: Your proficiency ranks for simple weapons and martial weapons increase to expert, and your proficiency rank for advanced weapons increases to trained.
     traits:
       - archetype
   Evasiveness (Rogue):
+    grants:
+      combat_stats:
+        saves:
+          reflex: master
     assoc_archetype:
       - Rogue Archetype
     feat_type:
@@ -1980,11 +2082,15 @@ pf2e_feats:
       level: 12
       feat:
         - Rogue Dedication
-        - expert in Reflex saves
+      combat_stats: Reflex/expert
     shortdesc: Your proficiency rank for Reflex saves increases to master.
     traits:
       - archetype
   Evasiveness (Swashbuckler):
+    grants:
+      combat_stats:
+        saves:
+          reflex: master
     assoc_archetype:
       - Swashbuckler Archetype
     feat_type:
@@ -1994,7 +2100,7 @@ pf2e_feats:
       level: 12
       feat:
         - Swashbuckler Dedication
-        - expert in Reflex saves
+      combat_stats: Reflex/expert
     shortdesc: Your proficiency rank for Reflex saves increases to master.
     traits:
       - archetype
@@ -2233,6 +2339,10 @@ pf2e_feats:
     traits:
       - archetype
   Juggernaut's Fortitude:
+    grants:
+      combat_stats:
+        saves:
+          fortitude: master
     assoc_archetype:
       - Barbarian Archetype
     feat_type:
@@ -2242,11 +2352,14 @@ pf2e_feats:
       level: 12
       feat:
         - Barbarian Dedication
-        - expert in Fortitude saves
+      combat_stats: Fortitude/expert
     shortdesc: Your proficiency rank in Fortitude saves increases to master.
     traits:
       - archetype
   Master Spotter (Investigator):
+    grants:
+      combat_stats:
+        perception: master
     assoc_archetype:
       - Investigator Archetype
     feat_type:
@@ -2261,6 +2374,9 @@ pf2e_feats:
     traits:
       - archetype
   Master Spotter (Ranger):
+    grants:
+      combat_stats:
+        perception: master
     assoc_archetype:
       - Ranger Archetype
     feat_type:
@@ -2275,6 +2391,30 @@ pf2e_feats:
     traits:
       - archetype
   Perfection's Path:
+    feat_choice:
+      summary: a saving throw in which you are an expert
+      options:
+        Fortitude:
+          prereq:
+            combat_stats: Fortitude/expert
+          grants:
+            combat_stats:
+              saves:
+                fortitude: master
+        Reflex:
+          prereq:
+            combat_stats: Reflex/expert
+          grants:
+            combat_stats:
+              saves:
+                reflex: master
+        Will:
+          prereq:
+            combat_stats: Will/expert
+          grants:
+            combat_stats:
+              saves:
+                will: master
     assoc_archetype:
       - Monk Archetype
     feat_type:

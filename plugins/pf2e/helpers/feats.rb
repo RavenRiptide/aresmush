@@ -423,22 +423,25 @@ module AresMUSH
 
           msg << "innate_tradition" unless has_required_innate_tradition
         when "combat_stats"
-          combat = char.combat
+          # "Perception/expert", "Reflex/expert", or "Weapon/expert" for expert in any kind of
+          # weapon or unarmed attack. A factor nobody reads fails, the way an unknown key does.
           factor, minimum = required.to_s.split("/")
+          held = combat_stat_ranks(char, factor)
 
-          passes_check = true
-
-          case factor
-          when "Perception"
-            prof = Pf2e.get_prof_bonus(char, combat.perception)
-            min = Pf2e.get_prof_bonus(char, minimum)
-
-            passes_check = min > prof ? false : true
-          else
+          if held.nil?
             Global.logger.error "Unhandled combat_stats prereq '#{required}'."
-          end
+            msg << "combat_stats"
+          else
+            min_rank = prof_rank(minimum).to_i
 
-          msg << "combat_stats" unless passes_check
+            msg << "combat_stats" unless held.any? { |prof| prof_rank(prof).to_i >= min_rank }
+          end
+        when "max_class_hp"
+          # Resiliency's "a class granting no more Hit Points per level than 8 + your Constitution
+          # modifier": the base class's Hit Points per level, before Constitution.
+          class_hp = Global.read_config('pf2e_class', char.pf2_base_info['charclass'], 'HP')
+
+          msg << "max_class_hp" if class_hp.nil? || class_hp.to_i > required.to_i
         when "oralign"
           alignment = char.pf2_faith["alignment"]
           
@@ -515,6 +518,21 @@ module AresMUSH
 
       return true if msg.empty?
       return false
+    end
+
+    # The proficiencies a combat_stats prereq factor reads, or nil for a factor it does not know.
+    # Several for Weapon, which any weapon category, group or unarmed attack satisfies.
+    def self.combat_stat_ranks(char, factor)
+      combat = char.combat
+
+      case factor.to_s.downcase
+      when 'perception'
+        [ combat&.perception ]
+      when 'fortitude', 'reflex', 'will'
+        [ (combat&.saves || {})[factor.to_s.downcase] ]
+      when 'weapon'
+        (combat&.weapon_prof || {}).values + (combat&.weapon_group_prof || {}).values
+      end
     end
 
     # The skill that goes with the tradition a source casts from, counting one this level grants, or
@@ -750,6 +768,9 @@ module AresMUSH
             key_display = 'Innate spell tradition'
           elsif k == 'caster'
             key_display = 'Ability to cast'
+          elsif k == 'max_class_hp'
+            key_display = 'Class Hit Points'
+            v = "no more than #{v} + your Constitution modifier per level"
           elsif k == 'tradition_skill'
             # Stored as "source/proficiency", and the skill depends on the character.
             key_display = 'Skill requirement'
@@ -1237,7 +1258,7 @@ module AresMUSH
       options = if block['options'].is_a?(Hash)
         block['options'].keys.select { |label| choice_option_allowed?(char, block['options'][label]) }.sort
       elsif block['from_feats'].is_a?(Hash)
-        choice_feat_pool(char, block['from_feats'])
+        choice_feat_pool(char, resolve_prior_steps(char, choice_name, block['from_feats']))
       elsif block['from_skills'].is_a?(Hash)
         choice_skill_pool(char, block['from_skills'])
       elsif block['from_weapons'].is_a?(Hash)
@@ -1260,6 +1281,21 @@ module AresMUSH
       return options if taken.empty?
 
       options.reject { |option| taken.any? { |t| t.to_s.casecmp?(option.to_s) } }
+    end
+
+    PRIOR_STEPS = 'from_prior_steps'.freeze
+
+    # A feat pool's `assoc_skill: from_prior_steps`, read as the skills picked in this choice's
+    # earlier steps - the ones still sitting in its open slot, so a later taking of a repeatable feat
+    # asks about its own picks and not the last one's.
+    def self.resolve_prior_steps(char, choice_name, filter)
+      return filter unless filter['assoc_skill'].to_s == PRIOR_STEPS
+
+      slots = (char.pf2_to_assign || {})['feat choice'] || {}
+      key = slots.keys.find { |k| k.to_s.casecmp?(choice_name.to_s) }
+      picked = Array(key && slots[key]).reject { |slot| slot.to_s.casecmp?('open') }
+
+      filter.merge('assoc_skill' => picked)
     end
 
     def self.match_choice_option(char, choice_name, block, label)
@@ -1302,6 +1338,10 @@ module AresMUSH
     def self.choice_grants(char, block, label, choice_name = nil)
       option = choice_option_def(block, label)
       return option['grants'] if option
+
+      # A pool's own grants, applying to whatever was picked from it: Skill Mastery's raise of the
+      # skill chosen, written `raise_skill: [ chosen ]`.
+      return substitute_choice_label(block['grants'], label) if block.is_a?(Hash) && block['grants'].is_a?(Hash)
 
       return { 'skill' => [ label ] } if block.is_a?(Hash) && block.key?('from_lores')
 
@@ -1965,11 +2005,16 @@ module AresMUSH
       filter = {} unless filter.is_a?(Hash)
 
       min_rank = prof_rank(filter['min_prof'] || 'trained') || 1
+      max_rank = filter['max_prof'] ? prof_rank(filter['max_prof']) : nil
 
-      list = char.skills.select do |skill|
-        rank = prof_rank(skill.prof_level)
-        rank && rank >= min_rank
-      end.map { |skill| skill.name }
+      # Ranks as this level leaves them, so a skill raised earlier in the level - by an earlier
+      # step of the same choice, say - is judged at its new rank.
+      sheet = DraftSheet.of(char)
+
+      list = char.skills.map(&:name).select do |name|
+        rank = prof_rank(sheet.skill_prof(name))
+        rank && rank >= min_rank && (max_rank.nil? || rank <= max_rank)
+      end
 
       if filter['key_abil']
         wanted = Array(filter['key_abil']).compact.map { |a| a.to_s.downcase }

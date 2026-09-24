@@ -123,7 +123,36 @@ module AresMUSH
       # For right now, until I do conditions, it's just 0
       drain_value = 0
 
-      (charclass_hp + con_mod - drain_value) * level + ancestry_hp
+      feats = (char.pf2_feats || {}).values.flatten
+
+      (charclass_hp + con_mod - drain_value) * level + ancestry_hp +
+        feat_hp_bonus(feats, Global.read_config('pf2e_feats') || {}, level)
+    end
+
+    # Hit Points the feats held add to the maximum, from each feat's `hp_bonus`:
+    #
+    #   per_level            that many for each character level - Toughness
+    #   per_archetype_feat   that many for each feat held of the feat's own archetype, itself and the
+    #                        Dedication included - Resiliency
+    #
+    # Worked out rather than stored, so it follows the character's level and their later archetype
+    # feats, and a rollback has nothing to undo.
+    def self.feat_hp_bonus(feat_names, feats_config, level)
+      details = feat_names.map do |name|
+        key = feats_config.keys.find { |k| k.to_s.casecmp?(name.to_s) }
+
+        key ? feats_config[key] : {}
+      end
+
+      details.sum do |info|
+        bonus = info['hp_bonus']
+        next 0 unless bonus.is_a?(Hash)
+
+        archetypes = Array(info['assoc_archetype'])
+        of_archetype = details.count { |other| (Array(other['assoc_archetype']) & archetypes).any? }
+
+        bonus['per_level'].to_i * level.to_i + bonus['per_archetype_feat'].to_i * of_archetype
+      end
     end
 
     def self.get_current_hp(char)

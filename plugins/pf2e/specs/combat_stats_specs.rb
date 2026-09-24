@@ -60,6 +60,71 @@ module AresMUSH
         end
       end
 
+      # A class table names a proficiency at the level the class raises it, and cannot know that a
+      # feat raised it further in between - an Oracle's 13th level says Reflex expert to an Oracle
+      # whose Evasiveness made it master at 12th.
+      describe "a rank already higher than the one written", :dbtest => true do
+        before(:each) do
+          bootstrapper = AresMUSH::Bootstrapper.new
+          bootstrapper.config_reader.load_game_config
+          bootstrapper.db.load_config
+
+          @char = Character.create(:name => "Ranks#{rand(1000000)}")
+          @combat = Pf2eCombat.create(:character => @char,
+            :saves => { 'fortitude' => 'trained', 'reflex' => 'master', 'will' => 'expert' },
+            :weapon_prof => { 'simple' => 'expert', 'martial' => 'trained' },
+            :perception => 'master', :class_dc => 'expert', :key_abil => 'Strength')
+          @char.update(:combat => @combat)
+        end
+
+        after(:each) do
+          @combat.delete if @combat
+          @char.delete if @char
+        end
+
+        def combat
+          Pf2eCombat[@combat.id]
+        end
+
+        it "should keep a save the table would lower" do
+          Pf2eCombat.update_combat_stats(@char, 'saves' => { 'reflex' => 'expert' })
+
+          expect(combat.saves['reflex']).to eq 'master'
+        end
+
+        it "should still raise the entries beside it" do
+          Pf2eCombat.update_combat_stats(@char, 'saves' => { 'reflex' => 'expert', 'fortitude' => 'expert' })
+
+          expect(combat.saves).to eq({ 'fortitude' => 'expert', 'reflex' => 'master', 'will' => 'expert' })
+        end
+
+        it "should keep a weapon rank the table would lower" do
+          Pf2eCombat.update_combat_stats(@char, 'weapon_prof' => { 'simple' => 'trained', 'advanced' => 'trained' })
+
+          expect(combat.weapon_prof).to eq({ 'simple' => 'expert', 'martial' => 'trained', 'advanced' => 'trained' })
+        end
+
+        it "should keep Perception and a class DC the table would lower" do
+          Pf2eCombat.update_combat_stats(@char, 'perception' => 'expert', 'class_dc' => 'trained')
+
+          expect(combat.perception).to eq 'master'
+          expect(combat.class_dc).to eq 'expert'
+        end
+
+        it "should raise Perception past what it was" do
+          Pf2eCombat.update_combat_stats(@char, 'perception' => 'legendary')
+
+          expect(combat.perception).to eq 'legendary'
+        end
+
+        # A key ability is a choice rather than a rank, so the newest one stands.
+        it "should still replace a value that is not a rank" do
+          Pf2eCombat.update_combat_stats(@char, 'key_abil' => 'Dexterity')
+
+          expect(combat.key_abil).to eq 'Dexterity'
+        end
+      end
+
       # Every `combat_stats` key in every class's chargen and advance blocks has to be one the
       # writer writes, or the class never receives it. Proficiencies nest under `armor_prof` and
       # `weapon_prof`; a bare `light` or `martial` is not a key.

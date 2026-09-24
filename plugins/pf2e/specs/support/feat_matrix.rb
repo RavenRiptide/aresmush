@@ -31,6 +31,8 @@ module AresMUSH
         :focus_pool => 0,
         :divine_font => nil,
         :perception => 'untrained',
+        :saves => {},
+        :weapon_prof => {},
         :archetypes => {},
         :advancing => nil
       }.freeze
@@ -95,8 +97,8 @@ module AresMUSH
       end
 
       def matrix_combat(opts)
-        double(:perception => opts[:perception], :class_dc => 'trained', :saves => {},
-               :weapon_prof => {}, :armor_prof => {}, :weapon_group_prof => {},
+        double(:perception => opts[:perception], :class_dc => 'trained', :saves => opts[:saves],
+               :weapon_prof => opts[:weapon_prof], :armor_prof => {}, :weapon_group_prof => {},
                :sneak_attack => nil)
       end
 

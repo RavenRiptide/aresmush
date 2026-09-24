@@ -153,9 +153,14 @@ module AresMUSH
                               .reject { |f| f.empty? || f == 'OPEN' }
       end
 
-      # Both kinds of skill increase a level can hand out, counted for one skill.
+      # The skill increases this level holds for one skill: both kinds a level hands out, and the
+      # `raise_skill` grants waiting for advance/done - Skill Mastery's, or a feat's level clause.
       def staged_raises_for(name)
         staged = Array(draft['raise skill']) + Array(draft['raise skill choice'])
+
+        (draft['grants'] || {}).each_value do |payload|
+          staged += Array(payload['raise_skill']) if payload.is_a?(Hash)
+        end
 
         staged.reject { |s| s.to_s.strip.empty? || Pf2e.open_skill_token?(s) }
               .count { |s| s.to_s.casecmp?(name.to_s) }
