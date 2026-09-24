@@ -29,6 +29,7 @@ en:
     adv_deferred_choice: "Your earlier choice for %{choice} improves at level %{level}. This has been applied automatically."
     adv_deferred_feat: "%{feat} improves at level %{level}. This has been applied automatically."
     feat_level_clause_applied: "%{feat} has a benefit that applies from level %{level}, which you already qualify for. It has been applied."
+    adv_archetype_breadth: "%{feat} gives your %{archetype} an extra spell slot at %{ranks}."
     choice_level_clause_applied: "Your %{choice} choice of %{value} has a benefit that applies from level %{level}, which you already qualify for. It has been applied."
     adv_archetype_assigned: "You have added %{archetype} to your archetypes list."
     adv_no_archetype_assigned: "No archetype has been assigned."

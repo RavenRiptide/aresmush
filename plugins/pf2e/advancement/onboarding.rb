@@ -46,6 +46,11 @@ module AresMUSH
           'specialty choice' => {
             'item' => 'archetype specialty choice',
             'skills' => lambda { |name| [ 'pf2e.adv_archetype_specialty_choice_skill_training', { :archetypespecialtychoice => name } ] }
+          },
+          # A later feat of the archetype's adding to its spellcasting - see LevelClauses.
+          'feat' => {
+            'item' => 'archetype feat',
+            'skills' => lambda { |_name| [ 'pf2e.adv_archetype_skills_assigned', {} ] }
           }
         }.freeze
 
@@ -178,11 +183,11 @@ module AresMUSH
               ctx[:advancement]['magic_stats'] ||= {}
               Pf2e.wrap_adv_magic_stats(ctx[:advancement], ctx[:base_class])
 
-              # Merged rather than replaced: an archetype's specialty may bring spellcasting of
-              # its own on top of the dedication's, and it arrives as a second call with the
-              # same archetype key.
+              # Merged key by key: an archetype's specialty may bring spellcasting of its own on top
+              # of the dedication's, and a spellcasting feat taken late stages several levels' slots
+              # at once, each a second call with the same archetype key.
               held = ctx[:advancement]['magic_stats'][ctx[:archetype]] || {}
-              ctx[:advancement]['magic_stats'][ctx[:archetype]] = held.merge(assessed['magic_stats'])
+              ctx[:advancement]['magic_stats'][ctx[:archetype]] = Pf2e.merge_magic_stats(held, assessed['magic_stats'])
 
               options = assessed['magic_options'] || {}
 

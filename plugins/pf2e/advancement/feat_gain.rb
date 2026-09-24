@@ -48,6 +48,14 @@ module AresMUSH
             'apply' => lambda { |ctx| FeatGain.at_level(ctx) }
           },
           {
+            'name' => 'archetype breadth',
+            'when' => lambda { |ctx| ctx[:details]['archetype_breadth'] },
+            'apply' => lambda { |ctx|
+              ArchetypeBreadth.stage(ctx[:char], Array(ctx[:details]['assoc_archetype']).first,
+                ctx[:to_assign], ctx[:advancement])
+            }
+          },
+          {
             'name' => 'choice',
             'when' => lambda { |_ctx| true },
             'apply' => lambda { |ctx| FeatGain.choice(ctx) }
@@ -212,17 +220,23 @@ module AresMUSH
 
         # Clauses keyed to a level the character has already reached, including the one they
         # are gaining now. These stage a grants block like any other, so chargen applies them
-        # outright for the same reason `grants` does.
+        # outright for the same reason `grants` does. Archetype spellcasting among them is staged
+        # for the archetype instead - see LevelClauses.
         def self.at_level(ctx)
-          Pf2e.feat_at_level_catch_up(ctx[:details], ctx[:level]).map do |level, payload|
-            if ctx[:chargen]
-              apply_grants_now(ctx, payload)
-            else
-              grants = (ctx[:advancement]['grants'] ||= {})
-              grants["#{ctx[:feat]} (level #{level})"] = payload
+          Pf2e.feat_at_level_catch_up(ctx[:details], ctx[:level]).flat_map do |level, payload|
+            magic, rest = LevelClauses.split(payload)
+
+            unless rest.empty?
+              if ctx[:chargen]
+                apply_grants_now(ctx, rest)
+              else
+                grants = (ctx[:advancement]['grants'] ||= {})
+                grants["#{ctx[:feat]} (level #{level})"] = rest
+              end
             end
 
-            [ 'pf2e.feat_level_clause_applied', { :feat => ctx[:feat], :level => level } ]
+            LevelClauses.archetype_magic(ctx[:char], ctx[:feat], magic, ctx[:to_assign], ctx[:advancement]) +
+              [ [ 'pf2e.feat_level_clause_applied', { :feat => ctx[:feat], :level => level } ] ]
           end
         end
 

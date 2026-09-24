@@ -570,6 +570,27 @@ pf2e_feats:
     traits:
       - archetype
   Basic Bard Spellcasting:
+    at_level:
+      4:
+        archetype_magic:
+          spells_per_day:
+            1: 1
+          repertoire:
+            1: 1
+      6:
+        archetype_magic:
+          signature_spells:
+            any: 1
+          spells_per_day:
+            2: 1
+          repertoire:
+            2: 1
+      8:
+        archetype_magic:
+          spells_per_day:
+            3: 1
+          repertoire:
+            3: 1
     assoc_archetype:
       - Bard Archetype
     feat_type:
@@ -622,6 +643,19 @@ pf2e_feats:
     traits:
       - archetype
   Basic Cleric Spellcasting:
+    at_level:
+      4:
+        archetype_magic:
+          spells_per_day:
+            1: 1
+      6:
+        archetype_magic:
+          spells_per_day:
+            2: 1
+      8:
+        archetype_magic:
+          spells_per_day:
+            3: 1
     assoc_archetype:
       - Cleric Archetype
     feat_type:
@@ -719,6 +753,19 @@ pf2e_feats:
     traits:
       - archetype
   Basic Druid Spellcasting:
+    at_level:
+      4:
+        archetype_magic:
+          spells_per_day:
+            1: 1
+      6:
+        archetype_magic:
+          spells_per_day:
+            2: 1
+      8:
+        archetype_magic:
+          spells_per_day:
+            3: 1
     assoc_archetype:
       - Druid Archetype
     feat_type:
@@ -879,6 +926,27 @@ pf2e_feats:
     traits:
       - archetype
   Basic Oracle Spellcasting:
+    at_level:
+      4:
+        archetype_magic:
+          spells_per_day:
+            1: 1
+          repertoire:
+            1: 1
+      6:
+        archetype_magic:
+          signature_spells:
+            any: 1
+          spells_per_day:
+            2: 1
+          repertoire:
+            2: 1
+      8:
+        archetype_magic:
+          spells_per_day:
+            3: 1
+          repertoire:
+            3: 1
     assoc_archetype:
       - Oracle Archetype
     feat_type:
@@ -892,6 +960,27 @@ pf2e_feats:
     traits:
       - archetype
   Basic Sorcerer Spellcasting:
+    at_level:
+      4:
+        archetype_magic:
+          spells_per_day:
+            1: 1
+          repertoire:
+            1: 1
+      6:
+        archetype_magic:
+          signature_spells:
+            any: 1
+          spells_per_day:
+            2: 1
+          repertoire:
+            2: 1
+      8:
+        archetype_magic:
+          spells_per_day:
+            3: 1
+          repertoire:
+            3: 1
     assoc_archetype:
       - Sorcerer Archetype
     feat_type:
@@ -947,6 +1036,25 @@ pf2e_feats:
     traits:
       - archetype
   Basic Witch Spellcasting:
+    at_level:
+      4:
+        archetype_magic:
+          spells_per_day:
+            1: 1
+          spellbook:
+            1: 2
+      6:
+        archetype_magic:
+          spells_per_day:
+            2: 1
+          spellbook:
+            2: 2
+      8:
+        archetype_magic:
+          spells_per_day:
+            3: 1
+          spellbook:
+            3: 2
     assoc_archetype:
       - Witch Archetype
     feat_type:
@@ -981,6 +1089,25 @@ pf2e_feats:
     traits:
       - archetype
   Basic Wizard Spellcasting:
+    at_level:
+      4:
+        archetype_magic:
+          spells_per_day:
+            1: 1
+          spellbook:
+            1: 2
+      6:
+        archetype_magic:
+          spells_per_day:
+            2: 1
+          spellbook:
+            2: 2
+      8:
+        archetype_magic:
+          spells_per_day:
+            3: 1
+          spellbook:
+            3: 2
     assoc_archetype:
       - Wizard Archetype
     feat_type:
@@ -1620,6 +1747,8 @@ pf2e_feats:
     traits:
       - archetype
   Arcane Breadth:
+    archetype_breadth:
+      spells_per_day: 1
     assoc_archetype:
       - Wizard Archetype
     feat_type:
@@ -1633,6 +1762,9 @@ pf2e_feats:
     traits:
       - archetype
   Bloodline Breadth:
+    archetype_breadth:
+      spells_per_day: 1
+      repertoire: 1
     assoc_archetype:
       - Sorcerer Archetype
     feat_type:
@@ -1646,6 +1778,8 @@ pf2e_feats:
     traits:
       - archetype
   Divine Breadth:
+    archetype_breadth:
+      spells_per_day: 1
     assoc_archetype:
       - Cleric Archetype
     feat_type:
@@ -1672,6 +1806,9 @@ pf2e_feats:
     traits:
       - archetype
   Mysterious Breadth:
+    archetype_breadth:
+      spells_per_day: 1
+      repertoire: 1
     assoc_archetype:
       - Oracle Archetype
     feat_type:
@@ -1685,6 +1822,9 @@ pf2e_feats:
     traits:
       - archetype
   Occult Breadth:
+    archetype_breadth:
+      spells_per_day: 1
+      repertoire: 1
     assoc_archetype:
       - Bard Archetype
     feat_type:
@@ -1698,6 +1838,8 @@ pf2e_feats:
     traits:
       - archetype
   Patron's Breadth:
+    archetype_breadth:
+      spells_per_day: 1
     assoc_archetype:
       - Witch Archetype
     feat_type:
@@ -1711,6 +1853,8 @@ pf2e_feats:
     traits:
       - archetype
   Primal Breadth:
+    archetype_breadth:
+      spells_per_day: 1
     assoc_archetype:
       - Druid Archetype
     feat_type:
@@ -1855,6 +1999,28 @@ pf2e_feats:
     traits:
       - archetype
   Expert Bard Spellcasting:
+    at_level:
+      12:
+        archetype_magic:
+          proficiency: expert
+          signature_spells:
+            any: 1
+          spells_per_day:
+            4: 1
+          repertoire:
+            4: 1
+      14:
+        archetype_magic:
+          spells_per_day:
+            5: 1
+          repertoire:
+            5: 1
+      16:
+        archetype_magic:
+          spells_per_day:
+            6: 1
+          repertoire:
+            6: 1
     assoc_archetype:
       - Bard Archetype
     feat_type:
@@ -1869,6 +2035,20 @@ pf2e_feats:
     traits:
       - archetype
   Expert Cleric Spellcasting:
+    at_level:
+      12:
+        archetype_magic:
+          proficiency: expert
+          spells_per_day:
+            4: 1
+      14:
+        archetype_magic:
+          spells_per_day:
+            5: 1
+      16:
+        archetype_magic:
+          spells_per_day:
+            6: 1
     assoc_archetype:
       - Cleric Archetype
     feat_type:
@@ -1883,6 +2063,20 @@ pf2e_feats:
     traits:
       - archetype
   Expert Druid Spellcasting:
+    at_level:
+      12:
+        archetype_magic:
+          proficiency: expert
+          spells_per_day:
+            4: 1
+      14:
+        archetype_magic:
+          spells_per_day:
+            5: 1
+      16:
+        archetype_magic:
+          spells_per_day:
+            6: 1
     assoc_archetype:
       - Druid Archetype
     feat_type:
@@ -1897,6 +2091,28 @@ pf2e_feats:
     traits:
       - archetype
   Expert Oracle Spellcasting:
+    at_level:
+      12:
+        archetype_magic:
+          proficiency: expert
+          signature_spells:
+            any: 1
+          spells_per_day:
+            4: 1
+          repertoire:
+            4: 1
+      14:
+        archetype_magic:
+          spells_per_day:
+            5: 1
+          repertoire:
+            5: 1
+      16:
+        archetype_magic:
+          spells_per_day:
+            6: 1
+          repertoire:
+            6: 1
     assoc_archetype:
       - Oracle Archetype
     feat_type:
@@ -1911,6 +2127,28 @@ pf2e_feats:
     traits:
       - archetype
   Expert Sorcerer Spellcasting:
+    at_level:
+      12:
+        archetype_magic:
+          proficiency: expert
+          signature_spells:
+            any: 1
+          spells_per_day:
+            4: 1
+          repertoire:
+            4: 1
+      14:
+        archetype_magic:
+          spells_per_day:
+            5: 1
+          repertoire:
+            5: 1
+      16:
+        archetype_magic:
+          spells_per_day:
+            6: 1
+          repertoire:
+            6: 1
     assoc_archetype:
       - Sorcerer Archetype
     feat_type:
@@ -1925,6 +2163,26 @@ pf2e_feats:
     traits:
       - archetype
   Expert Witch Spellcasting:
+    at_level:
+      12:
+        archetype_magic:
+          proficiency: expert
+          spells_per_day:
+            4: 1
+          spellbook:
+            4: 2
+      14:
+        archetype_magic:
+          spells_per_day:
+            5: 1
+          spellbook:
+            5: 2
+      16:
+        archetype_magic:
+          spells_per_day:
+            6: 1
+          spellbook:
+            6: 2
     assoc_archetype:
       - Witch Archetype
     feat_type:
@@ -1939,6 +2197,26 @@ pf2e_feats:
     traits:
       - archetype
   Expert Wizard Spellcasting:
+    at_level:
+      12:
+        archetype_magic:
+          proficiency: expert
+          spells_per_day:
+            4: 1
+          spellbook:
+            4: 2
+      14:
+        archetype_magic:
+          spells_per_day:
+            5: 1
+          spellbook:
+            5: 2
+      16:
+        archetype_magic:
+          spells_per_day:
+            6: 1
+          spellbook:
+            6: 2
     assoc_archetype:
       - Wizard Archetype
     feat_type:
@@ -2009,6 +2287,22 @@ pf2e_feats:
       - archetype
   # Level 18 Archetype Feats
   Master Bard Spellcasting:
+    at_level:
+      18:
+        archetype_magic:
+          proficiency: master
+          signature_spells:
+            any: 1
+          spells_per_day:
+            7: 1
+          repertoire:
+            7: 1
+      20:
+        archetype_magic:
+          spells_per_day:
+            8: 1
+          repertoire:
+            8: 1
     assoc_archetype:
       - Bard Archetype
     feat_type:
@@ -2023,6 +2317,16 @@ pf2e_feats:
     traits:
       - archetype
   Master Cleric Spellcasting:
+    at_level:
+      18:
+        archetype_magic:
+          proficiency: master
+          spells_per_day:
+            7: 1
+      20:
+        archetype_magic:
+          spells_per_day:
+            8: 1
     assoc_archetype:
       - Cleric Archetype
     feat_type:
@@ -2037,6 +2341,16 @@ pf2e_feats:
     traits:
       - archetype
   Master Druid Spellcasting:
+    at_level:
+      18:
+        archetype_magic:
+          proficiency: master
+          spells_per_day:
+            7: 1
+      20:
+        archetype_magic:
+          spells_per_day:
+            8: 1
     assoc_archetype:
       - Druid Archetype
     feat_type:
@@ -2051,6 +2365,22 @@ pf2e_feats:
     traits:
       - archetype
   Master Oracle Spellcasting:
+    at_level:
+      18:
+        archetype_magic:
+          proficiency: master
+          signature_spells:
+            any: 1
+          spells_per_day:
+            7: 1
+          repertoire:
+            7: 1
+      20:
+        archetype_magic:
+          spells_per_day:
+            8: 1
+          repertoire:
+            8: 1
     assoc_archetype:
       - Oracle Archetype
     feat_type:
@@ -2065,6 +2395,22 @@ pf2e_feats:
     traits:
       - archetype
   Master Sorcerer Spellcasting:
+    at_level:
+      18:
+        archetype_magic:
+          proficiency: master
+          signature_spells:
+            any: 1
+          spells_per_day:
+            7: 1
+          repertoire:
+            7: 1
+      20:
+        archetype_magic:
+          spells_per_day:
+            8: 1
+          repertoire:
+            8: 1
     assoc_archetype:
       - Sorcerer Archetype
     feat_type:
@@ -2079,6 +2425,20 @@ pf2e_feats:
     traits:
       - archetype
   Master Witch Spellcasting:
+    at_level:
+      18:
+        archetype_magic:
+          proficiency: master
+          spells_per_day:
+            7: 1
+          spellbook:
+            7: 2
+      20:
+        archetype_magic:
+          spells_per_day:
+            8: 1
+          spellbook:
+            8: 2
     assoc_archetype:
       - Witch Archetype
     feat_type:
@@ -2093,6 +2453,20 @@ pf2e_feats:
     traits:
       - archetype
   Master Wizard Spellcasting:
+    at_level:
+      18:
+        archetype_magic:
+          proficiency: master
+          spells_per_day:
+            7: 1
+          spellbook:
+            7: 2
+      20:
+        archetype_magic:
+          spells_per_day:
+            8: 1
+          spellbook:
+            8: 2
     assoc_archetype:
       - Wizard Archetype
     feat_type:

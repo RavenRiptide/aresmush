@@ -342,8 +342,15 @@ module AresMUSH
       deferred_feat_grants(char, new_level).each do |feat, lvl, grants|
         next unless grants.is_a?(Hash)
 
-        advancement['grants'] ||= {}
-        advancement['grants']["#{feat} (level #{lvl})"] = grants
+        magic, rest = Advancement::LevelClauses.split(grants)
+
+        unless rest.empty?
+          advancement['grants'] ||= {}
+          advancement['grants']["#{feat} (level #{lvl})"] = rest
+        end
+
+        return_msg.concat(Advancement::FeatGain.render(
+          Advancement::LevelClauses.archetype_magic(char, feat, magic, to_assign, advancement)))
 
         return_msg << t('pf2e.adv_deferred_feat', :feat => feat, :level => lvl)
       end
