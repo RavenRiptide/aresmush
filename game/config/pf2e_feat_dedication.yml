@@ -2158,7 +2158,8 @@ pf2e_feats:
       level: 12
       feat:
         - Basic Sorcerer Spellcasting
-        - master in Arcana, Nature, Occultism, or Religion, depending on bloodline
+      tradition_skill:
+        - Sorcerer Archetype/master
     shortdesc: You gain the expert spellcasting benefits.
     traits:
       - archetype
@@ -2192,7 +2193,8 @@ pf2e_feats:
       level: 12
       feat:
         - Basic Witch Spellcasting
-        - master in the skill associated with your patron's tradition
+      tradition_skill:
+        - Witch Archetype/master
     shortdesc: You gain the expert spellcasting benefits.
     traits:
       - archetype
@@ -2420,7 +2422,8 @@ pf2e_feats:
       level: 18
       feat:
         - Expert Sorcerer Spellcasting
-        - legendary in Arcana, Nature, Occultism, or Religion depending on bloodline
+      tradition_skill:
+        - Sorcerer Archetype/legendary
     shortdesc: You gain the master spellcasting benefits.
     traits:
       - archetype
@@ -2448,7 +2451,8 @@ pf2e_feats:
       level: 18
       feat:
         - Expert Witch Spellcasting
-        - legendary in the skill associated with your patron's tradition
+      tradition_skill:
+        - Witch Archetype/legendary
     shortdesc: You gain the master spellcasting benefits.
     traits:
       - archetype

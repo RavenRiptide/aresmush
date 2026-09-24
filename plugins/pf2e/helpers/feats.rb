@@ -328,6 +328,23 @@ module AresMUSH
 
             msg << "skill#{i}" if char_prof < min_prof
           end
+        when "tradition_skill"
+          # A skill that follows whichever tradition a source casts from - Expert Sorcerer
+          # Spellcasting asks for master in the skill of the bloodline's tradition. Entries are
+          # "source/proficiency"; a source casting from no tradition fails.
+          Array(required).each_with_index do |entry, i|
+            source, minimum_prof = entry.to_s.split("/")
+            skill_name = tradition_skill_for(char, source)
+
+            if skill_name.nil?
+              msg << "tradition_skill#{i}"
+              next
+            end
+
+            skill_prof = DraftSheet.of(char).skill_prof(skill_name)
+
+            msg << "tradition_skill#{i}" if Pf2e.get_prof_bonus(char, skill_prof) < Pf2e.get_prof_bonus(char, minimum_prof)
+          end
         when "specialize"
           held = held_specialties(char)
 
@@ -498,6 +515,20 @@ module AresMUSH
 
       return true if msg.empty?
       return false
+    end
+
+    # The skill that goes with the tradition a source casts from, counting one this level grants, or
+    # nil when the source casts from none.
+    def self.tradition_skill_for(char, source)
+      found = DraftSheet.of(char).traditions.find { |held, _| held.to_s.casecmp?(source.to_s) }
+      tradition = found && Array(found[1]).first
+
+      return nil if tradition.blank?
+
+      skills = Global.read_config('pf2e_magic', 'tradition_skills') || {}
+      key = skills.keys.find { |t| t.to_s.casecmp?(tradition.to_s) }
+
+      key && skills[key]
     end
 
     def self.has_feat?(char, feat)
@@ -719,6 +750,15 @@ module AresMUSH
             key_display = 'Innate spell tradition'
           elsif k == 'caster'
             key_display = 'Ability to cast'
+          elsif k == 'tradition_skill'
+            # Stored as "source/proficiency", and the skill depends on the character.
+            key_display = 'Skill requirement'
+
+            v = Array(v).map do |entry|
+              source, prof = entry.to_s.split("/")
+
+              "#{prof} in the skill for your #{source}'s tradition"
+            end
           elsif k == 'anyskills'
             # Stored as "rank/count", which is not something to show a player as-is.
             key_display = 'Skill requirement'

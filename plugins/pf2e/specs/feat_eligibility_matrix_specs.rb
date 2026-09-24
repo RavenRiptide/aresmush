@@ -44,6 +44,7 @@ module AresMUSH
           'Devoted' => { 'feat_type' => [ 'General' ], 'prereq' => { 'focus_spell' => [ 'Lay on Hands' ] } },
           'Healer' => { 'feat_type' => [ 'General' ], 'prereq' => { 'divine_font' => [ 'heal' ] } },
           'Watchful' => { 'feat_type' => [ 'General' ], 'prereq' => { 'combat_stats' => 'Perception/expert' } },
+          'TraditionSkilled' => { 'feat_type' => [ 'General' ], 'prereq' => { 'tradition_skill' => [ 'Sorcerer Archetype/master' ] } },
 
           # Gates that are not prereq entries: the feat's own type decides who may take it.
           'FighterOnly' => { 'feat_type' => [ 'Charclass' ], 'assoc_charclass' => [ 'Fighter' ] },
@@ -59,6 +60,8 @@ module AresMUSH
         allow(Global).to receive(:read_config).with('pf2e', 'prof_progression')
           .and_return(%w(untrained trained expert master legendary))
         matrix_focus([])
+        allow(Global).to receive(:read_config).with('pf2e_magic', 'tradition_skills')
+          .and_return('arcane' => 'Arcana', 'divine' => 'Religion', 'occult' => 'Occultism', 'primal' => 'Nature')
       end
 
       # feat => the mutation that satisfies its prerequisite. Everything else stays at the axis
@@ -83,6 +86,9 @@ module AresMUSH
         'Focused' => { :focus_pool => 1 },
         'Healer' => { :divine_font => 'heal' },
         'Watchful' => { :perception => 'expert' },
+        # The skill follows the archetype's tradition, so both have to move.
+        'TraditionSkilled' => { :traditions => { 'Sorcerer Archetype' => [ 'divine', 'trained' ] },
+                                :skills => { 'Religion' => 'master' } },
         'ElfOnly' => { :ancestry => 'Elf' }
       }.freeze
 
@@ -108,7 +114,7 @@ module AresMUSH
         'EitherSkill' => %w(Skilled),
         # `caster` asks whether the character casts from a tradition. A class tradition counts and
         # so do innate spells. A focus pool on its own does not, and neither does a divine font.
-        'Casting' => %w(Arcanist InnatelyPrimal),
+        'Casting' => %w(Arcanist InnatelyPrimal TraditionSkilled),
         # A tradition is what `tradition` asks for, and Casting's mutation grants one.
         'Arcanist' => %w(Casting),
         # Both heritage rows are satisfied by a heritage that is Skilled and is not Versatile.
@@ -161,6 +167,35 @@ module AresMUSH
               expect(matrix_allows?(matrix_char(other_mutation), feat)).to be false
             end
           end
+        end
+      end
+
+      # `tradition_skill` reads the skill from the tradition, which the single mutation above cannot
+      # show going wrong in either direction.
+      describe "a skill that follows an archetype's tradition" do
+        def sorcerer(tradition, skill, prof = 'master')
+          matrix_char(:traditions => { 'Sorcerer Archetype' => [ tradition, 'trained' ] },
+                      :skills => { skill => prof })
+        end
+
+        it "should refuse the right rank in another tradition's skill" do
+          expect(matrix_allows?(sorcerer('divine', 'Arcana'), 'TraditionSkilled')).to be false
+        end
+
+        it "should refuse the tradition's skill below the rank asked for" do
+          expect(matrix_allows?(sorcerer('divine', 'Religion', 'expert'), 'TraditionSkilled')).to be false
+        end
+
+        it "should allow a higher rank than the one asked for" do
+          expect(matrix_allows?(sorcerer('occult', 'Occultism', 'legendary'), 'TraditionSkilled')).to be true
+        end
+
+        it "should count a tradition this level is granting" do
+          char = matrix_char(:skills => { 'Nature' => 'master' }, :advancing => true)
+          allow(char).to receive(:pf2_advancement)
+            .and_return('magic_stats' => { 'Sorcerer Archetype' => { 'tradition' => { 'primal' => 'trained' } } })
+
+          expect(matrix_allows?(char, 'TraditionSkilled')).to be true
         end
       end
 

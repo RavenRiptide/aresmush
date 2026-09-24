@@ -257,6 +257,13 @@ pf2e_magic:
     - Bard Archetype
     - Oracle Archetype
     - Sorcerer Archetype
+  # The skill that goes with each tradition, for a prerequisite that follows whichever tradition a
+  # source casts from (the `tradition_skill` prereq).
+  tradition_skills:
+    arcane: Arcana
+    divine: Religion
+    occult: Occultism
+    primal: Nature
   focus_casting_stat: 
     bloodline: Charisma
     composition: Charisma

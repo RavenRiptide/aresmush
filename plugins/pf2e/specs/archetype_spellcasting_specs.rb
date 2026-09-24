@@ -114,6 +114,33 @@ module AresMUSH
         end
       end
 
+      # A `feat` prereq is a list of feats the character must hold, so anything else written there
+      # makes the feat impossible to take.
+      it "should name only real feats as feat prerequisites" do
+        casters.each do |archetype|
+          schedule.each_key do |tier|
+            name = feat_for(tier, archetype)
+
+            Array(@feats[name]['prereq']['feat']).each do |required|
+              expect(@feats).to have_key(required), "#{name} requires #{required.inspect}"
+            end
+          end
+        end
+      end
+
+      # A Sorcerer's tradition comes from the bloodline and a Witch's from the patron, so the skill
+      # their Expert and Master feats ask for follows it.
+      it "should ask for the tradition's skill where the archetype's tradition varies" do
+        { 'Sorcerer Archetype' => 'Sorcerer', 'Witch Archetype' => 'Witch' }.each_pair do |archetype, cls|
+          { 'Expert' => 'master', 'Master' => 'legendary' }.each_pair do |tier, prof|
+            prereq = @feats["#{tier} #{cls} Spellcasting"]['prereq']
+
+            expect(prereq['tradition_skill']).to eq([ "#{archetype}/#{prof}" ])
+            expect(prereq).to_not have_key('skill')
+          end
+        end
+      end
+
       it "should give a repertoire caster a signature at the first level of each tier" do
         casters.each do |archetype|
           schedule.each_pair do |tier, levels|
