@@ -356,23 +356,25 @@ module AresMUSH
           magic.spellbook = spellbook
         when "adapted_spell"
           # Structure: { "name" => spell, "tradition" => trad, "base_level" => n,
-          #                       "source" => feat, "no_heighten" => bool }
-          name = value['name'].to_s
+          #                       "source" => feat, "no_heighten" => bool }, or a list of them
+          # for a feat that adds several spells at once (Fey Caller).
+          adapted_class = Pf2emagic.get_caster_type(charclass) ? charclass : nil
+          adapted = magic.adapted_spells
 
-          unless name.empty?
-            adapted_class = Pf2emagic.get_caster_type(charclass) ? charclass : nil
+          (value.is_a?(Array) ? value : [ value ]).each do |entry|
+            name = entry['name'].to_s
+            next if name.empty?
 
-            adapted = magic.adapted_spells
             adapted[name] = {
-              'tradition'  => value['tradition'].to_s.downcase,
-              'base_level' => value['base_level'].to_i,
-              'source'     => value['source'],
+              'tradition'  => entry['tradition'].to_s.downcase,
+              'base_level' => entry['base_level'].to_i,
+              'source'     => entry['source'],
               'class'      => adapted_class
             }
-            adapted[name]['no_heighten'] = true if value['no_heighten']
-
-            magic.adapted_spells = adapted
+            adapted[name]['no_heighten'] = true if entry['no_heighten']
           end
+
+          magic.adapted_spells = adapted
         when "signature_spell", "signature_spells"
           # This key means that the character needs to pick a spell from their repertoire as a signature spell.
           # Structure of value: { level to pick from => number of spells to add }

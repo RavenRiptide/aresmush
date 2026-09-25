@@ -258,7 +258,11 @@ pf2e_feats:
     shortdesc: "Your deity bestows a special spell related to their powers. Select one domain—a subject of particular interest to you within your religion—from your deity's list. You gain an initial domain spell for that domain, a spell unique to the domain and not available to other clerics.%r%rDomain spells are a type of focus spell. It costs 1 Focus Point to cast a focus spell, and you start with a focus pool of 1 Focus Point. You refill your focus pool during your daily preparations, and you can regain 1 Focus Point by spending 10 minutes using the Refocus activity to pray to your deity or do service toward their causes.%r%rFocus spells are automatically heightened to half your level rounded up, much like cantrips. Focus spells don't require spell slots, and can't be cast using spell slots. Your focus pool can hold one Focus Point for each focus spell you have, up to 3 points.%r%r**Special** You can select this feat multiple times, selecting a different domain each time and gaining its domain spell."
     traits:
       - cleric
-    init_magic: true
+    magic_stats:
+      focus_pool: 1
+    feat_choice:
+      summary: one of your deity's domains
+      from: deity_domains
   Double Slice:
     assoc_charclass:
       - Fighter
@@ -496,6 +500,17 @@ pf2e_feats:
     shortdesc: "You've trained with one of the ranger sects known as wardens, who practice a specialized type of primal magic. You gain your choice of one warden spell from these initial warden spells (or another you have access to): *gravity weapon*, *heal companion*, *magic hide*.%r%r**Special** You can take this feat multiple times, choosing a different initial warden spell each time."
     traits:
       - ranger
+    repeatable: true
+    magic_stats:
+      focus_pool: 1
+    feat_choice:
+      summary: an initial warden spell
+      from_spells:
+        traits:
+          - ranger
+          - focus
+        base_level: 1
+        focus_type: warden
   Known Weaknesses:
     assoc_charclass:
       - Investigator
@@ -1220,7 +1235,13 @@ pf2e_feats:
     shortdesc: Your patron grants you a special lesson, revealing a hidden facet of its nature. Choose a basic lesson. You gain its associated hex, and your familiar learns the associated spell.
     traits:
       - witch
-    init_magic: true
+    magic_stats:
+      focus_pool: 1
+    feat_choice:
+      summary: a basic lesson
+      from: lessons
+      tiers:
+        - basic
   Blade Brake:
     assoc_charclass:
       - Fighter
@@ -1478,6 +1499,11 @@ pf2e_feats:
     shortdesc: "Every oracle's mystery touches on a divine domain of the deities that fuel it; you can access that power. Choose one of the domains associated with your mystery for which you don't already have an initial domain spell. You gain an initial domain spell from that domain, which you cast as a revelation spell.%r%r**Special** You can select this feat multiple times, selecting a different domain each time and gaining its domain spell as a revelation spell."
     traits:
       - oracle
+    magic_stats:
+      focus_pool: 1
+    feat_choice:
+      summary: a domain of your mystery
+      from: mystery_domains
   Dueling Parry:
     assoc_charclass:
       - Fighter
@@ -2108,6 +2134,17 @@ pf2e_feats:
     shortdesc: "You unlock more powerful primal spells. You gain your choice of one warden spell from the advanced warden spells.%r%r*animal feature*%r%r*enlarge companion*%r%r*hunter's luck*%r%r*soothing mist*%r%r**Special** You can take this feat multiple times, choosing a different advanced warden spell each time."
     traits:
       - ranger
+    repeatable: true
+    magic_stats:
+      focus_pool: 1
+    feat_choice:
+      summary: an advanced warden spell
+      from_spells:
+        traits:
+          - ranger
+          - focus
+        base_level: 2
+        focus_type: warden
   Alchemical Discoveries:
     assoc_charclass:
       - Investigator
@@ -2254,7 +2291,6 @@ pf2e_feats:
       - bard
       - concentrate
       - spellshape
-    init_magic: true
   Dastardly Dash:
     assoc_charclass:
       - Swashbuckler
@@ -2570,7 +2606,6 @@ pf2e_feats:
       - bard
       - concentrate
       - spellshape
-    init_magic: true
   Invigorating Elixir:
     assoc_charclass:
       - Alchemist
@@ -3128,7 +3163,6 @@ pf2e_feats:
     shortdesc: "**Frequency** once per round%r%rYou collect your patron's magic into one of your witch armaments, causing them to shine with runes, light, or another signifier of your patron.%r%rMake an unarmed Strike with one with your witch's armaments. If you hit, you establish a sympathetic link with the target, making it easier for your patron to affect them. Until the beginning of your next turn, the target takes a –1 circumstance penalty to its saves against your hexes, or a –2 penalty if the triggering Strike was a critical hit."
     traits:
       - witch
-    init_magic: true
   Tenacious Toxins:
     assoc_charclass:
       - Alchemist
@@ -3251,6 +3285,11 @@ pf2e_feats:
     shortdesc: You draw more power from your bloodline. You gain the advanced bloodline spell associated with your bloodline.
     traits:
       - sorcerer
+    feat_choice:
+      summary: your bloodline's advanced spell
+      auto: subclass_spell
+      from: subclass_spell
+      tier: advanced
   Advanced Monastic Weaponry:
     assoc_charclass:
       - Monk
@@ -3299,7 +3338,11 @@ pf2e_feats:
     shortdesc: Divine power reveals greater mysteries to you. You learn the advanced revelation spell associated with your mystery.
     traits:
       - oracle
-    init_magic: true
+    feat_choice:
+      summary: your mystery's advanced revelation spell
+      auto: subclass_spell
+      from: subclass_spell
+      tier: advanced
   Advanced Weapon Training:
     assoc_charclass:
       - Fighter
@@ -3756,7 +3799,14 @@ pf2e_feats:
     shortdesc: Your patron grants you greater knowledge. Choose a greater or basic lesson. You gain its associated hex, and your familiar learns the associated spell.
     traits:
       - witch
-    init_magic: true
+    magic_stats:
+      focus_pool: 1
+    feat_choice:
+      summary: a greater or basic lesson
+      from: lessons
+      tiers:
+        - basic
+        - greater
   Green Empathy:
     assoc_charclass:
       - Druid
@@ -3908,6 +3958,17 @@ pf2e_feats:
     shortdesc: "Your mastery of warden magic increases. You gain your choice of one warden spell from the master warden spells.%r%r*ephemeral tracking*%r%r*ranger's bramble*%r%r**Special** You can take this feat multiple times, choosing a different master warden spell each time."
     traits:
       - ranger
+    repeatable: true
+    magic_stats:
+      focus_pool: 1
+    feat_choice:
+      summary: a master warden spell
+      from_spells:
+        traits:
+          - ranger
+          - focus
+        base_level: 3
+        focus_type: warden
   Mature Animal Companion (Ranger):
     assoc_charclass:
       - Ranger
@@ -4416,7 +4477,11 @@ pf2e_feats:
     shortdesc: Through your conviction, you have glimpsed the deeper secrets of your deity's domain. You gain an advanced domain spell from the domain you chose with Deity's Domain as a devotion spell.
     traits:
       - champion
-    init_magic: true
+    magic_stats:
+      focus_pool: 1
+    feat_choice:
+      summary: the domain you chose with Deity's Domain
+      from: held_domains
   Advanced Domain:
     repeatable: true
     assoc_charclass:
@@ -4430,7 +4495,11 @@ pf2e_feats:
     shortdesc: "Your prayers have unlocked deeper secrets of your deity's domain. You gain an advanced domain spell from one of your domains for which you have an initial domain spell.%r%r**Special** You can select this feat multiple times. Each time, you must select a different advanced domain spell."
     traits:
       - cleric
-    init_magic: true
+    magic_stats:
+      focus_pool: 1
+    feat_choice:
+      summary: a domain whose initial spell you have
+      from: held_domains
   Advanced School Spell:
     feat_choice:
       auto: subclass_spell
@@ -4446,7 +4515,6 @@ pf2e_feats:
     shortdesc: You gain access to the advanced teachings of your arcane institution, learning a powerful new school spell. You gain the advanced school spell for your arcane school.
     traits:
       - wizard
-    init_magic: true
   Alter Admixture:
     assoc_charclass:
       - Alchemist
@@ -4778,7 +4846,20 @@ pf2e_feats:
     shortdesc: You have learned some of the tricks the fey use to bend primal magic toward illusions and trickery. Add *illusory disguise*, *illusory object*, and *illusory scene* to your spell list, which you cast as primal spells.
     traits:
       - druid
-    init_magic: true
+    magic_stats:
+      adapted_spell:
+        - name: Illusory Disguise
+          tradition: primal
+          base_level: 1
+          source: Fey Caller
+        - name: Illusory Object
+          tradition: primal
+          base_level: 1
+          source: Fey Caller
+        - name: Illusory Scene
+          tradition: primal
+          base_level: 5
+          source: Fey Caller
   Flashy Roll:
     assoc_charclass:
       - Swashbuckler
@@ -4804,7 +4885,6 @@ pf2e_feats:
       - druid
       - healing
       - vitality
-    init_magic: true
   Follow-Up Assault:
     assoc_charclass:
       - Barbarian
@@ -5387,7 +5467,6 @@ pf2e_feats:
     shortdesc: "**Frequency** once per day%r%r**Trigger** An ally you can see falls to 0 Hit Points.%r%rWhen an ally you can see falls in battle, your surge of righteous indignation allows you to draw upon untapped reserves of divine power. You instantly regain 1 Focus Point."
     traits:
       - cleric
-    init_magic: true
   Surging Might:
     assoc_charclass:
       - Oracle
@@ -5743,7 +5822,7 @@ pf2e_feats:
     shortdesc: Your devotion is strong enough to increase your focus to incredible heights. Whenever you Refocus, completely refill your focus pool.
     traits:
       - champion
-    init_magic: true
+    refocus: refill
   Disarming Twist:
     assoc_charclass:
       - Fighter
@@ -5868,7 +5947,11 @@ pf2e_feats:
     shortdesc: You uncover the greater secrets of your bloodline. You gain the greater bloodline spell associated with your bloodline.
     traits:
       - sorcerer
-    init_magic: true
+    feat_choice:
+      summary: your bloodline's greater spell
+      auto: subclass_spell
+      from: subclass_spell
+      tier: greater
   Greater Debilitating Bomb:
     assoc_charclass:
       - Alchemist
@@ -5996,7 +6079,15 @@ pf2e_feats:
     shortdesc: "Your patron grants you even greater secrets. Choose a major, greater, or basic lesson. You gain its associated hex, and your familiar learns the associated spell.%r%r**Special** You can select this feat a second time if you're 14th level or higher, and a third time if you're 18th level or higher. Choose a different lesson each time."
     traits:
       - witch
-    init_magic: true
+    magic_stats:
+      focus_pool: 1
+    feat_choice:
+      summary: a major, greater or basic lesson
+      from: lessons
+      tiers:
+        - basic
+        - greater
+        - major
   Master Monster Hunter:
     assoc_charclass:
       - Ranger
@@ -6698,7 +6789,7 @@ pf2e_feats:
     shortdesc: By listening to the beating of your heart, your focus recovers faster. Whenever you Refocus, completely refill your focus pool.
     traits:
       - sorcerer
-    init_magic: true
+    refocus: refill
   Bloody Debilitation:
     assoc_charclass:
       - Rogue
@@ -6855,7 +6946,11 @@ pf2e_feats:
     shortdesc: You command a deep understanding of the domains related to your mystery. Choose one of the domains associated with your mystery for which you have an initial domain spell. You gain an advanced domain spell from that domain, which you cast as a revelation spell.
     traits:
       - oracle
-    init_magic: true
+    magic_stats:
+      focus_pool: 1
+    feat_choice:
+      summary: a domain whose initial spell you have
+      from: held_domains
   Domain Focus:
     assoc_charclass:
       - Cleric
@@ -6866,7 +6961,7 @@ pf2e_feats:
     shortdesc: Your devotion to your deity's domains grows greater, and so does the power granted to you. Whenever you Refocus, completely refill your focus pool.
     traits:
       - cleric
-    init_magic: true
+    refocus: refill
   Double Prey:
     assoc_charclass:
       - Ranger
@@ -7136,7 +7231,11 @@ pf2e_feats:
     shortdesc: You unlock deeper revelations hidden within your mystery. You gain your mystery's greater revelation spell.
     traits:
       - oracle
-    init_magic: true
+    feat_choice:
+      summary: your mystery's greater revelation spell
+      auto: subclass_spell
+      from: subclass_spell
+      tier: greater
   Greater Spiritual Evolution:
     assoc_charclass:
       - Sorcerer
@@ -7160,7 +7259,7 @@ pf2e_feats:
     shortdesc: Your patron's teachings have allowed you to achieve a deeper focus. Whenever you Refocus, completely refill your focus pool.
     traits:
       - witch
-    init_magic: true
+    refocus: refill
   Improved Dueling Riposte:
     assoc_charclass:
       - Fighter
@@ -7209,7 +7308,7 @@ pf2e_feats:
     shortdesc: Your connection to your muse has granted you unusual focus. Whenever you Refocus, completely refill your focus pool.
     traits:
       - bard
-    init_magic: true
+    refocus: refill
   Just as Planned:
     assoc_charclass:
       - Investigator
@@ -7284,7 +7383,7 @@ pf2e_feats:
     shortdesc: Your meditation is so effective that you can achieve a deep focus with the world around you. When you Refocus, you regain all your Focus Points instead of 1.
     traits:
       - monk
-    init_magic: true
+    refocus: refill
   Mobile Finisher:
     assoc_charclass:
       - Swashbuckler
@@ -7344,7 +7443,7 @@ pf2e_feats:
     shortdesc: Your connection to nature is particularly strong, and the spirits of nature flock around you, helping you replenish your focus. Whenever you Refocus, completely refill your focus pool.
     traits:
       - druid
-    init_magic: true
+    refocus: refill
   Primal Summons:
     assoc_charclass:
       - Druid
@@ -7630,12 +7729,22 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 12
-      feat:
-        - warden spells
+      focus_spell:
+        - Animal Feature
+        - Enlarge Companion
+        - Ephemeral Tracking
+        - Gravity Weapon
+        - Heal Companion
+        - "Hunter's Luck"
+        - "Hunter's Vision"
+        - Magic Hide
+        - "Ranger's Bramble"
+        - Soothing Mist
+        - Terrain Transposition
     shortdesc: Your connection with your surroundings deepens and expands, allowing you to draw in more of nature's primal power as you focus. When you Refocus, you regain all your Focus Points instead of 1.
     traits:
       - ranger
-    init_magic: true
+    refocus: refill
   Witch's Broom:
     assoc_charclass:
       - Witch
@@ -7726,7 +7835,7 @@ pf2e_feats:
     shortdesc: Your connection to your bonded item increases your focus pool. Whenever you Refocus while your bonded item is in your possession, you completely refill your focus pool.
     traits:
       - wizard
-    init_magic: true
+    refocus: refill
   Channeling Block:
     assoc_charclass:
       - Cleric
@@ -8157,7 +8266,7 @@ pf2e_feats:
     shortdesc: The further extents of your mystery provide an endless wellspring of magic. When you Refocus, you regain all your Focus Points instead of 1.
     traits:
       - oracle
-    init_magic: true
+    refocus: refill
   Rites of Transfiguration:
     assoc_charclass:
       - Witch
@@ -8636,7 +8745,19 @@ pf2e_feats:
     shortdesc: "You have broadened your understanding of the divine and can tap into the wonders of a different mystery. Select one revelation spell from a mystery other than your own. You can choose only an initial revelation spell or an advanced revelation spell.%r%rThis spell gains the cursebound trait for you, and when you cast it, you gain the cursebound 1 effects of its mystery in addition to your normal curse effects. Any ability that lets you use a cursebound ability without increasing the severity of your curse also prevents you from gaining this additional curse effect.%r%rYou can't cast your chosen revelation spell if any of the following conditions are true:%r%rits mystery's curse effects directly conflict with or negate the effects of your own mystery's curse,%r%rthe curse would have no effect on you (for example, removing an ability from your original mystery that you lack),%r%ror if either of these criteria would be met once you finish Casting the Spell"
     traits:
       - oracle
-    init_magic: true
+    magic_stats:
+      focus_pool: 1
+    feat_choice:
+      summary: an initial or advanced revelation spell from another mystery
+      from_spells:
+        traits:
+          - oracle
+          - focus
+        base_level:
+          - 1
+          - 3
+        subclass: other
+        focus_type: revelation
   Dragon Transformation:
     assoc_charclass:
       - Barbarian
@@ -10233,7 +10354,6 @@ pf2e_feats:
     shortdesc: The truest depths of your divine mystery are fathomless and contradictory, granting you changing powers that even you can barely begin to fathom. Each day during your daily preparations, choose one basic or advanced domain spell from any domain from *Player Core*, one of the domains granted by your mystery, another domain to which you have access, or any initial or advanced revelation spell from another mystery. You gain that spell as a revelation spell until your next daily preparations.
     traits:
       - oracle
-    init_magic: true
   Patron's Truth:
     assoc_charclass:
       - Witch

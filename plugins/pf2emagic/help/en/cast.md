@@ -54,6 +54,6 @@ For example, inputting `cast/innate primal/2=Glitterdust/Sandy` will cast a leve
 
 ## Refocusing
 **Commands:**
-`refocus`: Runs the code for the Refocus activity. This may be done only if your focus pool is zero, and then only once an hour in OOC time.
+`refocus`: Runs the code for the Refocus activity, restoring 1 Focus Point, or your whole focus pool if you have a feat such as Domain Focus that refills it. This may be done only while your focus pool is not full, and then only once an hour in OOC time.
 
 Admins can refocus a character by inputting `refocus <character>`. Admins may do this at any time, without time or pool size restrictions. 

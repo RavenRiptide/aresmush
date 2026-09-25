@@ -1210,8 +1210,13 @@ module AresMUSH
     def self.apply_init_magic_feat(char, feat_name, feat_details, client)
       return unless feat_details && feat_details['init_magic']
 
+      # The flag grants the spell that has the feat's own name.
       spell_result = Pf2emagic.get_spell_details(feat_name)
-      return if spell_result.is_a?(String)
+
+      if spell_result.is_a?(String)
+        Global.logger.error "Feat '#{feat_name}' carries init_magic, but no single spell has its name."
+        return
+      end
 
       spell_name, spell_details = spell_result
       focus_type_by_source = Global.read_config('pf2e_magic', 'focus_type_by_source')
@@ -1417,18 +1422,12 @@ module AresMUSH
         return nil unless found
 
         { 'magic_stats' => { 'focus_pool' => 1, 'focus_spell' => { found[0] => [ found[1] ] } } }
-      when 'deity_domains'
-        # Choosing a domain grants that domain's initial spell as a focus spell.
-        domain_info = Global.read_config('pf2e_magic', 'domains', value)
-        return nil unless domain_info && domain_info['initial']
-
-        focus_type_by_source = Global.read_config('pf2e_magic', 'focus_type_by_source') || {}
-        focus_type = focus_type_by_source[char.pf2_base_info['charclass']] || 'devotion'
-
-        # The domain is what granted the spell, so it travels with it - otherwise the sheet has
-        # to work back from the deity's domain list to say where the spell came from.
-        { 'magic_stats' => { 'focus_spell' => { focus_type => [ domain_info['initial'] ] },
-                             'focus_source' => "Domain #{value}" } }
+      when 'deity_domains', 'mystery_domains'
+        domain_spell_grant(char, value, 'initial')
+      when 'held_domains'
+        domain_spell_grant(char, value, 'advanced')
+      when 'lessons'
+        lesson_grant(char, value)
       when 'devotion_spells'
         { 'magic_stats' => { 'focus_spell' => { 'devotion' => [ value ] } } }
       when 'traditions', 'other_traditions'
@@ -1436,6 +1435,77 @@ module AresMUSH
       else
         nil
       end
+    end
+
+    def self.domain_table
+      Global.read_config('pf2e_magic', 'domains') || {}
+    end
+
+    # A domain's spell of one tier, as the focus type the character's class casts it as. The domain
+    # is what granted the spell, so it travels with it - otherwise the sheet has to work back from a
+    # deity's or a mystery's domain list to say where the spell came from.
+    def self.domain_spell_grant(char, domain, tier)
+      table = domain_table
+      key = table.keys.find { |d| d.to_s.casecmp?(domain.to_s) }
+      spell = key && table[key][tier]
+      return nil if spell.blank?
+
+      focus_type_by_source = Global.read_config('pf2e_magic', 'focus_type_by_source') || {}
+      focus_type = focus_type_by_source[char.pf2_base_info['charclass']] || 'devotion'
+
+      { 'magic_stats' => { 'focus_spell' => { focus_type => [ spell ] }, 'focus_source' => "Domain #{key}" } }
+    end
+
+    # A witch's lessons as choice labels, from the tiers the feat's block names. A lesson whose
+    # familiar spell is a choice is listed once per spell, "Lesson of the Elements (Air Bubble)", so
+    # the one pick settles both. A lesson whose hex is already held is left out.
+    def self.lesson_options(char, block)
+      tiers = Array(block.is_a?(Hash) ? block['tiers'] : nil).map { |t| t.to_s.downcase }
+      lessons = Global.read_config('pf2e_magic', 'lessons') || {}
+      held = held_focus_spells(char).map(&:downcase)
+
+      labels = tiers.flat_map do |tier|
+        (lessons[tier] || {}).flat_map do |lesson, info|
+          next [] if held.include?(info['hex'].to_s.downcase)
+
+          spells = Array(info['spell'])
+          spells.size > 1 ? spells.map { |spell| "#{lesson} (#{spell})" } : [ lesson ]
+        end
+      end
+
+      labels.sort
+    end
+
+    # The lesson a label names, and the familiar spell it carries.
+    def self.lesson_for_label(label)
+      lessons = (Global.read_config('pf2e_magic', 'lessons') || {}).values.inject({}) { |all, tier| all.merge(tier || {}) }
+
+      name, spell = label.to_s.match(/\A(.+?)(?: \((.+)\))?\z/).captures
+      key = lessons.keys.find { |l| l.to_s.casecmp?(name) }
+      return nil unless key
+
+      info = lessons[key]
+      spells = Array(info['spell'])
+      spell = spell ? spells.find { |s| s.casecmp?(spell) } : spells.first
+      return nil unless spell && (spells.size == 1 || label.to_s.include?('('))
+
+      [ key, info['hex'], spell ]
+    end
+
+    # A lesson's hex, and its familiar spell written into the witch's spellbook at the spell's rank.
+    def self.lesson_grant(char, label)
+      found = lesson_for_label(label)
+      return nil unless found
+
+      lesson, hex, spell = found
+      rank = ((Global.read_config('pf2e_spells') || {})[spell] || {})['base_level'].to_i
+
+      focus_type_by_source = Global.read_config('pf2e_magic', 'focus_type_by_source') || {}
+      focus_type = focus_type_by_source[char.pf2_base_info['charclass']] || 'hex'
+
+      { 'magic_stats' => { 'focus_spell' => { focus_type => [ hex ] },
+                           'addspellbook' => { rank => [ spell ] },
+                           'focus_source' => lesson } }
     end
 
     THE_TRADITIONS = %w(arcane divine occult primal)
@@ -2042,6 +2112,11 @@ module AresMUSH
 
       allowed_trads = filter.key?('tradition') ? resolve_tradition_spec(char, filter['tradition'], choice_name) : nil
 
+      # `subclass: own` or `other`: spells tagged for the character's own bloodline or mystery, or
+      # for another one. An untagged spell belongs to no subclass and matches neither.
+      subclass = filter['subclass'].to_s.downcase
+      own = subclass.empty? ? '' : (char.pf2_base_info || {})['specialize'].to_s.downcase
+
       list = spells.keys.select do |name|
         details = spells[name]
         next false unless details.is_a?(Hash)
@@ -2053,6 +2128,13 @@ module AresMUSH
 
         traits = Array(details['traits']).compact.map { |t| t.to_s.downcase }
         next false unless wanted.all? { |w| traits.include?(w) }
+
+        unless subclass.empty?
+          tags = (Array(details['bloodline']) + Array(details['mystery'])).map { |t| t.to_s.downcase }
+          next false if tags.empty?
+          next false if subclass == 'own' && !tags.include?(own)
+          next false if subclass == 'other' && tags.include?(own)
+        end
 
         if allowed_trads
           spell_trads = Array(details['tradition']).compact.map { |t| t.to_s.downcase }
@@ -2286,10 +2368,12 @@ module AresMUSH
       spec = Global.read_config('pf2e_specialty', cls.to_s, subclass)
       return nil unless spec.is_a?(Hash)
 
-      focus = if tier.to_s.casecmp?('advanced')
-        spec['advanced_focus_spell']
-      else
+      # The initial spell is the one chargen grants; each later tier has its own key, such as
+      # `advanced_focus_spell` or `greater_focus_spell`.
+      focus = if tier.blank? || tier.to_s.casecmp?('initial')
         spec.dig('chargen', 'magic_stats', 'focus_spell')
+      else
+        spec["#{tier.to_s.downcase}_focus_spell"]
       end
 
       return nil unless focus.is_a?(Hash)
@@ -2314,6 +2398,26 @@ module AresMUSH
         return [] unless deity_info
 
         Array(deity_info['domains']).compact.sort
+      when 'held_domains'
+        # Advanced Domain and its like: a domain whose initial spell is held and whose advanced
+        # spell is not yet.
+        held = held_focus_spells(char).map(&:downcase)
+
+        domain_table.select do |_domain, info|
+          held.include?(info['initial'].to_s.downcase) && !held.include?(info['advanced'].to_s.downcase)
+        end.keys.sort
+      when 'mystery_domains'
+        # Domain Acumen: the domains the oracle's mystery lists, less those already begun.
+        base = char.pf2_base_info || {}
+        mystery = Global.read_config('pf2e_specialty', base['charclass'].to_s, base['specialize'].to_s) || {}
+        held = held_focus_spells(char).map(&:downcase)
+        table = domain_table
+
+        Array(mystery['domains']).select do |domain|
+          table[domain] && !held.include?(table[domain]['initial'].to_s.downcase)
+        end.sort
+      when 'lessons'
+        lesson_options(char, block)
       when 'devotion_spells'
         options = [ 'Shields of the Spirit' ]
 

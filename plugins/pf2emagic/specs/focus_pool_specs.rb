@@ -143,9 +143,52 @@ module AresMUSH
         end
       end
 
+      # A Refocus restores one point, or the whole pool for a feat that says it refills.
+      describe :do_refocus do
+        def refocus(features: [])
+          @char.update(:pf2_features => @char.pf2_features.merge('charclass_features' => features))
+          @magic.update(:tradition => @magic.tradition.merge(@char.pf2_base_info['charclass'] => [ 'divine', 'trained' ]))
+
+          Pf2emagic.do_refocus(Character[@char.id], Character[@char.id])
+        end
+
+        it "should restore one point" do
+          as('Cleric')
+          hold(3, 0)
+
+          expect(refocus).to be_nil
+          expect(pool['current']).to eq 1
+        end
+
+        it "should refill the pool for a feat that says it does" do
+          as('Cleric', :feats => { 'charclass' => [ 'Domain Focus' ] })
+          hold(3, 0)
+          refocus
+
+          expect(pool['current']).to eq 3
+        end
+
+        it "should refill the pool for Revelation's Focus" do
+          as('Oracle', :feats => { 'charclass' => [ "Revelation's Focus" ] })
+          hold(2, 0)
+          refocus
+
+          expect(pool['current']).to eq 2
+        end
+
+        # Major and Extreme Curse raise the most cursebound an oracle can be, and nothing else.
+        it "should restore one point to an oracle with Extreme Curse" do
+          as('Oracle')
+          hold(3, 0)
+          refocus(:features => [ 'Major Curse', 'Extreme Curse' ])
+
+          expect(pool['current']).to eq 1
+        end
+      end
+
       # Every class that starts with focus spells starts with one point.
       describe "a first-level character built through the real commands" do
-        %w{Bard Champion Druid Oracle Witch}.each do |charclass|
+        %w{Bard Champion Cleric Druid Oracle Witch}.each do |charclass|
           it "should give a #{charclass} one focus point" do
             built = Pf2e::AutoBuilder.new(@char).build_level_one(charclass)
             held = Character[built.id].magic.focus_pool
@@ -153,6 +196,15 @@ module AresMUSH
             expect(held).to eq('max' => 1, 'current' => 1)
             expect(Pf2emagic.expected_focus_pool(Character[built.id])).to eq 1
           end
+        end
+
+        # The Cloistered doctrine grants Domain Initiate, whose domain is picked with cg/option.
+        it "should give a Cloistered Cleric the initial spell of the domain they pick" do
+          built = Pf2e::AutoBuilder.new(@char).build_level_one('Cleric')
+          magic = Character[built.id].magic
+
+          expect(built.pf2_base_info['specialize']).to eq 'Cloistered'
+          expect(Entries.focus_spells(magic, 'domain')).to eq [ 'Soothing Words' ]
         end
       end
     end

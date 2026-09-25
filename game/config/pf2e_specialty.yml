@@ -512,6 +512,17 @@ pf2e_specialty:
   Monk: {}
   Oracle:
     Ancestors:
+      advanced_focus_spell:
+        revelation:
+        - Ancestral Defense
+      greater_focus_spell:
+        revelation:
+        - Ancestral Form
+      domains:
+      - Death
+      - Duty
+      - Family
+      - Soul
       chargen:
         feat_choice:
           Ancestors Mystery:
@@ -546,6 +557,17 @@ pf2e_specialty:
               5:
               - Dreaming Potential
     Battle:
+      advanced_focus_spell:
+        revelation:
+        - Battlefield Persistence
+      greater_focus_spell:
+        revelation:
+        - Revel in Retribution
+      domains:
+      - Destruction
+      - Might
+      - Protection
+      - Zeal
       chargen:
         skills:
         - Athletics
@@ -575,6 +597,17 @@ pf2e_specialty:
               4:
               - Weapon Storm
     Bones:
+      advanced_focus_spell:
+        revelation:
+        - Armor of Bones
+      greater_focus_spell:
+        revelation:
+        - Claim Undead
+      domains:
+      - Death
+      - Decay
+      - Undeath
+      - Vigil
       chargen:
         skills:
         - Medicine
@@ -604,6 +637,17 @@ pf2e_specialty:
               3:
               - Ghostly Weapon
     Cosmos:
+      advanced_focus_spell:
+        revelation:
+        - Interstellar Void
+      greater_focus_spell:
+        revelation:
+        - Moonlight Bridge
+      domains:
+      - Darkness
+      - Moon
+      - Nothingness
+      - Star
       chargen:
         skills:
         - Nature
@@ -633,6 +677,17 @@ pf2e_specialty:
               5:
               - Moon Frenzy
     Flames:
+      advanced_focus_spell:
+        revelation:
+        - Whirling Flames
+      greater_focus_spell:
+        revelation:
+        - Flaming Fusillade
+      domains:
+      - Dust
+      - Fire
+      - Star
+      - Sun
       chargen:
         skills:
         - Acrobatics
@@ -662,6 +717,17 @@ pf2e_specialty:
               3:
               - Fireball
     Life:
+      advanced_focus_spell:
+        revelation:
+        - Delay Affliction
+      greater_focus_spell:
+        revelation:
+        - Life-Giving Form
+      domains:
+      - Death
+      - Healing
+      - Pain
+      - Soul
       chargen:
         skills:
         - Medicine
@@ -691,6 +757,17 @@ pf2e_specialty:
               5:
               - Grisly Growths
     Lore:
+      advanced_focus_spell:
+        revelation:
+        - Access Lore
+      greater_focus_spell:
+        revelation:
+        - Dread Secret
+      domains:
+      - Knowledge
+      - Magic
+      - Secrecy
+      - Truth
       chargen:
         skills:
         - Occultism
@@ -720,6 +797,17 @@ pf2e_specialty:
               6:
               - Never Mind
     Tempest:
+      advanced_focus_spell:
+        revelation:
+        - Thunderburst
+      greater_focus_spell:
+        revelation:
+        - Tempest Form
+      domains:
+      - Air
+      - Cold
+      - Lightning
+      - Water
       chargen:
         skills:
         - Nature
@@ -807,6 +895,12 @@ pf2e_specialty:
       - Dexterity
   Sorcerer:
     Aberrant:
+      advanced_focus_spell:
+        bloodline:
+        - Aberrant Whispers
+      greater_focus_spell:
+        bloodline:
+        - Unusual Anatomy
       chargen:
         magic_stats:
           tradition:
@@ -875,6 +969,12 @@ pf2e_specialty:
             tradition:
               occult: legendary
     Angelic:
+      advanced_focus_spell:
+        bloodline:
+        - Angelic Wings
+      greater_focus_spell:
+        bloodline:
+        - Celestial Brand
       chargen:
         magic_stats:
           tradition:
@@ -943,6 +1043,12 @@ pf2e_specialty:
             tradition:
               divine: legendary
     Demonic:
+      advanced_focus_spell:
+        bloodline:
+        - Swamp of Sloth
+      greater_focus_spell:
+        bloodline:
+        - Chthonian Wrath
       chargen:
         magic_stats:
           tradition:
@@ -1011,6 +1117,12 @@ pf2e_specialty:
             tradition:
               divine: legendary
     Diabolic:
+      advanced_focus_spell:
+        bloodline:
+        - Embrace the Pit
+      greater_focus_spell:
+        bloodline:
+        - Hellfire Plume
       chargen:
         magic_stats:
           tradition:
@@ -1079,6 +1191,12 @@ pf2e_specialty:
             tradition:
               divine: legendary
     Draconic:
+      advanced_focus_spell:
+        bloodline:
+        - Dragon Breath
+      greater_focus_spell:
+        bloodline:
+        - Dragon Wings
       choose:
         choice_name: Dragon Exemplar
         choice_description: Choose the dragon type to which you are linked.
@@ -1140,6 +1258,12 @@ pf2e_specialty:
               9:
               - Overwhelming Presence
     Elemental:
+      advanced_focus_spell:
+        bloodline:
+        - Elemental Motion
+      greater_focus_spell:
+        bloodline:
+        - Elemental Blast
       choose:
         choice_name: Elemental Influence
         choice_description: Choose the elemental that influenced your bloodline.
@@ -1208,6 +1332,12 @@ pf2e_specialty:
             tradition:
               primal: legendary
     Fey:
+      advanced_focus_spell:
+        bloodline:
+        - Fey Disappearance
+      greater_focus_spell:
+        bloodline:
+        - Fey Glamour
       chargen:
         magic_stats:
           tradition:
@@ -1276,6 +1406,12 @@ pf2e_specialty:
             tradition:
               primal: legendary
     Hag:
+      advanced_focus_spell:
+        bloodline:
+        - Horrific Visage
+      greater_focus_spell:
+        bloodline:
+        - You're Mine
       chargen:
         magic_stats:
           tradition:
@@ -1344,6 +1480,12 @@ pf2e_specialty:
             tradition:
               occult: legendary
     Imperial:
+      advanced_focus_spell:
+        bloodline:
+        - Extend Blood Magic
+      greater_focus_spell:
+        bloodline:
+        - Arcane Countermeasure
       chargen:
         magic_stats:
           tradition:
@@ -1412,6 +1554,12 @@ pf2e_specialty:
             tradition:
               arcane: legendary
     Undead:
+      advanced_focus_spell:
+        bloodline:
+        - Drain Life
+      greater_focus_spell:
+        bloodline:
+        - Grasping Grave
       chargen:
         magic_stats:
           tradition:

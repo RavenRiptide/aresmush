@@ -122,7 +122,7 @@ pf2e_deities:
       - Ambition
       - Destruction
       - Indulgence
-      - Nightmare
+      - Nightmares
     cleric_spells:
       - Runic Body
       - Moon Frenzy
@@ -251,7 +251,7 @@ pf2e_deities:
     related_lore: Deimosian Lore
     fav_weapon: light hammer
     domains:
-      - Delirium
+      - Disorientation
       - Secrecy
       - Trickery
       - Confidence
@@ -508,7 +508,7 @@ pf2e_deities:
       - Air
       - Travel
       - Water
-      - Weather
+      - Wealth
     cleric_spells:
       - Water Breathing
       - Mariner's Curse
@@ -603,7 +603,7 @@ pf2e_deities:
     related_lore: Taaran Lore
     fav_weapon: spiked chain
     domains:
-      - Void
+      - Nothingness
       - Darkness
       - Magic
       - Secrecy

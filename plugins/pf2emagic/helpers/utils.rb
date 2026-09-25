@@ -117,52 +117,23 @@ module AresMUSH
         return t('pf2emagic.cant_refocus_time', :time => formatted_last_refocus) unless (elapsed > 3600)
       end
 
-      spent = (max - current).to_i
-      charclass_feats = Array(Pf2e::DraftSheet.of(target).feats_by_bucket['charclass']).map { |f| f.to_s.upcase }
-      charclass_features = Array(target.pf2_features['charclass_features']).map { |f| f.to_s.upcase }
-      charclass = target.pf2_base_info['charclass']
-
-      two_point_refocus_feats = [
-        'DOMAIN FOCUS',
-        'INSPIRATIONAL FOCUS',
-        'PRIMAL FOCUS',
-        'MEDITATIVE FOCUS',
-        "WARDEN'S FOCUS",
-        'BLOODLINE FOCUS',
-        'HEX FOCUS',
-        'BONDED FOCUS'
-      ]
-
-      three_point_refocus_feats = [
-        'DOMAIN WELLSPRING',
-        'PRIMAL WELLSPRING',
-        'MEDITATIVE WELLSPRING',
-        "WARDEN'S WELLSPRING",
-        'BLOODLINE WELLSPRING',
-        'HEX WELLSPRING'
-      ]
-
-      has_two_point_feat = !(charclass_feats & two_point_refocus_feats).empty?
-      has_three_point_feat = !(charclass_feats & three_point_refocus_feats).empty?
-
-      is_oracle = (charclass == 'Oracle')
-      has_major_curse = is_oracle && charclass_features.include?('MAJOR CURSE')
-      has_extreme_curse = is_oracle && charclass_features.include?('EXTREME CURSE')
-
-      restore_points = 1
-      if spent >= 3 && (has_three_point_feat || has_extreme_curse)
-        restore_points = 3
-      elsif spent >= 2 && (has_two_point_feat || has_major_curse)
-        restore_points = 2
-      end
-
-      current = [ current + restore_points, max ].min
+      current = refocus_refills?(target) ? max : [ current + 1, max ].min
 
       focus_pool["current"] = current
       magic.update(focus_pool: focus_pool)
       magic.update(last_refocus: Time.now)
 
       return nil
+    end
+
+    # A Refocus restores one point, or the whole pool for a character holding a feat marked
+    # `refocus: refill` - Domain Focus and the class feats like it.
+    def self.refocus_refills?(char)
+      Pf2e::DraftSheet.of(char).feats_by_bucket.values.flatten.any? do |feat|
+        details = Pf2e.get_feat_details(feat)
+
+        !details.is_a?(String) && details[1]['refocus'].to_s == 'refill'
+      end
     end
 
     def self.curriculum_spells(char, charclass, level)
