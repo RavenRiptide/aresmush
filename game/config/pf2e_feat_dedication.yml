@@ -409,6 +409,10 @@ pf2e_feats:
       - dedication
       - multiclass
   Swashbuckler Dedication:
+    movement:
+      - status_bonus: 5
+        when: panache
+        source: Stylish Combatant
     assoc_archetype:
       - Swashbuckler Archetype
     assoc_class:
@@ -1839,6 +1843,9 @@ pf2e_feats:
     traits:
       - archetype
   Monk Moves:
+    movement:
+      - status_bonus: 10
+        when: unarmored
     assoc_archetype:
       - Monk Archetype
     feat_type:
@@ -1994,6 +2001,11 @@ pf2e_feats:
     traits:
       - archetype
   Swashbuckler's Speed:
+    movement:
+      - status_bonus: 10
+        when: panache
+      - status_bonus: 5
+        when: no_panache
     assoc_archetype:
       - Swashbuckler Archetype
     feat_type:

@@ -670,6 +670,8 @@ pf2e_feats:
         - arcane
         - occult
   Cave Climber:
+    movement:
+      - climb: 10
     feat_type:
       - Ancestry
     assoc_ancestry:
@@ -1526,6 +1528,10 @@ pf2e_feats:
       feat:
         - Bone Magic
   Gecko's Grip:
+    movement:
+      - climb: 15
+        prereq:
+          heritage: Pantli
     feat_type:
       - Ancestry
     assoc_ancestry:
@@ -2579,6 +2585,9 @@ pf2e_feats:
       level: 9
       heritage: Dar
   Nimble Hooves:
+    movement:
+      - increase: 5
+        group: ancestry
     feat_type:
       - Ancestry
     assoc_ancestry: 
@@ -2600,6 +2609,9 @@ pf2e_feats:
       level: 1
       heritage: Niasa
   Nimble Sil:
+    movement:
+      - increase: 5
+        group: ancestry
     feat_type:
       - Ancestry
     assoc_ancestry:
@@ -3433,6 +3445,8 @@ pf2e_feats:
     actions: 1
     frequency: once per round
   Soaring Form:
+    movement:
+      - fly: 20
     feat_type:
       - Ancestry
     assoc_ancestry:
@@ -3730,6 +3744,11 @@ pf2e_feats:
       level: 1
       heritage: Dar
   Swift Swimmer:
+    movement:
+      - swim: 15
+      - swim: 25
+        prereq:
+          heritage: Makar
     feat_type:
       - Ancestry
     assoc_ancestry:
@@ -3834,6 +3853,8 @@ pf2e_feats:
       feat:
         - Dance Underfoot
   Tree Climber (Sildanyar):
+    movement:
+      - climb: 10
     feat_type:
       - Ancestry
     assoc_ancestry:
@@ -4107,6 +4128,15 @@ pf2e_feats:
       level: 1
       heritage: Dar
   War Conditioning:
+    feat_choice:
+      summary: a climb Speed or a swim Speed
+      options:
+        Climb:
+          movement:
+            - climb: 20
+        Swim:
+          movement:
+            - swim: 20
     feat_type:
       - Ancestry
     assoc_ancestry:
@@ -4138,6 +4168,8 @@ pf2e_feats:
       level: 5
       heritage: Ashen One
   Warren Digger:
+    movement:
+      - burrow: 15
     feat_type:
       - Ancestry
     assoc_ancestry:

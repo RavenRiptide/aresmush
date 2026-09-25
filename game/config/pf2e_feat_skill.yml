@@ -1324,6 +1324,11 @@ pf2e_feats:
       level: 7
       skill: Survival/master
   Quick Climb:
+    movement:
+      - climb: land
+        prereq:
+          skill:
+            - Athletics/legendary
     feat_type:
       - Skill
       - General
@@ -1352,6 +1357,11 @@ pf2e_feats:
         - Occultism/master
         - Religion/master
   Quick Swim:
+    movement:
+      - swim: land
+        prereq:
+          skill:
+            - Athletics/legendary
     feat_type:
       - Skill
       - General

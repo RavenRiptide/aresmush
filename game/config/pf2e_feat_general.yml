@@ -127,6 +127,8 @@ pf2e_feats:
       ability:
         - Dexterity/14
   Fleet:
+    movement:
+      - increase: 5
     feat_type:
       - General
     shortdesc: You move more quickly on foot. Your Speed increases by 5 feet.
