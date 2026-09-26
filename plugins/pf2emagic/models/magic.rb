@@ -85,6 +85,9 @@ module AresMUSH
           end
 
           magic_options["repertoire"] = assignment_list
+        when "repertoire_each_rank"
+          magic_options["repertoire"] = Pf2e.merge_spell_slots(magic_options["repertoire"],
+            Pf2emagic.each_rank_picks(Pf2emagic.castable_rank(char), value))
         when "spellbook"
           assignment_list = magic_options["spellbook"] || {}
 
@@ -132,7 +135,7 @@ module AresMUSH
     # stat is then dispatched as if it were a class name.
     STAT_KEYS = %w{
       spell_abil tradition spells_per_day restricted_slots restricted_spellbook repertoire
-      addrepertoire get_genie_repertoire get_dragon_repertoire focus_spell
+      repertoire_each_rank addrepertoire get_genie_repertoire get_dragon_repertoire focus_spell
       domain_focus_spell focus_cantrip spellbook addspellbook adapted_spell signature_spell
       signature_spells innate_spell divine_font grant_choice gated_spell focus_source
     }.freeze
@@ -213,6 +216,12 @@ module AresMUSH
           end
 
           to_assign["repertoire"] = assignment_list
+
+        when "repertoire_each_rank"
+          # One pick at each rank the character can cast. A level that opens a new rank later adds
+          # the pick there, through Pf2e.open_each_rank_picks.
+          to_assign["repertoire"] = Pf2e.merge_spell_slots(to_assign["repertoire"],
+            Pf2emagic.each_rank_picks(Pf2emagic.castable_rank(char), value))
 
         when "addrepertoire"
           # This key is called for spells added to the repertoire by bloodlines, mysteries, etc.

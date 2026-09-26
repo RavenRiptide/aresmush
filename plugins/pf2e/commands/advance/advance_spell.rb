@@ -65,7 +65,7 @@ module AresMUSH
         found = Pf2e::Advancement::SpellSlots.spend_from_pool(found.state,
           :full => self.type == 'spellbook' && rank_full?(found.state, level, charclass),
           :rank => level,
-          :max_rank => Pf2e.preview_max_spell_rank(enactor, charclass))
+          :max_rank => Pf2e.preview_max_spell_rank(enactor, found.state['class_key'] || charclass))
 
         return if Pf2e::CharState.emit_error!(client, found)
 

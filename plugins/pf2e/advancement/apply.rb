@@ -375,7 +375,9 @@ module AresMUSH
             picks.each_pair do |rank, spells|
               chosen = Array(spells).reject { |spell| spell.to_s.strip.empty? || spell.to_s.casecmp?('open') }
 
-              for_source[rank] = chosen unless chosen.empty?
+              # Joined to the signatures already held at that rank: a second one there, from
+              # Signature Spell Expansion, does not replace the first.
+              for_source[rank] = (Array(for_source[rank]) + chosen).uniq { |spell| spell.to_s.downcase } unless chosen.empty?
             end
 
             held[source] = for_source

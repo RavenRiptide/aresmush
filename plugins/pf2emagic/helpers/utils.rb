@@ -3,8 +3,37 @@ module AresMUSH
 
     ANY_RANK = 'any'
 
+    # A pick at any rank the character can cast is keyed `any`. One limited to a rank and below is
+    # keyed `up to <rank>`, as Signature Spell Expansion's "base rank of 3rd or lower" is.
+    CAPPED_ANY_RANK = /\Aup to (\d+)\z/i
+
     def self.any_rank?(key)
-      key.to_s.casecmp?(ANY_RANK)
+      key.to_s.casecmp?(ANY_RANK) || key.to_s.strip.match?(CAPPED_ANY_RANK)
+    end
+
+    # The highest rank an any-rank key takes, or nil when only the character's own slots limit it.
+    def self.any_rank_cap(key)
+      match = key.to_s.strip.match(CAPPED_ANY_RANK)
+
+      match ? match[1].to_i : nil
+    end
+
+    # rank => open picks, from 1st rank up to the highest, keyed as a rank list is.
+    def self.each_rank_picks(max_rank, per_rank)
+      (1..max_rank.to_i).each_with_object({}) do |rank, picks|
+        picks[rank.to_s] = Array.new(per_rank.to_i, 'open')
+      end
+    end
+
+    # The highest rank the character's own class has slots for, counting a level-up in progress.
+    def self.castable_rank(char)
+      Pf2e.preview_max_spell_rank(char, char.pf2_base_info['charclass']).to_i
+    end
+
+    def self.any_rank_heading(key)
+      cap = any_rank_cap(key)
+
+      cap ? t('pf2emagic.any_rank_up_to_heading', :rank => rank_label(cap)) : t('pf2emagic.any_rank_heading')
     end
 
     def self.adapted_spell?(char, charclass, spell_name)

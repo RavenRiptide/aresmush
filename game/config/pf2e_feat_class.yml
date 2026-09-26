@@ -75,6 +75,9 @@ pf2e_feats:
     traits:
       - druid
   Bardic Lore:
+    grants:
+      skill:
+        - Bardic Lore
     assoc_charclass:
       - Bard
     feat_type:
@@ -575,6 +578,10 @@ pf2e_feats:
       - monk
       - stance
   Monastic Weaponry:
+    grants:
+      combat_stats:
+        weapon_prof:
+          monk: trained
     assoc_charclass:
       - Monk
     feat_type:
@@ -968,6 +975,9 @@ pf2e_feats:
       - flourish
       - ranger
   Underworld Investigator:
+    grants:
+      skill:
+        - Underworld Lore
     assoc_charclass:
       - Investigator
     feat_type:
@@ -3383,6 +3393,10 @@ pf2e_feats:
     traits:
       - rogue
   Animal Skin:
+    grants:
+      combat_stats:
+        armor_prof:
+          unarmored: expert
     assoc_charclass:
       - Barbarian
     feat_type:
@@ -3580,6 +3594,7 @@ pf2e_feats:
     traits:
       - alchemist
   Dirge of Doom:
+    init_magic: true
     assoc_charclass:
       - Bard
     feat_type:
@@ -4196,6 +4211,7 @@ pf2e_feats:
     traits:
       - ranger
   Song of Marching:
+    init_magic: true
     assoc_charclass:
       - Bard
     feat_type:
@@ -5592,6 +5608,10 @@ pf2e_feats:
     traits:
       - monk
   Wind Caller:
+    magic_stats:
+      focus_spell:
+        order:
+          - Stormwind Flight
     assoc_charclass:
       - Druid
     feat_type:
@@ -5965,6 +5985,7 @@ pf2e_feats:
       - concentrate
       - spellshape
   House of Imaginary Walls:
+    init_magic: true
     assoc_charclass:
       - Bard
     feat_type:
@@ -6379,6 +6400,9 @@ pf2e_feats:
     traits:
       - druid
   Signature Spell Expansion:
+    magic_stats:
+      signature_spells:
+        "up to 3": 2
     assoc_charclass:
       - Sorcerer
     feat_type:
@@ -7415,6 +7439,7 @@ pf2e_feats:
       - druid
     refocus: refill
   Primal Summons:
+    init_magic: true
     assoc_charclass:
       - Druid
     feat_type:
@@ -8867,6 +8892,8 @@ pf2e_feats:
     traits:
       - ranger
   Greater Mental Evolution:
+    magic_stats:
+      repertoire_each_rank: 1
     assoc_charclass:
       - Sorcerer
     feat_type:
@@ -8893,6 +8920,7 @@ pf2e_feats:
     traits:
       - sorcerer
   Impaling Briars:
+    init_magic: true
     assoc_charclass:
       - Druid
     feat_type:
@@ -9324,6 +9352,8 @@ pf2e_feats:
     traits:
       - barbarian
   Deep Lore:
+    magic_stats:
+      repertoire_each_rank: 1
     assoc_charclass:
       - Bard
     feat_type:
@@ -9572,6 +9602,10 @@ pf2e_feats:
     traits:
       - cleric
   Invoke Disaster:
+    magic_stats:
+      focus_spell:
+        order:
+          - Storm Lord
     assoc_charclass:
       - Druid
     feat_type:
@@ -9955,6 +9989,9 @@ pf2e_feats:
     traits:
       - barbarian
   Archwizard's Might:
+    magic_stats:
+      spells_per_day:
+        "10": "+1"
     assoc_charclass:
       - Wizard
     feat_type:
@@ -10025,6 +10062,9 @@ pf2e_feats:
     traits:
       - sorcerer
   Bloodline Perfection:
+    magic_stats:
+      spells_per_day:
+        "10": "+1"
     assoc_charclass:
       - Sorcerer
     feat_type:
@@ -10137,6 +10177,9 @@ pf2e_feats:
     traits:
       - rogue
   Hierophant's Power:
+    magic_stats:
+      spells_per_day:
+        "10": "+1"
     assoc_charclass:
       - Druid
     feat_type:
@@ -10252,6 +10295,9 @@ pf2e_feats:
     traits:
       - monk
   Maker of Miracles:
+    magic_stats:
+      spells_per_day:
+        "10": "+1"
     assoc_charclass:
       - Cleric
     feat_type:
@@ -10286,6 +10332,9 @@ pf2e_feats:
       - oracle
       - spellshape
   Oracular Providence:
+    magic_stats:
+      spells_per_day:
+        "10": "+1"
     assoc_charclass:
       - Oracle
     feat_type:
@@ -10318,6 +10367,9 @@ pf2e_feats:
     traits:
       - oracle
   Patron's Truth:
+    magic_stats:
+      spells_per_day:
+        "10": "+1"
     assoc_charclass:
       - Witch
     feat_type:
@@ -10328,6 +10380,9 @@ pf2e_feats:
     traits:
       - witch
   Perfect Encore:
+    magic_stats:
+      spells_per_day:
+        "10": "+1"
     assoc_charclass:
       - Bard
     feat_type:

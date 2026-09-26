@@ -309,11 +309,25 @@ module AresMUSH
         prof_list << group_value if group_value
       end
 
+      prof_list << monk_weapon_prof(char_wp_prof, wp_info)
+
       prof_list = prof_list.compact
 
       # Of everything we've accumulated, the character's proficiency with that weapon is the best one in the list.
       Pf2e.select_best_prof(prof_list)
 
+    end
+
+    # Monastic Weaponry: simple and martial weapons with the monk trait at the rank it grants, or at
+    # the character's unarmed rank up to master once that is higher.
+    def self.monk_weapon_prof(char_wp_prof, wp_info)
+      return nil unless char_wp_prof['monk']
+      return nil unless %w(simple martial).include?(wp_info['category'].to_s)
+      return nil unless Array(wp_info['traits']).any? { |trait| trait.to_s.casecmp?('monk') }
+
+      unarmed = char_wp_prof['unarmed'].to_s.casecmp?('legendary') ? 'master' : char_wp_prof['unarmed']
+
+      Pf2e.higher_prof(char_wp_prof['monk'], unarmed)
     end
 
     # The character's proficiency with one named unarmed attack.

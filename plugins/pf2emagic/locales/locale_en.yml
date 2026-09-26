@@ -23,6 +23,7 @@ en:
     cg_spellbook_to_choose: "Spellbook spells left to choose"
     cg_spellbook_restricted: "%{count} from your %{restriction} (%{spells})"
     any_rank_heading: "Any spell rank you can cast"
+    any_rank_up_to_heading: "Any %{rank} spell or lower"
     cg_spells_to_choose: "%{list} (%{tradition}) spells left to choose"
     cg_spells_to_choose_start: "%{list} (%{tradition}) spells to choose"
     cg_spells_to_choose_start_plain: "%{list} spells to choose"

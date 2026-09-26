@@ -245,6 +245,74 @@ module AresMUSH
           end
         end
       end
+
+      describe "composition cantrips" do
+        it "should grant each as a composition cantrip" do
+          [ 'Dirge of Doom', 'Song of Marching', 'House of Imaginary Walls' ].each do |name|
+            expect(feat(name)['init_magic']).to be(true), name
+            expect(traits(name)).to include('cantrip', 'composition'), name
+          end
+        end
+      end
+
+      describe "order spells" do
+        it "should grant the spells named after their feats" do
+          [ 'Primal Summons', 'Impaling Briars' ].each do |name|
+            expect(feat(name)['init_magic']).to be(true), name
+            expect(traits(name)).to include('focus', 'druid'), name
+          end
+        end
+
+        it "should grant the spells named otherwise by name" do
+          { 'Wind Caller' => 'Stormwind Flight', 'Invoke Disaster' => 'Storm Lord' }.each_pair do |name, granted|
+            expect(feat(name)['magic_stats']).to eq('focus_spell' => { 'order' => [ granted ] })
+            expect(traits(granted)).to include('focus', 'druid'), granted
+          end
+        end
+      end
+
+      it "should raise Animal Skin's unarmored defense to expert" do
+        expect(feat('Animal Skin')['grants']).to eq('combat_stats' => { 'armor_prof' => { 'unarmored' => 'expert' } })
+      end
+
+      it "should train Monastic Weaponry's monk weapons" do
+        expect(feat('Monastic Weaponry')['grants']).to eq('combat_stats' => { 'weapon_prof' => { 'monk' => 'trained' } })
+      end
+
+      # Neither is the Additional Lore feat, whose Lore rises at 3rd, 7th and 15th level.
+      it "should train the Lore each feat names" do
+        skills = YAML.load_file("game/config/pf2e_skills.yml")['pf2e_skills']
+
+        { 'Bardic Lore' => 'Bardic Lore', 'Underworld Investigator' => 'Underworld Lore' }.each_pair do |name, lore|
+          expect(feat(name)['grants']).to eq('skill' => [ lore ])
+          expect(skills).to have_key(lore)
+        end
+      end
+
+      # A class table sets a rank's slots outright, so a feat adds to them. The rank is a string
+      # because the stored slots are keyed by string, and a number would miss them.
+      it "should add a 10th-rank slot for each feat whose text gives one" do
+        givers = @feats.select { |_name, details| details['shortdesc'].to_s.match?(/additional 10th-rank spell slot/i) }
+
+        expect(givers.keys).to include('Perfect Encore', "Archwizard's Might")
+
+        givers.each_pair do |name, details|
+          expect(details['magic_stats']).to eq('spells_per_day' => { '10' => '+1' }), name
+        end
+      end
+
+      it "should add a repertoire spell of each rank for Deep Lore and Greater Mental Evolution" do
+        [ 'Deep Lore', 'Greater Mental Evolution' ].each do |name|
+          expect(feat(name)['magic_stats']).to eq('repertoire_each_rank' => 1), name
+        end
+      end
+
+      it "should give Signature Spell Expansion two signatures of 3rd rank or lower" do
+        stats = feat('Signature Spell Expansion')['magic_stats']
+
+        expect(stats).to eq('signature_spells' => { 'up to 3' => 2 })
+        expect(Pf2emagic.any_rank_cap(stats['signature_spells'].keys.first)).to eq 3
+      end
     end
   end
 end

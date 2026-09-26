@@ -283,10 +283,12 @@ module AresMUSH
 
       # What the level opened, filled through the command a player types.
       describe "filling the picks" do
+        # An 11th-level character with an archetype's basic spellcasting has its slots to 2nd rank.
         def ready(archetype, tradition, to_assign, repertoire: {})
           magic = PF2Magic.create(:character => @char,
                                   :tradition => { archetype => [ tradition, 'trained' ] },
                                   :spell_abil => { archetype => 'Charisma' },
+                                  :spells_per_day => { archetype => { '1' => 1, '2' => 1 } },
                                   :repertoire => { archetype => repertoire })
           @char.update(:magic => magic, :pf2_level => 11, :advancing => true, :pf2_to_assign => to_assign)
 

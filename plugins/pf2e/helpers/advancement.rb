@@ -23,7 +23,7 @@ module AresMUSH
     def self.level_key?(key)
       key_str = key.to_s.downcase
 
-      key_str == 'cantrip' || key_str == Pf2emagic::ANY_RANK || key_str.match?(/\A-?\d+\z/)
+      key_str == 'cantrip' || Pf2emagic.any_rank?(key_str) || key_str.match?(/\A-?\d+\z/)
     end
 
     def self.wrap_magic_assign(to_assign, key, base_class_key)
@@ -297,6 +297,49 @@ module AresMUSH
       { assigned: assigned, free_count: free_count, open_count: open_count, open_lore_count: open_lore_count }
     end
 
+    # A feat that adds a repertoire spell of each rank the character can cast (Deep Lore, Greater
+    # Mental Evolution) adds one more at each rank a later level opens. Returns the messages.
+    def self.open_each_rank_picks(char, to_assign, advancement)
+      feats = Global.read_config('pf2e_feats') || {}
+      held = DraftSheet.of(char).feat_names.uniq { |name| name.to_s.downcase }
+
+      givers = held.each_with_object({}) do |name, found|
+        key = feats.keys.find { |k| k.to_s.casecmp?(name.to_s) }
+        count = key ? ((feats[key] || {})['magic_stats'] || {})['repertoire_each_rank'].to_i : 0
+
+        found[key] = count if count.positive?
+      end
+
+      return [] if givers.empty?
+
+      charclass = char.pf2_base_info['charclass']
+      committed = ((char.magic&.spells_per_day || {})[charclass] || {}).keys
+      ranks = new_spell_ranks(committed, (advancement['magic_stats'] || {})['spells_per_day'])
+
+      return [] if ranks.empty?
+
+      per_rank = givers.values.sum
+
+      pool = (to_assign['repertoire'] || {}).each_with_object({}) { |(rank, picks), out| out[rank.to_s] = picks }
+      ranks.each { |rank| pool[rank] = Array(pool[rank]) + Array.new(per_rank, 'open') }
+      to_assign['repertoire'] = pool
+
+      ranks.map do |rank|
+        t('pf2e.adv_each_rank_repertoire', :feats => givers.keys.sort.join(' and '),
+          :rank => Pf2emagic.rank_label(rank))
+      end
+    end
+
+    # The spell ranks a level's slots reach that the character had no slots at before, as strings.
+    def self.new_spell_ranks(committed, staged)
+      return [] unless staged.is_a?(Hash)
+
+      held = Array(committed).map(&:to_s)
+
+      staged.keys.map(&:to_s).reject { |rank| rank.casecmp?('cantrip') || rank.to_i.zero? || held.include?(rank) }
+            .sort_by(&:to_i)
+    end
+
     # What advancing to the next level offers, as the messages telling the player what to pick.
     #
     # The level block's own keys are Advancement::Opens, a row each. What is left here is the three
@@ -321,6 +364,8 @@ module AresMUSH
 
         return_msg << t('pf2e.adv_item_feat_choice', :choice => name, :summary => with_article(summary))
       end
+
+      return_msg.concat(open_each_rank_picks(char, to_assign, advancement))
 
       # Fold in anything an earlier feat choice deferred to this level, such as Canny Acumen.
       new_level = char.pf2_level + 1
