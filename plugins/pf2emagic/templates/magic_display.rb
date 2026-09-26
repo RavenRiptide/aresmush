@@ -278,11 +278,10 @@ module AresMUSH
 
         return '' unless has_focus_magic
 
-        focus_pool = @magic.focus_pool || {}
-        max = focus_pool['max'].to_i
-        current = focus_pool['current'].to_i
+        max = Pf2emagic.focus_pool_max(@magic)
+        current = Pf2emagic.focus_points_left(@magic)
 
-        return '' if max.zero? && current.zero?
+        return '' if max.zero?
 
         "#{item_color}Focus Points:%xn #{max}%r%r#{item_color}Remaining Focus Points:%xn #{current}%r"
       end

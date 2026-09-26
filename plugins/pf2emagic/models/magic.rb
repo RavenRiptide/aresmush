@@ -5,7 +5,10 @@ module AresMUSH
     # The focus pool is shared: PF2e gives a character one pool however many sources feed it. The
     # spells live on Pf2eSpellcastingEntry rows, one per focus type per granting source, because a
     # bucket per type cannot say whose the spells are.
-    attribute :focus_pool, :type => DataType::Hash, :default => { "max"=>0, "current"=>0 }
+    #
+    # Only the points left are stored. The most the pool holds is counted from the spells, by
+    # Pf2emagic.focus_pool_max.
+    attribute :focus_pool, :type => DataType::Hash, :default => { "current"=>0 }
     attribute :last_refocus, :type => DataType::Time
     # A list of grants rather than a map keyed by spell name, because two sources can grant the same
     # innate spell and a map holds only one of them. Charm comes from Enthralling Allure at rank 4
@@ -129,7 +132,7 @@ module AresMUSH
     # stat is then dispatched as if it were a class name.
     STAT_KEYS = %w{
       spell_abil tradition spells_per_day restricted_slots restricted_spellbook repertoire
-      focus_pool addrepertoire get_genie_repertoire get_dragon_repertoire focus_spell
+      addrepertoire get_genie_repertoire get_dragon_repertoire focus_spell
       domain_focus_spell focus_cantrip spellbook addspellbook adapted_spell signature_spell
       signature_spells innate_spell divine_font grant_choice gated_spell focus_source
     }.freeze
@@ -211,27 +214,6 @@ module AresMUSH
 
           to_assign["repertoire"] = assignment_list
 
-        when "focus_pool"
-          # Each source adds its points to the pool once, as it is granted. PF2e caps the pool at
-          # three however many sources feed it.
-          pool = magic.focus_pool
-
-          old_max_pool = pool["max"].to_i
-          old_current_pool = pool["current"].to_i
-
-          new_max_pool = (old_max_pool + value.to_i).clamp(0, 3)
-          pool["max"] = new_max_pool
-
-          new_current_pool = if old_max_pool.zero? && old_current_pool.zero?
-                               new_max_pool
-                             elsif old_current_pool == old_max_pool
-                               new_max_pool
-                             else
-                               [ old_current_pool, new_max_pool ].min
-                             end
-
-          pool["current"] = new_current_pool
-          magic.focus_pool = pool
         when "addrepertoire"
           # This key is called for spells added to the repertoire by bloodlines, mysteries, etc.
           # Initial/advanced/greater bloodline spells are focus spells and handled by that key.
@@ -306,18 +288,27 @@ module AresMUSH
           # One spellcasting entry per focus type per granting source, so two sources of the same
           # type stay apart - they share PF2e's single focus pool but cast at their own DCs.
           # Cantrips and spells are the same entry under different keys, because they differ only
-          # in how they are cast.
-          kind = key.to_s == 'focus_cantrip' ? 'cantrip' : 'spell'
-
+          # in how they are cast. A spell that is a cantrip is filed as one whichever key granted
+          # it: a composition cantrip has a rank above 0, and costs nothing all the same.
+          #
           # A block may name what granted it - "Domain Healing" for a cleric's domain spell -
           # and otherwise it is the class itself. Recorded with the level, so the sheet can say
           # where a focus spell came from without deriving it.
           source = info['focus_source'].presence || charclass
 
+          # A pool that was full stays full as it grows; one with points spent keeps them spent.
+          was_full = Pf2emagic.focus_points_left(magic) >= Pf2emagic.focus_pool_max(magic)
+
           value.each_pair do |fstype, spell_list|
-            Pf2emagic::Entries.grant_focus!(char, fstype, spell_list,
-              :kind => kind, :granted_by => source, :granted_at => char.pf2_level)
+            Array(spell_list).each do |spell|
+              kind = key.to_s == 'focus_cantrip' || Pf2emagic.focus_cantrip?(spell) ? 'cantrip' : 'spell'
+
+              Pf2emagic::Entries.grant_focus!(char, fstype, [ spell ],
+                :kind => kind, :granted_by => source, :granted_at => char.pf2_level)
+            end
           end
+
+          magic.focus_pool = { 'current' => Pf2emagic.focus_pool_max(magic) } if was_full
         when "spellbook"
           # Spells need to be chosen, redirect to to_assign.
 

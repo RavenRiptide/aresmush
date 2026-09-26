@@ -4,11 +4,11 @@ require_relative "../../pf2e/specs/support/auto_builder"
 module AresMUSH
   module Pf2emagic
 
-    # A caster's focus pool: one point for each source that grants one, capped at three.
+    # A caster's focus pool: one point for each focus spell they know that costs one, up to three.
+    # Cantrips - a bard's compositions, a witch's hex cantrips - cost nothing and add nothing.
     #
-    # A grant adds its points to the pool the character already holds. The recount reaches the same
-    # total from the character's class, specialty, feats and archetype specialties, which is what
-    # refocus falls back on and what repairs a character whose stored maximum is wrong.
+    # The maximum is counted from the spells whenever it is asked for. Only what is left of it is
+    # stored.
     describe "focus pool", :dbtest => true do
 
       before(:each) do
@@ -24,123 +24,113 @@ module AresMUSH
         @char.delete if @char
       end
 
-      def as(charclass, specialize: nil, feats: {}, archetypes: {})
+      def as(charclass, specialize: nil, feats: {})
         base = @char.pf2_base_info.merge('charclass' => charclass)
         base['specialize'] = specialize if specialize
 
-        @char.update(:pf2_base_info => base, :pf2_feats => feats,
-                     :pf2_archetypeinfo => @char.pf2_archetypeinfo.merge(archetypes))
+        @char.update(:pf2_base_info => base, :pf2_feats => feats)
         @char = Character[@char.id]
       end
 
-      def pool
-        PF2Magic[@magic.id].focus_pool
+      def magic
+        PF2Magic[@magic.id]
       end
 
-      def hold(max, current)
-        @magic.update(:focus_pool => { 'max' => max, 'current' => current })
+      def max
+        Pf2emagic.focus_pool_max(magic)
       end
 
-      def grant(points)
-        PF2Magic.update_magic(Character[@char.id], @char.pf2_base_info['charclass'], { 'focus_pool' => points }, nil)
+      def remaining
+        magic.focus_pool['current'].to_i
       end
 
-      describe "a grant" do
-        # The class's own point is the grant being applied, so it is counted once.
-        it "should give an Oracle one point from the class" do
-          as('Oracle')
-          grant(1)
+      def left(points)
+        @magic.update(:focus_pool => { 'current' => points })
+      end
 
-          expect(pool).to eq('max' => 1, 'current' => 1)
+      def know(type, spells, kind: 'spell', granted_by: 'Test')
+        Entries.grant_focus!(Character[@char.id], type, spells, :kind => kind, :granted_by => granted_by)
+      end
+
+      # Through the grant path every class, feat and choice uses.
+      def grant(type, spells)
+        PF2Magic.update_magic(Character[@char.id], @char.pf2_base_info['charclass'], { 'focus_spell' => { type => spells } }, nil)
+      end
+
+      describe :focus_pool_max do
+        it "should count each focus spell that costs a point" do
+          know('domain', [ 'Soothing Words', 'Unity' ])
+
+          expect(max).to eq 2
         end
 
-        it "should count a feat's point once while the feat is held" do
-          as('Monk', :feats => { 'charclass' => [ 'Qi Spells' ] })
-          grant(1)
+        it "should not count a focus cantrip" do
+          know('composition', [ 'Courageous Anthem' ], :kind => 'cantrip')
 
-          expect(pool['max']).to eq 1
+          expect(max).to eq 0
         end
 
-        it "should add to the points already held" do
-          as('Oracle')
-          hold(1, 1)
-          grant(1)
+        # Rallying Anthem is rank 2, and a cantrip all the same.
+        it "should not count a composition cantrip filed among the spells" do
+          know('composition', [ 'Rallying Anthem' ])
 
-          expect(pool).to eq('max' => 2, 'current' => 2)
+          expect(max).to eq 0
+        end
+
+        it "should count a spell two sources grant once" do
+          know('domain', [ 'Soothing Words' ], :granted_by => 'Domain Family')
+          know('domain', [ 'Soothing Words' ], :granted_by => 'Cleric')
+
+          expect(max).to eq 1
         end
 
         it "should stop at three" do
-          as('Oracle')
-          hold(3, 3)
-          grant(1)
+          know('domain', [ 'Soothing Words', 'Unity', "Healer's Blessing", 'Rebuke Death' ])
 
-          expect(pool['max']).to eq 3
+          expect(max).to eq 3
         end
 
-        it "should read a signed delta the same as a bare number" do
-          as('Oracle')
-          hold(1, 1)
-          grant('+1')
+        it "should be nothing without magic" do
+          expect(Pf2emagic.focus_pool_max(nil)).to eq 0
+        end
+      end
 
-          expect(pool['max']).to eq 2
+      describe "a granted focus spell" do
+        it "should keep a full pool full" do
+          as('Cleric')
+          know('domain', [ 'Soothing Words' ])
+          left(1)
+          grant('domain', [ 'Unity' ])
+
+          expect(max).to eq 2
+          expect(remaining).to eq 2
         end
 
         it "should leave spent points spent" do
-          as('Oracle')
-          hold(2, 0)
-          grant(1)
+          as('Cleric')
+          know('domain', [ 'Soothing Words' ])
+          left(0)
+          grant('domain', [ 'Unity' ])
 
-          expect(pool).to eq('max' => 3, 'current' => 0)
+          expect(remaining).to eq 0
+        end
+
+        it "should file a composition cantrip as a cantrip, whatever key granted it" do
+          as('Bard')
+          grant('composition', [ 'Rallying Anthem' ])
+
+          expect(Entries.focus_cantrips(magic, 'composition')).to eq [ 'Rallying Anthem' ]
+          expect(Entries.focus_spells(magic, 'composition')).to eq []
         end
       end
 
-      describe :focus_pool_sources do
-        def total
-          Pf2emagic.expected_focus_pool(Character[@char.id])
-        end
+      it "should fill the pool at daily preparations" do
+        know('domain', [ 'Soothing Words', 'Unity' ])
+        left(0)
 
-        it "should count the class's point" do
-          as('Oracle')
+        Pf2e.daily_refresh_focus_pool(magic)
 
-          expect(total).to eq 1
-        end
-
-        # A Druid's order restates the class's point rather than adding a second one.
-        it "should count a specialty that restates the class's point once" do
-          as('Druid', :specialize => 'Animal')
-
-          expect(total).to eq 1
-        end
-
-        it "should count a point from each feat that grants one" do
-          as('Monk', :feats => { 'charclass' => [ 'Qi Spells', 'Advanced Qi Spells' ] })
-
-          expect(total).to eq 2
-        end
-
-        it "should count a feat whose point comes with the subclass spell it chooses" do
-          as('Fighter', :feats => { 'charclass' => [ 'Sorcerer Dedication', 'Basic Bloodline Spell' ] })
-
-          expect(total).to eq 1
-        end
-
-        it "should count an archetype specialty's point" do
-          as('Wizard', :archetypes => { 'archetype1' => 'Druid Archetype', 'archetype_specialty1' => 'Animal' })
-
-          expect(total).to eq 1
-        end
-
-        it "should stop at three" do
-          as('Oracle', :feats => { 'charclass' => [ 'Qi Spells', 'Advanced Qi Spells', 'Master Qi Spells' ] })
-
-          expect(total).to eq 3
-        end
-
-        it "should find nothing for a class without focus spells" do
-          as('Fighter')
-
-          expect(total).to eq 0
-        end
+        expect(remaining).to eq 2
       end
 
       # A Refocus restores one point, or the whole pool for a feat that says it refills.
@@ -152,49 +142,65 @@ module AresMUSH
           Pf2emagic.do_refocus(Character[@char.id], Character[@char.id])
         end
 
+        def three_spells
+          know('domain', [ 'Soothing Words', 'Unity', "Healer's Blessing" ])
+        end
+
         it "should restore one point" do
           as('Cleric')
-          hold(3, 0)
+          three_spells
+          left(0)
 
           expect(refocus).to be_nil
-          expect(pool['current']).to eq 1
+          expect(remaining).to eq 1
         end
 
         it "should refill the pool for a feat that says it does" do
           as('Cleric', :feats => { 'charclass' => [ 'Domain Focus' ] })
-          hold(3, 0)
+          three_spells
+          left(0)
           refocus
 
-          expect(pool['current']).to eq 3
+          expect(remaining).to eq 3
         end
 
         it "should refill the pool for Revelation's Focus" do
           as('Oracle', :feats => { 'charclass' => [ "Revelation's Focus" ] })
-          hold(2, 0)
+          know('revelation', [ 'Ancestral Touch', 'Ancestral Defense' ])
+          left(0)
           refocus
 
-          expect(pool['current']).to eq 2
+          expect(remaining).to eq 2
         end
 
         # Major and Extreme Curse raise the most cursebound an oracle can be, and nothing else.
         it "should restore one point to an oracle with Extreme Curse" do
           as('Oracle')
-          hold(3, 0)
+          know('revelation', [ 'Ancestral Touch', 'Ancestral Defense', 'Ancestral Form' ])
+          left(0)
           refocus(:features => [ 'Major Curse', 'Extreme Curse' ])
 
-          expect(pool['current']).to eq 1
+          expect(remaining).to eq 1
+        end
+
+        it "should refuse a character with only focus cantrips" do
+          as('Bard')
+          know('composition', [ 'Courageous Anthem' ], :kind => 'cantrip')
+
+          expect(refocus).not_to be_nil
+          expect(remaining).to eq 0
         end
       end
 
-      # Every class that starts with focus spells starts with one point.
+      # Every class that starts with a focus spell costing a point starts with one point.
       describe "a first-level character built through the real commands" do
-        %w{Bard Champion Cleric Druid Oracle Witch}.each do |charclass|
+        %w{Bard Champion Cleric Druid Oracle Sorcerer Witch Wizard}.each do |charclass|
           it "should give a #{charclass} one focus point" do
             built = Pf2e::AutoBuilder.new(@char).build_level_one(charclass)
-            held = Character[built.id].magic.focus_pool
+            held = Character[built.id].magic
 
-            expect(held).to eq('max' => 1, 'current' => 1)
-            expect(Pf2emagic.expected_focus_pool(Character[built.id])).to eq 1
+            expect(Pf2emagic.focus_pool_max(held)).to eq 1
+            expect(held.focus_pool['current']).to eq 1
           end
         end
 
@@ -205,6 +211,14 @@ module AresMUSH
 
           expect(built.pf2_base_info['specialize']).to eq 'Cloistered'
           expect(Entries.focus_spells(magic, 'domain')).to eq [ 'Soothing Words' ]
+        end
+
+        # Player Core: Patron's Puppet or Phase Familiar, picked with cg/option.
+        it "should give a Witch the hex she picks at first level" do
+          built = Pf2e::AutoBuilder.new(@char).build_level_one('Witch')
+          magic = Character[built.id].magic
+
+          expect(Entries.focus_spells(magic, 'hex')).to eq [ "Patron's Puppet" ]
         end
       end
     end

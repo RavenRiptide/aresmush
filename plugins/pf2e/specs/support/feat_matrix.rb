@@ -81,7 +81,12 @@ module AresMUSH
       end
 
       # nil when the character has no magic at all, which is what a non-caster looks like.
+      #
+      # The pool's size is its own axis: the game counts it from the focus spells held, and letting
+      # the focus spell axis set it too would make one axis open the other's feats.
       def matrix_magic(opts)
+        allow(Pf2emagic).to receive(:focus_pool_max).and_return(opts[:focus_pool].to_i)
+
         blank = opts[:traditions].empty? && opts[:innate].empty? && opts[:focus_spells].empty? &&
                 opts[:focus_pool].to_i.zero? && opts[:divine_font].nil?
 
@@ -89,7 +94,7 @@ module AresMUSH
 
         double(:tradition => opts[:traditions],
                :innate_spells => opts[:innate],
-               :focus_pool => { 'max' => opts[:focus_pool], 'current' => opts[:focus_pool] },
+               :focus_pool => { 'current' => opts[:focus_pool] },
                :divine_font => opts[:divine_font],
                :spell_abil => {}, :spells_per_day => {}, :repertoire => {}, :spellbook => {},
                :signature_spells => {}, :restricted_spellbook => {}, :restricted_slots => {},

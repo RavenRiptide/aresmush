@@ -73,30 +73,10 @@ module AresMUSH
       return t('pf2emagic.not_caster') unless is_caster?(target)
 
       magic = target.magic
-      focus_pool = magic.focus_pool
 
-      current = focus_pool["current"].to_i
-      max = focus_pool["max"].to_i
+      max = focus_pool_max(magic)
+      current = focus_points_left(magic)
 
-      has_focus_magic = Entries.focus?(magic)
-
-      if max.zero?
-        recalculated_max = expected_focus_pool(target)
-        recalculated_max = 1 if recalculated_max.zero? && has_focus_magic
-
-        if recalculated_max.zero?
-          return t('pf2emagic.no_focus_pool')
-        end
-
-        max = recalculated_max
-        current = [ current, max ].min
-
-        focus_pool["max"] = max
-        focus_pool["current"] = current
-        magic.update(focus_pool: focus_pool)
-      end
-
-      # Max focus pool defaults to zero and is always 1-3 if target has a focus pool.
       return t('pf2emagic.no_focus_pool') if max.zero?
 
       # These checks are skipped if an admin is force-refocusing the target.
@@ -119,8 +99,7 @@ module AresMUSH
 
       current = refocus_refills?(target) ? max : [ current + 1, max ].min
 
-      focus_pool["current"] = current
-      magic.update(focus_pool: focus_pool)
+      magic.update(focus_pool: { 'current' => current })
       magic.update(last_refocus: Time.now)
 
       return nil
@@ -157,79 +136,36 @@ module AresMUSH
       current.to_i + value.strip.to_i
     end
 
-    # The focus pool a character's sources add up to, capped at three as PF2e caps it.
-    def self.expected_focus_pool(char)
-      focus_pool_sources(char).sum { |_source, points| points }.clamp(0, 3)
+    # The most points a focus pool holds: one per focus spell known that costs a point, up to three
+    # (Player Core, Focus Spells). A spell two sources grant is one spell, and cantrips count for
+    # nothing. Counted whenever it is asked for, so it follows every grant, rollback and correction.
+    def self.focus_pool_max(magic)
+      return 0 unless magic
+
+      spells = Entries.focus_entries(magic).flat_map { |e| Array((e['known'] || {})['spell']) }
+
+      spells.map(&:to_s).uniq(&:downcase).reject { |spell| focus_cantrip?(spell) }.size.clamp(0, 3)
     end
 
-    # Every source of focus points a character holds, as [ source, points ] pairs:
-    #
-    # - the class, whose chargen block the specialty's and then the specialty option's replace,
-    #   as chargen merges them; then the class's and specialty's level blocks up to their level
-    # - each feat held, from its magic_stats, plus one for a feat whose choice is the subclass's
-    #   focus spell
-    # - each archetype held, its specialty, and that specialty's choice
-    def self.focus_pool_sources(char)
-      base = char.pf2_base_info || {}
-      charclass = base['charclass'].to_s
-      class_info = Global.read_config('pf2e_class', charclass) || {}
-      specialty_info = (Global.read_config('pf2e_specialty', charclass) || {})[base['specialize'].to_s] || {}
-      option_info = ((specialty_info['choose'] || {})['options'] || {})[base['specialize_info'].to_s] || {}
+    # The points left, never more than the pool now holds.
+    def self.focus_points_left(magic)
+      return 0 unless magic
 
-      sources = []
-
-      chargen = [ class_info, specialty_info, option_info ].map { |info| focus_points_in(info['chargen']) }.compact.last
-      sources << [ charclass, chargen ] if chargen
-
-      [ class_info, specialty_info ].each do |info|
-        (info['advance'] || {}).each_pair do |level, block|
-          points = focus_points_in(block)
-          sources << [ "#{charclass} level #{level}", points ] if points && level.to_i <= char.pf2_level.to_i
-        end
-      end
-
-      Pf2e::DraftSheet.of(char).feats_by_bucket.values.flatten.each do |feat|
-        details = Pf2e.get_feat_details(feat)
-        next if details.is_a?(String)
-
-        name, info = details
-        choice = info['feat_choice'].is_a?(Hash) ? info['feat_choice'] : {}
-        points = focus_points_in(info).to_i + (choice['from'].to_s == 'subclass_spell' ? 1 : 0)
-
-        sources << [ name, points ] if points > 0
-      end
-
-      archetypes = char.pf2_archetypeinfo || {}
-
-      (1..4).each do |slot|
-        archetype = archetypes["archetype#{slot}"].to_s
-        next if archetype.blank?
-
-        specialty = archetypes["archetype_specialty#{slot}"].to_s
-        choice = archetypes["archetype_specialty_choice#{slot}"].to_s
-        spec_info = specialty.blank? ? {} : (Global.read_config('pf2e_archetype_specialty', archetype, specialty) || {})
-        choice_info = choice.blank? ? {} : (((spec_info['choose'] || {})['options'] || {})[choice] || {})
-
-        [
-          [ archetype, Global.read_config('pf2e_archetype', archetype) || {} ],
-          [ "#{archetype} (#{specialty})", spec_info ],
-          [ "#{archetype} (#{choice})", choice_info ]
-        ].each do |source, info|
-          points = focus_points_in(info['initial_dedication'])
-          sources << [ source, points ] if points
-        end
-      end
-
-      sources
+      [ (magic.focus_pool || {})['current'].to_i, focus_pool_max(magic) ].min
     end
 
-    # The focus_pool a block's magic_stats name, or nil when they name none.
-    def self.focus_points_in(block)
-      return nil unless block.is_a?(Hash) && block['magic_stats'].is_a?(Hash)
+    # A cantrip costs no point to cast. That is rank 0, or the cantrip trait: a bard's composition
+    # cantrips have ranks above 0 and are cantrips all the same.
+    def self.focus_cantrip?(spell)
+      spells = Global.read_config('pf2e_spells') || {}
+      key = spells.key?(spell) ? spell : spells.keys.find { |name| name.to_s.casecmp?(spell.to_s) }
+      details = key && spells[key]
 
-      points = block['magic_stats']['focus_pool']
+      return false unless details.is_a?(Hash)
 
-      points.nil? ? nil : points.to_i
+      rank = details['base_level'].to_s.downcase
+
+      rank == 'cantrip' || rank == '0' || Array(details['traits']).any? { |t| t.to_s.casecmp?('cantrip') }
     end
 
     def self.get_spell_details(term)

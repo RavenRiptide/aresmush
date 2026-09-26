@@ -1687,7 +1687,6 @@ pf2e_feats:
       - archetype
   Counter Perform:
     magic_stats:
-      focus_pool: 1
       focus_spell:
         composition:
           - Counter Performance

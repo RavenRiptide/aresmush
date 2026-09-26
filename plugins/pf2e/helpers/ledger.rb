@@ -94,6 +94,12 @@ module AresMUSH
             Ledger.add_to_list(by_rank[p['rank'].to_s] ||= [], p['spell'])
           }
         },
+        # A focus spell or cantrip, with the focus type it is cast as and what granted it. The record
+        # is the whole payload, since one spell can come from two sources.
+        'focus_spell' => {
+          'key' => 'spell', 'sheet' => 'focus', 'sync' => 'records',
+          'apply' => lambda { |sheet, p| Ledger.add_to_list(sheet['focus'], Ledger.focus_record(p)) }
+        },
         'set_prof' => {
           'key' => 'key', 'sheet' => 'profs',
           'apply' => lambda { |sheet, p| (sheet['profs'][p['group']] ||= {})[p['key']] = p['to'] }
@@ -131,6 +137,14 @@ module AresMUSH
         list << item unless list.include?(item)
       end
 
+      FOCUS_FIELDS = %w(type kind spell granted_by).freeze
+
+      # A focus spell's record in a fixed shape, so records from the ledger and from the character
+      # compare equal whatever else a payload carried.
+      def self.focus_record(payload)
+        FOCUS_FIELDS.each_with_object({}) { |field, record| record[field] = (payload || {})[field].to_s }
+      end
+
       def self.empty_sheet(level)
         {
           'level' => level.to_i,
@@ -146,6 +160,7 @@ module AresMUSH
           'traits' => [],
           'specials' => [],
           'spells' => {},
+          'focus' => [],
           'profs' => {},
           'unsupported' => []
         }
@@ -240,6 +255,20 @@ module AresMUSH
 
             ops << { 'op' => 'set_known', 'source' => source, 'lists' => by_rank }
           end
+        end
+
+        # Focus spells the fold holds and the character lacks go back on; ones whose grant was
+        # reverted come off. A focus spell the ledger has no record of at all is left where it is -
+        # the materialiser manages what it has history for.
+        if !draft
+          wanted = Array(sheet['focus']).map { |r| focus_record(r) }
+          held = Array(current['focus']).map { |r| focus_record(r) }
+          recorded = Array(current['focus_recorded']).map { |r| focus_record(r) }
+
+          add = wanted - held
+          remove = (held & recorded) - wanted
+
+          ops << { 'op' => 'set_focus', 'add' => add, 'remove' => remove } unless add.empty? && remove.empty?
         end
 
         # Ability scores, derived from nothing. Every ability starts at 10, its ancestry flaw applies
@@ -417,6 +446,14 @@ module AresMUSH
           end
 
           [ grants, gone ]
+        },
+        # A list of records, each a whole payload: focus spells, where the same spell from two
+        # sources is two records. One revocation per record gone, matched on every field.
+        'records' => lambda { |sheet, section, value, _spec|
+          held = Array(sheet[section]).map { |r| Ledger.focus_record(r) }
+          wanted = Array(value).map { |r| Ledger.focus_record(r) }
+
+          [ wanted - held, (held - wanted).map { |r| { 'match' => r, 'limit' => 1 } } ]
         },
         # A map of name to rank: skills, lores. A changed rank is a new grant, not a duplicate.
         'ranked' => lambda { |sheet, section, value, spec|

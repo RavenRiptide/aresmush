@@ -258,8 +258,6 @@ pf2e_feats:
     shortdesc: "Your deity bestows a special spell related to their powers. Select one domain—a subject of particular interest to you within your religion—from your deity's list. You gain an initial domain spell for that domain, a spell unique to the domain and not available to other clerics.%r%rDomain spells are a type of focus spell. It costs 1 Focus Point to cast a focus spell, and you start with a focus pool of 1 Focus Point. You refill your focus pool during your daily preparations, and you can regain 1 Focus Point by spending 10 minutes using the Refocus activity to pray to your deity or do service toward their causes.%r%rFocus spells are automatically heightened to half your level rounded up, much like cantrips. Focus spells don't require spell slots, and can't be cast using spell slots. Your focus pool can hold one Focus Point for each focus spell you have, up to 3 points.%r%r**Special** You can select this feat multiple times, selecting a different domain each time and gaining its domain spell."
     traits:
       - cleric
-    magic_stats:
-      focus_pool: 1
     feat_choice:
       summary: one of your deity's domains
       from: deity_domains
@@ -501,8 +499,6 @@ pf2e_feats:
     traits:
       - ranger
     repeatable: true
-    magic_stats:
-      focus_pool: 1
     feat_choice:
       summary: an initial warden spell
       from_spells:
@@ -747,8 +743,6 @@ pf2e_feats:
     grants:
       grant_choice_once:
         - Qi Tradition
-    magic_stats:
-      focus_pool: 1
     feat_choice:
       summary: 1st-rank qi spell
       from_spells:
@@ -1235,8 +1229,6 @@ pf2e_feats:
     shortdesc: Your patron grants you a special lesson, revealing a hidden facet of its nature. Choose a basic lesson. You gain its associated hex, and your familiar learns the associated spell.
     traits:
       - witch
-    magic_stats:
-      focus_pool: 1
     feat_choice:
       summary: a basic lesson
       from: lessons
@@ -1499,8 +1491,6 @@ pf2e_feats:
     shortdesc: "Every oracle's mystery touches on a divine domain of the deities that fuel it; you can access that power. Choose one of the domains associated with your mystery for which you don't already have an initial domain spell. You gain an initial domain spell from that domain, which you cast as a revelation spell.%r%r**Special** You can select this feat multiple times, selecting a different domain each time and gaining its domain spell as a revelation spell."
     traits:
       - oracle
-    magic_stats:
-      focus_pool: 1
     feat_choice:
       summary: a domain of your mystery
       from: mystery_domains
@@ -2135,8 +2125,6 @@ pf2e_feats:
     traits:
       - ranger
     repeatable: true
-    magic_stats:
-      focus_pool: 1
     feat_choice:
       summary: an advanced warden spell
       from_spells:
@@ -2545,7 +2533,6 @@ pf2e_feats:
       grant_choice_once:
         - Qi Tradition
     magic_stats:
-      focus_pool: 1
       focus_spell:
         qi:
           - Harmonize Self
@@ -3306,8 +3293,6 @@ pf2e_feats:
     grants:
       grant_choice_once:
         - Qi Tradition
-    magic_stats:
-      focus_pool: 1
     feat_choice:
       summary: 3rd-rank qi spell
       from_spells:
@@ -3799,8 +3784,6 @@ pf2e_feats:
     shortdesc: Your patron grants you greater knowledge. Choose a greater or basic lesson. You gain its associated hex, and your familiar learns the associated spell.
     traits:
       - witch
-    magic_stats:
-      focus_pool: 1
     feat_choice:
       summary: a greater or basic lesson
       from: lessons
@@ -3959,8 +3942,6 @@ pf2e_feats:
     traits:
       - ranger
     repeatable: true
-    magic_stats:
-      focus_pool: 1
     feat_choice:
       summary: a master warden spell
       from_spells:
@@ -4477,8 +4458,6 @@ pf2e_feats:
     shortdesc: Through your conviction, you have glimpsed the deeper secrets of your deity's domain. You gain an advanced domain spell from the domain you chose with Deity's Domain as a devotion spell.
     traits:
       - champion
-    magic_stats:
-      focus_pool: 1
     feat_choice:
       summary: the domain you chose with Deity's Domain
       from: held_domains
@@ -4495,8 +4474,6 @@ pf2e_feats:
     shortdesc: "Your prayers have unlocked deeper secrets of your deity's domain. You gain an advanced domain spell from one of your domains for which you have an initial domain spell.%r%r**Special** You can select this feat multiple times. Each time, you must select a different advanced domain spell."
     traits:
       - cleric
-    magic_stats:
-      focus_pool: 1
     feat_choice:
       summary: a domain whose initial spell you have
       from: held_domains
@@ -4619,7 +4596,6 @@ pf2e_feats:
       grant_choice_once:
         - Qi Tradition
     magic_stats:
-      focus_pool: 1
       focus_spell:
         qi:
           - Clinging Shadows Stance
@@ -5601,7 +5577,6 @@ pf2e_feats:
       grant_choice_once:
         - Qi Tradition
     magic_stats:
-      focus_pool: 1
       focus_spell:
         qi:
           - Wild Winds Stance
@@ -6079,8 +6054,6 @@ pf2e_feats:
     shortdesc: "Your patron grants you even greater secrets. Choose a major, greater, or basic lesson. You gain its associated hex, and your familiar learns the associated spell.%r%r**Special** You can select this feat a second time if you're 14th level or higher, and a third time if you're 18th level or higher. Choose a different lesson each time."
     traits:
       - witch
-    magic_stats:
-      focus_pool: 1
     feat_choice:
       summary: a major, greater or basic lesson
       from: lessons
@@ -6690,7 +6663,6 @@ pf2e_feats:
       grant_choice_once:
         - Qi Tradition
     magic_stats:
-      focus_pool: 1
       focus_spell:
         qi:
           - Wind Jump
@@ -6946,8 +6918,6 @@ pf2e_feats:
     shortdesc: You command a deep understanding of the domains related to your mystery. Choose one of the domains associated with your mystery for which you have an initial domain spell. You gain an advanced domain spell from that domain, which you cast as a revelation spell.
     traits:
       - oracle
-    magic_stats:
-      focus_pool: 1
     feat_choice:
       summary: a domain whose initial spell you have
       from: held_domains
@@ -8308,7 +8278,6 @@ pf2e_feats:
       grant_choice_once:
         - Qi Tradition
     magic_stats:
-      focus_pool: 1
       focus_spell:
         qi:
           - Shadow's Web
@@ -8745,8 +8714,6 @@ pf2e_feats:
     shortdesc: "You have broadened your understanding of the divine and can tap into the wonders of a different mystery. Select one revelation spell from a mystery other than your own. You can choose only an initial revelation spell or an advanced revelation spell.%r%rThis spell gains the cursebound trait for you, and when you cast it, you gain the cursebound 1 effects of its mystery in addition to your normal curse effects. Any ability that lets you use a cursebound ability without increasing the severity of your curse also prevents you from gaining this additional curse effect.%r%rYou can't cast your chosen revelation spell if any of the following conditions are true:%r%rits mystery's curse effects directly conflict with or negate the effects of your own mystery's curse,%r%rthe curse would have no effect on you (for example, removing an ability from your original mystery that you lack),%r%ror if either of these criteria would be met once you finish Casting the Spell"
     traits:
       - oracle
-    magic_stats:
-      focus_pool: 1
     feat_choice:
       summary: an initial or advanced revelation spell from another mystery
       from_spells:
@@ -9009,8 +8976,6 @@ pf2e_feats:
     grants:
       grant_choice_once:
         - Qi Tradition
-    magic_stats:
-      focus_pool: 1
     feat_choice:
       summary: 8th-rank qi spell
       from_spells:
@@ -9452,8 +9417,6 @@ pf2e_feats:
     grants:
       grant_choice_once:
         - Qi Tradition
-    magic_stats:
-      focus_pool: 1
     feat_choice:
       summary: 9th-rank qi spell
       from_spells:

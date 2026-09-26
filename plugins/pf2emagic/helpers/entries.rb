@@ -511,10 +511,25 @@ module AresMUSH
         level.to_i > 0 ? "#{name}, lvl #{level.to_i}" : name
       end
 
-      # Takes a focus spell or cantrip away, wherever it was granted from.
-      def self.revoke_focus!(char, type, spell, kind:)
+      # Every focus spell and cantrip held, one record per spell per granting source, in the shape
+      # the ledger records them.
+      def self.focus_records(magic)
+        return [] unless magic
+
+        focus_entries(magic).flat_map do |entry|
+          (entry['known'] || {}).flat_map do |kind, spells|
+            Array(spells).map do |spell|
+              { 'type' => entry['name'].to_s, 'kind' => kind.to_s, 'spell' => spell.to_s, 'granted_by' => entry['granted_by'].to_s }
+            end
+          end
+        end
+      end
+
+      # Takes a focus spell or cantrip away: from the source named, or wherever it was granted from.
+      def self.revoke_focus!(char, type, spell, kind:, granted_by: nil)
         rows(char, FOCUS).each do |row|
           next unless row.name.to_s.casecmp?(type.to_s)
+          next if granted_by && row.granted_by.to_s != granted_by.to_s
 
           known = row.known || {}
           held = Array(known[kind.to_s])

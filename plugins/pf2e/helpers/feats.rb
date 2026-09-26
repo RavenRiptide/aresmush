@@ -371,11 +371,7 @@ module AresMUSH
             msg << "divine_font" unless Array(required).any? { |f| f.to_s.casecmp?(font.to_s) }
           end
         when "has_focus_pool"
-          magic = char.magic
-          msg << "focus_pool" && next unless magic
-
-          pool = magic.focus_pool['max']
-          msg << "focus_pool" if pool.zero?
+          msg << "focus_pool" if Pf2emagic.focus_pool_max(char.magic).zero?
         when "feat"
           feats = DraftSheet.of(char).feat_names
           req = required.map { |word| word.upcase }
@@ -1218,11 +1214,11 @@ module AresMUSH
         return
       end
 
-      spell_name, spell_details = spell_result
+      spell_name, _details = spell_result
       focus_type_by_source = Global.read_config('pf2e_magic', 'focus_type_by_source')
       focus_type = focus_type_by_source[char.pf2_base_info['charclass']] || 'devotion'
 
-      key = spell_details['base_level'].to_i.zero? ? 'focus_cantrip' : 'focus_spell'
+      key = Pf2emagic.focus_cantrip?(spell_name) ? 'focus_cantrip' : 'focus_spell'
       spell_info = { key => { focus_type => [ spell_name ] } }
 
       PF2Magic.update_magic(char, char.pf2_base_info['charclass'], spell_info, client)
@@ -1421,7 +1417,7 @@ module AresMUSH
         found = archetype_subclass_spell(char, block.is_a?(Hash) ? block['archetype'] : nil, block.is_a?(Hash) ? block['tier'] : nil)
         return nil unless found
 
-        { 'magic_stats' => { 'focus_pool' => 1, 'focus_spell' => { found[0] => [ found[1] ] } } }
+        { 'magic_stats' => { 'focus_spell' => { found[0] => [ found[1] ] } } }
       when 'deity_domains', 'mystery_domains'
         domain_spell_grant(char, value, 'initial')
       when 'held_domains'

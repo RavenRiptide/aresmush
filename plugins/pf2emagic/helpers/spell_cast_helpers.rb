@@ -33,17 +33,12 @@ module AresMUSH
       splevel = [ base, hlevel ].max.to_s
 
       # Do they have any focus points left in their pool?
-      fpool = magic.focus_pool
-      pool = fpool['current']
+      pool = focus_points_left(magic)
 
-      available = (pool > 0)
-      return t('pf2emagic.not_enough_focus_points') unless available
+      return t('pf2emagic.not_enough_focus_points') unless pool > 0
 
       # Do the cast.
-
-      pool = pool - 1
-      fpool['current'] = pool
-      magic.update(focus_pool: fpool)
+      magic.update(focus_pool: { 'current' => pool - 1 })
 
       caster_stats['focus type'] = focus_type
       caster_stats['spell level'] = splevel

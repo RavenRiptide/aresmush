@@ -417,7 +417,6 @@ pf2e_specialty:
         feat:
         - Animal Companion
         magic_stats:
-          focus_pool: 1
           focus_spell:
             order:
             - Heal Animal
@@ -436,7 +435,6 @@ pf2e_specialty:
           focus_spell:
             order:
             - Cornucopia
-          focus_pool: 1
         familiar: Leshy
     Storm:
       anathema:
@@ -449,7 +447,6 @@ pf2e_specialty:
         feat:
         - Storm Born
         magic_stats:
-          focus_pool: 1
           focus_spell:
             order:
             - Tempest Surge
@@ -464,7 +461,6 @@ pf2e_specialty:
         feat:
         - Untamed Form
         magic_stats:
-          focus_pool: 1
           focus_spell:
             order:
             - Untamed Shift
@@ -1744,7 +1740,6 @@ pf2e_specialty:
               9: 1
       chargen:
         magic_stats:
-          focus_pool: 1
           focus_spell:
             school:
             - Protective Wards
@@ -1892,7 +1887,6 @@ pf2e_specialty:
               9: 1
       chargen:
         magic_stats:
-          focus_pool: 1
           focus_spell:
             school:
             - Force Bolt
@@ -2040,7 +2034,6 @@ pf2e_specialty:
               9: 1
       chargen:
         magic_stats:
-          focus_pool: 1
           focus_spell:
             school:
             - Earthworks
@@ -2188,7 +2181,6 @@ pf2e_specialty:
               9: 1
       chargen:
         magic_stats:
-          focus_pool: 1
           focus_spell:
             school:
             - Charming Push
@@ -2336,7 +2328,6 @@ pf2e_specialty:
               9: 1
       chargen:
         magic_stats:
-          focus_pool: 1
           focus_spell:
             school:
             - Scramble Body
@@ -2484,7 +2475,6 @@ pf2e_specialty:
               9: 1
       chargen:
         magic_stats:
-          focus_pool: 1
           focus_spell:
             school:
             - Fortify Summoning
@@ -2529,7 +2519,6 @@ pf2e_specialty:
         grant_choice:
         - Unified Magical Theory
         magic_stats:
-          focus_pool: 1
           focus_spell:
             school:
             - Hand of the Apprentice

@@ -142,7 +142,6 @@ pf2e_archetype_specialty:
         anathema:
         - "Commit wanton cruelty to animals or kill animals unnecessarily. (This doesn't prevent you from defending yourself against animals or killing them cleanly for food.)"
         magic_stats:
-          focus_pool: 1
           focus_spell:
             order:
             - Heal Animal

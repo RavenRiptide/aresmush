@@ -57,28 +57,17 @@ module AresMUSH
         end
       end
 
-      # A focus spell a feat grants adds a point to the pool, as Qi Spells does.
       describe "feats that grant a focus spell" do
-        def point_and_choice(name)
-          details = feat(name)
-
-          [ details.dig('magic_stats', 'focus_pool'), details['feat_choice'] ]
-        end
-
-        it "should give each a focus point and a choice" do
+        it "should give each a choice" do
           [
             'Initiate Warden', 'Advanced Warden', 'Masterful Warden',
             'Domain Initiate', 'Advanced Domain', "Advanced Deity's Domain", 'Domain Acumen', 'Domain Fluency',
             'Basic Lesson', 'Greater Lesson', 'Major Lesson', 'Diverse Mystery'
           ].each do |name|
-            point, choice = point_and_choice(name)
-
-            expect(point).to eq(1), name
-            expect(choice).to be_a(Hash), name
+            expect(feat(name)['feat_choice']).to be_a(Hash), name
           end
         end
 
-        # The subclass spell choice brings its own point, which the pool's recount adds for it.
         it "should choose the subclass spell of the tier each names" do
           {
             'Advanced Bloodline' => 'advanced', 'Greater Bloodline' => 'greater',
@@ -114,6 +103,42 @@ module AresMUSH
           expect(adapted.map { |a| a['name'] }).to eq [ 'Illusory Disguise', 'Illusory Object', 'Illusory Scene' ]
           expect(adapted.map { |a| a['tradition'] }.uniq).to eq [ 'primal' ]
           adapted.each { |a| expect(a['base_level']).to eq(spell(a['name'])['base_level'].to_i), a['name'] }
+        end
+      end
+
+      # A pool holds a point per focus spell that costs one, counted from the spells, so nothing in
+      # the data declares points. A declaration would be read by nothing.
+      it "should declare no focus points anywhere in the data" do
+        found = []
+
+        walk = lambda do |node, path|
+          case node
+          when Hash
+            node.each_pair do |key, value|
+              found << "#{path}/#{key}" if key.to_s == 'focus_pool'
+              walk.call(value, "#{path}/#{key}")
+            end
+          when Array
+            node.each_with_index { |value, i| walk.call(value, "#{path}[#{i}]") }
+          end
+        end
+
+        Dir.glob("game/config/pf2e_*.yml").each { |file| walk.call(YAML.load_file(file), File.basename(file)) }
+
+        expect(found).to eq []
+      end
+
+      # Player Core p. 178: "You learn your choice of the patron's puppet hex or phase familiar hex."
+      it "should give a first-level witch her choice of hex" do
+        classes = YAML.load_file("game/config/pf2e_class.yml")['pf2e_class']
+        choice = classes['Witch']['chargen']['feat_choice']["Witch's Hex"]
+
+        expect(choice['options'].keys.sort).to eq [ "Patron's Puppet", 'Phase Familiar' ]
+
+        choice['options'].each_pair do |hex, option|
+          expect(option['grants']['magic_stats']['focus_spell']).to eq('hex' => [ hex ])
+          expect(traits(hex)).to include('focus', 'hex')
+          expect(traits(hex)).not_to include('cantrip')
         end
       end
 

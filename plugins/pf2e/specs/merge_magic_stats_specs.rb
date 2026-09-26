@@ -6,16 +6,17 @@ module AresMUSH
     # Two sources staging magic for the same class in one level-up.
     describe "merge_magic_stats" do
 
-      it "should add two focus points together" do
-        merged = Pf2e.merge_magic_stats({ 'focus_pool' => 1 }, { 'focus_pool' => 1 })
+      it "should keep the focus spells of two sources" do
+        merged = Pf2e.merge_magic_stats({ 'focus_spell' => { 'domain' => [ 'Unity' ] } },
+                                        { 'focus_spell' => { 'revelation' => [ 'Thunderburst' ] } })
 
-        expect(merged['focus_pool']).to eq 2
+        expect(merged['focus_spell']).to eq('domain' => [ 'Unity' ], 'revelation' => [ 'Thunderburst' ])
       end
 
-      it "should keep a single focus point as it is" do
-        merged = Pf2e.merge_magic_stats({ 'spell_abil' => 'Wisdom' }, { 'focus_pool' => 1 })
+      it "should keep a key only one source has" do
+        merged = Pf2e.merge_magic_stats({ 'spell_abil' => 'Wisdom' }, { 'focus_spell' => { 'domain' => [ 'Unity' ] } })
 
-        expect(merged).to eq('spell_abil' => 'Wisdom', 'focus_pool' => 1)
+        expect(merged).to eq('spell_abil' => 'Wisdom', 'focus_spell' => { 'domain' => [ 'Unity' ] })
       end
 
       it "should merge hashes and join lists" do
