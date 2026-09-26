@@ -891,6 +891,9 @@ pf2e_specialty:
       - Dexterity
   Sorcerer:
     Aberrant:
+      blood_magic:
+        name: Eerie Veil
+        text: "An ominous pall spills from your mind. Either one target takes a –1 status penalty to Will saving throws for 1 round or you gain a +2 status bonus to Will saving throws for 1 round."
       advanced_focus_spell:
         bloodline:
         - Aberrant Whispers
@@ -965,6 +968,9 @@ pf2e_specialty:
             tradition:
               occult: legendary
     Angelic:
+      blood_magic:
+        name: Divine Aura
+        text: "You project a warming aura that protects you or one target, granting a +1 status bonus to saving throws for 1 round."
       advanced_focus_spell:
         bloodline:
         - Angelic Wings
@@ -1039,6 +1045,9 @@ pf2e_specialty:
             tradition:
               divine: legendary
     Demonic:
+      blood_magic:
+        name: Corruption of Sin
+        text: "You mentally broadcast brief glimpses into the darkest desires of the mind. Either a target takes a –1 status penalty to AC for 1 round, or you gain a +2 status bonus to Intimidation checks for 1 round."
       advanced_focus_spell:
         bloodline:
         - Swamp of Sloth
@@ -1113,6 +1122,9 @@ pf2e_specialty:
             tradition:
               divine: legendary
     Diabolic:
+      blood_magic:
+        name: Tongue of Flame
+        text: "Your tongue becomes laced with the fires of Hell, and you can either lash out at a foe with it or swallow it to make your lies more palatable. Either a target takes 1 fire damage per spell rank (if the spell already deals initial fire damage, combine this with the spell's initial damage before determining weaknesses and resistances), or you gain a +2 status bonus to Deception checks for 1 round."
       advanced_focus_spell:
         bloodline:
         - Embrace the Pit
@@ -1187,6 +1199,10 @@ pf2e_specialty:
             tradition:
               divine: legendary
     Draconic:
+      blood_magic:
+        name: Scaly Hide
+        text: "Draconic scales grow briefly on you or one target, granting a +1 status bonus to AC for 1 round."
+      choice_spells: get_dragon_spell
       advanced_focus_spell:
         bloodline:
         - Dragon Breath
@@ -1228,6 +1244,10 @@ pf2e_specialty:
         reaction: []
         feat: []
       advance:
+        3:
+          magic_stats:
+            choice_repertoire:
+            - '2'
         5:
           magic_stats:
             addrepertoire:
@@ -1238,6 +1258,10 @@ pf2e_specialty:
             addrepertoire:
               4:
               - Fly
+        9:
+          magic_stats:
+            choice_repertoire:
+            - '5'
         11:
           magic_stats:
             addrepertoire:
@@ -1248,12 +1272,27 @@ pf2e_specialty:
             addrepertoire:
               7:
               - Mask of Terror
+        15:
+          magic_stats:
+            choice_repertoire:
+            - '8'
         17:
           magic_stats:
             addrepertoire:
               9:
               - Overwhelming Presence
     Elemental:
+      blood_magic:
+        name: Elemental Fury
+        text: "Elemental energy wreathes your form and infuses your magic. Either you gain a +2 status bonus to Intimidation checks for 1 round, or a target takes 1 damage per spell rank; this damage type is listed under your elemental influence. If the spell already deals that type of damage, combine it with the spell's initial damage before determining weaknesses and resistances."
+        damage_by_choice:
+          Air: slashing
+          Earth: bludgeoning
+          Fire: fire
+          Metal: piercing
+          Water: bludgeoning
+          Wood: bludgeoning
+      choice_spells: get_elemental_spell
       advanced_focus_spell:
         bloodline:
         - Elemental Motion
@@ -1274,11 +1313,9 @@ pf2e_specialty:
         magic_stats:
           tradition:
             primal: trained
-          addrepertoire:
-            cantrip:
-            - Produce Flame
-            1:
-            - Burning Hands
+          choice_repertoire:
+          - cantrip
+          - '1'
           focus_spell:
             bloodline:
             - Elemental Toss
@@ -1294,6 +1331,10 @@ pf2e_specialty:
             addrepertoire:
               2:
               - Resist Energy
+        5:
+          magic_stats:
+            choice_repertoire:
+            - '3'
         7:
           magic_stats:
             addrepertoire:
@@ -1306,6 +1347,10 @@ pf2e_specialty:
             addrepertoire:
               5:
               - Elemental Form
+        11:
+          magic_stats:
+            choice_repertoire:
+            - '6'
         13:
           magic_stats:
             addrepertoire:
@@ -1328,6 +1373,9 @@ pf2e_specialty:
             tradition:
               primal: legendary
     Fey:
+      blood_magic:
+        name: Cloak of Ribbons
+        text: "Colorful fey ribbons dance around you. Either you gain a +2 status bonus to Performance checks for 1 round, or you can become concealed for 1 round. Such obvious concealment can't be used to Hide."
       advanced_focus_spell:
         bloodline:
         - Fey Disappearance
@@ -1402,6 +1450,9 @@ pf2e_specialty:
             tradition:
               primal: legendary
     Hag:
+      blood_magic:
+        name: Retributive Spite
+        text: "Malice and acrimony take physical form around you. You deal 4 mental damage per spell rank (basic Will save) to the first creature that deals damage to you before the end of your next turn; if no creature damages you in that time, you consume that spite to gain temporary Hit Points at the beginning of your next turn equal to the spell's rank. These temporary Hit Points last until the beginning of your following turn."
       advanced_focus_spell:
         bloodline:
         - Horrific Visage
@@ -1476,6 +1527,9 @@ pf2e_specialty:
             tradition:
               occult: legendary
     Imperial:
+      blood_magic:
+        name: Imperious Defense
+        text: "Raw magic emanates from every cell in your body, protecting you. Until the start of your next turn, you gain your choice of either a +1 status bonus to AC or a +1 status bonus to saving throws."
       advanced_focus_spell:
         bloodline:
         - Extend Blood Magic
@@ -1550,6 +1604,9 @@ pf2e_specialty:
             tradition:
               arcane: legendary
     Undead:
+      blood_magic:
+        name: Stolen Life
+        text: "You can channel the necromantic energy in your blood. Either you gain temporary Hit Points equal to the spell's rank that last until the start of your next turn, or a target takes 1 void damage per spell rank (if the spell already deals initial void damage, combine this with the spell's initial damage before determining weaknesses and resistances)."
       advanced_focus_spell:
         bloodline:
         - Drain Life

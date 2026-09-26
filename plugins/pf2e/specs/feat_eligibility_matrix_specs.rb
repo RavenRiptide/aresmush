@@ -55,6 +55,13 @@ module AresMUSH
           'Stanced' => { 'feat_type' => [ 'General' ], 'prereq' => { 'stances' => 2 } },
           'Dispeller' => { 'feat_type' => [ 'General' ], 'prereq' => { 'repertoire_spell' => [ 'Dispel Magic' ] } },
           'Bonded' => { 'feat_type' => [ 'General' ], 'prereq' => { 'familiar' => true } },
+          'Leafy' => { 'feat_type' => [ 'General' ], 'prereq' => { 'specialize' => [ 'Leaf' ] } },
+
+          # Order Explorer's shape: a choice of another specialty that makes the character a member.
+          'Explorer' => { 'feat_type' => [ 'General' ],
+                          'feat_choice' => { 'from' => 'other_specialties', 'joins_specialty' => true } },
+          # Crossblooded Evolution's: another specialty, without membership.
+          'Crossing' => { 'feat_type' => [ 'General' ], 'feat_choice' => { 'from' => 'other_specialties' } },
 
           # Held, never taken: a stance to count, and a feat that gives a familiar.
           'Crane Poise' => { 'feat_type' => [ 'General' ], 'traits' => [ 'stance' ] },
@@ -117,6 +124,8 @@ module AresMUSH
         'Stanced' => { :feats => { 'charclass' => [ 'Crane Poise', 'Tiger Poise' ] } },
         'Dispeller' => { :repertoire => { 'Sorcerer' => { '3' => [ 'Dispel Magic' ] } } },
         'Bonded' => { :feats => { 'charclass' => [ 'Pact' ] } },
+        # A specialty joined through a choice counts, as the one taken at chargen does.
+        'Leafy' => { :choices => { 'Explorer' => [ 'Leaf' ] } },
         'ElfOnly' => { :ancestry => 'Elf' }
       }.freeze
 
@@ -265,6 +274,19 @@ module AresMUSH
           allow(char).to receive(:pf2_advancement).and_return('feats' => { 'charclass' => [ 'Tiger Poise' ] })
 
           expect(matrix_allows?(char, 'Stanced')).to be true
+        end
+      end
+
+      describe "a specialty joined through a choice" do
+        it "should not count one chosen without joining it" do
+          expect(matrix_allows?(matrix_char(:choices => { 'Crossing' => [ 'Leaf' ] }), 'Leafy')).to be false
+        end
+
+        it "should count one picked during the level-up in progress" do
+          char = matrix_char(:advancing => true)
+          allow(char).to receive(:pf2_to_assign).and_return('feat_choices' => { 'Explorer' => [ 'Leaf' ] })
+
+          expect(matrix_allows?(char, 'Leafy')).to be true
         end
       end
 

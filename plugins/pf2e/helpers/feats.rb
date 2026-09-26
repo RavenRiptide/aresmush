@@ -275,7 +275,74 @@ module AresMUSH
         held << pending unless pending.blank? || pending.to_s.casecmp?('open')
       end
 
+      # A specialty joined through a feat's choice (Order Explorer, Multifarious Muse).
+      flagged_choices(char, 'joins_specialty').each { |_name, labels| held.concat(labels) }
+
       held.compact.map { |s| s.to_s.strip.upcase }.reject(&:empty?)
+    end
+
+    # [ choice name, labels ] for each feat choice resolved or in flight whose block carries `flag`.
+    def self.flagged_choices(char, flag)
+      in_flight = (char.pf2_to_assign || {})['feat_choices']
+      names = recorded_choices(char).map(&:first) + (in_flight.is_a?(Hash) ? in_flight.keys : [])
+
+      names.map(&:to_s).uniq { |n| n.downcase }.filter_map do |name|
+        block = feat_choice_block_for(name)
+
+        next unless block.is_a?(Hash) && block[flag]
+
+        [ name, choice_labels_for(char, name) ]
+      end
+    end
+
+    # The character's class's specialties: its orders, muses or bloodlines.
+    def self.class_specialties(char)
+      (Global.read_config('pf2e_specialty', char.pf2_base_info['charclass'].to_s) || {}).keys
+    end
+
+    # A choice's labels read as [ specialty, its own 1st-level option ], for a choice that picked
+    # another bloodline and then that bloodline's choice.
+    def self.specialty_and_option(char, labels)
+      specialties = class_specialties(char)
+      specialty = Array(labels).find { |label| specialties.any? { |s| s.casecmp?(label.to_s) } }
+
+      return nil unless specialty
+
+      info = Global.read_config('pf2e_specialty', char.pf2_base_info['charclass'].to_s, specialty) || {}
+      options = ((info['choose'] || {})['options'] || {}).keys
+      option = Array(labels).find { |label| options.any? { |o| o.casecmp?(label.to_s) } }
+
+      [ specialty, option ]
+    end
+
+    # Bloodlines whose blood magic a choice shares (Crossblooded Evolution), with their option.
+    def self.shared_bloodlines(char)
+      flagged_choices(char, 'shares_blood_magic').filter_map { |_name, labels| specialty_and_option(char, labels) }
+    end
+
+    # class => [ spells ] a choice adds to the repertoire at the highest rank the class casts
+    # (Greater Crossblooded Evolution).
+    def self.top_rank_spells(char)
+      spells = flagged_choices(char, 'known_at').flat_map { |_name, labels| labels }
+
+      spells.empty? ? {} : { char.pf2_base_info['charclass'] => spells.uniq }
+    end
+
+    # The 1st-level feat of the character's class that lists a specialty as a prerequisite, or nil
+    # when there is not exactly one.
+    def self.specialty_first_feat(char, specialty)
+      charclass = char.pf2_base_info['charclass']
+
+      found = (Global.read_config('pf2e_feats') || {}).select do |_name, details|
+        prereq = (details.is_a?(Hash) && details['prereq']) || {}
+
+        prereq['level'].to_i == 1 && Array(details['assoc_charclass']).include?(charclass) &&
+          Array(prereq['specialize']).any? { |s| s.to_s.casecmp?(specialty.to_s) }
+      end
+
+      Global.logger.error "#{charclass} #{specialty} has #{found.size} 1st-level feats; one was expected." unless found.size == 1
+
+      found.size == 1 ? found.keys.first : nil
     end
 
     # Every focus spell the character knows, across all focus types, spells and cantrips
@@ -1338,7 +1405,7 @@ module AresMUSH
       elsif block.key?('from_lores')
         choice_lore_pool(char, block['from_lores'])
       elsif block['from']
-        choice_dynamic_options(char, block['from'], block)
+        choice_dynamic_options(char, block['from'], block, choice_name)
       else
         []
       end
@@ -1495,6 +1562,20 @@ module AresMUSH
         lesson_grant(char, value)
       when 'devotion_spells'
         { 'magic_stats' => { 'focus_spell' => { 'devotion' => [ value ] } } }
+      when 'other_specialties'
+        # Order Explorer and Multifarious Muse: "you gain a 1st-level feat that lists that order as a
+        # prerequisite", which is the gain itself, so its prerequisites are not asked again.
+        feat = block.is_a?(Hash) && block['grants_specialty_feat'] && specialty_first_feat(char, value)
+
+        feat ? { 'feat' => [ { 'name' => feat, 'prereqs' => 'ignore' } ] } : nil
+      when 'chosen_specialties'
+        # Order Magic: the specialty's initial focus spell, as its chargen block grants it.
+        return nil unless block.is_a?(Hash) && block['grants_specialty_focus']
+
+        info = Global.read_config('pf2e_specialty', char.pf2_base_info['charclass'].to_s, value.to_s) || {}
+        focus = ((info['chargen'] || {})['magic_stats'] || {})['focus_spell']
+
+        focus.is_a?(Hash) ? { 'magic_stats' => { 'focus_spell' => focus } } : nil
       when 'traditions', 'other_traditions'
         nil
       else
@@ -2478,7 +2559,7 @@ module AresMUSH
       spell.blank? ? nil : [ focus_type, spell ]
     end
 
-    def self.choice_dynamic_options(char, source, block = nil)
+    def self.choice_dynamic_options(char, source, block = nil, choice_name = nil)
       case source.to_s.downcase
       when 'subclass_spell'
         found = archetype_subclass_spell(char, block.is_a?(Hash) ? block['archetype'] : nil, block.is_a?(Hash) ? block['tier'] : nil)
@@ -2512,6 +2593,27 @@ module AresMUSH
         end.sort
       when 'lessons'
         lesson_options(char, block)
+      when 'other_specialties'
+        # Another order, muse or bloodline than the character's own.
+        own = char.pf2_base_info['specialize'].to_s
+
+        class_specialties(char).reject { |s| s.casecmp?(own) }.sort
+      when 'chosen_specialties'
+        # The specialties picked with another choice - Order Magic's orders explored.
+        chosen = choice_labels_for(char, block.is_a?(Hash) ? block['from_choice'] : nil)
+
+        class_specialties(char).select { |s| chosen.any? { |c| c.to_s.casecmp?(s) } }.sort
+      when 'specialty_options'
+        # The 1st-level choice of the specialty picked in this choice's first step, if it has one.
+        specialty = specialty_and_option(char, choice_labels_for(char, choice_name))&.first
+        info = specialty && Global.read_config('pf2e_specialty', char.pf2_base_info['charclass'].to_s, specialty)
+
+        (((info || {})['choose'] || {})['options'] || {}).keys.sort
+      when 'secondary_gift_spells'
+        # The sorcerous gift spells of the bloodline another choice picked, its option's included.
+        found = specialty_and_option(char, choice_labels_for(char, block.is_a?(Hash) ? block['from_choice'] : nil))
+
+        found ? Pf2emagic.all_gift_spells(char.pf2_base_info['charclass'], found[0], found[1]).sort : []
       when 'devotion_spells'
         options = [ 'Shields of the Spirit' ]
 
@@ -2869,6 +2971,10 @@ module AresMUSH
       choices[choice_name] = existing.uniq
       to_assign['feat_choices'] = choices
 
+      # The character holds this pick before the next step asks what it offers, since what a step
+      # offers can depend on the pick before it.
+      char.pf2_to_assign = to_assign
+
       msgs.concat(open_chained_choice(char, choice_name, block, to_assign))
 
       char.pf2_advancement = advancement
@@ -2885,6 +2991,10 @@ module AresMUSH
     def self.open_chained_choice(char, choice_name, block, to_assign = nil)
       nxt = block.is_a?(Hash) && block['then_choose']
       return [] unless nxt.is_a?(Hash)
+
+      # A step that only some picks need - a bloodline's own 1st-level choice, which not every
+      # bloodline has - is not opened when it has nothing to offer.
+      return [] if nxt['skip_if_empty'] && choice_options(char, choice_name, nxt).empty?
 
       if to_assign
         open_feat_choice(to_assign, choice_name)

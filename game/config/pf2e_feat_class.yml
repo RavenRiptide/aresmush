@@ -1817,6 +1817,12 @@ pf2e_feats:
     traits:
       - ranger
   Multifarious Muse:
+    repeatable: true
+    feat_choice:
+      summary: another muse
+      from: other_specialties
+      joins_specialty: true
+      grants_specialty_feat: true
     assoc_charclass:
       - Bard
     feat_type:
@@ -1850,6 +1856,12 @@ pf2e_feats:
       - spellshape
       - wizard
   Order Explorer:
+    repeatable: true
+    feat_choice:
+      summary: another druidic order
+      from: other_specialties
+      joins_specialty: true
+      grants_specialty_feat: true
     assoc_charclass:
       - Druid
     feat_type:
@@ -2827,6 +2839,12 @@ pf2e_feats:
     traits:
       - investigator
   Order Magic:
+    repeatable: true
+    feat_choice:
+      summary: an order you explored with Order Explorer
+      from: chosen_specialties
+      from_choice: Order Explorer
+      grants_specialty_focus: true
     assoc_charclass:
       - Druid
     feat_type:
@@ -4720,6 +4738,14 @@ pf2e_feats:
     traits:
       - cleric
   Crossblooded Evolution:
+    feat_choice:
+      summary: another bloodline
+      from: other_specialties
+      shares_blood_magic: true
+      then_choose:
+        summary: the choice that bloodline makes at 1st level
+        from: specialty_options
+        skip_if_empty: true
     assoc_charclass:
       - Sorcerer
     feat_type:
@@ -9538,6 +9564,21 @@ pf2e_feats:
     traits:
       - monk
   Greater Crossblooded Evolution:
+    feat_choice:
+      summary: a sorcerous gift spell of your secondary bloodline
+      from: secondary_gift_spells
+      from_choice: Crossblooded Evolution
+      known_at: highest_rank
+      then_choose:
+        summary: a sorcerous gift spell of your secondary bloodline
+        from: secondary_gift_spells
+        from_choice: Crossblooded Evolution
+        known_at: highest_rank
+        then_choose:
+          summary: a sorcerous gift spell of your secondary bloodline
+          from: secondary_gift_spells
+          from_choice: Crossblooded Evolution
+          known_at: highest_rank
     assoc_charclass:
       - Sorcerer
     feat_type:

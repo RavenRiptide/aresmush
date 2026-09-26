@@ -140,7 +140,7 @@ module AresMUSH
     # stat is then dispatched as if it were a class name.
     STAT_KEYS = %w{
       spell_abil tradition spells_per_day restricted_slots restricted_spellbook repertoire
-      repertoire_each_rank addrepertoire get_genie_repertoire get_dragon_repertoire focus_spell
+      repertoire_each_rank addrepertoire choice_repertoire focus_spell
       domain_focus_spell focus_cantrip spellbook addspellbook adapted_spell signature_spell
       signature_spells innate_spell divine_font grant_choice gated_spell focus_source
     }.freeze
@@ -244,56 +244,16 @@ module AresMUSH
           repertoire[charclass] = rep_for_class
 
           magic.repertoire = repertoire
-        when "get_genie_repertoire"
-          # Value of this key is an integer that corresponds to the level of the spell.
-          # It works like repertoire, but what this bloodline gets depends on their genie ancestry.
-
-          genie = char.pf2_base_info['specialize_info']
-          spells = Global.read_config('pf2e_subclass', 'get_genie_spell', genie)
-
-          # Do nothing if genie not found.
-          next unless spells
-
-          # Grab the spell corresponding to value.
-          spell = spells[value]
-
-          next unless spell
-
+        when "choice_repertoire"
+          # The gift spells a bloodline's 1st-level choice decides - a dragon exemplar's, an
+          # elemental influence's - at the ranks listed. The bloodline names its table.
+          gifts = Pf2emagic.choice_gift_spells(char, Array(value))
           repertoire = magic.repertoire
-          rep_for_class = repertoire[charclass]
+          rep_for_class = repertoire[charclass] || {}
 
-          rep_at_level = rep_for_class[value] || []
-
-          rep_at_level << spell
-
-          rep_for_class[value] = rep_at_level
-
-          repertoire[charclass] = rep_for_class
-
-          magic.repertoire = repertoire
-        when "get_dragon_repertoire"
-          # Value of this key is an integer that corresponds to the level of the spell.
-          # It works like repertoire, but what this bloodline gets depends on their dragon ancestry.
-
-          draconic = char.pf2_base_info['specialize_info']
-          spells = Global.read_config('pf2e_subclass', 'get_dragon_spell', draconic)
-
-          # Do nothing if draconic not found.
-          next unless spells
-
-          # Grab the spell corresponding to value.
-          spell = spells[value]
-
-          next unless spell
-
-          repertoire = magic.repertoire
-          rep_for_class = repertoire[charclass]
-
-          rep_at_level = rep_for_class[value] || []
-
-          rep_at_level << spell
-
-          rep_for_class[value] = rep_at_level
+          gifts.each_pair do |rank, spells|
+            rep_for_class[rank] = (Array(rep_for_class[rank]) + spells).uniq
+          end
 
           repertoire[charclass] = rep_for_class
 

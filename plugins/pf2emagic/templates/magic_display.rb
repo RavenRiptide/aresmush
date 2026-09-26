@@ -132,6 +132,23 @@ module AresMUSH
         list
       end
 
+      # A sorcerer's blood magic, and any a choice shares from another bloodline.
+      def blood_magic_effects
+        @blood_magic_effects ||= Pf2emagic.blood_magic(@char)
+      end
+
+      def has_blood_magic
+        blood_magic_effects.any?
+      end
+
+      def blood_magic
+        blood_magic_effects.map do |effect|
+          damage = effect['damage'] ? " The damage is #{effect['damage']}." : ''
+
+          "%xh#{effect['name']}%xn (#{effect['bloodline']}): #{effect['text']}#{damage}"
+        end
+      end
+
       def has_adapted_spells
         !(@magic.adapted_spells || {}).empty?
       end

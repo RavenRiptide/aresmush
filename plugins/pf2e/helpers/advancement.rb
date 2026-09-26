@@ -59,6 +59,7 @@ module AresMUSH
           focus_cantrip
           innate_spell
           addrepertoire
+          choice_repertoire
           addspellbook
           divine_font
         )
