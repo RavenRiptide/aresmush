@@ -164,6 +164,7 @@ pf2e_feats:
       level: 1
       heritage: Aesa
   Animal Accomplice:
+    familiar: true
     feat_type:
       - Ancestry
     assoc_ancestry:
@@ -2985,6 +2986,7 @@ pf2e_feats:
         - Oruch Ferocity
     actions: free
   Rat Familiar:
+    familiar: true
     feat_type:
       - Ancestry
     assoc_ancestry:

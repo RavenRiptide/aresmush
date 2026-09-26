@@ -372,6 +372,25 @@ module AresMUSH
           end
         when "has_focus_pool"
           msg << "focus_pool" if Pf2emagic.focus_pool_max(char.magic).zero?
+        when "feature"
+          msg << "feature" unless Array(required).all? { |name| holds_feature?(char, name) }
+        when "sanctification"
+          held = char.pf2_faith['sanctification']
+
+          if char.advancing
+            pending = (char.pf2_advancement || {})['archetype_sanctification']
+            held = pending unless pending.blank?
+          end
+
+          msg << "sanctification" unless Array(required).any? { |s| s.to_s.casecmp?(held.to_s) }
+        when "stances"
+          msg << "stances" if held_stance_count(char) < required.to_i
+        when "repertoire_spell"
+          known = DraftSheet.of(char).repertoire.values.flat_map { |by_rank| (by_rank || {}).values.flatten }
+
+          msg << "repertoire_spell" unless Array(required).all? { |s| known.any? { |k| k.to_s.casecmp?(s.to_s) } }
+        when "familiar"
+          msg << "familiar" unless has_familiar?(char)
         when "feat"
           feats = DraftSheet.of(char).feat_names
           req = required.map { |word| word.upcase }
@@ -528,6 +547,51 @@ module AresMUSH
         [ (combat&.saves || {})[factor.to_s.downcase] ]
       when 'weapon'
         (combat&.weapon_prof || {}).values + (combat&.weapon_group_prof || {}).values
+      end
+    end
+
+    # Whether the character holds a class or archetype feature. A name matches a feature, the option
+    # recorded in "Feature (Option)" - a Champion's Blessed Armament - or a feat choice resolved to
+    # it, which is how the Champion archetype's Devout Blessing records the same blessing.
+    def self.holds_feature?(char, name)
+      wanted = name.to_s.strip
+
+      held = DraftSheet.of(char).feature_names.any? do |feature|
+        option = feature[/\(([^()]+)\)\z/, 1]
+
+        feature.casecmp?(wanted) || option.to_s.strip.casecmp?(wanted)
+      end
+
+      held || choice_labels(char).any? { |label| label.to_s.casecmp?(wanted) }
+    end
+
+    # Every label a feat choice has resolved to, counting the ones this level has picked.
+    def self.choice_labels(char)
+      in_flight = (char.pf2_to_assign || {})['feat_choices']
+
+      recorded_choices(char).map { |_name, label, _level| label } +
+        (in_flight.is_a?(Hash) ? in_flight.values.flatten : [])
+    end
+
+    # The feats with the stance trait the character holds, counting this level's.
+    def self.held_stance_count(char)
+      held_feat_details(char).count { |_name, details| Array(details['traits']).any? { |t| t.to_s.casecmp?('stance') } }
+    end
+
+    # A familiar, from a feat flagged as giving one or from the Witch's Familiar class feature.
+    def self.has_familiar?(char)
+      held_feat_details(char).any? { |_name, details| details['familiar'] == true } || holds_feature?(char, 'Familiar')
+    end
+
+    # [ name, details ] for each feat the character holds, counting this level's.
+    def self.held_feat_details(char)
+      feats = Global.read_config('pf2e_feats') || {}
+      by_upcase = feats.keys.each_with_object({}) { |key, out| out[key.to_s.upcase] = key }
+
+      DraftSheet.of(char).feat_names.filter_map do |name|
+        key = by_upcase[name.to_s.upcase]
+
+        key && feats[key].is_a?(Hash) ? [ key, feats[key] ] : nil
       end
     end
 

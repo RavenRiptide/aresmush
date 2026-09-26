@@ -34,6 +34,7 @@ pf2e_feats:
     traits:
       - alchemist
   Alchemical Familiar:
+    familiar: true
     assoc_charclass:
       - Alchemist
     feat_type:
@@ -349,6 +350,7 @@ pf2e_feats:
     traits:
       - champion
   Familiar:
+    familiar: true
     assoc_charclass:
       - Sorcerer
       - Wizard
@@ -521,6 +523,7 @@ pf2e_feats:
     traits:
       - investigator
   Leshy Familiar:
+    familiar: true
     assoc_charclass:
       - Druid
     feat_type:
@@ -1569,9 +1572,7 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 2
-      orfeat:
-        - Familiar
-        - Leshy Familiar
+      familiar: true
     shortdesc: "You infuse your familiar with additional magical energy. You can select four familiar or master abilities each day, instead of two.%r%r**Special** [Witch] Add the bonus familiar abilities you gain for being a witch to this amount. [Wizard] If your arcane thesis is improved familiar attunement, your familiar's base number of familiar abilities, before adding any extra abilities from the arcane thesis, is four."
     traits:
       - druid
@@ -2691,7 +2692,7 @@ pf2e_feats:
     prereq:
       level: 4
       feat:
-        - Animal Companion (Druid)
+        - Animal Companion
     shortdesc: "Your animal companion has grown up over the course of your adventures, becoming a mature animal companion and gaining additional capabilities.%r%rYour animal companion has greater independence. During an encounter, even if you don't use the Command an Animal action, your animal companion can still use 1 action that round on your turn to Strike or Stride (or Burrow, Climb, Fly, or Swim if it has that Speed). It can do this at any point during your turn, as long as you aren't currently taking an action. If it does, that's all the actions it gets that round—you can't Command it later."
     traits:
       - druid
@@ -4976,7 +4977,8 @@ pf2e_feats:
       level: 8
       feat:
         - Faithful Steed
-        - lay on hands
+      focus_spell:
+        - Lay on Hands
     shortdesc: "Your devotion to your mount manifests as a surge of vital energy.%r%rWhen you cast *lay on hands* on your mount, instead of the normal amount, the spell restores 10 Hit Points, plus 10 for each heightened rank."
     traits:
       - champion
@@ -5024,7 +5026,7 @@ pf2e_feats:
     prereq:
       level: 8
       feat:
-        - Mature Animal Companion
+        - Mature Animal Companion (Druid)
     shortdesc: Your animal companion continues to grow and develop. It becomes either a nimble or savage animal companion, gaining additional capabilities determined by the type.
     traits:
       - druid
@@ -5305,8 +5307,8 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 8
-      feat:
-        - healing font
+      divine_font:
+        - heal
     shortdesc: "You can remove conditions with divine grace. You can sacrifice one *heal* spell you've prepared in your extra slots from your healing font to cast one of the following spells instead: *cleanse affliction*, *clear mind*, *sound body*, or *sure footing*. The spell is heightened to the same rank as the spell you sacrificed."
     traits:
       - cleric
@@ -5328,9 +5330,9 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 8
-      orfeat:
+      sanctification:
         - holy
-        - unholy trait
+        - unholy
     shortdesc: "You touch a weapon and bring it into concordance with your deity. For 1 round, that weapon gains your holy or unholy trait. It also deals an additional 2d6 spirit damage to creatures of the opposed trait. For example, if you are holy, the weapon would deal an extra 2d6 spirit damage to unholy creatures.%r%rIf you use Sanctify Armament again, any previous use of it expires."
     traits:
       - cleric
@@ -5653,7 +5655,7 @@ pf2e_feats:
     prereq:
       level: 10
       feat:
-        - Efficient Alchemy
+        - Efficient Alchemy (Alchemist)
     shortdesc: You make an even-larger batch of alchemical items each morning. Increase the maximum number of items you can create with advanced alchemy to 8 + your Intelligence modifier, or to 10 + your Intelligence modifier if you're 16th level or higher.
     traits:
       - alchemist
@@ -5977,8 +5979,8 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 10
-      feat:
-        - healing font
+      divine_font:
+        - heal
     shortdesc: "The restorative power of your healing invigorates the recipient. If the next action you use is to cast *heal* targeting a single living creature and the target regains Hit Points from the spell, the target also gains three bonuses until the end of its next turn: a +5-foot status bonus to its Speed, a +1 status bonus to attack rolls, and a +1 status bonus to damage rolls. In addition, if the target is prone, it can immediately Stand as a free action that doesn't trigger reactions."
     traits:
       - cleric
@@ -6025,7 +6027,7 @@ pf2e_feats:
     prereq:
       level: 10
       feat:
-        - Mature Animal Companion
+        - Mature Animal Companion (Ranger)
     shortdesc: Your animal companion continues to grow and develop. It becomes a nimble or savage animal companion (your choice), gaining additional capabilities determined by the type of companion.
     traits:
       - ranger
@@ -6230,8 +6232,7 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 10
-      feat:
-        - at least one stance feat
+      stances: 1
     shortdesc: "**Trigger** You are targeted by an attack or attempt a Reflex saving throw against a damaging effect, and you are in a stance.%r%rYour flexibility with stances lets you sacrifice their benefits to better protect yourself. You leave the stance you were in, gaining a +4 circumstance bonus to the triggering saving throw or to your AC against the triggering attack."
     traits:
       - monk
@@ -6286,8 +6287,8 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 10
-      feat:
-        - blessed armament
+      feature:
+        - Blessed Armament
     shortdesc: "Your blessed armament radiates power, further enhancing your chosen weapon. When you choose the weapon for your blessed armament during your daily preparations, add the *astral* and *brilliant* property runes to the list of effects you can choose from. If you're holy, also add the *holy* rune, and if you're unholy, also add the *unholy* rune.%r%rIn addition, you can change the rune you've selected for the day to a different rune from your list as a 10-minute activity that has the concentrate, divine, and exploration traits. Changing the rune doesn't restore abilities that can be used only a limited number of times, such as Holy Healing for the *holy* rune."
     traits:
       - champion
@@ -6298,7 +6299,7 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 10
-      feat:
+      feature:
         - Opportune Riposte
     shortdesc: You can riposte almost without a thought. At the start of each of your turns when you regain your actions, you gain an additional reaction that can be used only to perform an Opportune Riposte.
     traits:
@@ -6453,8 +6454,8 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 10
-      feat:
-        - blessed swiftness
+      feature:
+        - Blessed Swiftness
     shortdesc: You gain the *spectral advance* devotion spell, which lets you move to an enemy, bypassing hindrances.
     traits:
       - champion
@@ -6743,7 +6744,7 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 12
-      orfeat:
+      sanctification:
         - holy
         - unholy
     shortdesc: You radiate an aura of belief that imbues your attacks and those of nearby allies with divine power. Each willing ally in your champion's aura adds the holy trait to their Strikes if you're holy or adds the unholy trait to their Strikes if you're unholy.
@@ -6815,8 +6816,6 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 12
-      feat:
-        - you aren't unholy
     shortdesc: You can suffer so that others might live. You can cast the *champion's sacrifice* devotion spell.
     traits:
       - champion
@@ -7499,7 +7498,7 @@ pf2e_feats:
     prereq:
       level: 12
       feat:
-        - Ricochet Stance
+        - Ricochet Stance (Rogue)
     shortdesc: While in Ricochet Stance, you can bounce a thrown weapon off a foe to distract them. You can attempt a Feint against a creature within the first range increment of a thrown weapon you are wielding, rather than only creatures within your melee reach.
     traits:
       - rogue
@@ -7789,7 +7788,7 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 14
-      feat:
+      sanctification:
         - holy
     shortdesc: Your righteous aura dampens evil's might and prevents the unholy from escaping you. You and all allies in your champion's aura gain resistance 5 to unholy spells, unholy Strikes, and other unholy effects. If a teleportation spell or effect would teleport an unholy creature out of your champion's aura, your aura attempts to counteract it, using the spell rank and DC of your devotion spells.
     traits:
@@ -7939,9 +7938,9 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 14
-      orfeat:
-        - harmful font
-        - healing font
+      divine_font:
+        - heal
+        - harm
     shortdesc: "Divine power is always at your fingertips, swiftly responding to your call. When you cast *harm* or *heal* by spending 2 actions, you can get the effects of the 3-action version instead of the 2-action version.%r%rYou can do this with *harm* if you have harmful font or *heal* if you have healing font (or both if you have Versatile Font)."
     traits:
       - cleric
@@ -8023,7 +8022,7 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 14
-      feat:
+      feature:
         - Opportune Riposte
     shortdesc: "Your ripostes can deflect attacks back at their source. You can use opportune riposte with a trigger of 'A foe outside of your reach critically fails an attack roll against you' in addition to its usual trigger.%r%rWhen you use opportune riposte with this new trigger against a ranged attack, your Strike deflects some of the triggering effect back toward its source. Compare the result of your attack roll to the AC of the triggering foe.%r%rOn a hit, you deal the normal amount of damage for your Strike, but the damage type changes to that of the triggering attack. For instance, if you used opportune riposte to deflect a *blazing bolt*, your Strike would deal fire damage instead of its normal damage type."
     traits:
@@ -8058,8 +8057,8 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 14
-      feat:
-        - dispel magic in your spell repertoire
+      repertoire_spell:
+        - Dispel Magic
     shortdesc: You weave dispelling energy into a spell. If your next action is to cast a single-target spell against an enemy, and you either hit the enemy with the spell attack roll or the enemy fails its saving throw, you can cast *dispel magic* on the enemy as a free action, expending a spell slot as normal and targeting one spell effect affecting the enemy.
     traits:
       - sorcerer
@@ -8791,7 +8790,7 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 16
-      feat:
+      sanctification:
         - unholy
     shortdesc: Your life has made you a nexus for your deity's vile power. You're continuously surrounded by a *bane* spell, with a spell rank equal to half your level (rounded up). The radius is 15 feet, and you can't increase it. You can Dismiss the spell; if you do, it returns automatically after 1 minute.
     traits:
@@ -8803,7 +8802,7 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 16
-      feat:
+      sanctification:
         - holy
     shortdesc: Your deeds have brought your deity's grace to you for all of eternity. You're continuously surrounded by a *bless* spell, with a spell rank equal to half your level (rounded up). The radius is 15 feet, and you can't increase it. You can Dismiss the spell; if you do, it returns automatically after 1 minute.
     traits:
@@ -8861,8 +8860,7 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 16
-      feat:
-        - at least two stances
+      stances: 2
     shortdesc: "You have combined two stances into a single stance all your own. When you take this feat, choose two stances you know and combine them into a single fused stance. Give your new fused stance a unique name. When you enter your fused stance, you gain all the effects of both stances, including the requirements and restrictions.%r%rIf the stances both grant special attacks, you gain all those attacks. If a stance restricts you to one particular attack (such as Crane Stance), you must abide by that restriction. If the fused stances have incompatible restrictions, the GM determines which apply, or determines you can't fuse those stances at all."
     traits:
       - monk
@@ -8939,7 +8937,7 @@ pf2e_feats:
     prereq:
       level: 16
       feat:
-        - Predictive Purchase
+        - Predictive Purchase (Investigator)
     shortdesc: "It seems impossible, but you've analyzed every angle and are able to just keep pulling out exactly the item you need, even in far-flung locations.%r%rYou can use Prescient Planner even if you have already used it after purchasing goods, and you can use it as a single action instead of a 2-action activity, during which you Interact to draw the item.%r%rIn addition, five times per day, you can use Prescient Planner to pull out a common consumable item up to 6 levels lower than your level."
     traits:
       - investigator
@@ -8994,8 +8992,8 @@ pf2e_feats:
     prereq:
       level: 16
       orfeat:
-        - Opening Stance (Fighter)
-        - Reflexive Stance (Monk)
+        - Opening Stance
+        - Reflexive Stance
     shortdesc: "**Trigger** Your turn begins.%r%rYou move fluidly between stances, using your mastery of combat to always adopt the best tactics. You use an action with the stance trait."
     traits:
       - fighter
@@ -9382,7 +9380,7 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 18
-      feat:
+      focus_spell:
         - Courageous Anthem
     shortdesc: Your *courageous anthem* lets loose a discordant shriek that imbues your allies' attacks with powerful sonic reverberations. While your allies are affected by your *courageous anthem*, their weapon Strikes and unarmed attacks deal an additional 1d6 sonic damage.
     traits:
@@ -9502,7 +9500,7 @@ pf2e_feats:
     prereq:
       level: 18
       feat:
-        - Predictive Purchase
+        - Predictive Purchase (Rogue)
     shortdesc: You can use Prescient Planner even if you have already used it after purchasing goods, and you can Interact to draw the item as a single action instead of a 2-action activity. In addition, five times per day, you can use Prescient Planner to pull out a common consumable item up to 6 levels lower than your level.
     traits:
       - rogue
@@ -9691,7 +9689,7 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 18
-      feat:
+      feature:
         - Opportune Riposte
     shortdesc: "Your parries and finishers allow you to riposte with the slightest provocation.%r%rYou can use Opportune Riposte against an enemy who fails at a Strike against you (not just critically fails), provided you have both damaged that creature with a finisher on your last turn and currently have a circumstance bonus to AC from the parry weapon trait or Extravagant Parry."
     traits:
@@ -9738,7 +9736,8 @@ pf2e_feats:
       level: 18
       feat:
         - Form Control
-        - Strength +4
+      ability:
+        - Strength/18
     shortdesc: Thanks to magic and muscle memory, you can stay in your alternate shapes indefinitely. When you use Form Control, instead of lasting 1 hour, *untamed form* duration is unlimited (you can still Dismiss it).
     traits:
       - druid
@@ -9793,8 +9792,8 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 18
-      feat:
-        - lay on hands
+      focus_spell:
+        - Lay on Hands
     shortdesc: Your healing energies linger after you cast, providing continual benefits. An ally that recovers Hit Points from your *lay on hands* gains 10 temporary Hit Points immediately and at the start of their turn during each of the next 10 rounds. These temporary HP last until the start of the creature's next turn. This effect ends if the ally is knocked unconscious.
     traits:
       - champion
@@ -10008,8 +10007,8 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 20
-      feat:
-        - blessed armament
+      feature:
+        - Blessed Armament
     shortdesc: "Add the following property runes to the list you can choose for your blessed armament: *animated*, *greater fearsome*, *grievous*, *keen*, and *greater vitalizing*. If you have the Radiant Armament feat, add *greater astral* and *greater brilliant* to the list as well.%r%rIn addition, you can change the rune you've selected for the day to a different rune from your list as a single action that has the concentrate and divine traits. Changing the rune doesn't restore abilities that can be used only a limited number of times."
     traits:
       - champion
@@ -10071,7 +10070,7 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 20
-      feat:
+      feature:
         - Bloodline Paragon
     shortdesc: You command the ultimate powers of your bloodline and tradition. You gain an additional 10th-rank spell slot.
     traits:
@@ -10447,8 +10446,8 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 20
-      feat:
-        - blessed shield
+      feature:
+        - Blessed Shield
     shortdesc: "Your shield is a vessel of divine protection. When you're wielding your chosen shield, it is always raised, even without you using the Raise a Shield action.%r%rIf the shield would be destroyed, it vanishes to your deity's realm instead, where a servitor of your deity repairs it. During your next daily preparations, the shield returns to you fully repaired. While the shield is gone, you can spend 1 minute to infuse a different shield with your blessed shield benefit until your true shield returns"
     traits:
       - champion
@@ -10502,8 +10501,8 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 20
-      feat:
-        - blessed swiftness
+      feature:
+        - Blessed Swiftness
     shortdesc: "The movement of you and your allies is swift and decisive as the judgment of your deity. If your ally starts a move action in your champion's aura, their movement during that action doesn't trigger reactions.%r%rIn addition, you're permanently quickened. You can use your extra action only to Step or Stride. If you have a fly Speed, add Fly to this list. If you have an animal companion and are mounted on it at the start of your turn, you can have your mount be quickened that turn instead of you."
     traits:
       - champion

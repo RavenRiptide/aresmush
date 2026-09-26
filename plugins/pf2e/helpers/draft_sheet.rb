@@ -35,6 +35,16 @@ module AresMUSH
         (held_feats + staged_feats).uniq
       end
 
+      # Class and archetype feature names, counting the ones this level grants. A class option is
+      # "Feature (Option)", which is how the sheet records it.
+      def feature_names
+        held = (@char.pf2_features || {}).values.flatten
+        staged = Array(draft['charclass_feature']) + Array(draft['archetype_features'])
+        options = (draft['charclass_feature option'] || {}).map { |feature, option| "#{feature} (#{option})" }
+
+        (held + staged + options).map(&:to_s).reject(&:blank?).uniq
+      end
+
       # bucket => [ feats ], the sheet's and the draft's together, in the spelling they were
       # recorded in. A feat the rules let you take more than once is held once per taking, so the
       # lists are concatenated rather than merged.

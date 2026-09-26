@@ -445,6 +445,7 @@ pf2e_feats:
       - dedication
       - multiclass
   Witch Dedication:
+    familiar: true
     assoc_archetype:
       - Witch Archetype
     assoc_class:

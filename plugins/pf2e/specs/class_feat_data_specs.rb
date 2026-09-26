@@ -307,6 +307,117 @@ module AresMUSH
         end
       end
 
+      describe "prerequisites" do
+        def class_feats
+          YAML.load_file("game/config/pf2e_feat_class.yml")['pf2e_feats']
+        end
+
+        # A name under `feat` or `orfeat` is matched against the feats a character holds, so one
+        # that names anything else can never be met.
+        it "should name only feats under feat and orfeat" do
+          # These wait on the familiar and companion systems: a patron's tradition, and holding an
+          # animal companion.
+          waiting = [ 'Spirit Familiar (Witch)', 'Stitched Familiar', 'Side by Side (Ranger)' ]
+          known = @feats.keys.map(&:downcase)
+
+          class_feats.each_pair do |name, details|
+            next if waiting.include?(name)
+
+            prereq = details['prereq'] || {}
+
+            Array(prereq['feat']).concat(Array(prereq['orfeat'])).each do |wanted|
+              expect(known).to include(wanted.to_s.downcase), "#{name} asks for #{wanted.inspect}"
+            end
+          end
+        end
+
+        # Every name a `feature` prereq asks for is one a class table grants: a feature, or an
+        # option of a class choice.
+        it "should name only features a class grants" do
+          granted = []
+
+          collect = lambda do |node|
+            case node
+            when Hash
+              node.each_pair do |key, value|
+                granted.concat(Array(value).map(&:to_s)) if key.to_s == 'charclass_feature'
+                granted.concat(value['options'].keys) if %w(charclass_choice choose).include?(key.to_s) && value.is_a?(Hash) && value['options'].is_a?(Hash)
+                collect.call(value)
+              end
+            when Array
+              node.each { |item| collect.call(item) }
+            end
+          end
+
+          %w(class specialty).each { |file| collect.call(YAML.load_file("game/config/pf2e_#{file}.yml")) }
+
+          @feats.each_pair do |name, details|
+            Array((details['prereq'] || {})['feature']).each do |wanted|
+              expect(granted).to include(wanted), "#{name} asks for the feature #{wanted.inspect}"
+            end
+          end
+        end
+
+        it "should ask for what each feat's text names" do
+          {
+            'Heal Mount' => { 'level' => 8, 'feat' => [ 'Faithful Steed' ], 'focus_spell' => [ 'Lay on Hands' ] },
+            'Rejuvenating Touch' => { 'level' => 18, 'focus_spell' => [ 'Lay on Hands' ] },
+            'Discordant Voice' => { 'level' => 18, 'focus_spell' => [ 'Courageous Anthem' ] },
+            'Restorative Channel' => { 'level' => 8, 'divine_font' => [ 'heal' ] },
+            'Heroic Recovery' => { 'level' => 10, 'divine_font' => [ 'heal' ] },
+            'Fast Channel' => { 'level' => 14, 'divine_font' => [ 'heal', 'harm' ] },
+            'Perfect Form Control' => { 'level' => 18, 'feat' => [ 'Form Control' ], 'ability' => [ 'Strength/18' ] },
+            "Champion's Sacrifice" => { 'level' => 12 },
+            'Reflexive Riposte' => { 'level' => 10, 'feature' => [ 'Opportune Riposte' ] },
+            'Impossible Riposte' => { 'level' => 14, 'feature' => [ 'Opportune Riposte' ] },
+            'Parry and Riposte' => { 'level' => 18, 'feature' => [ 'Opportune Riposte' ] },
+            'Radiant Armament' => { 'level' => 10, 'feature' => [ 'Blessed Armament' ] },
+            'Armament Paragon' => { 'level' => 20, 'feature' => [ 'Blessed Armament' ] },
+            'Shield Paragon' => { 'level' => 20, 'feature' => [ 'Blessed Shield' ] },
+            'Spectral Advance' => { 'level' => 10, 'feature' => [ 'Blessed Swiftness' ] },
+            'Swift Paragon' => { 'level' => 20, 'feature' => [ 'Blessed Swiftness' ] },
+            'Bloodline Perfection' => { 'level' => 20, 'feature' => [ 'Bloodline Paragon' ] },
+            'Sanctify Armament' => { 'level' => 8, 'sanctification' => [ 'holy', 'unholy' ] },
+            'Aura of Faith' => { 'level' => 12, 'sanctification' => [ 'holy', 'unholy' ] },
+            'Aura of Righteousness' => { 'level' => 14, 'sanctification' => [ 'holy' ] },
+            'Eternal Blessing' => { 'level' => 16, 'sanctification' => [ 'holy' ] },
+            'Eternal Bane' => { 'level' => 16, 'sanctification' => [ 'unholy' ] },
+            'Prevailing Position' => { 'level' => 10, 'stances' => 1 },
+            'Fuse Stance' => { 'level' => 16, 'stances' => 2 },
+            'Interweave Dispel' => { 'level' => 14, 'repertoire_spell' => [ 'Dispel Magic' ] },
+            'Enhanced Familiar' => { 'level' => 2, 'familiar' => true }
+          }.each_pair do |name, prereq|
+            expect(feat(name)['prereq']).to eq(prereq), name
+          end
+        end
+
+        it "should name each class's own version of a feat that has one per class" do
+          {
+            'Implausible Purchase (Investigator)' => 'Predictive Purchase (Investigator)',
+            'Implausible Purchase (Rogue)' => 'Predictive Purchase (Rogue)',
+            'Ricochet Feint' => 'Ricochet Stance (Rogue)',
+            'Advanced Efficient Alchemy' => 'Efficient Alchemy (Alchemist)',
+            'Mature Animal Companion (Druid)' => 'Animal Companion',
+            'Incredible Companion (Druid)' => 'Mature Animal Companion (Druid)',
+            'Incredible Companion (Ranger)' => 'Mature Animal Companion (Ranger)'
+          }.each_pair do |name, wanted|
+            expect(feat(name)['prereq']['feat']).to eq([ wanted ]), name
+          end
+
+          expect(feat('Master of Many Styles')['prereq']['orfeat']).to eq [ 'Opening Stance', 'Reflexive Stance' ]
+        end
+
+        # Enhanced Familiar asks for a familiar, however the character came by it. Pet only mentions
+        # a familiar gained later, which "you gain a familiar" does not match.
+        it "should flag every feat whose text gives a familiar, and only those" do
+          @feats.each_pair do |name, details|
+            gives = details['shortdesc'].to_s.match?(/\byou gain a familiar\b/i)
+
+            expect(details['familiar'] == true).to eq(gives), name
+          end
+        end
+      end
+
       it "should give Signature Spell Expansion two signatures of 3rd rank or lower" do
         stats = feat('Signature Spell Expansion')['magic_stats']
 

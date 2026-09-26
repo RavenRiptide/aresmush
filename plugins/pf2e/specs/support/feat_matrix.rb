@@ -30,6 +30,10 @@ module AresMUSH
         :focus_spells => [],
         :focus_pool => 0,
         :divine_font => nil,
+        :repertoire => {},
+        :features => [],
+        :choices => {},
+        :sanctification => nil,
         :perception => 'untrained',
         :saves => {},
         :weapon_prof => {},
@@ -53,14 +57,17 @@ module AresMUSH
             'heritage' => opts[:heritage],
             'specialize' => opts[:specialize]
           },
-          :pf2_faith => { 'deity' => opts[:deity], 'alignment' => opts[:alignment] },
+          :pf2_faith => { 'deity' => opts[:deity], 'alignment' => opts[:alignment],
+                          'sanctification' => opts[:sanctification] },
           :pf2_feats => opts[:feats],
+          :pf2_features => { 'charclass_features' => opts[:features], 'archetype_features' => [] },
           :pf2_special => opts[:specials],
           :pf2_archetypeinfo => opts[:archetypes],
           :pf2_to_assign => {},
           :pf2_advancement => {},
-          # Read by adopted_ancestries, which every Ancestry feat goes through.
-          :pf2_level_tracker => {},
+          # Read by adopted_ancestries, which every Ancestry feat goes through, and by the feature
+          # prereq, which counts a resolved feat choice. choice => [ labels ], recorded at level 1.
+          :pf2_level_tracker => opts[:choices].empty? ? {} : { '1' => { 'feat_choices' => opts[:choices] } },
           :skills => opts[:skills].map { |name, prof| matrix_skill(name, prof) },
           :abilities => matrix_abilities(opts[:abilities]),
           :magic => matrix_magic(opts),
@@ -88,7 +95,7 @@ module AresMUSH
         allow(Pf2emagic).to receive(:focus_pool_max).and_return(opts[:focus_pool].to_i)
 
         blank = opts[:traditions].empty? && opts[:innate].empty? && opts[:focus_spells].empty? &&
-                opts[:focus_pool].to_i.zero? && opts[:divine_font].nil?
+                opts[:focus_pool].to_i.zero? && opts[:divine_font].nil? && opts[:repertoire].empty?
 
         return nil if blank
 
@@ -96,7 +103,7 @@ module AresMUSH
                :innate_spells => opts[:innate],
                :focus_pool => { 'current' => opts[:focus_pool] },
                :divine_font => opts[:divine_font],
-               :spell_abil => {}, :spells_per_day => {}, :repertoire => {}, :spellbook => {},
+               :spell_abil => {}, :spells_per_day => {}, :repertoire => opts[:repertoire], :spellbook => {},
                :signature_spells => {}, :restricted_spellbook => {}, :restricted_slots => {},
                :character => nil)
       end
