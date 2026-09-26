@@ -19,7 +19,7 @@ module AresMUSH
       signatures
     end
 
-    def self.prepare_spell(spell, char, castclass, level, use_arcane_evo=false)
+    def self.prepare_spell(spell, char, castclass, level)
       # All validations are done in the helper.
 
       return t('pf2emagic.not_caster') unless Pf2emagic.is_caster?(char)
@@ -31,11 +31,7 @@ module AresMUSH
 
       prepared_cc_list = Global.read_config('pf2e_magic', 'prepared_casters')
 
-      if !(prepared_cc_list.include? cc)
-        if !use_arcane_evo
-          return t('pf2emagic.does_not_prepare')
-        end
-      end
+      return t('pf2emagic.does_not_prepare') unless prepared_cc_list.include?(cc)
 
       # Can you prepare the level of spell you asked for?
       max_level = max_spell_level_available(char, cc)
@@ -74,7 +70,7 @@ module AresMUSH
       # Whether this class has to have the spell written down comes from its config - does it get a
       # spellbook at all - rather than from its name, so a class that enumerates its spells is not
       # handed its whole tradition list.
-      if !is_adapted && (use_arcane_evo || needs_spellbook || Entries.enumerated?(cc))
+      if !is_adapted && (needs_spellbook || Entries.enumerated?(cc))
         is_in_spellbook = spellbook_check(magic, cc, level, spell_name)
         return t('pf2emagic.not_in_spellbook') unless is_in_spellbook[0]
         make_signature = is_in_spellbook[1]
@@ -97,15 +93,7 @@ module AresMUSH
 
       spell_trad = spell_details['tradition']
 
-      return t('pf2emagic.cant_prepare_trad', :cc => cc) unless is_adapted || spell_trad.include?(tradition[0].downcase)
-
-      if use_arcane_evo
-        repertoire = obj.repertoire
-        repertoire['Arcane Evolution'] = [ spells ]
-        magic.update(repertoire: repertoire)
-
-        return return_msg
-      end
+      return t('pf2emagic.cant_prepare_trad', :cc => cc) unless is_adapted || spell_trad.include?(Entries.tradition_of(magic, cc).to_s.downcase)
 
       spell_list = magic.spells_prepared
       spell_list_for_class = spell_list[cc] || {}

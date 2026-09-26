@@ -418,6 +418,85 @@ module AresMUSH
         end
       end
 
+      # Player Core p. 186.
+      it "should give Witch's Armaments its three unarmed attacks, one per taking" do
+        details = feat("Witch's Armaments")
+        attacks = details['feat_choice']['options'].transform_values { |option| option['grants']['attack'] }
+
+        expect(details['repeatable']).to be true
+        expect(attacks).to eq(
+          'Eldritch Nails' => { 'Nails' => { 'damage' => '1d6', 'damage_type' => 'S', 'group' => 'Brawling',
+                                             'traits' => [ 'agile', 'unarmed' ] } },
+          'Iron Teeth' => { 'Jaws' => { 'damage' => '1d8', 'damage_type' => 'P', 'group' => 'Brawling',
+                                        'traits' => [ 'unarmed' ] } },
+          'Living Hair' => { 'Hair' => { 'damage' => '1d4', 'damage_type' => 'B', 'group' => 'Brawling',
+                                         'traits' => [ 'agile', 'disarm', 'finesse', 'trip', 'unarmed' ] } }
+        )
+      end
+
+      # "Choose a weapon group. You gain proficiency with all advanced weapons in that group as if
+      # they were martial weapons of their weapon group."
+      it "should let Advanced Weapon Training choose a group whose advanced weapons count as martial" do
+        expect(feat('Advanced Weapon Training')['feat_choice']).to eq(
+          'summary' => 'a weapon group', 'from_weapon_groups' => { 'category' => 'advanced' }, 'as_category' => 'martial'
+        )
+      end
+
+      describe "spell books" do
+        it "should give Esoteric Polymath a book of occult spells that keeps the repertoire" do
+          expect(feat('Esoteric Polymath')['spell_book']).to eq(
+            'name' => 'Book of Occult Spells', 'tradition' => 'occult', 'supplements' => 'Bard',
+            'keeps_repertoire' => true, 'switch' => 'esotericpolymath'
+          )
+        end
+
+        it "should give Arcane Evolution a list of arcane spells" do
+          expect(feat('Arcane Evolution')['spell_book']).to eq(
+            'name' => 'Arcane Evolution List', 'tradition' => 'arcane', 'supplements' => 'Sorcerer',
+            'switch' => 'arcaneevolution'
+          )
+        end
+
+        # A player types the feat's name to prepare from its book, and a switch cannot hold a space.
+        it "should name each book's switch after its feat" do
+          @feats.each_pair do |name, details|
+            next unless details['spell_book']
+
+            expect(details['spell_book']['switch']).to eq(name.downcase.gsub(/[^a-z]/, '')), name
+          end
+        end
+
+        # "You become trained in one skill of your choice."
+        it "should give Arcane Evolution a skill of the player's choice" do
+          expect(feat('Arcane Evolution')['grants']).to eq('skill' => [ 'open' ])
+        end
+
+        # Player Core p. 258: a success is a critical success, and a failure can be tried again
+        # after a week or a level.
+        it "should give Magical Shorthand its Learn a Spell rules" do
+          expect(feat('Magical Shorthand')['learn_spell']).to eq('upgrade_success' => true, 'retry_after_days' => 7)
+        end
+
+        # Player Core p. 201.
+        it "should give Spellbook Prodigy Magical Shorthand, prerequisites waived, and soften a critical failure" do
+          prodigy = feat('Spellbook Prodigy')
+
+          expect(prodigy['assoc_charclass']).to eq [ 'Wizard' ]
+          expect(prodigy['prereq']).to eq('level' => 1, 'skill' => 'Arcana/trained')
+          expect(prodigy['grants']).to eq('feat' => [ { 'name' => 'Magical Shorthand', 'prereqs' => 'ignore' } ])
+          expect(prodigy['learn_spell']).to eq('soften_critical_failure' => true)
+        end
+
+        # Player Core p. 230, the Learning a Spell table: rank => [ price in gp, typical DC ].
+        it "should price Learn a Spell by rank" do
+          expect(@magic['learn_spell']).to eq(
+            'cantrip' => [ 2, 15 ], 1 => [ 2, 15 ], 2 => [ 6, 18 ], 3 => [ 16, 20 ], 4 => [ 36, 23 ],
+            5 => [ 70, 26 ], 6 => [ 140, 28 ], 7 => [ 300, 31 ], 8 => [ 650, 34 ], 9 => [ 1500, 36 ],
+            10 => [ 7000, 41 ]
+          )
+        end
+      end
+
       it "should give Signature Spell Expansion two signatures of 3rd rank or lower" do
         stats = feat('Signature Spell Expansion')['magic_stats']
 

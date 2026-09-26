@@ -71,7 +71,7 @@ module AresMUSH
       'armor_prof' => 'merge',
       'weapon_prof' => 'merge',
       'weapon_group_prof' => 'merge',
-      'unarmed_attacks' => 'merge',
+      'unarmed_attacks' => 'define',
       'defense' => 'merge',
       'perception' => 'set',
       'class_dc' => 'set',
@@ -94,9 +94,10 @@ module AresMUSH
 
         case STAT_WRITERS[name]
         when 'merge'
-          existing = combat.send(name) || {}
-          (value || {}).each_pair { |item, new_value| existing[item] = Pf2e.higher_prof(existing[item], new_value) }
-          combat.update(name.to_sym => existing)
+          combat.update(name.to_sym => merge_stat(combat.send(name) || {}, value || {}))
+        when 'define'
+          # Each entry is a definition, so a new one of the same name replaces the old whole.
+          combat.update(name.to_sym => (combat.send(name) || {}).merge(value || {}))
         when 'set'
           combat.update(name.to_sym => Pf2e.higher_prof(combat.send(name), value))
         else
@@ -105,6 +106,18 @@ module AresMUSH
       end
 
       return combat
+    end
+
+    # Keeps the better of what is held and what is written, however deep the stat nests: a rank
+    # per weapon category within a group, a resistance per damage type. Resistances to one type do
+    # not stack, so the larger number stands. Anything else is replaced.
+    def self.merge_stat(held, written)
+      return written if held.nil?
+      return written.each_with_object(held.dup) { |(key, value), out| out[key] = merge_stat(out[key], value) } if held.is_a?(Hash) && written.is_a?(Hash)
+      return [ held, written ].max if held.is_a?(Numeric) && written.is_a?(Numeric)
+      return Pf2e.higher_prof(held, written) if Pf2e.prof_rank(held) && Pf2e.prof_rank(written)
+
+      written
     end
 
     def self.write_archetype_dcs(combat, value)
@@ -247,15 +260,12 @@ module AresMUSH
 
       prof_list = [ 'untrained' ]
 
-      case wp_cat
-      when 'unarmed'
-        prof_list << char_wp_prof['unarmed']
-      when 'simple'
-        prof_list << char_wp_prof['simple']
-      when 'martial'
-        prof_list << char_wp_prof['martial']
-      when 'advanced'
-        prof_list << char_wp_prof['advanced']
+      # Its own category, and any a choice lets it count as: Advanced Weapon Training's advanced
+      # weapons count as martial weapons of their group.
+      categories = [ wp_cat.to_s ] + Pf2e.weapon_counts_as(char, wp_cat, wp_group)
+
+      categories.each do |category|
+        prof_list << char_wp_prof[category] if %w(unarmed simple martial advanced).include?(category)
       end
 
       # Does character get a proficiency in that particular weapon from their class?
@@ -305,8 +315,8 @@ module AresMUSH
       # Does character get a proficiency in that particular weapon from a weapon group choice?
       if wp_group && group_profs[wp_group]
         group_prof = group_profs[wp_group]
-        group_value = group_prof[wp_cat] || group_prof[wp_cat.to_s]
-        prof_list << group_value if group_value
+
+        categories.each { |category| prof_list << group_prof[category] }
       end
 
       prof_list << monk_weapon_prof(char_wp_prof, wp_info)

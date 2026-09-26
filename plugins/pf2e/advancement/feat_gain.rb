@@ -59,6 +59,16 @@ module AresMUSH
             'name' => 'choice',
             'when' => lambda { |_ctx| true },
             'apply' => lambda { |ctx| FeatGain.choice(ctx) }
+          },
+          # A book of spells beside the repertoire, with how to learn into it and prepare from it.
+          {
+            'name' => 'spell book',
+            'when' => lambda { |ctx| ctx[:details]['spell_book'].is_a?(Hash) },
+            'apply' => lambda { |ctx|
+              book = ctx[:details]['spell_book'].merge('feat' => ctx[:feat])
+
+              [ [ nil, Pf2emagic::SpellBooks.instructions(book) ] ]
+            }
           }
         ].freeze
 

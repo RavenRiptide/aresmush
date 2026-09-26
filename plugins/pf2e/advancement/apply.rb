@@ -319,12 +319,9 @@ module AresMUSH
           []
         end
 
+        # Through the writer every combat stat goes through, which never lowers a rank.
         def self.weapon_group(ctx, ranks)
-          combat = Pf2eCombat.get_create_combat_obj(ctx[:char])
-          groups = combat.weapon_group_prof || {}
-          groups[ctx[:option]] = ranks
-
-          combat.update(:weapon_group_prof => groups)
+          Pf2eCombat.update_combat_stats(ctx[:char], 'weapon_group_prof' => { ctx[:option] => ranks })
 
           []
         end

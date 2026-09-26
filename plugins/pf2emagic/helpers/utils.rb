@@ -52,12 +52,12 @@ module AresMUSH
       magic = char.magic
       return false unless magic
 
-      trad = magic.tradition
-      trad = trad.delete('innate')
-      innate_only = trad.empty?
+      # The tradition register carries a literal 'innate' key that is not a casting source.
+      casting = (magic.tradition || {}).reject { |key, _| key.to_s.casecmp?('innate') }
 
-      return false if innate_only && !Entries.innate?(magic)
-      return true
+      return true unless casting.empty?
+
+      Entries.innate?(magic)
     end
 
     def self.generate_spells_today(char)
@@ -92,7 +92,8 @@ module AresMUSH
 
       spells_today['innate'] = innate_spells_today unless innate_spells_today.empty?
 
-      magic.update(spells_today: spells_today)
+      # A spell picked from a book lasts until the next daily preparations, which is now.
+      magic.update(spells_today: spells_today, daily_pick: {})
 
     end
 

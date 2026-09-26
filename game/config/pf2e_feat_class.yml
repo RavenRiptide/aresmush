@@ -1079,6 +1079,23 @@ pf2e_feats:
       - cursebound
       - divine
       - oracle
+  Spellbook Prodigy:
+    assoc_charclass:
+      - Wizard
+    feat_type:
+      - Charclass
+    grants:
+      feat:
+        - name: Magical Shorthand
+          prereqs: ignore
+    learn_spell:
+      soften_critical_failure: true
+    prereq:
+      level: 1
+      skill: Arcana/trained
+    shortdesc: "You are particularly adept at learning spells to add to your spellbook. You gain the Magical Shorthand skill feat without needing to meet its prerequisites. Further, when you roll a critical failure on your check to Learn a Spell, you get a failure instead."
+    traits:
+      - wizard
   Widen Spell:
     assoc_charclass:
       - Druid
@@ -1100,6 +1117,42 @@ pf2e_feats:
       - witch
       - wizard
   Witch's Armaments:
+    repeatable: true
+    feat_choice:
+      summary: unarmed attack
+      options:
+        Eldritch Nails:
+          grants:
+            attack:
+              Nails:
+                damage: 1d6
+                damage_type: S
+                group: Brawling
+                traits:
+                  - agile
+                  - unarmed
+        Iron Teeth:
+          grants:
+            attack:
+              Jaws:
+                damage: 1d8
+                damage_type: P
+                group: Brawling
+                traits:
+                  - unarmed
+        Living Hair:
+          grants:
+            attack:
+              Hair:
+                damage: 1d4
+                damage_type: B
+                group: Brawling
+                traits:
+                  - agile
+                  - disarm
+                  - finesse
+                  - trip
+                  - unarmed
     assoc_charclass:
       - Witch
     feat_type:
@@ -1590,6 +1643,12 @@ pf2e_feats:
     traits:
       - swashbuckler
   Esoteric Polymath:
+    spell_book:
+      name: Book of Occult Spells
+      tradition: occult
+      supplements: Bard
+      keeps_repertoire: true
+      switch: esotericpolymath
     assoc_charclass:
       - Bard
     feat_type:
@@ -2168,6 +2227,14 @@ pf2e_feats:
     traits:
       - druid
   Arcane Evolution:
+    spell_book:
+      name: Arcane Evolution List
+      tradition: arcane
+      supplements: Sorcerer
+      switch: arcaneevolution
+    grants:
+      skill:
+        - open
     assoc_charclass:
       - Sorcerer
     feat_type:
@@ -3340,6 +3407,11 @@ pf2e_feats:
       from: subclass_spell
       tier: advanced
   Advanced Weapon Training:
+    feat_choice:
+      summary: a weapon group
+      from_weapon_groups:
+        category: advanced
+      as_category: martial
     assoc_charclass:
       - Fighter
     feat_type:

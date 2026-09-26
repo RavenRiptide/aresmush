@@ -1148,7 +1148,8 @@ module AresMUSH
     end
 
     # Feats a feat hands over. Each is bound by the same eligibility and repeat rules as one the
-    # player picks, which is also what ends a chain that closes on itself.
+    # player picks, which is also what ends a chain that closes on itself. A grant that waives the
+    # prerequisites is still bound by the rest: the feat's class or ancestry, and the repeat limit.
     def self.grant_feats(ctx)
       char = ctx[:char]
 
@@ -1157,7 +1158,7 @@ module AresMUSH
 
         next [] unless parsed
 
-        fname, label, source, filter = parsed
+        fname, label, source, filter, waived = parsed
         found = get_feat_details(fname)
 
         if found.is_a?(String)
@@ -1165,7 +1166,9 @@ module AresMUSH
           next []
         end
 
-        unless can_take_feat_details?(char, found[0], found[1])
+        checked = waived ? found[1].merge('prereq' => nil) : found[1]
+
+        unless can_take_feat_details?(char, found[0], checked)
           Global.logger.warn "#{char.name} was granted '#{found[0]}' but does not qualify for it."
           next []
         end
@@ -1328,6 +1331,8 @@ module AresMUSH
         choice_skill_pool(char, block['from_skills'])
       elsif block['from_weapons'].is_a?(Hash)
         choice_weapon_pool(char, block['from_weapons'])
+      elsif block['from_weapon_groups'].is_a?(Hash)
+        choice_weapon_group_pool(char, block['from_weapon_groups'])
       elsif block['from_spells'].is_a?(Hash)
         choice_spell_pool(char, block['from_spells'], choice_name)
       elsif block.key?('from_lores')
@@ -2358,6 +2363,19 @@ module AresMUSH
       list.sort
     end
 
+    # Weapon groups holding a weapon of the filter's category, drawn from pf2e_weapons.yml.
+    def self.choice_weapon_group_pool(_char, filter)
+      wanted = Array((filter.is_a?(Hash) ? filter : {})['category']).map { |c| c.to_s.downcase }
+      weapons = Global.read_config('pf2e_weapons') || {}
+
+      weapons.values.filter_map do |details|
+        next unless details.is_a?(Hash) && details['group'].present?
+        next if wanted.any? && !wanted.include?(details['category'].to_s.downcase)
+
+        details['group'].to_s
+      end.uniq.sort
+    end
+
     # Weapon names the character has chosen through any feat whose choice draws from the
     # weapon list, such as Weapon Proficiency.
     def self.chosen_weapons(char)
@@ -2366,6 +2384,22 @@ module AresMUSH
         next unless block.is_a?(Hash) && block['from_weapons']
 
         label
+      end.uniq
+    end
+
+    # The categories a weapon also counts as for this character: Advanced Weapon Training's chosen
+    # group, whose advanced weapons count as martial. Read from any recorded choice whose block draws
+    # from the weapon groups and names an `as_category`.
+    def self.weapon_counts_as(char, category, group)
+      return [] if group.blank?
+
+      recorded_choices(char).filter_map do |name, label, _level|
+        block = find_choice_block(char, name)
+        next unless block.is_a?(Hash) && block['from_weapon_groups'].is_a?(Hash) && block['as_category'].present?
+        next unless block['from_weapon_groups']['category'].to_s.casecmp?(category.to_s)
+        next unless label.to_s.casecmp?(group.to_s)
+
+        block['as_category'].to_s.downcase
       end.uniq
     end
 
@@ -2532,13 +2566,16 @@ module AresMUSH
       DEFERRED_CHOICE_SOURCES.include?(source.to_s.downcase)
     end
 
+    # [ name, choice, choice_from, choice_filter, prereqs waived ] for a granted feat, which the data
+    # writes as a bare name or a hash. `prereqs: ignore` hands a feat over without its prerequisites,
+    # as Spellbook Prodigy does Magical Shorthand.
     def self.granted_feat_entry(entry)
-      return [ entry.to_s, nil, nil, nil ] unless entry.is_a?(Hash)
+      return [ entry.to_s, nil, nil, nil, false ] unless entry.is_a?(Hash)
 
       name = entry['name'].to_s
       return nil if name.empty?
 
-      [ name, entry['choice'], entry['choice_from'], entry['choice_filter'] ]
+      [ name, entry['choice'], entry['choice_from'], entry['choice_filter'], entry['prereqs'].to_s.casecmp?('ignore') ]
     end
 
     def self.granted_choice_label(char, source)

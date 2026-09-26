@@ -59,6 +59,7 @@ module AresMUSH
             (magic['tradition'] || {}).reject { |key, _v| key.to_s.casecmp?(INNATE) }.map do |source, trad|
               category = caster_types[source] || caster_types[source.to_s]
               spontaneous = category.to_s == 'spontaneous'
+              pick = (magic['daily_pick'] || {})[source]
 
               Entries.entry(
                 'name' => source,
@@ -69,8 +70,8 @@ module AresMUSH
                 'ability' => (magic['spell_abil'] || {})[source],
                 'slots' => (magic['spells_per_day'] || {})[source] || {},
                 # A spontaneous caster knows a repertoire; a prepared one keeps a spellbook.
-                'known' => ((spontaneous ? magic['repertoire'] : magic['spellbook']) || {})[source] || {},
-                'signature' => (magic['signature_spells'] || {})[source] || {},
+                'known' => Entries.with_pick(((spontaneous ? magic['repertoire'] : magic['spellbook']) || {})[source], pick, 'repertoire'),
+                'signature' => Entries.with_pick((magic['signature_spells'] || {})[source], pick, 'signature'),
                 'restrictions' => (magic['restricted_spellbook'] || {})[source] || {}
               )
             end
@@ -105,6 +106,19 @@ module AresMUSH
           }
         }
       ].freeze
+
+      # A list by rank with the day's pick from a book added, when the pick is of that kind: a
+      # spell joining the repertoire, or a repertoire spell made a signature spell.
+      def self.with_pick(by_rank, pick, kind)
+        list = (by_rank || {}).each_with_object({}) { |(rank, spells), out| out[rank.to_s] = Array(spells).dup }
+
+        return list unless pick.is_a?(Hash) && pick['as'].to_s == kind
+
+        rank = pick['rank'].to_s
+        list[rank] = (Array(list[rank]) + [ pick['spell'] ]).uniq
+
+        list
+      end
 
       # Entry hashes for everything this character casts from.
       #
@@ -214,7 +228,7 @@ module AresMUSH
       # these and nothing else. Focus spells are absent: they are stored as rows, not projected.
       ATTRIBUTES = %w(
         tradition spell_abil spells_per_day spellbook repertoire signature_spells
-        restricted_spellbook innate_spells
+        restricted_spellbook innate_spells daily_pick
       ).freeze
 
       # ------------------------------------------------------------------------------
@@ -396,17 +410,46 @@ module AresMUSH
 
         return {} unless magic
 
-        for_magic(magic).each_with_object({}) do |entry, lists|
+        lists = for_magic(magic).each_with_object({}) do |entry, out|
           next unless [ 'class', 'archetype' ].include?(entry['source_type'])
           next unless enumerated?(entry['name'])
 
-          known = (entry['known'] || {}).each_with_object({}) do |(rank, spells), by_rank|
-            kept = Array(spells).reject { |spell| spell.to_s.casecmp?(OPEN) }
+          # The day's pick from a book is not a spell learned, so it is never recorded.
+          pick = (magic.daily_pick || {})[entry['name']]
+          known = without_pick(entry['known'], pick)
 
-            by_rank[rank.to_s] = kept unless kept.empty?
-          end
+          out[entry['name']] = known unless known.empty?
+        end
 
-          lists[entry['name']] = known unless known.empty?
+        # A book a feat keeps: the spells learned into it and, for one that keeps the repertoire
+        # (Esoteric Polymath), every spell in the repertoire it supplements.
+        SpellBooks.held(char).each do |book|
+          stored = (magic.spellbook || {})[book['name']] || {}
+          repertoire = book['keeps_repertoire'] ? lists[book['supplements']] || {} : {}
+          contents = without_open(SpellBooks.contents(stored, repertoire))
+
+          lists[book['name']] = contents unless contents.empty?
+        end
+
+        lists
+      end
+
+      def self.without_pick(by_rank, pick)
+        list = without_open(by_rank)
+
+        return list unless pick.is_a?(Hash) && pick['as'].to_s == 'repertoire'
+
+        rank = pick['rank'].to_s
+        kept = Array(list[rank]).reject { |spell| spell.to_s.casecmp?(pick['spell'].to_s) }
+
+        kept.empty? ? list.reject { |r, _| r == rank } : list.merge(rank => kept)
+      end
+
+      def self.without_open(by_rank)
+        (by_rank || {}).each_with_object({}) do |(rank, spells), out|
+          kept = Array(spells).reject { |spell| spell.to_s.casecmp?(OPEN) }
+
+          out[rank.to_s] = kept unless kept.empty?
         end
       end
 

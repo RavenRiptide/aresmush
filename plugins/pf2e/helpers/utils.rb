@@ -253,40 +253,36 @@ module AresMUSH
       return return_hash
     end
 
+    # A check's degree of success: 0 critical failure, 1 failure, 2 success, 3 critical success.
+    # 10 over the DC is a critical success and 10 under a critical failure, and a natural 20 or 1
+    # moves the result one degree. `natural` is nil for a roll that is not a d20.
+    def self.degree_index(natural, total, dc)
+      degree = if total - dc >= 10 then 3
+               elsif total >= dc then 2
+               elsif total - dc <= -10 then 0
+               else 1
+               end
+
+      degree += 1 if natural == 20
+      degree -= 1 if natural == 1
+
+      degree.clamp(0, 3)
+    end
+
+    # A degree of success as the room sees it, by degree_index.
+    DEGREE_LABELS = [
+      "(%xrCRITICAL FAILURE%xn)",
+      "(%xh%xyFAILURE%xn)",
+      "(%xgSUCCESS!%xn)",
+      "(%xh%xmCRITICAL SUCCESS!%xn)"
+    ].freeze
+
     def self.get_degree(list,result,total,dc)
-      degrees = [ "(%xrCRITICAL FAILURE%xn)",
-        "(%xh%xyFAILURE%xn)",
-        "(%xgSUCCESS!%xn)",
-        "(%xh%xmCRITICAL SUCCESS!%xn)"
-      ]
-      if total - dc >= 10
-        scase = 3
-      elsif total >= dc
-        scase = 2
-      elsif total - dc <= -10
-        scase = 0
-      else
-        scase = 1
-      end
+      # Only a roll whose first die is the d20 has a natural result to move the degree.
+      natural = list[0] == '1d20' ? result[0].delete_prefix("(%xc").delete_suffix("%xn)").to_i : nil
+      whirldice = natural == 1 ? t('pf2e.whirldice') : ""
 
-      #### Success modifiers happen only if the first item in the list is a 1d20.
-
-      succ_mod = 0
-      whirldice = ""
-
-      if list[0] == '1d20'
-
-        int_result = result[0].delete_prefix("(%xc").delete_suffix("%xn)").to_i
-        if int_result == 20
-          succ_mod = 1
-        elsif int_result == 1
-          succ_mod = -1
-          whirldice = t('pf2e.whirldice')
-        end
-      end
-
-      success_case = (scase + succ_mod).clamp(0,3)
-      degrees[success_case] + whirldice
+      DEGREE_LABELS[degree_index(natural, total, dc)] + whirldice
     end
 
     def self.pretty_string(string)

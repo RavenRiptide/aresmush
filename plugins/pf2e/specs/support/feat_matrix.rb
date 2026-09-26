@@ -104,7 +104,7 @@ module AresMUSH
                :focus_pool => { 'current' => opts[:focus_pool] },
                :divine_font => opts[:divine_font],
                :spell_abil => {}, :spells_per_day => {}, :repertoire => opts[:repertoire], :spellbook => {},
-               :signature_spells => {}, :restricted_spellbook => {}, :restricted_slots => {},
+               :signature_spells => {}, :restricted_spellbook => {}, :restricted_slots => {}, :daily_pick => {},
                :character => nil)
       end
 

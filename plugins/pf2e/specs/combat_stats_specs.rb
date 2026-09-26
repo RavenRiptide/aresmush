@@ -123,6 +123,105 @@ module AresMUSH
 
           expect(combat.key_abil).to eq 'Dexterity'
         end
+
+        # A weapon group holds a rank per category, one level deeper than weapon_prof.
+        describe "a weapon group" do
+          def mastery
+            { 'simple' => 'master', 'martial' => 'master', 'unarmed' => 'master', 'advanced' => 'expert' }
+          end
+
+          before(:each) do
+            @combat.update(:weapon_group_prof => { 'Sword' => mastery })
+          end
+
+          it "should keep the ranks a grant does not mention" do
+            Pf2eCombat.update_combat_stats(@char, 'weapon_group_prof' => { 'Sword' => { 'advanced' => 'master' } })
+
+            expect(combat.weapon_group_prof['Sword']).to eq mastery.merge('advanced' => 'master')
+          end
+
+          it "should not lower a rank" do
+            Pf2eCombat.update_combat_stats(@char, 'weapon_group_prof' => { 'Sword' => { 'martial' => 'trained' } })
+
+            expect(combat.weapon_group_prof['Sword']).to eq mastery
+          end
+
+          it "should leave another group alone" do
+            Pf2eCombat.update_combat_stats(@char, 'weapon_group_prof' => { 'Axe' => { 'martial' => 'expert' } })
+
+            expect(combat.weapon_group_prof).to eq('Sword' => mastery, 'Axe' => { 'martial' => 'expert' })
+          end
+        end
+
+        # Resistances to one damage type from two sources do not stack; the higher applies.
+        it "should keep the higher of two resistances and add a new one" do
+          @combat.update(:defense => { 'resistance' => { 'fire' => 5 } })
+
+          Pf2eCombat.update_combat_stats(@char, 'defense' => { 'resistance' => { 'fire' => 1, 'cold' => 1 } })
+
+          expect(combat.defense).to eq('resistance' => { 'fire' => 5, 'cold' => 1 })
+        end
+
+        # An unarmed attack is a definition, so a new one of the same name replaces the old whole.
+        it "should replace an unarmed attack rather than merge its fields" do
+          @combat.update(:unarmed_attacks => {
+            'Claw' => { 'damage' => '1d6', 'damage_type' => 'S', 'traits' => [ 'agile', 'Versatile (P)' ] }
+          })
+
+          Pf2eCombat.update_combat_stats(@char, 'unarmed_attacks' => { 'Claw' => { 'damage' => '1d8', 'damage_type' => 'S' } })
+
+          expect(combat.unarmed_attacks).to eq('Claw' => { 'damage' => '1d8', 'damage_type' => 'S' })
+        end
+      end
+
+      # The Fighter's two group choices, through the rows that apply them.
+      describe "a Fighter's weapon group choices", :dbtest => true do
+        before(:each) do
+          bootstrapper = AresMUSH::Bootstrapper.new
+          bootstrapper.config_reader.load_game_config
+          bootstrapper.db.load_config
+
+          @char = Character.create(:name => "Groups#{rand(1000000)}")
+          @combat = Pf2eCombat.create(:character => @char, :weapon_prof => { 'martial' => 'expert' })
+          @char.update(:combat => @combat)
+        end
+
+        after(:each) do
+          @combat.delete if @combat
+          @char.delete if @char
+        end
+
+        def choose(feature, group)
+          Advancement::Apply.feature_options(:char => Character[@char.id], :value => { feature => group })
+        end
+
+        def groups
+          Pf2eCombat[@combat.id].weapon_group_prof
+        end
+
+        it "should keep the mastery group when the legend goes to another" do
+          choose('Fighter Weapon Mastery', 'Sword')
+          choose('Weapon Legend', 'Axe')
+
+          expect(groups['Sword']).to eq('simple' => 'master', 'martial' => 'master', 'unarmed' => 'master', 'advanced' => 'expert')
+          expect(groups['Axe']).to eq('simple' => 'legendary', 'martial' => 'legendary', 'unarmed' => 'legendary', 'advanced' => 'master')
+        end
+
+        it "should raise the mastery group when the legend goes to it" do
+          choose('Fighter Weapon Mastery', 'Sword')
+          choose('Weapon Legend', 'Sword')
+
+          expect(groups['Sword']).to eq('simple' => 'legendary', 'martial' => 'legendary', 'unarmed' => 'legendary', 'advanced' => 'master')
+        end
+
+        # Only through the merging writer can a later choice never lower an earlier one.
+        it "should not lower a group a stronger source already raised" do
+          @combat.update(:weapon_group_prof => { 'Sword' => { 'martial' => 'legendary' } })
+
+          choose('Fighter Weapon Mastery', 'Sword')
+
+          expect(groups['Sword']['martial']).to eq 'legendary'
+        end
       end
 
       # Every `combat_stats` key in every class's chargen and advance blocks has to be one the

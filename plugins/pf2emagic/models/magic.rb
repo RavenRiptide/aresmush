@@ -31,6 +31,11 @@ module AresMUSH
     attribute :adapted_spells, :type => DataType::Hash, :default => {}
     attribute :tradition, :type => DataType::Hash, :default => { "innate"=>["innate", "trained"] }
     attribute :prepared_lists, :type => DataType::Hash, :default => {}
+    # class => { 'spell', 'rank', 'as' => signature | repertoire }: the spell picked from a book
+    # (Esoteric Polymath, Arcane Evolution) at the last daily preparations. Cleared at the next.
+    attribute :daily_pick, :type => DataType::Hash, :default => {}
+    # spell => { 'level', 'at' }: a failed Learn a Spell, which blocks trying that spell again.
+    attribute :learn_failures, :type => DataType::Hash, :default => {}
     attribute :divine_font
 
     reference :character, "AresMUSH::Character"

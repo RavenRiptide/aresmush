@@ -279,6 +279,19 @@ pf2e_magic:
     - Sorcerer Archetype
   # The skill that goes with each tradition, for a prerequisite that follows whichever tradition a
   # source casts from (the `tradition_skill` prereq).
+  # Learn a Spell, Player Core p. 230: spell rank => [ price of the materials in gp, typical DC ].
+  learn_spell:
+    cantrip: [ 2, 15 ]
+    1: [ 2, 15 ]
+    2: [ 6, 18 ]
+    3: [ 16, 20 ]
+    4: [ 36, 23 ]
+    5: [ 70, 26 ]
+    6: [ 140, 28 ]
+    7: [ 300, 31 ]
+    8: [ 650, 34 ]
+    9: [ 1500, 36 ]
+    10: [ 7000, 41 ]
   tradition_skills:
     arcane: Arcana
     divine: Religion

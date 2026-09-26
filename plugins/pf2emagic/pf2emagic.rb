@@ -18,7 +18,8 @@ module AresMUSH
       when "prepared"
         return PF2DisplayPreparedCmd
       when "prepare"
-        return PF2PrepareSpellCmd
+        # A switch names a book a feat keeps: prepare/esotericpolymath, prepare/arcaneevolution.
+        return cmd.switch ? PF2PrepareFromBookCmd : PF2PrepareSpellCmd
       when "unprepare"
         return PF2UnprepareSpellCmd
       when "spell"
@@ -27,6 +28,8 @@ module AresMUSH
           return PF2SearchSpellCmd
         when "eligible"
           return PF2SpellEligibleCmd
+        when "learn"
+          return PF2LearnSpellCmd
         when nil
           return PF2DisplaySpellCmd
         end

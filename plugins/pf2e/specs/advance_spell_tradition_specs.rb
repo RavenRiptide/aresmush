@@ -14,7 +14,7 @@ module AresMUSH
         # Entries reads the character off the magic object to merge its stored rows in.
         magic = double(:tradition => held, :character => nil, :innate_spells => [], :spell_abil => {},
                        :spells_per_day => {}, :repertoire => {}, :spellbook => {},
-                       :signature_spells => {}, :restricted_spellbook => {})
+                       :signature_spells => {}, :restricted_spellbook => {}, :daily_pick => {})
         allow(magic).to receive(:tradition=) { |value| allow(magic).to receive(:tradition).and_return(value) }
 
         enactor = double(:magic => magic, :name => 'Someone')
