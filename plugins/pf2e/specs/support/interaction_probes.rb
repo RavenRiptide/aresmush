@@ -30,7 +30,7 @@ module AresMUSH
       end
 
       def martial
-        @party.find { |char| weapon_of(char) } || @party.first
+        standing.find { |char| weapon_of(char) } || @party.first
       end
 
       def weapon_of(char)
@@ -123,18 +123,21 @@ module AresMUSH
           [ found, "a #{wanted.downcase} target is not off-guard: #{defence_rows(holder).inspect[0, 300]}" ]
         end
 
-        archer = @party.find { |char| ranged_of(char) }
+        archer = standing.find { |char| ranged_of(char) }
         if archer
           probe('the third range increment is -4 to the attack') do
             ref, _holder = aim
             type(archer, 'e/reload') if Loading.held(state_of(archer)).any?
-            type(archer, "e/strike #{ref}=#{ranged_of(archer)}/range 3")
+            shot = type(archer, "e/strike #{ref}=#{ranged_of(archer)}/range 3")
+            # A Strike that was refused rolled nothing, and the last roll is someone else's business.
+            next [ false, "refused: #{shot.failures.first}" ] if shot.failures.any?
+
             rows = rows_of((@audit.last_roll(archer.name) || {})['result'])
             [ rows.any? { |row| row['value'].to_i == -4 && row['source'].to_s.include?('range') }, "no -4 range penalty in #{rows.map { |row| [ row['source'], row['value'] ] }.inspect}" ]
           end
         end
 
-        demoralizer = @party.max_by { |char| Pf2eSkills.get_skill_bonus(Character[char.id], 'Intimidation').to_i rescue 0 }
+        demoralizer = (standing.any? ? standing : @party).max_by { |char| Pf2eSkills.get_skill_bonus(Character[char.id], 'Intimidation').to_i rescue 0 }
         probe('Demoralize leaves Frightened by its degree, which then lowers the target\'s DCs') do
           ref, holder = aim
           before = value_of(holder, 'Frightened')
@@ -185,7 +188,7 @@ module AresMUSH
           [ found, "prone target is not off-guard: #{defence_rows(holder).inspect[0, 300]}" ]
         end
 
-        rogue = @party.find { |char| Character[char.id].pf2_base_info['charclass'] == 'Rogue' }
+        rogue = standing.find { |char| Character[char.id].pf2_base_info['charclass'] == 'Rogue' }
         if rogue
           probe('a rogue\'s Strike at an off-guard target adds sneak attack\'s precision damage') do
             ref, _holder = aim
@@ -202,7 +205,7 @@ module AresMUSH
           end
         end
 
-        barbarian = @party.find { |char| Character[char.id].pf2_base_info['charclass'] == 'Barbarian' }
+        barbarian = standing.find { |char| Character[char.id].pf2_base_info['charclass'] == 'Barbarian' }
         if barbarian
           probe('Rage gives temporary hit points and adds its damage to a melee Strike') do
             type(barbarian, 'e/act rage')
@@ -217,7 +220,7 @@ module AresMUSH
         end
 
         # A shield broken in an earlier fight gives nothing raised, and is refused; it is no test.
-        shield = @party.find { |char| state_of(char).shields.to_a.any?(&:equipped) && !ShieldBlock.cannot_raise(state_of(char)) }
+        shield = standing.find { |char| state_of(char).shields.to_a.any?(&:equipped) && !ShieldBlock.cannot_raise(state_of(char)) }
         if shield
           probe('Raise a Shield is +2 circumstance to AC against the next Strike') do
             ref, _holder = aim

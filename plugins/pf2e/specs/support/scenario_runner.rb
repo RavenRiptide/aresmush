@@ -427,6 +427,10 @@ module AresMUSH
         hp_of(char) <= 0 || Pf2e.dead?(state_of(char))
       end
 
+      def standing
+        @party.reject { |char| down?(char) }
+      end
+
       # The GM's correction for a player knocked out: what play at a table would be the cleric's next
       # action, here so that everyone plays every round. The GM is staff, whose fight kills, so the dead
       # are brought back first.

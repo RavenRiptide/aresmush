@@ -36,10 +36,6 @@ module AresMUSH
         @minds ||= Hash.new { |held, id| held[id] = { 'done' => [], 'turns' => 0 } }
       end
 
-      def standing
-        @party.reject { |char| down?(char) }
-      end
-
       def actions_used(row)
         TurnState.turn(Pf2eNpc[row['npc']])['actions'].to_i
       end
