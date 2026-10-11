@@ -427,6 +427,36 @@ module AresMUSH
         end
       end
 
+      # Viper Vine: Captivating Pollen, which it "can't use for 1d4 rounds", without the word again.
+      describe "an ability whose words leave out again" do
+        before(:each) do
+          add('viper vine')
+          next_turn
+        end
+
+        it "should warn the GM who uses it before it is back" do
+          as(2, "act captivating pollen=#{@hero.name}", 0.5)
+          as(2, "act captivating pollen=#{@hero.name}", 0.5)
+
+          expect(heard).to include(t('pf2e.recharge_not_back', :actor => 'Viper Vine #2', :action => 'Captivating Pollen', :round => 4).strip)
+        end
+      end
+
+      # Tarn Linnorm: it "can't use Corrosive Breath or Double Breath again for 1d4 rounds".
+      describe "two abilities that wait together" do
+        before(:each) do
+          add('tarn linnorm')
+          next_turn
+        end
+
+        it "should warn the GM who uses the other before they are back" do
+          as(2, "act corrosive breath=#{@hero.name}", 0.5)
+          as(2, "act double breath=#{@hero.name}", 0.5)
+
+          expect(heard).to include(t('pf2e.recharge_not_back', :actor => 'Tarn Linnorm #2', :action => 'Double Breath', :round => 4).strip)
+        end
+      end
+
       # Dullahan: Frightful Presence, 30 feet, DC 23 Will; Frightened 1, 2 or 4 by the save, and immune for
       # a minute after it whatever was rolled.
       describe "an aura that calls for a save" do

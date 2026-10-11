@@ -24,8 +24,9 @@ module AresMUSH
       #          'alchemy' => [ 'Alchemist's Fire (Lesser)' ] }
       Seat = Struct.new(:charclass, :ancestry, :heritage, :background, :kit, keyword_init: true)
 
-      # What one command did: who typed it, what they typed, what they were told, and anything it raised.
-      Outcome = Struct.new(:who, :text, :said, :failures, :error, keyword_init: true) do
+      # What one command did: who typed it, what they typed, what they and the room were told, and anything
+      # it raised.
+      Outcome = Struct.new(:who, :text, :said, :room, :failures, :error, keyword_init: true) do
         def ok?
           failures.empty? && error.nil?
         end
@@ -112,6 +113,7 @@ module AresMUSH
           (AresMUSH.const_get(plugin).get_cmd_handler(client, cmd, enactor) rescue nil)
         }.find { |found| found }
         error = nil
+        told = @told_room.size
 
         say "  > #{enactor.name}: #{text}"
 
@@ -131,6 +133,7 @@ module AresMUSH
         @lines << "    ** #{error.class}: #{error.message} (#{error.backtrace&.first})" if error
 
         outcome = Outcome.new(:who => enactor.name, :text => text, :said => client.successes + client.oocs,
+                              :room => @told_room[told..],
                               :failures => client.failures.map { |line| clean(line) }, :error => error)
         @outcomes << outcome
         outcome
@@ -147,7 +150,7 @@ module AresMUSH
 
       # A spell lost to a flat check - its caster grabbed, deafened or stupefied - does nothing to read.
       def lost?(outcome)
-        outcome.said.any? { |line| line.to_s.include?('The action is lost') }
+        (outcome.said + outcome.room).any? { |line| line.to_s.include?('The action is lost') }
       end
 
       # ------------------------------------------------------------------------------

@@ -39,7 +39,11 @@ module AresMUSH
 
       # An ability it cannot use every round deals twice the difference: one with a frequency, or one it
       # cannot use again for some rounds.
-      LIMITED = /\bFrequency\b|\bonce per\b|can't use [^.%]{1,60} again for\b/i
+      LIMITED = /\bFrequency\b|\bonce per\b/i
+
+      def self.limited?(ability)
+        ability['text'].to_s.match?(LIMITED) || !Recharge.rounds_of(ability['name'], ability).nil?
+      end
 
       def self.names
         ROWS.keys
@@ -74,7 +78,7 @@ module AresMUSH
           'skills' => block['skills']&.transform_values(&moved),
           'strikes' => block['strikes']&.map { |strike| strike(strike, by) },
           'spellcasting' => block['spellcasting']&.map { |one| one.merge('dc' => moved.call(one['dc']), 'attack' => moved.call(one['attack'])) },
-          'actions' => block['actions']&.map { |ability| ability.merge('text' => words(ability['text'], by)) }
+          'actions' => block['actions']&.map { |ability| ability.merge('text' => words(ability['text'], by, limited?(ability))) }
         ).compact
       end
 
@@ -87,10 +91,10 @@ module AresMUSH
       end
 
       # An ability's words with its DCs and what it deals moved.
-      def self.words(text, by)
+      def self.words(text, by, limited = false)
         return text if text.nil?
 
-        amount = text.match?(LIMITED) ? by * 2 : by
+        amount = limited ? by * 2 : by
 
         # The first of what it deals, as the first of a Strike's damage is.
         text.gsub(DC) { "DC #{$1.to_i + by}" }.sub(self.dealt) { plus($~[:formula], amount) }

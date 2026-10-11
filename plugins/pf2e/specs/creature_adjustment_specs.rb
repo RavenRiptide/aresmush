@@ -20,6 +20,8 @@ module AresMUSH
               'text' => "The creature breathes fire that deals 4d6 fire damage in a 15-foot cone (DC 20 basic Reflex save).%rIt can't use Fire Breath again for 1d4 rounds." },
             { 'name' => 'Tail Sweep', 'type' => 'action', 'cost' => 1,
               'text' => 'Each creature within reach takes 2d6+3 bludgeoning damage with a DC 20 basic Reflex save.' },
+            { 'name' => 'Grave Pollen', 'type' => 'action', 'cost' => 1,
+              'text' => "Each creature in the area takes 3d6 poison damage (DC 20 basic Fortitude save). It can't use Grave Pollen for 1d4 rounds." },
             { 'name' => 'Constrict', 'type' => 'action', 'cost' => 1, 'text' => '(1d8+6) bludgeoning, DC 20 basic Fortitude' },
             { 'name' => 'Burning', 'type' => 'passive',
               'text' => 'Its Strikes deal an extra 1d6 fire damage and 1d4 persistent fire damage, ended by a DC 15 flat check.' }
@@ -77,6 +79,10 @@ module AresMUSH
 
         it "should add four to what an ability deals that it cannot use every round" do
           expect(text_of(elite, 'Fire Breath')).to include('deals 4d6+4 fire damage', 'DC 22 basic Reflex', 'again for 1d4 rounds')
+        end
+
+        it "should add four where the words name the ability without saying again" do
+          expect(text_of(elite, 'Grave Pollen')).to include('takes 3d6+4 poison damage', 'DC 22 basic Fortitude')
         end
 
         it "should add to the first of what an ability deals, and not to each kind of it" do

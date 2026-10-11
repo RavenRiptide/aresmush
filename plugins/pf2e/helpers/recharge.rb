@@ -8,11 +8,37 @@ module AresMUSH
 
       KEY = 'recharge'.freeze
 
-      # `can't use Flame Breath again for 1d4 rounds`
-      def self.rounds_of(name, own)
-        found = own['text'].to_s.match(/can['’]t use #{Regexp.escape(name)} again for (\d*d\d+|\d+) rounds?/i)
+      # The sentence that says so, and what it calls the ability, which a passive one leaves out:
+      #
+      #   can't use Flame Breath again for 1d4 rounds
+      #   can't use this ability again for 1d4 rounds
+      #   can't use Captivating Pollen for 1d4 rounds
+      #   can't be used again for 1d4 rounds
+      WAIT = /can['’]t (?:use (?<what>[^.;%]{1,80}?)|be used)(?<again> again)? for (?<rounds>\d*d\d+|\d+) rounds?/i
 
-        found ? found[1] : nil
+      # The wait an ability's own words give it. One that says `again` is about the ability it is written
+      # in, whatever it calls it; one that does not has to name it, since "can't use reactions for 1 round"
+      # is what the ability does to someone else.
+      def self.wait(name, own)
+        own['text'].to_s.to_enum(:scan, WAIT).map { Regexp.last_match }.find do |found|
+          found[:again] || found[:what].to_s.downcase.include?(name.to_s.downcase)
+        end
+      end
+
+      def self.rounds_of(name, own)
+        found = wait(name, own)
+
+        found ? found[:rounds] : nil
+      end
+
+      # Which of a creature's abilities wait when this one is used: itself, and any other its words name
+      # beside it - a linnorm "can't use Corrosive Breath or Double Breath again".
+      def self.waiting(name, own, abilities)
+        said = wait(name, own)&.[](:what).to_s.gsub(/#{Regexp.escape(name)}/i, '')
+        beside = Array(abilities).map { |one| one['name'].to_s }
+                                 .select { |other| !other.empty? && said.match?(/\b#{Regexp.escape(other)}\b/i) }
+
+        [ name ] + beside
       end
 
       def self.ready(holder)
@@ -32,7 +58,8 @@ module AresMUSH
         out['gm'] << Telling.event('pf2e.recharge_not_back', :actor => scene.actor.label, :action => name, :round => back) if back > now
 
         rolled = Pf2e.roll_formula(rounds)
-        TurnState.write(holder, KEY => ready(holder).merge(name => now + rolled + 1))
+        gone = waiting(name, own, Actors.of(holder).own_abilities).to_h { |one| [ one, now + rolled + 1 ] }
+        TurnState.write(holder, KEY => ready(holder).merge(gone))
         out['gm'] << Telling.event('pf2e.recharge_set', :actor => scene.actor.label, :action => name, :rounds => rolled,
                                                        :round => now + rolled + 1)
       end
