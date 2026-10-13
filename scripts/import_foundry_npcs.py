@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Foundry's bestiaries, as creatures a GM can add to an encounter.
 
-Only creatures Foundry marks as Remaster (`publication.remaster`, the ORC licence) are read: the game
-does not use Legacy, OGL material. Each keeps the book it is from as `source`.
+Only creatures Foundry marks as Remaster and as published under the ORC licence are read
+(`publication.remaster`, `publication.license`): the game does not use Legacy or OGL material, and a few
+books written to the Remaster's rules, Rage of Elements among them, were still published under the OGL.
+Each creature keeps the book it is from as `source`.
 
 Every such `npc` actor in their packs is a full stat block as data: its defences, its Strikes with their
 bonuses and damage, its abilities, its spellcasting. An encounter needs those numbers to resolve an action
@@ -320,6 +322,7 @@ def main():
     by_pack = collections.defaultdict(dict)
     repeated = 0
     legacy = 0
+    ogl = collections.Counter()
     refused = collections.Counter()
     words = rules.strings(args.checkout)
 
@@ -336,10 +339,14 @@ def main():
             continue
 
         # Only what Foundry marks as Remaster: the game plays by the ORC-licensed books, and a creature
-        # from a Legacy one, which Archives of Nethys marks so too, is left out.
+        # from a Legacy one, which Archives of Nethys marks so too, is left out. So is one from a book
+        # that follows the Remaster's rules and was still published under the OGL.
         publication = ((doc['system'].get('details') or {}).get('publication')) or {}
         if not publication.get('remaster'):
             legacy += 1
+            continue
+        if publication.get('license') != 'ORC':
+            ogl[publication.get('title') or '(no book named)'] += 1
             continue
 
         pack = path.split('/')[2]
@@ -366,6 +373,8 @@ def main():
     print('written' if args.write else 'dry run')
     print(f'  {total} creatures in {len(by_pack)} packs; {repeated} repeats of a name already read; '
           f'{legacy} from Legacy books left out')
+    print(f'  {sum(ogl.values())} from Remaster books under the OGL left out: '
+          + ', '.join(f'{many} {title}' for title, many in ogl.most_common()))
     for pack, entries in sorted(by_pack.items(), key=lambda one: -len(one[1]))[:12]:
         print(f'  {len(entries):5d}  {pack}')
 

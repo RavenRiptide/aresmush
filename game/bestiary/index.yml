@@ -2157,10 +2157,6 @@
 "Woolly Wrangler": {"pack": "pathfinder-npc-core", "level": 8, "traits": ["human", "humanoid"]}
 "World Ender": {"pack": "pathfinder-npc-core", "level": 16, "traits": ["human", "humanoid"]}
 "Zealot of Asmodeus": {"pack": "pathfinder-npc-core", "level": 4, "traits": ["human", "humanoid", "unholy"]}
-"Elite Mutant Cryptid Snapdrake": {"pack": "pfs-season-5-bestiary", "level": 10, "traits": ["elemental", "plant", "wood"]}
-"Enraged Shurrizih": {"pack": "pfs-season-5-bestiary", "level": 9, "traits": ["air", "chaotic", "earth", "elemental", "fire", "genie", "metal", "water", "wood"]}
-"Mutant Cryptid Pine Pangolin": {"pack": "pfs-season-5-bestiary", "level": 8, "traits": ["elemental", "plant", "wood"]}
-"Shurrizih": {"pack": "pfs-season-5-bestiary", "level": 7, "traits": ["air", "chaotic", "earth", "elemental", "fire", "genie", "metal", "water", "wood"]}
 "Acid Ooze": {"pack": "pfs-season-6-bestiary", "level": 1, "traits": ["mindless", "ooze"]}
 "Acid Oozelet": {"pack": "pfs-season-6-bestiary", "level": 0, "traits": ["mindless", "ooze"]}
 "Adolescent Kirin": {"pack": "pfs-season-6-bestiary", "level": 3, "traits": ["beast", "fey", "holy"]}
@@ -2504,86 +2500,6 @@
 "Vatumledor": {"pack": "prey-for-death-bestiary", "level": 16, "traits": ["dragon", "occult"]}
 "Vofnir": {"pack": "prey-for-death-bestiary", "level": 12, "traits": ["human", "humanoid"]}
 "Zaiho": {"pack": "prey-for-death-bestiary", "level": 16, "traits": ["human", "humanoid"]}
-"Abysium Horror": {"pack": "rage-of-elements-bestiary", "level": 10, "traits": ["elemental", "metal"]}
-"Anemos": {"pack": "rage-of-elements-bestiary", "level": 18, "traits": ["air", "elemental"]}
-"Ardande Gardener": {"pack": "rage-of-elements-bestiary", "level": 1, "traits": ["ardande", "human", "humanoid"]}
-"Asp of Grief": {"pack": "rage-of-elements-bestiary", "level": 10, "traits": ["beast", "elemental", "metal"]}
-"Austral, The South Wind": {"pack": "rage-of-elements-bestiary", "level": 18, "traits": ["air", "elemental"]}
-"Avalanche Legion": {"pack": "rage-of-elements-bestiary", "level": 11, "traits": ["earth", "elemental", "troop"]}
-"Blustering Gale": {"pack": "rage-of-elements-bestiary", "level": 11, "traits": ["air", "elemental", "troop"]}
-"Boiling Spring": {"pack": "rage-of-elements-bestiary", "level": 13, "traits": ["aquatic", "elemental", "fire", "water"]}
-"Boreal, The North Wind": {"pack": "rage-of-elements-bestiary", "level": 18, "traits": ["air", "elemental"]}
-"Brass Bastion": {"pack": "rage-of-elements-bestiary", "level": 14, "traits": ["construct", "fire", "mindless"]}
-"Brochmaw": {"pack": "rage-of-elements-bestiary", "level": 13, "traits": ["elemental", "fire"]}
-"Capritellix": {"pack": "rage-of-elements-bestiary", "level": 17, "traits": ["elemental", "metal"]}
-"Carved Beast": {"pack": "rage-of-elements-bestiary", "level": 6, "traits": ["elemental", "plant", "wood"]}
-"Coldmire Pond": {"pack": "rage-of-elements-bestiary", "level": 8, "traits": ["aquatic", "elemental", "water"]}
-"Comozant Wyrd": {"pack": "rage-of-elements-bestiary", "level": 5, "traits": ["air", "elemental", "incorporeal"]}
-"Crystal Strider": {"pack": "rage-of-elements-bestiary", "level": 10, "traits": ["earth", "elemental"]}
-"Cullitox": {"pack": "rage-of-elements-bestiary", "level": 3, "traits": ["earth", "elemental"]}
-"Despairing Pall": {"pack": "rage-of-elements-bestiary", "level": 1, "traits": ["air", "elemental"]}
-"Dewdrop Jelly": {"pack": "rage-of-elements-bestiary", "level": 1, "traits": ["aquatic", "elemental", "water"]}
-"Elder Outcrop": {"pack": "rage-of-elements-bestiary", "level": 13, "traits": ["earth", "elemental"]}
-"Elemental Thicket": {"pack": "rage-of-elements-bestiary", "level": 11, "traits": ["elemental", "plant", "wood"]}
-"Eural, The East Wind": {"pack": "rage-of-elements-bestiary", "level": 18, "traits": ["air", "elemental"]}
-"Faydhaan Shuyookh": {"pack": "rage-of-elements-bestiary", "level": 14, "traits": ["elemental", "genie", "water"]}
-"Ferrous Butterfly": {"pack": "rage-of-elements-bestiary", "level": 1, "traits": ["elemental", "metal"]}
-"Gennayn": {"pack": "rage-of-elements-bestiary", "level": 2, "traits": ["elemental", "genie"]}
-"Gluttonous Geode": {"pack": "rage-of-elements-bestiary", "level": 1, "traits": ["earth", "elemental"]}
-"Harvest Regiment": {"pack": "rage-of-elements-bestiary", "level": 8, "traits": ["elemental", "plant", "troop", "wood"]}
-"Ifrit Shuyookh": {"pack": "rage-of-elements-bestiary", "level": 14, "traits": ["elemental", "fire", "genie"]}
-"Jaathoom Shuyookh": {"pack": "rage-of-elements-bestiary", "level": 10, "traits": ["air", "elemental", "genie"]}
-"Jabali Shuyookh": {"pack": "rage-of-elements-bestiary", "level": 12, "traits": ["earth", "elemental", "genie"]}
-"Jann Shuyookh": {"pack": "rage-of-elements-bestiary", "level": 9, "traits": ["air", "earth", "elemental", "fire", "genie", "metal", "water", "wood"]}
-"Kinzaruk": {"pack": "rage-of-elements-bestiary", "level": 3, "traits": ["elemental", "metal"]}
-"Kizidhar": {"pack": "rage-of-elements-bestiary", "level": 6, "traits": ["elemental", "genie", "plant", "wood"]}
-"Kizidhar Shuyookh": {"pack": "rage-of-elements-bestiary", "level": 11, "traits": ["elemental", "genie", "plant", "wood"]}
-"Lava Otter": {"pack": "rage-of-elements-bestiary", "level": 1, "traits": ["elemental", "fire"]}
-"Lithic Locus": {"pack": "rage-of-elements-bestiary", "level": 14, "traits": ["construct", "earth", "elemental", "spirit"]}
-"Living Grove": {"pack": "rage-of-elements-bestiary", "level": 5, "traits": ["elemental", "plant", "wood"]}
-"Living Lodestone": {"pack": "rage-of-elements-bestiary", "level": 6, "traits": ["elemental", "metal"]}
-"Living Magma": {"pack": "rage-of-elements-bestiary", "level": 13, "traits": ["elemental", "fire"]}
-"Lomori Sprout": {"pack": "rage-of-elements-bestiary", "level": 3, "traits": ["aeon", "plant", "wood"]}
-"Melomach": {"pack": "rage-of-elements-bestiary", "level": 13, "traits": ["elemental", "metal"]}
-"Mercurial": {"pack": "rage-of-elements-bestiary", "level": 2, "traits": ["elemental", "metal"]}
-"Metal Wisp": {"pack": "rage-of-elements-bestiary", "level": 0, "traits": ["elemental", "metal"]}
-"Moss Sloth": {"pack": "rage-of-elements-bestiary", "level": 2, "traits": ["elemental", "plant", "wood"]}
-"Munsahir Gatecrasher": {"pack": "rage-of-elements-bestiary", "level": 4, "traits": ["elemental", "fire", "humanoid"]}
-"Munsahir Trooper": {"pack": "rage-of-elements-bestiary", "level": 5, "traits": ["elemental", "fire", "humanoid"]}
-"Murajau": {"pack": "rage-of-elements-bestiary", "level": 5, "traits": ["amphibious", "humanoid"]}
-"Nanoshard Swarm": {"pack": "rage-of-elements-bestiary", "level": 9, "traits": ["elemental", "metal", "swarm"]}
-"Nightwood Guardian": {"pack": "rage-of-elements-bestiary", "level": 9, "traits": ["giant", "troll", "wood"]}
-"Nursery Crawler": {"pack": "rage-of-elements-bestiary", "level": 3, "traits": ["elemental", "plant", "wood"]}
-"Olobigonde": {"pack": "rage-of-elements-bestiary", "level": 2, "traits": ["animal", "aquatic", "elemental", "water"]}
-"Ore Louse": {"pack": "rage-of-elements-bestiary", "level": 5, "traits": ["amphibious", "beast", "water"]}
-"Oregorger": {"pack": "rage-of-elements-bestiary", "level": 11, "traits": ["elemental", "metal"]}
-"Painted Stag": {"pack": "rage-of-elements-bestiary", "level": 9, "traits": ["elemental", "plant", "wood"]}
-"Pelegox Cube": {"pack": "rage-of-elements-bestiary", "level": 11, "traits": ["elemental", "metal", "troop"]}
-"Picture-in-Clouds": {"pack": "rage-of-elements-bestiary", "level": 13, "traits": ["air", "elemental"]}
-"Pine Pangolin": {"pack": "rage-of-elements-bestiary", "level": 7, "traits": ["elemental", "plant", "wood"]}
-"Quickiron Plasm": {"pack": "rage-of-elements-bestiary", "level": 4, "traits": ["elemental", "metal"]}
-"Rakkatak": {"pack": "rage-of-elements-bestiary", "level": 5, "traits": ["elemental", "fire"]}
-"Rust Scarab": {"pack": "rage-of-elements-bestiary", "level": 5, "traits": ["elemental", "metal"]}
-"Saltborn Stalkers": {"pack": "rage-of-elements-bestiary", "level": 13, "traits": ["aquatic", "elemental", "troop", "water"]}
-"Skymetal Striker": {"pack": "rage-of-elements-bestiary", "level": 7, "traits": ["elemental", "metal"]}
-"Snapdrake": {"pack": "rage-of-elements-bestiary", "level": 8, "traits": ["elemental", "plant", "wood"]}
-"Solar Crow": {"pack": "rage-of-elements-bestiary", "level": 10, "traits": ["elemental", "fire"]}
-"Sootsoldiers": {"pack": "rage-of-elements-bestiary", "level": 10, "traits": ["elemental", "fire", "troop"]}
-"Sootsoldiers (The Radiant Host)": {"pack": "rage-of-elements-bestiary", "level": 10, "traits": ["elemental", "fire", "troop"]}
-"Talos Gadgeteer": {"pack": "rage-of-elements-bestiary", "level": 1, "traits": ["human", "humanoid", "talos"]}
-"Tantriog": {"pack": "rage-of-elements-bestiary", "level": 7, "traits": ["amphibious", "elemental", "water"]}
-"Twins of Rowan": {"pack": "rage-of-elements-bestiary", "level": 13, "traits": ["elemental", "plant", "wood"]}
-"Vault Builder": {"pack": "rage-of-elements-bestiary", "level": 23, "traits": ["earth", "elemental"]}
-"Vault Keeper": {"pack": "rage-of-elements-bestiary", "level": 14, "traits": ["earth", "elemental"]}
-"Vegetable Lamb": {"pack": "rage-of-elements-bestiary", "level": 1, "traits": ["elemental", "plant", "wood"]}
-"Veiled Current": {"pack": "rage-of-elements-bestiary", "level": 8, "traits": ["air", "elemental"]}
-"Veldenar": {"pack": "rage-of-elements-bestiary", "level": 11, "traits": ["air", "elemental"]}
-"Whipping Willow": {"pack": "rage-of-elements-bestiary", "level": 4, "traits": ["elemental", "plant", "wood"]}
-"Wood Scamp": {"pack": "rage-of-elements-bestiary", "level": 1, "traits": ["elemental", "plant", "wood"]}
-"Wood Wisp": {"pack": "rage-of-elements-bestiary", "level": 0, "traits": ["elemental", "plant", "wood"]}
-"Zephyr, The West Wind": {"pack": "rage-of-elements-bestiary", "level": 18, "traits": ["air", "elemental"]}
-"Zuhra": {"pack": "rage-of-elements-bestiary", "level": 8, "traits": ["elemental", "genie", "metal"]}
-"Zuhra Shuyookh": {"pack": "rage-of-elements-bestiary", "level": 13, "traits": ["elemental", "genie"]}
 "Abysium Sentinel": {"pack": "revenge-of-the-runelords-bestiary", "level": 18, "traits": ["construct"]}
 "Adamantine Sentinel": {"pack": "revenge-of-the-runelords-bestiary", "level": 15, "traits": ["construct"]}
 "Aethusa": {"pack": "revenge-of-the-runelords-bestiary", "level": 15, "traits": ["human", "humanoid"]}
