@@ -42,7 +42,9 @@ module AresMUSH
         allow(Acting).to receive(:deal).and_wrap_original do |original, scene, whom, rows, out, **opts|
           before = audit_dying(whom.holder)
           result = original.call(scene, whom, rows, out, **opts)
-          audit.safely("hit on #{whom.label}") { audit.hit_dropped(whom.label, before, audit_dying(whom.holder), opts[:critical]) } if before
+          # A blow not meant to kill knocks them out, and leaves them no nearer death.
+          spared = out['lines'].any? { |line| line.is_a?(Hash) && line['key'] == 'pf2e.act_knocked_out' }
+          audit.safely("hit on #{whom.label}") { audit.hit_dropped(whom.label, before, audit_dying(whom.holder), opts[:critical]) } if before && !spared
           result
         end
 

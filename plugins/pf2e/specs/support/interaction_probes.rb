@@ -30,7 +30,7 @@ module AresMUSH
       end
 
       def martial
-        standing.find { |char| weapon_of(char) } || @party.first
+        able.find { |char| weapon_of(char) } || @party.first
       end
 
       def weapon_of(char)
@@ -123,7 +123,7 @@ module AresMUSH
           [ found, "a #{wanted.downcase} target is not off-guard: #{defence_rows(holder).inspect[0, 300]}" ]
         end
 
-        archer = standing.find { |char| ranged_of(char) }
+        archer = able.find { |char| ranged_of(char) }
         if archer
           probe('the third range increment is -4 to the attack') do
             ref, _holder = aim
@@ -137,7 +137,7 @@ module AresMUSH
           end
         end
 
-        demoralizer = (standing.any? ? standing : @party).max_by { |char| Pf2eSkills.get_skill_bonus(Character[char.id], 'Intimidation').to_i rescue 0 }
+        demoralizer = (able.any? ? able : @party).max_by { |char| Pf2eSkills.get_skill_bonus(Character[char.id], 'Intimidation').to_i rescue 0 }
         probe('Demoralize leaves Frightened by its degree, which then lowers the target\'s DCs') do
           ref, holder = aim
           before = value_of(holder, 'Frightened')
@@ -188,7 +188,7 @@ module AresMUSH
           [ found, "prone target is not off-guard: #{defence_rows(holder).inspect[0, 300]}" ]
         end
 
-        rogue = standing.find { |char| Character[char.id].pf2_base_info['charclass'] == 'Rogue' }
+        rogue = able.find { |char| Character[char.id].pf2_base_info['charclass'] == 'Rogue' }
         if rogue
           probe('a rogue\'s Strike at an off-guard target adds sneak attack\'s precision damage') do
             ref, _holder = aim
@@ -205,7 +205,7 @@ module AresMUSH
           end
         end
 
-        barbarian = standing.find { |char| Character[char.id].pf2_base_info['charclass'] == 'Barbarian' }
+        barbarian = able.find { |char| Character[char.id].pf2_base_info['charclass'] == 'Barbarian' }
         if barbarian
           probe('Rage gives temporary hit points and adds its damage to a melee Strike') do
             type(barbarian, 'e/act rage')
@@ -220,7 +220,7 @@ module AresMUSH
         end
 
         # A shield broken in an earlier fight gives nothing raised, and is refused; it is no test.
-        shield = standing.find { |char| state_of(char).shields.to_a.any?(&:equipped) && !ShieldBlock.cannot_raise(state_of(char)) }
+        shield = able.find { |char| state_of(char).shields.to_a.any?(&:equipped) && !ShieldBlock.cannot_raise(state_of(char)) }
         if shield
           probe('Raise a Shield is +2 circumstance to AC against the next Strike') do
             ref, _holder = aim
@@ -252,7 +252,7 @@ module AresMUSH
 
         # A GM trusted to gives a potion out; under any other, whoever still carries one spends it.
         type(@gm, "e/loot #{helper.name}=Healing Potion (Minor)") if Character[@gm.id].has_permission?('trusted_gm')
-        helper = ([ helper ] + @party - [ healed ]).find { |char| carries.call(char) && !down?(char) }
+        helper = ([ helper ] + @party - [ healed ]).find { |char| carries.call(char) && able.include?(char) }
 
         if helper
           probe('a potion given to a dying ally ends their dying, and leaves them wounded and awake') do

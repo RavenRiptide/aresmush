@@ -431,6 +431,15 @@ module AresMUSH
         @party.reject { |char| down?(char) }
       end
 
+      # Those of the party who can act: standing, and neither unconscious, paralyzed nor petrified.
+      def able
+        standing.reject do |char|
+          state = state_of(char)
+
+          state && (Pf2e.held_conditions(state).keys & ActsInEncounter::HELPLESS).any?
+        end
+      end
+
       # The GM's correction for a player knocked out: what play at a table would be the cleric's next
       # action, here so that everyone plays every round. The GM is staff, whose fight kills, so the dead
       # are brought back first.
