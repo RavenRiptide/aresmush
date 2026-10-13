@@ -121,11 +121,22 @@ module AresMUSH
           expect(heard).to include('spends a Hero Point to roll again a check that rolled 1', '- hit')
           expect(points).to eq 0
           expect(History.entries(encounter).size).to eq entries
-          expect(History.latest(encounter).heroes).to eq [ @hero.name ]
+          expect(History.latest(encounter).hero_spent).to eq(@hero.name => 1)
 
           @client.said.clear
           run(PF2EncounterHistoryCmd, 'e/history')
           expect(heard).to include(t('pf2e.hero_history', :names => @hero.name))
+        end
+
+        it "should come back when the GM takes the Strike back, and be spent again when they put it back" do
+          hero_types('hero/reroll', FightBench::HIGH)
+
+          run(PF2EncounterUndoCmd, 'e/undo')
+          expect(points).to eq 1
+          expect(heard).to include(t('pf2e.hero_returned', :list => "#{@hero.name} 1"))
+
+          run(PF2EncounterUndoCmd, 'e/redo')
+          expect(points).to eq 0
         end
 
         it "should be one Strike made, and not two" do
@@ -334,11 +345,12 @@ module AresMUSH
           expect(Pf2e.condition_level(hero, 'Dying')).to eq 0
         end
 
-        it "should be something the GM can take back" do
+        it "should be something the GM can take back, with every point it cost" do
           hero_types('hero/survive')
           run(PF2EncounterUndoCmd, 'e/undo')
 
           expect(Pf2e.condition_level(hero, 'Dying')).to eq 2
+          expect(points).to eq 2
         end
 
         it "should be for someone in an encounter here, where dying happens" do

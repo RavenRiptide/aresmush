@@ -129,6 +129,20 @@ module AresMUSH
         Ok.new(:state => have - count)
       end
 
+      # The Hero Points spent in a change, by name, given back as it is taken back, or spent again as it
+      # is put back. Answers each as `"Aria 2"`: who, and what they hold now.
+      def self.moved!(scene, spent, back)
+        rows = (spent || {}).filter_map do |name, count|
+          char = Character.find_one_by_name(name)
+
+          char ? [ char, (held(scene, char) + (back ? count.to_i : -count.to_i)).clamp(0, most) ] : nil
+        end
+
+        write!(scene, rows.to_h { |char, now| [ char.id, now ] }) if rows.any?
+
+        rows.map { |char, now| "#{char.name} #{now}" }
+      end
+
       # One back, for a spend that came to nothing.
       def self.refund!(scene, char)
         write!(scene, char.id => [ held(scene, char) + 1, most ].min)
@@ -168,10 +182,11 @@ module AresMUSH
 
       # Someone dying, or dead in the encounter they stand in, spends every Hero Point they hold - at
       # least one - not to die: no longer dying, unconscious with no Hit Points, and no more wounded
-      # than they were.
+      # than they were. Answers how many it cost.
       def self.survive!(scene, char, holder)
         return Err.new(:hero_not_dying, 'pf2e.hero_not_dying') unless dying?(holder)
 
+        cost = held(scene, char)
         spent = spend!(scene, char, :all)
 
         return spent if spent.err?
@@ -180,7 +195,7 @@ module AresMUSH
         Pf2e.remove_condition(holder, 'Dying', true)
         Pf2e.set_condition(holder, 'Unconscious', nil, 'granted_by' => Pf2eHP::NO_HIT_POINTS)
 
-        Ok.new(:state => 0)
+        Ok.new(:state => cost)
       end
     end
   end

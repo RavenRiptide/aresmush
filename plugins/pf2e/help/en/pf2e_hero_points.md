@@ -36,7 +36,8 @@ Spend it before the scene moves on. Once someone else has acted, the moment has 
 Point is refused and kept; the GM can still take the fight back with `+e/undo`. It is also refused and
 kept while the GM whose action it was is working in another encounter.
 
-A Hero Point spent stays spent if the GM then takes the change back with `+e/undo`: the GM can award one.
+If the GM takes back with `+e/undo` a change you spent a Hero Point in, you have it back, and `+e/redo`
+spends it again. The same goes for `hero/survive`.
 
 ## Not dying
 

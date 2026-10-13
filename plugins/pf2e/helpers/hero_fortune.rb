@@ -106,7 +106,7 @@ module AresMUSH
       # another would have it made again there.
       def self.fought_again(char, entry, face)
         encounter = PF2Encounter[entry.encounter_id]
-        kept = %i{seq said before after dice heroes created_at}.to_h { |field| [ field, entry.public_send(field) ] }
+        kept = %i{seq said before after dice hero_spent created_at}.to_h { |field| [ field, entry.public_send(field) ] }
         command = command_of(entry.said)
 
         return Err.new(:hero_no_replay, 'pf2e.hero_no_replay') unless
@@ -132,7 +132,8 @@ module AresMUSH
         end
 
         # The change is the one it was, made when it was: only its dice are new.
-        again.update(:heroes => Array(kept[:heroes]) + [ char.name ], :created_at => kept[:created_at])
+        spent = kept[:hero_spent] || {}
+        again.update(:hero_spent => spent.merge(char.name => spent[char.name].to_i + 1), :created_at => kept[:created_at])
 
         Ok.new(:state => Array(again.dice).select { |row| row['who'] == char.name && row['hero'] }.last)
       end

@@ -683,6 +683,8 @@ en:
     hero_sheet_no_scene: "none outside a scene"
     hero_history: " (Hero Point: %{names})"
     hero_would_save: "%b%b%{name} holds %{count} Hero Points: hero/survive spends them all to stop dying."
+    hero_returned: "Hero Points given back: %{list}."
+    hero_respent: "Hero Points spent again: %{list}."
     hero_no_scene: "Hero Points are a scene's, and there is no scene here."
     hero_held: "You hold %{count} of %{most} Hero Points in this scene."
     hero_party: "The party's Hero Points: %{list}."

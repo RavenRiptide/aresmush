@@ -119,9 +119,14 @@ module AresMUSH
 
         saved = nil
 
-        History.recording(encounter, "#{enactor.name}: #{cmd.raw}") { saved = HeroPoints.survive!(scene, enactor, holder) }
+        said = "#{enactor.name}: #{cmd.raw}"
+        History.recording(encounter, said) { saved = HeroPoints.survive!(scene, enactor, holder) }
 
         return if CharState.emit_error!(client, saved)
+
+        # What it cost is kept with the change, so the GM taking it back gives the points back.
+        made = History.latest(encounter)
+        made.update(:hero_spent => { enactor.name => saved.state }) if made && made.said == said
 
         tell_scene t('pf2e.hero_survives', :name => enactor.name)
       end

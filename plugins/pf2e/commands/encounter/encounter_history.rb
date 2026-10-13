@@ -23,6 +23,10 @@ module AresMUSH
         message = t(undoing ? 'pf2e.history_undone' : 'pf2e.history_redone', :name => enactor.name,
                                                                              :said => done.state.said)
 
+        # The Hero Points spent in a change go back with it, and are spent again when it is put back.
+        moved = encounter.scene ? HeroPoints.moved!(encounter.scene, done.state.hero_spent, undoing) : []
+        message += "%r#{t(undoing ? 'pf2e.hero_returned' : 'pf2e.hero_respent', :list => moved.join(', '))}" if moved.any?
+
         enactor_room.emit_ooc message
         PF2Encounter.send_to_encounter(encounter, message)
         Scenes.add_to_scene(encounter.scene, message, Game.master.system_character, false, true) if encounter.scene
@@ -46,7 +50,7 @@ module AresMUSH
 
         at = History.at(encounter)
         lines = History.entries(encounter).map do |entry|
-          spent = Array(entry.heroes).empty? ? '' : t('pf2e.hero_history', :names => entry.heroes.join(', '))
+          spent = (entry.hero_spent || {}).empty? ? '' : t('pf2e.hero_history', :names => entry.hero_spent.keys.join(', '))
 
           "#{entry.seq == at ? '%xh>%xn' : ' '} #{entry.seq.to_s.rjust(3)}  #{entry.seq > at ? '%xx' : ''}#{entry.said}#{spent}%xn"
         end
