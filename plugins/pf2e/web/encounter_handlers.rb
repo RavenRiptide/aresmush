@@ -9,11 +9,13 @@ module AresMUSH
         AnsiFormatter.strip_ansi(MushFormatter.format(text.to_s)).gsub(/\r?\n/, "\n")
       end
 
-      # Every change in the encounter, with whether it has been taken back.
+      # Every change in the encounter, with whether it has been taken back and who spent a Hero Point in it.
       def self.history(encounter)
         at = History.at(encounter)
 
-        History.entries(encounter).map { |entry| { seq: entry.seq, said: entry.said, undone: entry.seq > at } }
+        History.entries(encounter).map do |entry|
+          { seq: entry.seq, said: entry.said, undone: entry.seq > at, heroes: (entry.hero_spent || {}).keys }
+        end
       end
 
       def self.combatant(encounter, one, viewer, gm)
@@ -24,7 +26,7 @@ module AresMUSH
           conditions: holder ? Pf2e.condition_labels(holder, false) : [],
           effects: holder ? ActiveEffects.on(holder).map { |effect| "#{effect.name} (#{plain(ActiveEffects.remaining(effect))})" } : [],
           cover: (encounter.cover || {})[number], concealment: (encounter.concealment || {})[number],
-          hp: hit_points_seen(holder, viewer, gm),
+          hp: hit_points_seen(holder, viewer, gm), hero_points: hero_points_seen(encounter, holder, viewer, gm),
           turn: holder ? plain(TurnState.summary(holder)) : nil }
       end
 
@@ -36,6 +38,16 @@ module AresMUSH
         return nil if Actors.of(holder).creature? || viewer.nil?
 
         Sheet.viewable?(viewer, holder, 'combat').ok? ? Harm.hit_points(holder) : nil
+      end
+
+      # A character's Hero Points in the encounter's scene, for whoever may see their hit points.
+      def self.hero_points_seen(encounter, holder, viewer, gm)
+        scene = encounter.scene
+
+        return nil unless holder && scene && !Actors.of(holder).creature?
+        return nil unless gm || (viewer && Sheet.viewable?(viewer, holder, 'combat').ok?)
+
+        HeroPoints.held(scene, HeroPoints.character(holder))
       end
     end
 
