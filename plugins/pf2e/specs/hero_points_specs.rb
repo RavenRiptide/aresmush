@@ -234,6 +234,29 @@ module AresMUSH
           expect(History.latest(encounter).dice).to eq @dice_before
         end
 
+        it "should leave the change made when it was, so a roll made since is still their last" do
+          made = Time.now - 3600
+          History.latest(encounter).update(:created_at => made)
+
+          hero_types('hero/reroll', FightBench::HIGH)
+
+          expect(History.latest(encounter).created_at.to_i).to eq made.to_i
+        end
+
+        it "should leave what the GM took back after it there to put back, where it comes to nothing" do
+          next_turn
+          run(PF2EncounterUndoCmd, 'e/undo')
+          entries = History.entries(encounter).map { |entry| [ entry.seq, entry.said ] }
+          allow_any_instance_of(PF2EncounterAsCmd).to receive(:on_command)
+
+          hero_types('hero/reroll', FightBench::HIGH)
+
+          expect(refused).to eq [ t('pf2e.hero_no_replay') ]
+          expect(points).to eq 1
+          expect(History.entries(encounter).map { |entry| [ entry.seq, entry.said ] }).to eq entries
+          expect(History.redo(encounter).ok?).to be true
+        end
+
         it "should leave the creature's turn as one use of its breath" do
           used = TurnState.turn(npc)['actions'].to_i
 
