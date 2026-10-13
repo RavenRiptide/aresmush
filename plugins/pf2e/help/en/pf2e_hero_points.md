@@ -33,13 +33,17 @@ the new one happens - the damage, the condition, the action spent - and nobody e
 Outside an encounter it is your last `roll` in the scene.
 
 Spend it before the scene moves on. Once someone else has acted, the moment has passed and the Hero
-Point is refused and kept; the GM can still take the fight back with `+e/undo`.
+Point is refused and kept; the GM can still take the fight back with `+e/undo`. It is also refused and
+kept while the GM whose action it was is working in another encounter.
+
+A Hero Point spent stays spent if the GM then takes the change back with `+e/undo`: the GM can award one.
 
 ## Not dying
 
 `hero/survive` - Spends every Hero Point you hold, and at least one. You stop dying: unconscious with no
-Hit Points, and no more wounded than you were. You can do this while you are dying, and after a
-worsening has killed you, for as long as that encounter runs. The room is reminded when it would save you.
+Hit Points, and no more wounded than you were. You can do this in an encounter while you are dying, and
+after a worsening has killed you, for as long as that encounter runs. The room is reminded when it would
+save you.
 
 ## Getting more
 

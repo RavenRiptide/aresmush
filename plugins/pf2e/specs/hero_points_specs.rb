@@ -223,6 +223,17 @@ module AresMUSH
           expect(Pf2eHP.get_max_hp(hero) - hero_hp).to be < @burned
         end
 
+        it "should be refused while its GM is working in another encounter, and cost nothing" do
+          allow(Combatants).to receive(:encounter_here).and_call_original
+          allow(Combatants).to receive(:encounter_here).with(satisfy { |who| who.name == @gm.name }).and_return(nil)
+
+          hero_types('hero/reroll', FightBench::HIGH)
+
+          expect(refused).to eq [ t('pf2e.hero_no_replay') ]
+          expect(points).to eq 1
+          expect(History.latest(encounter).dice).to eq @dice_before
+        end
+
         it "should leave the creature's turn as one use of its breath" do
           used = TurnState.turn(npc)['actions'].to_i
 
@@ -305,6 +316,16 @@ module AresMUSH
           run(PF2EncounterUndoCmd, 'e/undo')
 
           expect(Pf2e.condition_level(hero, 'Dying')).to eq 2
+        end
+
+        it "should be for someone in an encounter here, where dying happens" do
+          Character[@hero.id].update(:pf2_is_dead => true)
+          allow(Combatants).to receive(:encounter_here).and_return(nil)
+
+          hero_types('hero/survive')
+
+          expect(refused).to eq [ t('pf2e.hero_not_dying') ]
+          expect(Character[@hero.id].pf2_is_dead).to be true
         end
 
         it "should be refused to someone who is not dying, or has none" do

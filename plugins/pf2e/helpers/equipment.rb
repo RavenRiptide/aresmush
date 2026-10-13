@@ -7,13 +7,13 @@ module AresMUSH
     # Everything in the encounter - their sheet there, their Strikes and AC, what they use - reads and
     # changes the copy, so what they buy or sell outside meanwhile is no part of it. A character carrying on
     # from an earlier encounter carries that one's copy on. When the encounter ends, what they used up of
-    # their own consumables comes off their own inventory, and their money and anything that lasts no longer
-    # than the encounter stay with it.
+    # their own consumables comes off their own inventory, and their money and anything made to last only a
+    # while stay with it.
     #
     # An item that something made rather than the character owning it says so: `granted_by` what made it,
     # and `expires` when it goes - `encounter` for what the encounter gave out, `rest` for what lasts until
-    # the next daily preparations, nothing for what they keep. An alchemist's preparations and ammunition
-    # will be made this way; see `docs/plans/2026-09-22-made-and-granted-items.md`.
+    # the next daily preparations, `turn` until its maker's next turn, nothing for what they keep. An
+    # alchemist's preparations are made this way; see `docs/plans/2026-09-22-made-and-granted-items.md`.
     module Equipment
 
       # The kinds of item, by the collection a holder keeps each in. Bags first, so an item in one can be
@@ -92,17 +92,17 @@ module AresMUSH
         state.update(:pf2_money => from.pf2_money.to_i, :consumables_at_start => started_with(state))
       end
 
-      # The encounter has ended: what it did to the character's own consumables happens to them. What it
-      # gave out was the encounter's, and goes no further. Answers what it could not do - an item they no
-      # longer have - as events, for whoever tells it.
-      # What of the copy becomes the character's own when the encounter ends: anything it made that outlasts
-      # it. What it gave out for the encounter alone goes with it.
+      # What of the copy becomes the character's own when the encounter ends: what it gave them to keep.
+      # Anything made to last a while - for the encounter, the day or a turn - is the encounter's and goes
+      # with it: whoever joins another fresh joins rested, and the day's preparations are made again.
       def self.kept(state)
         kinds.flat_map do |collection, model|
-          state.public_send(collection).to_a.reject(&:copied_from).reject { |one| one.expires == 'encounter' }
-               .map { |one| [ model, one ] }
+          state.public_send(collection).to_a.reject(&:copied_from).reject(&:expires).map { |one| [ model, one ] }
         end
       end
+
+      # The encounter has ended: what it did to the character's own consumables happens to them. Answers
+      # what it could not do - an item they no longer have - as events, for whoever tells it.
 
       def self.settle!(state)
         char = state.character

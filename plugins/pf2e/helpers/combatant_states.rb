@@ -40,6 +40,8 @@ module AresMUSH
         state.update(:focus_current => pool, :pf2_reagents => char.pf2_reagents || {})
         Pf2emagic.generate_spells_today(state) if char.magic
         Equipment.copy!(state, char)
+        # Rested: anything an earlier day made is gone before this day's is made.
+        %w{turn rest}.each { |lasting| Equipment.lapse!(state, lasting) }
         Pf2e.daily_refresh_reagents(state)
         Alchemy.at_rest!(state)
         Paths.apply_all!(state)

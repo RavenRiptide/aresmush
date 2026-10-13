@@ -72,7 +72,8 @@ module AresMUSH
         row = if replay && again?(replay, row)
                 row.merge('faces' => replay['face'] ? [ replay['face'] ] : yield, 'hero' => true)
               else
-                row.merge('faces' => was && was['faces'].size == row['n'] ? was['faces'] : yield)
+                # A die that falls as it did keeps that a Hero Point was once spent on it.
+                was && was['faces'].size == row['n'] ? row.merge(was.slice('faces', 'hero')) : row.merge('faces' => yield)
               end
 
         Thread.current[RECORDING] << row if Thread.current[RECORDING]
@@ -88,6 +89,11 @@ module AresMUSH
         replay['seen'] += 1
 
         at == replay['swap']
+      end
+
+      # Whether a Hero Point was spent on any check of `who`'s in a tape.
+      def self.hero?(tape, who)
+        Array(tape).any? { |row| row['who'] == who && row['hero'] }
       end
 
       # The last check `who` made in a tape, if they made one.

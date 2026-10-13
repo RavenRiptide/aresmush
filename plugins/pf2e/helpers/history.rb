@@ -111,9 +111,9 @@ module AresMUSH
         return yield if encounter.nil? || !encounter.is_active || Thread.current[KEY]
 
         Thread.current[KEY] = true
-        before = snapshot(encounter)
 
         begin
+          before = snapshot(encounter)
           dice = DiceTape.recording { yield }
         ensure
           Thread.current[KEY] = nil

@@ -93,16 +93,17 @@ module AresMUSH
         expect(standing.consumables.to_a.map(&:name)).to include('Elixir of Life')
       end
 
-      # What a rest makes - an alchemist's preparations - lasts the day, so it leaves the encounter with them.
-      it "should give them what it made that outlasts it, until their next preparations" do
+      # What a rest or a turn makes - an alchemist's preparations, Quick Alchemy - is the encounter's too:
+      # whoever joins the next one fresh joins rested, and makes the day's again.
+      it "should keep to the encounter what was made to last a day or a turn" do
         PF2Consumable.create(:name => "Alchemist's Fire (Lesser)", :quantity => 2, :state => standing,
                              :granted_by => 'advanced alchemy', :expires => 'rest')
+        PF2Consumable.create(:name => 'Acid Flask (Lesser)', :quantity => 1, :state => standing,
+                             :granted_by => 'quick alchemy', :expires => 'turn')
 
         finish
 
-        kept = PF2Consumable.find(:character_id => @hero.id).to_a.find { |one| one.expires == 'rest' }
-        expect(kept&.name).to eq "Alchemist's Fire (Lesser)"
-        expect(kept.granted_by).to eq 'advanced alchemy'
+        expect(PF2Consumable.find(:character_id => @hero.id).map(&:name)).to eq [ 'Minor Healing Potion' ]
       end
 
       it "should let what a day's preparations made lapse at the next rest" do

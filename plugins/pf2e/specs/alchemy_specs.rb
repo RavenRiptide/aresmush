@@ -214,6 +214,34 @@ module AresMUSH
           expect([ Alchemy.batches(joined), Alchemy.left(joined) ]).to eq [ 5, 5 ]
         end
 
+        it "should leave on their sheet nothing of what it made, however many encounters they join" do
+          prepare
+
+          3.times do
+            later = PF2Encounter.create(:organizer => 'GM', :round => 1, :is_active => true)
+            Combatants.join(PF2Encounter[later.id], @char.name, 10, :holder => Character[@char.id])
+            state = CombatantStates.of(PF2Encounter[later.id], Character[@char.id])
+
+            expect(state.consumables.to_a.map(&:quantity)).to eq [ 2 ]
+
+            Encounters::Ending.end!(PF2Encounter[later.id])
+            PF2Encounter[later.id].delete
+          end
+
+          expect(PF2Consumable.find(:character_id => @char.id).to_a).to eq []
+        end
+
+        it "should clear from their sheet what an earlier day's preparations left there" do
+          stale = PF2Consumable.create(:name => "Alchemist's Fire (Lesser)", :quantity => 2, :character => @char,
+                                       :granted_by => 'advanced alchemy', :expires => 'rest')
+
+          state = joined
+          expect(state.consumables.to_a).to eq []
+
+          Encounters::Ending.end!(PF2Encounter[@other.id])
+          expect(PF2Consumable[stale.id]).to be_nil
+        end
+
         it "should start them with what they prepared, made of those reagents" do
           prepare
 

@@ -111,12 +111,15 @@ module AresMUSH
       include CommandHandler
       include HeroCommand
 
+      # Dying happens in an encounter, so it is someone standing in the one here who is saved.
       def handle
-        holder = standing || enactor
-        found = encounter
+        holder = standing
+
+        return client.emit_failure(t('pf2e.hero_not_dying')) unless holder
+
         saved = nil
 
-        History.recording(found, "#{enactor.name}: #{cmd.raw}") { saved = HeroPoints.survive!(scene, enactor, holder) }
+        History.recording(encounter, "#{enactor.name}: #{cmd.raw}") { saved = HeroPoints.survive!(scene, enactor, holder) }
 
         return if CharState.emit_error!(client, saved)
 

@@ -58,11 +58,14 @@ module AresMUSH
         { 'die' => natural, 'dice' => dice, 'kept' => keep, 'substitution' => nil, 'face' => natural }
       end
 
-      # Whose roll it is, by name, for the record of the dice.
+      # Whose roll it is, by name, for the record of the dice. A creature's is marked as one, so it is
+      # never taken for a character's of the same name.
       def self.roller(checks)
         char = checks.map { |check| check.respond_to?(:char) ? check.char : nil }.compact.first
 
-        char.respond_to?(:name) ? char.name : nil
+        return nil unless char.respond_to?(:name)
+
+        Actors.of(char).creature? ? "creature:#{char.name}" : char.name
       end
 
       # Fortune or misfortune on a roll, from the checks in it: one of each cancels.

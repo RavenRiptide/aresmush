@@ -53,7 +53,7 @@ module AresMUSH
         plain = rolled ? DiceTape.last_check(rolled['dice'], char.name) : nil
 
         found = if fought && plain
-                  entry.created_at.to_f >= rolled['at'].to_f ? { 'row' => fought, 'entry' => entry } : { 'row' => plain, 'roll' => rolled }
+                  entry.created_at.to_f >= rolled['at'].to_i ? { 'row' => fought, 'entry' => entry } : { 'row' => plain, 'roll' => rolled }
                 elsif fought then { 'row' => fought, 'entry' => entry }
                 elsif plain then { 'row' => plain, 'roll' => rolled }
                 end
@@ -101,13 +101,16 @@ module AresMUSH
       end
 
       # In an encounter: the change is taken back and made again. If that comes to nothing - the command
-      # is refused now, or never reaches their check - the encounter is put back as it was.
+      # is refused now, or never reaches their check - the encounter is put back as it was. Whoever
+      # typed the command has to be where it would still be about this encounter: a GM who has turned to
+      # another would have it made again there.
       def self.fought_again(char, entry, face)
         encounter = PF2Encounter[entry.encounter_id]
-        kept = %i{seq said before after dice heroes}.to_h { |field| [ field, entry.public_send(field) ] }
+        kept = %i{seq said before after dice heroes created_at}.to_h { |field| [ field, entry.public_send(field) ] }
         command = command_of(entry.said)
 
-        return Err.new(:hero_no_replay, 'pf2e.hero_no_replay') unless command
+        return Err.new(:hero_no_replay, 'pf2e.hero_no_replay') unless
+          command && Combatants.encounter_here(command.enactor)&.id == encounter.id
 
         undone = History.undo(encounter)
 
@@ -120,23 +123,28 @@ module AresMUSH
         end
 
         made = History.latest(PF2Encounter[encounter.id])
-        row = made && made.seq == kept[:seq] ? DiceTape.last_check(made.dice, char.name) : nil
+        again = made && made.seq == kept[:seq] && made.id != entry.id ? made : nil
 
-        unless row && row['hero']
-          put_back(encounter, kept)
+        unless again && DiceTape.hero?(again.dice, char.name) && !DiceTape.hero?(kept[:dice], char.name)
+          put_back(encounter, kept, again)
 
           return Err.new(:hero_no_replay, 'pf2e.hero_no_replay')
         end
 
-        made.update(:heroes => Array(kept[:heroes]) + [ char.name ])
+        # The change is the one it was, made when it was: only its dice are new.
+        again.update(:heroes => Array(kept[:heroes]) + [ char.name ], :created_at => kept[:created_at])
 
-        Ok.new(:state => row)
+        Ok.new(:state => Array(again.dice).select { |row| row['who'] == char.name && row['hero'] }.last)
       end
 
-      # The encounter and its history as an entry left them.
-      def self.put_back(encounter, kept)
+      # The encounter and its history as an entry left them. Where making it again wrote nothing, the
+      # entry is still there to be put back, and so is anything taken back after it; where it wrote
+      # something else in its place, the entry is written again.
+      def self.put_back(encounter, kept, written)
+        return History.redo(encounter) unless written
+
         History.restore(encounter, kept[:after])
-        History.entries(encounter).select { |one| one.seq >= kept[:seq] }.each(&:delete)
+        written.delete
         Pf2eEncounterEntry.create(kept.merge(:encounter => encounter))
         PF2Encounter[encounter.id].update(:history_at => kept[:seq])
       end
@@ -151,7 +159,12 @@ module AresMUSH
 
         row = DiceTape.last_check((Character[char.id].pf2_last_check || {})['dice'], char.name)
 
-        row && row['hero'] ? Ok.new(:state => row) : Err.new(:hero_no_replay, 'pf2e.hero_no_replay')
+        return Err.new(:hero_no_replay, 'pf2e.hero_no_replay') unless row && row['hero']
+
+        # The roll is the one it was, made when it was.
+        Character[char.id].update(:pf2_last_check => Character[char.id].pf2_last_check.merge('at' => roll['at']))
+
+        Ok.new(:state => row)
       end
     end
   end

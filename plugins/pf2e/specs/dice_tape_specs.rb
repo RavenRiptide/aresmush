@@ -38,6 +38,18 @@ module AresMUSH
         expect(breath).to eq [ [ 3, 4 ], 7, 15 ]
       end
 
+      it "should say whether a Hero Point was spent on any check of someone's" do
+        thrown(4, 17, 3)
+        tape = DiceTape.recording { [ check('Aria'), check('Aria'), check('Aria') ] }
+        thrown(9)
+        again = DiceTape.recording { DiceTape.replaying(tape, :who => 'Aria') { [ check('Aria'), check('Aria'), check('Aria'), check('Aria') ] } }
+
+        # Their new result had them roll once more, so the check a Hero Point changed is no longer their last.
+        expect(DiceTape.last_check(again, 'Aria')['hero']).to be_nil
+        expect(DiceTape.hero?(again, 'Aria')).to be true
+        expect(DiceTape.hero?(tape, 'Aria')).to be false
+      end
+
       it "should say which of someone's checks was their last, or that they made none" do
         thrown(3, 4, 7, 15)
         tape = DiceTape.recording { breath }
@@ -104,6 +116,17 @@ module AresMUSH
           DiceTape.replaying(tape, :who => 'Aria') { rolled = [ check('Aria'), check('Bren') ] }
 
           expect(rolled).to eq [ 19, 15 ]
+        end
+
+        it "should keep that another check in it had its Hero Point" do
+          thrown(18)
+          once = DiceTape.recording { DiceTape.replaying(@tape, :who => 'Aria') { breath } }
+          thrown(11)
+
+          twice = DiceTape.recording { DiceTape.replaying(once, :who => 'Bren') { breath } }
+
+          expect(twice.map { |row| [ row['who'], row['faces'], row['hero'] ] }).to eq [ [ nil, [ 3, 4 ], nil ], [ 'Aria', [ 18 ], true ],
+                                                                                 [ 'Bren', [ 11 ], true ] ]
         end
 
         it "should leave nothing behind it" do
