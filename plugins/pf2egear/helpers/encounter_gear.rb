@@ -37,6 +37,9 @@ module AresMUSH
         return nil if found.err? || !found.state
         return t('pf2e.consumable_throw_it', :item => found.state.name) if Pf2e::Consumables.bomb?(found.state.name)
 
+        material = Pf2e::Ammunition.material(found.state.name)
+        return t('pf2e.ammunition_shoot_it', :item => found.state.name, :material => material.tr('-', ' ')) if material
+
         encounter = Pf2e::Combatants.encounter_here(enactor)
         whom = self.use_option ? Pf2e::Combatants.resolve(enactor, self.use_option, encounter)
                                : Pf2e::Combatants.find(encounter, enactor.name)

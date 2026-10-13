@@ -741,6 +741,25 @@ pf2e_consumables:
       - alchemical
       - consumable
       - elixir
+  # Ammunition of a precious material, by the piece: GM Core p. 240 prices ten pieces at the base Price of
+  # one weapon of the material and grade (Archives of Nethys, Rules.aspx?ID=3177), so a tenth of that
+  # each. `ammunition.material` is what a shot with one is made of.
+  Cold Iron Ammunition (Low-Grade):
+    bulk: 0
+    level: 2
+    price: 400
+    traits:
+      - consumable
+    ammunition:
+      material: cold iron
+  Silver Ammunition (Low-Grade):
+    bulk: 0
+    level: 2
+    price: 400
+    traits:
+      - consumable
+    ammunition:
+      material: silver
   Comprehension Elixir (Lesser):
     bulk: 0.1
     level: 2

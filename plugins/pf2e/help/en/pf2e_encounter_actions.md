@@ -116,6 +116,11 @@ for as many actions as its reload. It will not shoot again until you have.
 the game cannot see. A creature weak to it takes more, and a resistance that excepts it does not apply:
 `+e/strike #3=longsword/cold iron`.
 
+A bow, a crossbow or a sling always has ordinary ammunition: it is not counted, and nothing sells it.
+Ammunition of a precious material is an item you carry, bought by the piece: `buy consumables=cold iron
+ammunition/10`. Saying the material when you shoot - `+e/strike #3=longbow/cold iron` - shoots one piece,
+which is used up whether or not it hits, and is refused if you carry none.
+
 ## Holding and being held
 
 A creature that grabs you holds you, and `+e/view` says who. While you are held:

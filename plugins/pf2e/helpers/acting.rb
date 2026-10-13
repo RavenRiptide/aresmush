@@ -894,6 +894,9 @@ module AresMUSH
         return attack if attack.is_a?(Err)
         return unloaded(attack) if Loading.unloaded?(scene.actor.holder, attack)
 
+        shooting = Ammunition.for_strike(scene.actor.holder, attack, said['words'])
+        return shooting if shooting.err?
+
         # What has swallowed someone cannot attack them, and is off-guard to them.
         if Holding.inside?(scene.target.holder, scene.actor.label)
           return Err.new(:swallowed, 'pf2e.swallowed_cannot_attack', 'actor' => scene.actor.label, 'target' => scene.target.label)
@@ -942,8 +945,9 @@ module AresMUSH
           splash(scene, attack, check, out)
         end
 
-        # A bomb is thrown whatever it does.
+        # A bomb is thrown whatever it does, and what was shot is shot.
         Consumables.spend!(scene.actor.holder, attack['consumable']) if attack['consumable']
+        Ammunition.shoot!(scene.actor.holder, shooting.state, out)
         Loading.shot(scene.actor.holder, attack)
 
         struck = { 'strike' => attack['name'], 'target' => scene.target.label, 'hit' => rolled['hit'] ? true : false,
