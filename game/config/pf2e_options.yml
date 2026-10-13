@@ -58,6 +58,12 @@ pf2e:
     # answers to `advance` as well.
     advance/font: dfont
   max_level: 20
+  # Hero Points, which are a scene's: what each player character starts a scene with, the most one may
+  # hold, and what one costs in RPP.
+  hero_points:
+    start: 1
+    most: 3
+    rpp_cost: 3
   allowed_alignments:
     - OL
     - BL

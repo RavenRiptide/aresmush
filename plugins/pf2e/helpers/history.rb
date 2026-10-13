@@ -114,13 +114,13 @@ module AresMUSH
         before = snapshot(encounter)
 
         begin
-          yield
+          dice = DiceTape.recording { yield }
         ensure
           Thread.current[KEY] = nil
         end
 
         after = snapshot(encounter)
-        append(encounter, said, before, after) unless before == after
+        append(encounter, said, before, after, dice) unless before == after
       end
 
       def self.entries(encounter)
@@ -131,12 +131,17 @@ module AresMUSH
         PF2Encounter[encounter.id].history_at.to_i
       end
 
-      def self.append(encounter, said, before, after)
+      # The change in effect now: the last one made and not taken back.
+      def self.latest(encounter)
+        entries(encounter).find { |entry| entry.seq == at(encounter) }
+      end
+
+      def self.append(encounter, said, before, after, dice = [])
         applied = at(encounter)
 
         entries(encounter).select { |entry| entry.seq > applied }.each(&:delete)
         Pf2eEncounterEntry.create(:encounter => encounter, :seq => applied + 1, :said => said,
-                                  :before => before, :after => after)
+                                  :before => before, :after => after, :dice => dice)
         PF2Encounter[encounter.id].update(:history_at => applied + 1)
       end
 

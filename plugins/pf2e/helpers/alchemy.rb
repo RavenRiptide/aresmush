@@ -52,7 +52,7 @@ module AresMUSH
       # What the day holds for them. In an encounter that is what their state there has left. Out of one
       # they are rested, so it is what a rest gives, less what their list will take of it.
       def self.day(holder)
-        standing = holder.is_a?(Pf2eCombatantState)
+        standing = !Gm.encounter_of(holder).nil?
         total = standing ? batches(holder) : capacity(holder)
         left = standing ? left(holder) : [ total - batches_for(planned(holder)), 0 ].max
 

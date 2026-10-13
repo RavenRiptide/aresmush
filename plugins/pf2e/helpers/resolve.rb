@@ -50,10 +50,19 @@ module AresMUSH
                    'face' => substitution['value'].to_i }
         end
 
-        dice = keep ? [ Pf2e.roll_dice(1, 20).first, Pf2e.roll_dice(1, 20).first ] : Pf2e.roll_dice(1, 20)
+        dice = DiceTape.for_check(roller(checks), keep) do
+          keep ? [ Pf2e.roll_dice(1, 20).first, Pf2e.roll_dice(1, 20).first ] : Pf2e.roll_dice(1, 20)
+        end
         natural = keep == 'keep-lower' ? dice.min : dice.max
 
         { 'die' => natural, 'dice' => dice, 'kept' => keep, 'substitution' => nil, 'face' => natural }
+      end
+
+      # Whose roll it is, by name, for the record of the dice.
+      def self.roller(checks)
+        char = checks.map { |check| check.respond_to?(:char) ? check.char : nil }.compact.first
+
+        char.respond_to?(:name) ? char.name : nil
       end
 
       # Fortune or misfortune on a roll, from the checks in it: one of each cancels.

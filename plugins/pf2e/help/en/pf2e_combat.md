@@ -29,6 +29,7 @@ a name only one combatant has. Acting in an encounter - actions, Strikes, spells
 `+e/sheet[ <#id or name>][/<section>]`: A character's sheet as they stand in this encounter: their Hit Points, conditions and what they are under, which `sheet` does not show. Sections are those of `sheet`.
 `encounter/view [<encounter ID>]`: View the initiative table for the encounter in question: each combatant's id, initiative, conditions, and the cover and concealment set on them. (Alias `tinit <encounter ID>`)
 `+e/creature <#id>`: A creature's name and conditions. Its stat block and hit points are its GM's to see.
+`hero`, `hero/reroll`, `hero/boost`, `hero/survive`: Your Hero Points in the scene, and spending one to roll your last check again, to add 10 to it, or all of them not to die. See `help hero points`.
 
 ## Encounter commands for plot runners
 
@@ -65,6 +66,7 @@ How far an encounter may go depends on who runs it:
 `encounter/prev`: Moves the initiative backwards one turn. (Alias: `pinit`)
 `encounter/scan`: For the GM: everyone in the encounter as they stand, by id - each character and creature's hit points, AC, Perception, saves and whether they have a Reactive Strike, a creature's level and whether it is elite or weak, and beneath each what they are immune to, weak to and resist. (Alias: `tscan`)
 `+e/level <n>`: Sets the party's level for the encounter's difficulty, which is otherwise the characters' average. `+e/level 0` goes back to the average. `+e/view` shows the difficulty: the threat, from trivial to extreme, and the XP behind it, by GM Core's encounter budget.
+`hero/award [<why>]`: Gives every player character in the scene a Hero Point, up to three. `encounter/scan` shows what each holds.
 `encounter/end <encounter ID>`: Ends an encounter. Trust given for it, the cover and concealment set in it, and what may be used once an encounter all end with it.
 `encounter/restart <encounter ID>`: Restarts an encounter, so long as the scene has not ended.
 

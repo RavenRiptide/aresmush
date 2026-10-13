@@ -72,7 +72,8 @@ module AresMUSH
           "#{figures['reactive'].call(holder) ? 'Y' : 'N'}"
       end
 
-      # `Immune poison; Weak fire 5; Resist cold 5, slashing 5`, or nothing.
+      # `Hero Points 2; Immune poison; Weak fire 5; Resist cold 5, slashing 5`, or nothing. Hero Points are
+      # a player character's, in an encounter that is part of a scene.
       def iwr_line(one)
         held = (one.creature? ? CREATURE : CHARACTER)['iwr'].call(one.holder)
         parts = IWR_WORDS.filter_map do |kind, word|
@@ -80,8 +81,16 @@ module AresMUSH
 
           listed.empty? ? nil : "#{word} #{listed.join(', ')}"
         end
+        parts.unshift(hero_points(one)) if hero_points(one)
 
         parts.empty? ? nil : "%b#{' ' * 4}#{parts.join('; ')}"
+      end
+
+      def hero_points(one)
+        scene = @encounter.scene
+        char = one.creature? ? nil : HeroPoints.character(one.holder)
+
+        scene && char ? t('pf2e.hero_scan', :count => HeroPoints.held(scene, char)) : nil
       end
 
       def signed(value)

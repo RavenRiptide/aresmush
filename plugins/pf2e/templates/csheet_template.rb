@@ -50,6 +50,10 @@ module AresMUSH
         Pf2eHP.display_character_hp(@char)
       end
 
+      def hero_points
+        HeroPoints.shown(@char)
+      end
+
       def temp_hp
         hp = @char.hp
 

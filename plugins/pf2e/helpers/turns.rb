@@ -80,8 +80,11 @@ module AresMUSH
         end
 
         fate = Pf2eHP.now_dying(holder, value, Gm.may_kill?(holder))
-
         told << event(FATES[fate] || 'pf2e.recovery_dying', 'name' => holder.name, 'value' => value)
+
+        hint = value > dying ? HeroPoints.dying_hint(holder) : nil
+
+        hint ? told << event('pf2e.hero_would_save', hint) : told
       end
 
       # What a recovery check that would kill is told as.

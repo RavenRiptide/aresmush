@@ -212,7 +212,8 @@ has made the attack.
 `+e/act sneak=<target>` are your Stealth against its Perception DC, and leave you hidden or undetected
 as the outcome has it.
 `+e/act recall knowledge=<creature>` is against the DC of its level and rarity, with a skill that knows
-its kind unless you name one: `/religion`. The GM answers what the outcome earns.
+its kind unless you name one: `/religion`. The GM answers what the outcome earns, and the game shows you
+nothing of the creature's stat block.
 
 Concealment is set on the target for everyone, where the rules make it a matter of who is looking: a
 creature hidden from one character can be in plain sight of another who has darkvision. When that

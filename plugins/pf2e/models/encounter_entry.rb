@@ -11,6 +11,10 @@ module AresMUSH
     # What was typed, and who typed it: `Aria: +e/strike #3=longsword`.
     attribute :said
 
+    # The dice it rolled, in order (`Pf2e::DiceTape`), and who has spent a Hero Point on a check in it.
+    attribute :dice, :type => DataType::Array, :default => []
+    attribute :heroes, :type => DataType::Array, :default => []
+
     attribute :before, :type => DataType::Hash, :default => {}
     attribute :after, :type => DataType::Hash, :default => {}
 

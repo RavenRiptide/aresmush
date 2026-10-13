@@ -31,6 +31,9 @@ module AresMUSH
     # the turn's counts back as they were.
     attribute :pf2_last_roll, :type => DataType::Array, :default => []
 
+    # Their last `roll`, with its dice, for a Hero Point to roll again: `{ 'scene', 'raw', 'dice', 'at' }`.
+    attribute :pf2_last_check, :type => DataType::Hash, :default => {}
+
     # The encounter a GM's `+e` commands address while they are away from its scene (`+e/focus`).
     attribute :pf2_encounter_focus
 

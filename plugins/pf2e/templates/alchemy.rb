@@ -24,7 +24,7 @@ module AresMUSH
       end
 
       def standing?
-        @holder.is_a?(Pf2eCombatantState)
+        !Gm.encounter_of(@holder).nil?
       end
 
       def reagents

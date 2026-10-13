@@ -46,7 +46,9 @@ module AresMUSH
 
         at = History.at(encounter)
         lines = History.entries(encounter).map do |entry|
-          "#{entry.seq == at ? '%xh>%xn' : ' '} #{entry.seq.to_s.rjust(3)}  #{entry.seq > at ? '%xx' : ''}#{entry.said}%xn"
+          spent = Array(entry.heroes).empty? ? '' : t('pf2e.hero_history', :names => entry.heroes.join(', '))
+
+          "#{entry.seq == at ? '%xh>%xn' : ' '} #{entry.seq.to_s.rjust(3)}  #{entry.seq > at ? '%xx' : ''}#{entry.said}#{spent}%xn"
         end
 
         return client.emit_ooc(t('pf2e.history_empty', :id => encounter.id)) if lines.empty?

@@ -112,6 +112,7 @@ module AresMUSH
 
       # CUSTOM CODE ADD FOR EMBLEM OF EA: a scene's encounters go with it.
       self.encounters.each { |e| e.delete }
+      self.hero_pools.each { |pool| pool.delete }
     end
     
     def all_info_set?

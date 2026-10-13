@@ -35,9 +35,15 @@ module AresMUSH
         end
       end
 
+      # The dice are kept with what was typed, so a Hero Point can roll the check again.
       def handle
+        scene = HeroPoints.scene_of(enactor)
+        roll = nil
+        dice = DiceTape.recording do
+          DiceTape.for_check(enactor.name) { roll = Pf2e.parse_roll_string(enactor, self.mods, Pf2e.circumstances(self.doing)) }
+        end
+        enactor.update(:pf2_last_check => { 'scene' => scene&.id.to_s, 'raw' => cmd.raw, 'dice' => dice, 'at' => Time.now.to_f })
 
-        roll = Pf2e.parse_roll_string(enactor, self.mods, Pf2e.circumstances(self.doing))
         result = roll['result']
         total = roll['total']
 

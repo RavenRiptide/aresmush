@@ -1340,6 +1340,9 @@ module AresMUSH
           return
         end
 
+        hint = HeroPoints.dying_hint(whom.holder)
+        out['lines'] << told('pf2e.hero_would_save', :name => hint['name'], :count => hint['count']) if hint
+
         # The encounter as whoever is telling this holds it, so what is written to it here is not written
         # over by what they write next.
         encounter = held['encounter'] || Gm.encounter_of(whom.holder)&.then { |one| PF2Encounter[one.id] }

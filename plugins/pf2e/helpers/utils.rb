@@ -257,8 +257,14 @@ module AresMUSH
       Check.of(char, Pf2eSkills.lore?(name) ? 'lore' : 'skill', name, options)
     end
 
+    # Every die in the game is rolled here, so one change's dice can be kept and fall the same again
+    # (`DiceTape`).
     def self.roll_dice(amount=1, sides=20)
-      amount.to_i.times.collect { |t| rand(1..sides.to_i) }
+      DiceTape.draw(amount, sides) { throw_dice(amount, sides) }
+    end
+
+    def self.throw_dice(amount, sides)
+      amount.to_i.times.collect { rand(1..sides.to_i) }
     end
 
     def self.character_has?(array, element)

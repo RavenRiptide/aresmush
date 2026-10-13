@@ -347,6 +347,21 @@ module AresMUSH
         end
       when "listxp"
         return PF2ListXPCmd
+      when "hero"
+        case cmd.switch
+        when nil
+          return PF2HeroViewCmd
+        when "award"
+          return PF2HeroAwardCmd
+        when "reroll", "boost"
+          return PF2HeroFortuneCmd
+        when "survive"
+          return PF2HeroSurviveCmd
+        when "buy"
+          return PF2HeroBuyCmd
+        when "give"
+          return PF2HeroGiveCmd
+        end
       when "alchemy"
         case cmd.switch
         when "prepare"
