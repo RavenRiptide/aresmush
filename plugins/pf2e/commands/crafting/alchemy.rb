@@ -1,7 +1,8 @@
 module AresMUSH
   module Pf2e
 
-    # `alchemy` - what an alchemist will make at their next preparations, and what their reagents allow.
+    # `alchemy` - what an alchemist will make at their next preparations, and what their reagents allow:
+    # as they stand in the encounter here, where they are in one.
     class PF2AlchemyViewCmd
       include CommandHandler
 
@@ -17,12 +18,10 @@ module AresMUSH
         return client.emit_failure(t('pf2e.not_found')) unless char
         return client.emit_failure(t('pf2e.alchemy_not_alchemist')) unless Alchemy.alchemist?(char)
 
-        planned = Alchemy.plan(char).map { |name, many| t('pf2e.alchemy_line', :item => name, :many => many) }
-        lines = [ t('pf2e.alchemy_title', :name => char.name, :batches => Alchemy.batches(char),
-                                          :items => Alchemy.batches(char) * Alchemy.per_batch,
-                                          :left => Alchemy.left(char)) ]
+        encounter = Combatants.encounter_here(enactor)
+        holder = (encounter && CombatantStates.of(encounter, char)) || char
 
-        client.emit (lines + (planned.empty? ? [ t('pf2e.alchemy_nothing_planned') ] : planned)).join('%r')
+        client.emit PF2AlchemyTemplate.new(holder, client).render
       end
     end
 

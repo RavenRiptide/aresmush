@@ -61,8 +61,6 @@ module AresMUSH
       it "should price a formula by the level of what it makes, not by the item's price" do
         expect(Crafting.price(1)).to eq 100
         expect(Crafting.price(12)).to eq 10_000
-        expect(Crafting.craft_dc('level' => 3, 'traits' => [])).to eq 18
-        expect(Crafting.craft_dc('level' => 3, 'traits' => [ 'Rare' ])).to eq 23
       end
 
       it "should buy a common formula, taking its price from their money" do
@@ -112,40 +110,6 @@ module AresMUSH
         Crafting.forget!(char, 'consumables', 'Healing Potion (Minor)', :by => 'Staff')
 
         expect(known).to eq []
-      end
-
-      describe "working one out from an item" do
-        before(:each) do
-          @potion = PF2Consumable.create(:name => 'Healing Potion (Minor)', :quantity => 1, :character => @char)
-        end
-
-        after(:each) { PF2Consumable[@potion.id]&.delete }
-
-        it "should refuse an item they do not carry" do
-          run(PF2FormulaReverseCmd, 'formula/reverse consumables=healing potion (lesser)')
-
-          expect(@client.failures.last).to eq t('pf2e.formula_not_held', :item => 'Healing Potion (Lesser)')
-        end
-
-        it "should learn it on a success, paying for the materials" do
-          purse = char.pf2_money
-
-          run(PF2FormulaReverseCmd, 'formula/reverse consumables=healing potion (minor)')
-
-          expect(@client.failures).to eq []
-          expect(known).to eq [ 'Healing Potion (Minor)' ]
-          expect(char.pf2_money).to eq purse - Crafting.price(1)
-        end
-
-        it "should waste half the materials on a critical failure, and teach them nothing" do
-          allow(Pf2e).to receive(:roll_dice).and_return([ 1 ])
-          purse = char.pf2_money
-
-          run(PF2FormulaReverseCmd, 'formula/reverse consumables=healing potion (minor)')
-
-          expect(known).to eq []
-          expect(char.pf2_money).to eq purse - (Crafting.price(1) / 2)
-        end
       end
     end
   end

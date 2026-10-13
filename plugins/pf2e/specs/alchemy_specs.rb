@@ -1,4 +1,5 @@
 require "plugin_test_loader"
+require_relative "support/auto_builder"
 
 module AresMUSH
   module Pf2e
@@ -26,6 +27,7 @@ module AresMUSH
       after(:each) do
         PF2Encounter[@encounter.id]&.delete
         PF2Consumable.find(:character_id => @char.id).each(&:delete)
+        Character[@char.id].combat&.delete
         (@abilities + [ @hp, @char ]).each(&:delete)
       end
 
@@ -134,6 +136,149 @@ module AresMUSH
           3.times { Alchemy.quick!(standing, "alchemist's fire (lesser)") }
 
           expect(Alchemy.quick!(standing, "alchemist's fire (lesser)").code).to eq :no_reagents_left
+        end
+      end
+
+      # What reagents make is its own, beside anything of the same name they already hold: it goes when its
+      # time is up and takes nothing else with it.
+      describe "what is made of reagents, beside what they already hold" do
+        def fires(holder = standing)
+          holder.consumables.to_a.select { |one| one.name == "Alchemist's Fire (Lesser)" }
+        end
+
+        it "should leave what they prepared when what Quick Alchemy made is gone" do
+          prepare
+          Pf2e.rest(standing)
+          Alchemy.quick!(standing, "alchemist's fire (lesser)")
+
+          Turns.turn_started(PF2Encounter[@encounter.id], @char.name, 2)
+
+          expect(fires.map { |one| [ one.quantity, one.expires ] }).to eq [ [ 2, 'rest' ] ]
+        end
+
+        it "should throw what will not last before what will" do
+          combat = Pf2eCombat.create(:character => @char, :weapon_prof => { 'martial' => 'trained' }, :unarmed_attacks => {})
+          @char.update(:combat => combat)
+          prepare
+          Pf2e.rest(standing)
+          Alchemy.quick!(standing, "alchemist's fire (lesser)")
+
+          thrown = Actors.of(standing).attacks.find { |names, _attack| names.include?("Alchemist's Fire (Lesser)") }.last
+          quick = fires.find { |one| one.expires == 'turn' }
+
+          expect(thrown['consumable']).to eq quick.id.to_s
+        end
+
+        describe "when it is something they own" do
+          before(:each) do
+            @own = PF2Consumable.create(:name => "Alchemist's Fire (Lesser)", :quantity => 2, :character => @char)
+            @later = PF2Encounter.create(:organizer => 'GM', :round => 1, :is_active => true)
+            Combatants.join(PF2Encounter[@later.id], @char.name, 10, :holder => Character[@char.id])
+          end
+
+          after(:each) { PF2Encounter[@later.id]&.delete }
+
+          def there
+            CombatantStates.of(PF2Encounter[@later.id], Character[@char.id])
+          end
+
+          it "should leave their own, and take none of it from them when the encounter ends" do
+            Alchemy.quick!(there, "alchemist's fire (lesser)")
+            Turns.turn_started(PF2Encounter[@later.id], @char.name, 2)
+
+            expect(fires(there).map { |one| [ one.quantity, one.expires ] }).to eq [ [ 2, nil ] ]
+
+            Equipment.settle!(there)
+
+            expect(PF2Consumable[@own.id].quantity).to eq 2
+          end
+        end
+      end
+
+      # Someone who joins fresh joins rested, and a rest is when an alchemist's reagents and preparations
+      # are made.
+      describe "joining an encounter fresh" do
+        before(:each) do
+          char.update(:pf2_reagents => {}, :pf2_base_info => { 'charclass' => 'Alchemist' })
+          @other = PF2Encounter.create(:organizer => 'GM', :round => 1, :is_active => true)
+        end
+
+        after(:each) { PF2Encounter[@other.id]&.delete }
+
+        def joined
+          Combatants.join(PF2Encounter[@other.id], @char.name, 10, :holder => Character[@char.id])
+          CombatantStates.of(PF2Encounter[@other.id], Character[@char.id])
+        end
+
+        it "should start an alchemist with the day's reagents, though none were recorded" do
+          expect([ Alchemy.batches(joined), Alchemy.left(joined) ]).to eq [ 5, 5 ]
+        end
+
+        it "should start them with what they prepared, made of those reagents" do
+          prepare
+
+          fire = joined.consumables.to_a.find { |one| one.name == "Alchemist's Fire (Lesser)" }
+          expect([ fire&.quantity, fire&.expires ]).to eq [ 2, 'rest' ]
+          expect(Alchemy.left(joined)).to eq 4
+        end
+      end
+
+      describe "what the day holds" do
+        before(:each) { char.update(:pf2_reagents => {}, :pf2_base_info => { 'charclass' => 'Alchemist' }) }
+
+        it "should be what a rest would give, for someone in no encounter" do
+          expect(Alchemy.day(char)).to eq('batches' => 5, 'items' => 10, 'left' => 5)
+        end
+
+        it "should leave of it what their list will not take" do
+          prepare("alchemist's fire (lesser)", 3)
+
+          expect(Alchemy.day(char)).to eq('batches' => 5, 'items' => 10, 'left' => 3)
+        end
+
+        it "should be what they have left, for someone in an encounter" do
+          Pf2e.rest(standing)
+          Alchemy.quick!(standing, "alchemist's fire (lesser)")
+
+          expect(Alchemy.day(standing)).to eq('batches' => 5, 'items' => 10, 'left' => 4)
+        end
+      end
+
+      describe "the alchemy screen" do
+        before(:each) do
+          char.update(:pf2_reagents => {}, :pf2_base_info => { 'charclass' => 'Alchemist' })
+          @client = AutoBuilder::CaptureClient.new
+        end
+
+        def shown
+          PF2AlchemyViewCmd.new(@client, Command.new('alchemy'), char).on_command
+          @client.successes.join("\n")
+        end
+
+        it "should show an alchemist in no encounter what a rest gives them" do
+          expect(shown).to include('5 batches', '10 items a day', '5 batches left')
+        end
+
+        it "should list what is on their preparations" do
+          prepare
+
+          expect(shown).to include("2 Alchemist's Fire (Lesser)")
+        end
+
+        it "should say so where nothing is on the list" do
+          expect(shown).to include(t('pf2e.alchemy_nothing_planned').strip)
+        end
+
+        it "should show someone in an encounter what they have left and what they made today" do
+          prepare
+          Pf2e.rest(standing)
+          Alchemy.quick!(standing, "alchemist's fire (lesser)")
+
+          screen = PF2AlchemyTemplate.new(standing, @client).render
+
+          expect(screen).to include('5 batches', '3 batches left today',
+                                    t('pf2e.alchemy_made_rest', :item => "Alchemist's Fire (Lesser)", :many => 2),
+                                    t('pf2e.alchemy_made_turn', :item => "Alchemist's Fire (Lesser)", :many => 1))
         end
       end
     end

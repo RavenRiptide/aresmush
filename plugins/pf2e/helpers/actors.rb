@@ -235,7 +235,9 @@ module AresMUSH
           [ [ name ], Pf2eCombat.unarmed_descriptor(name, info, Pf2eCombat.get_unarmed_prof(@holder, name, info), @holder) ]
         end
 
-        bombs = Pf2egear::Inventory.held(@holder, 'consumables').select { |item| Consumables.bomb?(item.name) }.map do |item|
+        # Of two bombs alike, the one that will not last is the one thrown.
+        carried = Equipment.soonest_first(Pf2egear::Inventory.held(@holder, 'consumables'))
+        bombs = carried.select { |item| Consumables.bomb?(item.name) }.map do |item|
           [ [ item.name ], Pf2eCombat.bomb_descriptor(@holder, item) ]
         end
 

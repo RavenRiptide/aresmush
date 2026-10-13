@@ -37,14 +37,6 @@ module AresMUSH
         Ok.new(:state => found)
       end
 
-      # The DC of working on something of this level, and what its rarity adds.
-      def self.craft_dc(info)
-        table = Global.read_config('pf2e_crafting') || {}
-        rarity = Array(info['traits']).map(&:to_s).map(&:downcase).find { |trait| (table['rarity_dc'] || {}).key?(trait) }
-
-        (table['craft_dc'] || {})[info['level'].to_i.clamp(0, 25)].to_i + (table['rarity_dc'] || {})[rarity].to_i
-      end
-
       # Only a common formula is simply bought; anything rarer is the GM's to hand out.
       def self.common?(info)
         (Array(info['traits']).map(&:to_s).map(&:downcase) & %w{uncommon rare unique}).empty?

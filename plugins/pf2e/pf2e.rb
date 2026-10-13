@@ -364,8 +364,6 @@ module AresMUSH
           return PF2FormulaRemoveCmd
         when "buy"
           return PF2FormulaBuyCmd
-        when "reverse"
-          return PF2FormulaReverseCmd
         when nil
           return PF2DisplayFormulasCmd
         end

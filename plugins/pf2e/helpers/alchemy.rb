@@ -44,6 +44,28 @@ module AresMUSH
         reagents(holder).last.to_i
       end
 
+      # How many batches so many items take.
+      def self.batches_for(items)
+        (items.to_f / per_batch).ceil
+      end
+
+      # What the day holds for them. In an encounter that is what their state there has left. Out of one
+      # they are rested, so it is what a rest gives, less what their list will take of it.
+      def self.day(holder)
+        standing = holder.is_a?(Pf2eCombatantState)
+        total = standing ? batches(holder) : capacity(holder)
+        left = standing ? left(holder) : [ total - batches_for(planned(holder)), 0 ].max
+
+        { 'batches' => total, 'items' => total * per_batch, 'left' => left }
+      end
+
+      # What they hold that was made of reagents today, and how long each lasts.
+      def self.made(holder)
+        Array(holder.consumables.to_a).select { |one| MADE_BY.include?(one.granted_by) }
+      end
+
+      MADE_BY = [ 'advanced alchemy', 'quick alchemy' ].freeze
+
       def self.spend!(holder, batches)
         total, allocated, remaining = reagents(holder)
 
@@ -111,7 +133,7 @@ module AresMUSH
           "#{many} #{found.state.first}"
         end.compact
 
-        spend!(holder, (prepared.values.sum(&:to_i).to_f / per_batch).ceil)
+        spend!(holder, batches_for(prepared.values.sum(&:to_i)))
 
         [ Turns.event('pf2e.alchemy_prepared', 'name' => holder.name, 'items' => made.join(', ')) ]
       end

@@ -24,40 +24,6 @@ pf2e_crafting:
     18: 120000
     19: 200000
     20: 350000
-  # The DC of a check against something of a given level (GM Core's level-based DCs, checked against
-  # Archives of Nethys, Rules.aspx?ID=2629), which is the Craft DC of an item of that level.
-  craft_dc:
-    0: 14
-    1: 15
-    2: 16
-    3: 18
-    4: 19
-    5: 20
-    6: 22
-    7: 23
-    8: 24
-    9: 26
-    10: 27
-    11: 28
-    12: 30
-    13: 31
-    14: 32
-    15: 34
-    16: 35
-    17: 36
-    18: 38
-    19: 39
-    20: 40
-    21: 42
-    22: 44
-    23: 46
-    24: 48
-    25: 50
-  # What rarity adds to that DC.
-  rarity_dc:
-    uncommon: 2
-    rare: 5
-    unique: 10
   # An alchemist's preparations: each batch of infused reagents makes this many items at a rest, and one
   # in the moment with Quick Alchemy.
   alchemy:

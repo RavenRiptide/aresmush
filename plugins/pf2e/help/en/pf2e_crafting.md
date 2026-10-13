@@ -18,7 +18,6 @@ inside a fight and out of one, and nothing in an encounter gives you a formula o
 
 `formulas [<character>]`: The formulas a character knows, and their reagents for the day if they have any.
 `formula/buy <category>=<item>`: Buys a common formula. PF2e prices a formula by the level of the item it makes, not by that item's own price, and the money comes out of your purse.
-`formula/reverse <category>=<item>`: Works a formula out from an item you carry: a Crafting check against what the item's level makes it. On a success you learn it and pay the formula's price in materials; on a critical failure half of that is wasted and you learn nothing.
 
 An uncommon or rarer formula is not simply bought; staff give those.
 

@@ -28,13 +28,28 @@ module AresMUSH
       LINKS = %w{bag shield weapon}.freeze
 
       # Something made an item for whoever holds it: the encounter gave it out, a rest prepared it, a
-      # character crafted it. `expires` says how long it lasts.
+      # character crafted it. `expires` says how long it lasts. It is kept apart from anything of the same
+      # name that lasts another while, so each goes at its own time: what Quick Alchemy made for a turn is
+      # not the two they prepared for the day, nor the two they bought.
       def self.grant!(holder, category, name, quantity, info, granted_by:, expires: nil)
-        item = Pf2egear.create_item(holder, category, name, quantity, info)
+        return Pf2egear.build_item(holder, category, name, info).update(:granted_by => granted_by, :expires => expires) unless
+          Pf2egear::Inventory.stackable?(category)
 
-        item.update(:granted_by => granted_by, :expires => expires)
+        held = Pf2egear::Inventory.all(holder, category).find do |item|
+          item.name == name && !item.copied_from && item.granted_by == granted_by && item.expires == expires
+        end
 
-        item
+        return held.update(:quantity => held.quantity.to_i + quantity.to_i) if held
+
+        Pf2egear.build_item(holder, category, name, info).update(:quantity => quantity, :granted_by => granted_by, :expires => expires)
+      end
+
+      # How soon each kind of lasting ends, soonest first; what they keep lasts longest.
+      LASTS = [ 'turn', 'encounter', 'rest', nil ].freeze
+
+      # Items with the ones that will be gone soonest first, which is the one to use up of two alike.
+      def self.soonest_first(items)
+        items.sort_by.with_index { |item, at| [ LASTS.index(item.expires) || LASTS.size, at ] }
       end
 
       # What lasts no longer than this, gone: the day's preparations at the next rest, what Quick Alchemy
