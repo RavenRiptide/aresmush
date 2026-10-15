@@ -39,11 +39,21 @@ replaced; a weakness, resistance, immunity, skill, sense or trait is added.
 `creature/describe <name>` - The line that makes it again, and what a line cannot hold - spellcasting, an
 ability's traits - which stays only in the saved creature.
 
+## On the web
+
+The portal's creature pages (`/pf2/creatures`) do all of this with a form: the library of your own, those
+shared with you, the published ones and the bestiary; a new creature from one that exists, from a
+description or blank; an editor that checks the creature as you change it and shows what the game will run
+of each Strike and ability; and for admins, the queue of what awaits approval.
+
 ## Seeing them
 
 `creature/list [mine|shared|published|all][/<level>]` - The saved creatures you may see.
 `creature <creature>` - Its stat block, whose it is, and where it stands: a draft, submitted, published or retired.
 `creature/history <name>` - Its revisions, and who did what to it.
+`creature/check <creature>` - What would keep it from being saved, what is warned of, and where each figure
+sits for its level in GM Core's tables: extreme, high, moderate, low or terrible. A figure above the highest
+is flagged to you and to the admins who approve it, and is not refused.
 `+e/bestiary <words>` lists the saved creatures you may add beside the bestiary's.
 
 A creature is named by its name, or by `c:<id>` - `creature c:12`, `+e/add c:12` - which reaches only saved
