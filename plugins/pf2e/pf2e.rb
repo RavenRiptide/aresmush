@@ -347,6 +347,37 @@ module AresMUSH
         end
       when "listxp"
         return PF2ListXPCmd
+      when "creature", "creatures"
+        case cmd.switch
+        when nil
+          return cmd.args.to_s.strip.empty? ? PF2CreatureListCmd : PF2CreatureViewCmd
+        when "list"
+          return PF2CreatureListCmd
+        when "save"
+          return PF2CreatureSaveCmd
+        when "clone"
+          return PF2CreatureCloneCmd
+        when "set", "unset"
+          return PF2CreatureSetCmd
+        when "rename"
+          return PF2CreatureRenameCmd
+        when "notes"
+          return PF2CreatureNotesCmd
+        when "describe"
+          return PF2CreatureDescribeCmd
+        when "share", "unshare"
+          return PF2CreatureShareCmd
+        when "history"
+          return PF2CreatureHistoryCmd
+        when "retire", "restore"
+          return PF2CreatureRetireCmd
+        when "submit", "withdraw"
+          return PF2CreatureSubmitCmd
+        when "queue"
+          return PF2CreatureQueueCmd
+        when "approve", "reject", "unpublish"
+          return PF2CreatureReviewCmd
+        end
       when "hero"
         case cmd.switch
         when nil

@@ -126,7 +126,8 @@ Anything else on its stat block is told with its words when used, for you to run
 ## A creature of your own
 
 A Plotmaster or staff describes a creature on one line: its figures first, then whatever else it has,
-each part after a semicolon and named by its first word.
+each part after a semicolon and named by its first word. To keep one and add it again by name, save it:
+see `help creatures`.
 
 `+e/add Bandit Chief=ac 19 hp 45 level 3 fort 9 ref 11 will 7 perception 9 speed 25 str 3 dex 4; skills athletics 9, stealth 11; resist poison 5; weak fire 5; immune sleep; traits humanoid, human; strike shortsword +12 1d6+6 piercing (agile, finesse); ranged shortbow +12 1d6+2 piercing (range 60, deadly d10); ability Hail of Arrows [2]: Each creature in a 15-foot burst takes 3d6 piercing damage (DC 20 basic Reflex save).`
 

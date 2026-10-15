@@ -180,6 +180,19 @@ module AresMUSH
         end
       end
 
+      it "should keep a deleted author's published creatures, and retire the rest" do
+        author = Character.create(:name => "Gone#{rand(1000000)}")
+        kept = hound(author, 'Barrow Hound')
+        dropped = hound(author, 'Bog Hound')
+        CreatureReview.submit!(kept, author, '')
+        CreatureReview.approve!(kept, @admin)
+
+        author.delete
+
+        expect([ Pf2eCreature[kept.id].status, Pf2eCreature[kept.id].owner_id, Pf2eCreature[kept.id].owner_name ]).to eq [ 'published', nil, author.name ]
+        expect(Pf2eCreature[dropped.id].status).to eq 'retired'
+      end
+
       describe "in an encounter" do
         before(:each) { @encounter = PF2Encounter.create(:organizer => @pm.name, :round => 1, :is_active => true) }
         after(:each) { PF2Encounter[@encounter.id]&.delete }

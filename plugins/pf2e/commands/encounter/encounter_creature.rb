@@ -116,8 +116,8 @@ module AresMUSH
     end
 
     # `+e/creature <#id|name|creature>` - a combatant's stat block and state, or a creature from the
-    # bestiary. Players in an encounter see a combatant's name and conditions; its GM sees the whole
-    # block, and reads the bestiary.
+    # bestiary or a saved one. Players in an encounter see a combatant's name and conditions; its GM sees
+    # the whole block, and reads the bestiary and the saved creatures they may see.
     class PF2EncounterCreatureCmd
       include CommandHandler
 
@@ -147,15 +147,17 @@ module AresMUSH
         # A stat block is for whoever runs the fight. Someone in another's reads it when it is over.
         return client.emit_failure(t('pf2e.creature_gm_only')) unless gm
 
-        found = Bestiary.find(self.term)
+        found = Creatures.find(enactor, self.term, 'view')
 
         return if CharState.emit_error!(client, found)
 
-        client.emit StatBlock.lines(found.state, Bestiary.entry(found.state)).join('%r')
+        block = Creatures.block(found.state) || found.state['creature']&.head&.block
+        client.emit StatBlock.lines(found.state['name'], block).join('%r')
       end
     end
 
-    # `+e/bestiary <words>[/<level>]` - creatures whose names hold the words.
+    # `+e/bestiary <words>[/<level>]` - creatures whose names hold the words: the bestiary's this
+    # character may add, then the saved ones they may use, each with whose it is.
     class PF2EncounterBestiaryCmd
       include CommandHandler
 
@@ -175,18 +177,36 @@ module AresMUSH
 
       def handle
         found = Bestiary.search(self.words, self.level).select { |name, _one| Gm.open?(enactor, name) }
+                        .map { |name, one| "#{name.ljust(40)} Creature #{one['level']}" }
+        found += saved.map do |creature|
+          "#{"c:#{creature.id} #{creature.name}".ljust(40)} Creature #{creature.level} [#{whose(creature)}]"
+        end
 
         return client.emit_failure(t('pf2e.creature_not_found', :creature => self.words)) if found.empty?
 
-        lines = found.first(LIMIT).map { |name, one| "#{name.ljust(40)} Creature #{one['level']}" }
+        lines = found.first(LIMIT)
         lines << t('pf2e.bestiary_more', :count => found.size - LIMIT) if found.size > LIMIT
 
         client.emit lines.join('%r')
       end
+
+      def saved
+        wanted = Domains.slug(self.words)
+
+        Creatures.allowed(enactor, 'use').select { |creature| creature.name_slug.to_s.include?(wanted) }
+                 .select { |creature| self.level.nil? || creature.level.to_i == self.level }.sort_by { |creature| [ creature.level.to_i, creature.name ] }
+      end
+
+      def whose(creature)
+        return 'yours' if creature.owner_id.to_s == enactor.id.to_s
+
+        creature.published_id ? 'published' : creature.owner_name
+      end
     end
 
-    # `+e/add [<count>] [elite|weak] <creature>[=<name>]` adds creatures from the bestiary to the
-    # encounter, each with its own id and initiative, and adjusted if the GM says so.
+    # `+e/add [<count>] [elite|weak] <creature>[=<name>]` adds creatures from the bestiary, or saved ones,
+    # to the encounter, each with its own id and initiative, and adjusted if the GM says so. A saved one
+    # is added as the revision the GM gets (`Creatures`), which no later edit changes.
     # `+e/add [elite|weak] <name>=<description>` adds one of the GM's own making (`Pf2e::Described`),
     # which is a Plotmaster's or staff's to do.
     class PF2EncounterAddCmd
@@ -231,13 +251,19 @@ module AresMUSH
         added = if described
                   [ Combatants.add_npc(encounter, :described => described.state, :adjustment => self.adjustment) ]
                 else
-                  found = Bestiary.find(self.creature)
+                  found = Creatures.find(enactor, self.creature, 'use')
                   return if CharState.emit_error!(client, found)
-                  return client.emit_failure(t('pf2e.creature_not_open', :creature => found.state)) unless Gm.open?(enactor, found.state)
+
+                  ref = found.state
+                  unless Creatures.usable?(enactor, ref)
+                    return client.emit_failure(t(ref['source'] == 'saved' ? 'pf2e.creature_saved_not_open' : 'pf2e.creature_not_open', :creature => ref['name']))
+                  end
+
+                  from = ref['source'] == 'saved' ? { :revision => ref['revision'] } : { :creature => ref['name'] }
 
                   self.count.times.map do |index|
                     named = self.name.empty? ? nil : (self.count > 1 ? "#{self.name} #{index + 1}" : self.name)
-                    Combatants.add_npc(encounter, :creature => found.state, :name => named, :adjustment => self.adjustment)
+                    Combatants.add_npc(encounter, **from, :name => named, :adjustment => self.adjustment)
                   end
                 end
 

@@ -107,6 +107,7 @@ module AresMUSH
       self.pf2_effects.each { |e| e.delete }
       self.encounters.each { |e| e.characters.delete(self) }
       Pf2e::CombatantStates.character_deleted(self)
+      Pf2e::CreatureStore.owner_deleted(self)
     end
 
   end

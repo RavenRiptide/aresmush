@@ -62,6 +62,15 @@ module AresMUSH
         event!(creature, retired ? 'retired' : 'restored', by)
       end
 
+      # Their published creatures stay, for staff to hand on, with the name they were saved under; the rest
+      # are retired. The game does not delete approved characters, so this is for the deletion staff make.
+      def self.owner_deleted(char)
+        Pf2eCreature.find(:owner_id => char.id).to_a.each do |creature|
+          creature.update(:owner => nil, :owner_name => creature.owner_name || char.name)
+          creature.update(:retired_at => Time.now) unless creature.published_id || creature.retired_at
+        end
+      end
+
       def self.notes!(creature, notes, by)
         Pf2eCreature[creature.id].update(:notes => notes)
         event!(creature, 'notes', by)
