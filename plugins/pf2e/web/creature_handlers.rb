@@ -34,6 +34,16 @@ module AresMUSH
           (from.nil? || summary[:level] >= from) && (to.nil? || summary[:level] <= to)
       end
 
+      # The level of the revision this character is shown, read without loading it where that is the
+      # latest, whose level the creature keeps.
+      def self.shown_level(char, creature)
+        actor = CreatureAccess.actor(char)
+        row = Creatures.row(creature)
+        latest = CreatureAccess.owner?(actor, row) || CreatureAccess.admin?(actor) || CreatureAccess.latest?(actor, row)
+
+        latest || creature.published_id == creature.head_id ? creature.level.to_i : creature.published&.block&.dig('level').to_i
+      end
+
       def self.number(value)
         value.to_s.strip.match?(/\A-?\d+\z/) ? value.to_i : nil
       end
@@ -54,19 +64,23 @@ module AresMUSH
         from = CreatureWeb.number(request.args['level_from'])
         to = CreatureWeb.number(request.args['level_to'])
 
-        listed = scope == 'bestiary' ? bestiary(char) : saved(char, actor, scope)
+        # Each is found, filtered and sorted by its name and level, and only the page given is made up.
+        listed = scope == 'bestiary' ? bestiary : saved(char, actor, scope)
         listed = listed.select { |one| CreatureWeb.matches?(one, words, from, to) }.sort_by { |one| [ one[:level], one[:name] ] }
         page = [ request.args['page'].to_i, 1 ].max
+        shown = listed.drop((page - 1) * CreatureWeb::PAGE).first(CreatureWeb::PAGE)
 
         { scope: scope, scopes: scopes, total: listed.size, page: page, pages: [ (listed.size + CreatureWeb::PAGE - 1) / CreatureWeb::PAGE, 1 ].max,
-          creatures: listed.drop((page - 1) * CreatureWeb::PAGE).first(CreatureWeb::PAGE),
+          creatures: shown.map { |one| one[:summary].call(char) },
           can_create: CreatureAccess.may(actor, 'create').ok?, runs_own: CreatureAccess.runs_own?(actor), admin: CreatureAccess.admin?(actor),
           waiting: CreatureAccess.admin?(actor) ? Creatures.all.count(&:submitted_id) : 0,
           open_bestiaries: Gm.open_bestiaries }
       end
 
-      def bestiary(char)
-        Bestiary.index.map { |name, listed| CreatureWeb.bestiary_summary(char, name, listed) }
+      def bestiary
+        Bestiary.index.map do |name, listed|
+          { name: name, level: listed['level'].to_i, summary: ->(char) { CreatureWeb.bestiary_summary(char, name, listed) } }
+        end
       end
 
       def saved(char, actor, scope)
@@ -80,7 +94,9 @@ module AresMUSH
           when 'published' then CreatureAccess.published?(row)
           else true
           end
-        end.map { |creature| CreatureWeb.saved_summary(char, creature) }
+        end.map do |creature|
+          { name: creature.name, level: CreatureWeb.shown_level(char, creature), summary: ->(viewer) { CreatureWeb.saved_summary(viewer, creature) } }
+        end
       end
     end
 

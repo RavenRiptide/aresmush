@@ -76,6 +76,26 @@ module AresMUSH
 
           expect([ names(answer), answer[:total], answer[:pages] ]).to eq [ [ 'Barrow Hound' ], 1, 1 ]
         end
+
+        it "should list and filter a creature at the level of the revision each viewer is shown" do
+          CreatureStore.revise!(@published, Described.read('x', 'ac 16 hp 30 level 5').state, @pm)
+
+          expect(asked(PF2CreaturesHandler, @player, { 'scope' => 'published', 'level_to' => '2' })[:creatures].map { |one| one[:level] }).to eq [ 2 ]
+          expect(names(asked(PF2CreaturesHandler, @player, { 'scope' => 'published', 'level_from' => '5' }))).to eq []
+          expect(names(asked(PF2CreaturesHandler, @pm, { 'scope' => 'mine', 'level_from' => '5' }))).to eq [ 'Bog Hound' ]
+        end
+
+        it "should make up only the page it gives" do
+          stub_const('AresMUSH::Pf2e::CreatureWeb::PAGE', 1)
+          allow(CreatureWeb).to receive(:saved_summary).and_call_original
+          allow(Gm).to receive(:open?).and_call_original
+
+          asked(PF2CreaturesHandler, @pm, { 'scope' => 'mine' })
+          asked(PF2CreaturesHandler, @pm, { 'scope' => 'bestiary' })
+
+          expect(CreatureWeb).to have_received(:saved_summary).once
+          expect(Gm).to have_received(:open?).once
+        end
       end
 
       describe "one creature" do
