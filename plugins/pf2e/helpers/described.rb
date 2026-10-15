@@ -193,6 +193,98 @@ module AresMUSH
 
         { 'name' => found[:name].strip, 'type' => type, 'cost' => cost, 'traits' => [], 'text' => found[:text].strip }
       end
+
+      # ------------------------------------------------------------------------------
+      # Written back
+
+      # The line that describes a stat block again: what `creature/describe` prints, and what `read`
+      # makes the same block of. What a line cannot hold is left out; `unwritable` says what that is.
+      def self.write(block)
+        ([ figures_line(block) ] + parts_of(block)).join('; ')
+      end
+
+      def self.figures_line(block)
+        FIGURES.filter_map do |figure|
+          value = block.dig(*figure['at'])
+
+          next nil if value.nil?
+          next nil if figure['words'].first == 'level' && value.to_i.zero?
+          next nil if %w{perception fort ref will}.include?(figure['words'].first) && value.to_i.zero?
+
+          "#{figure['words'].first} #{value}"
+        end.join(' ')
+      end
+
+      def self.parts_of(block)
+        parts = []
+        parts << "skills #{block['skills'].map { |skill, value| "#{skill} #{value}" }.join(', ')}" if Hash(block['skills']).any?
+        parts << "immune #{Array(block['immunities']).map { |one| spaced(one) }.join(', ')}" if Array(block['immunities']).any?
+        parts << "weak #{resisted_words(block['weaknesses'])}" if Hash(block['weaknesses']).any?
+        parts << "resist #{resisted_words(block['resistances'])}" if Hash(block['resistances']).any?
+        parts << "traits #{block['traits'].map { |one| spaced(one) }.join(', ')}" if Array(block['traits']).any?
+        parts << "senses #{block['senses'].join(', ')}" if Array(block['senses']).any?
+        parts << "size #{block['size']}" if block['size']
+        parts << "rarity #{block['rarity']}" if block['rarity']
+        parts.concat(Array(block['strikes']).map { |strike| strike_words(strike) })
+        parts.concat(written_abilities(block).map { |one| ability_words(one) })
+        parts << "shield #{block['shield']['name']} #{block['shield']['hardness']} #{block['shield']['hp']} +#{block['shield']['ac']}" if block['shield']
+        parts
+      end
+
+      def self.spaced(slug)
+        slug.to_s.tr('-', ' ')
+      end
+
+      def self.resisted_words(held)
+        held.map do |type, value|
+          worth = value.is_a?(Hash) ? value['value'] : value
+          except = value.is_a?(Hash) && Array(value['except']).any? ? " except #{value['except'].map { |one| spaced(one) }.join(' or ')}" : ''
+
+          "#{spaced(type)} #{worth}#{except}"
+        end.join(', ')
+      end
+
+      def self.strike_words(strike)
+        traits = Array(strike['traits']).map { |trait| trait.sub(/\Arange-increment-(\d+)\z/, 'range \1').tr('-', ' ') }
+        ranged = Array(strike['traits']).any? { |trait| trait.start_with?('range-increment-') }
+        damage = Array(strike['damage']).map { |formula, type, category| [ formula, category == 'persistent' ? 'persistent' : nil, spaced(type) ].compact.join(' ') }
+        bonus = strike['bonus'].to_i.negative? ? strike['bonus'].to_s : "+#{strike['bonus'].to_i}"
+
+        "#{ranged ? 'ranged' : 'strike'} #{strike['name']} #{bonus} #{damage.join(' plus ')}#{traits.any? ? " (#{traits.join(', ')})" : ''}"
+      end
+
+      # Its abilities, but for the Shield Block a shield part makes again.
+      def self.written_abilities(block)
+        Array(block['actions']).reject { |one| block['shield'] && one['name'] == ShieldBlock::NAME && one['text'] == BLOCKS }
+      end
+
+      def self.ability_words(ability)
+        cost = ability['type'] == 'action' ? (ability['cost'] || 1).to_s : ability['type']
+
+        "ability #{ability['name']} [#{cost}]: #{ability['text']}"
+      end
+
+      # What a line cannot hold of a stat block, which `write` leaves out.
+      def self.unwritable(block)
+        missing = []
+        missing << 'spellcasting' if Array(block['spellcasting']).any?
+        missing << 'hp details' if block['hp_details'].to_s.strip != ''
+
+        Array(block['strikes']).each do |strike|
+          missing << "the effects of #{strike['name']}" if Array(strike['effects']).any?
+          missing << "the rules of #{strike['name']}" if Array(strike['rules']).any?
+          missing << "the #{(strike['damage'] || []).map(&:last).compact.uniq.join(' and ')} damage of #{strike['name']}" if
+            Array(strike['damage']).any? { |one| one[2] && one[2] != 'persistent' }
+        end
+
+        Array(block['actions']).each do |ability|
+          missing << "the traits of #{ability['name']}" if Array(ability['traits']).any?
+          missing << "the rules of #{ability['name']}" if Array(ability['rules']).any?
+          missing << "the words of #{ability['name']}, which hold a semicolon" if ability['text'].to_s.include?(';')
+        end
+
+        missing
+      end
     end
   end
 end

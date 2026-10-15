@@ -184,6 +184,37 @@ module AresMUSH
         expect(elite['ac']).to eq 17
         expect(elite['strikes'].first['damage']).to eq [ [ '1d8+6', 'piercing', nil ] ]
       end
+
+      # What `creature/describe` prints: the line that makes the creature again.
+      describe "written back as a line" do
+        LINES = [
+          'ac 15 hp 20',
+          'ac 18 hp 45 level 3 perception 9 fort 11 ref 8 will 6 speed 25 fly 40 str 4 dex -1 hardness 5',
+          'ac 16 hp 30; skills Athletics 8, Stealth 7; immune poison, sleep; weak fire 5, cold iron 3; ' \
+            'resist physical 5 except silver, cold 10; traits humanoid, human; senses darkvision, scent 30 feet; ' \
+            'size large; rarity uncommon',
+          'ac 17 hp 40; strike jaws +12 2d8+6 piercing plus 1d6 persistent fire (agile, reach 10); ' \
+            'ranged spear +9 1d6+4 piercing (thrown, range 20)',
+          'ac 17 hp 40; ability Tail Sweep [2]: Each creature within reach takes 2d6 bludgeoning damage (DC 20 basic Reflex save).; ' \
+            'ability Ferocity [reaction]: It keeps fighting.; ability Bulwark [passive]: It stands firm.',
+          'ac 17 hp 40; shield Tower Shield 5 20 +3'
+        ].freeze
+
+        LINES.each do |line|
+          it "should read back as it was written: #{line[0, 60]}" do
+            written = block(line)
+
+            expect(Described.read('Bandit', Described.write(written)).state).to eq written
+          end
+        end
+
+        it "should say what a line cannot hold" do
+          held = block('ac 15 hp 20').merge('spellcasting' => [ { 'name' => 'Arcane Innate Spells' } ], 'hp_details' => 'regeneration 5',
+                                            'actions' => [ { 'name' => 'Bite', 'type' => 'action', 'cost' => 1, 'traits' => [ 'fire' ], 'text' => 'x', 'rules' => [ {} ] } ])
+
+          expect(Described.unwritable(held)).to eq [ 'spellcasting', 'hp details', 'the traits of Bite', 'the rules of Bite' ]
+        end
+      end
     end
   end
 end

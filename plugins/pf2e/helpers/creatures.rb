@@ -1,0 +1,153 @@
+module AresMUSH
+  module Pf2e
+
+    # The creatures a GM names: the bestiary's, and those saved by the game's players (`Pf2eCreature`).
+    #
+    # A name resolves in this order, so that every bestiary name keeps its meaning:
+    #
+    #   c:<id>, c:<name>   a saved creature, and only that (`custom:` too)
+    #   a bestiary name    exactly, as it always has
+    #   one of your own    exactly
+    #   anyone else's      exactly, among those you may do this with
+    #   part of a name     across both; one match is it, several are listed
+    #
+    # Answers a ref: `{ 'source' => 'bestiary', 'name' }`, or `{ 'source' => 'saved', 'name', 'creature',
+    # 'revision' }`, the revision being the one this character gets (`CreatureAccess.latest?`).
+    module Creatures
+
+      SAVED = /\Ac(?:ustom)?:\s*(.+)\z/i
+      LISTED = 8
+
+      def self.row(creature)
+        { 'id' => creature.id.to_s, 'name' => creature.name, 'owner_id' => creature.owner_id&.to_s,
+          'owner_name' => creature.owner_name, 'audience' => creature.audience || 'private',
+          'shared_with' => Array(creature.shared_with).map(&:to_s), 'head' => creature.head_id,
+          'published' => creature.published_id, 'submitted' => creature.submitted_id, 'retired' => !creature.retired_at.nil?,
+          'level' => creature.level.to_i, 'status' => creature.status }
+      end
+
+      def self.all
+        Pf2eCreature.all.to_a
+      end
+
+      # Saved creatures this character may do this with.
+      def self.allowed(char, action)
+        actor = CreatureAccess.actor(char)
+
+        all.select { |creature| CreatureAccess.may(actor, action, row(creature)).ok? }
+      end
+
+      # The revision of a saved creature this character gets: its latest for its author and those it is
+      # shared with, the published one for anyone else.
+      def self.revision_for(char, creature)
+        latest = CreatureAccess.latest?(CreatureAccess.actor(char), row(creature))
+
+        latest ? creature.head : creature.published
+      end
+
+      def self.ref(char, creature)
+        { 'source' => 'saved', 'name' => creature.name, 'creature' => creature, 'revision' => revision_for(char, creature) }
+      end
+
+      def self.labelled(creature)
+        "c:#{creature.id} #{creature.name} (#{creature.owner_name})"
+      end
+
+      def self.find(char, term, action = 'view')
+        wanted = term.to_s.strip
+        forced = wanted.match(SAVED)
+
+        return saved(char, forced[1].strip, action) if forced
+
+        named = Bestiary.named(wanted)
+        return Ok.new(:state => { 'source' => 'bestiary', 'name' => named }) if named
+
+        exactly = exact(char, wanted, action)
+        return exactly if exactly
+
+        partly(char, wanted, action)
+      end
+
+      # `c:12` or `c:barrow hound`: saved creatures only.
+      def self.saved(char, term, action)
+        if term.match?(/\A\d+\z/)
+          creature = Pf2eCreature[term]
+          allowed = creature && CreatureAccess.may(CreatureAccess.actor(char), action, row(creature)).ok?
+
+          return allowed ? Ok.new(:state => ref(char, creature)) : Err.new(:not_found, 'pf2e.creature_not_found', 'creature' => "c:#{term}")
+        end
+
+        exact(char, term, action) || Err.new(:not_found, 'pf2e.creature_not_found', 'creature' => "c:#{term}")
+      end
+
+      # By whole name: their own first, then others'.
+      def self.exact(char, term, action)
+        wanted = Domains.slug(term)
+        named = allowed(char, action).select { |creature| creature.name_slug == wanted }
+        own = named.select { |creature| creature.owner_id.to_s == char.id.to_s }
+
+        return Ok.new(:state => ref(char, own.first)) if own.size == 1
+        return Ok.new(:state => ref(char, named.first)) if named.size == 1
+        return ambiguous(term, named.map { |creature| labelled(creature) }) if named.size > 1
+
+        nil
+      end
+
+      def self.partly(char, term, action)
+        wanted = Domains.slug(term)
+        beasts = Bestiary.index.keys.select { |name| Domains.slug(name).include?(wanted) }
+        saved = allowed(char, action).select { |creature| creature.name_slug.to_s.include?(wanted) }
+
+        return Ok.new(:state => { 'source' => 'bestiary', 'name' => beasts.first }) if beasts.size == 1 && saved.empty?
+        return Ok.new(:state => ref(char, saved.first)) if saved.size == 1 && beasts.empty?
+        return Err.new(:not_found, 'pf2e.creature_not_found', 'creature' => term) if beasts.empty? && saved.empty?
+
+        ambiguous(term, saved.map { |creature| labelled(creature) } + beasts)
+      end
+
+      def self.ambiguous(term, options)
+        Err.new(:ambiguous, 'pf2e.creature_ambiguous', 'creature' => term, 'options' => options.first(LISTED).join(', '))
+      end
+
+      # The stat block a ref names.
+      def self.block(ref)
+        ref['source'] == 'saved' ? ref['revision']&.block : Bestiary.entry(ref['name'])
+      end
+
+      # Whether a character may add what a ref names to an encounter.
+      def self.usable?(char, ref)
+        return Gm.open?(char, ref['name']) if ref['source'] == 'bestiary'
+
+        !ref['revision'].nil? && CreatureAccess.may(CreatureAccess.actor(char), 'use', row(ref['creature'])).ok?
+      end
+
+      # What changed from one block to the next, for a revision's summary: `AC 18 to 19; Strike Claw added`.
+      FIGURES = { 'ac' => 'AC', 'hp' => 'HP', 'level' => 'level', 'perception' => 'Perception', 'hardness' => 'Hardness' }.freeze
+
+      def self.changes(was, now)
+        was ||= {}
+        said = FIGURES.filter_map { |field, word| was[field] == now[field] ? nil : "#{word} #{was[field] || '-'} to #{now[field] || '-'}" }
+        said += %w{fortitude reflex will}.filter_map do |save|
+          before = (was['saves'] || {})[save]
+          after = (now['saves'] || {})[save]
+          before == after ? nil : "#{save.capitalize} #{before || '-'} to #{after || '-'}"
+        end
+        said += named_changes(was['strikes'], now['strikes'], 'Strike') + named_changes(was['actions'], now['actions'], 'ability')
+        said += %w{traits immunities weaknesses resistances skills senses spellcasting shield size rarity}.filter_map do |field|
+          was[field] == now[field] ? nil : "#{field.tr('_', ' ')} changed"
+        end
+
+        said.empty? ? 'no change' : said.join('; ')
+      end
+
+      def self.named_changes(was, now, what)
+        before = Array(was).to_h { |one| [ one['name'].to_s, one ] }
+        after = Array(now).to_h { |one| [ one['name'].to_s, one ] }
+
+        (after.keys - before.keys).map { |name| "#{what} #{name} added" } +
+          (before.keys - after.keys).map { |name| "#{what} #{name} removed" } +
+          (after.keys & before.keys).reject { |name| after[name] == before[name] }.map { |name| "#{what} #{name} changed" }
+      end
+    end
+  end
+end

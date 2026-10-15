@@ -39,6 +39,7 @@ import import_foundry_rules as rules  # noqa: E402
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BESTIARY = os.path.join(ROOT, 'game', 'bestiary')
 INDEX = 'index.yml'
+HOUSE = 'house.yml'
 # An ability's words are kept whole: what it does is read from them - its save, its outcomes, an
 # affliction's stages - and a stage cut off is a stage lost.
 ABILITY_TEXT = None
@@ -362,8 +363,9 @@ def main():
 
     if args.write:
         os.makedirs(BESTIARY, exist_ok=True)
+        # The house bestiary is the game's own creatures, which the game writes; it is not Foundry's.
         for old in os.listdir(BESTIARY):
-            if old.endswith('.yml'):
+            if old.endswith('.yml') and old != HOUSE:
                 os.remove(os.path.join(BESTIARY, old))
         for pack, entries in by_pack.items():
             open(os.path.join(BESTIARY, f'{pack}.yml'), 'w').write(rendered(entries))

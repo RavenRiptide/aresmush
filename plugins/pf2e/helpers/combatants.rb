@@ -260,13 +260,14 @@ module AresMUSH
       # Adding a creature
 
       # A creature joins the encounter: its own hit points and conditions, an id, and a place in the
-      # order - its Perception check unless the GM says where. `name` is what the GM calls it; otherwise
+      # order - its Perception check unless the GM says where. It is a bestiary creature, a saved one by
+      # the revision of it added, or one described on the spot. `name` is what the GM calls it; otherwise
       # it is the creature and its id.
-      def self.add_npc(encounter, creature: nil, described: nil, name: nil, initiative: nil, adjustment: nil)
+      def self.add_npc(encounter, creature: nil, described: nil, revision: nil, name: nil, initiative: nil, adjustment: nil)
         npc = Pf2eNpc.create(:encounter => encounter, :creature => creature, :described => described || {},
-                             :adjustment => adjustment)
+                             :revision => revision, :adjustment => adjustment)
         number = encounter.last_number.to_i + 1
-        base = name.to_s.strip.empty? ? "#{creature || described['name']} ##{number}" : name.to_s.strip
+        base = name.to_s.strip.empty? ? "#{creature || (revision&.block || described)['name']} ##{number}" : name.to_s.strip
         label = rows(encounter).any? { |row| row['name'] == base } ? "#{base} ##{number}" : base
 
         npc.update(:name => label, :number => number)
