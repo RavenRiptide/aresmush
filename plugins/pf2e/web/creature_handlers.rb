@@ -58,7 +58,7 @@ module AresMUSH
 
         char = request.enactor
         actor = CreatureAccess.actor(char)
-        scopes = %w{mine shared published bestiary} + (CreatureAccess.admin?(actor) ? [ 'all' ] : [])
+        scopes = (CreatureAccess::SCOPES.keys - [ 'all' ]) + [ 'bestiary' ] + (CreatureAccess.admin?(actor) ? [ 'all' ] : [])
         scope = scopes.include?(request.args['scope']) ? request.args['scope'] : 'mine'
         words = request.args['words'].to_s.strip
         from = CreatureWeb.number(request.args['level_from'])
@@ -84,17 +84,7 @@ module AresMUSH
       end
 
       def saved(char, actor, scope)
-        Creatures.allowed(char, 'view').select do |creature|
-          row = Creatures.row(creature)
-          mine = CreatureAccess.owner?(actor, row)
-
-          case scope
-          when 'mine' then mine
-          when 'shared' then !mine && CreatureAccess.reaches?(actor, row)
-          when 'published' then CreatureAccess.published?(row)
-          else true
-          end
-        end.map do |creature|
+        Creatures.allowed(char, 'view').select { |creature| CreatureAccess.in_scope?(actor, Creatures.row(creature), scope) }.map do |creature|
           { name: creature.name, level: CreatureWeb.shown_level(char, creature), summary: ->(viewer) { CreatureWeb.saved_summary(viewer, creature) } }
         end
       end
@@ -141,13 +131,7 @@ module AresMUSH
       end
 
       def history(creature)
-        creature.events.to_a.sort_by { |one| [ one.created_at.to_s, one.id.to_i ] }.map do |one|
-          # What changed belongs to the event that made the revision, not to one that only names it.
-          made = %w{created revised renamed}.include?(one.kind)
-          summary = made && one.revision ? creature.revisions.to_a.find { |revision| revision.number == one.revision }&.summary : nil
-
-          { at: one.created_at.to_s[0, 16], by: one.by, kind: one.kind, revision: one.revision, summary: summary }
-        end
+        Creatures.history(creature).map { |one| one.except('detail').transform_keys(&:to_sym) }
       end
     end
   end
@@ -366,21 +350,13 @@ module AresMUSH
 
       # Every Plotmaster or not, and these by name: Plotmasters and admins only.
       def share(char, creature, args)
-        named = Array(args['with']).map(&:to_s).map(&:strip).reject(&:empty?).map { |name| [ name, Character.find_one_by_name(name) ] }
-        missing = named.find { |_name, one| one.nil? }
-        return Err.new(:not_found, 'pf2e.char_not_found') if missing
+        named = Creatures.sharers(Array(args['with']).map(&:to_s).map(&:strip).reject(&:empty?))
+        return named if named.err?
 
-        refused = named.find { |_name, one| !CreatureAccess.shareable?(CreatureAccess.actor(one)) }
-        return Err.new(:creature_share_who, 'pf2e.creature_share_who', 'name' => refused.last.name) if refused
-
-        ids = named.map { |_name, one| one.id.to_s }
+        ids = named.state.map { |one| one.id.to_s }
         plotmasters = args['plotmasters'] == true || args['plotmasters'].to_s == 'true'
-        audience = if plotmasters then 'plotmasters'
-                   elsif ids.any? then 'shared'
-                   else 'private'
-                   end
 
-        CreatureStore.share!(creature, audience, ids, char)
+        CreatureStore.share!(creature, CreatureAccess.audience(plotmasters, ids), ids, char)
       end
     end
 
@@ -394,7 +370,7 @@ module AresMUSH
         char = request.enactor
         return { error: t('pf2e.creature_may_not', :action => 'review') } unless CreatureAccess.admin?(CreatureAccess.actor(char))
 
-        waiting = Creatures.all.select(&:submitted_id).sort_by { |creature| creature.submitted.created_at.to_s }
+        waiting = Creatures.waiting
 
         { submissions: waiting.map { |creature| submission(char, creature) } }
       end

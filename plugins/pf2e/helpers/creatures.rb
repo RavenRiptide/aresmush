@@ -32,6 +32,38 @@ module AresMUSH
         Pf2eCreature.all.to_a
       end
 
+      # Those awaiting an admin's approval, longest waiting first.
+      def self.waiting
+        all.select(&:submitted_id).sort_by { |creature| creature.submitted.created_at.to_s }
+      end
+
+      # Everything done to one, oldest first: `{ 'at', 'by', 'kind', 'revision', 'summary', 'detail' }`. What
+      # changed belongs to the event that made the revision, not to one that only names it.
+      MADE = %w{created revised renamed}.freeze
+
+      def self.history(creature)
+        summaries = creature.revisions.to_a.to_h { |one| [ one.number, one.summary ] }
+
+        creature.events.to_a.sort_by { |one| [ one.created_at.to_s, one.id.to_i ] }.map do |one|
+          # An event that names no revision reads back as 0; revisions count from 1.
+          revision = one.revision.to_i.positive? ? one.revision : nil
+
+          { 'at' => one.created_at.to_s[0, 16], 'by' => one.by, 'kind' => one.kind, 'revision' => revision,
+            'summary' => MADE.include?(one.kind) ? summaries[revision] : nil, 'detail' => one.detail || {} }
+        end
+      end
+
+      # The characters a share names, each one who may be named in one.
+      def self.sharers(names)
+        named = names.map { |name| [ name, Character.find_one_by_name(name) ] }
+        refused = named.find { |_name, char| char && !CreatureAccess.shareable?(CreatureAccess.actor(char)) }
+
+        return Err.new(:not_found, 'pf2e.char_not_found') if named.any? { |_name, char| char.nil? }
+        return Err.new(:creature_share_who, 'pf2e.creature_share_who', 'name' => refused.last.name) if refused
+
+        Ok.new(:state => named.map(&:last))
+      end
+
       # Saved creatures this character may do this with.
       def self.allowed(char, action)
         actor = CreatureAccess.actor(char)

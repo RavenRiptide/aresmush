@@ -82,7 +82,7 @@ module AresMUSH
       end
 
       def handle
-        waiting = Creatures.all.select(&:submitted_id).sort_by { |creature| creature.submitted.created_at.to_s }
+        waiting = Creatures.waiting
 
         return client.emit_ooc(t('pf2e.creature_queue_empty')) if waiting.empty?
 

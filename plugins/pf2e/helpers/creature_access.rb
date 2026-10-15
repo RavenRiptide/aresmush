@@ -50,6 +50,25 @@ module AresMUSH
         runs_own?(actor)
       end
 
+      # Who a creature is shared with: every Plotmaster, or those named, or nobody but its author.
+      def self.audience(plotmasters, ids)
+        return 'plotmasters' if plotmasters
+
+        ids.any? ? 'shared' : 'private'
+      end
+
+      # The lists creatures are shown in, each of those an actor may view.
+      SCOPES = {
+        'mine' => ->(actor, row) { owner?(actor, row) },
+        'shared' => ->(actor, row) { !owner?(actor, row) && reaches?(actor, row) },
+        'published' => ->(_actor, row) { published?(row) },
+        'all' => ->(_actor, _row) { true }
+      }.freeze
+
+      def self.in_scope?(actor, row, scope)
+        SCOPES.fetch(scope).call(actor, row)
+      end
+
       # Whether they get its latest revision, as its author left it, rather than the one published.
       def self.latest?(actor, row)
         admin?(actor) || (runs_own?(actor) && (owner?(actor, row) || reaches?(actor, row)))

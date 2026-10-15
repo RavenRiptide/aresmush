@@ -270,9 +270,11 @@ module AresMUSH
       it "should keep a history of who did what" do
         gm_types(HOUND)
         gm_types('creature/set barrow hound=ac 19')
+        gm_types('creature/share barrow hound=plotmasters')
         gm_types('creature/history barrow hound')
 
-        expect(heard).to include('created', 'revised r2 - AC 18 to 19')
+        expect(heard).to include('created', 'revised r2 - AC 18 to 19', 'shared - audience: plotmasters')
+        expect(heard).to_not include(' r0')
       end
 
       it "should be retired off the lists, and restored" do

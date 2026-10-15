@@ -71,8 +71,6 @@ module AresMUSH
 
       attr_accessor :scope, :level
 
-      SCOPES = %w{mine shared published all}.freeze
-
       def parse_args
         scope, _, level = cmd.args.to_s.partition('/')
         self.scope = scope.strip.downcase.empty? ? 'all' : scope.strip.downcase
@@ -80,11 +78,11 @@ module AresMUSH
       end
 
       def check_scope
-        SCOPES.include?(self.scope) ? nil : t('pf2e.creature_list_scopes', :scopes => SCOPES.join(', '))
+        CreatureAccess::SCOPES.key?(self.scope) ? nil : t('pf2e.creature_list_scopes', :scopes => CreatureAccess::SCOPES.keys.join(', '))
       end
 
       def handle
-        listed = Creatures.allowed(enactor, 'view').select { |creature| in_scope?(creature) }
+        listed = Creatures.allowed(enactor, 'view').select { |creature| CreatureAccess.in_scope?(actor, Creatures.row(creature), self.scope) }
                           .select { |creature| self.level.nil? || creature.level.to_i == self.level }
                           .sort_by { |creature| [ creature.level.to_i, creature.name ] }
 
@@ -95,17 +93,6 @@ module AresMUSH
         end
 
         client.emit ([ t('pf2e.creature_list_title') ] + lines).join('%r')
-      end
-
-      def in_scope?(creature)
-        mine = creature.owner_id.to_s == enactor.id.to_s
-
-        case self.scope
-        when 'mine' then mine
-        when 'shared' then !mine && CreatureAccess.reaches?(actor, Creatures.row(creature))
-        when 'published' then !creature.published_id.nil?
-        else true
-        end
       end
     end
 
@@ -364,26 +351,17 @@ module AresMUSH
         return shared(creature, false, []) if words == [ 'private' ]
         return shared(creature, !unsharing, held) if words == [ 'plotmasters' ]
 
-        named = self.with.map { |name| [ name, Character.find_one_by_name(name) ] }
-        missing = named.find { |_name, char| char.nil? }
-        return client.emit_failure(t('pf2e.char_not_found')) if missing
+        named = Creatures.sharers(self.with)
+        return if CharState.emit_error!(client, named)
 
-        refused = named.find { |_name, char| !CreatureAccess.shareable?(CreatureAccess.actor(char)) }
-        return client.emit_failure(t('pf2e.creature_share_who', :name => refused.last.name)) if refused
-
-        ids = named.map { |_name, char| char.id.to_s }
+        ids = named.state.map { |char| char.id.to_s }
 
         shared(creature, creature.audience == 'plotmasters', unsharing ? held - ids : (held + ids).uniq)
       end
 
       # Every Plotmaster or not, and these by name, which stand apart: either is taken back alone.
       def shared(creature, plotmasters, ids)
-        audience = if plotmasters then 'plotmasters'
-                   elsif ids.any? then 'shared'
-                   else 'private'
-                   end
-
-        CreatureStore.share!(creature, audience, ids, enactor)
+        CreatureStore.share!(creature, CreatureAccess.audience(plotmasters, ids), ids, enactor)
 
         who = ([ plotmasters ? t('pf2e.creature_audience_plotmasters') : nil ] + ids.map { |id| Character[id]&.name }).compact
         who = [ t('pf2e.creature_audience_private') ] if who.empty?
@@ -412,13 +390,11 @@ module AresMUSH
         return if CharState.emit_error!(client, found)
 
         creature = found.state
-        events = creature.events.to_a.sort_by { |one| [ one.created_at.to_s, one.id.to_i ] }
-        summaries = creature.revisions.to_a.to_h { |one| [ one.number, one.summary ] }
-        lines = events.map do |one|
-          revision = one.revision ? " r#{one.revision}" : ''
-          said = one.kind == 'revised' || one.kind == 'created' ? summaries[one.revision] : (one.detail || {}).map { |key, value| "#{key}: #{Array(value).join(', ')}" }.join('; ')
+        lines = Creatures.history(creature).map do |one|
+          revision = one['revision'] ? " r#{one['revision']}" : ''
+          said = one['summary'] || one['detail'].map { |key, value| "#{key}: #{Array(value).join(', ')}" }.join('; ')
 
-          "#{one.created_at.to_s[0, 16]}  #{one.by.to_s.ljust(14)} #{one.kind}#{revision}#{said.to_s.empty? ? '' : " - #{said}"}"
+          "#{one['at']}  #{one['by'].to_s.ljust(14)} #{one['kind']}#{revision}#{said.to_s.empty? ? '' : " - #{said}"}"
         end
 
         client.emit ([ t('pf2e.creature_history_title', :name => creature.name, :id => creature.id) ] + lines).join('%r')

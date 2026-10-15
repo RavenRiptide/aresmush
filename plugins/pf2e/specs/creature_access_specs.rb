@@ -139,6 +139,27 @@ module AresMUSH
         end
       end
 
+      describe "the lists" do
+        it "should hold each creature in the lists it belongs to" do
+          own = row(:owner => 'pm1')
+          shared = row(:owner => 'pm2', :audience => 'plotmasters')
+          published = row(:owner => 'p1', :published => true)
+          pm = actor('pm', 'pm1')
+
+          lists = CreatureAccess::SCOPES.to_h { |scope| [ scope, [ own, shared, published ].select { |one| CreatureAccess.in_scope?(pm, one, scope) } ] }
+
+          expect(lists).to eq('mine' => [ own ], 'shared' => [ shared ], 'published' => [ published ], 'all' => [ own, shared, published ])
+        end
+      end
+
+      describe "an audience" do
+        it "should be every Plotmaster, or those named, or the author alone" do
+          expect(CreatureAccess.audience(true, [ '4' ])).to eq 'plotmasters'
+          expect(CreatureAccess.audience(false, [ '4' ])).to eq 'shared'
+          expect(CreatureAccess.audience(false, [])).to eq 'private'
+        end
+      end
+
       it "should say what was refused, by its code" do
         refused = CreatureAccess.may(actor('player', 'p1'), 'edit', row(:owner => 'pm1'))
 

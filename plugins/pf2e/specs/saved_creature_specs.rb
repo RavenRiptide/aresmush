@@ -71,6 +71,17 @@ module AresMUSH
         end
       end
 
+      it "should keep a history of each thing done to it, with what each revision changed" do
+        creature = hound
+        CreatureStore.revise!(creature, Described.read('x', 'ac 19 hp 40 level 3; strike jaws +11 1d10+5 piercing').state, @pm)
+        CreatureStore.rename!(Pf2eCreature[creature.id], 'Grave Hound', @pm)
+        CreatureStore.share!(creature, 'plotmasters', [], @pm)
+
+        rows = Creatures.history(Pf2eCreature[creature.id]).map { |one| [ one['kind'], one['revision'], one['summary'] ] }
+
+        expect(rows).to eq [ [ 'created', 1, 'created' ], [ 'revised', 2, 'AC 18 to 19' ], [ 'renamed', 3, 'renamed from Barrow Hound' ], [ 'shared', nil, nil ] ]
+      end
+
       describe "finding one by name" do
         it "should leave a bestiary name meaning the bestiary's creature" do
           expect(found(@pm, 'goblin warrior').state).to eq('source' => 'bestiary', 'name' => 'Goblin Warrior')
