@@ -84,6 +84,7 @@ module AresMUSH
           expect(answer[:lines].join("\n")).to include('Barrow Hound', 'AC 18')
           expect([ answer[:add], answer[:addable] ]).to eq [ "+e/add c:#{@draft.id}", true ]
           expect(answer[:history].map { |one| one[:kind] }).to eq [ 'created' ]
+          expect([ answer[:block]['ac'], answer[:editing_revision] ]).to eq [ 18, 1 ]
         end
 
         it "should refuse a player a draft that is not theirs, saying only that it is not there" do
@@ -93,7 +94,7 @@ module AresMUSH
         it "should show a player a published one, with no history or notes" do
           answer = asked(PF2CreatureHandler, @player, { 'ref' => "saved:#{@published.id}" })
 
-          expect([ answer[:addable], answer[:history], answer[:notes] ]).to eq [ true, [], nil ]
+          expect([ answer[:addable], answer[:history], answer[:notes], answer[:block] ]).to eq [ true, [], nil, nil ]
         end
 
         it "should show a bestiary creature, and say a player may not add one outside the open books" do
@@ -168,6 +169,8 @@ module AresMUSH
           blank = asked(PF2CreatureStartHandler, @pm, { 'from' => 'blank', 'level' => '4' })
 
           expect([ goblin[:block]['ac'], goblin[:cloned_from], blank[:block]['level'] ]).to eq [ 16, 'bestiary:Goblin Warrior', 4 ]
+          expect(asked(PF2CreatureStartHandler, @pm, { 'from' => 'described', 'words' => 'ac 15 hp 20 level 1' })[:block]['ac']).to eq 15
+          expect(asked(PF2CreatureStartHandler, @pm, { 'from' => 'described', 'words' => 'a goblin' })[:error]).to eq t('pf2e.creature_save_words')
         end
 
         it "should offer the words a block may use" do

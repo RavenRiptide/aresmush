@@ -106,6 +106,7 @@ module AresMUSH
 
         { creature: summary, lines: CreatureWeb.lines(creature.name, shown.block), add: "+e/add c:#{creature.id}",
           addable: Creatures.usable?(char, Creatures.ref(char, creature)),
+          block: mine ? CreatureBlock.plain(creature.head.block) : nil, editing_revision: mine ? creature.head.number : nil,
           notes: mine ? creature.notes : nil, review_note: mine ? creature.review_note : nil,
           history: mine ? history(creature) : [] }
       end
@@ -182,7 +183,8 @@ module AresMUSH
       end
     end
 
-    # `pf2CreatureStart` - a block to begin from: `{ from: 'bestiary:<name>' | 'saved:<id>' | 'blank', level }`.
+    # `pf2CreatureStart` - a block to begin from: `{ from: 'bestiary:<name>' | 'saved:<id>' | 'blank', level }`,
+    # or `{ from: 'described', words }` for the line a one-line `+e/add` reads.
     class PF2CreatureStartHandler
       def handle(request)
         error = Website.check_login(request)
@@ -194,6 +196,14 @@ module AresMUSH
           level = request.args['level'].to_i
           return { block: { 'name' => '', 'level' => level, 'traits' => [], 'saves' => { 'fortitude' => 0, 'reflex' => 0, 'will' => 0 },
                             'strikes' => [], 'actions' => [] }, cloned_from: nil }
+        end
+
+        if from == 'described'
+          read = Described.read('', request.args['words'].to_s)
+          return { error: t('pf2e.creature_save_words') } unless read
+          return { error: t(read.key, **CharState.symbolize(read.args)) } if read.err?
+
+          return { block: read.state, cloned_from: 'described' }
         end
 
         block = CreatureEditor.source(request.enactor, from)
