@@ -32,6 +32,8 @@ module AresMUSH
         [ 'a Strike with no name', { 'strikes' => [ { 'name' => ' ', 'bonus' => 9, 'damage' => [ [ '1d6', 'bludgeoning', nil ] ] } ] }, :creature_unnamed ],
         [ 'an ability with no words', { 'actions' => [ { 'name' => 'Rally', 'type' => 'action', 'cost' => 1, 'text' => '' } ] }, :creature_ability_text ],
         [ 'an action costing four', { 'actions' => [ { 'name' => 'Rally', 'type' => 'action', 'cost' => 4, 'text' => 'x' } ] }, :creature_ability_cost ],
+        [ 'more abilities than a stat block holds', { 'actions' => Array.new(41) { |i| { 'name' => "A#{i}", 'type' => 'passive', 'text' => 'x' } } }, :creature_too_many ],
+        [ 'an ability of more words than a stat block holds', { 'actions' => [ { 'name' => 'Lore', 'type' => 'passive', 'text' => 'x' * 4001 } ] }, :creature_text_long ],
         [ 'two Strikes of one name', { 'strikes' => [ { 'name' => 'Club', 'bonus' => 9, 'damage' => [ [ '1d6', 'bludgeoning', nil ] ] },
                                                       { 'name' => 'club', 'bonus' => 7, 'damage' => [ [ '1d4', 'bludgeoning', nil ] ] } ] }, :creature_twice ]
       ].freeze

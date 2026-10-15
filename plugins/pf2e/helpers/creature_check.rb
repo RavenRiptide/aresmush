@@ -16,7 +16,19 @@ module AresMUSH
       end
 
       def self.errors(block)
-        needs(block) + level(block) + strikes(block) + abilities(block)
+        needs(block) + level(block) + strikes(block) + abilities(block) + sizes(block)
+      end
+
+      # What one creature may hold at most, which keeps a stat block a stat block.
+      MOST = { 'strikes' => 20, 'actions' => 40 }.freeze
+      LONGEST_TEXT = 4000
+
+      def self.sizes(block)
+        many = MOST.filter_map { |field, most| Array(block[field]).size > most ? found(:creature_too_many, 'what' => field, 'most' => most) : nil }
+        long = Array(block['actions']).select { |one| one['text'].to_s.length > LONGEST_TEXT }
+                                      .map { |one| found(:creature_text_long, 'ability' => one['name'], 'most' => LONGEST_TEXT) }
+
+        many + long
       end
 
       def self.needs(block)

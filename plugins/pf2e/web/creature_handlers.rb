@@ -131,3 +131,159 @@ module AresMUSH
     end
   end
 end
+
+module AresMUSH
+  module Pf2e
+
+    # What the web editor shares: whose creature an id names, and what a block came from.
+    module CreatureEditor
+
+      def self.editable(char, id)
+        found = Creatures.find(char, "c:#{id}", 'view')
+
+        return Err.new(:not_found, 'pf2e.creature_web_not_found') if found.err?
+
+        creature = found.state['creature']
+
+        CreatureAccess.may(CreatureAccess.actor(char), 'edit', Creatures.row(creature)).and_then { Ok.new(:state => creature) }
+      end
+
+      # The block a new creature was started from, which its rules may come from: a bestiary creature, or a
+      # saved one this character may see.
+      def self.source(char, cloned_from)
+        kind, _, key = cloned_from.to_s.partition(':')
+
+        case kind
+        when 'bestiary' then Bestiary.entry(Bestiary.named(key).to_s)
+        when 'saved'
+          found = Creatures.find(char, "c:#{key}", 'clone')
+          found.ok? ? Creatures.shown_block(char, found.state) : nil
+        end
+      end
+
+      def self.findings(list)
+        list.map { |one| { code: one['code'].to_s, message: t(one['key'], **CharState.symbolize(one['args'])) } }
+      end
+
+      def self.refusal(err)
+        { code: err.code.to_s, message: t(err.key, **CharState.symbolize(err.args)) }
+      end
+    end
+
+    # `pf2CreatureOptions` - the words a stat block may use, for the editor's choices.
+    class PF2CreatureOptionsHandler
+      def handle(request)
+        error = Website.check_login(request)
+        return error if error
+
+        { traits: CreatureVocabulary.traits, damage_types: IWR::DAMAGE_TYPES, sizes: %w{tiny small medium large huge gargantuan},
+          rarities: %w{common uncommon rare unique}, skills: Hash(Global.read_config('pf2e_skills')).keys.sort,
+          costs: [ '1', '2', '3', 'reaction', 'free', 'passive' ] }
+      end
+    end
+
+    # `pf2CreatureStart` - a block to begin from: `{ from: 'bestiary:<name>' | 'saved:<id>' | 'blank', level }`.
+    class PF2CreatureStartHandler
+      def handle(request)
+        error = Website.check_login(request)
+        return error if error
+
+        from = request.args['from'].to_s
+
+        if from == 'blank'
+          level = request.args['level'].to_i
+          return { block: { 'name' => '', 'level' => level, 'traits' => [], 'saves' => { 'fortitude' => 0, 'reflex' => 0, 'will' => 0 },
+                            'strikes' => [], 'actions' => [] }, cloned_from: nil }
+        end
+
+        block = CreatureEditor.source(request.enactor, from)
+
+        return { error: t('pf2e.creature_web_not_found') } unless block
+
+        { block: CreatureBlock.plain(block).except('pack', 'source', 'adjustment', 'approved'), cloned_from: from }
+      end
+    end
+
+    # `pf2CreatureCheck` - a block as it is built: `{ name, block, id?, cloned_from? }`. Answers what would
+    # keep it from being saved, what is only warned of, what the game runs of it, and its stat block.
+    class PF2CreatureCheckHandler
+      def handle(request)
+        error = Website.check_login(request)
+        return error if error
+
+        char = request.enactor
+        editing = request.args['id'].to_s.empty? ? nil : CreatureEditor.editable(char, request.args['id'])
+        return { error: t('pf2e.creature_web_not_found') } if editing&.err?
+
+        creature = editing&.state
+        base = creature ? creature.head&.block : CreatureEditor.source(char, request.args['cloned_from'])
+        name = request.args['name'].to_s.strip
+        block = CreatureBlock.cleaned(request.args['block'], base).merge('name' => name)
+        named = CreatureCheck.name(name).and_then { |checked| CreatureStore.name_free(creature&.owner || char, checked, creature) }
+        errors = (named.err? ? [ CreatureCheck.found(named.code, named.args) ] : []) + CreatureCheck.errors(block)
+
+        { errors: CreatureEditor.findings(errors), warnings: CreatureEditor.findings(CreatureVocabulary.warnings(block)),
+          mechanised: CreatureMechanised.of(block), lines: CreatureWeb.lines(name, block), line: Described.write(block),
+          unwritable: Described.unwritable(block) }
+      end
+    end
+
+    # `pf2CreatureSave` - saves a block: `{ name, block, notes?, cloned_from? }` for a new creature, with
+    # `id` and `base_revision` - the revision the editor began from - for a new revision of one. A save
+    # against a revision since changed is refused, with the head, so nobody's edit is lost.
+    class PF2CreatureSaveHandler
+      def handle(request)
+        error = Website.check_login(request)
+        return error if error
+
+        char = request.enactor
+        id = request.args['id'].to_s
+
+        return CreatureAccess.may(CreatureAccess.actor(char), 'create').ok? ? create(char, request) : { error: t('pf2e.creature_may_not', :action => 'create') } if id.empty?
+
+        found = CreatureEditor.editable(char, id)
+        return { error: t(found.key, **CharState.symbolize(found.args)) } if found.err?
+
+        revise(char, found.state, request)
+      end
+
+      def create(char, request)
+        name = request.args['name'].to_s.strip
+        block = CreatureBlock.cleaned(request.args['block'], CreatureEditor.source(char, request.args['cloned_from'])).merge('name' => name)
+        named = CreatureCheck.name(name).and_then { |checked| CreatureStore.name_free(char, checked) }
+
+        return { errors: [ CreatureEditor.refusal(named) ] } if named.err?
+
+        errors = CreatureCheck.errors(block)
+        return { errors: CreatureEditor.findings(errors) } if errors.any?
+
+        creature = CreatureStore.create!(char, named.state, block, :cloned_from => request.args['cloned_from'].to_s.empty? ? 'web' : request.args['cloned_from'])
+        CreatureStore.notes!(creature, request.args['notes'].to_s, char) if request.args['notes'].to_s.strip != ''
+
+        { id: creature.id, revision: creature.head.number, summary: creature.head.summary }
+      end
+
+      def revise(char, creature, request)
+        return { error: t('pf2e.creature_stale'), head: creature.head.number } if creature.head.number != request.args['base_revision'].to_i
+
+        name = request.args['name'].to_s.strip
+        block = CreatureBlock.cleaned(request.args['block'], creature.head.block)
+        errors = CreatureCheck.errors(block.merge('name' => name))
+        return { errors: CreatureEditor.findings(errors) } if errors.any?
+
+        if name != creature.name
+          named = CreatureCheck.name(name).and_then { |checked| CreatureStore.name_free(creature.owner || char, checked, creature) }
+          return { errors: [ CreatureEditor.refusal(named) ] } if named.err?
+
+          CreatureStore.rename!(creature, named.state, char)
+        end
+
+        revision = CreatureStore.revise!(Pf2eCreature[creature.id], block, char)
+        CreatureStore.notes!(creature, request.args['notes'].to_s, char) if request.args.key?('notes') && request.args['notes'].to_s != creature.notes.to_s
+        head = Pf2eCreature[creature.id].head
+
+        { id: creature.id, revision: head.number, summary: revision ? revision.summary : t('pf2e.creature_unchanged', :name => name) }
+      end
+    end
+  end
+end

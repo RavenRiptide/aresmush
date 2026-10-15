@@ -104,6 +104,80 @@ module AresMUSH
           expect(asked(PF2CreatureHandler, @player, { 'ref' => "bestiary:#{shut}" })[:addable]).to be false
         end
       end
+
+      describe "the editor" do
+        def block(**more)
+          Described.read('x', 'ac 18 hp 40 level 3; strike jaws +11 1d10+5 piercing').state.merge(more.transform_keys(&:to_s))
+        end
+
+        it "should check a block as it is built: errors, warnings, what the game runs, and its stat block" do
+          answer = asked(PF2CreatureCheckHandler, @pm, { 'name' => 'Grave Hound', 'block' => block('traits' => [ 'undead', 'glorp' ]) })
+
+          expect(answer[:errors]).to eq []
+          expect(answer[:warnings].map { |one| one[:code] }).to eq [ 'creature_trait_unknown' ]
+          expect(answer[:mechanised].map { |one| one['part'] }).to eq [ 'Strike Jaws' ]
+          expect(answer[:lines].first).to start_with('Grave Hound')
+        end
+
+        it "should not check against another's creature" do
+          expect(asked(PF2CreatureCheckHandler, @player, { 'id' => @draft.id, 'name' => 'x', 'block' => block })[:error]).to eq t('pf2e.creature_web_not_found')
+        end
+
+        it "should say what is wrong with a name, and an error in a figure" do
+          answer = asked(PF2CreatureCheckHandler, @pm, { 'name' => 'Goblin Warrior', 'block' => block('hp' => 0) })
+
+          expect(answer[:errors].map { |one| one[:code] }).to eq %w{creature_name_bestiary creature_needs}
+        end
+
+        it "should save a new creature, and a new revision of it against the revision it was editing" do
+          made = asked(PF2CreatureSaveHandler, @pm, { 'name' => 'Grave Hound', 'block' => block })
+          creature = Pf2eCreature[made[:id]]
+
+          again = asked(PF2CreatureSaveHandler, @pm, { 'id' => creature.id, 'base_revision' => 1, 'name' => 'Grave Hound', 'block' => block('ac' => 19) })
+
+          expect([ made[:revision], again[:revision], again[:summary] ]).to eq [ 1, 2, 'AC 18 to 19' ]
+          creature.delete
+        end
+
+        it "should refuse a save against a revision someone has since changed" do
+          made = asked(PF2CreatureSaveHandler, @pm, { 'name' => 'Grave Hound', 'block' => block })
+          asked(PF2CreatureSaveHandler, @pm, { 'id' => made[:id], 'base_revision' => 1, 'name' => 'Grave Hound', 'block' => block('ac' => 19) })
+
+          stale = asked(PF2CreatureSaveHandler, @pm, { 'id' => made[:id], 'base_revision' => 1, 'name' => 'Grave Hound', 'block' => block('ac' => 20) })
+
+          expect([ stale[:error], stale[:head] ]).to eq [ t('pf2e.creature_stale'), 2 ]
+          Pf2eCreature[made[:id]].delete
+        end
+
+        it "should not save what has errors, or another's creature" do
+          expect(asked(PF2CreatureSaveHandler, @pm, { 'name' => 'Grave Hound', 'block' => block('hp' => 0) })[:errors]).to_not be_empty
+          expect(asked(PF2CreatureSaveHandler, @player, { 'id' => @draft.id, 'base_revision' => 1, 'name' => 'Barrow Hound', 'block' => block })[:error])
+            .to eq t('pf2e.creature_web_not_found')
+        end
+
+        it "should keep engine rules only where the creature it came from had them" do
+          ruled = block.merge('strikes' => [ { 'name' => 'Jaws', 'bonus' => 11, 'damage' => [ [ '1d10+5', 'piercing', nil ] ], 'rules' => [ { 'key' => 'FlatModifier' } ] } ])
+          made = asked(PF2CreatureSaveHandler, @pm, { 'name' => 'Grave Hound', 'block' => ruled })
+
+          expect(Pf2eCreature[made[:id]].head.block['strikes'].first['rules']).to be_nil
+          Pf2eCreature[made[:id]].delete
+        end
+
+        it "should start one from a bestiary creature, rules and all, or blank at a level" do
+          goblin = asked(PF2CreatureStartHandler, @pm, { 'from' => 'bestiary:Goblin Warrior' })
+          blank = asked(PF2CreatureStartHandler, @pm, { 'from' => 'blank', 'level' => '4' })
+
+          expect([ goblin[:block]['ac'], goblin[:cloned_from], blank[:block]['level'] ]).to eq [ 16, 'bestiary:Goblin Warrior', 4 ]
+        end
+
+        it "should offer the words a block may use" do
+          answer = asked(PF2CreatureOptionsHandler, @pm, {})
+
+          expect(answer[:traits]).to include('undead', 'arvek')
+          expect(answer[:damage_types]).to include('fire', 'piercing')
+          expect(answer[:sizes]).to eq %w{tiny small medium large huge gargantuan}
+        end
+      end
     end
   end
 end
