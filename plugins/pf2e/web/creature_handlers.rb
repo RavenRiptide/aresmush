@@ -126,7 +126,9 @@ module AresMUSH
 
       def history(creature)
         creature.events.to_a.sort_by { |one| [ one.created_at.to_s, one.id.to_i ] }.map do |one|
-          summary = one.revision ? creature.revisions.to_a.find { |revision| revision.number == one.revision }&.summary : nil
+          # What changed belongs to the event that made the revision, not to one that only names it.
+          made = %w{created revised renamed}.include?(one.kind)
+          summary = made && one.revision ? creature.revisions.to_a.find { |revision| revision.number == one.revision }&.summary : nil
 
           { at: one.created_at.to_s[0, 16], by: one.by, kind: one.kind, revision: one.revision, summary: summary }
         end

@@ -194,6 +194,8 @@ module AresMUSH
 
         it "should let its author submit it, and an admin see it in the queue and approve it" do
           acted(@pm, @draft, 'submit', 'note' => 'for the barrow')
+          history = asked(PF2CreatureHandler, @pm, { 'ref' => "saved:#{@draft.id}" })[:history]
+          expect(history.map { |one| [ one[:kind], one[:summary] ] }).to eq [ [ 'created', 'created' ], [ 'submitted', nil ] ]
 
           queue = asked(PF2CreatureQueueHandler, @admin, {})
           expect(queue[:submissions].map { |one| [ one[:creature][:name], one[:note], one[:changes] ] }).to eq [ [ 'Barrow Hound', 'for the barrow', 'new' ] ]
