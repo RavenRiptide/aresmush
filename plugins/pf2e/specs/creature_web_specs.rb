@@ -87,7 +87,7 @@ module AresMUSH
         end
 
         it "should refuse a player a draft that is not theirs, saying only that it is not there" do
-          expect(asked(PF2CreatureHandler, @player, { 'ref' => "saved:#{@draft.id}" })[:error]).to include('No creature you may use')
+          expect(asked(PF2CreatureHandler, @player, { 'ref' => "saved:#{@draft.id}" })[:error]).to eq t('pf2e.creature_web_not_found')
         end
 
         it "should show a player a published one, with no history or notes" do

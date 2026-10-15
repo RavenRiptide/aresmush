@@ -36,7 +36,7 @@ module AresMUSH
         lines << "HP #{block['hp']}#{block['hp_details'] ? " (#{block['hp_details']})" : ''}" \
                  "#{block['hardness'].to_i.positive? ? ", Hardness #{block['hardness']}" : ''}#{iwr(block)}"
         lines << shield_line(block['shield'], npc) if block['shield']
-        lines << "Speed #{(block['speeds'] || {}).map { |kind, feet| kind == 'land' ? "#{feet} feet" : "#{kind} #{feet} feet" }.join(', ')}"
+        lines << "Speed #{block['speeds'].map { |kind, feet| kind == 'land' ? "#{feet} feet" : "#{kind} #{feet} feet" }.join(', ')}" if Hash(block['speeds']).any?
 
         Array(block['strikes']).each { |strike| lines << strike_line(strike) }
 

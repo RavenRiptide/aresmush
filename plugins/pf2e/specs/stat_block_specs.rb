@@ -13,6 +13,13 @@ module AresMUSH
         StatBlock.lines('Boggard', block).find { |line| line.include?(strike['name']) }
       end
 
+      it "should leave out its Speed where it has none, and give it where it has" do
+        block = { 'level' => 1, 'traits' => [], 'ac' => 15, 'hp' => 20, 'perception' => 5, 'saves' => {} }
+
+        expect(StatBlock.lines('Boggard', block).grep(/\ASpeed/)).to eq []
+        expect(StatBlock.lines('Boggard', block.merge('speeds' => { 'land' => 20, 'swim' => 25 })).grep(/\ASpeed/)).to eq [ 'Speed 20 feet, swim 25 feet' ]
+      end
+
       it "should leave out the parentheses of a Strike with no traits" do
         line = strike_line('name' => 'Club', 'bonus' => 10, 'traits' => [], 'damage' => [ [ '1d6+6', 'bludgeoning' ] ])
 

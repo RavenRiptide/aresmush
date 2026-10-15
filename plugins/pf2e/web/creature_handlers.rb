@@ -97,7 +97,7 @@ module AresMUSH
 
         found = Creatures.find(char, "c:#{key}", 'view')
 
-        return { error: t('pf2e.creature_not_found', :creature => "c:#{key}") } if found.err?
+        return { error: t('pf2e.creature_web_not_found') } if found.err?
 
         creature = found.state['creature']
         summary = CreatureWeb.saved_summary(char, creature)
@@ -113,7 +113,7 @@ module AresMUSH
       def bestiary(char, name)
         named = Bestiary.named(name)
 
-        return { error: t('pf2e.creature_not_found', :creature => name) } unless named
+        return { error: t('pf2e.creature_web_not_found') } unless named
 
         summary = CreatureWeb.bestiary_summary(char, named, Bestiary.index[named])
 
