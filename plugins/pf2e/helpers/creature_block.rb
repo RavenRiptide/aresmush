@@ -41,6 +41,12 @@ module AresMUSH
         value.is_a?(Hash) ? value : {}
       end
 
+      # A creature with nothing yet but its level, for an author to build from.
+      def self.blank(level)
+        { 'name' => '', 'level' => level, 'traits' => [], 'saves' => { 'fortitude' => 0, 'reflex' => 0, 'will' => 0 },
+          'strikes' => [], 'actions' => [] }
+      end
+
       def self.cleaned(raw, base = nil)
         raw = hash(plain(raw))
         base = hash(plain(base))

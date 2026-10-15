@@ -29,6 +29,13 @@ module AresMUSH
         StatBlock.lines(name, block).map { |line| EncounterWeb.plain(line) }
       end
 
+      # What the game makes of a block: what would keep it from being saved, what is warned of, what it
+      # runs of each part, where its figures sit for its level, and its stat block.
+      def self.assessed(name, block)
+        { errors: CreatureEditor.findings(CreatureCheck.errors(block)), warnings: CreatureEditor.findings(CreatureCheck.warnings(block)),
+          mechanised: CreatureMechanised.of(block), bands: CreatureBenchmarks.bands(block), lines: lines(name, block) }
+      end
+
       def self.matches?(summary, words, from, to)
         (words.empty? || Domains.slug(summary[:name]).include?(Domains.slug(words))) &&
           (from.nil? || summary[:level] >= from) && (to.nil? || summary[:level] <= to)
@@ -203,11 +210,7 @@ module AresMUSH
 
         from = request.args['from'].to_s
 
-        if from == 'blank'
-          level = request.args['level'].to_i
-          return { block: { 'name' => '', 'level' => level, 'traits' => [], 'saves' => { 'fortitude' => 0, 'reflex' => 0, 'will' => 0 },
-                            'strikes' => [], 'actions' => [] }, cloned_from: nil }
-        end
+        return { block: CreatureBlock.blank(request.args['level'].to_i), cloned_from: nil } if from == 'blank'
 
         if from == 'described'
           read = Described.read('', request.args['words'].to_s)
@@ -241,11 +244,10 @@ module AresMUSH
         name = request.args['name'].to_s.strip
         block = CreatureBlock.cleaned(request.args['block'], base).merge('name' => name)
         named = CreatureSaving.named(creature&.owner || char, name, creature)
-        errors = (named.err? ? [ CreatureCheck.found(named.code, named.args) ] : []) + CreatureCheck.errors(block)
+        assessed = CreatureWeb.assessed(name, block)
+        assessed[:errors] = CreatureEditor.findings([ CreatureCheck.found(named.code, named.args) ]) + assessed[:errors] if named.err?
 
-        { errors: CreatureEditor.findings(errors), warnings: CreatureEditor.findings(CreatureCheck.warnings(block)),
-          mechanised: CreatureMechanised.of(block), bands: CreatureBenchmarks.bands(block), lines: CreatureWeb.lines(name, block), line: Described.write(block),
-          unwritable: Described.unwritable(block) }
+        assessed.merge(line: Described.write(block), unwritable: Described.unwritable(block))
       end
     end
 
@@ -380,9 +382,8 @@ module AresMUSH
         block = revision.block
 
         { creature: CreatureWeb.saved_summary(char, creature), revision: revision.number, note: creature.submitted_note,
-          changes: creature.published ? Creatures.changes(creature.published.block, block) : t('pf2e.creature_queue_new'),
-          errors: CreatureEditor.findings(CreatureCheck.errors(block)), warnings: CreatureEditor.findings(CreatureCheck.warnings(block)),
-          mechanised: CreatureMechanised.of(block), bands: CreatureBenchmarks.bands(block), lines: CreatureWeb.lines(creature.name, block) }
+          changes: creature.published ? Creatures.changes(creature.published.block, block) : t('pf2e.creature_queue_new') }
+          .merge(CreatureWeb.assessed(creature.name, block))
       end
     end
 
