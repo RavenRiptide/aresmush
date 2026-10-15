@@ -236,8 +236,8 @@ module AresMUSH
         named = CreatureCheck.name(name).and_then { |checked| CreatureStore.name_free(creature&.owner || char, checked, creature) }
         errors = (named.err? ? [ CreatureCheck.found(named.code, named.args) ] : []) + CreatureCheck.errors(block)
 
-        { errors: CreatureEditor.findings(errors), warnings: CreatureEditor.findings(CreatureVocabulary.warnings(block)),
-          mechanised: CreatureMechanised.of(block), lines: CreatureWeb.lines(name, block), line: Described.write(block),
+        { errors: CreatureEditor.findings(errors), warnings: CreatureEditor.findings(CreatureCheck.warnings(block)),
+          mechanised: CreatureMechanised.of(block), bands: CreatureBenchmarks.bands(block), lines: CreatureWeb.lines(name, block), line: Described.write(block),
           unwritable: Described.unwritable(block) }
       end
     end
@@ -395,8 +395,8 @@ module AresMUSH
 
         { creature: CreatureWeb.saved_summary(char, creature), revision: revision.number, note: creature.submitted_note,
           changes: creature.published ? Creatures.changes(creature.published.block, block) : t('pf2e.creature_queue_new'),
-          errors: CreatureEditor.findings(CreatureCheck.errors(block)), warnings: CreatureEditor.findings(CreatureVocabulary.warnings(block)),
-          mechanised: CreatureMechanised.of(block), lines: CreatureWeb.lines(creature.name, block) }
+          errors: CreatureEditor.findings(CreatureCheck.errors(block)), warnings: CreatureEditor.findings(CreatureCheck.warnings(block)),
+          mechanised: CreatureMechanised.of(block), bands: CreatureBenchmarks.bands(block), lines: CreatureWeb.lines(creature.name, block) }
       end
     end
 

@@ -375,6 +375,8 @@ module AresMUSH
           return PF2CreatureSubmitCmd
         when "queue"
           return PF2CreatureQueueCmd
+        when "check"
+          return PF2CreatureCheckCmd
         when "approve", "reject", "unpublish"
           return PF2CreatureReviewCmd
         end

@@ -118,6 +118,7 @@ module AresMUSH
           expect(answer[:warnings].map { |one| one[:code] }).to eq [ 'creature_trait_unknown' ]
           expect(answer[:mechanised].map { |one| one['part'] }).to eq [ 'Strike Jaws' ]
           expect(answer[:lines].first).to start_with('Grave Hound')
+          expect(answer[:bands].find { |one| one['figure'] == 'AC' }['band']).to eq 'moderate'
         end
 
         it "should not check against another's creature" do

@@ -15,6 +15,12 @@ module AresMUSH
         { 'code' => code, 'key' => "pf2e.#{code}", 'args' => args }
       end
 
+      # What is warned of and not refused: a word the game does not know, and a figure above the highest
+      # GM Core gives for the creature's level.
+      def self.warnings(block)
+        CreatureVocabulary.warnings(block) + CreatureBenchmarks.warnings(block)
+      end
+
       def self.errors(block)
         needs(block) + level(block) + strikes(block) + abilities(block) + sizes(block)
       end

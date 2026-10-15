@@ -198,6 +198,14 @@ module AresMUSH
           expect(YAML.load_file(@house).keys).to eq [ 'Barrow Hound' ]
         end
 
+        it "should show the queue what is above GM Core's highest for its level" do
+          hero_types('creature/set barrow hound=ac 30')
+          hero_types('creature/submit barrow hound')
+          admin_types('creature/queue')
+
+          expect(heard).to include("Above GM Core's highest for its level: AC above extreme")
+        end
+
         it "should go back to its author with a reason" do
           hero_types('creature/submit barrow hound')
           admin_types('creature/reject barrow hound=Its howl is above extreme.')
@@ -250,6 +258,13 @@ module AresMUSH
           gm_types("creature/unshare barrow hound=#{@admin.name}")
           expect(hound.audience).to eq 'private'
         end
+      end
+
+      it "should check a creature against GM Core's tables for its level" do
+        gm_types(HOUND)
+        gm_types('creature/check barrow hound')
+
+        expect(heard).to include('a level 3 creature', 'Nothing keeps it from being saved', 'AC 18: moderate', 'Jaws attack 11: moderate')
       end
 
       it "should keep a history of who did what" do

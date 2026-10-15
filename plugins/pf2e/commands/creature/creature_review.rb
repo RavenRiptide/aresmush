@@ -44,6 +44,39 @@ module AresMUSH
       end
     end
 
+    # `creature/check <creature>` - what would keep a creature from being saved, what is warned of, and
+    # where each of its figures sits for its level by GM Core's tables.
+    class PF2CreatureCheckCmd
+      include CommandHandler
+      include CreatureCommand
+
+      attr_accessor :term
+
+      def parse_args
+        self.term = trim_arg(cmd.args)
+      end
+
+      def required_args
+        [ self.term ]
+      end
+
+      def handle
+        found = Creatures.find(enactor, self.term, 'view')
+        return if CharState.emit_error!(client, found)
+
+        block = Creatures.shown_block(enactor, found.state)
+        errors = CreatureCheck.errors(block)
+        warnings = CreatureCheck.warnings(block)
+        bands = CreatureBenchmarks.bands(block).map { |one| "#{one['figure']} #{one['value']}: #{one['band']}" }
+        lines = [ t('pf2e.creature_check_title', :name => found.state['name'], :level => block['level'].to_i) ]
+        lines << (errors.empty? ? t('pf2e.creature_check_no_errors') : told_errors(errors))
+        lines << told_errors(warnings) if warnings.any?
+        lines << bands.each_slice(3).map { |three| three.join('; ') }.join('%r')
+
+        client.emit lines.join('%r%r')
+      end
+    end
+
     # `creature/queue` - for admins, the creatures awaiting approval.
     class PF2CreatureQueueCmd
       include CommandHandler
@@ -63,7 +96,10 @@ module AresMUSH
           changes = creature.published ? Creatures.changes(creature.published.block, revision.block) : t('pf2e.creature_queue_new')
           note = creature.submitted_note.to_s.empty? ? '' : " \"#{creature.submitted_note}\""
 
-          "c:#{creature.id} #{creature.name}, Creature #{revision.block['level']}, by #{creature.owner_name}, revision #{revision.number}#{note}%r    #{changes}"
+          above = CreatureBenchmarks.warnings(revision.block).map { |one| "#{one['args']['figure']} #{one['args']['band']}" }
+          flagged = above.empty? ? '' : "%r    #{t('pf2e.creature_queue_above', :list => above.join(', '))}"
+
+          "c:#{creature.id} #{creature.name}, Creature #{revision.block['level']}, by #{creature.owner_name}, revision #{revision.number}#{note}%r    #{changes}#{flagged}"
         end
 
         client.emit ([ t('pf2e.creature_queue_title') ] + lines).join('%r')
