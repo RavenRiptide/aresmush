@@ -19,7 +19,9 @@ module AresMUSH
       LISTED = 8
 
       def self.row(creature)
+        owner = creature.owner
         { 'id' => creature.id.to_s, 'name' => creature.name, 'owner_id' => creature.owner_id&.to_s,
+          'owner_runs_own' => !owner.nil? && Gm.plotmaster?(owner),
           'owner_name' => creature.owner_name, 'audience' => creature.audience || 'private',
           'shared_with' => Array(creature.shared_with).map(&:to_s), 'head' => creature.head_id,
           'published' => creature.published_id, 'submitted' => creature.submitted_id, 'retired' => !creature.retired_at.nil?,
@@ -43,6 +45,22 @@ module AresMUSH
         latest = CreatureAccess.latest?(CreatureAccess.actor(char), row(creature))
 
         latest ? creature.head : creature.published
+      end
+
+      # The revision of one to show this character: its latest to its author and to admins, who may change
+      # it, and otherwise the one they get.
+      def self.shown(char, ref)
+        return ref['revision'] unless ref['source'] == 'saved'
+
+        creature = ref['creature']
+        actor = CreatureAccess.actor(char)
+
+        CreatureAccess.owner?(actor, row(creature)) || CreatureAccess.admin?(actor) ? creature.head : ref['revision']
+      end
+
+      # The stat block of a ref, as this character is shown it.
+      def self.shown_block(char, ref)
+        ref['source'] == 'saved' ? shown(char, ref)&.block : Bestiary.entry(ref['name'])
       end
 
       def self.ref(char, creature)

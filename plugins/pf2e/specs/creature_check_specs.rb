@@ -53,7 +53,7 @@ module AresMUSH
 
         NAMES = [ [ '', :creature_name_empty ], [ 'Barrow=Hound', :creature_name_mark ], [ 'Bar;row', :creature_name_mark ],
                   [ 'Hound #2', :creature_name_mark ], [ 'Hound/Elite', :creature_name_mark ], [ '3 Hounds', :creature_name_count ],
-                  [ 'elite hound', :creature_name_adjusted ], [ 'c:hound', :creature_name_mark ], [ 'x' * 61, :creature_name_long ] ].freeze
+                  [ 'elite hound', :creature_name_adjusted ], [ 'c:hound', :creature_name_mark ], [ '12', :creature_name_count ], [ 'x' * 61, :creature_name_long ] ].freeze
 
         NAMES.each do |words, code|
           it "should refuse #{words[0, 20].inspect}" do

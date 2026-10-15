@@ -126,13 +126,13 @@ module AresMUSH
 
       # `fire 5, cold iron 10` as what each is worth, or nothing where one has no number.
       def self.valued(words)
-        read = listed(words).map { |one| one.match(/\A(.+?)\s+[+-]?(\d+)\z/) }
+        read = listed(words).map { |one| one.match(/\A(.+?)\s+([+-]?\d+)\z/) }
 
         read.all? ? read.to_h { |found| [ found[1], found[2].to_i ] } : nil
       end
 
       # `physical 10 except silver, cold 5`: what each is worth, with what a resistance lets through.
-      EXCEPTING = /\A(?<type>.+?)\s+[+-]?(?<value>\d+)(?:\s+except\s+(?<except>.+))?\z/i
+      EXCEPTING = /\A(?<type>.+?)\s+(?<value>[+-]?\d+)(?:\s+except\s+(?<except>.+))?\z/i
 
       def self.resisted(words)
         read = listed(words).map { |one| one.match(EXCEPTING) }
@@ -246,7 +246,9 @@ module AresMUSH
 
       def self.strike_words(strike)
         traits = Array(strike['traits']).map { |trait| trait.sub(/\Arange-increment-(\d+)\z/, 'range \1').tr('-', ' ') }
-        ranged = Array(strike['traits']).any? { |trait| trait.start_with?('range-increment-') }
+        # The bestiary keeps a ranged Strike's range by itself; a line keeps it among the traits.
+        traits << "range #{strike['range'].to_i}" if strike['range'].to_i.positive? && traits.none? { |one| one.start_with?('range ') }
+        ranged = traits.any? { |trait| trait.start_with?('range ') }
         damage = Array(strike['damage']).map { |formula, type, category| [ formula, category == 'persistent' ? 'persistent' : nil, spaced(type) ].compact.join(' ') }
         bonus = strike['bonus'].to_i.negative? ? strike['bonus'].to_s : "+#{strike['bonus'].to_i}"
 
@@ -264,11 +266,19 @@ module AresMUSH
         "ability #{ability['name']} [#{cost}]: #{ability['text']}"
       end
 
+      # What a stat block holds that `write` reads: the rest is what a line cannot hold.
+      WRITTEN = %w{name level ac hp hardness perception saves speeds abilities skills immunities weaknesses resistances
+                   traits senses size rarity strikes actions shield source pack adjustment approved spellcasting hp_details}.freeze
+
       # What a line cannot hold of a stat block, which `write` leaves out.
       def self.unwritable(block)
         missing = []
         missing << 'spellcasting' if Array(block['spellcasting']).any?
         missing << 'hp details' if block['hp_details'].to_s.strip != ''
+
+        Hash(block['resistances']).each do |type, value|
+          missing << "the doubling of its #{spaced(type)} resistance" if value.is_a?(Hash) && Array(value['double']).any?
+        end
 
         Array(block['strikes']).each do |strike|
           missing << "the effects of #{strike['name']}" if Array(strike['effects']).any?
@@ -283,7 +293,7 @@ module AresMUSH
           missing << "the words of #{ability['name']}, which hold a semicolon" if ability['text'].to_s.include?(';')
         end
 
-        missing
+        missing + (block.keys - WRITTEN).map { |key| "its #{spaced(key)}" }
       end
     end
   end

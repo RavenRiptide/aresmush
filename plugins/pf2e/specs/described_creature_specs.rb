@@ -208,6 +208,27 @@ module AresMUSH
           end
         end
 
+        it "should keep a figure below nothing below nothing" do
+          held = block('ac 15 hp 20; skills Stealth -2; resist fire -5')
+
+          expect([ held['skills'], held['resistances'] ]).to eq [ { 'Stealth' => -2 }, { 'fire' => -5 } ]
+        end
+
+        it "should write a bestiary Strike with a range as a ranged one" do
+          held = block('ac 15 hp 20').merge('strikes' => [ { 'name' => 'Spike', 'bonus' => 9, 'damage' => [ [ '1d6', 'piercing', nil ] ],
+                                                             'traits' => [], 'range' => 40 } ])
+
+          expect(Described.write(held)).to include('ranged Spike +9 1d6 piercing (range 40)')
+          expect(Npcs.range_of(Described.read('Bandit', Described.write(held)).state['strikes'].first)).to eq 40
+        end
+
+        it "should say a resistance doubled against something, and anything else it holds, cannot be written" do
+          held = block('ac 15 hp 20').merge('resistances' => { 'physical' => { 'value' => 5, 'double' => [ 'non-magical' ] } },
+                                            'languages' => [ 'Common' ])
+
+          expect(Described.unwritable(held)).to eq [ 'the doubling of its physical resistance', 'its languages' ]
+        end
+
         it "should say what a line cannot hold" do
           held = block('ac 15 hp 20').merge('spellcasting' => [ { 'name' => 'Arcane Innate Spells' } ], 'hp_details' => 'regeneration 5',
                                             'actions' => [ { 'name' => 'Bite', 'type' => 'action', 'cost' => 1, 'traits' => [ 'fire' ], 'text' => 'x', 'rules' => [ {} ] } ])

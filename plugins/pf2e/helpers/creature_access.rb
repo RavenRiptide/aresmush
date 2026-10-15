@@ -30,9 +30,11 @@ module AresMUSH
       end
 
       # Shared with them: by name, or with every Plotmaster. A share reaches only a Plotmaster or an
-      # admin, and only while they are one.
+      # admin, only while they are one, and only from an author who may use it unapproved themselves - a
+      # player's creature reaches nobody unapproved, nor does a Plotmaster's once they stop being one.
       def self.reaches?(actor, row)
-        runs_own?(actor) && (row['audience'] == 'plotmasters' || Array(row['shared_with']).map(&:to_s).include?(actor['id'].to_s))
+        runs_own?(actor) && row['owner_runs_own'] &&
+          (row['audience'] == 'plotmasters' || Array(row['shared_with']).map(&:to_s).include?(actor['id'].to_s))
       end
 
       def self.published?(row)
@@ -59,7 +61,7 @@ module AresMUSH
         'use' => ->(actor, row) { !retired?(row) && (latest?(actor, row) || published?(row)) },
         'clone' => ->(actor, row) { ACTIONS['view'].call(actor, row) },
         'edit' => ->(actor, row) { admin?(actor) || owner?(actor, row) },
-        'share' => ->(actor, row) { admin?(actor) || owner?(actor, row) },
+        'share' => ->(actor, row) { admin?(actor) || (owner?(actor, row) && runs_own?(actor)) },
         'submit' => ->(actor, row) { admin?(actor) || owner?(actor, row) },
         'review' => ->(actor, _row) { admin?(actor) },
         'retire' => ->(actor, row) { admin?(actor) || (owner?(actor, row) && !published?(row)) },

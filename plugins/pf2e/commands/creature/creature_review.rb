@@ -108,6 +108,7 @@ module AresMUSH
 
         return if CharState.emit_error!(client, done)
 
+        CharState.emit_messages!(client, done)
         message = t("pf2e.creature_#{DONE[decision]}", :name => creature.name, :by => enactor.name, :reason => self.reason)
         client.emit_success message
         Global.logger.info "PF2 creature c:#{creature.id} #{creature.name} #{DONE[decision]} by #{enactor.name}"

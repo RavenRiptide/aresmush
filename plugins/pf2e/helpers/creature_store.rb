@@ -11,6 +11,20 @@ module AresMUSH
         block.except('pack', 'adjustment').merge('name' => creature_name, 'source' => "Custom: #{owner_name}")
       end
 
+      # Whether a name is free for this author: none of their own other creatures has it, and no other
+      # published one, which anyone may name, has it either. A retired creature holds no name.
+      def self.name_free(owner, name, creature = nil)
+        slug = Domains.slug(name)
+        others = Pf2eCreature.find(:name_slug => slug).to_a.reject { |one| one.retired_at || (creature && one.id == creature.id) }
+        own = others.find { |one| one.owner_id.to_s == owner.id.to_s }
+        published = others.find(&:published_id)
+
+        return Err.new(:creature_name_yours, 'pf2e.creature_name_yours', 'name' => own.name) if own
+        return Err.new(:creature_published_name, 'pf2e.creature_published_name', 'name' => name, 'other' => Creatures.labelled(published)) if published
+
+        Ok.new(:state => name)
+      end
+
       def self.create!(char, name, block, cloned_from: nil)
         creature = Pf2eCreature.create(:name => name, :name_slug => Domains.slug(name), :owner => char, :owner_name => char.name,
                                        :audience => 'private', :cloned_from => cloned_from)
@@ -21,7 +35,7 @@ module AresMUSH
 
       # A new revision, where the block has changed: the head moves to it and the lists' fields follow.
       # Answers it, or nothing where nothing changed.
-      def self.revise!(creature, block, by, kind: 'revised', detail: {})
+      def self.revise!(creature, block, by, kind: 'revised', detail: {}, summary: nil)
         creature = Pf2eCreature[creature.id]
         block = kept(creature.name, creature.owner_name, block)
         head = creature.head
@@ -30,7 +44,7 @@ module AresMUSH
 
         number = creature.revisions.to_a.map { |one| one.number.to_i }.max.to_i + 1
         revision = Pf2eCreatureRevision.create(:creature => creature, :number => number, :block => block, :by => by.name,
-                                               :by_id => by.id, :summary => head ? Creatures.changes(head.block, block) : 'created')
+                                               :by_id => by.id, :summary => summary || (head ? Creatures.changes(head.block, block) : 'created'))
 
         creature.update(:head => revision, :level => block['level'].to_i, :traits => Array(block['traits']))
         event!(creature, kind, by, :revision => number, :detail => detail)
@@ -49,7 +63,7 @@ module AresMUSH
         was = creature.name
 
         creature.update(:name => name, :name_slug => Domains.slug(name))
-        revise!(creature, creature.head.block, by, :kind => 'renamed', :detail => { 'from' => was, 'to' => name })
+        revise!(creature, creature.head.block, by, :kind => 'renamed', :detail => { 'from' => was, 'to' => name }, :summary => "renamed from #{was}")
       end
 
       def self.share!(creature, audience, shared_with, by)
@@ -57,9 +71,13 @@ module AresMUSH
         event!(creature, 'shared', by, :detail => { 'audience' => audience, 'with' => shared_with.map(&:to_s) })
       end
 
+      # Retired, it is off the lists and out of use, any request for approval with it; and out of the
+      # house bestiary, where it was published.
       def self.retire!(creature, by, retired)
-        Pf2eCreature[creature.id].update(:retired_at => retired ? Time.now : nil)
+        creature = Pf2eCreature[creature.id]
+        creature.update(:retired_at => retired ? Time.now : nil, :submitted => retired ? nil : creature.submitted)
         event!(creature, retired ? 'retired' : 'restored', by)
+        HouseBestiary.write! if creature.published_id
       end
 
       # Their published creatures stay, for staff to hand on, with the name they were saved under; the rest

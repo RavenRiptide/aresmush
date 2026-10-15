@@ -8,13 +8,16 @@ module AresMUSH
         @actor ||= CreatureAccess.actor(enactor)
       end
 
-      # A saved creature this character may do `action` with, by name, `c:<id>` or `c:<name>`.
+      # A saved creature this character may do `action` with, by name, `c:<id>` or `c:<name>`. One they
+      # may see and not do this with is refused as that, rather than as not there.
       def saved(term, action)
-        found = Creatures.find(enactor, term =~ Creatures::SAVED ? term : "c:#{term}", action)
+        found = Creatures.find(enactor, term =~ Creatures::SAVED ? term : "c:#{term}", 'view')
 
         return found if found.err?
 
-        Ok.new(:state => found.state['creature'])
+        creature = found.state['creature']
+
+        CreatureAccess.may(actor, action, Creatures.row(creature)).and_then { Ok.new(:state => creature) }
       end
 
       # Errors as one line each, for what refused a save.
@@ -22,13 +25,16 @@ module AresMUSH
         errors.map { |one| t(one['key'], **CharState.symbolize(one['args'])) }.join('%r')
       end
 
-      # Saves a block as a new revision of their creature of that name, or as a new creature.
-      def save(name, block, cloned_from: nil)
+      # Saves a block as a new revision of their creature of that name, or as a new creature. A clone is
+      # always a new creature, and never writes over one of theirs.
+      def save(name, block, cloned_from: nil, fresh: false)
         errors = CreatureCheck.errors(block)
 
         return client.emit_failure(t('pf2e.creature_invalid', :errors => told_errors(errors))) if errors.any?
 
         own = Creatures.allowed(enactor, 'edit').find { |one| one.owner_id.to_s == enactor.id.to_s && one.name_slug == Domains.slug(name) }
+
+        return client.emit_failure(t('pf2e.creature_name_yours', :name => own.name)) if own && fresh
 
         if own
           revision = CreatureStore.revise!(own, block, enactor)
@@ -38,7 +44,7 @@ module AresMUSH
                                                               :summary => revision.summary))
         end
 
-        named = CreatureCheck.name(name)
+        named = CreatureCheck.name(name).and_then { |checked| CreatureStore.name_free(enactor, checked) }
         return if CharState.emit_error!(client, named)
 
         made = CreatureStore.create!(enactor, named.state, block, :cloned_from => cloned_from)
@@ -133,7 +139,7 @@ module AresMUSH
         return client.emit(StatBlock.lines(ref['name'], Bestiary.entry(ref['name'])).join('%r')) if ref['source'] == 'bestiary'
 
         creature = ref['creature']
-        revision = ref['revision'] || creature.head
+        revision = Creatures.shown(enactor, ref)
         lines = [ t('pf2e.creature_header', :id => creature.id, :revision => revision.number, :latest => creature.head.number,
                                             :owner => creature.owner_name, :status => creature.status) ]
         lines += StatBlock.lines(creature.name, revision.block)
@@ -216,10 +222,10 @@ module AresMUSH
         return if CharState.emit_error!(client, found)
 
         ref = found.state
-        block = Creatures.block(ref) || ref['creature']&.head&.block
+        block = Creatures.shown_block(enactor, ref)
         from = ref['source'] == 'bestiary' ? "bestiary:#{ref['name']}" : "saved:#{ref['creature'].id}"
 
-        save(self.name, block, :cloned_from => from)
+        save(self.name, block, :cloned_from => from, :fresh => true)
       end
     end
 
@@ -269,10 +275,11 @@ module AresMUSH
         found = saved(self.term, 'edit')
         return if CharState.emit_error!(client, found)
 
-        named = CreatureCheck.name(self.name)
+        creature = found.state
+        named = CreatureCheck.name(self.name).and_then { |checked| CreatureStore.name_free(creature.owner || enactor, checked, creature) }
         return if CharState.emit_error!(client, named)
 
-        CreatureStore.rename!(found.state, named.state, enactor)
+        CreatureStore.rename!(creature, named.state, enactor)
         client.emit_success t('pf2e.creature_renamed', :was => found.state.name, :name => named.state)
       end
     end
@@ -322,7 +329,7 @@ module AresMUSH
         found = Creatures.find(enactor, self.term, 'clone')
         return if CharState.emit_error!(client, found)
 
-        block = Creatures.block(found.state) || found.state['creature']&.head&.block
+        block = Creatures.shown_block(enactor, found.state)
         lines = [ "creature/save #{found.state['name']}=#{Described.write(block)}" ]
         missing = Described.unwritable(block)
         lines << t('pf2e.creature_unwritable', :list => missing.join(', ')) if missing.any?
@@ -349,17 +356,20 @@ module AresMUSH
         [ self.term, self.with.first ]
       end
 
+      WORDS = %w{plotmasters private}.freeze
+
       def handle
         found = saved(self.term, 'share')
         return if CharState.emit_error!(client, found)
 
         creature = found.state
-        everyone = self.with.first.downcase
+        words = self.with.map(&:downcase) & WORDS
+        unsharing = cmd.switch_is?('unshare')
+        held = Array(creature.shared_with).map(&:to_s)
 
-        if %w{plotmasters private}.include?(everyone) && !cmd.switch_is?('unshare')
-          CreatureStore.share!(creature, everyone, [], enactor)
-          return told(creature)
-        end
+        return client.emit_failure(t('pf2e.creature_share_mixed')) if words.any? && (self.with.size > 1 || (unsharing && words == [ 'private' ]))
+        return shared(creature, false, []) if words == [ 'private' ]
+        return shared(creature, !unsharing, held) if words == [ 'plotmasters' ]
 
         named = self.with.map { |name| [ name, Character.find_one_by_name(name) ] }
         missing = named.find { |_name, char| char.nil? }
@@ -369,24 +379,23 @@ module AresMUSH
         return client.emit_failure(t('pf2e.creature_share_who', :name => refused.last.name)) if refused
 
         ids = named.map { |_name, char| char.id.to_s }
-        held = Array(creature.shared_with).map(&:to_s)
-        now = cmd.switch_is?('unshare') ? held - ids : (held + ids).uniq
 
-        CreatureStore.share!(creature, now.empty? ? 'private' : 'shared', now, enactor)
-        told(creature)
+        shared(creature, creature.audience == 'plotmasters', unsharing ? held - ids : (held + ids).uniq)
       end
 
-      def told(creature)
-        creature = Pf2eCreature[creature.id]
-        names = Array(creature.shared_with).map { |id| Character[id]&.name }.compact
+      # Every Plotmaster or not, and these by name, which stand apart: either is taken back alone.
+      def shared(creature, plotmasters, ids)
+        audience = if plotmasters then 'plotmasters'
+                   elsif ids.any? then 'shared'
+                   else 'private'
+                   end
 
-        who = case creature.audience
-              when 'plotmasters' then t('pf2e.creature_audience_plotmasters')
-              when 'shared' then names.join(', ')
-              else t('pf2e.creature_audience_private')
-              end
+        CreatureStore.share!(creature, audience, ids, enactor)
 
-        client.emit_success t('pf2e.creature_shared', :name => creature.name, :who => who)
+        who = ([ plotmasters ? t('pf2e.creature_audience_plotmasters') : nil ] + ids.map { |id| Character[id]&.name }).compact
+        who = [ t('pf2e.creature_audience_private') ] if who.empty?
+
+        client.emit_success t('pf2e.creature_shared', :name => creature.name, :who => who.join(', '))
       end
     end
 

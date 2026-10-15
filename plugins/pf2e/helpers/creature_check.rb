@@ -70,7 +70,7 @@ module AresMUSH
         return Err.new(:creature_name_empty, 'pf2e.creature_name_empty') if named.empty?
         return Err.new(:creature_name_long, 'pf2e.creature_name_long', 'most' => LONGEST) if named.length > LONGEST
         return Err.new(:creature_name_mark, 'pf2e.creature_name_mark') if named.match?(%r{[=;#/]|\Ac(?:ustom)?:}i)
-        return Err.new(:creature_name_count, 'pf2e.creature_name_count') if named.match?(/\A\d+\s/)
+        return Err.new(:creature_name_count, 'pf2e.creature_name_count') if named.match?(/\A\d+(?:\s|\z)/)
         return Err.new(:creature_name_adjusted, 'pf2e.creature_name_adjusted', 'word' => named.split.first) if
           Adjustments.names.include?(named.split.first.downcase)
 

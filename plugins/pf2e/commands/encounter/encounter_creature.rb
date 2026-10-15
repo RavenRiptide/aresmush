@@ -151,8 +151,7 @@ module AresMUSH
 
         return if CharState.emit_error!(client, found)
 
-        block = Creatures.block(found.state) || found.state['creature']&.head&.block
-        client.emit StatBlock.lines(found.state['name'], block).join('%r')
+        client.emit StatBlock.lines(found.state['name'], Creatures.shown_block(enactor, found.state)).join('%r')
       end
     end
 

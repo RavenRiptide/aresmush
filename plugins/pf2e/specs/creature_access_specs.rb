@@ -13,8 +13,8 @@ module AresMUSH
           'approved' => approved }
       end
 
-      def row(owner: 'owner', audience: 'private', shared_with: [], published: false, retired: false, submitted: false)
-        { 'id' => '7', 'owner_id' => owner, 'audience' => audience, 'shared_with' => shared_with,
+      def row(owner: 'owner', audience: 'private', shared_with: [], published: false, retired: false, submitted: false, owner_runs_own: true)
+        { 'id' => '7', 'owner_id' => owner, 'owner_runs_own' => owner_runs_own, 'audience' => audience, 'shared_with' => shared_with,
           'published' => published ? '3' : nil, 'retired' => retired, 'submitted' => submitted ? '4' : nil }
       end
 
@@ -83,6 +83,14 @@ module AresMUSH
 
           expect(may?(actor('player', 'p1'), 'use', held)).to be false
           expect(may?(actor('player', 'p1'), 'view', held)).to be false
+        end
+
+        it "should reach nobody from an author who may not use it unapproved themselves" do
+          held = row(:owner => 'p1', :audience => 'plotmasters', :owner_runs_own => false)
+
+          expect(may?(actor('pm', 'pm2'), 'use', held)).to be false
+          expect(may?(actor('player', 'p1'), 'share', held)).to be false
+          expect(may?(actor('admin', 'a1'), 'use', held)).to be true
         end
 
         it "should be with Plotmasters and admins only" do

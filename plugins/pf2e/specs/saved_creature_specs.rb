@@ -180,6 +180,79 @@ module AresMUSH
         end
       end
 
+      describe "names" do
+        it "should refuse a name the author already has, in a rename" do
+          hound(@pm, 'Barrow Hound')
+          bog = hound(@pm, 'Bog Hound')
+
+          expect(CreatureStore.name_free(@pm, 'barrow hound', bog).code).to eq :creature_name_yours
+          expect(CreatureStore.name_free(@pm, 'Bog Hound', bog).ok?).to be true
+        end
+
+        it "should refuse a published creature's name to anyone else" do
+          one = hound(@player)
+          CreatureReview.submit!(one, @player, '')
+          CreatureReview.approve!(one, @admin)
+
+          expect(CreatureStore.name_free(@pm, 'Barrow Hound').code).to eq :creature_published_name
+        end
+
+        it "should keep the house bestiary under the name each was approved with" do
+          one = hound(@player)
+          CreatureReview.submit!(one, @player, '')
+          CreatureReview.approve!(one, @admin)
+          CreatureStore.rename!(one, 'Grave Hound', @player)
+
+          expect(YAML.load_file(@house).keys).to eq [ 'Barrow Hound' ]
+          expect(Pf2eCreature[one.id].head.summary).to eq 'renamed from Barrow Hound'
+        end
+      end
+
+      it "should show its author the latest revision, once published and after they stop being a Plotmaster" do
+        creature = hound(@player)
+        CreatureReview.submit!(creature, @player, '')
+        CreatureReview.approve!(creature, @admin)
+        CreatureStore.revise!(creature, Pf2eCreature[creature.id].head.block.merge('ac' => 25), @player)
+
+        ref = found(@player, 'barrow hound').state
+        expect(Creatures.shown(@player, ref).block['ac']).to eq 25
+        expect(Creatures.shown(@other_pm, found(@other_pm, 'barrow hound').state).block['ac']).to eq 18
+      end
+
+      describe "retired" do
+        it "should take back its request for approval, and not be approved" do
+          creature = hound(@player)
+          CreatureReview.submit!(creature, @player, '')
+          CreatureStore.retire!(creature, @player, true)
+
+          expect(Pf2eCreature[creature.id].submitted_id).to be_nil
+          expect(CreatureReview.approve!(creature, @admin).code).to eq :creature_not_submitted
+        end
+
+        it "should leave the house bestiary, and leave its name free" do
+          creature = hound(@player)
+          CreatureReview.submit!(creature, @player, '')
+          CreatureReview.approve!(creature, @admin)
+
+          CreatureStore.retire!(creature, @admin, true)
+
+          expect(YAML.load_file(@house)).to eq({})
+          expect(CreatureStore.name_free(@pm, 'Barrow Hound').ok?).to be true
+        end
+      end
+
+      it "should say where the house bestiary could not be written, and keep the approval" do
+        allow(HouseBestiary).to receive(:path).and_return('/nonexistent/dir/house.yml')
+        creature = hound(@player)
+        CreatureReview.submit!(creature, @player, '')
+
+        done = CreatureReview.approve!(creature, @admin)
+
+        expect(done.ok?).to be true
+        expect(done.messages.map { |one| one['key'] }).to eq [ 'pf2e.creature_house_unwritten' ]
+        expect(Pf2eCreature[creature.id].status).to eq 'published'
+      end
+
       it "should keep a deleted author's published creatures, and retire the rest" do
         author = Character.create(:name => "Gone#{rand(1000000)}")
         kept = hound(author, 'Barrow Hound')

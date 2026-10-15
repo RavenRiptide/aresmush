@@ -95,6 +95,22 @@ module AresMUSH
           expect(heard).to include('creature/save Barrow Hound=ac 18 hp 40 level 3 perception 9; strike Jaws +11 1d10+5 piercing')
         end
 
+        it "should not clone over a creature of one's own" do
+          gm_types(HOUND)
+          gm_types('creature/clone goblin warrior=Barrow Hound')
+
+          expect(refused).to eq [ t('pf2e.creature_name_yours', :name => 'Barrow Hound') ]
+          expect(hound.head.block['ac']).to eq 18
+        end
+
+        it "should not rename onto a creature of one's own" do
+          gm_types(HOUND)
+          gm_types('creature/save Bog Hound=ac 15 hp 20')
+          gm_types('creature/rename bog hound=Barrow Hound')
+
+          expect(refused).to eq [ t('pf2e.creature_name_yours', :name => 'Barrow Hound') ]
+        end
+
         it "should save a creature from the encounter it runs" do
           add('giant rat')
           gm_types('creature/save Sewer Rat=#2')
@@ -158,6 +174,12 @@ module AresMUSH
       describe "a player's own" do
         before(:each) { hero_types(HOUND) }
 
+        it "should not be shared, since its author may not use it unapproved" do
+          hero_types('creature/share barrow hound=plotmasters')
+
+          expect(refused).to eq [ t('pf2e.creature_may_not', :action => 'share') ]
+        end
+
         it "should be saved, and not added until an admin approves it" do
           expect(hound.owner_id).to eq @hero.id
           expect(Creatures.usable?(Character[@hero.id], Creatures.find(Character[@hero.id], 'barrow hound').state)).to be false
@@ -201,6 +223,24 @@ module AresMUSH
 
           gm_types("creature/share barrow hound=#{@admin.name}")
           expect(heard).to include("Barrow Hound is now for: #{@admin.name}")
+        end
+
+        it "should keep a share with every Plotmaster beside shares with named ones, and take each back alone" do
+          gm_types('creature/share barrow hound=plotmasters')
+          gm_types("creature/share barrow hound=#{@admin.name}")
+          expect([ hound.audience, hound.shared_with ]).to eq [ 'plotmasters', [ @admin.id.to_s ] ]
+
+          gm_types("creature/unshare barrow hound=#{@admin.name}")
+          expect([ hound.audience, hound.shared_with ]).to eq [ 'plotmasters', [] ]
+
+          gm_types('creature/unshare barrow hound=plotmasters')
+          expect(hound.audience).to eq 'private'
+        end
+
+        it "should not take a word and names together" do
+          gm_types("creature/share barrow hound=private,#{@admin.name}")
+
+          expect(refused).to eq [ t('pf2e.creature_share_mixed') ]
         end
 
         it "should let an admin it is shared with use it unapproved, and then nobody once unshared" do

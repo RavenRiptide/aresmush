@@ -104,7 +104,16 @@ module AresMUSH
 
         return nothing(words) if left == held || (how == :whole && held.nil?)
 
+        return Ok.new(:state => unshielded(block)) if field == 'shield'
+
         Ok.new(:state => how == :whole ? block.except(field) : block.merge(field => left))
+      end
+
+      # No shield, and no Shield Block made with one.
+      def self.unshielded(block)
+        blocks = Array(block['actions']).reject { |one| one['name'] == ShieldBlock::NAME && one['text'] == Described::BLOCKS }
+
+        block.except('shield').merge('actions' => blocks)
       end
 
       def self.nothing(words)
