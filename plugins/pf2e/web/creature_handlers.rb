@@ -249,7 +249,7 @@ module AresMUSH
         base = creature ? creature.head&.block : CreatureEditor.source(char, request.args['cloned_from'])
         name = request.args['name'].to_s.strip
         block = CreatureBlock.cleaned(request.args['block'], base).merge('name' => name)
-        named = CreatureCheck.name(name).and_then { |checked| CreatureStore.name_free(creature&.owner || char, checked, creature) }
+        named = CreatureSaving.named(creature&.owner || char, name, creature)
         errors = (named.err? ? [ CreatureCheck.found(named.code, named.args) ] : []) + CreatureCheck.errors(block)
 
         { errors: CreatureEditor.findings(errors), warnings: CreatureEditor.findings(CreatureCheck.warnings(block)),
@@ -278,41 +278,34 @@ module AresMUSH
       end
 
       def create(char, request)
-        name = request.args['name'].to_s.strip
-        block = CreatureBlock.cleaned(request.args['block'], CreatureEditor.source(char, request.args['cloned_from'])).merge('name' => name)
-        named = CreatureCheck.name(name).and_then { |checked| CreatureStore.name_free(char, checked) }
+        from = request.args['cloned_from'].to_s
+        block = CreatureBlock.cleaned(request.args['block'], CreatureEditor.source(char, from))
 
-        return { errors: [ CreatureEditor.refusal(named) ] } if named.err?
-
-        errors = CreatureCheck.errors(block)
-        return { errors: CreatureEditor.findings(errors) } if errors.any?
-
-        creature = CreatureStore.create!(char, named.state, block, :cloned_from => request.args['cloned_from'].to_s.empty? ? 'web' : request.args['cloned_from'])
-        CreatureStore.notes!(creature, request.args['notes'].to_s, char) if request.args['notes'].to_s.strip != ''
-
-        { id: creature.id, revision: creature.head.number, summary: creature.head.summary }
+        told(CreatureSaving.create(char, request.args['name'].to_s.strip, block, :cloned_from => from.empty? ? 'web' : from,
+                                                                                 :notes => request.args['notes'].to_s))
       end
 
       def revise(char, creature, request)
-        return { error: t('pf2e.creature_stale'), head: creature.head.number } if creature.head.number != request.args['base_revision'].to_i
-
-        name = request.args['name'].to_s.strip
         block = CreatureBlock.cleaned(request.args['block'], creature.head.block)
-        errors = CreatureCheck.errors(block.merge('name' => name))
-        return { errors: CreatureEditor.findings(errors) } if errors.any?
+        notes = request.args.key?('notes') ? request.args['notes'].to_s : nil
 
-        if name != creature.name
-          named = CreatureCheck.name(name).and_then { |checked| CreatureStore.name_free(creature.owner || char, checked, creature) }
-          return { errors: [ CreatureEditor.refusal(named) ] } if named.err?
+        told(CreatureSaving.revise(char, creature, block, :name => request.args['name'].to_s, :notes => notes,
+                                                          :base_revision => request.args['base_revision'].to_i))
+      end
 
-          CreatureStore.rename!(creature, named.state, char)
+      def told(outcome)
+        if outcome.err?
+          return { error: t('pf2e.creature_stale'), head: outcome.args['head'] } if outcome.code == :creature_stale
+          return { errors: CreatureEditor.findings(outcome.args['errors']) } if outcome.code == :creature_invalid
+
+          return { errors: [ CreatureEditor.refusal(outcome) ] }
         end
 
-        revision = CreatureStore.revise!(Pf2eCreature[creature.id], block, char)
-        CreatureStore.notes!(creature, request.args['notes'].to_s, char) if request.args.key?('notes') && request.args['notes'].to_s != creature.notes.to_s
-        head = Pf2eCreature[creature.id].head
+        creature = outcome.state['creature']
+        revision = outcome.state['revision']
 
-        { id: creature.id, revision: head.number, summary: revision ? revision.summary : t('pf2e.creature_unchanged', :name => name) }
+        { id: creature.id, revision: creature.head.number,
+          summary: revision ? revision.summary : t('pf2e.creature_unchanged', :name => creature.name) }
       end
     end
   end

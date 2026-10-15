@@ -25,31 +25,31 @@ module AresMUSH
         errors.map { |one| t(one['key'], **CharState.symbolize(one['args'])) }.join('%r')
       end
 
-      # Saves a block as a new revision of their creature of that name, or as a new creature. A clone is
-      # always a new creature, and never writes over one of theirs.
+      # Says why something was refused: every finding of a block's checks, or the one refusal.
+      def refused?(outcome)
+        return false if outcome.ok?
+        return CharState.emit_error!(client, outcome) unless outcome.code == :creature_invalid
+
+        client.emit_failure t('pf2e.creature_invalid', :errors => told_errors(outcome.args['errors']))
+        true
+      end
+
+      # Says what a save (`CreatureSaving`) did.
+      def told_saved(outcome)
+        return if refused?(outcome)
+
+        creature = outcome.state['creature']
+        revision = outcome.state['revision']
+
+        return client.emit_success(t('pf2e.creature_created', :name => creature.name, :id => creature.id)) if outcome.state['created']
+        return client.emit_ooc(t('pf2e.creature_unchanged', :name => creature.name)) unless revision
+
+        client.emit_success t('pf2e.creature_saved', :name => creature.name, :id => creature.id, :revision => revision.number,
+                                                     :summary => revision.summary)
+      end
+
       def save(name, block, cloned_from: nil, fresh: false)
-        errors = CreatureCheck.errors(block)
-
-        return client.emit_failure(t('pf2e.creature_invalid', :errors => told_errors(errors))) if errors.any?
-
-        # A retired creature holds no name, so saving under its name makes a new one.
-        own = Creatures.allowed(enactor, 'edit').find { |one| one.owner_id.to_s == enactor.id.to_s && one.name_slug == Domains.slug(name) && !one.retired_at }
-
-        return client.emit_failure(t('pf2e.creature_name_yours', :name => own.name)) if own && fresh
-
-        if own
-          revision = CreatureStore.revise!(own, block, enactor)
-          return client.emit_ooc(t('pf2e.creature_unchanged', :name => own.name)) unless revision
-
-          return client.emit_success(t('pf2e.creature_saved', :name => own.name, :id => own.id, :revision => revision.number,
-                                                              :summary => revision.summary))
-        end
-
-        named = CreatureCheck.name(name).and_then { |checked| CreatureStore.name_free(enactor, checked) }
-        return if CharState.emit_error!(client, named)
-
-        made = CreatureStore.create!(enactor, named.state, block, :cloned_from => cloned_from)
-        client.emit_success t('pf2e.creature_created', :name => made.name, :id => made.id)
+        told_saved(CreatureSaving.save(enactor, name, block, :cloned_from => cloned_from, :fresh => fresh))
       end
 
       # The latest revision of one of theirs, changed and saved again.
@@ -57,18 +57,10 @@ module AresMUSH
         found = saved(term, 'edit')
         return if CharState.emit_error!(client, found)
 
-        creature = found.state
-        changed = yield(creature.head.block)
+        changed = yield(found.state.head.block)
         return if CharState.emit_error!(client, changed)
 
-        errors = CreatureCheck.errors(changed.state)
-        return client.emit_failure(t('pf2e.creature_invalid', :errors => told_errors(errors))) if errors.any?
-
-        revision = CreatureStore.revise!(creature, changed.state, enactor)
-        return client.emit_ooc(t('pf2e.creature_unchanged', :name => creature.name)) unless revision
-
-        client.emit_success t('pf2e.creature_saved', :name => creature.name, :id => creature.id, :revision => revision.number,
-                                                     :summary => revision.summary)
+        told_saved(CreatureSaving.revise(enactor, found.state, changed.state))
       end
     end
 
