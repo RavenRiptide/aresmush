@@ -284,6 +284,17 @@ module AresMUSH
         gm_types('creature/restore barrow hound')
         expect(hound.status).to eq 'draft'
       end
+
+      it "should not be restored under a name its author has used since" do
+        gm_types(HOUND)
+        first = hound
+        gm_types('creature/retire barrow hound')
+        gm_types(HOUND)
+
+        gm_types("creature/restore c:#{first.id}")
+        expect(refused.join).to include('You already have a creature called Barrow Hound')
+        expect(Pf2eCreature[first.id].status).to eq 'retired'
+      end
     end
   end
 end

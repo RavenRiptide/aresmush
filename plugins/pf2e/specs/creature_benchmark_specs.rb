@@ -55,6 +55,17 @@ module AresMUSH
         expect(bands(block('actions' => [ waits ]))['Breath damage']).to eq 'above limited use'
       end
 
+      it "should not weigh a creature past the levels the book's tables give" do
+        expect(CreatureBenchmarks.bands(block('level' => 25, 'hp' => 600))).to eq []
+      end
+
+      it "should weigh an ability usable every round as unlimited, though it has a frequency" do
+        each_round = { 'name' => 'Spray', 'type' => 'action', 'cost' => 1, 'traits' => [],
+                       'text' => 'Frequency once per round%rEach creature in a cone takes 2d6 acid damage (DC 20 basic Reflex save).' }
+
+        expect(bands(block('actions' => [ each_round ]))['Spray damage']).to eq 'unlimited use'
+      end
+
       it "should hold every level from -1 to 24 in every table, each band no higher than the one above it" do
         CreatureBenchmarks.tables.each do |name, table|
           expect(table['levels'].keys.sort).to eq((-1..24).to_a), name

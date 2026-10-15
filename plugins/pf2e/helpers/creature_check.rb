@@ -7,7 +7,21 @@ module AresMUSH
     # Each finding is `{ 'code', 'key', 'args' }`, for a command to tell and a spec to read by its code.
     module CreatureCheck
 
-      FORMULA = /\A\d*d\d+(?:[+-]\d+)?\z|\A\d+\z/i
+      FORMULA = /\A(?:(?<count>\d*)d(?<sides>\d+)(?<plus>[+-]\d+)?|(?<flat>\d+))\z/i
+      DICE = 1..50
+      SIDES = 2..100
+      PLUS = 500
+
+      # A damage formula the game can roll: up to 50 dice of 2 to 100 sides, and a figure added of at most
+      # 500, or a flat number of at most that.
+      def self.formula?(formula)
+        found = formula.to_s.delete(' ').match(FORMULA)
+
+        return false unless found
+        return found[:flat].to_i <= PLUS if found[:flat]
+
+        DICE.cover?(found[:count].to_s.empty? ? 1 : found[:count].to_i) && SIDES.cover?(found[:sides].to_i) && found[:plus].to_i.abs <= PLUS
+      end
       LEVELS = (-1..25).freeze
       LONGEST = 60
 
@@ -55,7 +69,7 @@ module AresMUSH
           damage = Array(strike['damage'])
           next [ found(:creature_strike_damage, 'strike' => named) ] if damage.empty?
 
-          damage.reject { |formula, _type, _category| formula.to_s.delete(' ').match?(FORMULA) }
+          damage.reject { |formula, _type, _category| formula?(formula) }
                 .map { |formula, _type, _category| found(:creature_formula, 'formula' => formula, 'strike' => named) }
         end + twice(listed, 'Strike')
       end

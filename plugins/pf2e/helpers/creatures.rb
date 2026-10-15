@@ -15,7 +15,7 @@ module AresMUSH
     # 'revision' }`, the revision being the one this character gets (`CreatureAccess.latest?`).
     module Creatures
 
-      SAVED = /\Ac(?:ustom)?:\s*(.+)\z/i
+      SAVED = /\Ac(?:ustom)?:\s*(.+)\z/im
       LISTED = 8
 
       def self.row(creature)

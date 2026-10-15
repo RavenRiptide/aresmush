@@ -159,7 +159,7 @@ module AresMUSH
         found = words.match(STRIKE)
         damage = found ? found[:damage].split(/\s+plus\s+/i).map { |one| one.strip.match(DAMAGE) } : []
 
-        return nil unless found && damage.any? && damage.all?
+        return nil unless found && damage.any? && damage.all? && damage.all? { |one| CreatureCheck.formula?(one[:formula]) }
 
         { 'name' => titled(found[:name]), 'bonus' => found[:bonus].to_i,
           'damage' => damage.map { |one| [ one[:formula].delete(' '), slug(one[:type]), one[:persistent] ? 'persistent' : nil ] },

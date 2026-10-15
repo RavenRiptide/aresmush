@@ -1,10 +1,14 @@
 module AresMUSH
   module Pf2e
 
-    # A stat block as the web editor sends it, made into one the engine reads: only the parts a stat block
-    # has, numbers as numbers, and no engine rules the author wrote. A Strike or ability keeps its rules
-    # only where the creature it came from - the bestiary creature cloned, or the revision edited - had the
-    # same ones on a part of that name; rules are the importer's, read from Foundry, never an author's.
+    # A stat block as the web editor sends it, made into one the engine reads. Anyone may craft what is
+    # sent, so every part is taken only in the shape a stat block has - a figure as a number, a list of
+    # words, a Strike as its fields - and anything else is dropped rather than raised on or stored. Lists
+    # and words are kept to a stat block's size.
+    #
+    # A Strike or ability keeps engine rules only where the creature it came from - the bestiary creature
+    # cloned, or the revision edited - had the same ones on a part of that name: rules are the importer's,
+    # read from Foundry, never an author's.
     module CreatureBlock
 
       NUMBERS = %w{level ac hp hardness perception}.freeze
@@ -12,42 +16,89 @@ module AresMUSH
       LISTS = %w{traits immunities senses}.freeze
       WORDS = %w{name size rarity hp_details}.freeze
 
+      MOST_LISTED = 30
+      LONGEST = 2000
+      LONGEST_TEXT = 4000
+
       def self.plain(value)
         JSON.parse(JSON.dump(value))
       end
 
+      # A number from what may not be one: a string or a number, else nothing.
+      def self.int(value)
+        value.is_a?(Integer) || value.is_a?(Float) || (value.is_a?(String) && value.strip.match?(/\A[+-]?\d+\z/)) ? value.to_i : nil
+      end
+
+      def self.word(value, longest = LONGEST)
+        value.is_a?(String) || value.is_a?(Numeric) ? value.to_s.strip[0, longest] : ''
+      end
+
+      def self.words(value)
+        (value.is_a?(Array) ? value : []).map { |one| word(one, 60) }.reject(&:empty?).first(MOST_LISTED)
+      end
+
+      def self.hash(value)
+        value.is_a?(Hash) ? value : {}
+      end
+
       def self.cleaned(raw, base = nil)
-        raw = plain(Hash(raw))
-        base = plain(Hash(base))
+        raw = hash(plain(raw))
+        base = hash(plain(base))
         block = {}
 
-        WORDS.each { |field| block[field] = raw[field].to_s.strip if raw[field].to_s.strip != '' }
-        NUMBERS.each { |field| block[field] = raw[field].to_i if raw.key?(field) && raw[field].to_s.strip != '' }
-        COUNTED.each { |field| block[field] = Hash(raw[field]).transform_values(&:to_i) if raw[field].is_a?(Hash) }
-        LISTS.each { |field| block[field] = Array(raw[field]).map { |one| one.to_s.strip }.reject(&:empty?) }
-        %w{weaknesses resistances}.each { |field| block[field] = Hash(raw[field]) if raw[field].is_a?(Hash) && raw[field].any? }
+        WORDS.each { |field| block[field] = word(raw[field]) if word(raw[field]) != '' }
+        NUMBERS.each { |field| block[field] = int(raw[field]) unless int(raw[field]).nil? }
+        COUNTED.each do |field|
+          counted = hash(raw[field]).filter_map { |key, value| int(value).nil? ? nil : [ word(key, 60), int(value) ] }.reject { |key, _| key.empty? }
+          block[field] = counted.first(MOST_LISTED).to_h if raw[field].is_a?(Hash)
+        end
+        LISTS.each { |field| block[field] = words(raw[field]) }
+        %w{weaknesses resistances}.each { |field| block[field] = resisted(raw[field]) if raw[field].is_a?(Hash) && resisted(raw[field]).any? }
 
-        block['strikes'] = Array(raw['strikes']).map { |one| strike(Hash(one), base) }
-        block['actions'] = Array(raw['actions']).map { |one| ability(Hash(one), base) }
-        block['shield'] = shield(Hash(raw['shield'])) if raw['shield'].is_a?(Hash)
-        block['spellcasting'] = Array(raw['spellcasting']).map { |one| casting(Hash(one)) } if Array(raw['spellcasting']).any?
+        block['strikes'] = parts(raw['strikes']).map { |one| strike(one, base) }
+        block['actions'] = parts(raw['actions']).map { |one| ability(one, base) }
+        block['shield'] = shield(raw['shield']) if raw['shield'].is_a?(Hash)
+        block['spellcasting'] = parts(raw['spellcasting']).first(10).map { |one| casting(one) } if parts(raw['spellcasting']).any?
 
         block.compact
       end
 
+      def self.parts(value)
+        (value.is_a?(Array) ? value : []).select { |one| one.is_a?(Hash) }
+      end
+
+      # A weakness or resistance: its value, or its value with what it excepts and what it doubles against.
+      def self.resisted(value)
+        hash(value).filter_map do |type, held|
+          key = word(type, 60)
+          next nil if key.empty?
+
+          if held.is_a?(Hash)
+            worth = int(held['value'])
+            next nil if worth.nil?
+
+            [ key, { 'value' => worth, 'except' => words(held['except']), 'double' => words(held['double']) }.reject { |_, one| one == [] } ]
+          else
+            int(held).nil? ? nil : [ key, int(held) ]
+          end
+        end.first(MOST_LISTED).to_h
+      end
+
       def self.strike(raw, base)
-        out = { 'name' => raw['name'].to_s.strip, 'bonus' => raw['bonus'].to_i,
-                'damage' => Array(raw['damage']).map { |formula, type, category| [ formula.to_s.delete(' '), type.to_s.strip.downcase, category.to_s.empty? ? nil : category.to_s ] },
-                'traits' => Array(raw['traits']).map(&:to_s), 'effects' => Array(raw['effects']).map(&:to_s).reject(&:empty?) }
-        out['range'] = raw['range'].to_i if raw['range'].to_i.positive?
+        damage = (raw['damage'].is_a?(Array) ? raw['damage'] : []).select { |one| one.is_a?(Array) && one.size >= 2 }.first(5).map do |formula, type, category|
+          [ word(formula, 40).delete(' '), word(type, 40).downcase, word(category, 20).empty? ? nil : word(category, 20) ]
+        end
+        out = { 'name' => word(raw['name'], 60), 'bonus' => int(raw['bonus']).to_i, 'damage' => damage, 'traits' => words(raw['traits']),
+                'effects' => words(raw['effects']) }
+        out['range'] = int(raw['range']) if int(raw['range']).to_i.positive?
 
         ruled(out, raw, base['strikes'])
       end
 
       def self.ability(raw, base)
-        out = { 'name' => raw['name'].to_s.strip, 'type' => raw['type'].to_s.empty? ? 'action' : raw['type'].to_s,
-                'cost' => raw['cost'].to_s.strip.empty? ? nil : raw['cost'].to_i, 'traits' => Array(raw['traits']).map(&:to_s),
-                'text' => raw['text'].to_s }
+        type = %w{action reaction free passive}.include?(raw['type']) ? raw['type'] : 'action'
+        out = { 'name' => word(raw['name'], 60), 'type' => type, 'cost' => int(raw['cost']), 'traits' => words(raw['traits']),
+                'text' => word(raw['text'], LONGEST_TEXT + 1) }
 
         ruled(out, raw, base['actions'])
       end
@@ -55,21 +106,24 @@ module AresMUSH
       # Its rules, where the part of that name it came from had these same ones.
       def self.ruled(out, raw, from)
         rules = raw['rules']
-        before = Array(from).find { |one| one['name'].to_s.casecmp?(out['name']) }
+        before = (from.is_a?(Array) ? from : []).find { |one| one.is_a?(Hash) && one['name'].to_s.casecmp?(out['name']) }
 
         rules.is_a?(Array) && rules.any? && before && before['rules'] == rules ? out.merge('rules' => rules) : out
       end
 
       def self.shield(raw)
-        { 'name' => raw['name'].to_s.strip.empty? ? 'Shield' : raw['name'].to_s.strip, 'hardness' => raw['hardness'].to_i,
-          'hp' => raw['hp'].to_i, 'ac' => (raw['ac'] || 2).to_i }
+        { 'name' => word(raw['name'], 60).empty? ? 'Shield' : word(raw['name'], 60), 'hardness' => int(raw['hardness']).to_i,
+          'hp' => int(raw['hp']).to_i, 'ac' => (int(raw['ac']) || 2) }
       end
 
       def self.casting(raw)
-        { 'name' => raw['name'].to_s, 'tradition' => raw['tradition'].to_s, 'type' => raw['type'].to_s, 'dc' => raw['dc'].to_i,
-          'attack' => raw['attack'].to_i, 'spells' => Hash(raw['spells']).transform_values { |names| Array(names).map(&:to_s) } }
-          .merge(raw['slots'].is_a?(Hash) ? { 'slots' => raw['slots'].transform_values(&:to_i) } : {})
-          .merge(raw['uses'].is_a?(Hash) ? { 'uses' => raw['uses'].transform_values(&:to_i) } : {})
+        spells = hash(raw['spells']).filter_map { |rank, names| int(rank).nil? ? nil : [ int(rank).to_s, words(names) ] }.to_h
+        counted = ->(value) { hash(value).filter_map { |key, number| int(number).nil? ? nil : [ word(key, 60), int(number) ] }.to_h }
+
+        { 'name' => word(raw['name'], 60), 'tradition' => word(raw['tradition'], 20), 'type' => word(raw['type'], 20),
+          'dc' => int(raw['dc']).to_i, 'attack' => int(raw['attack']).to_i, 'spells' => spells }
+          .merge(raw['slots'].is_a?(Hash) ? { 'slots' => counted.call(raw['slots']) } : {})
+          .merge(raw['uses'].is_a?(Hash) ? { 'uses' => counted.call(raw['uses']) } : {})
       end
     end
   end

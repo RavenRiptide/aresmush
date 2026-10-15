@@ -16,7 +16,7 @@ module AresMUSH
       def self.name_free(owner, name, creature = nil)
         slug = Domains.slug(name)
         others = Pf2eCreature.find(:name_slug => slug).to_a.reject { |one| one.retired_at || (creature && one.id == creature.id) }
-        own = others.find { |one| one.owner_id.to_s == owner.id.to_s }
+        own = owner && others.find { |one| one.owner_id.to_s == owner.id.to_s }
         published = others.find(&:published_id)
 
         return Err.new(:creature_name_yours, 'pf2e.creature_name_yours', 'name' => own.name) if own
@@ -78,6 +78,17 @@ module AresMUSH
         creature.update(:retired_at => retired ? Time.now : nil, :submitted => retired ? nil : creature.submitted)
         event!(creature, retired ? 'retired' : 'restored', by)
         HouseBestiary.write! if creature.published_id
+      end
+
+      # Back in use, unless its author has since given another creature its name, or another's was
+      # published under it.
+      def self.restore!(creature, by)
+        creature = Pf2eCreature[creature.id]
+
+        name_free(creature.owner, creature.name, creature).and_then do
+          retire!(creature, by, false)
+          Ok.new(:state => creature)
+        end
       end
 
       # Their published creatures stay, for staff to hand on, with the name they were saved under; the rest

@@ -31,7 +31,8 @@ module AresMUSH
         table = tables[kind] || {}
         held = table['levels'] || {}
 
-        [ Array(table['columns']), held[level.to_i.clamp(-1, 24)] || [] ]
+        # A creature past the levels the book's tables give is not weighed against the nearest.
+        [ Array(table['columns']), held[level.to_i] || [] ]
       end
 
       def self.band(kind, level, value)
@@ -64,7 +65,9 @@ module AresMUSH
           dealt = CreatureAbilities.damage_save(ability['text'])
           next nil unless dealt
 
-          limited = Recharge.rounds_of(ability['name'], ability) || CreatureAbilities.frequency(ability['text'])
+          # Used every round it may be, however its frequency is written, it is unlimited.
+          often = CreatureAbilities.frequency(ability['text'])
+          limited = Recharge.rounds_of(ability['name'], ability) || (often && !%w{round turn}.include?(often['per']))
           [ "#{ability['name']} damage", 'area_damage', Pf2e.average(dealt['formula']).to_i, limited ? 'limited_use' : 'unlimited_use' ]
         end
 

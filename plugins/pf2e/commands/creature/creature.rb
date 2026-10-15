@@ -32,7 +32,8 @@ module AresMUSH
 
         return client.emit_failure(t('pf2e.creature_invalid', :errors => told_errors(errors))) if errors.any?
 
-        own = Creatures.allowed(enactor, 'edit').find { |one| one.owner_id.to_s == enactor.id.to_s && one.name_slug == Domains.slug(name) }
+        # A retired creature holds no name, so saving under its name makes a new one.
+        own = Creatures.allowed(enactor, 'edit').find { |one| one.owner_id.to_s == enactor.id.to_s && one.name_slug == Domains.slug(name) && !one.retired_at }
 
         return client.emit_failure(t('pf2e.creature_name_yours', :name => own.name)) if own && fresh
 
@@ -452,7 +453,12 @@ module AresMUSH
         return if CharState.emit_error!(client, found)
 
         retiring = cmd.switch_is?('retire')
-        CreatureStore.retire!(found.state, enactor, retiring)
+        if retiring
+          CreatureStore.retire!(found.state, enactor, true)
+        else
+          return if CharState.emit_error!(client, CreatureStore.restore!(found.state, enactor))
+        end
+
         client.emit_success t(retiring ? 'pf2e.creature_retired_ok' : 'pf2e.creature_restored', :name => found.state.name)
       end
     end

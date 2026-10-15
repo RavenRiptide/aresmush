@@ -96,7 +96,7 @@ module AresMUSH
 
         return bestiary(char, key) if source == 'bestiary'
 
-        found = Creatures.find(char, "c:#{key}", 'view')
+        found = Creatures.saved(char, key, 'view')
 
         return { error: t('pf2e.creature_web_not_found') } if found.err?
 
@@ -144,7 +144,7 @@ module AresMUSH
     module CreatureEditor
 
       def self.editable(char, id)
-        found = Creatures.find(char, "c:#{id}", 'view')
+        found = Creatures.saved(char, id.to_s, 'view')
 
         return Err.new(:not_found, 'pf2e.creature_web_not_found') if found.err?
 
@@ -161,7 +161,7 @@ module AresMUSH
         case kind
         when 'bestiary' then Bestiary.entry(Bestiary.named(key).to_s)
         when 'saved'
-          found = Creatures.find(char, "c:#{key}", 'clone')
+          found = Creatures.saved(char, key, 'clone')
           found.ok? ? Creatures.shown_block(char, found.state) : nil
         end
       end
@@ -214,7 +214,7 @@ module AresMUSH
 
         return { error: t('pf2e.creature_web_not_found') } unless block
 
-        { block: CreatureBlock.plain(block).except('pack', 'source', 'adjustment', 'approved'), cloned_from: from }
+        { block: CreatureBlock.cleaned(block, block), cloned_from: from }
       end
     end
 
@@ -316,7 +316,7 @@ module AresMUSH
 
         char = request.enactor
         act = request.args['act'].to_s
-        found = Creatures.find(char, "c:#{request.args['id']}", 'view')
+        found = Creatures.saved(char, request.args['id'].to_s, 'view')
 
         return { error: t('pf2e.creature_web_not_found') } if found.err? || !ACTIONS.key?(act)
 
@@ -351,7 +351,7 @@ module AresMUSH
       end
 
       def restore(char, creature, _args)
-        CreatureStore.retire!(creature, char, false)
+        CreatureStore.restore!(creature, char)
       end
 
       # Every Plotmaster or not, and these by name: Plotmasters and admins only.

@@ -29,7 +29,8 @@ module AresMUSH
       end
 
       after(:each) do
-        [ @draft, @published ].each { |creature| Pf2eCreature[creature.id]&.delete }
+        owners = [ @pm, @player, @admin ].map(&:id)
+        Pf2eCreature.all.to_a.select { |creature| owners.include?(creature.owner_id) }.each(&:delete)
         [ @pm, @player, @admin ].each(&:delete)
       end
 
@@ -87,6 +88,12 @@ module AresMUSH
           expect([ answer[:block]['ac'], answer[:editing_revision] ]).to eq [ 18, 1 ]
         end
 
+        it "should find only a saved creature by its id, whatever else the id says" do
+          expect(asked(PF2CreatureHandler, @pm, { 'ref' => "saved:#{@draft.id}\nGoblin Warrior" })[:error]).to eq t('pf2e.creature_web_not_found')
+          expect(asked(PF2CreatureHandler, @pm, { 'ref' => 'saved:Goblin Warrior' })[:error]).to eq t('pf2e.creature_web_not_found')
+          expect(asked(PF2CreatureActHandler, @pm, { 'id' => 'Goblin Warrior', 'act' => 'retire' })[:error]).to eq t('pf2e.creature_web_not_found')
+        end
+
         it "should refuse a player a draft that is not theirs, saying only that it is not there" do
           expect(asked(PF2CreatureHandler, @player, { 'ref' => "saved:#{@draft.id}" })[:error]).to eq t('pf2e.creature_web_not_found')
         end
@@ -138,7 +145,6 @@ module AresMUSH
           again = asked(PF2CreatureSaveHandler, @pm, { 'id' => creature.id, 'base_revision' => 1, 'name' => 'Grave Hound', 'block' => block('ac' => 19) })
 
           expect([ made[:revision], again[:revision], again[:summary] ]).to eq [ 1, 2, 'AC 18 to 19' ]
-          creature.delete
         end
 
         it "should refuse a save against a revision someone has since changed" do
@@ -148,7 +154,6 @@ module AresMUSH
           stale = asked(PF2CreatureSaveHandler, @pm, { 'id' => made[:id], 'base_revision' => 1, 'name' => 'Grave Hound', 'block' => block('ac' => 20) })
 
           expect([ stale[:error], stale[:head] ]).to eq [ t('pf2e.creature_stale'), 2 ]
-          Pf2eCreature[made[:id]].delete
         end
 
         it "should not save what has errors, or another's creature" do
@@ -162,7 +167,6 @@ module AresMUSH
           made = asked(PF2CreatureSaveHandler, @pm, { 'name' => 'Grave Hound', 'block' => ruled })
 
           expect(Pf2eCreature[made[:id]].head.block['strikes'].first['rules']).to be_nil
-          Pf2eCreature[made[:id]].delete
         end
 
         it "should start one from a bestiary creature, rules and all, or blank at a level" do
@@ -172,6 +176,13 @@ module AresMUSH
           expect([ goblin[:block]['ac'], goblin[:cloned_from], blank[:block]['level'] ]).to eq [ 16, 'bestiary:Goblin Warrior', 4 ]
           expect(asked(PF2CreatureStartHandler, @pm, { 'from' => 'described', 'words' => 'ac 15 hp 20 level 1' })[:block]['ac']).to eq 15
           expect(asked(PF2CreatureStartHandler, @pm, { 'from' => 'described', 'words' => 'a goblin' })[:error]).to eq t('pf2e.creature_save_words')
+        end
+
+        it "should start from a bestiary creature in the shape the editor saves" do
+          goblin = asked(PF2CreatureStartHandler, @pm, { 'from' => 'bestiary:Goblin Warrior' })[:block]
+
+          expect(goblin).to eq CreatureBlock.cleaned(goblin, Bestiary.entry('Goblin Warrior'))
+          expect(goblin['strikes'].map { |one| one['rules'] }).to eq(Bestiary.entry('Goblin Warrior')['strikes'].map { |one| one['rules'] })
         end
 
         it "should offer the words a block may use" do
@@ -227,6 +238,14 @@ module AresMUSH
           expect(acted(@pm, @draft, 'restore')[:creature][:status]).to eq 'draft'
 
           expect(acted(@player, @published, 'retire')[:error]).to eq t('pf2e.creature_may_not', :action => 'retire')
+        end
+
+        it "should not restore one under a name its author has used since" do
+          acted(@pm, @draft, 'retire')
+          again = CreatureStore.create!(@pm, 'Barrow Hound', Described.read('x', 'ac 18 hp 40 level 3').state)
+
+          expect(acted(@pm, @draft, 'restore')[:error]).to eq t('pf2e.creature_name_yours', :name => 'Barrow Hound')
+          expect(Pf2eCreature[@draft.id].status).to eq 'retired'
         end
 
         it "should share with every Plotmaster, and with named characters" do
