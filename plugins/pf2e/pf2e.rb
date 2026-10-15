@@ -468,6 +468,12 @@ module AresMUSH
         return PF2CreatureCheckHandler
       when "pf2CreatureSave"
         return PF2CreatureSaveHandler
+      when "pf2CreatureAct"
+        return PF2CreatureActHandler
+      when "pf2CreatureQueue"
+        return PF2CreatureQueueHandler
+      when "pf2CreatureReview"
+        return PF2CreatureReviewHandler
       when "pf2Actions"
         return PF2ActionsHandler
       when "pf2LastRoll"

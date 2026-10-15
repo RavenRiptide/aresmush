@@ -60,7 +60,8 @@ module AresMUSH
 
         { scope: scope, scopes: scopes, total: listed.size, page: page, pages: [ (listed.size + CreatureWeb::PAGE - 1) / CreatureWeb::PAGE, 1 ].max,
           creatures: listed.drop((page - 1) * CreatureWeb::PAGE).first(CreatureWeb::PAGE),
-          can_create: CreatureAccess.may(actor, 'create').ok?, runs_own: CreatureAccess.runs_own?(actor),
+          can_create: CreatureAccess.may(actor, 'create').ok?, runs_own: CreatureAccess.runs_own?(actor), admin: CreatureAccess.admin?(actor),
+          waiting: CreatureAccess.admin?(actor) ? Creatures.all.count(&:submitted_id) : 0,
           open_bestiaries: Gm.open_bestiaries }
       end
 
@@ -107,6 +108,7 @@ module AresMUSH
         { creature: summary, lines: CreatureWeb.lines(creature.name, shown.block), add: "+e/add c:#{creature.id}",
           addable: Creatures.usable?(char, Creatures.ref(char, creature)),
           block: mine ? CreatureBlock.plain(creature.head.block) : nil, editing_revision: mine ? creature.head.number : nil,
+          shared_with: mine ? Array(creature.shared_with).filter_map { |id| Character[id]&.name } : [],
           notes: mine ? creature.notes : nil, review_note: mine ? creature.review_note : nil,
           history: mine ? history(creature) : [] }
       end
@@ -293,6 +295,140 @@ module AresMUSH
         head = Pf2eCreature[creature.id].head
 
         { id: creature.id, revision: head.number, summary: revision ? revision.summary : t('pf2e.creature_unchanged', :name => name) }
+      end
+    end
+  end
+end
+
+module AresMUSH
+  module Pf2e
+
+    # `pf2CreatureAct` - what an author does to one of their own from its page: `{ id, act }`, the act being
+    # submit (with `note`), withdraw, retire, restore, or share (with `plotmasters` and `with`, names).
+    class PF2CreatureActHandler
+      ACTIONS = { 'submit' => 'submit', 'withdraw' => 'submit', 'retire' => 'retire', 'restore' => 'retire', 'share' => 'share' }.freeze
+
+      def handle(request)
+        error = Website.check_login(request)
+        return error if error
+
+        char = request.enactor
+        act = request.args['act'].to_s
+        found = Creatures.find(char, "c:#{request.args['id']}", 'view')
+
+        return { error: t('pf2e.creature_web_not_found') } if found.err? || !ACTIONS.key?(act)
+
+        creature = found.state['creature']
+        allowed = CreatureAccess.may(CreatureAccess.actor(char), ACTIONS[act], Creatures.row(creature))
+        return { error: t(allowed.key, **CharState.symbolize(allowed.args)) } if allowed.err?
+
+        done = send(act, char, creature, request.args)
+        return { error: t(done.key, **CharState.symbolize(done.args)) } if done.is_a?(Err)
+
+        { creature: CreatureWeb.saved_summary(char, Pf2eCreature[creature.id]) }
+      end
+
+      def submit(char, creature, args)
+        errors = CreatureCheck.errors(creature.head.block)
+        return Err.new(:creature_invalid, 'pf2e.creature_invalid', 'errors' => CreatureEditor.findings(errors).map { |one| one[:message] }.join(' ')) if errors.any?
+
+        done = CreatureReview.submit!(creature, char, args['note'].to_s)
+        if done.ok?
+          message = t('pf2e.creature_awaits', :name => creature.name, :id => creature.id, :author => char.name)
+          Global.notifier.notify_ooc(:pf2_creature, message) { |one| one && one.is_admin? }
+        end
+        done
+      end
+
+      def withdraw(char, creature, _args)
+        CreatureReview.withdraw!(creature, char)
+      end
+
+      def retire(char, creature, _args)
+        CreatureStore.retire!(creature, char, true)
+      end
+
+      def restore(char, creature, _args)
+        CreatureStore.retire!(creature, char, false)
+      end
+
+      # Every Plotmaster or not, and these by name: Plotmasters and admins only.
+      def share(char, creature, args)
+        named = Array(args['with']).map(&:to_s).map(&:strip).reject(&:empty?).map { |name| [ name, Character.find_one_by_name(name) ] }
+        missing = named.find { |_name, one| one.nil? }
+        return Err.new(:not_found, 'pf2e.char_not_found') if missing
+
+        refused = named.find { |_name, one| !CreatureAccess.shareable?(CreatureAccess.actor(one)) }
+        return Err.new(:creature_share_who, 'pf2e.creature_share_who', 'name' => refused.last.name) if refused
+
+        ids = named.map { |_name, one| one.id.to_s }
+        plotmasters = args['plotmasters'] == true || args['plotmasters'].to_s == 'true'
+        audience = if plotmasters then 'plotmasters'
+                   elsif ids.any? then 'shared'
+                   else 'private'
+                   end
+
+        CreatureStore.share!(creature, audience, ids, char)
+      end
+    end
+
+    # `pf2CreatureQueue` - for admins: what awaits approval, with its findings and what changed since it
+    # was last published.
+    class PF2CreatureQueueHandler
+      def handle(request)
+        error = Website.check_login(request)
+        return error if error
+
+        char = request.enactor
+        return { error: t('pf2e.creature_may_not', :action => 'review') } unless CreatureAccess.admin?(CreatureAccess.actor(char))
+
+        waiting = Creatures.all.select(&:submitted_id).sort_by { |creature| creature.submitted.created_at.to_s }
+
+        { submissions: waiting.map { |creature| submission(char, creature) } }
+      end
+
+      def submission(char, creature)
+        revision = creature.submitted
+        block = revision.block
+
+        { creature: CreatureWeb.saved_summary(char, creature), revision: revision.number, note: creature.submitted_note,
+          changes: creature.published ? Creatures.changes(creature.published.block, block) : t('pf2e.creature_queue_new'),
+          errors: CreatureEditor.findings(CreatureCheck.errors(block)), warnings: CreatureEditor.findings(CreatureVocabulary.warnings(block)),
+          mechanised: CreatureMechanised.of(block), lines: CreatureWeb.lines(creature.name, block) }
+      end
+    end
+
+    # `pf2CreatureReview` - an admin's decision: `{ id, decision: approve | reject | unpublish, note }`. A
+    # rejection needs its reason, which its author reads on the creature.
+    class PF2CreatureReviewHandler
+      DONE = { 'approve' => 'approved', 'reject' => 'rejected', 'unpublish' => 'unpublished' }.freeze
+
+      def handle(request)
+        error = Website.check_login(request)
+        return error if error
+
+        char = request.enactor
+        return { error: t('pf2e.creature_may_not', :action => 'review') } unless CreatureAccess.admin?(CreatureAccess.actor(char))
+
+        creature = Pf2eCreature[request.args['id']]
+        decision = request.args['decision'].to_s
+        return { error: t('pf2e.creature_web_not_found') } unless creature && DONE.key?(decision)
+
+        note = request.args['note'].to_s
+        done = case decision
+               when 'approve' then CreatureReview.approve!(creature, char)
+               when 'reject' then CreatureReview.reject!(creature, char, note)
+               else CreatureReview.unpublish!(creature, char)
+               end
+
+        return { error: t(done.key, **CharState.symbolize(done.args)) } if done.err?
+
+        message = t("pf2e.creature_#{DONE[decision]}", :name => creature.name, :by => char.name, :reason => note)
+        Global.logger.info "PF2 creature c:#{creature.id} #{creature.name} #{DONE[decision]} by #{char.name}"
+        Login.notify(creature.owner, :pf2_creature, message, creature.id) if creature.owner && creature.owner != char
+
+        { creature: CreatureWeb.saved_summary(char, Pf2eCreature[creature.id]),
+          messages: done.messages.map { |one| t(one['key'], **CharState.symbolize(one['args'] || {})) } }
       end
     end
   end

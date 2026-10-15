@@ -181,6 +181,59 @@ module AresMUSH
           expect(answer[:sizes]).to eq %w{tiny small medium large huge gargantuan}
         end
       end
+
+      describe "approval and the queue" do
+        before(:each) do
+          allow(Global).to receive(:notifier).and_return(double(:notify_ooc => nil))
+          allow(Login).to receive(:notify)
+        end
+
+        def acted(who, creature, act, more = {})
+          asked(PF2CreatureActHandler, who, { 'id' => creature.id, 'act' => act }.merge(more))
+        end
+
+        it "should let its author submit it, and an admin see it in the queue and approve it" do
+          acted(@pm, @draft, 'submit', 'note' => 'for the barrow')
+
+          queue = asked(PF2CreatureQueueHandler, @admin, {})
+          expect(queue[:submissions].map { |one| [ one[:creature][:name], one[:note], one[:changes] ] }).to eq [ [ 'Barrow Hound', 'for the barrow', 'new' ] ]
+
+          answer = asked(PF2CreatureReviewHandler, @admin, { 'id' => @draft.id, 'decision' => 'approve' })
+          expect([ answer[:creature][:status], Pf2eCreature[@draft.id].status ]).to eq [ 'published', 'published' ]
+        end
+
+        it "should keep the queue and decisions from anyone but an admin" do
+          acted(@pm, @draft, 'submit')
+
+          expect(asked(PF2CreatureQueueHandler, @pm, {})[:error]).to eq t('pf2e.creature_may_not', :action => 'review')
+          expect(asked(PF2CreatureReviewHandler, @pm, { 'id' => @draft.id, 'decision' => 'approve' })[:error]).to eq t('pf2e.creature_may_not', :action => 'review')
+        end
+
+        it "should send one back with a reason, and need one" do
+          acted(@pm, @draft, 'submit')
+
+          expect(asked(PF2CreatureReviewHandler, @admin, { 'id' => @draft.id, 'decision' => 'reject', 'note' => '' })[:error]).to eq t('pf2e.creature_reason')
+          asked(PF2CreatureReviewHandler, @admin, { 'id' => @draft.id, 'decision' => 'reject', 'note' => 'Too strong.' })
+          expect(Pf2eCreature[@draft.id].review_note).to eq 'Too strong.'
+        end
+
+        it "should let its author withdraw it, retire it and restore it, and nobody else" do
+          acted(@pm, @draft, 'submit')
+          expect(acted(@pm, @draft, 'withdraw')[:creature][:status]).to eq 'draft'
+          expect(acted(@pm, @draft, 'retire')[:creature][:status]).to eq 'retired'
+          expect(acted(@pm, @draft, 'restore')[:creature][:status]).to eq 'draft'
+
+          expect(acted(@player, @published, 'retire')[:error]).to eq t('pf2e.creature_may_not', :action => 'retire')
+        end
+
+        it "should share with every Plotmaster, and with named characters" do
+          expect(acted(@pm, @draft, 'share', 'plotmasters' => true, 'with' => [ @admin.name ])[:creature][:audience]).to eq 'plotmasters'
+          expect(Pf2eCreature[@draft.id].shared_with).to eq [ @admin.id.to_s ]
+
+          expect(acted(@pm, @draft, 'share', 'plotmasters' => false, 'with' => [ @player.name ])[:error])
+            .to eq t('pf2e.creature_share_who', :name => @player.name)
+        end
+      end
     end
   end
 end
