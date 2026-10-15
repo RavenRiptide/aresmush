@@ -456,6 +456,10 @@ module AresMUSH
         return PF2DedicationFeatsHandler
       when "pf2Encounter"
         return PF2EncounterHandler
+      when "pf2Creatures"
+        return PF2CreaturesHandler
+      when "pf2Creature"
+        return PF2CreatureHandler
       when "pf2Actions"
         return PF2ActionsHandler
       when "pf2LastRoll"
