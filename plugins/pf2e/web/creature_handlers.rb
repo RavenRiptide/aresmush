@@ -189,6 +189,13 @@ module AresMUSH
       def self.refusal(err)
         { code: err.code.to_s, message: t(err.key, **CharState.symbolize(err.args)) }
       end
+
+      # An Err as a page shows it: every finding of a block's checks, or the one refusal.
+      def self.error(err)
+        return { error: t(err.key, **CharState.symbolize(err.args)) } unless err.code == :creature_invalid
+
+        { error: t('pf2e.creature_invalid', :errors => findings(err.args['errors']).map { |one| one[:message] }.join(' ')) }
+      end
     end
 
     # `pf2CreatureOptions` - the words a stat block may use, for the editor's choices.
@@ -221,7 +228,7 @@ module AresMUSH
         if from == 'described'
           read = Described.read('', request.args['words'].to_s)
           return { error: t('pf2e.creature_save_words') } unless read
-          return { error: t(read.key, **CharState.symbolize(read.args)) } if read.err?
+          return CreatureEditor.error(read) if read.err?
 
           return { block: read.state, cloned_from: 'described' }
         end
@@ -272,7 +279,7 @@ module AresMUSH
         return CreatureAccess.may(CreatureAccess.actor(char), 'create').ok? ? create(char, request) : { error: t('pf2e.creature_may_not', :action => 'create') } if id.empty?
 
         found = CreatureEditor.editable(char, id)
-        return { error: t(found.key, **CharState.symbolize(found.args)) } if found.err?
+        return CreatureEditor.error(found) if found.err?
 
         revise(char, found.state, request)
       end
@@ -331,23 +338,17 @@ module AresMUSH
 
         creature = found.state['creature']
         allowed = CreatureAccess.may(CreatureAccess.actor(char), ACTIONS[act], Creatures.row(creature))
-        return { error: t(allowed.key, **CharState.symbolize(allowed.args)) } if allowed.err?
+        return CreatureEditor.error(allowed) if allowed.err?
 
         done = send(act, char, creature, request.args)
-        return { error: t(done.key, **CharState.symbolize(done.args)) } if done.is_a?(Err)
+        return CreatureEditor.error(done) if done.is_a?(Err)
 
         { creature: CreatureWeb.saved_summary(char, Pf2eCreature[creature.id]) }
       end
 
       def submit(char, creature, args)
-        errors = CreatureCheck.errors(creature.head.block)
-        return Err.new(:creature_invalid, 'pf2e.creature_invalid', 'errors' => CreatureEditor.findings(errors).map { |one| one[:message] }.join(' ')) if errors.any?
-
         done = CreatureReview.submit!(creature, char, args['note'].to_s)
-        if done.ok?
-          message = t('pf2e.creature_awaits', :name => creature.name, :id => creature.id, :author => char.name)
-          Global.notifier.notify_ooc(:pf2_creature, message) { |one| one && one.is_admin? }
-        end
+        CreatureNotices.submitted(creature, char) if done.ok?
         done
       end
 
@@ -412,8 +413,6 @@ module AresMUSH
     # `pf2CreatureReview` - an admin's decision: `{ id, decision: approve | reject | unpublish, note }`. A
     # rejection needs its reason, which its author reads on the creature.
     class PF2CreatureReviewHandler
-      DONE = { 'approve' => 'approved', 'reject' => 'rejected', 'unpublish' => 'unpublished' }.freeze
-
       def handle(request)
         error = Website.check_login(request)
         return error if error
@@ -422,21 +421,14 @@ module AresMUSH
         return { error: t('pf2e.creature_may_not', :action => 'review') } unless CreatureAccess.admin?(CreatureAccess.actor(char))
 
         creature = Pf2eCreature[request.args['id']]
+        return { error: t('pf2e.creature_web_not_found') } unless creature
+
         decision = request.args['decision'].to_s
-        return { error: t('pf2e.creature_web_not_found') } unless creature && DONE.key?(decision)
-
         note = request.args['note'].to_s
-        done = case decision
-               when 'approve' then CreatureReview.approve!(creature, char)
-               when 'reject' then CreatureReview.reject!(creature, char, note)
-               else CreatureReview.unpublish!(creature, char)
-               end
+        done = CreatureReview.decide!(creature, char, decision, note)
+        return CreatureEditor.error(done) if done.err?
 
-        return { error: t(done.key, **CharState.symbolize(done.args)) } if done.err?
-
-        message = t("pf2e.creature_#{DONE[decision]}", :name => creature.name, :by => char.name, :reason => note)
-        Global.logger.info "PF2 creature c:#{creature.id} #{creature.name} #{DONE[decision]} by #{char.name}"
-        Login.notify(creature.owner, :pf2_creature, message, creature.id) if creature.owner && creature.owner != char
+        CreatureNotices.decided(creature, char, decision, note)
 
         { creature: CreatureWeb.saved_summary(char, Pf2eCreature[creature.id]),
           messages: done.messages.map { |one| t(one['key'], **CharState.symbolize(one['args'] || {})) } }

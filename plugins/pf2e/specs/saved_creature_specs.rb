@@ -168,6 +168,42 @@ module AresMUSH
           expect(CreatureReview.approve!(two, @admin).code).to eq :creature_published_name
         end
 
+        it "should not take a creature with errors for approval, and say every one" do
+          creature = CreatureStore.create!(@player, 'Broken Hound', { 'level' => 3, 'ac' => 18, 'hp' => 0 })
+          @made << creature
+
+          refused = CreatureReview.submit!(creature, @player, '')
+
+          expect([ refused.code, refused.args['errors'].map { |one| one['code'] } ]).to eq [ :creature_invalid, [ :creature_needs ] ]
+        end
+
+        it "should take any of an admin's three decisions by name, and nothing else" do
+          creature = hound(@player)
+          CreatureReview.submit!(creature, @player, '')
+
+          expect(CreatureReview.decide!(creature, @admin, 'shelve', '').code).to eq :creature_decision
+          expect(CreatureReview.decide!(creature, @admin, 'reject', 'Too strong.').ok?).to be true
+          CreatureReview.submit!(creature, @player, '')
+          expect(CreatureReview.decide!(creature, @admin, 'approve', '').ok?).to be true
+          expect(CreatureReview.decide!(creature, @admin, 'unpublish', '').ok?).to be true
+          expect(Pf2eCreature[creature.id].status).to eq 'draft'
+        end
+
+        it "should tell the admins of a submission, and the author of a decision not their own" do
+          creature = hound(@player)
+          notifier = double(:notify_ooc => nil)
+          allow(Global).to receive(:notifier).and_return(notifier)
+          allow(Login).to receive(:notify)
+
+          CreatureNotices.submitted(creature, @player)
+          said = CreatureNotices.decided(creature, @admin, 'reject', 'Too strong.')
+          CreatureNotices.decided(creature, @player, 'approve', '')
+
+          expect(notifier).to have_received(:notify_ooc).with(:pf2_creature, t('pf2e.creature_awaits', :name => 'Barrow Hound', :id => creature.id, :author => @player.name))
+          expect(said).to eq t('pf2e.creature_rejected', :name => 'Barrow Hound', :by => @admin.name, :reason => 'Too strong.')
+          expect(Login).to have_received(:notify).once.with(@player, :pf2_creature, said, creature.id)
+        end
+
         it "should take it out of the house bestiary when it is unpublished" do
           creature = hound(@player)
           CreatureReview.submit!(creature, @player, '')

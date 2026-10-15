@@ -236,6 +236,14 @@ module AresMUSH
           expect([ answer[:creature][:status], Pf2eCreature[@draft.id].status ]).to eq [ 'published', 'published' ]
         end
 
+        it "should say what keeps a creature from approval, and what decisions there are" do
+          broken = CreatureStore.create!(@pm, 'Broken Hound', { 'level' => 3, 'ac' => 18, 'hp' => 0 })
+
+          expect(acted(@pm, broken, 'submit')[:error]).to eq t('pf2e.creature_invalid', :errors => t('pf2e.creature_needs', :figure => 'HP'))
+          expect(asked(PF2CreatureReviewHandler, @admin, { 'id' => @draft.id, 'decision' => 'shelve' })[:error])
+            .to eq t('pf2e.creature_decision', :decisions => 'approve, reject, unpublish')
+        end
+
         it "should keep the queue and decisions from anyone but an admin" do
           acted(@pm, @draft, 'submit')
 

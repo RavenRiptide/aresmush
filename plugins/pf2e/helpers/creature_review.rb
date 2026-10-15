@@ -15,10 +15,26 @@ module AresMUSH
         return Err.new(:creature_submitted, 'pf2e.creature_submitted', 'name' => creature.name) if creature.submitted_id
         return Err.new(:creature_nothing_new, 'pf2e.creature_nothing_new', 'name' => creature.name) if creature.head_id == creature.published_id
 
+        refused = CreatureSaving.invalid(creature.head.block)
+        return refused if refused
+
         creature.update(:submitted => creature.head, :submitted_note => note.to_s.strip, :review_note => nil)
         CreatureStore.event!(creature, 'submitted', by, :revision => creature.head.number, :detail => { 'note' => note.to_s.strip })
 
         Ok.new(:state => creature)
+      end
+
+      # What each decision an admin may make is called once it is made.
+      DECISIONS = { 'approve' => 'approved', 'reject' => 'rejected', 'unpublish' => 'unpublished' }.freeze
+
+      # An admin's decision by name, with the reason a rejection needs.
+      def self.decide!(creature, by, decision, note)
+        case decision
+        when 'approve' then approve!(creature, by)
+        when 'reject' then reject!(creature, by, note)
+        when 'unpublish' then unpublish!(creature, by)
+        else Err.new(:creature_decision, 'pf2e.creature_decision', 'decisions' => DECISIONS.keys.join(', '))
+        end
       end
 
       def self.withdraw!(creature, by)

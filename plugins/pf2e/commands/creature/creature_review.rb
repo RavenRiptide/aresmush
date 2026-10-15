@@ -32,15 +32,10 @@ module AresMUSH
           return client.emit_success(t('pf2e.creature_withdrawn', :name => creature.name))
         end
 
-        errors = CreatureCheck.errors(creature.head.block)
-        return client.emit_failure(t('pf2e.creature_invalid', :errors => told_errors(errors))) if errors.any?
-
-        done = CreatureReview.submit!(creature, enactor, self.note)
-        return if CharState.emit_error!(client, done)
+        return if refused?(CreatureReview.submit!(creature, enactor, self.note))
 
         client.emit_success t('pf2e.creature_submitted_ok', :name => creature.name)
-        message = t('pf2e.creature_awaits', :name => creature.name, :id => creature.id, :author => enactor.name)
-        Global.notifier.notify_ooc(:pf2_creature, message) { |char| char && char.is_admin? }
+        CreatureNotices.submitted(creature, enactor)
       end
     end
 
@@ -128,27 +123,16 @@ module AresMUSH
         CreatureAccess.may(actor, 'review').ok? ? nil : t('pf2e.creature_may_not', :action => 'review')
       end
 
-      DONE = { 'approve' => 'approved', 'reject' => 'rejected', 'unpublish' => 'unpublished' }.freeze
-
       def handle
         found = saved(self.term, 'review')
         return if CharState.emit_error!(client, found)
 
-        creature = found.state
         decision = cmd.switch.to_s.downcase
-        done = case decision
-               when 'approve' then CreatureReview.approve!(creature, enactor)
-               when 'reject' then CreatureReview.reject!(creature, enactor, self.reason)
-               else CreatureReview.unpublish!(creature, enactor)
-               end
-
+        done = CreatureReview.decide!(found.state, enactor, decision, self.reason)
         return if CharState.emit_error!(client, done)
 
         CharState.emit_messages!(client, done)
-        message = t("pf2e.creature_#{DONE[decision]}", :name => creature.name, :by => enactor.name, :reason => self.reason)
-        client.emit_success message
-        Global.logger.info "PF2 creature c:#{creature.id} #{creature.name} #{DONE[decision]} by #{enactor.name}"
-        Login.notify(creature.owner, :pf2_creature, message, creature.id) if creature.owner && creature.owner != enactor
+        client.emit_success CreatureNotices.decided(found.state, enactor, decision, self.reason)
       end
     end
   end

@@ -820,6 +820,7 @@ en:
     creature_not_submitted: "%{name} is not awaiting approval."
     creature_not_published: "%{name} is not published."
     creature_published_name: "A published creature is already called %{name}: %{other}. Rename this one first."
+    creature_decision: "An admin's decision is one of %{decisions}."
     creature_reason: "Say why it goes back: creature/reject <creature>=<reason>."
     creature_submitted_ok: "%{name} is submitted for an admin's approval. Once approved, anyone may use it."
     creature_withdrawn: "%{name} is no longer awaiting approval."
