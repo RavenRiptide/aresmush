@@ -9,7 +9,7 @@ module AresMUSH
       def self.strike_line(strike)
         traits = Array(strike['traits'])
         ranged = Npcs.range_of(strike).positive?
-        hits = Array(strike['damage']).map { |formula, type, category| [ formula, category, type ].compact.join(' ') } +
+        hits = Array(strike['damage']).map { |formula, type, category| [ formula, category, type == 'untyped' ? nil : type ].compact.join(' ') } +
                Array(strike['effects'])
 
         "#{ranged ? 'Ranged' : 'Melee'} #{strike['name']} #{signed(strike['bonus'])}" \

@@ -259,13 +259,16 @@ module AresMUSH
       end
 
       # `physical 10 (except silver)`, `all-damage 5 (except force; double against non-magical)`.
+      # As a stat block writes them: `all damage 3 (except force or ghost touch; double against non-magical)`.
       def self.listed_words(held)
+        words = ->(type) { type.to_s.tr('-', ' ') }
+
         listed(held).map do |entry|
           notes = []
-          notes << "except #{entry['exceptions'].join(', ')}" if entry['exceptions'].any?
-          notes << "double against #{entry['doubleVs'].join(', ')}" if entry['doubleVs'].any?
+          notes << "except #{entry['exceptions'].map(&words).join(' or ')}" if entry['exceptions'].any?
+          notes << "double against #{entry['doubleVs'].join(' or ')}" if entry['doubleVs'].any?
 
-          "#{entry['type'].first} #{entry['value']}#{notes.empty? ? '' : " (#{notes.join('; ')})"}"
+          "#{words.call(entry['type'].first)} #{entry['value']}#{notes.empty? ? '' : " (#{notes.join('; ')})"}"
         end
       end
 

@@ -59,7 +59,7 @@ module AresMUSH
         found = block('ac 15 hp 20; resist physical 10 except silver or adamantine, fire 5')
 
         expect(found['resistances']).to eq('physical' => { 'value' => 10, 'except' => %w{silver adamantine} }, 'fire' => 5)
-        expect(Npcs.listed_words(found['resistances'])).to eq [ 'physical 10 (except silver, adamantine)', 'fire 5' ]
+        expect(Npcs.listed_words(found['resistances'])).to eq [ 'physical 10 (except silver or adamantine)', 'fire 5' ]
       end
 
       it "should hold its traits, size and rarity" do

@@ -39,6 +39,20 @@ module AresMUSH
         expect(Npcs.range_of('traits' => [ 'reach-10' ])).to eq 0
       end
 
+      it "should write untyped damage as its formula alone" do
+        line = strike_line('name' => 'Claw', 'bonus' => 11, 'traits' => [], 'damage' => [ [ '1d8+4', 'slashing', nil ], [ '1d4', 'untyped', nil ] ])
+
+        expect(line).to eq 'Melee Claw +11, 1d8+4 slashing plus 1d4'
+      end
+
+      it "should write weaknesses and resistances in words, with what they except" do
+        block = { 'level' => 1, 'traits' => [], 'ac' => 15, 'hp' => 20, 'perception' => 5, 'saves' => {},
+                  'weaknesses' => { 'cold-iron' => 5 },
+                  'resistances' => { 'all-damage' => { 'value' => 3, 'except' => [ 'force', 'ghost-touch' ], 'double' => [ 'non-magical' ] } } }
+
+        expect(StatBlock.lines('Wisp', block).grep(/\AHP/)).to eq [ 'HP 20; Weaknesses cold iron 5; Resistances all damage 3 (except force or ghost touch; double against non-magical)' ]
+      end
+
       it "should give a Strike that deals no damage only what it does" do
         line = strike_line('name' => 'Tongue', 'bonus' => 10, 'traits' => [ 'reach-10' ], 'damage' => [],
                            'effects' => [ 'Tongue Grab' ])
