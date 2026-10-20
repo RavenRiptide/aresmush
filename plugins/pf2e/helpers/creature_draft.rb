@@ -26,7 +26,8 @@ module AresMUSH
         'immune' => [ 'immunities', :listed ], 'immunity' => [ 'immunities', :listed ],
         'trait' => [ 'traits', :listed ], 'traits' => [ 'traits', :listed ],
         'sense' => [ 'senses', :listed ], 'senses' => [ 'senses', :listed ],
-        'shield' => [ 'shield', :whole ], 'size' => [ 'size', :whole ], 'rarity' => [ 'rarity', :whole ]
+        'shield' => [ 'shield', :whole ], 'size' => [ 'size', :whole ], 'rarity' => [ 'rarity', :whole ],
+        'shape' => [ 'shape', :whole ]
       }.freeze
 
       def self.set(block, words)
@@ -34,7 +35,9 @@ module AresMUSH
 
         return figures(block, words) if figure_words.include?(first)
 
-        read = Described.part_of(block.merge('strikes' => [], 'actions' => [], 'shield' => nil).compact, words.to_s.strip)
+        # A part is read against what it would add to, but a shape against the abilities that give it.
+        emptied = { 'strikes' => [], 'shield' => nil }.merge(first == 'shape' ? {} : { 'actions' => [] })
+        read = Described.part_of(block.merge(emptied).compact, words.to_s.strip)
 
         read.and_then { |part| Ok.new(:state => merged(block, part)) }
       end
@@ -82,7 +85,7 @@ module AresMUSH
           out[field] = kind == :list ? (Array(block[field]) + Array(part[field])).uniq : Hash(block[field]).merge(Hash(part[field]))
         end
 
-        %w{size rarity shield}.each { |field| out[field] = part[field] if part[field] }
+        %w{size rarity shield shape}.each { |field| out[field] = part[field] if part[field] }
 
         out
       end

@@ -37,7 +37,8 @@ module AresMUSH
           effects: holder ? ActiveEffects.on(holder).map { |effect| "#{effect.name} (#{plain(ActiveEffects.remaining(effect))})" } : [],
           cover: (encounter.cover || {})[number], concealment: (encounter.concealment || {})[number],
           hp: hit_points_seen(holder, viewer, gm), hero_points: hero_points_seen(encounter, holder, viewer, gm),
-          turn: holder ? plain(TurnState.summary(holder)) : nil }
+          turn: holder ? plain(TurnState.summary(holder)) : nil,
+          shapes: gm && one.creature? && holder ? Shapes.shown(holder) : nil }.compact
       end
 
       # The GM sees everyone's. A creature's are the GM's alone. A character's are on their combat sheet,

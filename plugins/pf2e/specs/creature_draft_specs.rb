@@ -16,6 +16,15 @@ module AresMUSH
         CreatureDraft.set(held, words)
       end
 
+      it "should start it in a shape its abilities give it, and refuse one they do not" do
+        wolf = Bestiary.entry('Werewolf')
+
+        expect(set('shape animal', wolf).state['shape']).to eq 'animal'
+        expect(set('shape dragon', wolf).code).to eq :described_shape
+        expect(CreatureDraft.unset(set('shape animal', wolf).state, 'shape').state).to_not have_key('shape')
+        expect(Described.write(set('shape animal', wolf).state)).to include('; shape animal')
+      end
+
       it "should change the figures named and keep the rest" do
         held = set('ac 18 ref 7').state
 

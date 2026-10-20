@@ -47,6 +47,12 @@ be:
   spontaneous caster, once a day for an innate spell unless its stat block says otherwise. Past that
   you are warned, and it is cast.
 - **Immunity to magic** keeps out a spell and all it does, but for the spells it names.
+- **A shape** - a werecreature's hybrid, humanoid or animal - decides which of
+  its Strikes it has: a werewolf has its weapons, jaws and claws as a hybrid, its weapons and fist as a
+  human, and only its jaws and claws as a wolf. Its stat block says which Strike is offered in which
+  shape. It changes shape with its ability, which takes the ability's actions: `+e/as #5=act change
+  shape/animal`. You see the shape each is in with `+e/creature #5` and on the encounter's page; the
+  players do not. `+e/add werewolf/animal` adds one already changed.
 - **A circumstance** its stat block makes a toggle - Pack Attack, a charge - is off until you say it
   holds: `/pack attack` on the Strike, or `+e/option #5=pack-attack/on`.
 - **Immunities, weaknesses and resistances** apply by what the damage is: a swarm resists a blade and

@@ -51,7 +51,8 @@ module AresMUSH
         'strike' => ->(block, words) { strike(words).then { |read| read && block.merge('strikes' => Array(block['strikes']) + [ read ]) } },
         'ranged' => ->(block, words) { strike(words).then { |read| read && block.merge('strikes' => Array(block['strikes']) + [ read ]) } },
         'ability' => ->(block, words) { ability(words).then { |read| read && block.merge('actions' => Array(block['actions']) + [ read ]) } },
-        'shield' => ->(block, words) { shield(words).then { |read| read && shielded(block, read) } }
+        'shield' => ->(block, words) { shield(words).then { |read| read && shielded(block, read) } },
+        'shape' => ->(block, words) { Shapes.choices_in(block).find { |one| one.casecmp?(words) }.then { |read| read && block.merge('shape' => read) } }
       }.freeze
 
       ALIASES = { 'skill' => 'skills', 'immunities' => 'immune', 'immunity' => 'immune', 'weakness' => 'weak',
@@ -60,7 +61,7 @@ module AresMUSH
 
       # What a part that could not be read is refused as.
       REFUSALS = { 'strike' => :described_strike, 'ranged' => :described_strike, 'ability' => :described_ability,
-                   'shield' => :described_shield }.freeze
+                   'shield' => :described_shield, 'shape' => :described_shape }.freeze
 
       SHIELD = /\A(?:(?<name>.*?[a-z].*?)\s+)?(?<hardness>\d+)\s+(?<hp>\d+)(?:\s+\+?(?<ac>\d+))?\z/i
       BLOCKS = 'Trigger The creature has its shield raised and takes damage from a physical attack.%r' \
@@ -228,6 +229,7 @@ module AresMUSH
         parts.concat(Array(block['strikes']).map { |strike| strike_words(strike) })
         parts.concat(written_abilities(block).map { |one| ability_words(one) })
         parts << "shield #{block['shield']['name']} #{block['shield']['hardness']} #{block['shield']['hp']} +#{block['shield']['ac']}" if block['shield']
+        parts << "shape #{block['shape']}" if block['shape']
         parts
       end
 
@@ -268,7 +270,7 @@ module AresMUSH
 
       # What a stat block holds that `write` reads: the rest is what a line cannot hold.
       WRITTEN = %w{name level ac hp hardness perception saves speeds abilities skills immunities weaknesses resistances
-                   traits senses size rarity strikes actions shield source pack adjustment approved spellcasting hp_details}.freeze
+                   traits senses size rarity strikes actions shield source pack adjustment approved spellcasting hp_details shape}.freeze
 
       # What a line cannot hold of a stat block, which `write` leaves out.
       def self.unwritable(block)
@@ -283,6 +285,7 @@ module AresMUSH
         Array(block['strikes']).each do |strike|
           missing << "the effects of #{strike['name']}" if Array(strike['effects']).any?
           missing << "the rules of #{strike['name']}" if Array(strike['rules']).any?
+          missing << "the shape #{strike['name']} is offered in" if strike['when']
           missing << "the #{(strike['damage'] || []).map(&:last).compact.uniq.join(' and ')} damage of #{strike['name']}" if
             Array(strike['damage']).any? { |one| one[2] && one[2] != 'persistent' }
         end

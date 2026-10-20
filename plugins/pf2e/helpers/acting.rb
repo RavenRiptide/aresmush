@@ -457,6 +457,10 @@ module AresMUSH
 
         own = own.merge('cost' => spent) if spent
         announce(scene, name, own, targets, out)
+
+        # A shape named as it is used is the shape it takes.
+        shaped = Shapes.taken_by(scene.actor.holder, own, said['words'])
+        out['lines'] << told('pf2e.shape_taken', :actor => scene.actor.label, :shape => "#{shaped['label']}: #{shaped['selected']}") if shaped
         Recharge.used(scene, name, own, out)
 
         affliction = Afflictions.read(name, own['text'], own['traits'])

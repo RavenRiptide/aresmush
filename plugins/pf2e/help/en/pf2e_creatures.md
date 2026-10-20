@@ -34,6 +34,9 @@ One that the game could not fight with - no AC, a damage formula it cannot read 
 `=strike jaws +12 2d8+5 piercing`, `=weak fire 5`, `=traits undead`. A Strike or ability of a name it has is
 replaced; a weakness, resistance, immunity, skill, sense or trait is added.
 `creature/unset <name>=<part>` - Takes one off: `=strike jaws`, `=ability grave howl`, `=weak fire`, `=trait undead`.
+`creature/set <name>=shape <shape>` - The shape it starts a fight in, of those its abilities give it: a
+werewolf of your own that always comes in as a wolf, `=shape animal`. `creature/unset <name>=shape` starts it
+as its stat block does.
 `creature/rename <name>=<new name>`
 `creature/notes <name>=<notes>` - Your own notes on it, which are no part of its stat block.
 `creature/describe <name>` - The line that makes it again, and what a line cannot hold - spellcasting, an

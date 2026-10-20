@@ -6,14 +6,15 @@ module AresMUSH
 
       # `Ranged Javelin +6 (thrown-30), 1d6+4 piercing plus Grab`: a Strike with a range increment is
       # ranged, and what it deals is its damage and then what else a hit does.
-      def self.strike_line(strike)
+      def self.strike_line(strike, block = {})
         traits = Array(strike['traits'])
         ranged = Npcs.range_of(strike).positive?
         hits = Array(strike['damage']).map { |formula, type, category| [ formula, category, type == 'untyped' ? nil : type ].compact.join(' ') } +
                Array(strike['effects'])
 
         "#{ranged ? 'Ranged' : 'Melee'} #{strike['name']} #{signed(strike['bonus'])}" \
-          "#{traits.any? ? " (#{traits.join(', ')})" : ''}#{hits.any? ? ", #{hits.join(' plus ')}" : ''}"
+          "#{traits.any? ? " (#{traits.join(', ')})" : ''}#{hits.any? ? ", #{hits.join(' plus ')}" : ''}" \
+          "#{strike['when'] ? "; #{Shapes.when_words(block, strike['when'])}" : ''}"
       end
 
       def self.lines(name, block, npc: nil, gm: true)
@@ -25,6 +26,8 @@ module AresMUSH
                    "#{conditions.empty? ? '' : "  #{t('pf2e.creature_conditions')}: #{conditions.join(', ')}"}"
           effects = ActiveEffects.on(npc).map(&:name)
           lines << "#{t('pf2e.creature_effects')}: #{effects.join(', ')}" if effects.any?
+          shapes = gm ? Shapes.shown(npc) : []
+          lines << shapes.join('; ') if shapes.any?
         end
 
         return lines unless gm
@@ -38,7 +41,7 @@ module AresMUSH
         lines << shield_line(block['shield'], npc) if block['shield']
         lines << "Speed #{block['speeds'].map { |kind, feet| kind == 'land' ? "#{feet} feet" : "#{kind} #{feet} feet" }.join(', ')}" if Hash(block['speeds']).any?
 
-        Array(block['strikes']).each { |strike| lines << strike_line(strike) }
+        Array(block['strikes']).each { |strike| lines << strike_line(strike, block) }
 
         Array(block['spellcasting']).each do |casting|
           spells = (casting['spells'] || {}).map { |rank, names| "#{rank_words(casting, rank)}: #{spell_words(casting, names)}" }
@@ -203,15 +206,16 @@ module AresMUSH
       end
     end
 
-    # `+e/add [<count>] [elite|weak] <creature>[=<name>]` adds creatures from the bestiary, or saved ones,
-    # to the encounter, each with its own id and initiative, and adjusted if the GM says so. A saved one
+    # `+e/add [<count>] [elite|weak] <creature>[/<shape>][=<name>]` adds creatures from the bestiary, or
+    # saved ones, to the encounter, each with its own id and initiative, adjusted if the GM says so, and
+    # in the shape named, if it has one (`Shapes`). A saved one
     # is added as the revision the GM gets (`Creatures`), which no later edit changes.
     # `+e/add [elite|weak] <name>=<description>` adds one of the GM's own making (`Pf2e::Described`),
     # which is a Plotmaster's or staff's to do.
     class PF2EncounterAddCmd
       include CommandHandler
 
-      attr_accessor :count, :adjustment, :creature, :name
+      attr_accessor :count, :adjustment, :creature, :name, :shape
 
       def parse_args
         left, _, right = cmd.args.to_s.partition('=')
@@ -220,6 +224,9 @@ module AresMUSH
         self.count = found && found[:count] ? found[:count].to_i.clamp(1, 20) : 1
         self.adjustment = found && found[:adjustment] ? found[:adjustment].downcase : nil
         self.creature = found ? found[:creature].strip : left.strip
+        self.creature, _, shape = self.creature.partition('/')
+        self.creature = self.creature.strip
+        self.shape = shape.strip.empty? ? nil : shape.strip
         self.name = right.strip
       end
 
@@ -246,6 +253,7 @@ module AresMUSH
 
         return client.emit_failure(t('pf2e.creature_custom_not_open')) if described && !Gm.plotmaster?(enactor)
         return if described && CharState.emit_error!(client, described)
+        return if described && CharState.emit_error!(client, shape_of(self.creature, described.state))
 
         added = if described
                   [ Combatants.add_npc(encounter, :described => described.state, :adjustment => self.adjustment) ]
@@ -258,6 +266,8 @@ module AresMUSH
                     return client.emit_failure(t(ref['source'] == 'saved' ? 'pf2e.creature_saved_not_open' : 'pf2e.creature_not_open', :creature => ref['name']))
                   end
 
+                  return if CharState.emit_error!(client, shape_of(ref['name'], Creatures.block(ref)))
+
                   from = ref['source'] == 'saved' ? { :revision => ref['revision'] } : { :creature => ref['name'] }
 
                   self.count.times.map do |index|
@@ -266,6 +276,12 @@ module AresMUSH
                   end
                 end
 
+        # In the shape the GM named, or the one a saved creature was saved to start in.
+        added.each do |one|
+          shape = self.shape || one.state['npc'].stat_block['shape']
+          Shapes.take!(one.state['npc'], shape) if shape
+        end
+
         added.each do |one|
           npc = one.state['npc']
           named = npc.name.end_with?("##{npc.number}") ? npc.name : "#{npc.name} (##{npc.number})"
@@ -273,6 +289,13 @@ module AresMUSH
                                                :name => named)
           Pf2e::Encounters::Announce.tell(encounter, message, :room => enactor_room)
         end
+      end
+
+      # Refused where it was asked to start in a shape its stat block does not give it.
+      def shape_of(name, block)
+        return Ok.new(:state => nil) if self.shape.nil? || Shapes.choices_in(block).any? { |one| Domains.slug(one) == Domains.slug(self.shape) }
+
+        Err.new(:no_shape, 'pf2e.shape_unknown', 'creature' => name, 'shape' => self.shape, 'shapes' => Shapes.choices_in(block).join(', '))
       end
     end
 

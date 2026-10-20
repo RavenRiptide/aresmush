@@ -7,6 +7,15 @@ module AresMUSH
     # its shape, and never raising.
     describe CreatureBlock do
 
+      it "should keep the shape a Strike is offered in only where the creature it came from had it" do
+        wolf = Bestiary.entry('Werewolf')
+        jaws = wolf['strikes'].find { |one| one['name'] == 'Jaws' }
+
+        expect(CreatureBlock.cleaned(wolf, wolf)['strikes'].find { |one| one['name'] == 'Jaws' }['when']).to eq jaws['when']
+        expect(CreatureBlock.cleaned(wolf.merge('strikes' => [ jaws.merge('when' => [ 'anything' ]) ]), wolf)['strikes'].first['when']).to be_nil
+        expect(CreatureBlock.cleaned(wolf.merge('shape' => 'animal'), wolf)['shape']).to eq 'animal'
+      end
+
       def cleaned(raw, base = nil)
         CreatureBlock.cleaned(raw, base)
       end

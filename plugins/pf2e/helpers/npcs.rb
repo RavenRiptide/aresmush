@@ -148,9 +148,14 @@ module AresMUSH
       # Its strikes and its spellcasting
 
       # A strike from the stat block as the attack code reads one: its bonus, traits and damage, and
-      # whether it is ranged, which is what its range says.
+      # whether it is ranged, which is what its range says. A Strike its stat block gives in one shape
+      # only says so (`when`), and is offered in that shape alone (`Shapes`).
       def self.strikes(npc)
-        Array(npc.stat_block['strikes']).map do |strike|
+        held = nil
+
+        Array(npc.stat_block['strikes']).select do |strike|
+          strike['when'].nil? || Predicate.test(strike['when'], held ||= options(npc))
+        end.map do |strike|
           range = range_of(strike)
 
           { 'id' => strike_id(strike), 'name' => strike['name'], 'base' => strike['name'], 'bonus' => strike['bonus'].to_i,

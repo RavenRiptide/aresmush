@@ -14,7 +14,7 @@ module AresMUSH
       NUMBERS = %w{level ac hp hardness perception}.freeze
       COUNTED = %w{saves speeds abilities skills}.freeze
       LISTS = %w{traits immunities senses}.freeze
-      WORDS = %w{name size rarity hp_details}.freeze
+      WORDS = %w{name size rarity hp_details shape}.freeze
 
       MOST_LISTED = 30
       LONGEST = 2000
@@ -109,12 +109,14 @@ module AresMUSH
         ruled(out, raw, base['actions'])
       end
 
-      # Its rules, where the part of that name it came from had these same ones.
+      # Its rules, and the shape it is offered in, where the part of that name it came from had these same.
       def self.ruled(out, raw, from)
-        rules = raw['rules']
         before = (from.is_a?(Array) ? from : []).find { |one| one.is_a?(Hash) && one['name'].to_s.casecmp?(out['name']) }
 
-        rules.is_a?(Array) && rules.any? && before && before['rules'] == rules ? out.merge('rules' => rules) : out
+        %w{rules when}.reduce(out) do |held, field|
+          kept = raw[field]
+          kept.is_a?(Array) && kept.any? && before && before[field] == kept ? held.merge(field => kept) : held
+        end
       end
 
       def self.shield(raw)
