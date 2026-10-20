@@ -16,6 +16,14 @@ module AresMUSH
 
         expect(unreadable).to eq []
       end
+
+      it "should give spells the creature editor would save" do
+        refused = Bestiary.index.keys.flat_map do |name|
+          CreatureCheck.spellcasting(Bestiary.entry(name)).map { |one| "#{name}: #{t(one['key'], **CharState.symbolize(one['args']))}" }
+        end
+
+        expect(refused).to eq []
+      end
     end
   end
 end

@@ -207,6 +207,15 @@ module AresMUSH
           expect(goblin['strikes'].map { |one| one['rules'] }).to eq(Bestiary.entry('Goblin Warrior')['strikes'].map { |one| one['rules'] })
         end
 
+        it "should find spells to give a creature, by words, rank and tradition" do
+          found = asked(PF2CreatureSpellsHandler, @pm, { 'words' => 'fireball' })[:spells]
+          expect(found.first).to include(name: 'Fireball', rank: 3, traditions: %w{arcane primal})
+
+          divine = asked(PF2CreatureSpellsHandler, @pm, { 'words' => 'fire', 'tradition' => 'divine' })[:spells]
+          expect(divine.map { |one| one[:traditions] }).to all(include('divine'))
+          expect(asked(PF2CreatureSpellsHandler, @pm, { 'words' => 'light', 'rank' => '0' })[:spells].map { |one| one[:rank] }.uniq).to eq [ 0 ]
+        end
+
         it "should start one from a GM Core road map at a level" do
           answer = asked(PF2CreatureStartHandler, @pm, { 'from' => 'road_map', 'road_map' => 'Sniper', 'level' => '7' })
 

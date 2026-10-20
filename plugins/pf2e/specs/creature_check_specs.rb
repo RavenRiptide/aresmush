@@ -23,10 +23,24 @@ module AresMUSH
         expect(CreatureCheck.errors(block)).to eq []
       end
 
+      it "should take spellcasting as the bestiary writes it" do
+        expect(codes(block('spellcasting' => [ casting, casting('type' => 'spontaneous', 'slots' => { '1' => 3 }) ]))).to eq []
+      end
+
       it "should take a shape its abilities give it" do
         wolf = Bestiary.entry('Werewolf')
 
         expect(codes(wolf.merge('shape' => 'animal'))).to_not include(:creature_shape)
+      end
+
+      # An innate caster's spellcasting, as the bestiary writes one.
+      CASTING = lambda do |more = {}|
+        { 'name' => 'Arcane Innate Spells', 'tradition' => 'arcane', 'type' => 'innate', 'dc' => 18, 'attack' => 10,
+          'spells' => { '0' => [ 'Light' ], '1' => [ 'Fear' ] } }.merge(more)
+      end
+
+      def casting(more = {})
+        CASTING.call(more)
       end
 
       ROWS = [
@@ -41,6 +55,11 @@ module AresMUSH
         [ 'more abilities than a stat block holds', { 'actions' => Array.new(41) { |i| { 'name' => "A#{i}", 'type' => 'passive', 'text' => 'x' } } }, :creature_too_many ],
         [ 'an ability of more words than a stat block holds', { 'actions' => [ { 'name' => 'Lore', 'type' => 'passive', 'text' => 'x' * 4001 } ] }, :creature_text_long ],
         [ 'a shape its abilities do not give it', { 'shape' => 'animal' }, :creature_shape ],
+        [ 'spells of no tradition', { 'spellcasting' => [ CASTING.call('tradition' => 'elemental') ] }, :creature_casting ],
+        [ 'spells cast no way the game knows', { 'spellcasting' => [ CASTING.call('type' => 'ritual') ] }, :creature_casting ],
+        [ 'a spell rank past 10', { 'spellcasting' => [ CASTING.call('spells' => { '11' => [ 'Wish' ] }) ] }, :creature_casting ],
+        [ 'a spontaneous caster with no slots for a rank it casts', { 'spellcasting' => [ CASTING.call('type' => 'spontaneous', 'spells' => { '1' => [ 'Fear' ] }) ] }, :creature_casting ],
+        [ 'more spellcasting than a stat block holds', { 'spellcasting' => Array.new(7) { CASTING.call } }, :creature_too_many ],
         [ 'two Strikes of one name', { 'strikes' => [ { 'name' => 'Club', 'bonus' => 9, 'damage' => [ [ '1d6', 'bludgeoning', nil ] ] },
                                                       { 'name' => 'club', 'bonus' => 7, 'damage' => [ [ '1d4', 'bludgeoning', nil ] ] } ] }, :creature_twice ]
       ].freeze

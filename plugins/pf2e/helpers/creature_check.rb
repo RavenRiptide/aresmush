@@ -36,7 +36,31 @@ module AresMUSH
       end
 
       def self.errors(block)
-        needs(block) + level(block) + strikes(block) + abilities(block) + sizes(block) + shape(block)
+        needs(block) + level(block) + strikes(block) + abilities(block) + sizes(block) + shape(block) + spellcasting(block)
+      end
+
+      TRADITIONS = %w{arcane divine occult primal}.freeze
+      # Foundry's: `items` is spells cast from scrolls and the like, as a thaumaturge does.
+      CASTING_TYPES = %w{prepared spontaneous innate focus items}.freeze
+      RANKS = (0..10).freeze
+
+      # Spells as the game casts them: a tradition and a way of casting it knows, ranks from cantrips to 10,
+      # and a spontaneous caster's slots for every rank above cantrips it casts at.
+      def self.spellcasting(block)
+        Array(block['spellcasting']).flat_map do |casting|
+          named = casting['name'].to_s.strip.empty? ? 'its spells' : casting['name']
+          problems = []
+          problems << found(:creature_casting, 'casting' => named, 'what' => t('pf2e.creature_casting_tradition', :list => TRADITIONS.join(', '))) unless TRADITIONS.include?(casting['tradition'])
+          problems << found(:creature_casting, 'casting' => named, 'what' => t('pf2e.creature_casting_type', :list => CASTING_TYPES.join(', '))) unless CASTING_TYPES.include?(casting['type'])
+
+          ranks = Hash(casting['spells']).keys.map(&:to_i)
+          problems << found(:creature_casting, 'casting' => named, 'what' => t('pf2e.creature_casting_ranks')) unless ranks.all? { |rank| RANKS.cover?(rank) }
+
+          unslotted = casting['type'] == 'spontaneous' ? ranks.select(&:positive?).reject { |rank| Hash(casting['slots'])[rank.to_s].to_i.positive? } : []
+          problems << found(:creature_casting, 'casting' => named, 'what' => t('pf2e.creature_casting_slots', :ranks => unslotted.sort.join(', '))) if unslotted.any?
+
+          problems
+        end
       end
 
       # The shape it starts in is one its abilities give it.
@@ -47,7 +71,7 @@ module AresMUSH
       end
 
       # What one creature may hold at most, which keeps a stat block a stat block.
-      MOST = { 'strikes' => 20, 'actions' => 40 }.freeze
+      MOST = { 'strikes' => 20, 'actions' => 40, 'spellcasting' => 6 }.freeze
       LONGEST_TEXT = 4000
 
       def self.sizes(block)

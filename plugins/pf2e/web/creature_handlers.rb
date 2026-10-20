@@ -25,6 +25,15 @@ module AresMUSH
           pack: listed['pack'], addable: Gm.open?(char, name) }
       end
 
+      # The spells the game knows, as the creature editor offers them: a cantrip at rank 0.
+      def self.spells
+        @spells ||= Hash(Global.read_config('pf2e_spells')).map do |name, details|
+          cantrip = Array(details['traits']).include?('cantrip')
+          { name: name, rank: cantrip ? 0 : details['base_level'].to_i, traditions: Array(details['tradition']),
+            rolled: !Acting.spell_mechanics(name).last.nil? }
+        end
+      end
+
       # A stat block as the lines `+e/creature` prints, as plain text.
       def self.lines(name, block)
         StatBlock.lines(name, block).map { |line| EncounterWeb.plain(line) }
@@ -200,6 +209,29 @@ module AresMUSH
           rarities: %w{common uncommon rare unique}, skills: Hash(Global.read_config('pf2e_skills')).keys.sort,
           costs: [ '1', '2', '3', 'reaction', 'free', 'passive' ],
           road_maps: CreatureBenchmarks.road_maps.map { |name, held| { name: name, says: held['says'] } } }
+      end
+    end
+
+    # `pf2CreatureSpells` - spells to give a creature: `{ words, rank?, tradition? }`. Each with its rank,
+    # its traditions, and whether the game rolls what it does or only announces it.
+    class PF2CreatureSpellsHandler
+      MOST = 30
+
+      def handle(request)
+        error = Website.check_login(request)
+        return error if error
+
+        words = request.args['words'].to_s.strip.downcase
+        rank = request.args['rank'].to_s.match?(/\A\d+\z/) ? request.args['rank'].to_i : nil
+        tradition = request.args['tradition'].to_s.strip.downcase
+
+        found = CreatureWeb.spells.select do |one|
+          one[:name].downcase.include?(words) && (rank.nil? || one[:rank] == rank) &&
+            (tradition.empty? || one[:traditions].include?(tradition))
+        end
+
+        # Those whose names begin with the words first.
+        { spells: found.sort_by { |one| [ one[:name].downcase.start_with?(words) ? 0 : 1, one[:name] ] }.first(MOST) }
       end
     end
 

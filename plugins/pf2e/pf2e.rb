@@ -474,6 +474,8 @@ module AresMUSH
         return PF2CreatureHandler
       when "pf2CreatureOptions"
         return PF2CreatureOptionsHandler
+      when "pf2CreatureSpells"
+        return PF2CreatureSpellsHandler
       when "pf2CreatureStart"
         return PF2CreatureStartHandler
       when "pf2CreatureCheck"
