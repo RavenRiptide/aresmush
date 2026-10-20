@@ -113,6 +113,12 @@ def valued(one):
     return held
 
 
+# A damage formula as the game reads it. Foundry's text sometimes writes a minus as an en dash or a
+# minus sign, which the game would read as no dice at all.
+def formula_of(text):
+    return text.replace('\u2013', '-').replace('\u2212', '-').replace(' ', '')
+
+
 def strike_of(item, refused, words):
     system = item['system']
     rolls = system.get('damageRolls') or {}
@@ -120,7 +126,7 @@ def strike_of(item, refused, words):
     traits = (system.get('traits') or {}).get('value') or []
 
     strike = {'name': item['name'], 'bonus': (system.get('bonus') or {}).get('value', 0),
-              'damage': [[one.get('damage'), one.get('damageType'), one.get('category')]
+              'damage': [[formula_of(one.get('damage')), one.get('damageType'), one.get('category')]
                          for one in rolls.values() if one.get('damage')],
               'traits': traits}
 

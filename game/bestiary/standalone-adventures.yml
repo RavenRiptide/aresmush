@@ -14,7 +14,7 @@
   speeds: {"land": 10, "swim": 40}
   senses: ["low-light-vision"]
   skills: {"Acrobatics": 5, "Deception": 5, "Thievery": 5}
-  strikes: [{"name": "Beak", "bonus": 7, "damage": [["1d4–1", "piercing", null]], "traits": ["finesse"]}]
+  strikes: [{"name": "Beak", "bonus": 7, "damage": [["1d4-1", "piercing", null]], "traits": ["finesse"]}]
   actions: [{"name": "Sneak Attack", "type": "passive", "traits": [], "text": "A raven's melee Strikes deal an additional 1d4 precision damage to Off-Guard creatures.", "rules": [{"key": "DamageDice", "category": "precision", "selector": "strike-damage", "diceNumber": 1, "dieSize": "d4", "predicate": ["target:condition:off-guard"]}, {"key": "RollOption", "option": "target:condition:off-guard", "toggleable": "totm", "label": "Enable abilities that require an off-guard target"}]}]
 "Boggard Guard":
   pack: "standalone-adventures"
