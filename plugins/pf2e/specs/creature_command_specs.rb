@@ -198,6 +198,50 @@ module AresMUSH
           expect(YAML.load_file(@house).keys).to eq [ 'Barrow Hound' ]
         end
 
+        describe "approved for its author's storylines only" do
+          before(:each) do
+            @ally = Character.create(:name => "Ally#{rand(1000000)}")
+            hero_types('creature/submitown barrow hound=for my storyline')
+          end
+
+          after(:each) { @ally.delete }
+
+          it "should show the queue what was asked, and be approved so" do
+            admin_types('creature/queue')
+            expect(heard).to include('for its author only')
+
+            admin_types('creature/approve barrow hound')
+            expect(heard).to include("for its author's storylines")
+            expect(hound.status).to eq 'approved'
+            expect(File.exist?(@house) ? YAML.load_file(@house) : {}).to eq({})
+          end
+
+          it "should be its author's to use and share with a player, and nobody else's to see" do
+            admin_types('creature/approve barrow hound')
+
+            expect(Creatures.usable?(Character[@hero.id], Creatures.find(Character[@hero.id], 'barrow hound', 'use').state)).to be true
+            expect(Creatures.find(Character[@ally.id], 'c:barrow hound').code).to eq :not_found
+
+            hero_types("creature/share barrow hound=#{@ally.name}")
+            expect(refused).to eq []
+            expect(Creatures.usable?(Character[@ally.id], Creatures.find(Character[@ally.id], 'c:barrow hound', 'use').state)).to be true
+
+            hero_types('creature/share barrow hound=plotmasters')
+            expect(refused).to eq [ t('pf2e.creature_share_plotmasters') ]
+          end
+
+          it "should be made public by its author, and retired by them before that" do
+            admin_types('creature/approve barrow hound')
+
+            hero_types('creature/public barrow hound')
+            expect(heard).to include(t('pf2e.creature_made_public', :name => 'Barrow Hound'))
+            expect(YAML.load_file(@house).keys).to eq [ 'Barrow Hound' ]
+
+            hero_types('creature/retire barrow hound')
+            expect(refused).to eq [ t('pf2e.creature_may_not', :action => 'retire') ]
+          end
+        end
+
         it "should show the queue what is above GM Core's highest for its level" do
           hero_types('creature/set barrow hound=ac 30')
           hero_types('creature/submit barrow hound')

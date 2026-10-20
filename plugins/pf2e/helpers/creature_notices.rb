@@ -14,7 +14,8 @@ module AresMUSH
       # An author is not told of their own decision, which an admin may make on a creature of theirs.
       def self.decided(creature, by, decision, note)
         done = CreatureReview::DECISIONS.fetch(decision)
-        message = t("pf2e.creature_#{done}", :name => creature.name, :by => by.name, :reason => note)
+        own = decision == 'approve' && Pf2eCreature[creature.id]&.approved_for == 'author'
+        message = t("pf2e.creature_#{own ? 'approved_own' : done}", :name => creature.name, :by => by.name, :reason => note)
 
         Global.logger.info "PF2 creature c:#{creature.id} #{creature.name} #{done} by #{by.name}"
         Login.notify(creature.owner, :pf2_creature, message, creature.id) if creature.owner && creature.owner != by

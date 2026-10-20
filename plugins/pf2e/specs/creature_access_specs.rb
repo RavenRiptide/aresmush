@@ -13,9 +13,10 @@ module AresMUSH
           'approved' => approved }
       end
 
-      def row(owner: 'owner', audience: 'private', shared_with: [], published: false, retired: false, submitted: false, owner_runs_own: true)
+      def row(owner: 'owner', audience: 'private', shared_with: [], published: false, retired: false, submitted: false, owner_runs_own: true,
+              approved_for: 'everyone')
         { 'id' => '7', 'owner_id' => owner, 'owner_runs_own' => owner_runs_own, 'audience' => audience, 'shared_with' => shared_with,
-          'published' => published ? '3' : nil, 'retired' => retired, 'submitted' => submitted ? '4' : nil }
+          'published' => published ? '3' : nil, 'retired' => retired, 'submitted' => submitted ? '4' : nil, 'approved_for' => approved_for }
       end
 
       def may?(who, action, held = row)
@@ -33,7 +34,8 @@ module AresMUSH
         'submit'  => [ true,  false,    false,  true ],
         'review'  => [ false, false,    false,  true ],
         'retire'  => [ true,  false,    false,  true ],
-        'purge'   => [ false, false,    false,  true ]
+        'purge'   => [ false, false,    false,  true ],
+        'make_public' => [ false, false, false, false ]
       }.freeze
 
       MATRIX.each do |action, (owner, other, player, admin)|
@@ -113,6 +115,47 @@ module AresMUSH
 
           expect(may?(actor('pm', 'pm1'), 'retire', held)).to be false
           expect(may?(actor('admin', 'a1'), 'retire', held)).to be true
+        end
+      end
+
+      describe "approved for its author's storylines only" do
+        def own(**more)
+          row(:owner => 'p1', :owner_runs_own => false, :published => true, :approved_for => 'author', **more)
+        end
+
+        it "should be its author's to use, as approved, and hidden from other players" do
+          expect(%w{view use}.map { |action| may?(actor('player', 'p1'), action, own) }).to eq [ true, true ]
+          expect(%w{view use clone}.map { |action| may?(actor('player', 'p2'), action, own) }).to eq [ false, false, false ]
+          expect(CreatureAccess.latest?(actor('player', 'p1'), own)).to be false
+          expect(CreatureAccess.in_scope?(actor('player', 'p2'), own, 'published')).to be false
+        end
+
+        it "should be shared by its author with players they name, who use it as approved" do
+          held = own(:audience => 'shared', :shared_with => [ 'p2' ])
+
+          expect(may?(actor('player', 'p1'), 'share', own)).to be true
+          expect(%w{view use}.map { |action| may?(actor('player', 'p2'), action, held) }).to eq [ true, true ]
+          expect(may?(actor('player', 'p3'), 'use', held)).to be false
+          expect(CreatureAccess.in_scope?(actor('player', 'p2'), held, 'shared')).to be true
+          expect(CreatureAccess.shareable?(actor('player', 'p2'), held)).to be true
+        end
+
+        it "should be shared by nobody, and with no player, before it is approved" do
+          held = row(:owner => 'p1', :owner_runs_own => false)
+
+          expect(may?(actor('player', 'p1'), 'share', held)).to be false
+          expect(CreatureAccess.shareable?(actor('player', 'p2'), row(:owner => 'pm1'))).to be false
+        end
+
+        it "should be made public by its author, and retired by them, where a public one is not" do
+          expect(may?(actor('player', 'p1'), 'make_public', own)).to be true
+          expect(may?(actor('player', 'p1'), 'make_public', own(:approved_for => 'everyone'))).to be false
+          expect(may?(actor('player', 'p1'), 'retire', own)).to be true
+          expect(may?(actor('player', 'p1'), 'retire', own(:approved_for => 'everyone'))).to be false
+        end
+
+        it "should still be everything to an admin" do
+          expect(%w{view use edit review retire make_public}.map { |action| may?(actor('admin', 'a1'), action, own) }).to all(be true)
         end
       end
 

@@ -255,6 +255,61 @@ module AresMUSH
         end
       end
 
+      describe "approved for its author's storylines only" do
+        def own_approved(name = 'Barrow Hound')
+          creature = hound(@player, name)
+          CreatureReview.submit!(creature, @player, 'for my storyline', :approved_for => 'author')
+          CreatureReview.approve!(creature, @admin)
+          Pf2eCreature[creature.id]
+        end
+
+        it "should be approved as asked, and kept out of the house bestiary and from other players" do
+          creature = own_approved
+
+          expect([ creature.status, creature.approved_for ]).to eq [ 'approved', 'author' ]
+          expect(YAML.load_file(@house)).to eq({})
+          expect(Creatures.usable?(@player, found(@player, 'barrow hound', 'use').state)).to be true
+          expect(found(@other_pm, 'c:barrow hound').code).to eq :not_found
+          expect(CreatureStore.name_free(@other_pm, 'Barrow Hound').ok?).to be true
+        end
+
+        it "should not keep another's public creature from its name" do
+          own_approved
+          other = hound(@other_pm)
+          CreatureReview.submit!(other, @other_pm, '')
+
+          expect(CreatureReview.approve!(other, @admin).ok?).to be true
+        end
+
+        it "should be made public by its author, as approved, and go into the house bestiary" do
+          creature = own_approved
+          CreatureStore.revise!(creature, creature.head.block.merge('ac' => 25), @player)
+
+          expect(CreatureReview.make_public!(creature, @player).ok?).to be true
+
+          creature = Pf2eCreature[creature.id]
+          expect([ creature.status, creature.approved_for ]).to eq [ 'published', 'everyone' ]
+          expect(YAML.load_file(@house)['Barrow Hound']['ac']).to eq 18
+          expect(CreatureReview.make_public!(creature, @player).code).to eq :creature_not_own_approved
+        end
+
+        it "should not be made public under the name of another public creature" do
+          creature = own_approved
+          other = hound(@other_pm)
+          CreatureReview.submit!(other, @other_pm, '')
+          CreatureReview.approve!(other, @admin)
+
+          expect(CreatureReview.make_public!(creature, @player).code).to eq :creature_published_name
+        end
+
+        it "should be retired with its author, unlike a public one" do
+          creature = own_approved
+          CreatureStore.owner_deleted(@player)
+
+          expect(Pf2eCreature[creature.id].retired_at).to_not be_nil
+        end
+      end
+
       it "should show its author the latest revision, once published and after they stop being a Plotmaster" do
         creature = hound(@player)
         CreatureReview.submit!(creature, @player, '')

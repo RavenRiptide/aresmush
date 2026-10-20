@@ -2,7 +2,8 @@ module AresMUSH
   module Pf2e
 
     # `creature/submit <name>[=<note>]` asks an admin to approve your creature's latest revision, which
-    # then anyone may use. `creature/withdraw <name>` takes the request back.
+    # then anyone may use; `creature/submitown` asks for it for your own storylines, and those you share
+    # it with. `creature/withdraw <name>` takes the request back.
     class PF2CreatureSubmitCmd
       include CommandHandler
       include CreatureCommand
@@ -32,9 +33,10 @@ module AresMUSH
           return client.emit_success(t('pf2e.creature_withdrawn', :name => creature.name))
         end
 
-        return if refused?(CreatureReview.submit!(creature, enactor, self.note))
+        own = cmd.switch_is?('submitown')
+        return if refused?(CreatureReview.submit!(creature, enactor, self.note, :approved_for => own ? 'author' : 'everyone'))
 
-        client.emit_success t('pf2e.creature_submitted_ok', :name => creature.name)
+        client.emit_success t(own ? 'pf2e.creature_submitted_own_ok' : 'pf2e.creature_submitted_ok', :name => creature.name)
         CreatureNotices.submitted(creature, enactor)
       end
     end
@@ -90,6 +92,7 @@ module AresMUSH
           revision = creature.submitted
           changes = creature.published ? Creatures.changes(creature.published.block, revision.block) : t('pf2e.creature_queue_new')
           note = creature.submitted_note.to_s.empty? ? '' : " \"#{creature.submitted_note}\""
+          note = " #{t('pf2e.creature_queue_own')}#{note}" if creature.submitted_for == 'author'
 
           above = CreatureBenchmarks.warnings(revision.block).map { |one| "#{one['args']['figure']} #{one['args']['band']}" }
           flagged = above.empty? ? '' : "%r    #{t('pf2e.creature_queue_above', :list => above.join(', '))}"
@@ -133,6 +136,33 @@ module AresMUSH
 
         CharState.emit_messages!(client, done)
         client.emit_success CreatureNotices.decided(found.state, enactor, decision, self.reason)
+      end
+    end
+
+    # `creature/public <name>` - one of yours approved for your own storylines, made public as approved.
+    class PF2CreaturePublicCmd
+      include CommandHandler
+      include CreatureCommand
+
+      attr_accessor :term
+
+      def parse_args
+        self.term = trim_arg(cmd.args)
+      end
+
+      def required_args
+        [ self.term ]
+      end
+
+      def handle
+        found = saved(self.term, 'make_public')
+        return if CharState.emit_error!(client, found)
+
+        done = CreatureReview.make_public!(found.state, enactor)
+        return if CharState.emit_error!(client, done)
+
+        CharState.emit_messages!(client, done)
+        client.emit_success t('pf2e.creature_made_public', :name => found.state.name)
       end
     end
   end

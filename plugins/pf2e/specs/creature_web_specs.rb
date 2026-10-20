@@ -244,6 +244,20 @@ module AresMUSH
             .to eq t('pf2e.creature_decision', :decisions => 'approve, reject, unpublish')
         end
 
+        it "should take a submission for its author's storylines only, show the queue so, and let its author make it public" do
+          mine = CreatureStore.create!(@player, 'Pell Hound', Described.read('x', 'ac 16 hp 30 level 2').state)
+          acted(@player, mine, 'submit', 'note' => 'my storyline', 'for' => 'author')
+
+          queued = asked(PF2CreatureQueueHandler, @admin, {})[:submissions].find { |one| one[:creature][:id] == mine.id }
+          expect(queued[:approved_for]).to eq 'author'
+
+          answer = asked(PF2CreatureReviewHandler, @admin, { 'id' => mine.id, 'decision' => 'approve' })
+          expect([ answer[:creature][:status], answer[:creature][:approved_for], answer[:creature][:can]['make_public'] ]).to eq [ 'approved', 'author', true ]
+
+          expect(acted(@player, mine, 'make_public')[:creature][:status]).to eq 'published'
+          expect(acted(@player, mine, 'make_public')[:error]).to eq t('pf2e.creature_may_not', :action => 'make_public')
+        end
+
         it "should keep the queue and decisions from anyone but an admin" do
           acted(@pm, @draft, 'submit')
 

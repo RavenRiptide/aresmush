@@ -1,15 +1,22 @@
 module AresMUSH
   module Pf2e
 
-    # An admin's approval of a saved creature, which publishes it for everyone (Raven, 2026-10-14). The
-    # author submits the head; an admin approves it, and that revision is what anyone else gets from then
-    # on, however the author edits it after; or sends it back with a reason. An admin may unpublish one.
+    # An admin's approval of a saved creature, which publishes it for everyone (Raven, 2026-10-14) or, as
+    # its author asks, for their own storylines only (2026-10-20). The author submits the head; an admin
+    # approves it, and that revision is what anyone else gets from then on, however the author edits it
+    # after; or sends it back with a reason. An admin may unpublish one, and its author make one approved
+    # for themselves public.
     #
-    # Every approval and unpublishing rewrites the house bestiary file (`HouseBestiary`).
+    # Every approval, unpublishing and making public rewrites the house bestiary file (`HouseBestiary`),
+    # which holds the public ones.
     module CreatureReview
 
-      def self.submit!(creature, by, note)
+      FOR = %w{everyone author}.freeze
+
+      def self.submit!(creature, by, note, approved_for: 'everyone')
         creature = Pf2eCreature[creature.id]
+
+        return Err.new(:creature_approved_for, 'pf2e.creature_approved_for', 'kinds' => FOR.join(', ')) unless FOR.include?(approved_for)
 
         return Err.new(:creature_retired, 'pf2e.creature_retired', 'name' => creature.name) if creature.retired_at
         return Err.new(:creature_submitted, 'pf2e.creature_submitted', 'name' => creature.name) if creature.submitted_id
@@ -18,8 +25,8 @@ module AresMUSH
         refused = CreatureSaving.invalid(creature.head.block)
         return refused if refused
 
-        creature.update(:submitted => creature.head, :submitted_note => note.to_s.strip, :review_note => nil)
-        CreatureStore.event!(creature, 'submitted', by, :revision => creature.head.number, :detail => { 'note' => note.to_s.strip })
+        creature.update(:submitted => creature.head, :submitted_note => note.to_s.strip, :submitted_for => approved_for, :review_note => nil)
+        CreatureStore.event!(creature, 'submitted', by, :revision => creature.head.number, :detail => { 'note' => note.to_s.strip, 'for' => approved_for })
 
         Ok.new(:state => creature)
       end
@@ -54,15 +61,39 @@ module AresMUSH
 
         return Err.new(:creature_not_submitted, 'pf2e.creature_not_submitted', 'name' => creature.name) unless creature.submitted_id
 
-        clash = Pf2eCreature.find(:name_slug => creature.name_slug).to_a.find { |other| other.id != creature.id && other.published_id && !other.retired_at }
-
-        return Err.new(:creature_published_name, 'pf2e.creature_published_name', 'name' => creature.name, 'other' => Creatures.labelled(clash)) if clash
+        approved_for = creature.submitted_for || 'everyone'
+        clash = approved_for == 'everyone' ? public_clash(creature) : nil
+        return clash if clash
 
         revision = creature.submitted
-        creature.update(:published => revision, :submitted => nil, :review_note => nil)
-        CreatureStore.event!(creature, 'approved', by, :revision => revision.number)
+        creature.update(:published => revision, :approved_for => approved_for, :submitted => nil, :submitted_for => nil, :review_note => nil)
+        CreatureStore.event!(creature, 'approved', by, :revision => revision.number, :detail => { 'for' => approved_for })
 
         HouseBestiary.told(Ok.new(:state => creature))
+      end
+
+      # One approved for its author's storylines, made public as approved: staff have reviewed it already.
+      def self.make_public!(creature, by)
+        creature = Pf2eCreature[creature.id]
+
+        return Err.new(:creature_not_own_approved, 'pf2e.creature_not_own_approved', 'name' => creature.name) unless CreatureAccess.own_approved?(Creatures.row(creature))
+
+        clash = public_clash(creature)
+        return clash if clash
+
+        creature.update(:approved_for => 'everyone')
+        CreatureStore.event!(creature, 'made public', by, :revision => creature.published.number)
+
+        HouseBestiary.told(Ok.new(:state => creature))
+      end
+
+      # Two public creatures may not share a name: anyone may name one.
+      def self.public_clash(creature)
+        clash = Pf2eCreature.find(:name_slug => creature.name_slug).to_a.find do |other|
+          other.id != creature.id && CreatureAccess.public?(Creatures.row(other)) && !other.retired_at
+        end
+
+        clash ? Err.new(:creature_published_name, 'pf2e.creature_published_name', 'name' => creature.name, 'other' => Creatures.labelled(clash)) : nil
       end
 
       def self.reject!(creature, by, reason)
@@ -103,7 +134,7 @@ module AresMUSH
       # Each under the name it was approved with, which a later rename does not change until it too is
       # approved.
       def self.blocks
-        Pf2eCreature.all.to_a.select { |creature| creature.published_id && !creature.retired_at }.to_h do |creature|
+        Pf2eCreature.all.to_a.select { |creature| CreatureAccess.public?(Creatures.row(creature)) && !creature.retired_at }.to_h do |creature|
           [ creature.published.block['name'], creature.published.block.merge('approved' => creature.published.number) ]
         end.sort.to_h
       end

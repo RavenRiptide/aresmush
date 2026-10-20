@@ -11,11 +11,12 @@ module AresMUSH
         actor = CreatureAccess.actor(char)
         row = Creatures.row(creature)
         shown = Creatures.shown(char, Creatures.ref(char, creature))
-        can = %w{view use edit clone share submit review retire}.to_h { |action| [ action, CreatureAccess.may(actor, action, row).ok? ] }
+        can = %w{view use edit clone share submit review retire make_public}.to_h { |action| [ action, CreatureAccess.may(actor, action, row).ok? ] }
 
         { ref: "saved:#{creature.id}", source: 'saved', id: creature.id, name: creature.name, level: shown&.block&.dig('level').to_i,
           traits: Array(shown&.block&.dig('traits')), owner: creature.owner_name, mine: CreatureAccess.owner?(actor, row),
-          status: creature.status, audience: creature.audience || 'private', revision: shown&.number, latest: creature.head&.number,
+          status: creature.status, audience: creature.audience || 'private', approved_for: creature.published_id ? (creature.approved_for || 'everyone') : nil,
+          revision: shown&.number, latest: creature.head&.number,
           published_revision: creature.published&.number, can: can }
       end
 
@@ -308,9 +309,11 @@ module AresMUSH
   module Pf2e
 
     # `pf2CreatureAct` - what an author does to one of their own from its page: `{ id, act }`, the act being
-    # submit (with `note`), withdraw, retire, restore, or share (with `plotmasters` and `with`, names).
+    # submit (with `note`, and `for`: everyone or author), withdraw, retire, restore, make_public, or share
+    # (with `plotmasters` and `with`, names).
     class PF2CreatureActHandler
-      ACTIONS = { 'submit' => 'submit', 'withdraw' => 'submit', 'retire' => 'retire', 'restore' => 'retire', 'share' => 'share' }.freeze
+      ACTIONS = { 'submit' => 'submit', 'withdraw' => 'submit', 'retire' => 'retire', 'restore' => 'retire', 'share' => 'share',
+                  'make_public' => 'make_public' }.freeze
 
       def handle(request)
         error = Website.check_login(request)
@@ -333,9 +336,13 @@ module AresMUSH
       end
 
       def submit(char, creature, args)
-        done = CreatureReview.submit!(creature, char, args['note'].to_s)
+        done = CreatureReview.submit!(creature, char, args['note'].to_s, :approved_for => args['for'].to_s.empty? ? 'everyone' : args['for'].to_s)
         CreatureNotices.submitted(creature, char) if done.ok?
         done
+      end
+
+      def make_public(char, creature, _args)
+        CreatureReview.make_public!(creature, char)
       end
 
       def withdraw(char, creature, _args)
@@ -352,13 +359,15 @@ module AresMUSH
 
       # Every Plotmaster or not, and these by name: Plotmasters and admins only.
       def share(char, creature, args)
-        named = Creatures.sharers(Array(args['with']).map(&:to_s).map(&:strip).reject(&:empty?))
+        named = Creatures.sharers(Array(args['with']).map(&:to_s).map(&:strip).reject(&:empty?), creature)
         return named if named.err?
 
         ids = named.state.map { |one| one.id.to_s }
         plotmasters = args['plotmasters'] == true || args['plotmasters'].to_s == 'true'
+        audience = CreatureAccess.share(Creatures.row(creature), plotmasters, ids)
+        return audience if audience.err?
 
-        CreatureStore.share!(creature, CreatureAccess.audience(plotmasters, ids), ids, char)
+        CreatureStore.share!(creature, audience.state, ids, char)
       end
     end
 
@@ -382,6 +391,7 @@ module AresMUSH
         block = revision.block
 
         { creature: CreatureWeb.saved_summary(char, creature), revision: revision.number, note: creature.submitted_note,
+          approved_for: creature.submitted_for || 'everyone',
           changes: creature.published ? Creatures.changes(creature.published.block, block) : t('pf2e.creature_queue_new') }
           .merge(CreatureWeb.assessed(creature.name, block))
       end

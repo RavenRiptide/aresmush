@@ -8,6 +8,10 @@ module AresMUSH
     # a Plotmaster - uses a creature only once an admin has approved it, which publishes that revision for
     # everyone. Admins approve, and may do anything. Raven set this out on 2026-10-14.
     #
+    # An author may ask instead for approval for their own storylines only (Raven, 2026-10-20). Approved
+    # so, it is theirs and those they name to use, as approved, and hidden from everyone else. They may
+    # make it public themselves, since staff have reviewed it, and retire it, as a public one's may not.
+    #
     # Pure: an actor is `{ 'id', 'kind' => Gm.kind(char), 'approved' }` (`actor`), and a creature is its
     # row (`Creatures.row`).
     module CreatureAccess
@@ -37,17 +41,32 @@ module AresMUSH
           (row['audience'] == 'plotmasters' || Array(row['shared_with']).map(&:to_s).include?(actor['id'].to_s))
       end
 
+      # Approved: for everyone, or for its author's storylines only.
       def self.published?(row)
         !row['published'].nil?
+      end
+
+      def self.public?(row)
+        published?(row) && row['approved_for'] != 'author'
+      end
+
+      def self.own_approved?(row)
+        published?(row) && row['approved_for'] == 'author'
+      end
+
+      # One approved for its author's storylines, shared by name: whoever is named uses it as approved.
+      def self.named_in?(actor, row)
+        own_approved?(row) && Array(row['shared_with']).map(&:to_s).include?(actor['id'].to_s)
       end
 
       def self.retired?(row)
         row['retired'] ? true : false
       end
 
-      # Who may be named in a share.
-      def self.shareable?(actor)
-        runs_own?(actor)
+      # Who may be named in a share: a Plotmaster or admin, or anyone approved where the creature is
+      # approved for its author's storylines.
+      def self.shareable?(actor, row = {})
+        runs_own?(actor) || (own_approved?(row) && actor['approved'] ? true : false)
       end
 
       # Who a creature is shared with: every Plotmaster, or those named, or nobody but its author.
@@ -57,11 +76,19 @@ module AresMUSH
         ids.any? ? 'shared' : 'private'
       end
 
+      # A share's audience, where it can reach them: every Plotmaster is reached only by a creature whose
+      # author uses their own unapproved.
+      def self.share(row, plotmasters, ids)
+        return Err.new(:creature_share_plotmasters, 'pf2e.creature_share_plotmasters') if plotmasters && !row['owner_runs_own']
+
+        Ok.new(:state => audience(plotmasters, ids))
+      end
+
       # The lists creatures are shown in, each of those an actor may view.
       SCOPES = {
         'mine' => ->(actor, row) { owner?(actor, row) },
-        'shared' => ->(actor, row) { !owner?(actor, row) && reaches?(actor, row) },
-        'published' => ->(_actor, row) { published?(row) },
+        'shared' => ->(actor, row) { !owner?(actor, row) && (reaches?(actor, row) || named_in?(actor, row)) },
+        'published' => ->(_actor, row) { public?(row) },
         'all' => ->(_actor, _row) { true }
       }.freeze
 
@@ -76,14 +103,15 @@ module AresMUSH
 
       ACTIONS = {
         'create' => ->(actor, _row) { admin?(actor) || actor['approved'] },
-        'view' => ->(actor, row) { admin?(actor) || owner?(actor, row) || (!retired?(row) && (reaches?(actor, row) || published?(row))) },
-        'use' => ->(actor, row) { !retired?(row) && (latest?(actor, row) || published?(row)) },
+        'view' => ->(actor, row) { admin?(actor) || owner?(actor, row) || (!retired?(row) && (reaches?(actor, row) || public?(row) || named_in?(actor, row))) },
+        'use' => ->(actor, row) { !retired?(row) && (latest?(actor, row) || public?(row) || (own_approved?(row) && (owner?(actor, row) || named_in?(actor, row)))) },
         'clone' => ->(actor, row) { ACTIONS['view'].call(actor, row) },
         'edit' => ->(actor, row) { admin?(actor) || owner?(actor, row) },
-        'share' => ->(actor, row) { admin?(actor) || (owner?(actor, row) && runs_own?(actor)) },
+        'share' => ->(actor, row) { admin?(actor) || (owner?(actor, row) && (runs_own?(actor) || own_approved?(row))) },
         'submit' => ->(actor, row) { admin?(actor) || owner?(actor, row) },
         'review' => ->(actor, _row) { admin?(actor) },
-        'retire' => ->(actor, row) { admin?(actor) || (owner?(actor, row) && !published?(row)) },
+        'retire' => ->(actor, row) { admin?(actor) || (owner?(actor, row) && !public?(row)) },
+        'make_public' => ->(actor, row) { own_approved?(row) && (admin?(actor) || owner?(actor, row)) },
         'purge' => ->(actor, _row) { admin?(actor) }
       }.freeze
 

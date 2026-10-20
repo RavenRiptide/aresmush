@@ -17,7 +17,7 @@ module AresMUSH
         slug = Domains.slug(name)
         others = Pf2eCreature.find(:name_slug => slug).to_a.reject { |one| one.retired_at || (creature && one.id == creature.id) }
         own = owner && others.find { |one| one.owner_id.to_s == owner.id.to_s }
-        published = others.find(&:published_id)
+        published = others.find { |one| CreatureAccess.public?(Creatures.row(one)) }
 
         return Err.new(:creature_name_yours, 'pf2e.creature_name_yours', 'name' => own.name) if own
         return Err.new(:creature_published_name, 'pf2e.creature_published_name', 'name' => name, 'other' => Creatures.labelled(published)) if published
@@ -96,7 +96,7 @@ module AresMUSH
       def self.owner_deleted(char)
         Pf2eCreature.find(:owner_id => char.id).to_a.each do |creature|
           creature.update(:owner => nil, :owner_name => creature.owner_name || char.name)
-          creature.update(:retired_at => Time.now) unless creature.published_id || creature.retired_at
+          creature.update(:retired_at => Time.now) unless CreatureAccess.public?(Creatures.row(creature)) || creature.retired_at
         end
       end
 

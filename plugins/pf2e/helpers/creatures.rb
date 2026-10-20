@@ -25,6 +25,7 @@ module AresMUSH
           'owner_name' => creature.owner_name, 'audience' => creature.audience || 'private',
           'shared_with' => Array(creature.shared_with).map(&:to_s), 'head' => creature.head_id,
           'published' => creature.published_id, 'submitted' => creature.submitted_id, 'retired' => !creature.retired_at.nil?,
+          'approved_for' => creature.approved_for || 'everyone',
           'level' => creature.level.to_i, 'status' => creature.status }
       end
 
@@ -53,10 +54,10 @@ module AresMUSH
         end
       end
 
-      # The characters a share names, each one who may be named in one.
-      def self.sharers(names)
+      # The characters a share of this creature names, each one who may be named in it.
+      def self.sharers(names, creature)
         named = names.map { |name| [ name, Character.find_one_by_name(name) ] }
-        refused = named.find { |_name, char| char && !CreatureAccess.shareable?(CreatureAccess.actor(char)) }
+        refused = named.find { |_name, char| char && !CreatureAccess.shareable?(CreatureAccess.actor(char), row(creature)) }
 
         return Err.new(:not_found, 'pf2e.char_not_found') if named.any? { |_name, char| char.nil? }
         return Err.new(:creature_share_who, 'pf2e.creature_share_who', 'name' => refused.last.name) if refused

@@ -351,7 +351,7 @@ module AresMUSH
         return shared(creature, false, []) if words == [ 'private' ]
         return shared(creature, !unsharing, held) if words == [ 'plotmasters' ]
 
-        named = Creatures.sharers(self.with)
+        named = Creatures.sharers(self.with, creature)
         return if CharState.emit_error!(client, named)
 
         ids = named.state.map { |char| char.id.to_s }
@@ -361,7 +361,10 @@ module AresMUSH
 
       # Every Plotmaster or not, and these by name, which stand apart: either is taken back alone.
       def shared(creature, plotmasters, ids)
-        CreatureStore.share!(creature, CreatureAccess.audience(plotmasters, ids), ids, enactor)
+        audience = CreatureAccess.share(Creatures.row(creature), plotmasters, ids)
+        return if CharState.emit_error!(client, audience)
+
+        CreatureStore.share!(creature, audience.state, ids, enactor)
 
         who = ([ plotmasters ? t('pf2e.creature_audience_plotmasters') : nil ] + ids.map { |id| Character[id]&.name }).compact
         who = [ t('pf2e.creature_audience_private') ] if who.empty?

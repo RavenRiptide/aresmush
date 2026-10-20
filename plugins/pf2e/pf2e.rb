@@ -371,8 +371,10 @@ module AresMUSH
           return PF2CreatureHistoryCmd
         when "retire", "restore"
           return PF2CreatureRetireCmd
-        when "submit", "withdraw"
+        when "submit", "submitown", "withdraw"
           return PF2CreatureSubmitCmd
+        when "public"
+          return PF2CreaturePublicCmd
         when "queue"
           return PF2CreatureQueueCmd
         when "check"

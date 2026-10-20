@@ -29,6 +29,11 @@ module AresMUSH
     attribute :review_note
     attribute :retired_at, :type => DataType::Time
 
+    # Whom the author asked approval for, and whom the published revision is approved for: `everyone`,
+    # or `author` - their own storylines, and those they share it with.
+    attribute :submitted_for
+    attribute :approved_for
+
     # The head's, for lists that need not read a block.
     attribute :level, :type => DataType::Integer
     attribute :traits, :type => DataType::Array, :default => []
@@ -51,6 +56,7 @@ module AresMUSH
     def status
       return 'retired' if self.retired_at
       return 'submitted' if self.submitted_id
+      return 'approved' if self.published_id && self.approved_for == 'author'
       return 'published' if self.published_id
 
       'draft'

@@ -11,8 +11,8 @@ aliases:
 
 A creature you save is kept, to add to an encounter by name as one from the bestiary is. Anyone may save
 one. A Plotmaster or an admin adds their own as they stand, and those another Plotmaster or admin shares
-with them. Anyone else adds a saved creature once an admin has approved it, and approval makes it anyone's
-to add.
+with them. Anyone else adds a saved creature once an admin has approved it: approval makes it anyone's
+to add, or, as its author asks, theirs and those they share it with, for their own storylines.
 
 Each change you save is a new revision of it. An encounter keeps the revision a creature was added as, so
 changing it later changes no fight that has it.
@@ -49,7 +49,7 @@ of each Strike and ability; and for admins, the queue of what awaits approval.
 ## Seeing them
 
 `creature/list [mine|shared|published|all][/<level>]` - The saved creatures you may see.
-`creature <creature>` - Its stat block, whose it is, and where it stands: a draft, submitted, published or retired.
+`creature <creature>` - Its stat block, whose it is, and where it stands: a draft, submitted, approved for its author, published or retired.
 `creature/history <name>` - Its revisions, and who did what to it.
 `creature/check <creature>` - What would keep it from being saved, what is warned of, and where each figure
 sits for its level in GM Core's tables: extreme, high, moderate, low or terrible. A figure above the highest
@@ -63,19 +63,25 @@ creatures. A bestiary name always means the bestiary's creature.
 
 `creature/share <name>=<character>[,<character>...]` - Lets those Plotmasters or admins add it as it
 stands. `=plotmasters` shares it with every Plotmaster; `=private` with nobody. A share reaches only a
-Plotmaster or an admin.
+Plotmaster or an admin, but for one approved for your own storylines, which you share with anyone - a
+co-GM of the storyline - and which they add as approved.
 `creature/unshare <name>=<character>`
 `creature/submit <name>[=<note>]` - Asks an admin to approve its latest revision. Once approved, anyone may
 add it, and it is that revision they get; what you change after waits for the next approval.
+`creature/submitown <name>[=<note>]` - Asks an admin to approve it for your own storylines only. Once
+approved you add it, as approved, and so do those you share it with; nobody else sees it.
+`creature/public <name>` - Makes one approved for your own storylines public, as it was approved, without
+asking again.
 `creature/withdraw <name>` - Takes the request back.
-`creature/retire <name>`, `creature/restore <name>` - Off the lists and out of use, or back. A published
+`creature/retire <name>`, `creature/restore <name>` - Off the lists and out of use, or back. A public
 creature is retired only by an admin.
 
 ## For admins
 
-`creature/queue` - What awaits approval, with what changed since it was last published.
-`creature/approve <creature>` - Publishes the submitted revision for everyone.
+`creature/queue` - What awaits approval, with what changed since it was last published, and whether its
+author asked for it for their own storylines only.
+`creature/approve <creature>` - Publishes the submitted revision, for everyone or for its author, as they asked.
 `creature/reject <creature>=<reason>` - Sends it back; its author reads the reason on it.
 `creature/unpublish <creature>` - Takes it out of use for everyone but whoever may use it unapproved.
 
-Every approved creature is also written to `game/bestiary/house.yml`, to keep with the game.
+Every public creature is also written to `game/bestiary/house.yml`, to keep with the game.
