@@ -1,5 +1,5 @@
 # GM Core's tables for building creatures (pp. 114-124), by creature level: what a figure is at each band.
-# Written by scripts/import_creature_benchmarks.py from Archives of Nethys on 2026-10-14; run it again rather than
+# Written by scripts/import_creature_benchmarks.py from Archives of Nethys on 2026-10-20; run it again rather than
 # editing by hand. A range is [high end, low end]; damage is its formula and its average.
 pf2e_creature_benchmarks:
   attribute:

@@ -207,8 +207,17 @@ module AresMUSH
           expect(goblin['strikes'].map { |one| one['rules'] }).to eq(Bestiary.entry('Goblin Warrior')['strikes'].map { |one| one['rules'] })
         end
 
+        it "should start one from a GM Core road map at a level" do
+          answer = asked(PF2CreatureStartHandler, @pm, { 'from' => 'road_map', 'road_map' => 'Sniper', 'level' => '7' })
+
+          expect([ answer[:block]['level'], answer[:block]['strikes'].first['name'], answer[:cloned_from] ]).to eq [ 7, 'Ranged Strike', 'road map: Sniper' ]
+          expect(asked(PF2CreatureStartHandler, @pm, { 'from' => 'road_map', 'road_map' => 'tank', 'level' => '7' })[:error]).to include('no tank road map')
+        end
+
         it "should offer the words a block may use" do
           answer = asked(PF2CreatureOptionsHandler, @pm, {})
+          expect(answer[:road_maps].map { |one| one[:name] }).to include('Brute', 'Sniper')
+          expect(answer[:road_maps].first[:says]).to_not be_empty
 
           expect(answer[:traits]).to include('undead', 'arvek')
           expect(answer[:damage_types]).to include('fire', 'piercing')

@@ -19,6 +19,42 @@ module AresMUSH
         CreatureBenchmarks.bands(held).to_h { |one| [ one['figure'], one['band'] ] }
       end
 
+      describe "a road map" do
+        it "should start a creature the game can fight, for every road map and level" do
+          CreatureBenchmarks.road_maps.keys.product([ -1, 7, 24 ]).each do |road_map, level|
+            started = CreatureBenchmarks.starting(level, road_map)
+
+            expect([ road_map, level, CreatureCheck.errors(started.state) ]).to eq [ road_map, level, [] ]
+          end
+        end
+
+        it "should set each figure it names at its band, and the rest at moderate" do
+          brute = CreatureBenchmarks.starting(7, 'brute').state
+          held = bands(brute)
+
+          expect(held).to include('AC' => 'moderate', 'Hit Points' => 'high', 'Perception' => 'low', 'Fortitude' => 'high',
+                                  'Reflex' => 'low', 'Will' => 'moderate', 'Strike attack' => 'high', 'Strike damage' => 'high')
+          expect([ brute['hp'], brute['abilities']['str'], brute['abilities']['dex'], brute['abilities']['wis'] ]).to eq [ 144, 6, 2, 2 ]
+        end
+
+        it "should give a sniper a ranged Strike, and a spellcaster its spell DC and attack" do
+          sniper = CreatureBenchmarks.starting(7, 'Sniper').state
+          caster = CreatureBenchmarks.starting(7, 'spellcaster').state
+
+          expect(Npcs.range_of(sniper['strikes'].first)).to be_positive
+          expect(caster['spellcasting'].first.slice('dc', 'attack')).to eq('dc' => 25, 'attack' => 17)
+        end
+
+        it "should say what the book says of it" do
+          expect(CreatureBenchmarks.road_maps['Soldier']['says']).to include('Reactive Strike')
+        end
+
+        it "should refuse a road map the book has none of, and a level past its tables" do
+          expect(CreatureBenchmarks.starting(7, 'tank').code).to eq :road_map_unknown
+          expect(CreatureBenchmarks.starting(25, 'brute').code).to eq :road_map_level
+        end
+      end
+
       it "should place each figure in its band for the level" do
         expect(bands).to include('AC' => 'moderate', 'Hit Points' => 'moderate', 'Perception' => 'moderate', 'Fortitude' => 'moderate',
                                  'Reflex' => 'high', 'Will' => 'low', 'Athletics' => 'moderate', 'Jaws attack' => 'moderate',

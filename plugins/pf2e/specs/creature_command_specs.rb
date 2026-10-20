@@ -333,6 +333,15 @@ module AresMUSH
         expect(hound.status).to eq 'draft'
       end
 
+      it "should start one from a GM Core road map at a level" do
+        gm_types('creature/new Ogre Bruiser=7 brute')
+        expect(heard).to include('Saved Ogre Bruiser as c:')
+        expect(Pf2eCreature.find(:name_slug => 'ogre-bruiser').first.head.block.slice('level', 'hp', 'perception')).to eq('level' => 7, 'hp' => 144, 'perception' => 12)
+
+        gm_types('creature/new Odd One=7 tank')
+        expect(refused.join).to include('no tank road map')
+      end
+
       it "should be handed on and purged by staff alone" do
         gm_types(HOUND)
         id = hound.id

@@ -198,11 +198,13 @@ module AresMUSH
 
         { traits: CreatureVocabulary.traits, damage_types: IWR::DAMAGE_TYPES, sizes: %w{tiny small medium large huge gargantuan},
           rarities: %w{common uncommon rare unique}, skills: Hash(Global.read_config('pf2e_skills')).keys.sort,
-          costs: [ '1', '2', '3', 'reaction', 'free', 'passive' ] }
+          costs: [ '1', '2', '3', 'reaction', 'free', 'passive' ],
+          road_maps: CreatureBenchmarks.road_maps.map { |name, held| { name: name, says: held['says'] } } }
       end
     end
 
     # `pf2CreatureStart` - a block to begin from: `{ from: 'bestiary:<name>' | 'saved:<id>' | 'blank', level }`,
+    # `{ from: 'road_map', road_map, level }` for one of GM Core's road maps,
     # or `{ from: 'described', words }` for the line a one-line `+e/add` reads.
     class PF2CreatureStartHandler
       def handle(request)
@@ -212,6 +214,14 @@ module AresMUSH
         from = request.args['from'].to_s
 
         return { block: CreatureBlock.blank(request.args['level'].to_i), cloned_from: nil } if from == 'blank'
+
+        if from == 'road_map'
+          started = CreatureBenchmarks.starting(request.args['level'].to_i, request.args['road_map'])
+          return CreatureEditor.error(started) if started.err?
+
+          key, = CreatureBenchmarks.road_map(request.args['road_map'])
+          return { block: started.state, cloned_from: "road map: #{key}" }
+        end
 
         if from == 'described'
           read = Described.read('', request.args['words'].to_s)

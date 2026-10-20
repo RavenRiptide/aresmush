@@ -175,6 +175,39 @@ module AresMUSH
       end
     end
 
+    # `creature/new <name>=<level> <road map>` - a creature started from one of GM Core's road maps, a
+    # brute or a sniper, every figure at the band the road map gives it, for you to change.
+    class PF2CreatureNewCmd
+      include CommandHandler
+      include CreatureCommand
+
+      attr_accessor :name, :level, :road_map
+
+      def parse_args
+        self.name, _, rest = cmd.args.to_s.partition('=')
+        self.name = self.name.strip
+        level, _, road_map = rest.strip.partition(/\s+/)
+        self.level = level.match?(/\A-?\d+\z/) ? level.to_i : nil
+        self.road_map = road_map.strip
+      end
+
+      def required_args
+        [ self.name, self.level, self.road_map ]
+      end
+
+      def check_may_create
+        CreatureAccess.may(actor, 'create').ok? ? nil : t('pf2e.creature_may_not', :action => 'create')
+      end
+
+      def handle
+        started = CreatureBenchmarks.starting(self.level, self.road_map)
+        return if CharState.emit_error!(client, started)
+
+        key, = CreatureBenchmarks.road_map(self.road_map)
+        save(self.name, started.state, :cloned_from => "road map: #{key}", :fresh => true)
+      end
+    end
+
     # `creature/clone <creature>=<new name>` - a copy of a bestiary creature, or a saved one you may see,
     # to make your own.
     class PF2CreatureCloneCmd

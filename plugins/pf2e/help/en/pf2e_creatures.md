@@ -30,6 +30,10 @@ One that the game could not fight with - no AC, a damage formula it cannot read 
 
 ## Changing one
 
+`creature/new <name>=<level> <road map>` - Starts one from GM Core's road maps: brute, magical striker,
+skill paragon, skirmisher, sniper, soldier or spellcaster. Each figure the road map names is at its band for
+the level, and the rest are moderate; one Strike, and a spellcaster's spell DC and attack, are there to
+rename and fill in. `creature/check` then says where each figure sits.
 `creature/set <name>=<part>` - Changes one part, in the same words: `=ac 19 hp 45`,
 `=strike jaws +12 2d8+5 piercing`, `=weak fire 5`, `=traits undead`. A Strike or ability of a name it has is
 replaced; a weakness, resistance, immunity, skill, sense or trait is added.

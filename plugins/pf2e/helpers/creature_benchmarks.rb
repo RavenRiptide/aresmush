@@ -94,6 +94,75 @@ module AresMUSH
           CreatureCheck.found(:creature_above, 'figure' => one['figure'], 'value' => one['value'], 'level' => block['level'].to_i, 'band' => one['band'])
         end
       end
+
+      # ------------------------------------------------------------------------------
+      # Road maps
+
+      # GM Core's base road maps, a brute and a sniper and the rest, each with the band of the figures it
+      # names and its own words (`game/config/pf2e_creature_road_maps.yml`).
+      def self.road_maps
+        Global.read_config('pf2e_creature_road_maps') || {}
+      end
+
+      def self.road_map(name)
+        road_maps.find { |key, _held| key.casecmp?(name.to_s.strip) }
+      end
+
+      ATTRIBUTES = %w{str dex con int wis cha}.freeze
+      SAVES = %w{fortitude reflex will}.freeze
+
+      # A creature to start from: every figure at the band its road map gives it, and moderate where it
+      # gives none, as the book says; the middle of a hit point range; one Strike, and spells' DC and attack
+      # where the road map names them, for the author to fill in and rename.
+      def self.starting(level, name)
+        found = road_map(name)
+        return Err.new(:road_map_unknown, 'pf2e.road_map_unknown', 'name' => name, 'road_maps' => road_maps.keys.join(', ')) unless found
+
+        levels = Hash(tables.dig('ac', 'levels')).keys.map(&:to_i)
+        return Err.new(:road_map_level, 'pf2e.road_map_level', 'from' => levels.min, 'to' => levels.max) unless levels.include?(level.to_i)
+
+        level = level.to_i
+        bands = Hash(found.last['bands'])
+        at = ->(figure, kind = figure) { figure_at(kind, level, bands[figure] || 'moderate') }
+
+        block = { 'name' => '', 'level' => level, 'size' => 'medium', 'traits' => [], 'ac' => at.call('ac'), 'hp' => at.call('hp'),
+                  'perception' => at.call('perception'),
+                  'saves' => SAVES.to_h { |save| [ save, at.call("save.#{save}", 'save') ] },
+                  'abilities' => ATTRIBUTES.to_h { |one| [ one, at.call("attribute.#{one}", 'attribute') ] },
+                  'strikes' => [ strike(level, bands) ], 'actions' => [] }
+
+        block['spellcasting'] = [ spells(level, bands['spell']) ] if bands['spell']
+
+        Ok.new(:state => block)
+      end
+
+      # A figure at a band: its number, the middle of a range, or a damage's formula. A band the book leaves
+      # empty at that level is read as moderate.
+      def self.figure_at(kind, level, band)
+        columns, cells = cells(kind, level)
+        cell = cells[columns.index(band)] if columns.include?(band)
+        cell = cells[columns.index('moderate')] if cell.nil? && columns.include?('moderate')
+
+        case cell
+        when Array then ((cell.first + cell.last) / 2.0).round
+        when Hash then cell['formula']
+        else cell
+        end
+      end
+
+      def self.strike(level, bands)
+        ranged = bands['ranged'] ? true : false
+        strike = { 'name' => ranged ? 'Ranged Strike' : 'Strike', 'bonus' => figure_at('strike_attack', level, bands['strike_attack'] || 'moderate'),
+                   'damage' => [ [ figure_at('strike_damage', level, bands['strike_damage'] || 'moderate'), ranged ? 'piercing' : 'bludgeoning', nil ] ],
+                   'traits' => [] }
+
+        ranged ? strike.merge('range' => 60) : strike
+      end
+
+      def self.spells(level, band)
+        { 'name' => 'Spells', 'tradition' => 'arcane', 'type' => 'innate', 'dc' => figure_at('spell', level, "#{band}_dc"),
+          'attack' => figure_at('spell', level, "#{band}_spell_attack_bonus"), 'spells' => {} }
+      end
     end
   end
 end

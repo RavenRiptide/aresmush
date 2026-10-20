@@ -777,6 +777,8 @@ en:
     creature_may_not: "You may not %{action} that creature."
     creature_needs: "A creature needs its %{figure}, above 0."
     creature_starts_as: "Starts a fight as: %{shape}"
+    road_map_unknown: "GM Core has no %{name} road map. Its road maps: %{road_maps}."
+    road_map_level: "GM Core's tables run from level %{from} to %{to}."
     creature_shape: "It has no %{shape} shape to start in. Its shapes: %{shapes}."
     creature_level: "A creature's level is from %{from} to %{to}; this one's is %{level}."
     creature_unnamed: "Each %{what} needs a name."
