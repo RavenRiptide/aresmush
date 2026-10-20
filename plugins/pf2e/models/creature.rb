@@ -33,6 +33,8 @@ module AresMUSH
     # or `author` - their own storylines, and those they share it with.
     attribute :submitted_for
     attribute :approved_for
+    # The job staff discuss a submission in, while it waits.
+    attribute :approval_job_id
 
     # The head's, for lists that need not read a block.
     attribute :level, :type => DataType::Integer

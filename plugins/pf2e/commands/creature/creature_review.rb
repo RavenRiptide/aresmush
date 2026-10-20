@@ -30,6 +30,8 @@ module AresMUSH
           done = CreatureReview.withdraw!(creature, enactor)
           return if CharState.emit_error!(client, done)
 
+          CreatureNotices.withdrawn(creature, enactor)
+
           return client.emit_success(t('pf2e.creature_withdrawn', :name => creature.name))
         end
 

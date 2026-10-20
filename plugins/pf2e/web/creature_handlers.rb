@@ -358,7 +358,9 @@ module AresMUSH
       end
 
       def withdraw(char, creature, _args)
-        CreatureReview.withdraw!(creature, char)
+        done = CreatureReview.withdraw!(creature, char)
+        CreatureNotices.withdrawn(creature, char) if done.ok?
+        done
       end
 
       def retire(char, creature, _args)

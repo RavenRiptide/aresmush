@@ -255,6 +255,51 @@ module AresMUSH
         end
       end
 
+      describe "a job for approval" do
+        before(:each) do
+          @job = double(:id => '77')
+          allow(Job).to receive(:[]).and_call_original
+          allow(Job).to receive(:[]).with('77').and_return(@job)
+          allow(Global).to receive(:notifier).and_return(double(:notify_ooc => nil))
+          allow(Login).to receive(:notify)
+        end
+
+        it "should be opened in the request category when one is submitted, with its stat block and note" do
+          creature = hound(@player)
+          CreatureReview.submit!(creature, @player, 'for the barrow', :approved_for => 'author')
+          expect(Jobs).to receive(:create_job) do |category, title, description, author|
+            expect([ category, author.id ]).to eq [ Jobs.request_category, @player.id ]
+            expect(title).to include('Barrow Hound', "c:#{creature.id}")
+            expect(description).to include('for the barrow', "its author's storylines", 'AC 18')
+            { :job => @job, :error => nil }
+          end
+
+          CreatureNotices.submitted(Pf2eCreature[creature.id], @player)
+
+          expect(Pf2eCreature[creature.id].approval_job_id).to eq '77'
+        end
+
+        it "should be closed with the decision, or with the request withdrawn" do
+          creature = hound(@player)
+          creature.update(:approval_job_id => '77')
+          expect(Jobs).to receive(:close_job).with(@admin, @job, a_string_including('Too strong.'))
+
+          CreatureNotices.decided(creature, @admin, 'reject', 'Too strong.')
+
+          expect(Pf2eCreature[creature.id].approval_job_id).to be_nil
+        end
+
+        it "should not be opened where the category is blank" do
+          allow(Global).to receive(:read_config).and_call_original
+          allow(Global).to receive(:read_config).with('pf2e', 'creature_approval_category').and_return('')
+          expect(Jobs).to_not receive(:create_job)
+          creature = hound(@player)
+          CreatureReview.submit!(creature, @player, '')
+
+          CreatureNotices.submitted(Pf2eCreature[creature.id], @player)
+        end
+      end
+
       describe "purged" do
         it "should be gone, with its revisions and history, and out of the house bestiary" do
           creature = hound(@player)

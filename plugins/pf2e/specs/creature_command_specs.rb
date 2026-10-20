@@ -15,6 +15,8 @@ module AresMUSH
         allow_any_instance_of(Character).to receive(:is_admin?) { |char| char.id == @admin.id }
         @house = File.join(Dir.tmpdir, "house-#{rand(1000000)}.yml")
         allow(HouseBestiary).to receive(:path).and_return(@house)
+        # A submission's job is CreatureNotices' to open, and its own spec's to check.
+        allow(Jobs).to receive(:create_job).and_return({ :job => nil, :error => 'none in a spec' })
       end
 
       after(:each) do

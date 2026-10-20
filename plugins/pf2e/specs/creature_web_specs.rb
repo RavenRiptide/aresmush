@@ -21,6 +21,8 @@ module AresMUSH
         allow_any_instance_of(Character).to receive(:has_permission?) { |char, permission| permission == 'kill_pc' && char.id == @pm.id }
         allow(Website).to receive(:check_login).and_return(nil)
         allow(HouseBestiary).to receive(:path).and_return(File.join(Dir.tmpdir, "house-#{tag}.yml"))
+        # A submission's job is CreatureNotices' to open, and its own spec's to check.
+        allow(Jobs).to receive(:create_job).and_return({ :job => nil, :error => 'none in a spec' })
 
         @draft = CreatureStore.create!(@pm, 'Barrow Hound', Described.read('x', 'ac 18 hp 40 level 3').state)
         @published = CreatureStore.create!(@pm, 'Bog Hound', Described.read('x', 'ac 16 hp 30 level 2').state)

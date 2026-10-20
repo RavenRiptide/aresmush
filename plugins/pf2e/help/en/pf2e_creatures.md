@@ -75,6 +75,7 @@ add it, and it is that revision they get; what you change after waits for the ne
 approved you add it, as approved, and so do those you share it with; nobody else sees it.
 `creature/public <name>` - Makes one approved for your own storylines public, as it was approved, without
 asking again.
+Submitting opens a job, where you and the admins can talk about it; the decision, or withdrawing, closes it.
 `creature/withdraw <name>` - Takes the request back.
 `creature/retire <name>`, `creature/restore <name>` - Off the lists and out of use, or back. A public
 creature is retired only by an admin.

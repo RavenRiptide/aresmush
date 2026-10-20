@@ -72,6 +72,9 @@ pf2e:
     - BT
     - WT
   roll_channel: 'Rolls'
+  # The job category a creature submitted for approval is discussed in. Left out, the game's request
+  # category; blank, no job.
+  creature_approval_category: REQ
   can_select_language:
     - common
     - uncommon
