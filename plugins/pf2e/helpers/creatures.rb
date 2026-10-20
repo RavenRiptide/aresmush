@@ -33,6 +33,12 @@ module AresMUSH
         Pf2eCreature.all.to_a
       end
 
+      # Saved creatures a bestiary name now takes, which an import can make: the bestiary's creature wins
+      # the name, and the saved one is reached by `c:` until it is renamed. `rake pf2e:creature_clashes`.
+      def self.clashes
+        all.reject(&:retired_at).select { |creature| Bestiary.named(creature.name) }
+      end
+
       # Those awaiting an admin's approval, longest waiting first.
       def self.waiting
         all.select(&:submitted_id).sort_by { |creature| creature.submitted.created_at.to_s }

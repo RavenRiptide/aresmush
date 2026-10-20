@@ -142,6 +142,14 @@ rescue LoadError
   # no rspec available
 end
 
+desc "List the saved creatures whose names a bestiary import has taken. rake pf2e:creature_clashes"
+task 'pf2e:creature_clashes' do
+  minimal_boot
+  clashes = AresMUSH::Pf2e::Creatures.clashes
+  puts clashes.empty? ? 'No saved creature has a bestiary name.' : 'Each is reached by c:<id> until it is renamed (creature/rename):'
+  clashes.each { |creature| puts "  #{AresMUSH::Pf2e::Creatures.labelled(creature)}" }
+end
+
 # Generate documentation
 # Use yardoc
 

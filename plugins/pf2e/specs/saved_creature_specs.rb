@@ -255,6 +255,13 @@ module AresMUSH
         end
       end
 
+      it "should list the saved creatures a bestiary name now takes, as an import can make one" do
+        clashing = hound(@pm, 'Goblin Warrior')
+        hound(@pm)
+
+        expect(Creatures.clashes.map(&:id)).to eq [ clashing.id ]
+      end
+
       describe "a job for approval" do
         before(:each) do
           @job = double(:id => '77')

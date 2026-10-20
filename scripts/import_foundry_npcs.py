@@ -447,6 +447,9 @@ def main():
         commit = subprocess.run(['git', '-C', args.checkout, 'rev-parse', 'HEAD'], capture_output=True, text=True).stdout.strip()
         open(os.path.join(BESTIARY, INDEX), 'w').write(indexed(by_pack, commit or 'an unknown commit'))
 
+    if args.write:
+        print('Run `bundle exec rake pf2e:creature_clashes` for saved creatures whose names this import has taken.')
+
     total = sum(len(one) for one in by_pack.values())
     print('written' if args.write else 'dry run')
     print(f'  {total} creatures in {len(by_pack)} packs; {repeated} repeats of a name already read; '
