@@ -65,7 +65,7 @@ How far an encounter may go depends on who runs it:
 `encounter/next`: Moves the initiative forward one turn. (Alias: `ninit`)
 `encounter/prev`: Moves the initiative backwards one turn. (Alias: `pinit`)
 `encounter/scan`: For the GM: everyone in the encounter as they stand, by id - each character and creature's hit points, AC, Perception, saves and whether they have a Reactive Strike, a creature's level and whether it is elite or weak, and beneath each what they are immune to, weak to and resist. (Alias: `tscan`)
-`+e/level <n>`: Sets the party's level for the encounter's difficulty, which is otherwise the characters' average. `+e/level 0` goes back to the average. `+e/view` shows the difficulty: the threat, from trivial to extreme, and the XP behind it, by GM Core's encounter budget.
+`+e/level <n>`: Sets the party's level for the encounter's difficulty, which is otherwise the characters' average. `+e/level 0` goes back to the average. `+e/view` shows the GM the difficulty: the threat, from trivial to extreme, and the XP behind it, by GM Core's encounter budget. Players are not shown it, in the game or on the web.
 `hero/award [<why>]`: Gives every player character in the scene a Hero Point, up to three. `encounter/scan` shows what each holds.
 `encounter/end <encounter ID>`: Ends an encounter. Trust given for it, the cover and concealment set in it, and what may be used once an encounter all end with it.
 `encounter/restart <encounter ID>`: Restarts an encounter, so long as the scene has not ended.

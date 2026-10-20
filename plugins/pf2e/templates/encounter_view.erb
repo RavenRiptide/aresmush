@@ -8,8 +8,10 @@
 <%= i %>
 <% end %>
 
+<% unless difficulty.empty? %>
 
 %b%b<%= difficulty %>
+<% end %>
 
 <% if trusted.any? %>
 <%= section_line("Trusted")%>

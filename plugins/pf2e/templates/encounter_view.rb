@@ -6,9 +6,10 @@ module AresMUSH
 
       attr_accessor :encounter
 
-      def initialize(encounter, client)
+      def initialize(encounter, client, viewer)
         @encounter = encounter
         @client = client
+        @viewer = viewer
 
         super File.dirname(__FILE__) + "/encounter_view.erb"
       end
@@ -63,8 +64,9 @@ module AresMUSH
         "%b#{left("##{number}", 4)}#{left(initiative, 5)}%b#{left(name, 24)}%b#{left(said.join(", "), 40)}"
       end
 
+      # For the GM, who builds the encounter by it; players are not told how hard a fight is meant to be.
       def difficulty
-        exploring? ? '' : Pf2e::Difficulty.shown(@encounter)
+        exploring? || !Combatants.gm?(@viewer, @encounter) ? '' : Pf2e::Difficulty.shown(@encounter)
       end
 
       def trusted

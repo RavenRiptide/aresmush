@@ -27,6 +27,29 @@ module AresMUSH
         rows.find { |row| row[:name].start_with?(name) }
       end
 
+      describe "the difficulty" do
+        def page(viewer)
+          allow(Website).to receive(:check_login).and_return(nil)
+          PF2EncounterHandler.new.handle(double(:args => { 'id' => encounter.id }, :enactor => Character[viewer.id]))
+        end
+
+        it "should be sent to the GM's page only" do
+          expect(page(@gm)[:difficulty]).to eq EncounterWeb.plain(Difficulty.shown(encounter)).strip
+          expect(page(@hero)).to_not have_key(:difficulty)
+        end
+
+        it "should be shown by +e/view to the GM only" do
+          line = EncounterWeb.plain(Difficulty.shown(encounter)).strip
+
+          run(PF2InitViewCmd, "e/view #{encounter.id}", @gm)
+          expect(heard).to include(line)
+
+          @client.said.clear
+          run(PF2InitViewCmd, "e/view #{encounter.id}", @hero)
+          expect(heard).to_not include(line)
+        end
+      end
+
       describe "Hero Points" do
         it "should be shown to the GM for each character, and for no creature" do
           rows = shown(Character[@gm.id], true)

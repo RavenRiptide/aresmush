@@ -65,12 +65,16 @@ module AresMUSH
         gm = enactor ? Combatants.gm?(enactor, encounter) : false
         listed = Combatants.all(encounter)
 
-        { id: encounter.id, round: encounter.round.to_i, active: encounter.is_active,
-          current: ActiveEffects.current_turn(encounter), organizer: PF2Encounter.gm_of(encounter)&.name || encounter.organizer, gm: gm,
-          trusted: Array(encounter.trusted), difficulty: EncounterWeb.plain(Difficulty.shown(encounter)).strip,
-          history: EncounterWeb.history(encounter),
-          combatants: listed.map { |one| EncounterWeb.combatant(encounter, one, enactor, gm) },
-          log: Array(encounter.messages).last(30).map { |_time, message| EncounterWeb.plain(message) } }
+        page = { id: encounter.id, round: encounter.round.to_i, active: encounter.is_active,
+                 current: ActiveEffects.current_turn(encounter), organizer: PF2Encounter.gm_of(encounter)&.name || encounter.organizer, gm: gm,
+                 trusted: Array(encounter.trusted),
+                 history: EncounterWeb.history(encounter),
+                 combatants: listed.map { |one| EncounterWeb.combatant(encounter, one, enactor, gm) },
+                 log: Array(encounter.messages).last(30).map { |_time, message| EncounterWeb.plain(message) } }
+
+        # The difficulty is the GM's alone, so it is not sent to anyone else.
+        page[:difficulty] = EncounterWeb.plain(Difficulty.shown(encounter)).strip if gm
+        page
       end
     end
 
