@@ -21,6 +21,6 @@ the story needs, and takes a mistaken rest back with `+e/undo`.
 `+e/refocus [<who>]` - Refocus: a Focus Point back, or more where your feats say so, while your pool is
 short of full. The GM may refocus anyone.
 
-An encounter can carry on from an earlier one (`help encounter`): whoever was in both starts the new one
+An encounter can carry on from an earlier one (`help encounter_runner`): whoever was in both starts the new one
 as they left the old, so a day of several encounters is one day until the GM rests it. Your own sheet
 never changes when you rest - what a rest restores is what an encounter spent.

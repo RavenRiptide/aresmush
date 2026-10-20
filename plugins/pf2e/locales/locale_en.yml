@@ -857,7 +857,7 @@ en:
     creature_not_open: "%{creature} is not in Monster Core or Monster Core 2, which are the creatures everyone may run. A Plotmaster or staff may add any other."
     creature_saved_not_open: "%{creature} is not approved yet. Anyone may add a saved creature once an admin approves it: creature/submit %{creature}."
     creature_custom_not_open: "A creature of your own making is a Plotmaster's or staff's to add. +e/bestiary <words> finds one in Monster Core or Monster Core 2."
-    described_needs: "A creature of your own needs its %{missing}: +e/add <name>=ac 16 hp 20 fort 5 ref 7 will 3 perception 2. See help combat."
+    described_needs: "A creature of your own needs its %{missing}: +e/add <name>=ac 16 hp 20 fort 5 ref 7 will 3 perception 2. See help encounter_creatureimport."
     described_part: "I can't read '%{words}' as part of a creature. After its figures come, each after a semicolon: %{parts}."
     described_strike: "I can't read '%{words}' as a Strike. Write it as: strike shortsword +9 1d6+4 piercing (agile, finesse)"
     described_shield: "I can't read '%{words}' as a shield. Write it as its Hardness and Hit Points: shield 5 20, or shield tower shield 5 20 +3"
