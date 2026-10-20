@@ -1058,10 +1058,10 @@ module AresMUSH
           expect(PF2EncounterHandler.new.handle(request(@gm, 'id' => @encounter.id))[:combatants].last[:hp]).to eq '6 / 6'
         end
 
-        it "should show the encounter's difficulty and its history" do
+        it "should show a player the encounter's history, and not its difficulty, which is the GM's" do
           seen = PF2EncounterHandler.new.handle(request(@hero, 'id' => @encounter.id))
 
-          expect(seen[:difficulty]).to eq "Moderate: 20 XP of 20 for a party of 1 at level 1."
+          expect(seen).to_not have_key(:difficulty)
           expect(seen[:history].map { |one| one[:said] }).to include(a_string_including('e/add goblin warrior'))
           expect(seen[:history].map { |one| one[:undone] }.uniq).to eq [ false ]
         end
