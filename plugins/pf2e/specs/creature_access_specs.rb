@@ -35,6 +35,7 @@ module AresMUSH
         'review'  => [ false, false,    false,  true ],
         'retire'  => [ true,  false,    false,  true ],
         'purge'   => [ false, false,    false,  true ],
+        'hand'    => [ false, false,    false,  true ],
         'make_public' => [ false, false, false, false ]
       }.freeze
 

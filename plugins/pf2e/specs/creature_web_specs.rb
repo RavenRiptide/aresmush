@@ -290,6 +290,15 @@ module AresMUSH
           expect(Pf2eCreature[@draft.id].status).to eq 'retired'
         end
 
+        it "should let an admin hand one on and purge it, and nobody else" do
+          expect(acted(@pm, @draft, 'purge')[:error]).to eq t('pf2e.creature_may_not', :action => 'purge')
+
+          expect(acted(@admin, @draft, 'hand', 'to' => @player.name)[:creature][:owner]).to eq @player.name
+          expect(acted(@admin, @draft, 'hand', 'to' => 'Nobody At All')[:error]).to eq t('pf2e.char_not_found')
+          expect(acted(@admin, @draft, 'purge')).to eq(purged: true)
+          expect(Pf2eCreature[@draft.id]).to be_nil
+        end
+
         it "should share with every Plotmaster, and with named characters" do
           expect(acted(@pm, @draft, 'share', 'plotmasters' => true, 'with' => [ @admin.name ])[:creature][:audience]).to eq 'plotmasters'
           expect(Pf2eCreature[@draft.id].shared_with).to eq [ @admin.id.to_s ]

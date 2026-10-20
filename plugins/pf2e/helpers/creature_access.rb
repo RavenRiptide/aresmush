@@ -112,7 +112,8 @@ module AresMUSH
         'review' => ->(actor, _row) { admin?(actor) },
         'retire' => ->(actor, row) { admin?(actor) || (owner?(actor, row) && !public?(row)) },
         'make_public' => ->(actor, row) { own_approved?(row) && (admin?(actor) || owner?(actor, row)) },
-        'purge' => ->(actor, _row) { admin?(actor) }
+        'purge' => ->(actor, _row) { admin?(actor) },
+        'hand' => ->(actor, _row) { admin?(actor) }
       }.freeze
 
       def self.may(actor, action, row = {})

@@ -100,6 +100,36 @@ module AresMUSH
         end
       end
 
+      # Gone for good, with its revisions and history: staff's, and only while no encounter holds any
+      # revision of it, since an encounter fights as the revision it added.
+      def self.purge!(creature, by)
+        creature = Pf2eCreature[creature.id]
+        held = creature.revisions.to_a.any? { |revision| Pf2eNpc.find(:revision_id => revision.id).any? }
+
+        return Err.new(:creature_in_use, 'pf2e.creature_in_use', 'name' => creature.name) if held
+
+        public = CreatureAccess.public?(Creatures.row(creature))
+        Global.logger.info "PF2 creature c:#{creature.id} #{creature.name} purged by #{by.name}"
+        creature.delete
+
+        public ? HouseBestiary.told(Ok.new(:state => nil)) : Ok.new(:state => nil)
+      end
+
+      # Another's from now on, as staff hand it on: a deleted author's published creature, or one an author
+      # leaves to someone else. Refused where the new owner already has a creature of its name.
+      def self.hand!(creature, to, by)
+        creature = Pf2eCreature[creature.id]
+
+        named = name_free(to, creature.name, creature)
+        return named if named.err?
+
+        was = creature.owner_name
+        creature.update(:owner => to, :owner_name => to.name)
+        event!(creature, 'handed', by, :detail => { 'from' => was, 'to' => to.name })
+
+        Ok.new(:state => creature)
+      end
+
       def self.notes!(creature, notes, by)
         Pf2eCreature[creature.id].update(:notes => notes)
         event!(creature, 'notes', by)

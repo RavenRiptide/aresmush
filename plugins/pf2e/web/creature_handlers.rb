@@ -11,7 +11,7 @@ module AresMUSH
         actor = CreatureAccess.actor(char)
         row = Creatures.row(creature)
         shown = Creatures.shown(char, Creatures.ref(char, creature))
-        can = %w{view use edit clone share submit review retire make_public}.to_h { |action| [ action, CreatureAccess.may(actor, action, row).ok? ] }
+        can = %w{view use edit clone share submit review retire make_public hand purge}.to_h { |action| [ action, CreatureAccess.may(actor, action, row).ok? ] }
 
         { ref: "saved:#{creature.id}", source: 'saved', id: creature.id, name: creature.name, level: shown&.block&.dig('level').to_i,
           traits: Array(shown&.block&.dig('traits')), owner: creature.owner_name, mine: CreatureAccess.owner?(actor, row),
@@ -310,10 +310,10 @@ module AresMUSH
 
     # `pf2CreatureAct` - what an author does to one of their own from its page: `{ id, act }`, the act being
     # submit (with `note`, and `for`: everyone or author), withdraw, retire, restore, make_public, or share
-    # (with `plotmasters` and `with`, names).
+    # (with `plotmasters` and `with`, names); and for staff, hand (with `to`, a name) and purge.
     class PF2CreatureActHandler
       ACTIONS = { 'submit' => 'submit', 'withdraw' => 'submit', 'retire' => 'retire', 'restore' => 'retire', 'share' => 'share',
-                  'make_public' => 'make_public' }.freeze
+                  'make_public' => 'make_public', 'hand' => 'hand', 'purge' => 'purge' }.freeze
 
       def handle(request)
         error = Website.check_login(request)
@@ -331,6 +331,7 @@ module AresMUSH
 
         done = send(act, char, creature, request.args)
         return CreatureEditor.error(done) if done.is_a?(Err)
+        return { purged: true } if act == 'purge'
 
         { creature: CreatureWeb.saved_summary(char, Pf2eCreature[creature.id]) }
       end
@@ -339,6 +340,17 @@ module AresMUSH
         done = CreatureReview.submit!(creature, char, args['note'].to_s, :approved_for => args['for'].to_s.empty? ? 'everyone' : args['for'].to_s)
         CreatureNotices.submitted(creature, char) if done.ok?
         done
+      end
+
+      def hand(char, creature, args)
+        to = Character.find_one_by_name(args['to'].to_s.strip)
+        return Err.new(:not_found, 'pf2e.char_not_found') unless to
+
+        CreatureStore.hand!(creature, to, char)
+      end
+
+      def purge(char, creature, _args)
+        CreatureStore.purge!(creature, char)
       end
 
       def make_public(char, creature, _args)

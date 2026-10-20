@@ -86,5 +86,9 @@ author asked for it for their own storylines only.
 `creature/approve <creature>` - Publishes the submitted revision, for everyone or for its author, as they asked.
 `creature/reject <creature>=<reason>` - Sends it back; its author reads the reason on it.
 `creature/unpublish <creature>` - Takes it out of use for everyone but whoever may use it unapproved.
+`creature/owner <creature>=<character>` - Hands it to someone else, whose it is from now on: a deleted
+author's published creature, or one an author leaves to another.
+`creature/purge <creature>` - Deletes it, with its revisions and history. Refused while an encounter that
+has not been deleted holds it, since that encounter fights as it was added; retire it meanwhile.
 
 Every public creature is also written to `game/bestiary/house.yml`, to keep with the game.

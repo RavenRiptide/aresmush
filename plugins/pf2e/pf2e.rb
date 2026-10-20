@@ -375,6 +375,10 @@ module AresMUSH
           return PF2CreatureSubmitCmd
         when "public"
           return PF2CreaturePublicCmd
+        when "owner"
+          return PF2CreatureOwnerCmd
+        when "purge"
+          return PF2CreaturePurgeCmd
         when "queue"
           return PF2CreatureQueueCmd
         when "check"

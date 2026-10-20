@@ -331,6 +331,20 @@ module AresMUSH
         expect(hound.status).to eq 'draft'
       end
 
+      it "should be handed on and purged by staff alone" do
+        gm_types(HOUND)
+        id = hound.id
+
+        gm_types("creature/owner barrow hound=#{@hero.name}")
+        expect(refused).to eq [ t('pf2e.creature_may_not', :action => 'hand') ]
+
+        admin_types("creature/owner c:#{id}=#{@hero.name}")
+        expect([ heard, Pf2eCreature[id].owner_id ]).to eq [ t('pf2e.creature_handed', :name => 'Barrow Hound', :owner => @hero.name), @hero.id ]
+
+        admin_types("creature/purge c:#{id}")
+        expect([ heard, Pf2eCreature[id] ]).to eq [ t('pf2e.creature_purged', :name => 'Barrow Hound'), nil ]
+      end
+
       it "should not be restored under a name its author has used since" do
         gm_types(HOUND)
         first = hound

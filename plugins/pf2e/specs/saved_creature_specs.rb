@@ -255,6 +255,50 @@ module AresMUSH
         end
       end
 
+      describe "purged" do
+        it "should be gone, with its revisions and history, and out of the house bestiary" do
+          creature = hound(@player)
+          CreatureReview.submit!(creature, @player, '')
+          CreatureReview.approve!(creature, @admin)
+          revisions = creature.revisions.to_a.map(&:id)
+
+          expect(CreatureStore.purge!(creature, @admin).ok?).to be true
+
+          expect(Pf2eCreature[creature.id]).to be_nil
+          expect(revisions.map { |id| Pf2eCreatureRevision[id] }.compact).to eq []
+          expect(YAML.load_file(@house)).to eq({})
+        end
+
+        it "should be refused while an encounter holds any revision of it" do
+          creature = hound(@pm)
+          npc = Pf2eNpc.create(:revision => creature.head)
+
+          expect(CreatureStore.purge!(creature, @admin).code).to eq :creature_in_use
+          expect(Pf2eCreature[creature.id]).to_not be_nil
+          npc.delete
+        end
+      end
+
+      describe "handed to a new owner" do
+        it "should be theirs, with the hand-over in its history" do
+          creature = hound(@player)
+
+          expect(CreatureStore.hand!(creature, @other_pm, @admin).ok?).to be true
+
+          creature = Pf2eCreature[creature.id]
+          expect([ creature.owner_id, creature.owner_name ]).to eq [ @other_pm.id, @other_pm.name ]
+          expect(creature.events.to_a.map(&:kind)).to include('handed')
+        end
+
+        it "should be refused to someone who has a creature of its name" do
+          creature = hound(@player)
+          hound(@other_pm)
+
+          expect(CreatureStore.hand!(creature, @other_pm, @admin).code).to eq :creature_name_yours
+          expect(Pf2eCreature[creature.id].owner_id).to eq @player.id
+        end
+      end
+
       describe "approved for its author's storylines only" do
         def own_approved(name = 'Barrow Hound')
           creature = hound(@player, name)

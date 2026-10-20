@@ -433,5 +433,63 @@ module AresMUSH
         client.emit_success t(retiring ? 'pf2e.creature_retired_ok' : 'pf2e.creature_restored', :name => found.state.name)
       end
     end
+
+    # `creature/owner <creature>=<character>` - for staff: hands it to someone else, whose it is from now on.
+    class PF2CreatureOwnerCmd
+      include CommandHandler
+      include CreatureCommand
+
+      attr_accessor :term, :to
+
+      def parse_args
+        self.term, _, to = cmd.args.to_s.partition('=')
+        self.term = self.term.strip
+        self.to = to.strip
+      end
+
+      def required_args
+        [ self.term, self.to ]
+      end
+
+      def handle
+        found = saved(self.term, 'hand')
+        return if CharState.emit_error!(client, found)
+
+        to = Character.find_one_by_name(self.to)
+        return client.emit_failure(t('pf2e.char_not_found')) unless to
+
+        return if CharState.emit_error!(client, CreatureStore.hand!(found.state, to, enactor))
+
+        client.emit_success t('pf2e.creature_handed', :name => found.state.name, :owner => to.name)
+      end
+    end
+
+    # `creature/purge <creature>` - for staff: gone for good, once no encounter holds it.
+    class PF2CreaturePurgeCmd
+      include CommandHandler
+      include CreatureCommand
+
+      attr_accessor :term
+
+      def parse_args
+        self.term = trim_arg(cmd.args)
+      end
+
+      def required_args
+        [ self.term ]
+      end
+
+      def handle
+        found = saved(self.term, 'purge')
+        return if CharState.emit_error!(client, found)
+
+        name = found.state.name
+        done = CreatureStore.purge!(found.state, enactor)
+        return if CharState.emit_error!(client, done)
+
+        CharState.emit_messages!(client, done)
+        client.emit_success t('pf2e.creature_purged', :name => name)
+      end
+    end
   end
 end
