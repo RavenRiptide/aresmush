@@ -20,6 +20,13 @@ module AresMUSH
         expect(StatBlock.lines('Boggard', block.merge('speeds' => { 'land' => 20, 'swim' => 25 })).grep(/\ASpeed/)).to eq [ 'Speed 20 feet, swim 25 feet' ]
       end
 
+      it "should say the shape a saved creature starts a fight in" do
+        block = { 'level' => 1, 'traits' => [], 'ac' => 15, 'hp' => 20, 'perception' => 5, 'saves' => {} }
+
+        expect(StatBlock.lines('Boggard', block.merge('shape' => 'animal'))).to include(t('pf2e.creature_starts_as', :shape => 'animal'))
+        expect(StatBlock.lines('Boggard', block).join).to_not include(t('pf2e.creature_starts_as', :shape => ''))
+      end
+
       it "should leave out the parentheses of a Strike with no traits" do
         line = strike_line('name' => 'Club', 'bonus' => 10, 'traits' => [], 'damage' => [ [ '1d6+6', 'bludgeoning' ] ])
 

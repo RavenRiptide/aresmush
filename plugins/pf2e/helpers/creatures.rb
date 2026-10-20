@@ -173,7 +173,8 @@ module AresMUSH
       end
 
       # What changed from one block to the next, for a revision's summary: `AC 18 to 19; Strike Claw added`.
-      FIGURES = { 'ac' => 'AC', 'hp' => 'HP', 'level' => 'level', 'perception' => 'Perception', 'hardness' => 'Hardness' }.freeze
+      FIGURES = { 'ac' => 'AC', 'hp' => 'HP', 'level' => 'level', 'perception' => 'Perception', 'hardness' => 'Hardness',
+                  'shape' => 'starting shape' }.freeze
 
       def self.changes(was, now)
         was ||= {}
