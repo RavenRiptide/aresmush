@@ -98,17 +98,19 @@ module AresMUSH
       it "should mark a fight's start and end in its log, the start with what it says" do
         run('e/start')
         fight = active
+        run('e/join', @aria)
         run("e/end #{fight.id}")
 
         log = EncounterWeb.log(PF2Encounter[fight.id])
         start = log.find { |one| one[:kind] == 'start' }
 
         expect(start[:fields]).to include('organizer' => @gm.name, 'id' => fight.id, 'init_stat' => fight.init_stat)
-        expect(start[:fields]['instruction']).to include('help initiative')
+        expect(start[:fields]['instruction']).to start_with('Please stop all actions').and end_with('commands.')
         expect(@logged.join).to include(PF2Encounter.page_url(fight))
         expect(log.last[:kind]).to eq 'end'
         expect(EncounterWeb.plain(log.last[:text]).strip).to eq t('pf2e.encounter_complete', :id => fight.id)
         expect(log.map { |one| one[:kind] } - %w{start end}).to all(eq 'line')
+        expect(log.map { |one| one[:text] }.grep(/\n(\e\[0m)?\z/)).to eq []
       end
 
       it "should start an exploration in the scene, logged there" do

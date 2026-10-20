@@ -40,7 +40,7 @@ module AresMUSH
       # What the banner says, without its layout.
       def fields
         { 'organizer' => organizer, 'id' => encounter_id, 'init_stat' => init_stat,
-          'instruction' => AnsiFormatter.strip_ansi(MushFormatter.format(instruction)) }
+          'instruction' => AnsiFormatter.strip_ansi(MushFormatter.format(instruction)).strip }
       end
 
       def page
