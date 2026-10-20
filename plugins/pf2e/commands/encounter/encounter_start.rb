@@ -73,16 +73,17 @@ module AresMUSH
           carries_on_from: exploring ? exploring.id : self.from
         )
 
-        tell(scene, encounter, PF2EncounterStart.new(encounter).render)
+        banner = PF2EncounterStart.new(encounter)
+        tell(scene, encounter, banner.render, :kind => 'start', :fields => banner.fields)
 
         # Everyone exploring comes into the fight, rolling initiative as their activity has it.
         Exploration.bring_into(encounter, PF2Encounter[exploring.id]).each { |line| tell(scene, encounter, line) } if exploring
       end
 
       # To the room, the encounter's log and the scene's, as an OOC line.
-      def tell(scene, encounter, message)
+      def tell(scene, encounter, message, kind: nil, fields: nil)
         enactor_room.emit message
-        PF2Encounter.send_to_encounter(encounter, message)
+        PF2Encounter.send_to_encounter(encounter, message, :kind => kind, :fields => fields)
         Scenes.add_to_scene(scene, message, Game.master.system_character, false, true)
       end
 

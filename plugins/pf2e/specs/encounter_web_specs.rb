@@ -27,6 +27,24 @@ module AresMUSH
         rows.find { |row| row[:name].start_with?(name) }
       end
 
+      describe "the way to its page" do
+        it "should be given by +e/view" do
+          run(PF2InitViewCmd, "e/view #{encounter.id}", @hero)
+
+          expect(heard).to include(PF2Encounter.page_url(encounter))
+        end
+
+        it "should be found from the scene it is running in, by anyone who may read the scene" do
+          allow(Website).to receive(:check_login).and_return(nil)
+          asked = ->(who) { PF2SceneEncounterHandler.new.handle(double(:args => { 'scene_id' => encounter.scene.id }, :enactor => Character[who.id])) }
+
+          expect(asked.call(@hero)).to eq(id: encounter.id, exploring: false)
+
+          allow(Scenes).to receive(:can_read_scene?).and_return(false)
+          expect(asked.call(@stranger)).to eq({})
+        end
+      end
+
       describe "the difficulty" do
         def page(viewer)
           allow(Website).to receive(:check_login).and_return(nil)

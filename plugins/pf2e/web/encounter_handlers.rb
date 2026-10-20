@@ -9,6 +9,15 @@ module AresMUSH
         AnsiFormatter.strip_ansi(MushFormatter.format(text.to_s)).gsub(/\r?\n/, "\n")
       end
 
+      # The log's last lines, each with its kind - `start`, `end` or `line` - and its text with the game's
+      # colours, for the page's AnsiFormat. The start banner's fields are its own, to lay out as the page's.
+      def self.log(encounter, last = 30)
+        Array(encounter.messages).last(last).map do |_time, message, kind, fields|
+          # The formatter ends every message with a line break, which a line of the page does not need.
+          { kind: kind || 'line', text: Website.format_output_for_html(message.to_s).chomp, fields: fields }.compact
+        end
+      end
+
       # Every change in the encounter, with whether it has been taken back and who spent a Hero Point in it.
       def self.history(encounter)
         at = History.at(encounter)
@@ -70,11 +79,26 @@ module AresMUSH
                  trusted: Array(encounter.trusted),
                  history: EncounterWeb.history(encounter),
                  combatants: listed.map { |one| EncounterWeb.combatant(encounter, one, enactor, gm) },
-                 log: Array(encounter.messages).last(30).map { |_time, message| EncounterWeb.plain(message) } }
+                 log: EncounterWeb.log(encounter) }
 
         # The difficulty is the GM's alone, so it is not sent to anyone else.
         page[:difficulty] = EncounterWeb.plain(Difficulty.shown(encounter)).strip if gm
         page
+      end
+    end
+
+    # `pf2SceneEncounter` - the encounter running in a scene, `{ scene_id }`, for the scene's page to link
+    # to: `{ id, exploring }`, or nothing where none runs or the viewer may not read the scene.
+    class PF2SceneEncounterHandler
+      def handle(request)
+        error = Website.check_login(request, true)
+        return error if error
+
+        scene = Scene[request.args['scene_id']]
+        return {} unless scene && Scenes.can_read_scene?(request.enactor, scene)
+
+        running = PF2Encounter.scene_active_encounter(scene)
+        running ? { id: running.id, exploring: Exploration.exploring?(running) } : {}
       end
     end
 

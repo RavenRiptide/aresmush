@@ -10,10 +10,10 @@ module AresMUSH
       # bookkeeping - who joins, whose turn, cover set, the encounter starting and ending - goes in as an
       # OOC line, which the shared log leaves out. That is how the game's own combat logs.
       module Announce
-        def self.tell(encounter, message, room: nil, story: false)
+        def self.tell(encounter, message, room: nil, story: false, kind: nil)
           scene = encounter.scene
           (scene&.room || room)&.emit message
-          PF2Encounter.send_to_encounter(encounter, message)
+          PF2Encounter.send_to_encounter(encounter, message, :kind => kind)
           log(scene, message, :story => story)
         end
 

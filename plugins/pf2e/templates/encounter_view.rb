@@ -69,6 +69,10 @@ module AresMUSH
         exploring? || !Combatants.gm?(@viewer, @encounter) ? '' : Pf2e::Difficulty.shown(@encounter)
       end
 
+      def page
+        t('pf2e.encounter_page', :url => PF2Encounter.page_url(@encounter))
+      end
+
       def trusted
         Array(@encounter.trusted)
       end

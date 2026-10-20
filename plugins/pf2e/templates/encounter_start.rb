@@ -37,6 +37,16 @@ module AresMUSH
         t(key, :help => "#{title_color}help initiative%xn")
       end
 
+      # What the banner says, without its layout.
+      def fields
+        { 'organizer' => organizer, 'id' => encounter_id, 'init_stat' => init_stat,
+          'instruction' => AnsiFormatter.strip_ansi(MushFormatter.format(instruction)) }
+      end
+
+      def page
+        t('pf2e.encounter_page', :url => PF2Encounter.page_url(@encounter))
+      end
+
       def roll_init_cmd
         "init/join #{encounter_id}[=<alternate stat>]"
       end

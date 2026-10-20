@@ -362,6 +362,7 @@ en:
     healing_applied_ok: "You heal %{amount} points of damage to %{list}."
 
     exploration_view_title: "Exploring (encounter %{id})"
+    encounter_page: "On the web: %{url}"
     initiative_view_title: "Initiative Table for Encounter %{id}"
     invalid_skill_change: "That skill cannot be changed at this stage of chargen."
 

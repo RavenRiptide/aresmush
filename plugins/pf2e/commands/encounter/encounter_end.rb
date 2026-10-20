@@ -34,7 +34,7 @@ module AresMUSH
         end
 
         encounter = PF2Encounter[encounter.id]
-        Pf2e::Encounters::Announce.tell(encounter, t('pf2e.encounter_complete', :id => encounter.id), :room => enactor_room)
+        Pf2e::Encounters::Announce.tell(encounter, t('pf2e.encounter_complete', :id => encounter.id), :room => enactor_room, :kind => 'end')
 
       end
     end

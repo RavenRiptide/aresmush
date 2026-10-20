@@ -77,10 +77,17 @@ module AresMUSH
       char.encounters.select { |e| e.is_active }
     end
 
-    def self.send_to_encounter(enc, msg)
+    # The encounter's log: `[time, message]`, and for a banner its kind - `start` or `end` - and, for the
+    # start, what it says, for a page to lay out as its own.
+    def self.send_to_encounter(enc, msg, kind: nil, fields: nil)
       message_list = enc.messages
-      message_list << [ Time.now, msg ]
+      message_list << ([ Time.now, msg ] + (kind ? [ kind, fields ] : []))
       enc.update(messages: message_list)
+    end
+
+    # Its page on the portal.
+    def self.page_url(encounter)
+      "#{Game.web_portal_url}/pf2/encounter/#{encounter.id}"
     end
 
     # Its GM, or staff: admins run every encounter.
