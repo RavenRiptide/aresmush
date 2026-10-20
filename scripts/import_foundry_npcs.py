@@ -83,6 +83,9 @@ def rules_of(item, refused, words):
     for rule in item['system'].get('rules') or []:
         if not isinstance(rule, dict):
             continue
+        # A Strike an ability gives a creature is one of its Strikes (`granted_strikes`), not a rule.
+        if granted(rule):
+            continue
         if rule.get('key') not in rules.KINDS:
             refused[f"not read: {rule.get('key')}"] += 1
             continue
@@ -93,6 +96,68 @@ def rules_of(item, refused, words):
             taken.append(rules.worded(row, words))
 
     return taken
+
+
+def granted(rule):
+    return rule.get('key') == 'Strike' and 'attackModifier' in rule
+
+
+def granted_strikes(items, words):
+    """The Strikes a creature's abilities give it in one form or another - a werewolf's jaws and claws
+    in hybrid and animal shape, its fist in humanoid - each with the predicate it is offered under."""
+    strikes = []
+
+    for item in items:
+        if item['type'] != 'action':
+            continue
+        for rule in item['system'].get('rules') or []:
+            if not isinstance(rule, dict) or not granted(rule):
+                continue
+            base = (rule.get('damage') or {}).get('base') or {}
+            if not base.get('die'):
+                continue
+
+            modifier = int(base.get('modifier') or 0)
+            formula = f"{base.get('dice') or 1}{base['die']}" + (f'{modifier:+d}' if modifier else '')
+            label = rules.translated(rule.get('label'), words)
+            name = label if isinstance(label, str) and not label.startswith('PF2E.') else titled(rule.get('slug') or 'strike')
+
+            strike = {'name': name, 'bonus': rule['attackModifier'],
+                      'damage': [[formula, base.get('damageType'), base.get('category')]],
+                      'traits': rule.get('traits') or []}
+            if rule.get('predicate'):
+                strike['when'] = rule['predicate']
+            strikes.append(strike)
+
+    return strikes
+
+
+# What a shape-changer's ability says it gives up in a shape: `In animal shape, ... it loses its weapon
+# Strikes`, `In humanoid shape, ... loses its jaws and claws Strikes`. Its paragraphs are joined by `%r`,
+# so `In` has no word boundary before it.
+LOSES = re.compile(r'In (\w+) shape\b[^.]*?\bloses its ([\w ,]+?) Strikes', re.I)
+
+
+def shaped(strikes, abilities):
+    """Each Strike its abilities' words say it gives up in a shape, offered unless it is in that shape."""
+    for ability in abilities:
+        shapes = {one.get('value'): rule['option'] for rule in ability.get('rules') or []
+                  if rule.get('key') == 'RollOption' for one in rule.get('suboptions') or []}
+
+        for shape, named in LOSES.findall(ability.get('text') or ''):
+            option = shapes.get(shape.lower())
+            if not option:
+                continue
+            words = [one.strip().lower() for one in re.split(r',|\band\b|\bor\b', named) if one.strip()]
+            unless = {'not': f'{option}:{shape.lower()}'}
+
+            for strike in strikes:
+                name = strike['name'].lower()
+                weapon = 'unarmed' not in (strike.get('traits') or [])
+                if ('weapon' in words and weapon) or name in words or f'{name}s' in words:
+                    held = strike.setdefault('when', [])
+                    if unless not in held:
+                        held.append(unless)
 
 
 def valued(one):
@@ -282,9 +347,12 @@ def npc_of(doc, pack, refused, words):
         npc['shield'] = shields[0]
 
     strikes = [strike_of(one, refused, words) for one in items if one['type'] == 'melee']
+    own = {one['name'].lower() for one in strikes}
+    strikes += [one for one in granted_strikes(items, words) if one['name'].lower() not in own]
+    abilities = [ability_of(one, refused, words) for one in items if one['type'] == 'action']
+    shaped(strikes, abilities)
     if strikes:
         npc['strikes'] = strikes
-    abilities = [ability_of(one, refused, words) for one in items if one['type'] == 'action']
     if abilities:
         npc['actions'] = abilities
 
