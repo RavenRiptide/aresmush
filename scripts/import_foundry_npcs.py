@@ -308,9 +308,10 @@ def rendered(entries):
     return '\n'.join(lines) + '\n'
 
 
-def indexed(by_pack):
-    """Which file holds each creature, with what a search filters on."""
-    lines = ['---']
+def indexed(by_pack, commit):
+    """Which file holds each creature, with what a search filters on, and the Foundry commit read, so the
+    next import can begin from the same one and change only what it means to."""
+    lines = [f'# Imported from foundryvtt/pf2e at {commit}.', '---']
 
     for pack, entries in sorted(by_pack.items()):
         for name, entry in sorted(entries.items()):
@@ -375,7 +376,8 @@ def main():
                 os.remove(os.path.join(BESTIARY, old))
         for pack, entries in by_pack.items():
             open(os.path.join(BESTIARY, f'{pack}.yml'), 'w').write(rendered(entries))
-        open(os.path.join(BESTIARY, INDEX), 'w').write(indexed(by_pack))
+        commit = subprocess.run(['git', '-C', args.checkout, 'rev-parse', 'HEAD'], capture_output=True, text=True).stdout.strip()
+        open(os.path.join(BESTIARY, INDEX), 'w').write(indexed(by_pack, commit or 'an unknown commit'))
 
     total = sum(len(one) for one in by_pack.values())
     print('written' if args.write else 'dry run')
