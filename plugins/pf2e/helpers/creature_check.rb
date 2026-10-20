@@ -36,7 +36,14 @@ module AresMUSH
       end
 
       def self.errors(block)
-        needs(block) + level(block) + strikes(block) + abilities(block) + sizes(block)
+        needs(block) + level(block) + strikes(block) + abilities(block) + sizes(block) + shape(block)
+      end
+
+      # The shape it starts in is one its abilities give it.
+      def self.shape(block)
+        return [] if block['shape'].nil? || Shapes.choices_in(block).include?(block['shape'])
+
+        [ found(:creature_shape, 'shape' => block['shape'], 'shapes' => Shapes.choices_in(block).join(', ')) ]
       end
 
       # What one creature may hold at most, which keeps a stat block a stat block.

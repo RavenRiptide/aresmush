@@ -23,6 +23,12 @@ module AresMUSH
         expect(CreatureCheck.errors(block)).to eq []
       end
 
+      it "should take a shape its abilities give it" do
+        wolf = Bestiary.entry('Werewolf')
+
+        expect(codes(wolf.merge('shape' => 'animal'))).to_not include(:creature_shape)
+      end
+
       ROWS = [
         [ 'no AC', { 'ac' => nil }, :creature_needs ],
         [ 'no Hit Points', { 'hp' => 0 }, :creature_needs ],
@@ -34,6 +40,7 @@ module AresMUSH
         [ 'an action costing four', { 'actions' => [ { 'name' => 'Rally', 'type' => 'action', 'cost' => 4, 'text' => 'x' } ] }, :creature_ability_cost ],
         [ 'more abilities than a stat block holds', { 'actions' => Array.new(41) { |i| { 'name' => "A#{i}", 'type' => 'passive', 'text' => 'x' } } }, :creature_too_many ],
         [ 'an ability of more words than a stat block holds', { 'actions' => [ { 'name' => 'Lore', 'type' => 'passive', 'text' => 'x' * 4001 } ] }, :creature_text_long ],
+        [ 'a shape its abilities do not give it', { 'shape' => 'animal' }, :creature_shape ],
         [ 'two Strikes of one name', { 'strikes' => [ { 'name' => 'Club', 'bonus' => 9, 'damage' => [ [ '1d6', 'bludgeoning', nil ] ] },
                                                       { 'name' => 'club', 'bonus' => 7, 'damage' => [ [ '1d4', 'bludgeoning', nil ] ] } ] }, :creature_twice ]
       ].freeze

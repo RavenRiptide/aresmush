@@ -776,6 +776,7 @@ en:
     ambiguous_combatant: "%{target} could be any of: %{options}. Use the id."
     creature_may_not: "You may not %{action} that creature."
     creature_needs: "A creature needs its %{figure}, above 0."
+    creature_shape: "It has no %{shape} shape to start in. Its shapes: %{shapes}."
     creature_level: "A creature's level is from %{from} to %{to}; this one's is %{level}."
     creature_unnamed: "Each %{what} needs a name."
     creature_strike_damage: "The Strike %{strike} deals no damage."
