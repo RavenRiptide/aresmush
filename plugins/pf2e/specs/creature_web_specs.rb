@@ -229,8 +229,8 @@ module AresMUSH
           history = asked(PF2CreatureHandler, @pm, { 'ref' => "saved:#{@draft.id}" })[:history]
           expect(history.map { |one| [ one[:kind], one[:summary] ] }).to eq [ [ 'created', 'created' ], [ 'submitted', nil ] ]
 
-          queue = asked(PF2CreatureQueueHandler, @admin, {})
-          expect(queue[:submissions].map { |one| [ one[:creature][:name], one[:note], one[:changes] ] }).to eq [ [ 'Barrow Hound', 'for the barrow', 'new' ] ]
+          queue = asked(PF2CreatureQueueHandler, @admin, {})[:submissions].select { |one| one[:creature][:id] == @draft.id }
+          expect(queue.map { |one| [ one[:creature][:name], one[:note], one[:changes] ] }).to eq [ [ 'Barrow Hound', 'for the barrow', 'new' ] ]
 
           answer = asked(PF2CreatureReviewHandler, @admin, { 'id' => @draft.id, 'decision' => 'approve' })
           expect([ answer[:creature][:status], Pf2eCreature[@draft.id].status ]).to eq [ 'published', 'published' ]

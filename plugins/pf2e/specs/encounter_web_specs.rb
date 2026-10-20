@@ -27,6 +27,11 @@ module AresMUSH
         rows.find { |row| row[:name].start_with?(name) }
       end
 
+      it "should give the game's text plain, with its own line breaks and none after it" do
+        expect(EncounterWeb.plain('%xhAC 18%xn')).to eq 'AC 18'
+        expect(EncounterWeb.plain('one%rtwo')).to eq "one\ntwo"
+      end
+
       describe "the way to its page" do
         it "should be given by +e/view" do
           run(PF2InitViewCmd, "e/view #{encounter.id}", @hero)

@@ -4,9 +4,10 @@ module AresMUSH
     # What the web portal draws of an encounter: the same data the `+e` commands read, as JSON.
     module EncounterWeb
 
-      # MUSH markup as plain text, for a page that styles it itself.
+      # MUSH markup as plain text, for a page that styles it itself, without the line break the formatter
+      # ends everything with.
       def self.plain(text)
-        AnsiFormatter.strip_ansi(MushFormatter.format(text.to_s)).gsub(/\r?\n/, "\n")
+        AnsiFormatter.strip_ansi(MushFormatter.format(text.to_s)).gsub(/\r?\n/, "\n").chomp
       end
 
       # The log's last lines, each with its kind - `start`, `end` or `line` - and its text with the game's
