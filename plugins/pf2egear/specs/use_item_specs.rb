@@ -63,6 +63,46 @@ module AresMUSH
         expect(PF2Consumable[@potion.id]).to be_nil
         expect(@client.said.join).to include(t('pf2egear.item_used_up', :name => 'Healing Potion (Minor)'))
       end
+
+      # What they carried into a running encounter is that encounter's until it ends: used or sold on their
+      # own sheet meanwhile, they would have it twice.
+      describe "what an encounter they are in carries" do
+        before(:each) do
+          @encounter = PF2Encounter.create(:organizer => 'GM', :round => 1, :is_active => true)
+          Pf2e::Combatants.join(@encounter, @char.name, 10, :holder => Character[@char.id])
+          allow_any_instance_of(Character).to receive(:is_approved?).and_return(true)
+        end
+
+        after(:each) { PF2Encounter[@encounter.id]&.delete }
+
+        def sell
+          PF2SellCmd.new(@client, Command.new('sell consumables=0/2'), Character[@char.id]).on_command
+        end
+
+        it "should be neither used nor sold from their own" do
+          use
+          sell
+
+          expect(@client.failures).to eq [ t('pf2egear.item_in_encounter', :item => 'Healing Potion (Minor)', :id => @encounter.id) ] * 2
+          expect(PF2Consumable[@potion.id].quantity).to eq 2
+        end
+
+        it "should be theirs to use and sell again once the encounter ends" do
+          Pf2e::Encounters::Ending.end!(PF2Encounter[@encounter.id])
+          use
+
+          expect(@client.failures).to eq []
+          expect(PF2Consumable[@potion.id].quantity).to eq 1
+        end
+
+        it "should leave what they bought since theirs to use" do
+          bought = PF2Consumable.create(:name => 'Antidote (Lesser)', :quantity => 1, :character => @char)
+          PF2UseItemCmd.new(@client, Command.new('use consumables=1'), Character[@char.id]).on_command
+
+          expect(@client.failures).to eq []
+          expect(PF2Consumable[bought.id]).to be_nil
+        end
+      end
     end
   end
 end

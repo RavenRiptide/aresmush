@@ -249,7 +249,9 @@ A creature's turn reminder, and its hit points after it is hurt, go to you alone
 
 As you enter an encounter, it takes a copy of what you carry: your gear, what you wear, wield and have
 invested, and your money. Everything in the encounter works from that copy - your sheet there, your
-Strikes and AC, what you use - so what you buy or sell outside meanwhile is no part of it.
+Strikes and AC, what you use - so what you buy, sell or equip outside meanwhile is no part of it. What
+you carried in is the encounter's until it ends: your own of it can't be used or sold on your sheet
+meanwhile, or you would have it twice.
 
 `+e/gear [<who>]` - What you carry in the encounter here.
 `+e/use <category>=<number>[/<use>]` - Use an item you carry there: drink a potion, spend a charge.

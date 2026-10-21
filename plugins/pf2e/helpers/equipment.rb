@@ -5,10 +5,11 @@ module AresMUSH
     # invested, and their money, taken as they enter it.
     #
     # Everything in the encounter - their sheet there, their Strikes and AC, what they use - reads and
-    # changes the copy, so what they buy or sell outside meanwhile is no part of it. A character carrying on
-    # from an earlier encounter carries that one's copy on. When the encounter ends, what they used up of
-    # their own consumables comes off their own inventory, and their money and anything made to last only a
-    # while stay with it.
+    # changes the copy, so what they buy or sell outside meanwhile is no part of it, and what they carried
+    # in is not used or sold outside until it ends (`held_by`). A character carrying on from an earlier
+    # encounter carries that one's copy on. When the encounter ends, what they used up of their own
+    # consumables comes off their own inventory, and their money and anything made to last only a while
+    # stay with it.
     #
     # An item that something made rather than the character owning it says so: `granted_by` what made it,
     # and `expires` when it goes - `encounter` for what the encounter gave out, `rest` for what lasts until
@@ -90,6 +91,22 @@ module AresMUSH
         end
 
         state.update(:pf2_money => from.pf2_money.to_i, :consumables_at_start => started_with(state))
+      end
+
+      # The running encounter that carries a copy of an item of a character's own, if one does. What they
+      # carried in is that encounter's until it ends, so it is neither used nor sold on their sheet
+      # meanwhile: they would have it twice. A copy is no character's, and is held by nothing.
+      def self.held_by(item)
+        char = item.respond_to?(:character) ? item.character : nil
+
+        return nil unless char
+
+        collection = kinds.find { |_collection, model| item.is_a?(model) }&.first
+        holding = Pf2eCombatantState.find(:character_id => char.id).to_a.find do |state|
+          state.encounter&.is_active && state.public_send(collection).to_a.any? { |copy| copy.copied_from.to_s == item.id.to_s }
+        end
+
+        holding&.encounter
       end
 
       # What of the copy becomes the character's own when the encounter ends: what it gave them to keep.

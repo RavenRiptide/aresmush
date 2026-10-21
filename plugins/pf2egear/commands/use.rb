@@ -52,6 +52,10 @@ module AresMUSH
           return
         end
 
+        held = Pf2e::Equipment.held_by(item)
+
+        return client.emit_failure(t('pf2egear.item_in_encounter', :item => item.name, :id => held.id)) if held
+
         # Consumables get their own, much simpler, handling, and do not require a use entry.
         if self.category.match? "consumable"
           message = t('pf2egear.item_use_ok', :name => enactor.name, :item => item.name)
