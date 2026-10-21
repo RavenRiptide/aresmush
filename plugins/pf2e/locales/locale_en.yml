@@ -323,6 +323,7 @@ en:
     encounter_complete: "*** END OF ENCOUNTER %{id} ***"
     encounter_add_ok: "%{name} joins encounter %{encounter} at initiative %{roll}."
     encounter_remove_ok: "You remove %{name} from encounter %{encounter}."
+    encounter_resync_ok: "%{gm} brings what %{name} carries here up to their sheet: what they have bought since joining, and their money."
     encounter_restarted: "*** ENCOUNTER %{id} RESTARTED ***"
     encounter_joined_ok: "%{name} joins encounter %{encounter} at initiative %{roll}."
     encounter_mod_ok: "You change the initiative for %{name} to %{init} in encounter %{encounter}."

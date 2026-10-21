@@ -214,6 +214,59 @@ module AresMUSH
         end
       end
 
+      # A GM's resync: what they carry here made what their sheet holds now, as they have been using it
+      # here - what they drew, what they drank, what the encounter gave them - and nothing else of theirs.
+      describe "a resync" do
+        def resync
+          Equipment.resync!(standing, Character[@hero.id])
+        end
+
+        it "should bring in what they bought since joining, and their money now" do
+          falchion = PF2Weapon.create(:name => 'Falchion', :equipped => true, :character => @hero)
+          @hero.update(:pf2_money => 400)
+
+          resync
+
+          copied = standing.weapons.to_a.find { |one| one.name == 'Falchion' }
+          expect([ copied.equipped, copied.copied_from ]).to eq [ true, falchion.id ]
+          expect(standing.pf2_money).to eq 400
+        end
+
+        it "should keep what they drew and used here" do
+          standing.weapons.to_a.first.update(:equipped => false)
+          drink(1)
+          @potions.update(:quantity => 5)
+
+          resync
+
+          expect(standing.weapons.to_a.map { |one| [ one.name, one.equipped ] }).to eq [ [ 'Longsword', false ] ]
+          expect(standing.consumables.to_a.first.quantity).to eq 4
+
+          finish
+
+          expect(PF2Consumable[@potions.id].quantity).to eq 4
+        end
+
+        it "should drop what their sheet no longer holds, and keep what the encounter gave them" do
+          Equipment.grant!(standing, 'consumables', 'Antidote (Lesser)', 1, {}, :granted_by => 'loot', :expires => 'encounter')
+          @rope.delete
+
+          resync
+
+          expect(standing.gear.to_a).to eq []
+          expect(standing.consumables.to_a.map(&:name)).to include('Antidote (Lesser)', 'Minor Healing Potion')
+        end
+
+        it "should put what they bought in the copy of its bag" do
+          torch = PF2Gear.create(:name => 'Torch', :character => @hero, :bag => @bag)
+
+          resync
+
+          copied = standing.gear.to_a.find { |one| one.copied_from == torch.id }
+          expect(copied.bag.id).to eq standing.bags.to_a.first.id
+        end
+      end
+
       it "should carry the copy on to an encounter that carries on, and settle only what that one used" do
         drink(1)
         finish

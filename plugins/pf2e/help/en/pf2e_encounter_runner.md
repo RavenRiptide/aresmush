@@ -38,6 +38,7 @@ How far an encounter may go depends on who runs it:
 `+e/creature <creature>`: A creature's stat block from the bestiary. Not while you are a player in someone else's encounter.
 `encounter/mod [<encounter ID>=]<#id or name>=<new init>`: Sets a combatant's initiative. Whoever's turn it is keeps it.
 `encounter/remove [<encounter ID>=]<#id or name>`: Takes a combatant out of the order; a creature removed is gone. (Alias: `rminit`)
+`+e/resync [<encounter ID>=]<#id or name>`: Brings what a character carries in the encounter up to their sheet, for something they had to buy after joining: what they have bought since comes in, and their money becomes their sheet's. What they already carried stays as they have it here - drawn or stowed, and less what they used of it - and what the encounter gave them stays too. `+e/undo` takes it back.
 `encounter/next`: Moves the initiative forward one turn. (Alias: `ninit`)
 `encounter/prev`: Moves the initiative backwards one turn. (Alias: `pinit`)
 `encounter/scan`: For the GM: everyone in the encounter as they stand, by id - each character and creature's hit points, AC, Perception, saves and whether they have a Reactive Strike, a creature's level and whether it is elite or weak, and beneath each what they are immune to, weak to and resist. (Alias: `tscan`)

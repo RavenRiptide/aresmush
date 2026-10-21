@@ -74,23 +74,85 @@ module AresMUSH
 
         kinds.each do |collection, model|
           from.public_send(collection).to_a.each do |item|
-            own = item.attributes.except(:character_id, :state_id, :created_at, :updated_at, :copied_from,
-                                         *LINKS.map { |link| :"#{link}_id" })
-            copy = model.create(own.merge(:state => state, :copied_from => item.copied_from || item.id))
+            copy = copy_item(state, model, item)
 
             copied[[ model, item.id ]] = copy
             made << [ item, copy ]
           end
         end
 
+        link!(made, copied)
+
+        state.update(:pf2_money => from.pf2_money.to_i, :consumables_at_start => started_with(state))
+      end
+
+      def self.copy_item(state, model, item)
+        own = item.attributes.except(:character_id, :state_id, :created_at, :updated_at, :copied_from,
+                                     *LINKS.map { |link| :"#{link}_id" })
+
+        model.create(own.merge(:state => state, :copied_from => item.copied_from || item.id))
+      end
+
+      # Each copy linked as its item is: to the copy of the item's bag, shield or weapon. `copied` is the
+      # copies by `[ model, the id of the item copied ]`.
+      def self.link!(made, copied)
         made.each do |item, copy|
           links = LINKS.select { |link| item.respond_to?(link) && item.public_send(link) }
                        .to_h { |link| [ link.to_sym, copied[[ item.public_send(link).class, item.public_send(link).id ]] ] }
 
           copy.update(links) unless links.empty?
         end
+      end
 
-        state.update(:pf2_money => from.pf2_money.to_i, :consumables_at_start => started_with(state))
+      # What a character carries in an encounter made what their sheet holds now, for a GM who lets them
+      # have what they bought since joining. What they had already is kept as they have it here - drawn,
+      # stowed, its charges spent - and a consumable less what they used of it here. What their sheet no
+      # longer holds goes, and what the encounter gave them stays. Their money is their sheet's.
+      def self.resync!(state, char)
+        copied = {}
+        made = []
+        started = state.consumables_at_start || {}
+
+        kinds.each do |collection, model|
+          own = char.public_send(collection).to_a
+          theirs = state.public_send(collection).to_a.select { |copy| from_sheet?(copy, model, char) }
+                        .group_by { |copy| copy.copied_from.to_s }
+
+          theirs.each { |source, copies| copies.each(&:delete) unless own.any? { |item| item.id.to_s == source } }
+
+          own.each do |item|
+            copy = Array(theirs[item.id.to_s]).first
+
+            if copy.nil?
+              copy = copy_item(state, model, item)
+              made << [ item, copy ]
+            elsif collection == 'consumables'
+              # What came in less what they used of it here.
+              left = copy.quantity.to_i + item.quantity.to_i - (started.dig(item.id.to_s, 'quantity') || copy.quantity).to_i
+              left.positive? ? copy.update(:quantity => left) : copy.delete
+            elsif Pf2egear::Inventory.stackable?(collection)
+              copy.update(:quantity => item.quantity)
+            end
+
+            copied[[ model, item.id ]] = copy
+          end
+        end
+
+        link!(made, copied)
+
+        # The consumables they came in with are now their sheet's, and what is used of them settles from there.
+        baseline = char.consumables.to_a.to_h { |one| [ one.id.to_s, { 'quantity' => one.quantity.to_i, 'name' => one.name } ] }
+        state.update(:pf2_money => char.pf2_money.to_i, :consumables_at_start => baseline)
+      end
+
+      # Whether a copy is of something on the character's own sheet, or was: the encounter's own - what it
+      # gave, what was made to last a while, what an earlier encounter's copy held - is not.
+      def self.from_sheet?(copy, model, char)
+        return false if copy.copied_from.nil? || copy.expires
+
+        source = model[copy.copied_from]
+
+        source.nil? || source.character_id.to_s == char.id.to_s
       end
 
       # The running encounter that carries a copy of an item of a character's own, if one does. What they

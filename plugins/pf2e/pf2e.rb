@@ -294,6 +294,8 @@ module AresMUSH
           return PF2EncounterRestartCmd
         when "remove"
           return PF2EncounterRemoveCmd
+        when "resync"
+          return PF2EncounterResyncCmd
         when nil
           return PF2InitiateCombatCmd
         end
