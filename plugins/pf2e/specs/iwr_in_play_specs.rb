@@ -179,7 +179,7 @@ module AresMUSH
         it "should show what it excepts and doubles against to its GM" do
           run(PF2EncounterCreatureCmd, 'e/creature #2')
 
-          expect(heard).to include('all-damage 5 (except force, ghost-touch, spirit; double against non-magical)')
+          expect(heard).to include('all damage 5 (except force or ghost touch or spirit; double against non-magical)')
         end
       end
 
