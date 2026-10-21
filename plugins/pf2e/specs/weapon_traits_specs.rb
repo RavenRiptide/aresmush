@@ -180,7 +180,7 @@ module AresMUSH
         it "should deal the kind of damage said, which is what is resisted" do
           strikes('longsword/piercing')
 
-          expect(heard).to include('1 piercing (resistance -5)')
+          expect(heard).to include('1 piercing (1d8+2: 4 +2; resistance -5)')
         end
 
         it "should refuse a kind it cannot deal" do

@@ -111,7 +111,7 @@ module AresMUSH
 
           it "should deal its damage as it swallows them" do
             # 1d8+1 and 1d6 with the dice at 12 in 20: 5 + 1 and 4.
-            expect(heard).to include("Damage to #{@hero.name}: 6 bludgeoning + 4 acid")
+            expect(heard).to include("Damage to #{@hero.name}: 6 bludgeoning (1d8+1: 5 +1) + 4 acid (1d6: 4)")
           end
 
           it "should deal its damage again at the end of each of their turns" do

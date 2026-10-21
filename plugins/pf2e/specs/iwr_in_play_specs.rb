@@ -124,7 +124,7 @@ module AresMUSH
 
         it "should come off a Strike, which says so" do
           expect(taken { run(PF2EncounterStrikeCmd, 'e/strike #2=fist', @hero) }).to eq 0
-          expect(heard).to include('0 bludgeoning (resistance -5)')
+          expect(heard).to include('0 bludgeoning (1d4+2: 3 +2; resistance -5)')
         end
 
         it "should let through a Strike with a weapon said to be silver" do

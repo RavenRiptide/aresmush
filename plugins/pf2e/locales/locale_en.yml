@@ -644,6 +644,10 @@ en:
     act_healed:
       one: "  %{target} recovers 1 Hit Point."
       other: "  %{target} recovers %{count} Hit Points."
+    act_healed_dice:
+      one: "  %{target} recovers 1 Hit Point (%{dice})."
+      other: "  %{target} recovers %{count} Hit Points (%{dice})."
+    act_area_rolled: "  %{spell} rolls %{rolled} for everything in its area."
     consumable_heals:
       one: "  %{target} regains 1 Hit Point from the %{item}."
       other: "  %{target} regains %{count} Hit Points from the %{item}."
@@ -670,6 +674,7 @@ en:
     until_rounds: " for %{rounds} rounds"
     until_one_round: " for 1 round"
     why_roll: "%{what} - %{statistic} %{roll}, from %{base}%{tail}"
+    why_damage: "Damage to %{target}: %{damage}."
     why_defence: "  against %{defence} %{dc}, from %{base}%{tail}"
     why_defence_plain: "  against %{defence} %{dc}."
     why_modifier: "    %{value} %{type} (%{source})"

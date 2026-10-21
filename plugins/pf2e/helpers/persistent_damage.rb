@@ -134,19 +134,41 @@ module AresMUSH
 
     # A formula of dice as a number: `2d6+3`. What an effect says it deals.
     def self.roll_formula(formula)
-      whole, divisor = formula.to_s.split('/')
-      return (roll_formula(whole) / divisor.to_i) if divisor.to_i.positive?
+      thrown_formula(formula)['total']
+    end
 
-      formula.to_s.delete(' ').scan(/[+-]?[^+-]+/).sum do |term|
+    # A formula rolled, with how its dice fell: `{ 'total' => 42, 'shown' => '3d8+24: 4, 8, 6 +24' }`. A
+    # formula with no dice has nothing to show.
+    def self.thrown_formula(formula)
+      whole, divisor = formula.to_s.split('/')
+
+      if divisor.to_i.positive?
+        thrown = thrown_formula(whole)
+        return { 'total' => thrown['total'] / divisor.to_i, 'shown' => thrown['shown'] && "#{thrown['shown']}, /#{divisor.to_i}" }
+      end
+
+      faces = []
+      flat = []
+      total = whole.to_s.delete(' ').scan(/[+-]?[^+-]+/).sum do |term|
         sign = term.start_with?('-') ? -1 : 1
         body = term.delete_prefix('+').delete_prefix('-')
 
         if (dice = body.match(/\A(\d*)d(\d+)\z/i))
-          sign * roll_dice(dice[1].empty? ? 1 : dice[1].to_i, dice[2].to_i).sum
+          fell = roll_dice(dice[1].empty? ? 1 : dice[1].to_i, dice[2].to_i)
+          faces += fell.map { |face| sign.negative? ? -face : face }
+          sign * fell.sum
         else
+          flat << sign * body.to_i unless body.to_i.zero?
           sign * body.to_i
         end
       end
+
+      { 'total' => total, 'shown' => faces.empty? ? nil : dice_shown(whole, faces, flat) }
+    end
+
+    # `3d8+24: 4, 8, 6 +24`.
+    def self.dice_shown(formula, faces, flat = [])
+      "#{formula.to_s.delete(' ')}: #{faces.join(', ')}#{flat.map { |one| one.negative? ? " #{one}" : " +#{one}" }.join}"
     end
 
     # What a formula comes to on average, which is how two of the same kind are compared.

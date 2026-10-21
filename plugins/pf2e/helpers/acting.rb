@@ -1247,7 +1247,8 @@ module AresMUSH
           sharp += held['amount'].to_i if %w{piercing slashing}.include?(DamageRoll.kind(row['type']).to_s)
           kind = row['categories'] == [ 'splash' ] ? "splash #{row['type']}" : row['type']
           notes = (row['splash'].to_i.positive? ? [ "with #{row['splash']} splash" ] : []) + IWR.words(held['applied'])
-          shown << "#{held['amount']} #{kind}#{notes.empty? ? '' : " (#{notes.join(', ')})"}"
+          noted = [ row['dice'], notes.empty? ? nil : notes.join(', ') ].compact.join('; ')
+          shown << "#{held['amount']} #{kind}#{noted.empty? ? '' : " (#{noted})"}"
         end
 
         # Twice someone's hit points in the whole of one blow is death, whatever kinds of damage made it up.
@@ -1264,6 +1265,7 @@ module AresMUSH
         return if shown.empty?
 
         out['lines'] << told('pf2e.act_damage', :damage => shown.join(' + '), :target => whom.label)
+        out['detail'] << told('pf2e.why_damage', :damage => shown.join(' + '), :target => whom.label) if out['detail']
         shaken_out(whom, taken, out)
         out['gm'] << told('pf2e.act_hp_left', :target => whom.label, :hp => Harm.hit_points(whom.holder))
         dropped(whom, standing, out, 'fate' => fate, 'segments' => segments, 'fell' => fell,
@@ -1442,6 +1444,8 @@ module AresMUSH
 
         attack = mechanics['attack']
         dc = casting ? spell_figure(scene.actor.holder, 'spell_dc', casting) : nil
+        # An area's damage and healing are rolled once, and told once, for everything in it.
+        once = named['area'] ? { 'spell' => spell, 'rolled' => {}, 'at' => out['lines'].size } : nil
 
         targets.each do |target|
           each = Scene.new(scene.encounter, scene.actor, target, scene.enactor, scene.permitted)
@@ -1456,9 +1460,9 @@ module AresMUSH
           if attack
             spell_attack(each, spell, mechanics, casting, formulas, said, out)
           elsif mechanics['save'] && !mends?(mechanics, formulas, target)
-            spell_save(each, spell, mechanics, dc, formulas, out)
+            spell_save(each, spell, mechanics, dc, formulas, out, once)
           elsif formulas.any?
-            spell_unopposed(each, mechanics, formulas, out)
+            spell_unopposed(each, mechanics, formulas, out, once)
           elsif mechanics['applies'] && each.target
             consequences(each, Array(mechanics['applies']).map { |one| one.merge('on' => 'target') }, out)
           else
@@ -1637,7 +1641,7 @@ module AresMUSH
 
       # A save against the caster's DC, rolled by each target: a basic save scales the damage, and any
       # save leaves what its outcome says.
-      def self.spell_save(scene, spell, mechanics, dc, formulas, out)
+      def self.spell_save(scene, spell, mechanics, dc, formulas, out, once = nil)
         target = scene.target
         save = mechanics['save']
 
@@ -1659,7 +1663,7 @@ module AresMUSH
         out['lines'] << told('pf2e.act_incapacitation', :target => target.label) if spared
         out['detail'] += detail_lines("#{target.label}'s #{save}", save, result, nil)
 
-        heal_or_hurt(scene, mechanics, formulas, result['degree'], out) if formulas.any?
+        heal_or_hurt(scene, mechanics, formulas, result['degree'], out, once) if formulas.any?
 
         out['dc'] = dc
         outcome(scene, mechanics, result['degree'], formulas, out)
@@ -1702,13 +1706,15 @@ module AresMUSH
         formulas.any? { |_f, _t, _c, kinds| Array(kinds).include?('healing') } && !hurts_this
       end
 
-      def self.heal_or_hurt(scene, mechanics, formulas, degree, out)
+      # `once` is an area's: what it rolled, by formula, which everything in it takes.
+      def self.heal_or_hurt(scene, mechanics, formulas, degree, out, once = nil)
         heals = formulas.select { |_f, _t, _c, kinds| Array(kinds).include?('healing') }
 
         if mends?(mechanics, formulas, scene.target)
-          amount = heals.sum { |formula, *_| Pf2e.roll_formula(formula) }
+          rows = spell_rows(heals, out, once)
+          amount = rows.sum { |row| row['amount'] }
           Harm.heal(scene.target.holder, amount)
-          out['lines'] << told('pf2e.act_healed', :target => scene.target.label, :count => amount)
+          out['lines'] << healed(scene.target.label, amount, DamageRoll.dice_of(rows))
           return
         end
 
@@ -1719,9 +1725,8 @@ module AresMUSH
           return out['lines'] << told('pf2e.act_spell_damage_gm', :target => scene.target.label, :damage => shown)
         end
 
-        rows = DamageRoll.of_formulas(formulas.map { |f, type, category, _| [ f, type, category ] }, false)
-        rows = rows.filter_map do |row|
-          next row.merge('amount' => (row['amount'] * factor).floor) unless row['category'].to_s == 'persistent'
+        rows = spell_rows(formulas, out, once).filter_map do |row|
+          next DamageRoll.scaled_row(row, factor) unless row['category'].to_s == 'persistent'
 
           scaled = Pf2e.scaled_formula(row['formula'], factor)
           scaled && row.merge('formula' => scaled)
@@ -1729,9 +1734,36 @@ module AresMUSH
         deal(scene, scene.target, rows, out, :critical => degree == Degree::CRITICAL_FAILURE)
       end
 
+      # A spell's formulas rolled. An area's are rolled the first time a target in it takes them, and told
+      # then, after the casting; every other target takes the same, its dice already told.
+      def self.spell_rows(formulas, out, once)
+        plain = formulas.map { |formula, type, category, _| [ formula, type, category ] }
+
+        return DamageRoll.of_formulas(plain, false) unless once
+
+        unless once['rolled'].key?(plain)
+          rows = once['rolled'][plain] = DamageRoll.of_formulas(plain, false)
+          rolled = rows.reject { |row| row['category'].to_s == 'persistent' }
+                       .map { |row| "#{row['dice'] || row['amount']} = #{row['amount']} #{row['type']}" }
+
+          unless rolled.empty?
+            out['lines'].insert(once['at'], told('pf2e.act_area_rolled', :spell => once['spell'], :rolled => rolled.join(', ')))
+            once['at'] += 1
+          end
+        end
+
+        once['rolled'][plain].map { |row| row.merge('dice' => nil) }
+      end
+
+      # `Aria recovers 8 Hit Points (2d8: 4, 4).`
+      def self.healed(label, amount, dice)
+        dice ? told('pf2e.act_healed_dice', :target => label, :count => amount, :dice => dice)
+             : told('pf2e.act_healed', :target => label, :count => amount)
+      end
+
       # Damage with no attack and no save: it lands.
-      def self.spell_unopposed(scene, mechanics, formulas, out)
-        heal_or_hurt(scene, mechanics, formulas, nil, out)
+      def self.spell_unopposed(scene, mechanics, formulas, out, once = nil)
+        heal_or_hurt(scene, mechanics, formulas, nil, out, once)
       end
 
       # A spell that puts an effect on whoever it is cast at, where the effect catalogue holds one of its
@@ -1772,13 +1804,16 @@ module AresMUSH
           elsif one['suffer'] then suffer_consequence(scene, whom, one, out)
           elsif one['effect'] then effect_consequence(scene, whom, one, rank, out)
           elsif one['heal']
-            amount = Pf2e.roll_formula(one['heal']) + (one['bonus'] || {})[dc.to_s].to_i
+            thrown = Pf2e.thrown_formula(one['heal'])
+            bonus = (one['bonus'] || {})[dc.to_s].to_i
+            amount = thrown['total'] + bonus
             Harm.heal(whom.holder, amount, options)
-            out['lines'] << told('pf2e.act_healed', :target => whom.label, :count => amount)
+            out['lines'] << healed(whom.label, amount, thrown['shown'] && (bonus.zero? ? thrown['shown'] : "#{thrown['shown']} +#{bonus}"))
             out['gm'] << told('pf2e.act_hp_left', :target => whom.label, :hp => Harm.hit_points(whom.holder))
           elsif one['damage']
-            deal(scene, whom, [ { 'amount' => Pf2e.roll_formula(one['damage']), 'type' => one['type'],
-                                  'formula' => one['damage'] } ], out)
+            thrown = Pf2e.thrown_formula(one['damage'])
+            deal(scene, whom, [ { 'amount' => thrown['total'], 'type' => one['type'], 'formula' => one['damage'],
+                                  'dice' => thrown['shown'] } ], out)
           elsif one['persistent']
             PersistentDamage.remove(whom.holder, one['persistent'])
             out['lines'] << told('pf2e.act_persistent_ended', :target => whom.label, :type => one['persistent'])

@@ -46,13 +46,13 @@ module AresMUSH
         it "should harm the undead with two, against a basic Fortitude save and without the 8" do
           cast('heal=#3/actions 2')
 
-          expect(heard).to include('Zombie Shambler #3 rolls Fortitude', '9 vitality (weakness 5)')
+          expect(heard).to include('Zombie Shambler #3 rolls Fortitude', '9 vitality (1d8: 4; weakness 5)')
         end
 
         it "should harm the undead with one, against the save" do
           cast('heal=#3/actions 1')
 
-          expect(heard).to include('Zombie Shambler #3 rolls Fortitude', '9 vitality (weakness 5)')
+          expect(heard).to include('Zombie Shambler #3 rolls Fortitude', '9 vitality (1d8: 4; weakness 5)')
         end
       end
 

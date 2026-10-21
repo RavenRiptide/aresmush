@@ -7,7 +7,9 @@ module AresMUSH
     # in the piles a critical hit treats differently. A creature's Strike and a spell say theirs as
     # formulas. Both come out of here the same shape, one row per kind:
     #
-    #   [ { 'type' => 'slashing', 'category' => nil, 'amount' => 9, 'formula' => '1d8+4' } ]
+    #   [ { 'type' => 'slashing', 'category' => nil, 'amount' => 9, 'formula' => '1d8+4', 'dice' => '1d8+4: 5 +4' } ]
+    #
+    # `dice` is how they fell, for the room to check the total against: nil where nothing was rolled.
     #
     # A critical hit doubles, which is the rule's default: the doubling pile's total twice, then what
     # never doubles, then what only a critical adds. What deadly and fatal add is `Damage`'s to say, for
@@ -40,12 +42,17 @@ module AresMUSH
 
           next nil if formula.empty?
 
-          amount = (throw_dice(instance['dice']).sum + instance['modifier'].to_i) * (critical ? 2 : 1) +
-                   throw_dice(instance['fixed_dice']).sum + instance['fixed_modifier'].to_i +
-                   (critical ? throw_dice(instance['crit_only_dice']).sum + instance['crit_only_modifier'].to_i : 0)
+          fell = throw_dice(instance['dice'])
+          fixed_fell = throw_dice(instance['fixed_dice'])
+          extra_fell = critical ? throw_dice(instance['crit_only_dice']) : []
+          amount = (fell.sum + instance['modifier'].to_i) * (critical ? 2 : 1) +
+                   fixed_fell.sum + instance['fixed_modifier'].to_i +
+                   (critical ? extra_fell.sum + instance['crit_only_modifier'].to_i : 0)
+          parts = [ [ doubling, fell, instance['modifier'], critical ], [ fixed, fixed_fell, instance['fixed_modifier'], false ],
+                    [ extra, extra_fell, instance['crit_only_modifier'], false ] ]
 
           { 'type' => kind(instance['damage_type']), 'category' => instance['category'],
-            'amount' => [ amount, 0 ].max, 'formula' => formula.gsub('+-', '-') }
+            'amount' => [ amount, 0 ].max, 'formula' => formula.gsub('+-', '-'), 'dice' => fallen(parts) }
         end
 
         merged(rows)
@@ -57,9 +64,12 @@ module AresMUSH
           # Fatal upsizes the weapon's own dice, which are the first formula's.
           formula = fatal_formula(formula, attack) if critical && index.zero?
 
+          thrown = Pf2e.thrown_formula(formula)
+
           { 'type' => kind(type), 'category' => category,
-            'amount' => [ Pf2e.roll_formula(formula) * (critical ? 2 : 1), 0 ].max,
-            'formula' => critical ? doubled(formula) : formula.to_s }
+            'amount' => [ thrown['total'] * (critical ? 2 : 1), 0 ].max,
+            'formula' => critical ? doubled(formula) : formula.to_s,
+            'dice' => critical ? scaled_note(thrown['shown'], thrown['total'], 'doubled') : thrown['shown'] }
         end
 
         rows += critical_extra_rows(attack, rows.first) if critical
@@ -70,8 +80,10 @@ module AresMUSH
       # Deadly's and fatal's critical-only dice, undoubled, of the weapon's own kind of damage.
       def self.critical_extra_rows(attack, weapon_row)
         Damage.critical_extras(attack).map do |count, die|
+          fell = Pf2e.roll_dice(count, die.delete('d').to_i)
+
           { 'type' => weapon_row ? weapon_row['type'] : kind(attack['damage_type']), 'category' => nil,
-            'amount' => Pf2e.roll_dice(count, die.delete('d').to_i).sum, 'formula' => "#{count}#{die}" }
+            'amount' => fell.sum, 'formula' => "#{count}#{die}", 'dice' => Pf2e.dice_shown("#{count}#{die}", fell) }
         end
       end
 
@@ -83,9 +95,11 @@ module AresMUSH
 
           times = critical && one['bucket'] == 'doubling' ? 2 : 1
           formula = times == 2 ? doubled(one['formula']) : one['formula'].to_s
+          thrown = Pf2e.thrown_formula(one['formula'])
 
           { 'type' => kind(one['type']), 'category' => one['category'],
-            'amount' => [ Pf2e.roll_formula(one['formula']) * times, 0 ].max, 'formula' => formula }
+            'amount' => [ thrown['total'] * times, 0 ].max, 'formula' => formula,
+            'dice' => times == 2 ? scaled_note(thrown['shown'], thrown['total'], 'doubled') : thrown['shown'] }
         end
 
         rows.compact
@@ -98,7 +112,42 @@ module AresMUSH
       def self.scaled(rows, degree)
         factor = BASIC.fetch(degree, 1)
 
-        rows.map { |row| row.merge('amount' => (row['amount'] * factor).floor) }
+        rows.map { |row| scaled_row(row, factor) }
+      end
+
+      SCALES = { 0.5 => 'halved', 2 => 'doubled' }.freeze
+
+      # A row scaled by an outcome, its dice saying what they came to and what was done with it.
+      def self.scaled_row(row, factor)
+        word = SCALES[factor]
+        dice = word && row['amount'].to_i.positive? ? scaled_note(row['dice'], row['amount'], word) : row['dice']
+
+        row.merge('amount' => (row['amount'] * factor).floor, 'dice' => dice)
+      end
+
+      # `6d6: 3, 5, 1, 2, 6, 1 = 18, halved`, or where the dice are told elsewhere, `18, halved`.
+      def self.scaled_note(dice, total, word)
+        dice ? "#{dice} = #{total}, #{word}" : "#{total}, #{word}"
+      end
+
+      # How a character's attack damage fell, pile by pile: `1d8+4: 5 +4 = 9, doubled + 1d6: 4`. A pile with
+      # no dice is its number; nothing where no die was rolled at all.
+      def self.fallen(parts)
+        return nil if parts.all? { |_formula, fell, _modifier, _doubled| fell.empty? }
+
+        parts.filter_map do |formula, fell, modifier, twice|
+          next nil if fell.empty? && modifier.to_i.zero?
+
+          shown = fell.empty? ? modifier.to_i.to_s : Pf2e.dice_shown(formula, fell, [ modifier.to_i ].reject(&:zero?))
+          twice ? scaled_note(shown, fell.sum + modifier.to_i, 'doubled') : shown
+        end.join(' + ')
+      end
+
+      # The dice of rows, together.
+      def self.dice_of(rows)
+        dice = rows.map { |row| row['dice'] }.compact
+
+        dice.empty? ? nil : dice.join(' + ')
       end
 
       def self.throw_dice(dice)
@@ -152,7 +201,7 @@ module AresMUSH
       def self.merged(rows)
         rows.group_by { |row| [ row['type'], row['category'] ] }.map do |(type, category), group|
           { 'type' => type, 'category' => category, 'amount' => group.sum { |row| row['amount'] },
-            'formula' => group.map { |row| row['formula'] }.compact.join('+') }
+            'formula' => group.map { |row| row['formula'] }.compact.join('+'), 'dice' => dice_of(group) }
         end.reject { |row| row['amount'].zero? && row['type'].to_s.empty? }
       end
 
@@ -170,7 +219,8 @@ module AresMUSH
           splash = group.select { |row| row['category'] == 'splash' }.sum { |row| row['amount'].to_i }
 
           { 'amount' => group.sum { |row| row['amount'].to_i }, 'type' => type, 'categories' => categories,
-            'splash' => categories.include?('splash') ? 0 : splash, 'formula' => formula.empty? ? nil : formula }
+            'splash' => categories.include?('splash') ? 0 : splash, 'formula' => formula.empty? ? nil : formula,
+            'dice' => dice_of(group) }
         end
       end
 

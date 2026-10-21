@@ -212,7 +212,7 @@ module AresMUSH
 
             expect(@client.failures).to eq []
             expect(said).to include('Medicine', 'DC 15 - ')
-            expect(said).to include(t('pf2e.act_healed', :target => @hero.name, :count => 12))
+            expect(said).to include(t('pf2e.act_healed_dice', :target => @hero.name, :count => 12, :dice => '2d8: 6, 6'))
             expect(Pf2eHP.get_hp_obj(state).damage).to eq 3
           end
 
@@ -812,6 +812,58 @@ module AresMUSH
           # A critical failure also leaves the target fleeing for a round.
           expect(npc(3).pf2_conditions).to have_key('Fleeing')
           expect(TurnState.turn(npc(2))['actions']).to eq 2
+        end
+      end
+
+      # A spell's damage and healing say how they were rolled, as a check does; an area's damage is rolled
+      # once and dealt to everything in it, each scaled by its own save.
+      describe "a spell's dice" do
+        before(:each) do
+          add('spirit priest')
+          3.times { add('goblin warrior') }
+        end
+
+        it "should show the dice a single target's damage was rolled with" do
+          @dice = 0.75
+          run(PF2EncounterAsCmd, 'e/as #2=cast divine lance=#3')
+
+          expect(@client.failures).to eq []
+          expect(said).to match(/Damage to Goblin Warrior #3: \d+ spirit \(\d+d4: 3, 3/)
+        end
+
+        it "should tell an area's dice once, and what each target's save made of them" do
+          @dice = 0.5
+          run(PF2EncounterAsCmd, 'e/as #2=cast fireball=#3')
+
+          expect(said).to include('Fireball rolls 6d6: 3, 3, 3, 3, 3, 3 = 18 fire for everything in its area.')
+          expect(said).to match(/Damage to Goblin Warrior #3: 18 fire\./)
+        end
+
+        it "should roll an area's damage once for everything in it" do
+          rolled = []
+          allow(Pf2e).to receive(:roll_dice) do |amount = 1, sides = 20|
+            rolled << amount if sides.to_i == 6
+            sides.to_i == 20 ? [ 2 ] * amount.to_i : Array.new(amount.to_i) { |at| (rolled.size + at) % 6 + 1 }
+          end
+
+          run(PF2EncounterAsCmd, 'e/as #2=cast fireball=#3,#4,#5')
+
+          expect(@client.failures).to eq []
+          expect(rolled).to eq [ 6 ]
+          taken = said.scan(/Damage to Goblin Warrior #\d: (\d+) fire/).flatten.uniq
+
+          expect(taken.size).to eq 1
+          expect(said.scan('6d6:').size).to eq 1
+        end
+
+        it "should show the dice a heal was rolled with" do
+          state = CombatantStates.of(@encounter, Character[@hero.id])
+          Pf2eHP.get_hp_obj(state).update(:damage => 12)
+          @dice = 0.5
+          run(PF2EncounterAsCmd, "e/as #2=cast heal=#{@hero.name}")
+
+          expect(@client.failures).to eq []
+          expect(said).to include("#{@hero.name} recovers 8 Hit Points (2d8: 4, 4).")
         end
       end
 
