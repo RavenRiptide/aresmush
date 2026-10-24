@@ -1,0 +1,91 @@
+---
+# What each outcome of an action's check does, applied by +e/act. Written from the note Foundry shows
+# for each outcome, and only what happens whatever anyone decides: Grapple's critical failure, where
+# the target chooses, and Shove's push, which is movement on the map, are left to the note.
+#
+# Keyed by the action's slug, or `<action>:<variant>` for one way of doing it. Each outcome -
+# criticalSuccess, success, failure, criticalFailure - lists what happens, and `always` what an action
+# that rolls nothing does:
+#
+#   on         whom it happens to: target, or actor
+#   condition  a condition set, at `value`; `remove` takes a list away instead
+#   until      how long a condition set here lasts, from the actor's turn: turn-end, next-turn-start,
+#              next-turn-end, or rounds:N
+#   effect     an effect put on them, with the `answer` it asks for where it asks one - or answers by
+#              the actor's proficiency in what they rolled (default, master, legendary)
+#   damage     damage they take, as a formula and a `type`
+#   heal       hit points they regain, as a formula, and `bonus` more by the DC the check was against
+#   persistent persistent damage of this type ended
+#   lower      a condition with a value made less, `by` so much; at nothing it is gone
+#   dying      their dying made worse, by so much
+#   recover    another flat check against persistent damage of this type, now, at `dc` where one is given
+#   suffer     persistent damage of this type dealt them now
+#   seen       someone hidden found, by so many steps: undetected, then hidden, then seen
+#   unseen     how well hidden they now are: hidden, undetected, or observed
+pf2e_action_consequences:
+  "trip":
+    criticalSuccess: [{"on": "target", "condition": "Prone"}, {"on": "target", "damage": "1d6", "type": "bludgeoning"}]
+    success: [{"on": "target", "condition": "Prone"}]
+    criticalFailure: [{"on": "actor", "condition": "Prone"}]
+  "grapple":
+    criticalSuccess: [{"on": "target", "condition": "Restrained", "until": "next-turn-end"}]
+    success: [{"on": "target", "condition": "Grabbed", "until": "next-turn-end"}]
+    failure: [{"on": "target", "remove": ["Grabbed", "Restrained"]}]
+    criticalFailure: [{"on": "target", "remove": ["Grabbed", "Restrained"]}]
+  "shove":
+    criticalFailure: [{"on": "actor", "condition": "Prone"}]
+  "disarm":
+    success: [{"on": "target", "effect": "Effect: Disarm (Success)"}]
+    criticalFailure: [{"on": "actor", "condition": "Off-Guard", "until": "next-turn-start"}]
+  "demoralize":
+    criticalSuccess: [{"on": "target", "condition": "Frightened", "value": 2}]
+    success: [{"on": "target", "condition": "Frightened", "value": 1}]
+  "feint":
+    criticalSuccess: [{"on": "target", "condition": "Off-Guard", "until": "next-turn-end"}]
+    success: [{"on": "target", "condition": "Off-Guard", "until": "turn-end"}]
+    criticalFailure: [{"on": "actor", "condition": "Off-Guard", "until": "next-turn-end"}]
+  "seek":
+    criticalSuccess: [{"on": "target", "seen": 2}]
+    success: [{"on": "target", "seen": 1}]
+  "hide":
+    criticalSuccess: [{"on": "actor", "unseen": "hidden"}]
+    success: [{"on": "actor", "unseen": "hidden"}]
+  "sneak":
+    criticalSuccess: [{"on": "actor", "unseen": "undetected"}]
+    success: [{"on": "actor", "unseen": "undetected"}]
+    failure: [{"on": "actor", "unseen": "hidden"}]
+    criticalFailure: [{"on": "actor", "unseen": "observed"}]
+  "retch":
+    criticalSuccess: [{"on": "actor", "lower": "Sickened", "by": 2}]
+    success: [{"on": "actor", "lower": "Sickened", "by": 1}]
+  "escape":
+    criticalSuccess: [{"on": "actor", "remove": ["Grabbed", "Immobilized", "Restrained"]}]
+    success: [{"on": "actor", "remove": ["Grabbed", "Immobilized", "Restrained"]}]
+  "bon-mot":
+    criticalSuccess: [{"on": "target", "effect": "Effect: Bon Mot", "answer": "Critical Success"}]
+    success: [{"on": "target", "effect": "Effect: Bon Mot", "answer": "Success"}]
+    criticalFailure: [{"on": "actor", "effect": "Effect: Bon Mot", "answer": "Critical Failure"}]
+  "aid":
+    criticalSuccess: [{"on": "target", "effect": "Effect: Aid", "answer": {"default": "+2", "master": "+3", "legendary": "+4"}}]
+    success: [{"on": "target", "effect": "Effect: Aid", "answer": "+1"}]
+    criticalFailure: [{"on": "target", "effect": "Effect: Aid", "answer": "-1"}]
+  "administer-first-aid:stabilize":
+    criticalSuccess: [{"on": "target", "remove": ["Dying"]}]
+    success: [{"on": "target", "remove": ["Dying"]}]
+    criticalFailure: [{"on": "target", "dying": 1}]
+  "administer-first-aid:stop-bleeding":
+    criticalSuccess: [{"on": "target", "recover": "bleed", "dc": 10}]
+    success: [{"on": "target", "recover": "bleed", "dc": 10}]
+    criticalFailure: [{"on": "target", "suffer": "bleed"}]
+  "battle-medicine":
+    criticalSuccess: [{"on": "target", "heal": "4d8", "bonus": {"20": 10, "30": 30, "40": 50}}]
+    success: [{"on": "target", "heal": "2d8", "bonus": {"20": 10, "30": 30, "40": 50}}]
+    criticalFailure: [{"on": "target", "damage": "1d8", "type": "untyped"}]
+  "stand":
+    always: [{"on": "actor", "remove": ["Prone"]}]
+  "drop-prone":
+    always: [{"on": "actor", "condition": "Prone"}]
+  "treat-wounds":
+    criticalSuccess: [{"on": "target", "heal": "4d8", "bonus": {"20": 10, "30": 30, "40": 50}}, {"on": "target", "remove": ["Wounded"]}]
+    success: [{"on": "target", "heal": "2d8", "bonus": {"20": 10, "30": 30, "40": 50}}, {"on": "target", "remove": ["Wounded"]}]
+    criticalFailure: [{"on": "target", "damage": "1d8", "type": "untyped"}]

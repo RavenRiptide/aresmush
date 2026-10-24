@@ -1,13 +1,27 @@
 module AresMUSH
   module Pf2e
 
+    # `+e/start [<stat>][=<encounter id>]` - starts an encounter in the scene, rolling initiative on the
+    # stat, and carrying on from the encounter named: whoever was in that one starts this one as they left
+    # it. Started during an exploration, it ends the exploration, carries on from it, and brings everyone
+    # exploring into the fight. Any approved character starts one, and is its GM (`Pf2e::Gm`).
     class PF2InitiateCombatCmd
       include CommandHandler
 
-      attr_accessor :init
+      attr_accessor :init, :from
 
       def parse_args
-        self.init = titlecase_arg(cmd.args)
+        stat, _, from = cmd.args.to_s.partition('=')
+
+        self.init = titlecase_arg(stat.strip.empty? ? nil : stat.strip)
+        self.from = from.strip.delete_prefix('#').empty? ? nil : from.strip.delete_prefix('#')
+      end
+
+      def check_from
+        return nil unless self.from
+        return nil if PF2Encounter[self.from]
+
+        t('pf2e.bad_id', :type => 'encounter')
       end
 
       def check_is_approved
@@ -25,46 +39,52 @@ module AresMUSH
           return
         end
 
-        # Only one encounter can be active in a scene at a time.
+        # Only one encounter can be active in a scene at a time. An exploration gives way to the fight
+        # that starts during it, which carries on from it.
 
         active_encounter = PF2Encounter.scene_active_encounter(scene)
+        exploring = Exploration.exploring?(active_encounter) ? active_encounter : nil
 
-        if active_encounter
+        if active_encounter && !exploring
           client.emit_failure t('pf2e.scene_has_active_encounter', :id => active_encounter.id)
           return
         end
 
-        # If no argument, initiative is based on Perception.
-        init_stat = self.init ? self.init : 'Perception'
+        # Initiative is Perception unless the GM names something else.
+        init_stat = Pf2e.initiative_stat(self.init || 'Perception')
 
-        valid_init_stat = Pf2e.is_valid_init_stat?(init_stat)
-
-        if !valid_init_stat
-          client.emit_failure t('pf2e.not_unique')
+        unless init_stat
+          client.emit_failure t('pf2e.bad_initiative_stat', :stat => self.init)
           return
         end
 
         # Do it.
 
+        if exploring
+          Pf2e::Encounters::Ending.end!(exploring).each { |event| client.emit_ooc Pf2e::Telling.render(event) }
+          tell(scene, PF2Encounter[exploring.id], t('pf2e.explore_ended', :id => exploring.id))
+        end
+
         encounter = PF2Encounter.create(
+          owner: enactor,
           organizer: enactor.name,
           scene: scene,
-          init_stat: init_stat
+          init_stat: init_stat,
+          carries_on_from: exploring ? exploring.id : self.from
         )
 
+        banner = PF2EncounterStart.new(encounter)
+        tell(scene, encounter, banner.render, :kind => 'start', :fields => banner.fields)
 
-        template = PF2EncounterStart.new(encounter)
+        # Everyone exploring comes into the fight, rolling initiative as their activity has it.
+        Exploration.bring_into(encounter, PF2Encounter[exploring.id]).each { |line| tell(scene, encounter, line) } if exploring
+      end
 
-        @message = template.render
-
-        # Emit to the room.
-        enactor_room.emit @message
-
-        # Log the init start in the encounter.
-        PF2Encounter.send_to_encounter(encounter, @message)
-
-        # Log the initiative message to the scene as an OOC message.
-        Scenes.add_to_scene(scene, @message, Game.master.system_character, false, true)
+      # To the room, the encounter's log and the scene's, as an OOC line.
+      def tell(scene, encounter, message, kind: nil, fields: nil)
+        enactor_room.emit message
+        PF2Encounter.send_to_encounter(encounter, message, :kind => kind, :fields => fields)
+        Scenes.add_to_scene(scene, message, Game.master.system_character, false, true)
       end
 
     end

@@ -21,6 +21,8 @@ module AresMUSH
 
         encounter = found.state
 
+        return client.emit_failure(t('pf2e.explore_no_turns')) if Pf2e::Exploration.exploring?(encounter)
+
         # Verify that this character can modify the encounter.
 
         cannot_modify = Pf2e.can_modify_encounter(enactor, encounter)
@@ -29,7 +31,13 @@ module AresMUSH
           return
         end
 
-        initlist = encounter.participants
+        initlist = Pf2e::Combatants.all(encounter)
+
+        # Whose turn is ending, before the order moves: an effect that lasts until the end of someone's
+        # turn ends now.
+        ending = Pf2e::ActiveEffects.current_turn(encounter)
+        ending_round = encounter.round
+
         moved = Pf2e::Encounters::Turn.move('next', :size => initlist.size,
                                            :at => encounter.next_init, :round => encounter.round)
 
@@ -44,24 +52,18 @@ module AresMUSH
         round_text = new_round ? t('pf2e.new_round', :round => moved.state['round']) : t(moved.state['label'])
 
         @message = t('pf2e.advance_init',
-          :current => initlist[this_init][1],
-          :next => initlist[next_init][1],
-          :init => initlist[this_init][0].to_i,
+          :current => initlist[this_init].label,
+          :next => initlist[next_init].label,
+          :init => initlist[this_init].init.to_i,
           :round => round_text
         )
 
-        # Emit to the room.
-        enactor_room.emit @message
-
-        # Log message to the encounter.
-        PF2Encounter.send_to_encounter(encounter, @message)
-
-        # Log the message to the scene as an OOC message.
-        Scenes.add_to_scene(scene, @message, Game.master.system_character, false, true)
+        Pf2e::Encounters::Announce.tell(encounter, @message, :room => enactor_room)
 
         # If the current initiative is a PC, shoot them a global notifier.
 
-        current_is_char = Character.named("#{this_name}")
+        holder = initlist[this_init].holder
+        current_is_char = holder && !initlist[this_init].creature? ? holder : nil
 
         if current_is_char
           @init_msg = t('pf2e.your_init', :id => encounter.id)
@@ -73,6 +75,23 @@ module AresMUSH
         # Update the encounter object.
 
         encounter.update(next_init: next_init)
+
+        # Time has passed: what ran out ends, what heals heals, what burns burns. The room is told each.
+        Pf2e::Turns.advanced(encounter, ending, ending_round, initlist[this_init].label,
+                             moved.state['round']).each do |event|
+          notice = Pf2e::Telling.render(event)
+
+          Pf2e::Encounters::Announce.tell(encounter, notice, :room => enactor_room, :story => true)
+        end
+
+        # The one whose turn it is hears what matters to it; a creature's reminder goes to the GM. Read
+        # again, because the turn starting has just changed what it holds.
+        holder = Pf2e::Combatants.at(encounter, this_init)&.holder
+
+        if holder
+          reminder = Pf2e::Turns.reminder(holder, moved.state['round'])
+          Pf2e::Actors.of(holder).hears_own_turn? ? Login.emit_ooc_if_logged_in(holder, reminder) : client.emit_ooc(reminder)
+        end
 
       end
 

@@ -148,6 +148,7 @@ module AresMUSH
           'specials' => char.pf2_special,
           'languages' => char.pf2_lang,
           'boosts' => char.pf2_boosts,
+          'formulas' => char.pf2_formula_book,
           'spells' => Pf2emagic::Entries.known_lists(char),
           'focus' => Pf2emagic::Entries.focus_records(char.magic),
           # Every focus spell the ledger has a grant for, reverted or live: the ones materialising
@@ -212,6 +213,11 @@ module AresMUSH
         # they are migrated to explain_for.
         char.update(:pf2_level_tracker => tracker_view(char, sheet))
 
+        # What the finished sheet implies rather than what was chosen: a feat that makes you trained in a
+        # skill, a counter another rule's predicate asks about. Applied after the fold, because the fold
+        # would otherwise take it straight back off again.
+        Pf2e::Paths.apply_all!(char)
+
         ops.size
       end
 
@@ -248,14 +254,19 @@ module AresMUSH
 
         rows(char).each do |row|
           next if !row['reverted_by'].blank?
-          next unless row['kind'] == 'grant_feat'
-          next if (row['payload'] || {})['choice'].blank?
+
+          payload = row['payload'] || {}
+          name, label = case row['kind']
+                        when 'grant_feat' then [ payload['feat'], payload['choice'] ]
+                        when 'make_choice' then [ payload['choice'], payload['label'] ]
+                        end
+          next if name.blank? || label.blank?
 
           key = row['effective_level'].to_i.to_s
           entry = (tracker[key] ||= {})
           choices = (entry['feat_choices'] ||= {})
-          list = (choices[row['payload']['feat']] ||= [])
-          list << row['payload']['choice'] unless list.include?(row['payload']['choice'])
+          list = (choices[name] ||= [])
+          list << label unless list.include?(label)
         end
 
         tracker
@@ -441,6 +452,7 @@ module AresMUSH
         },
         'add_trait' => lambda { |char, p| char.update(:pf2_traits => (Array(char.pf2_traits) + [ p['trait'] ]).uniq) },
         'add_special' => lambda { |char, p| char.update(:pf2_special => (Array(char.pf2_special) + [ p['special'] ]).uniq) },
+        'grant_formula' => lambda { |char, p| Pf2e::Crafting.write_formula(char, p['category'], p['formula']) },
         'set_ability_score' => lambda { |char, p| Ledger.apply_ability_score(char, p['ability'], p['to'].to_i) },
         'spell_access' => lambda { |char, p|
           known = Pf2emagic::Entries.known(char.magic, p['source'])
@@ -468,6 +480,7 @@ module AresMUSH
           char.update(:pf2_features => features)
         },
         'add_trait' => lambda { |char, match| char.update(:pf2_traits => Array(char.pf2_traits).reject { |t| t.to_s.casecmp?(match['trait'].to_s) }) },
+        'grant_formula' => lambda { |char, match| Pf2e::Crafting.write_formula(char, match['category'], match['formula'], :remove => true) },
         'add_special' => lambda { |char, match| char.update(:pf2_special => Array(char.pf2_special).reject { |s| s.to_s.casecmp?(match['special'].to_s) }) },
         'spell_access' => lambda { |char, match|
           known = Pf2emagic::Entries.known(char.magic, match['source'])
@@ -576,8 +589,14 @@ module AresMUSH
 
         plan['revocations'].each { |r| revert_matching!(char, r['kind'], r['match'], :by => marker, :materialize => false, :limit => r['limit']) }
 
+        # What this level chose, which `do_advancement` has just written against it.
+        chosen = (Pf2e.level_entry(char, level)['feat_choices'] || {})
+
         txn_id = write(char, :source_type => 'level_up', :source_ref => "advance to level #{level}", :effective_level => level, :materialize => false) do |txn|
           plan['grants'].each { |g| txn.grant(g['kind'], g['payload']) }
+          chosen.each_pair do |choice, labels|
+            Array(labels).each { |label| txn.grant('make_choice', 'choice' => choice, 'label' => label) }
+          end
         end
 
         invalidate!(char)
@@ -674,6 +693,10 @@ module AresMUSH
 
           (char.pf2_features || {}).each_pair do |bucket, features|
             Array(features).each { |f| txn.grant('grant_feature', 'bucket' => bucket, 'feature' => f) }
+          end
+
+          Pf2e.recorded_choices(char).each do |choice, label, level|
+            txn.grant('make_choice', { 'choice' => choice, 'label' => label }, { 'effective_level' => [ level, 1 ].max })
           end
 
           DraftSheet.of(char).languages.each { |l| txn.grant('add_language', 'language' => l) }

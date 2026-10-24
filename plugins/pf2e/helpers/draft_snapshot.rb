@@ -40,7 +40,7 @@ module AresMUSH
       # pick therefore also puts back the focus points spent during the same draft, which a rest or
       # a refocus restores anyway.
       SIDE_MODELS = {
-        'magic' => { 'model' => 'PF2Magic', 'transient' => %w{last_refocus spells_prepared spells_today prepared_lists slot_pairs} },
+        'magic' => { 'model' => 'PF2Magic', 'transient' => %w{spells_prepared spells_today prepared_lists slot_pairs} },
         'combat' => { 'model' => 'Pf2eCombat', 'transient' => [] },
         'hp' => { 'model' => 'Pf2eHP', 'transient' => %w{damage temp_max temp_current temp_hp} }
       }.freeze

@@ -9,6 +9,9 @@ module AresMUSH
     attribute :temp_max, :type => DataType::Integer, :default => 0
     attribute :temp_current, :type => DataType::Integer, :default => 0
     attribute :temp_hp, :type => DataType::Integer, :default => 0
+    # Which effect the temporary hit points came from, so ending that effect takes them away and ending
+    # some other one does not (`rule-element/temp-hp.ts`).
+    attribute :temp_hp_source
 
 
     reference :character, "AresMUSH::Character"
@@ -18,46 +21,76 @@ module AresMUSH
     ##### CLASS METHODS #####
 
     def self.display_character_hp(char)
-      hp = char.hp
+      return "---" if !char.hp
 
-      return "---" if !hp
+      display_hp(get_current_hp(char), get_max_hp(char))
+    end
 
-      current = get_current_hp(char)
-      max = get_max_hp(char)
+    # Hit points left of the most there can be, coloured by how many are left.
+    def self.display_hp(current, max)
       percent = max.zero? ? 0 : ((current.to_f / max.to_f) * 100).to_i
       hp_color = "%xg" if percent > 75
       hp_color = "%xc" if percent.between?(50,75)
       hp_color = "%xy" if percent.between?(25,50)
       hp_color = "%xr" if percent < 25
       "#{hp_color}#{current}%xn / #{max} (#{percent}%)"
-
     end
 
-    def self.get_dying_value(char)
+    # `kind` is what the damage was: `fire`, `S`, whatever the attack dealt. Given one, the character's
+    # immunities, weaknesses and resistances are applied before any of it lands - which is the point of
+    # damage having a kind at all.
+    # `options` are the circumstances of what is being done, which is how a bonus to healing from
+    # Treat Wounds applies to that and not to every point of healing: Robust Health's own rule is
+    # predicated on `action:treat-wounds`.
+    # `is_dm` is whether this damage may kill: the word of whoever deals it, where they have a say
+    # (`damage`), and otherwise the encounter's (`Pf2e::Gm.may_kill?`). Any damage takes a character no
+    # lower than nothing and leaves them dying there; past that, damage that may kill kills, and damage
+    # that may not leaves them unconscious. `critical` is a critical hit's, which leaves them two steps
+    # nearer death.
+    #
+    # `continuing` is the rest of a hit whose first damage has landed: a bite's poison after its
+    # piercing. A hit drops someone once, so what continues it leaves alone someone already at nothing.
+    # `resisted` is damage whose immunities, weaknesses and resistances the caller has already applied,
+    # knowing more about it than its kind.
+    #
+    # `nonlethal` is damage that knocks out and does not kill: whoever it reduces to nothing is
+    # unconscious, and not dying.
+    #
+    # Answers what became of them where the damage settled it: `:dead`, `:spared` or `:knocked_out`.
+    def self.modify_damage(char, amount, healing=false, is_dm=nil, kind=nil, options=[], critical: false, continuing: false,
+                           resisted: false, nonlethal: false)
+      # Nothing more happens to the dead.
+      return nil if char.pf2_is_dead
 
-      previous_value = char.pf2e_conditions['Dying'] ? Pf2e.get_condition_value(char, 'Dying') : 1
-      wounded_value = Pf2e.get_condition_value(char, 'Wounded')
-      dying_value = previous_value + wounded_value
-      doomed_value = Pf2e.get_condition_value(char, 'Doomed')
-
-    end
-
-    def self.modify_damage(char, amount, healing=false, is_dm=false)
+      is_dm = Pf2e::Gm.may_kill?(char) if is_dm.nil?
+      amount = Pf2e::IWR.apply(Pf2e::IWR.of(char), amount, kind)['amount'] if kind && !healing && !resisted
+      Pf2e::Turns.damaged(char, kind) if kind && !healing
+      amount = healed(char, amount, options) if healing
 
       hp = get_hp_obj(char)
       max_hp = get_max_hp(char)
       existing_damage = hp.damage
 
       if healing
-        if (existing_damage == max_hp)
-          wounded = char.pf2e_conditions['Wounded'] ? Pf2e.get_condition_value(char, 'Wounded') : 0
-          wounded_value = 1 + wounded
-          Pf2e.set_condition(char, 'Wounded', wounded_value)
+        # Healed out of dying: wounded one more. Someone who stopped dying on their own already was.
+        if Pf2e.condition_level(char, 'Dying').positive?
+          Pf2e.set_condition(char, 'Wounded', 1 + Pf2e.condition_level(char, 'Wounded'))
           Pf2e.remove_condition(char, 'Dying')
         end
 
-        hp.update(damage: (existing_damage - amount).clamp(0,max_hp))
-        return
+        # What an effect took and says cannot be healed stays taken while the effect lasts.
+        floor = [ Pf2e::HitPointLoss.unrecoverable(char), max_hp ].min
+        hp.update(damage: (existing_damage - amount).clamp(floor, max_hp))
+        woken(char)
+        return nil
+      end
+
+      # Damage of twice their hit points or more in one blow is death, whatever their dying - but for a
+      # blow not meant to kill, which does not.
+      if max_hp.positive? && amount >= 2 * max_hp && !nonlethal
+        hp.update(damage: max_hp, temp_hp: 0)
+
+        return now_dying(char, fatal_at(char), is_dm)
       end
 
       # Deduct from temp_hp first, if any, overflow goes to HP.
@@ -68,91 +101,152 @@ module AresMUSH
 
       damage = temp_hp - amount
 
-      hp.temp_hp = damage
+      hp.temp_hp = [ damage, 0 ].max
 
-      if damage.negative?
+      # A hit the temporary pool swallowed whole still spent it, and the reduced pool has to be
+      # written down or the same temporary hit points soak every hit that comes.
+      unless damage.negative?
+        hp.save
+        return nil
+      end
 
-        extra_damage = damage.abs
-        hp.temp_hp = 0
+      hp.temp_hp = 0
+      new_damage = existing_damage + damage.abs
 
-        new_damage = existing_damage + extra_damage
-
-        # Check to see if this damage puts the character in Dying.
-        if (new_damage >= max_hp && is_dc)
-          hp.damage = max_hp
-          dying_value = char.pf2e_conditions['Dying'] ? Pf2e.get_condition_value(char, 'Dying') : 1
-          wounded_value = Pf2e.get_condition_value(char, 'Wounded')
-          doomed_value = Pf2e.get_condition_value(char, 'Doomed')
-
-          if dying_value >= (4 - doomed_value)
-            # If this is true, the character is dead.
-            if is_dc
-              char.update(pf2_is_dead: true)
-            end
-
-            Pf2e.set_condition char, 'Dying', dying_value.clamp(0,(4 - doomed_value))
-          else
-            Pf2e.set_condition char, 'Dying', dying_value
-          end
-
-          hp.save
-          return
-        end
-
+      if new_damage < max_hp
         hp.damage = new_damage
         hp.save
+        return nil
       end
+
+      # Reduced to nothing: Dying 1, or 2 from a critical hit, one higher for each point of Wounded
+      # already carried; hit again while dying, one higher, or two from a critical hit.
+      hp.damage = max_hp
+      hp.save
+
+      return nil if continuing && existing_damage >= max_hp
+
+      step = critical ? 2 : 1
+      dying = Pf2e.condition_level(char, 'Dying')
+
+      if nonlethal && dying.zero?
+        knocked_out(char)
+        return :knocked_out
+      end
+
+      now_dying(char, dying.positive? ? dying + step : step + Pf2e.condition_level(char, 'Wounded'), is_dm)
+    end
+
+    # The whole of one blow, where it dealt more than one kind of damage: twice their hit points or more
+    # is death, as it is of a blow of one kind. Answers what became of them, or nothing.
+    def self.massive(char, taken)
+      max_hp = get_max_hp(char)
+
+      return nil if char.pf2_is_dead || !max_hp.positive? || taken < 2 * max_hp
+
+      get_hp_obj(char).update(damage: max_hp, temp_hp: 0)
+      now_dying(char, fatal_at(char), Pf2e::Gm.may_kill?(char))
+    end
+
+    # The value at which dying is death, which Doomed lowers.
+    def self.fatal_at(char)
+      4 - Pf2e.condition_level(char, 'Doomed')
+    end
+
+    # A character's Dying at the value named. At the value that is death they die where that may happen,
+    # and where it may not they stop dying, unconscious and wounded for it as anyone is who stops.
+    # Answers `:dead` or `:spared` for those, and nothing while they are only dying.
+    def self.now_dying(char, value, may_kill)
+      if value < fatal_at(char)
+        Pf2e.set_condition(char, 'Dying', value)
+        return nil
+      end
+
+      if may_kill
+        kill(char)
+        return :dead
+      end
+
+      stable(char)
+      :spared
+    end
+
+    # Dead: no hit points, and dying at the value that is death.
+    def self.kill(char)
+      get_hp_obj(char).update(damage: get_max_hp(char), temp_hp: 0)
+      char.update(pf2_is_dead: true)
+      Pf2e.set_condition(char, 'Dying', fatal_at(char))
+    end
+
+    # Dead no longer: as someone who stopped dying, to be healed awake.
+    def self.revive(char)
+      char.update(pf2_is_dead: false)
+      stable(char)
+    end
+
+    # No longer dying, with no hit points: unconscious until healed, and wounded one more.
+    def self.stable(char)
+      Pf2e.remove_condition(char, 'Dying', true)
+      Pf2e.set_condition(char, 'Wounded', Pf2e.condition_level(char, 'Wounded') + 1)
+      Pf2e.set_condition(char, 'Unconscious', nil, 'granted_by' => NO_HIT_POINTS)
+    end
+
+    # Knocked out by a blow not meant to kill: unconscious with no hit points, and no nearer death.
+    def self.knocked_out(char)
+      Pf2e.set_condition(char, 'Unconscious', nil, 'granted_by' => NO_HIT_POINTS)
+    end
+
+    # What someone who stopped dying is unconscious for, which healing them ends.
+    NO_HIT_POINTS = 'no hit points'.freeze
+
+    # Back above nothing, someone unconscious only for having no hit points wakes.
+    def self.woken(char)
+      held = (char.pf2_conditions || {})['Unconscious']
+
+      return unless held.is_a?(Hash) && held['granted_by'] == NO_HIT_POINTS && get_current_hp(char).positive?
+
+      Pf2e.remove_condition(char, 'Unconscious', true)
+    end
+
+    # What the character recovers, given what they were given. Theirs rather than the healer's - Robust
+    # Health recovers more from Treat Wounds whoever is doing the treating - and never below nothing.
+    def self.healed(char, amount, options)
+      (amount + Pf2e::Stat.total(char, 'healing', nil, options)).clamp(0, nil)
     end
 
     def self.get_hp_obj(char)
       char.hp
     end
 
-    # A character who has not committed base info has no HP row yet, and approving one used to
-    # raise `undefined method 'ancestry_hp' for nil`. No row means no hit points.
-    def self.get_max_hp(char)
+    # The DC to recover from dying: 10 plus the dying value, less whatever an effect took off it.
+    # Toughness and Defy Death both lower it, and both say so themselves as a write, so nothing here
+    # names either.
+    def self.recovery_dc(char)
+      10 + Pf2e.condition_level(char, 'Dying') + Pf2e::Paths.held(char, 'dying_recovery_dc').to_i
+    end
+
+    # Hit points before anything modifies them. Constitution belongs here rather than in a modifier
+    # because it is counted per level; Drained's own row multiplies by level to match.
+    #
+    # A character who has not committed base info has no HP row yet, and approving one used to raise
+    # `undefined method 'ancestry_hp' for nil`. No row means no hit points.
+    def self.base_max_hp(char)
       hp = get_hp_obj(char)
 
       return 0 unless hp
 
       con_mod = Pf2eAbilities.abilmod(Pf2eAbilities.get_score(char, "Constitution"))
-      ancestry_hp = hp.ancestry_hp
-      charclass_hp = hp.charclass_hp
-      level = char.pf2_level
-      # drain_value = Pf2e.get_condition_value(char, 'Drained')
-      # For right now, until I do conditions, it's just 0
-      drain_value = 0
 
-      feats = (char.pf2_feats || {}).values.flatten
-
-      (charclass_hp + con_mod - drain_value) * level + ancestry_hp +
-        feat_hp_bonus(feats, Global.read_config('pf2e_feats') || {}, level)
+      (hp.charclass_hp + con_mod) * char.pf2_level + hp.ancestry_hp
     end
 
-    # Hit Points the feats held add to the maximum, from each feat's `hp_bonus`:
-    #
-    #   per_level            that many for each character level - Toughness
-    #   per_archetype_feat   that many for each feat held of the feat's own archetype, itself and the
-    #                        Dedication included - Resiliency
-    #
-    # Worked out rather than stored, so it follows the character's level and their later archetype
-    # feats, and a rollback has nothing to undo.
-    def self.feat_hp_bonus(feat_names, feats_config, level)
-      details = feat_names.map do |name|
-        key = feats_config.keys.find { |k| k.to_s.casecmp?(name.to_s) }
+    def self.get_max_hp(char)
+      Pf2e::Stat.total(char, 'hp')
+    end
 
-        key ? feats_config[key] : {}
-      end
-
-      details.sum do |info|
-        bonus = info['hp_bonus']
-        next 0 unless bonus.is_a?(Hash)
-
-        archetypes = Array(info['assoc_archetype'])
-        of_archetype = details.count { |other| (Array(other['assoc_archetype']) & archetypes).any? }
-
-        bonus['per_level'].to_i * level.to_i + bonus['per_archetype_feat'].to_i * of_archetype
-      end
+    # The arithmetic as well as the answer, for a sheet that shows a player why Drained cost them 40.
+    def self.max_hp_breakdown(char)
+      Pf2e::Stat.of(char, 'hp')
     end
 
     def self.get_current_hp(char)

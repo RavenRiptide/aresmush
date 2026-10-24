@@ -1,0 +1,30 @@
+# What a formula costs to buy, by the level of the item it makes, in copper: PF2e prices a formula by that
+# level rather than by the item's own price. Player Core p. 294, checked against Archives of Nethys
+# (Rules.aspx?ID=2214). A rune's formula costs the same as a formula for an item of its level.
+pf2e_crafting:
+  formula_price:
+    0: 50
+    1: 100
+    2: 200
+    3: 300
+    4: 500
+    5: 800
+    6: 1300
+    7: 1800
+    8: 2500
+    9: 3500
+    10: 5000
+    11: 7000
+    12: 10000
+    13: 15000
+    14: 22500
+    15: 32500
+    16: 50000
+    17: 75000
+    18: 120000
+    19: 200000
+    20: 350000
+  # An alchemist's preparations: each batch of infused reagents makes this many items at a rest, and one
+  # in the moment with Quick Alchemy.
+  alchemy:
+    items_per_batch: 2

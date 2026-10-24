@@ -13,11 +13,11 @@ Many characters in Pathfinder 2e have access to magic. This page acts as a refer
 ## Basic Magic Commands
 **Commands**:
 `spell <spell name>`: Quickly looks up the details of a spell. This command will accept partial matches, but spell details are only given if there is exactly one match. (For a more robust spell search command, see `help spell search` to learn more about the `spell/search` command.)
-`magic`: Displays your remaining spell availability since your last `rest` by class, innate spell access, and archetypes. Also displays all focus spell lists. 
-`magic <character>`: Displays another character's remaining spell availability since their last rest by class, innate spell access, and archetypes. Also displays all focus spell lists.
+`magic`: Your magic by class, innate spell access and archetype, and your focus spells. In an encounter, it shows what you have left to cast there since the GM last rested you.
+`magic <character>`: Another character's, the same way.
 
 ## Preparing Spells
-If you're a prepared spellcaster, you must prepare spells and `rest` before casting them. For more information about preparing spells and resting and a full list of spell preparation commands, see `help prepare` and `help rest`.
+If you're a prepared spellcaster, what you prepare is what a rest in an encounter gives you to cast. For more information about preparing spells and resting and a full list of spell preparation commands, see `help prepare` and `help rest`.
 
 ## Learning Spells
 If you keep a spellbook (a wizard's spellbook or a witch's familiar) or a book a feat gives you (Esoteric Polymath, Arcane Evolution), you can Learn a Spell to add a common spell of its tradition to it. You roll the tradition's skill (Arcana, Nature, Occultism or Religion) against a DC set by the spell's rank, and pay for the materials:

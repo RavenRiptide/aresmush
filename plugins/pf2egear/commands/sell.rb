@@ -58,6 +58,9 @@ module AresMUSH
         return if Pf2e::CharState.emit_error!(client, found)
 
         item_id = found.state
+        held = Pf2e::Equipment.held_by(item_id)
+
+        return client.emit_failure(t('pf2egear.item_in_encounter', :item => item_id.name, :id => held.id)) if held
 
         # Gear and consumables are held as one row with a quantity, so selling one is a decrement.
         item_qty = item_id.quantity if Pf2egear::Inventory.stackable?(category)

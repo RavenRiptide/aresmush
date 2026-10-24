@@ -26,19 +26,22 @@ module AresMUSH
 
       def handle
 
-        char = PF2e.get_character(self.character, enactor)
+        char = Pf2e.get_character(self.character, enactor)
 
         if !char
           client.emit_failure t('pf2e.not_found')
           return
         end
 
-        msg = PF2e.update_formula(char, self.category, self.name, true)
+        found = Pf2e::Crafting.entry(self.category, self.name)
 
-        if msg
-          client.emit_failure msg
-          return
-        end
+        return if Pf2e::CharState.emit_error!(client, found)
+
+        named = found.state.first
+
+        return client.emit_failure(t('pf2e.nothing_to_do')) unless Pf2e::Crafting.known?(char, self.category, named)
+
+        Pf2e::Crafting.forget!(char, self.category, named, :by => enactor.name)
 
         client.emit_success t('pf2e.updated_ok', :element => 'Formulas', :char => char.name)
       end

@@ -3,14 +3,37 @@ module AresMUSH
     class PF2DamagePlayerCmd
       include CommandHandler
 
-      attr_accessor :target, :damage, :is_ndc
+      attr_accessor :target, :damage, :is_ndc, :kind, :about
 
+      # What may be said of the damage after its kind, each a word or two: what it is made of, and how
+      # it came. Asked for rather than held, because the helpers load after the commands.
+      def sayable
+        Pf2e::IWR::MATERIALS + %w{magical holy unholy area splash precision persistent spell ghost-touch nonlethal}
+      end
+
+      # `damage <who>=<how much>` or `<how much> <kind> [<what else is so of it>...]`, so a resistance
+      # has something to resist: `12 slashing silver`, `10 fire area`. A kind nobody names is damage of no
+      # kind, which nothing resists.
       def parse_args
         args = cmd.parse_args(ArgParser.arg1_equals_arg2)
 
         self.target = list_arg(args.arg1)
-        self.damage = integer_arg(args.arg2)
+
+        amount, _, named = args.arg2.to_s.strip.partition(' ')
+        kind, self.about = kind_and_about(named.strip.downcase)
+
+        self.damage = integer_arg(amount)
+        self.kind = kind.empty? ? nil : kind
         self.is_ndc = cmd.switch_is?("ndc")
+      end
+
+      # The words after the amount: those that say something of the damage, and before them its kind.
+      def kind_and_about(named)
+        slug = named.tr(' ', '-')
+        said = sayable.select { |word| slug.match?(/(?:\A|-)#{Regexp.escape(word)}(?:-damage)?(?:-|\z)/) }
+        kind = said.reduce(slug) { |rest, word| rest.sub(/(?:\A|-)#{Regexp.escape(word)}(?:-damage)?(?=-|\z)/, '') }
+
+        [ kind.delete_prefix('-').tr('-', ' ').strip, said ]
       end
 
       def required_args
@@ -24,59 +47,42 @@ module AresMUSH
 
       def handle
 
-        # Validate that the enactor has the right to run this command in this situation.
+        # Staff, or the GM of the encounter here, damage whoever is in it. A target may be a combatant's id.
+        encounter = Pf2e::Combatants.encounter_here(enactor)
+        targets = ActiveEffects.targets(client, enactor, self.target)
 
-        target_list = self.target.map { |t| Pf2e.get_character(t, enactor).name }.compact
+        return if targets.empty?
 
-        # Admins can damage anyone, anytime, anywhere. Everyone else needs to be in an encounter.
-        unless enactor.is_admin?
-          scene = enactor_room.scene
-
-          if !scene
-            client.emit_failure t('pf2e.must_be_in_scene')
-            return
-          end
-
-          encounter = PF2Encounter.get_encounter(enactor, scene)
-
-          if !encounter
-            client.emit_failure t('pf2e.bad_id', :type => 'encounter')
-            return
-          end
-
-          can_damage_pc = Pf2e.can_damage_pc?(enactor, target_list, encounter)
-
-          if !can_damage_pc
-            client.emit_failure t('pf2e.cannot_damage_pc')
-            return
-          end
+        if !enactor.is_admin? && !Pf2e.can_damage_pc?(enactor, targets.map(&:name), encounter&.id)
+          client.emit_failure t('pf2e.cannot_damage_pc')
+          return
         end
 
-        # Check for the /ndc switch, which has no meaning unless the enactor is a DM or admin.
-        # /ndc dictates whether the code invokes the Dead condition.
+        # Whether the damage may kill is a Plotmaster's or staff's to say, and /ndc is them saying it may
+        # not. From anyone else it never does.
+        is_dc = !self.is_ndc && Pf2e::Gm.plotmaster?(enactor)
 
-        is_dc = self.is_ndc ? false : enactor.has_permission?("kill_pc")
+        dropped = Pf2e::Acting.report
+        changed = []
 
-        ok_char_list = []
-        bad_char_list = []
+        ok_char_list = targets.map do |holder|
+          standing = Pf2e::Acting.still_up(holder)
+          held = Pf2e::Harm.damage(holder, self.damage, self.kind, :is_dm => is_dc, :about => self.about)
+          why = Pf2e::IWR.words(held['applied'])
+          changed << t('pf2e.damage_taken', :name => holder.name, :taken => held['amount'], :why => why.join(', ')) if why.any?
 
-        target_list.each do |item|
-          char = ClassTargetFinder.find(item, Character, enactor)
+          Pf2e::Actors.of(holder).notify_damage(self.damage, enactor.name)
+          Pf2e::Acting.dropped(Pf2e::Combatants::Combatant.new(holder, holder.name, nil), standing, dropped, held.merge('encounter' => encounter))
 
-          if (char.found?)
-            Pf2eHP.modify_damage(char.target, self.damage, false, is_dc)
-            ok_char_list << char.target.name
-            Login.notify char.target,:pf2_damage, t('pf2e.you_took_damage', :amount => self.damage, :source => enactor.name), 0
-          else
-            bad_char_list << item
-          end
-        end
-
-        if !(bad_char_list.empty?)
-          client.emit_ooc t('pf2e.bad_value_in_list', :items => 'characters', :list => bad_char_list.sort.join(", "))
+          holder.name
         end
 
         client.emit_success t('pf2e.damage_applied_ok', :list => ok_char_list.sort.join(", "), :amount => self.damage)
+        # What someone resists or is weak to is the GM's to know of the damage they named.
+        changed.each { |line| client.emit_ooc line }
+
+        # The room is told who it dropped, as a Strike tells it.
+        Pf2e::Telling.lines(dropped['lines']).each { |line| enactor_room.emit line.strip }
 
       end
 

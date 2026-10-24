@@ -78,6 +78,10 @@ module AresMUSH
           return PF2ShowSheetCmd
         when "combat"
           return PF2DisplayCombatSheetCmd
+        when "why"
+          return PF2StatBreakdownCmd
+        when "option", "options"
+          return PF2RollOptionCmd
         else
           return PF2DisplaySheetCmd
         end
@@ -168,10 +172,104 @@ module AresMUSH
         when "set"
           return PF2ConditionSetCmd
         end
-      when "encounter", "initiative", "init"
+      when "effect"
         case cmd.switch
+        when "add"
+          return PF2EffectAddCmd
+        when "remove"
+          return PF2EffectRemoveCmd
+        when "view"
+          return PF2EffectViewCmd
+        when "search"
+          return PF2EffectSearchCmd
+        end
+      when "effects"
+        return PF2EffectListCmd
+      when "action"
+        # `action/available/combat` arrives as one switch.
+        return PF2ActionAvailableCmd if cmd.switch.to_s.start_with?('available')
+
+        case cmd.switch
+        # Using an action is acting: the same command whether or not an encounter is running.
+        when "use"
+          return PF2EncounterActCmd
+        when "search"
+          return PF2ActionSearchCmd
+        when nil
+          return PF2ActionViewCmd
+        end
+      when "encounter", "initiative", "init", "e"
+        # `+e/explore=12` and `+e/start=12` arrive with the `=` in the switch and the number as a page.
+        if cmd.switch.to_s.include?('=') && cmd.args.to_s.strip.empty?
+          switch, rest = cmd.switch.split('=', 2)
+          cmd.switch = switch
+          cmd.args = "=#{rest}#{cmd.page}"
+          cmd.page = nil
+        end
+
+        case cmd.switch
+        when "act"
+          return PF2EncounterActCmd
+        when "strike"
+          return PF2EncounterStrikeCmd
+        when "reload"
+          return PF2EncounterReloadCmd
+        when "cast"
+          return PF2EncounterCastCmd
+        when "as"
+          return PF2EncounterAsCmd
+        when "why"
+          return PF2EncounterWhyCmd
+        when "turn"
+          return PF2EncounterTurnCmd
+        when "cover"
+          return PF2EncounterCoverCmd
+        when "conceal"
+          return PF2EncounterConcealCmd
+        when "trust", "untrust"
+          return PF2EncounterTrustCmd
+        when "creature"
+          return PF2EncounterCreatureCmd
+        when "bestiary"
+          return PF2EncounterBestiaryCmd
+        when "enter", "leave"
+          return PF2EncounterAuraCmd
+        when "option"
+          return PF2EncounterOptionCmd
+        when "sheet"
+          return PF2EncounterSheetCmd
+        when "undo", "redo"
+          return PF2EncounterUndoCmd
+        when "rest"
+          return PF2EncounterRestCmd
+        when "level"
+          return PF2EncounterLevelCmd
+        when "focus"
+          return PF2EncounterFocusCmd
+        when "gear"
+          return Pf2egear::PF2EncounterGearCmd
+        when "use"
+          return Pf2egear::PF2EncounterUseCmd
+        when "equip"
+          return Pf2egear::PF2EncounterEquipCmd
+        when "unequip"
+          return Pf2egear::PF2EncounterUnequipCmd
+        when "loot"
+          return Pf2egear::PF2EncounterLootCmd
+        when "alchemy"
+          return PF2EncounterAlchemyCmd
+        when "owner"
+          return PF2EncounterOwnerCmd
+        when "award"
+          return PF2EncounterAwardCmd
+        when "refocus"
+          return PF2EncounterRefocusCmd
+        when "history"
+          return PF2EncounterHistoryCmd
         when "start"
           return PF2InitiateCombatCmd
+        when "explore", "start/explore"
+          return PF2ExploreCmd
         when "view"
           return PF2InitViewCmd
         when "join"
@@ -184,18 +282,20 @@ module AresMUSH
           return PF2InitModCmd
         when "add"
           return PF2EncounterAddCmd
+        when "adjust"
+          return PF2EncounterAdjustCmd
+        when "affliction"
+          return PF2EncounterAfflictionCmd
         when "scan"
           return PF2EncounterScanCmd
         when "end"
           return PF2EncounterEndCmd
         when "restart"
           return PF2EncounterRestartCmd
-        when "bonus", "penalty"
-          return PF2EncounterBonusPenaltyCmd
-        when "expire"
-          return PF2EncounterExpireBonusesCmd
         when "remove"
           return PF2EncounterRemoveCmd
+        when "resync"
+          return PF2EncounterResyncCmd
         when nil
           return PF2InitiateCombatCmd
         end
@@ -249,21 +349,82 @@ module AresMUSH
         end
       when "listxp"
         return PF2ListXPCmd
-      when "refresh"
-        return PF2ForceRefreshCmd
-      when "rest"
-        return PF2DailyPrepCmd
-      when "formulas"
+      when "creature", "creatures"
+        case cmd.switch
+        when nil
+          return cmd.args.to_s.strip.empty? ? PF2CreatureListCmd : PF2CreatureViewCmd
+        when "list"
+          return PF2CreatureListCmd
+        when "save"
+          return PF2CreatureSaveCmd
+        when "clone"
+          return PF2CreatureCloneCmd
+        when "set", "unset"
+          return PF2CreatureSetCmd
+        when "rename"
+          return PF2CreatureRenameCmd
+        when "notes"
+          return PF2CreatureNotesCmd
+        when "describe"
+          return PF2CreatureDescribeCmd
+        when "share", "unshare"
+          return PF2CreatureShareCmd
+        when "history"
+          return PF2CreatureHistoryCmd
+        when "retire", "restore"
+          return PF2CreatureRetireCmd
+        when "submit", "submitown", "withdraw"
+          return PF2CreatureSubmitCmd
+        when "public"
+          return PF2CreaturePublicCmd
+        when "owner"
+          return PF2CreatureOwnerCmd
+        when "new"
+          return PF2CreatureNewCmd
+        when "purge"
+          return PF2CreaturePurgeCmd
+        when "queue"
+          return PF2CreatureQueueCmd
+        when "check"
+          return PF2CreatureCheckCmd
+        when "approve", "reject", "unpublish"
+          return PF2CreatureReviewCmd
+        end
+      when "hero"
+        case cmd.switch
+        when nil
+          return PF2HeroViewCmd
+        when "award"
+          return PF2HeroAwardCmd
+        when "reroll", "boost"
+          return PF2HeroFortuneCmd
+        when "survive"
+          return PF2HeroSurviveCmd
+        when "buy"
+          return PF2HeroBuyCmd
+        when "give"
+          return PF2HeroGiveCmd
+        end
+      when "alchemy"
+        case cmd.switch
+        when "prepare"
+          return PF2AlchemyPrepareCmd
+        when "clear"
+          return PF2AlchemyClearCmd
+        when nil
+          return PF2AlchemyViewCmd
+        end
+      when "formula", "formulas"
         case cmd.switch
         when "add"
           return PF2FormulaAddCmd
         when "remove"
           return PF2FormulaRemoveCmd
+        when "buy"
+          return PF2FormulaBuyCmd
         when nil
           return PF2DisplayFormulasCmd
         end
-      when "autorest"
-        return PF2AutoDailyPrepCmd
       when "cnote"
         case cmd.switch
         when "add"
@@ -305,6 +466,34 @@ module AresMUSH
         return PF2SkillFeatsHandler
       when "pf2DedicationFeats"
         return PF2DedicationFeatsHandler
+      when "pf2SceneEncounter"
+        return PF2SceneEncounterHandler
+      when "pf2Encounter"
+        return PF2EncounterHandler
+      when "pf2Creatures"
+        return PF2CreaturesHandler
+      when "pf2Creature"
+        return PF2CreatureHandler
+      when "pf2CreatureOptions"
+        return PF2CreatureOptionsHandler
+      when "pf2CreatureSpells"
+        return PF2CreatureSpellsHandler
+      when "pf2CreatureStart"
+        return PF2CreatureStartHandler
+      when "pf2CreatureCheck"
+        return PF2CreatureCheckHandler
+      when "pf2CreatureSave"
+        return PF2CreatureSaveHandler
+      when "pf2CreatureAct"
+        return PF2CreatureActHandler
+      when "pf2CreatureQueue"
+        return PF2CreatureQueueHandler
+      when "pf2CreatureReview"
+        return PF2CreatureReviewHandler
+      when "pf2Actions"
+        return PF2ActionsHandler
+      when "pf2LastRoll"
+        return PF2LastRollHandler
       end
 
       nil

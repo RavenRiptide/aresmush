@@ -12,7 +12,7 @@ aliases:
 
 In order for weapons, armor, shields, and magic items to be useful, they must be equipped, invested, or both, depending on what they are. Weapons, armor, and shields can be equipped; weapons, armor, and magic items with the _invested_ trait can be invested.
 
-Equipping an item takes immediate effect; investing must be done as part of daily preparations, meaning that you must set your list and then `rest` (see: `help rest`) for the investment to take effect.
+Equipping an item takes immediate effect; investing is part of the day's preparations: set your list, and it takes effect when the GM next rests you in an encounter (see: `help rest`).
 
 A few things to be aware of: 
 * You cannot equip or invest an item that is in a bag. The item must be in your main inventory.

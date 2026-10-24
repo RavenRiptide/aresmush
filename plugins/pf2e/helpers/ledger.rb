@@ -70,6 +70,13 @@ module AresMUSH
             Ledger.add_to_bucket(sheet['feat_choices'], p['feat'], p['choice']) unless p['choice'].blank?
           }
         },
+        # What a feat or a class asked the character to choose, by the name of the choice: Assurance's
+        # skill, a cleric's domain. A class's choice is often named for no feat, so it is a kind of its
+        # own rather than a field on the feat.
+        'make_choice' => {
+          'key' => 'choice', 'sheet' => 'feat_choices',
+          'apply' => lambda { |sheet, p| Ledger.add_to_bucket(sheet['feat_choices'], p['choice'], p['label']) }
+        },
         'grant_feature' => {
           'key' => 'feature', 'sheet' => 'features', 'sync' => 'bucketed', 'default_bucket' => 'charclass_features',
           'apply' => lambda { |sheet, p| Ledger.add_to_bucket(sheet['features'], p['bucket'] || 'charclass_features', p['feature']) }
@@ -93,6 +100,11 @@ module AresMUSH
 
             Ledger.add_to_list(by_rank[p['rank'].to_s] ||= [], p['spell'])
           }
+        },
+        # A formula a character knows, by the kind of thing it makes: bought, crafted, or given by staff.
+        'grant_formula' => {
+          'key' => 'formula', 'sheet' => 'formulas', 'sync' => 'bucketed', 'default_bucket' => 'consumables',
+          'apply' => lambda { |sheet, p| Ledger.add_to_bucket(sheet['formulas'], p['category'] || 'consumables', p['formula']) }
         },
         # A focus spell or cantrip, with the focus type it is cast as and what granted it. The record
         # is the whole payload, since one spell can come from two sources.
@@ -162,6 +174,7 @@ module AresMUSH
           'spells' => {},
           'focus' => [],
           'profs' => {},
+          'formulas' => {},
           'unsupported' => []
         }
       end
@@ -217,6 +230,7 @@ module AresMUSH
         'pf2_special' => 'specials',
         'pf2_lang' => 'languages',
         'pf2_boosts' => 'boosts',
+        'pf2_formula_book' => 'formulas',
         'pf2_level_tracker' => nil # kept for the old readers; filled by the store
       }.freeze
 

@@ -54,7 +54,7 @@ module AresMUSH
         bonus = Pf2e.take_ten_bonus(enactor, skill_name)
         total = 10 + bonus
 
-        degree = self.dc ? Pf2e.get_degree([ 'taketen' ], [], total, self.dc) : ""
+        degree = self.dc ? Pf2e.degree_label(Resolve.degree([], total, self.dc, nil)) : ""
 
         dc_string = self.dc ? "against DC #{self.dc} " : ""
 

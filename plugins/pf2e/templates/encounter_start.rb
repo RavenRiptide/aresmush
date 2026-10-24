@@ -25,7 +25,26 @@ module AresMUSH
       end
 
       def organizer
-        @encounter.organizer
+        PF2Encounter.gm_of(@encounter)&.name || @encounter.organizer
+      end
+
+      # What the room is to do: join, or - for a fight that takes over from an exploration, which has
+      # brought everyone in already - nothing but play on.
+      def instruction
+        from = @encounter.carries_on_from ? PF2Encounter[@encounter.carries_on_from] : nil
+        key = Exploration.exploring?(from) ? 'pf2e.encounter_start_from_exploring' : 'pf2e.encounter_start_join'
+
+        t(key, :help => "#{title_color}help initiative%xn")
+      end
+
+      # What the banner says, without its layout.
+      def fields
+        { 'organizer' => organizer, 'id' => encounter_id, 'init_stat' => init_stat,
+          'instruction' => AnsiFormatter.strip_ansi(MushFormatter.format(instruction)).strip }
+      end
+
+      def page
+        t('pf2e.encounter_page', :url => PF2Encounter.page_url(@encounter))
       end
 
       def roll_init_cmd

@@ -9,7 +9,6 @@ module AresMUSH
     # Only the points left are stored. The most the pool holds is counted from the spells, by
     # Pf2emagic.focus_pool_max.
     attribute :focus_pool, :type => DataType::Hash, :default => { "current"=>0 }
-    attribute :last_refocus, :type => DataType::Time
     # A list of grants rather than a map keyed by spell name, because two sources can grant the same
     # innate spell and a map holds only one of them. Charm comes from Enthralling Allure at rank 4
     # divine and Supernatural Charm at rank 1 arcane; Interplanar Teleport is divine from one source
@@ -403,19 +402,13 @@ module AresMUSH
       to_assign
     end
 
+    # is_focus should be the focus spell type if given.
     def self.get_spell_dc(char, charclass, is_focus=false)
-
-      # is_focus should be the focus spell type if given.
       caster_stats = Pf2emagic.get_caster_stats(char, charclass, is_focus)
 
       return 0 if caster_stats.is_a? String
 
-      prof = caster_stats['prof_level']
-      prof_bonus = Pf2e.get_prof_bonus(char, prof)
-
-      abil_mod = caster_stats['modifier']
-
-      10 + abil_mod + prof_bonus
+      Pf2e::Stat.total(char, 'spell_dc', caster_stats)
     end
 
     def self.get_spell_abil(char, charclass, is_focus=false)
@@ -432,18 +425,11 @@ module AresMUSH
     end
 
     def self.get_spell_attack_bonus(char, charclass, is_focus=false)
-
-      # is_focus should be the focus spell type if given.
       caster_stats = Pf2emagic.get_caster_stats(char, charclass, is_focus)
 
       return 0 if caster_stats.is_a? String
 
-      prof = caster_stats['prof_level']
-      prof_bonus = Pf2e.get_prof_bonus(char, prof)
-
-      abil_mod = caster_stats['modifier']
-
-      abil_mod + prof_bonus
+      Pf2e::Stat.total(char, 'spell_attack', caster_stats)
     end
 
     def self.factory_default(char)
@@ -461,7 +447,6 @@ module AresMUSH
       # Attributes with no declared default that a reset should still clear.
       magic.divine_font = nil
       magic.revelation_locked = nil
-      magic.last_refocus = nil
 
       magic.save
 

@@ -1,0 +1,31 @@
+<%= header %>
+<%= center("#{title_color}#{title}", 78) %>
+<%= divider %>
+<%= textline(t('pf2e.alchemy_heading_reagents')) %>
+
+<%= reagents %>
+
+<%= textline(t('pf2e.alchemy_heading_planned')) %>
+
+<% if planned.empty? %>
+<%= t('pf2e.alchemy_nothing_planned') %>
+<% else %>
+<% planned.each do |line| %>
+<%= line %>
+<% end %>
+<% end %>
+<% if standing? %>
+
+<%= textline(t('pf2e.alchemy_heading_made')) %>
+
+<% if made.empty? %>
+<%= t('pf2e.alchemy_nothing_made') %>
+<% else %>
+<% made.each do |line| %>
+<%= line %>
+<% end %>
+<% end %>
+<% end %>
+<%= divider %>
+<%= help_text %>
+<%= footer %>

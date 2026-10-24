@@ -58,6 +58,12 @@ pf2e:
     # answers to `advance` as well.
     advance/font: dfont
   max_level: 20
+  # Hero Points, which are a scene's: what each player character starts a scene with, the most one may
+  # hold, and what one costs in RPP.
+  hero_points:
+    start: 1
+    most: 3
+    rpp_cost: 3
   allowed_alignments:
     - OL
     - BL
@@ -66,6 +72,9 @@ pf2e:
     - BT
     - WT
   roll_channel: 'Rolls'
+  # The job category a creature submitted for approval is discussed in. Left out, the game's request
+  # category; blank, no job.
+  creature_approval_category: REQ
   can_select_language:
     - common
     - uncommon
@@ -135,10 +144,16 @@ pf2e:
         shadow plane: Shadow Planes
     region: {}
     terrain: {}
+  # The bestiaries whose creatures anyone may add to an encounter they run. A Plotmaster and staff
+  # add any creature.
+  event_runner_bestiaries:
+    - pathfinder-monster-core
+    - pathfinder-monster-core-2
   permissions:
     modify_sheet: Modify character sheets.
     view_sheets: View other people's character sheets (if sheets are closed).
-    kill_pc: (Associated to DM role) Has the ability to inflict Drained, Doomed, and Dead conditions on PC's.
+    kill_pc: (Plotmaster) Runs encounters with any creature, one of their own making among them, which may leave a character Drained, Doomed or dead.
+    trusted_gm: (Set by an admin) Gives characters items in an encounter they run, with +e/loot.
   prof_progression:
     - untrained
     - trained
@@ -158,8 +173,3 @@ pf2e:
     - general
     - archetype
     - dedication
-  daily_prep_cron:
-    hour: 
-      - 10
-    minute:
-      - 03

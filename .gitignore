@@ -50,4 +50,7 @@ killares
 # Emblem of Ea Specific Files
 # -----------------------------
 /plugins/tinker/commands/tinker_cmd.rb
+
+# Python bytecode from the import scripts
+__pycache__/
 /CLAUDE.md

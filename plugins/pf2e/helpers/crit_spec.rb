@@ -82,6 +82,20 @@ module AresMUSH
       access
     end
 
+    # What a critical hit with this attack does beyond its damage, where the character has the critical
+    # specialization effect with it: the group, its text, and the effects the engine applies
+    # (`crit_spec_effects` in the weapon groups). Nothing when they do not have it.
+    def self.crit_spec_consequences(char, attack)
+      group = canonical_crit_spec_group(attack['group'])
+
+      return nil unless group
+      return nil unless Array(crit_spec_access(char)[group]).include?(attack['name'])
+
+      info = Global.read_config('pf2e_weapon_groups', group) || {}
+
+      { 'group' => group, 'text' => info['crit_spec'], 'effects' => Array(info['crit_spec_effects']) }
+    end
+
     # What is granting access, for the header line. Feature and feat names only, since those are proper nouns rather than prose.
     def self.crit_spec_sources(char)
       sources = []
@@ -105,7 +119,22 @@ module AresMUSH
 
     # --- individual rules ---------------------------------------------------------------
 
+    # Whether a feat or an item says outright that this attack has the critical specialisation effect.
+    #
+    # Alongside the branches below rather than instead of them: those cover this setting's own ancestries,
+    # whose names are not the ones Foundry's data knows, so a rule about goblin weapons reaches nothing
+    # here while the branch about ancestry familiarity reaches Sildanyari ones.
+    def self.granted_crit_spec?(char, name, info)
+      options = Pf2eCombat.weapon_options(name, info) +
+                Pf2e::Effects.facts(char)
+
+      Pf2e::Rules.critical_specialization?(Pf2e::Effects.sources(char),
+                                           Pf2e::Effects.options(char), options)
+    end
+
     def self.crit_spec_weapon?(char, name, info)
+      return true if granted_crit_spec?(char, name, info)
+
       # Fighter Weapon Mastery: "all weapons and unarmed attacks for which you have master
       # proficiency". No group of its own, so it widens on its own as proficiency grows.
       if has_feature?(char, 'Fighter Weapon Mastery')
@@ -131,6 +160,8 @@ module AresMUSH
     end
 
     def self.crit_spec_unarmed?(char, name, info)
+      return true if granted_crit_spec?(char, name, info)
+
       # Fighter Weapon Mastery names unarmed attacks explicitly.
       if has_feature?(char, 'Fighter Weapon Mastery')
         return true if prof_at_least?(Pf2eCombat.get_unarmed_prof(char, name, info), 'master')

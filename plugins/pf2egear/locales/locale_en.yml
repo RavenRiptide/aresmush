@@ -4,7 +4,8 @@ en:
     already_equipped: "You already have one of those equipped. Unequip it first."
     ambiguous_item: "I have more than one item matching that name. Please be more specific."
     bad_use: "That is not something this item does. It can be used for: %{options}."
-    item_destroyed: "%{name} is destroyed."
+    item_used_up: "That was your last %{name}."
+    item_in_encounter: "Your %{item} went into encounter %{id} with you, and is the encounter's until it ends: use it there with +e/use. Your own is yours to use or sell again once the encounter is over."
     approved_players_only: "You must be approved for play to use this command."
     already_set_for_investment: "That item is already set for investment."
 
@@ -23,11 +24,13 @@ en:
     cannot_use_now: "This item must be %{action} to be used."
 
     item_equip_ok: "You equip %{name}."
+    equip_untrained_armor: "You are untrained in %{kind} armor, so your proficiency adds nothing to your AC while you wear %{name}."
+    equip_untrained_weapon: "You are untrained in %{name}, so your proficiency adds nothing to your attack rolls with it."
     item_bought_ok: "You buy %{quantity} of %{item} at a cost of %{cost}."
     item_rename_ok: "You rename %{name} to %{nickname}."
     item_sold_ok: "You sell %{quantity} of %{item} for %{cost}."
     item_unequip_ok: "You unequip %{name}."
-    item_use_ok: "%{name} uses a %{item}."
+    item_use_ok: "%{name} uses %{item}."
     item_view_title: "Detailed Item View for %{name}"
     items_invested_ok: "Successful. %{count} items successfully invested."
     items_uninvested_ok: "Successful. %{count} items successfully uninvested."
@@ -60,6 +63,9 @@ en:
     rune_power_gt_potency: "You cannot add a Striking or Resilient rune greater than the item's Potency rune."
     rune_potency_gt_power: "You cannot set a Potency rune lower than the item's Striking or Resilient rune."
     rune_property_set: "%{rune_name} %{operation} on %{char}'s %{item_name}."
+    rune_property_unknown: "There is no %{rune_name} rune. `browse runes` lists the ones there are."
+    rune_property_wrong_kind: "%{rune_name} is a %{kind} rune, and cannot go on that."
+    rune_property_no_slot: "That item has room for %{slots} property runes, and they are all taken. Etch a higher potency rune first."
     
 
     shields_dont_have_magic: "%xh%xmShields do not have magical properties.%xn"

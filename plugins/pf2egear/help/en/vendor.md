@@ -33,4 +33,5 @@ Weapons, armor, magic items, and shields will only permit you to buy or sell one
 A few things to be aware of:
  * Items of a higher level than the character cannot be bought or sold through the vendor. Please put in a request for such purchases.
  * If encumbrance tracking is turned on, the vendor will not permit you to purchase an item that you cannot carry (i.e. that would put you over your max Bulk capacity. Refer to the PRD for an explanation of Bulk.)
+ * Ordinary ammunition - arrows, bolts, sling bullets - is not sold and not counted: a weapon that shoots always has it. Ammunition of cold iron or silver is sold by the piece under consumables, and shot by saying the material: see `help encounter actions`.
  * The item list supports partial matching, but if there are multiple items with that name, it will try to match the exact one you specified, so it may help to cut and paste names.

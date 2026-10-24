@@ -1,0 +1,12 @@
+<%= header %>
+<%= center("#{title_color}#{title}", 78) %>%xn
+<%= divider %>
+<% if any? %>
+<% rows.each do |r| %>
+<%= r %>
+<% end %>
+<%= "%r%b%bTurn one off with %xh%xc#{switch}%xn, or back with %xh%xc#{back}%xn." %>
+<% else %>
+<%= "%b%b#{none}" %>
+<% end %>
+<%= footer %>

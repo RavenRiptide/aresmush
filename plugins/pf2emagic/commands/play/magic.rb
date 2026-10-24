@@ -29,9 +29,11 @@ module AresMUSH
           return
         end
 
-        magic = char.magic
+        # What they have left to cast is the encounter's, where they are in one here.
+        encounter = Pf2e::Combatants.encounter_here(enactor)
+        holder = (encounter && Pf2e::CombatantStates.of(encounter, char)) || char
 
-        template = PF2MagicDisplayTemplate.new(char, magic, client)
+        template = PF2MagicDisplayTemplate.new(holder, holder.magic, client)
 
         client.emit template.render
       end

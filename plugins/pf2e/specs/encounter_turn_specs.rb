@@ -4,10 +4,7 @@ module AresMUSH
   module Pf2e
     module Encounters
 
-      # Moving through an initiative order.
-      #
-      # The arithmetic was written twice, forwards and backwards, and the backwards copy read a
-      # round counter it had never assigned and indexed one past the end of the order.
+      # Moving through an initiative order. `at` is one past whoever's turn it is.
       describe Turn do
 
         def move(direction, at:, round: 3, size: 4)
@@ -37,18 +34,32 @@ module AresMUSH
         end
 
         describe "backwards" do
+          # The turn is the third in the order; backing up makes it the second's.
           it "should take the turn before this one" do
-            result = move('prev', :at => 2)
+            result = move('prev', :at => 3)
 
             expect(result.state['current']).to eq 1
             expect(result.state['upcoming']).to eq 2
             expect(result.state['new_round']).to be false
           end
 
-          # This is the case that raised: the previous turn is the last participant, and the round
-          # counter goes back one.
-          it "should back into the previous round from the top of the order" do
+          it "should undo a move forwards" do
+            forwards = move('next', :at => 2)
+            back = move('prev', :at => forwards.state['upcoming'])
+
+            expect(back.state['upcoming']).to eq 2
+          end
+
+          # The turn is the last in the order, and `at` has wrapped to the top: it is still this round.
+          it "should back up from the last turn without changing the round" do
             result = move('prev', :at => 0)
+
+            expect(result.state['current']).to eq 2
+            expect(result.state['new_round']).to be false
+          end
+
+          it "should back into the previous round from the round's first turn" do
+            result = move('prev', :at => 1)
 
             expect(result.state['current']).to eq 3
             expect(result.state['upcoming']).to eq 0

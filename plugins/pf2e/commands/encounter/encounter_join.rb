@@ -50,22 +50,25 @@ module AresMUSH
           return
         end
 
+        # Exploring has no initiative: they are simply there, doing what they say they are doing.
+        return join_exploration(encounter) if Pf2e::Exploration.exploring?(encounter)
+
         # If they specified an init stat, error if invalid, otherwise use the one
         # specified by the organizer.
 
-        init_stat = self.init_stat ? self.init_stat : encounter.init_stat
+        init_stat = Pf2e.initiative_stat(self.init_stat || encounter.init_stat)
 
-        if !Pf2e.is_valid_init_stat?(init_stat)
-          client.emit_failure t('pf2e.not_unique')
+        unless init_stat
+          client.emit_failure t('pf2e.bad_initiative_stat', :stat => self.init_stat || encounter.init_stat)
           return
         end
 
         # Calculate initiative and add the enactor to the encounter participants list.
-        roll = [ "1d20", init_stat ]
+        roll = [ "1d20", Pf2e.initiative_bonus(enactor, init_stat).to_s ]
 
         initiative = Pf2e.parse_roll_string(enactor, roll)['total']
 
-        PF2Encounter.add_to_initiative(encounter, enactor.name, initiative)
+        Pf2e::Combatants.join(encounter, enactor.name, initiative, :holder => enactor)
 
         # Set management for later use.
 
@@ -89,6 +92,18 @@ module AresMUSH
         scene = encounter.scene
         Scenes.add_to_scene(scene, @message, Game.master.system_character, false, true)
 
+      end
+
+      def join_exploration(encounter)
+        Pf2e::Combatants.join(encounter, enactor.name, 0, :holder => enactor)
+        enactor.encounters.add encounter
+        encounter.characters.add enactor
+
+        message = t('pf2e.explore_joined', :name => enactor.name, :encounter => encounter.id)
+
+        enactor_room.emit message
+        PF2Encounter.send_to_encounter(encounter, message)
+        Scenes.add_to_scene(encounter.scene, message, Game.master.system_character, false, true)
       end
     end
   end

@@ -15,8 +15,8 @@ module AresMUSH
       splist = Entries.focus_spells(magic, focus_type)
       cantrip_list = Entries.focus_cantrips(magic, focus_type)
 
-      spname = splist.select { |sp| sp.downcase.match? spell.downcase }
-      cantrip_match = cantrip_list.select { |sp| sp.downcase.match? spell.downcase }
+      spname = splist.select { |sp| sp.downcase.include?(spell.downcase) }
+      cantrip_match = cantrip_list.select { |sp| sp.downcase.include?(spell.downcase) }
 
       if spname.empty? && !cantrip_match.empty?
         return t('pf2e.multiple_matches', :element => 'spell') if cantrip_match.size > 1
@@ -58,7 +58,7 @@ module AresMUSH
 
       splist = Entries.focus_cantrips(magic, focus_type)
 
-      spname = splist.select { |sp| sp.downcase.match? spell.downcase }
+      spname = splist.select { |sp| sp.downcase.include?(spell.downcase) }
 
       return t('pf2emagic.no_match', :item => "spells") if spname.empty?
       return t('pf2e.multiple_matches', :element => 'spell') if spname.size > 1
@@ -209,11 +209,14 @@ module AresMUSH
       spname = find_spell[0]
       spdeets = find_spell[1]
 
-      splevel = level ? level : spdeets['base_level']
-
-      # Is that spell available at that level today?
+      # Is that spell available at that level today? Named without a rank, it is cast from the lowest
+      # rank it is prepared at today, or its own.
       cc_spells = magic.spells_today
       cc_spells_2day = cc_spells[charclass]
+      prepared_at = (cc_spells_2day || {}).select { |rank, list| rank != 'cantrip' && Array(list).include?(spname) }
+                                          .keys.min_by(&:to_i)
+
+      splevel = (level || prepared_at || spdeets['base_level']).to_s
 
       # Not prepared on its own, but in a slot holding two spells (Split Slot, Spell Combination).
       unless Array((cc_spells_2day || {})[splevel]).include?(spname)
@@ -380,9 +383,6 @@ module AresMUSH
       return t('pf2emagic.not_caster') unless Pf2emagic.is_caster?(char)
       magic = char.magic
 
-      caster_stats = get_caster_stats(char, 'innate')
-      return caster_stats if caster_stats.is_a? String
-
       # Find_spell will be either an array if it found a unique match or a string if it didn't.
       find_spell = get_spell_details(spell)
 
@@ -415,6 +415,9 @@ module AresMUSH
         magic.update(spells_today: cc_spells)
       end
 
+      # Everything about an innate cast is its grant's, but the proficiency, which is the character's
+      # innate one.
+      caster_stats = { 'prof_level' => Array((magic.tradition || {})['innate'])[1] || 'trained' }
       caster_stats['tradition'] = spinfo['tradition']
       caster_stats['spell level'] = spinfo['level']
       caster_stats['spell type'] = 'innate'
@@ -480,8 +483,12 @@ module AresMUSH
       focus_spells = Entries.focus_spells(magic, focus_type)
       focus_cantrips = Entries.focus_cantrips(magic, focus_type)
 
-      spell_match = focus_spells.select { |sp| sp.downcase.match? spell.downcase }
-      cantrip_match = focus_cantrips.select { |sp| sp.downcase.match? spell.downcase }
+      # A name that is a spell in its own right is that spell: `heal` is Heal, whatever Heal Animal is.
+      named = get_spells_by_name(spell)
+      return nil if named.size == 1 && named.first.casecmp?(spell.strip) && !(focus_spells + focus_cantrips).include?(named.first)
+
+      spell_match = focus_spells.select { |sp| sp.downcase.include?(spell.downcase) }
+      cantrip_match = focus_cantrips.select { |sp| sp.downcase.include?(spell.downcase) }
 
       return nil if spell_match.empty? && cantrip_match.empty?
 

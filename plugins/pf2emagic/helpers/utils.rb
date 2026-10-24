@@ -106,6 +106,7 @@ module AresMUSH
       end
     end
 
+    # Any tradition but innate makes a caster; innate alone does where it holds innate spells.
     def self.is_caster?(char)
       magic = char.magic
       return false unless magic
@@ -164,7 +165,9 @@ module AresMUSH
 
     end
 
-    def self.do_refocus(target, enactor)
+    # Refocusing, for someone as they stand in an encounter. The GM may refocus anyone, whatever their pool
+    # holds; anyone else only a pool that is short of full.
+    def self.do_refocus(target, gm = false)
 
       # This is included because it validates the existence of a magic object.
       return t('pf2emagic.not_caster') unless is_caster?(target)
@@ -176,28 +179,11 @@ module AresMUSH
 
       return t('pf2emagic.no_focus_pool') if max.zero?
 
-      # These checks are skipped if an admin is force-refocusing the target.
-      if !enactor.is_admin?
-        return t('pf2emagic.cant_refocus_pool') unless current < max
-
-        last_refocus, current_time = magic.last_refocus, Time.now
-
-        # Last refocus can be nil, use 0 epoch if it is
-
-        last_refocus = Time.at(0) unless last_refocus
-
-        elapsed = (current_time - last_refocus).to_i
-
-        local_last_refocus = OOCTime.localtime(enactor, last_refocus)
-        formatted_last_refocus = local_last_refocus.strftime("%-l:%M%P")
-
-        return t('pf2emagic.cant_refocus_time', :time => formatted_last_refocus) unless (elapsed > 3600)
-      end
+      return t('pf2emagic.cant_refocus_pool', :current => current, :max => max) unless gm || current < max
 
       current = refocus_refills?(target) ? max : [ current + 1, max ].min
 
       magic.update(focus_pool: { 'current' => current })
-      magic.update(last_refocus: Time.now)
 
       return nil
     end

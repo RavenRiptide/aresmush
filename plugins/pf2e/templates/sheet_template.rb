@@ -53,7 +53,7 @@ module AresMUSH
       end
 
       def subclass
-        @base_info['specialize'] ? @base_info['specialize'] : "N/A"
+        @base_info['specialize'].to_s.empty? ? "N/A" : @base_info['specialize']
       end
 
       def subclass_name
@@ -239,20 +239,12 @@ module AresMUSH
         @char.pf2_special.sort.join(", ")
       end
 
+      # Including the ones another brought with it, and saying which: a grabbed character is off-guard,
+      # and the sheet should say why.
       def conditions
-        cond = @char.pf2_conditions
-        if cond.empty?
-          value = "None active."
-        else
-          list = []
-          cond.each do |c,v|
-            list << format_condition(c,v)
-          end
+        labels = Pf2e.condition_labels(@char)
 
-          value = list.sort.join(", ")
-        end
-
-        value
+        labels.empty? ? "None active." : labels.join(", ")
       end
 
       def feats
@@ -277,11 +269,12 @@ module AresMUSH
         feature_list('archetype_features')
       end
 
-      # Through Array(), because the materialiser rebuilds pf2_features from the fold and the fold
-      # only makes a bucket that has something in it: a character with no archetype has no
-      # 'archetype_features' key at all, and `sheet` raised NoMethodError on every one of them.
+      # The fold only makes a bucket that has something in it, so a bucket may be missing. A feature
+      # the class table grants by its general name ("Fifth Doctrine") is named once, by the version
+      # a specialty grants alongside it ("Fifth Doctrine (Cloistered)").
       def feature_list(bucket)
         held = Array((@char.pf2_features || {})[bucket])
+        held = held.reject { |name| held.any? { |other| other.start_with?("#{name} (") } }
 
         held.empty? ? "None" : held.sort.join(", ")
       end
@@ -416,16 +409,32 @@ module AresMUSH
         "%b%b#{item_color}#{left("Class", 15)}#{left("Tradition", 14)}#{left("Prof", 8)}#{left("Spell Atk Bonus", 21)}#{left("Spell DC", 16)}%xn"
       end
 
+      # A row per casting class, and one per tradition of innate spells the character has. The register's
+      # own `innate` key is not a class, and says nothing where there are no innate spells.
       def spell_dcs
-        dc_list = magic_stats.tradition
+        classes = (magic_stats.tradition || {}).reject { |key, _| key.to_s.casecmp?('innate') }
 
-        list = []
+        classes.map { |key, value| format_spell_dc(key, value) } + innate_dcs
+      end
 
-        dc_list.each_pair do |key, value|
-          list << format_spell_dc(key, value)
+      # An innate spell is cast with its grant's tradition and ability, at the character's innate
+      # proficiency.
+      def innate_dcs
+        prof = Array((magic_stats.tradition || {})['innate'])[1] || 'trained'
+
+        Pf2emagic::Entries.for_magic(magic_stats).select { |entry| entry['source_type'] == 'innate' }.map do |entry|
+          ability = entry['ability'] || 'Charisma'
+          stats = { 'tradition' => entry['tradition'], 'prof_level' => prof, 'spell_abil' => ability,
+                    'modifier' => Pf2eAbilities.abilmod(Pf2eAbilities.get_score(@char, ability)) }
+          atk = Pf2e::Stat.total(@char, 'spell_attack', stats)
+          dc = Pf2e::Stat.total(@char, 'spell_dc', stats)
+
+          "%b%b#{left('Innate', 15)}#{left(Pf2e.pretty_string(entry['tradition'].to_s), 14)}#{left(prof.slice(0).upcase, 8)}#{left(atk, 22)}#{left(dc, 16)}"
         end
+      end
 
-        list
+      def ac
+        Pf2eCombat.calculate_ac(@char)
       end
 
       def known_for
@@ -447,13 +456,6 @@ module AresMUSH
         "#{linebreak}#{left(name, 13)}: #{left(score, 2)} #{left(mod, 9)}"
       end
 
-      def format_condition(condition, value)
-        colors = Global.read_config('pf2e', 'condition_colors')
-        cond_color = colors[condition.to_s]
-        name = "#{cond_color}#{condition}"
-        cv = value['value'] ? "/#{value['value']}" : ""
-        "#{name}#{cv}%xn"
-      end
 
       def format_known_for(string, i)
         linebreak = i % 2 == 0 ? "%r" : ""
