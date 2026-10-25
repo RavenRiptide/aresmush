@@ -27,7 +27,7 @@ module AresMUSH
 
       # The command that switches one, for whoever is reading.
       def switch
-        @combatant ? "+e/option #{@combatant}=<name>/off" : 'sheet/option <name>=off'
+        @combatant ? "e/option #{@combatant}=<name>/off" : 'sheet/option <name>=off'
       end
 
       def back

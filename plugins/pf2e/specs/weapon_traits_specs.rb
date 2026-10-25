@@ -218,7 +218,12 @@ module AresMUSH
           expect(refused).to eq []
         end
 
+        # No action from the books the game uses reloads this way, so a gunslinger's from Guns & Gears
+        # stands in for whatever does.
         it "should be loaded by an action that has its taker Interact to reload" do
+          covered = { 'from' => 'action', 'for' => 'class', 'type' => 'action', 'cost' => 1, 'traits' => [ 'gunslinger' ],
+                      'description' => 'Either Take Cover or attempt to Hide, then Interact to reload.' }
+          allow(Actions).to receive(:catalogue).and_wrap_original { |real| real.call.merge('Covered Reload' => covered) }
           @hero.update(:pf2_feats => { 'charclass' => [ 'Covered Reload' ] })
           strikes('heavy crossbow')
           hero_types('e/act covered reload')

@@ -9,33 +9,28 @@ aliases:
 
 # Casting Spells in Pathfinder 2e
 
-Spells are cast in an encounter, from what a rest there gave you: the day's slots, your focus points, and
-your innate spells' uses. Outside an encounter there is nothing to cast from. See `help encounter actions`
-for the whole grammar.
+You cast spells in an encounter, using what your last rest there gave you: the day's spell slots, your Focus Points, and your innate spells' uses. You can't cast spells outside an encounter. See "Spells" in `help encounter actions` or [read it on the web](/help/pf2e_encounter_actions) for how the game resolves a spell.
 
-`+e/cast <spell>[=<target>,<target>...][/rank <n>][/class <class>][/<how>]`
+`encounter/cast <spell>[=<target>,<target>...][/rank <n>][/class <class>][/<how>]`: Casts a spell in the encounter.
+%t **Examples**:
+%t `encounter/cast fear=#3`
+%t `encounter/cast glitterdust=#3,#4/rank 2`
+%t `encounter/cast lay on hands=Bram/focus`
+%t `encounter/cast daze=#2/innate`
 
+**Key**:
 `<spell>`: The spell's name.
-`<target>`: Whoever it is cast at, by id or name: `+e/cast fear=#3`.
-`rank <n>`: The rank to cast it at, where it can be heightened. Without one, its own.
-`class <class>`: Which of your casting classes casts it, where you have more than one.
-`<how>`: `focus` for a focus spell, `focusc` for a focus cantrip, `signature` for a signature spell at a
-higher rank, `innate` for an innate spell.
-
-    +e/cast glitterdust=#3,#4/rank 2
-    +e/cast lay on hands=Bram/focus
-    +e/cast daze=#2/innate
+`<target>`: The combatant you're casting the spell at, by ID or name. Separate several targets with commas.
+`rank <n>`: The rank to cast the spell at, if it can be heightened. Without a rank, the game casts the spell at its base rank.
+`class <class>`: Which of your casting classes casts the spell, if you have more than one.
+`<how>`: The kind of casting: `focus` for a focus spell, `focusc` for a focus cantrip, `signature` for a signature spell at a higher rank, or `innate` for an innate spell.
 
 ## Slots for Certain Spells
 
-Divine Evolution, Primal Evolution and Gifted Power each give you one extra slot a day at your highest
-rank, which can only cast certain spells, even ones not in your repertoire. `magic` lists the slot and its
-spells.
+Divine Evolution, Primal Evolution, and Gifted Power each give you one extra slot a day at your highest rank, which can only cast certain spells, even ones not in your repertoire. `magic` lists the slot and its spells.
 
-Cast one of those spells at your highest rank and the feat's slot is spent first. Leave the rank off, and a
-spell you could not otherwise cast uses the feat's slot at your highest rank; a spell in your repertoire is
-cast at its own rank from an ordinary slot, as usual.
+If you cast one of those spells at your highest rank, the game uses the feat's slot first. If you leave the rank off, a spell you couldn't otherwise cast uses the feat's slot at your highest rank, while a spell in your repertoire is cast at its own rank from a normal slot.
 
 ## Refocusing
 
-`+e/refocus` - Refocus in the encounter: see `help rest`.
+`encounter/refocus`: Performs the Refocus activity in the encounter. See `help rest` or [read it on the web](/help/pf2e_daily).

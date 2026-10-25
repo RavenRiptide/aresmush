@@ -128,7 +128,7 @@ module AresMUSH
         shown = Creatures.shown(char, found.state)
         mine = summary[:can]['edit']
 
-        { creature: summary, lines: CreatureWeb.lines(creature.name, shown.block), add: "+e/add c:#{creature.id}",
+        { creature: summary, lines: CreatureWeb.lines(creature.name, shown.block), add: "e/add c:#{creature.id}",
           addable: Creatures.usable?(char, Creatures.ref(char, creature)),
           block: mine ? CreatureBlock.plain(creature.head.block) : nil, editing_revision: mine ? creature.head.number : nil,
           shared_with: mine ? Array(creature.shared_with).filter_map { |id| Character[id]&.name } : [],
@@ -143,7 +143,7 @@ module AresMUSH
 
         summary = CreatureWeb.bestiary_summary(char, named, Bestiary.index[named])
 
-        { creature: summary, lines: CreatureWeb.lines(named, Bestiary.entry(named)), add: "+e/add #{named}", addable: summary[:addable],
+        { creature: summary, lines: CreatureWeb.lines(named, Bestiary.entry(named)), add: "e/add #{named}", addable: summary[:addable],
           notes: nil, review_note: nil, history: [] }
       end
 

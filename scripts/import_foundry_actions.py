@@ -58,6 +58,27 @@ TYPES = {'action', 'reaction', 'free', 'passive'}
 # class, an archetype, an ancestry, a heritage - belongs to whoever has the feat or feature of its name.
 COMMON = {'basic', 'skill', 'exploration', 'downtime'}
 
+# The books the game takes its actions from (`publication.title`). An action from any other is left out.
+PUBLICATIONS = {'Pathfinder Player Core', 'Pathfinder Player Core 2', 'Pathfinder GM Core'}
+
+# Actions Foundry files under an older book that a book the game uses reprints, by the book that does.
+REPRINTED = {
+    'Flurry of Blows': 'Pathfinder Player Core 2',
+    'Rampaging Ferocity': 'Pathfinder Player Core',
+    'Soaring Flight': 'Pathfinder Player Core 2',
+    'The Bigger They Are': 'Pathfinder Player Core 2',
+}
+
+# Actions Emblem of Ea calls by a name of its own, as its arvek's Manabane heritage calls Elfbane's.
+RENAMED = {'Resist Elf Magic': 'Resist Magic'}
+
+# Downtime activities from those books the game does not run, and why: each is done outside a scene.
+LEFT_OUT = {
+    'Earn Income': 'not run in the game',
+    'Long-Term Rest': "the GM's encounter/rest",
+    'Retraining': 'done through requests, not in a scene',
+}
+
 # A reaction whose effect is a Strike at whoever triggered it, and whether it has to be a melee one.
 STRIKES = re.compile(r'[Mm]ake an? (melee )?Strike against the triggering (?:creature|foe)')
 SEVERAL = re.compile(r'[Mm]ake (two|three) (unarmed )?Strikes\.')
@@ -350,7 +371,7 @@ def rendered(entries):
     for name, entry in sorted(entries.items()):
         lines.append(f'  {json.dumps(name, ensure_ascii=False)}:')
 
-        for field in ('from', 'for', 'type', 'cost', 'category', 'traits', 'frequency', 'self_effect',
+        for field in ('from', 'source', 'for', 'type', 'cost', 'category', 'traits', 'frequency', 'self_effect',
                       'strike', 'strikes', 'check', 'description'):
             if field in entry and entry[field] is not None:
                 lines.append(f'    {field}: {value(entry[field])}')
@@ -370,8 +391,17 @@ def main():
     entries = {}
     found = rules.strings(args.checkout)
 
+    other_books = collections.Counter()
     for doc in documents(args.checkout, 'actions'):
-        entries[doc['name']] = entry_of(doc, 'action', effects, counted)
+        book = REPRINTED.get(doc['name']) or (doc['system'].get('publication') or {}).get('title')
+        if book not in PUBLICATIONS:
+            other_books[book or '(no book named)'] += 1
+            continue
+        if doc['name'] in LEFT_OUT:
+            continue
+        name = RENAMED.get(doc['name'], doc['name'])
+        entries[name] = entry_of(doc, 'action', effects, counted)
+        entries[name]['source'] = book
 
     # A feat that is an action - a stance, a reaction - is one because of what it costs; the feat itself
     # stays where it is.
@@ -409,6 +439,8 @@ def main():
 
     print('written' if args.write else 'dry run')
     print(f'  {len(entries)} actions: {len(entries) - feat_actions} from their actions, {feat_actions} feats')
+    print(f'  {sum(other_books.values())} from books the game does not use left out: '
+          f'{", ".join(f"{book} {count}" for book, count in other_books.most_common())}')
     print(f'  {selves} put an effect on whoever uses them')
     print(f'  {len(declared) - len(unmatched)} roll a check; macros naming no action we hold: {unmatched}')
     print('\nwhat their actions carry that is not read yet:')

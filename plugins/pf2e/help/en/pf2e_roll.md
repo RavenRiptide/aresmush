@@ -18,16 +18,17 @@ The roll commands on this game have been constructed to be reasonably familiar t
 
 Public rolls appear in the log and are sent to everyone in the room.
 
-## Saying what you are doing
+## Bonuses for specific actions
 
-Some bonuses apply only to a particular action - a Skeleton Key helps you pick a lock, not with Thievery generally. Name the action after a slash to claim one.
-%t **Example**:
-%t `roll thievery/pick-a-lock` rolls Thievery and counts any bonus that applies to picking a lock.
-%t `roll thievery/pick-a-lock/25` does the same against DC 25. The DC and the action can come in either order, since one is a number and the other is not.
+Some bonuses only apply to a particular action. For example, a Skeleton Key helps you pick a lock, but doesn't help with other Thievery checks. To claim a bonus like this, name the action after a slash.
+%t **Examples**:
+%t `roll thievery/pick-a-lock` rolls Thievery, and counts any bonus that applies to picking a lock.
+%t `roll thievery/pick-a-lock/25` does the same against DC 25.
+%t **Note:** You can put the DC and the action in either order.
 
-You do not need to do this for a bonus that only depends on your gear. An item you are wearing, and have invested if it needs investing, applies what it gives you on its own.
+You don't need to name the action for a bonus that only depends on your gear. An item you're wearing (and have invested, if it needs investing) applies its bonus on its own.
 
-`sheet/why <figure>` lists the conditional bonuses you have and the circumstance each one needs, so you can see which are worth naming.
+`sheet/why <figure>`: Lists your conditional bonuses for `<figure>`, and the circumstance each one needs, so you can see which ones are worth naming.
 
 ## Other dice commands
 

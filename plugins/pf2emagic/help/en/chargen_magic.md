@@ -27,7 +27,7 @@ The following commands are applicable for adding and reviewing spells.
 
 **Note: All spells selected in character generation must be common spells.** A spell must not have the Uncommon or Rare traits. Uncommon and Rare spells can only be learned after chargen with RPP spends.
 
-%xrImportant!%xn The spells you select are what you have to cast in an encounter, from the first one you join. See `help rest`.
+%xrImportant!%xn The spells you select are available to cast from your first encounter onward. See `help rest`.
 
 ## Special Spell Cases
 Some class specialties or choices grant you extra spells that must be resolved with different syntax. These cases are indicated in the cg/review screen and can be resolved with the following commands:

@@ -8,34 +8,21 @@ aliases:
 ---
 # Pathfinder 2E - Exploring
 
-Between fights the party explores: travelling, searching, recovering. An exploration is an encounter of
-its own in the scene, without initiative or turns. What happens in it carries on into the fight that
-starts from it, and a fight can be carried on into the next exploration, so wounds, spent spells and
-used potions follow the party through the scene.
+Between fights, the party explores: traveling, searching, and recovering. Exploration is its own kind of encounter in the scene, with no initiative or turns. What happens during an exploration carries into the fight that starts from it, and a fight can carry into the next exploration, so wounds, spent spells, and used potions follow the party through the scene.
 
 ## For the GM
 
-`+e/explore[=<encounter ID>]`: Starts an exploration in the scene, with you as its GM. Name an earlier
-encounter - the fight just finished - and whoever was in it carries on as they left it.
-`encounter` (`+e/start`): Started while the party is exploring, the exploration ends and the fight begins,
-carrying on from it. Everyone exploring is in the fight at once, rolling initiative as their activity
-has it. Add the creatures with `+e/add`.
-`encounter/end <encounter ID>`: Ends a fight. Carry on exploring with `+e/explore=<encounter ID>`.
-`+e/rest`: A night's rest, for an exploration as for a fight.
+`encounter/explore[=<encounter ID>]`: Starts an exploration in the scene, with you as its GM. Name an earlier encounter, such as the fight that just ended, and everyone who was in it continues as they left it.
+`encounter` or `encounter/start`: While the party is exploring, ends the exploration and starts a fight that continues from it. Everyone exploring joins the fight immediately and rolls initiative based on their exploration activity. Add the creatures with `encounter/add`.
+`encounter/end <encounter ID>`: Ends a fight. To continue exploring from it, use `encounter/explore=<encounter ID>`.
+`encounter/rest`: Declares that a night has passed. It works the same in an exploration as in a fight; see `help rest` or [read it on the web](/help/pf2e_daily).
 
 ## For players
 
-`+e/join`: Joins the exploration. There is no initiative to roll.
-`+e/act <activity>`: What you do as you travel: one of Avoid Notice, Defend, Detect Magic, Follow the
-Expert, Hustle, Investigate, Repeat a Spell, Scout or Search. `+e/view` shows what everyone is doing.
-When a fight starts:
-- Avoid Notice rolls Stealth for your initiative instead of Perception.
-- Scout gives everyone else +1 to their initiative.
-- Defend starts you with your shield raised.
-- Anything else rolls Perception, as the GM named.
-
-`+e/act treat wounds=<who>[/<DC>]`: Ten minutes of Medicine: DC 15, or 20, 30 or 40 for more healing.
-A success heals 2d8, a critical success 4d8; a critical failure does 1d8 damage. It and anything else
-that takes minutes is done while exploring, not in a fight.
-`+e/refocus`, `+e/use consumables=<n>[/<who>]`, `+e/cast`: as in a fight.
-`roll <skill>[/<DC>]`: Any other check the GM asks for - Perception to notice, Survival to track.
+`encounter/join`: Joins the exploration. There's no initiative to roll.
+`encounter/act <activity>`: Chooses what you do as you travel: Avoid Notice, Defend, Detect Magic, Follow the Expert, Hustle, Investigate, Repeat a Spell, Scout, or Search. `encounter/view` shows what everyone is doing.
+%t **Note:** Your activity affects how you start a fight. Avoid Notice rolls Stealth for your initiative instead of Perception, Scout gives everyone else +1 to their initiative, and Defend starts you with your shield raised. Any other activity rolls Perception, or whatever statistic the GM chose.
+`encounter/act treat wounds=<who>[/<DC>]`: Spends ten minutes treating someone's wounds with a Medicine check against DC 15, or against DC 20, 30, or 40 for more healing. A success heals 2d8 HP and a critical success heals 4d8 HP; a critical failure deals 1d8 damage.
+%t **Note:** Treat Wounds, and anything else that takes minutes, can only be done while exploring, not during a fight.
+`encounter/refocus`, `encounter/use consumables=<n>[/<who>]`, and `encounter/cast`: Work the same way as in a fight.
+`roll <skill>[/<DC>]`: Rolls any other check the GM asks for, such as Perception to notice something or Survival to track.

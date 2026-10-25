@@ -564,7 +564,7 @@ module AresMUSH
           @dice = 0.75
           run(PF2EncounterAsCmd, 'e/as #2=strike #3')
 
-          expect(said).to include('+e/as #2=act knockdown=#3')
+          expect(said).to include('e/as #2=act knockdown=#3')
         end
       end
 
@@ -621,7 +621,7 @@ module AresMUSH
           run(PF2EncounterActCmd, 'e/act raise a shield', @hero)
           struck
 
-          expect(said).to include('+e/act shield block')
+          expect(said).to include('e/act shield block')
         end
 
         it "should refuse without a raised shield" do
@@ -697,7 +697,7 @@ module AresMUSH
         @hero.update(:pf2_features => { 'charclass_features' => [ 'Quick Alchemy' ], 'archetype_features' => [] })
         run(PF2EncounterActCmd, 'e/act quick alchemy', @hero)
 
-        expect(@client.failures.join).to include('+e/alchemy')
+        expect(@client.failures.join).to include('e/alchemy')
         expect(TurnState.turn(CombatantStates.of(@encounter, Character[@hero.id]))['actions'].to_i).to eq 0
       end
 
@@ -735,7 +735,7 @@ module AresMUSH
         it "should offer itself when it could turn the hit" do
           struck_exactly
 
-          expect(said).to include('+e/act nimble dodge')
+          expect(said).to include('e/act nimble dodge')
         end
 
         it "should refuse once something has moved their hit points since" do
@@ -1084,11 +1084,11 @@ module AresMUSH
           reminder = Turns.reminder(npc(2), 2)
 
           expect(reminder).to include(t('pf2e.turn_down', :name => npc(2).name, :ref => '#2'))
-          expect(reminder).to_not include('+e/as #2=strike')
+          expect(reminder).to_not include('e/as #2=strike')
         end
 
         it "should remind the GM of a creature's turn" do
-          expect(Turns.reminder(npc(2), 2)).to include('+e/as #2=strike')
+          expect(Turns.reminder(npc(2), 2)).to include('e/as #2=strike')
         end
       end
 

@@ -760,6 +760,12 @@ def main():
         if not theirs:
             raise SystemExit(f'no {pack} under {args.checkout}')
 
+        # An action the game renames takes its rules under the new name, and whatever Foundry already
+        # calls by that name - another book's action - gives it none.
+        if pack == 'actions':
+            from import_foundry_actions import RENAMED
+            theirs = {RENAMED.get(item, item): found for item, found in theirs.items() if item not in RENAMED.values()}
+
         # The class features' catalogue is made from the class tables, then filled like any other.
         made = class_feature_catalogue(theirs) if pack == 'class-features' else None
         if made and args.write:

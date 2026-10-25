@@ -7,45 +7,33 @@ aliases:
 ---
 # Pathfinder 2E - Effects
 
-An effect is what a spell, a feat or an item leaves behind for a while: *heroism*'s bonus for ten
-minutes, a barbarian's rage, a potion's resistance for an hour. Its numbers go straight into the sheet
-and every roll - a character under *heroism* rolls with the bonus without anyone adding it - and it ends
-by itself when its time is up.
+An effect is a temporary result of a spell, feat, or item, such as *heroism*'s bonus for ten minutes, a barbarian's rage, or a potion's resistance for an hour. The game applies an effect's numbers directly to the sheet and to every roll (a character under *heroism* gets the bonus without anyone adding it), and ends the effect on its own when its duration runs out.
 
-The effects are Foundry VTT's own for Pathfinder 2e, two thousand of them, so most things a spell or
-feat leaves behind are already here under the name you would expect.
+The game uses Foundry VTT's Pathfinder 2e effects, about two thousand of them, so most effects from spells and feats use the names you'd expect.
 
-### Seeing them
-`effects [<name>]` - What someone is under, how long each has left, and their conditions.
-`effect/view <effect>` - What an effect does, how long it lasts, and what it asks when it is applied.
-`effect/search <words>` - The effects whose names hold all of those words.
+### Viewing effects
+`effects [<name>]`: Shows your effects, or another character's, with how long each has left, plus their conditions.
+`effect/view <effect>`: Shows what an effect does, how long it lasts, and what it asks when it's applied.
+`effect/search <words>`: Lists the effects whose names contain all of `<words>`.
 
-### Applying and ending them
-`effect/add <names>=<effect>[/<option>...]` - Put one or more characters under an effect.
-`effect/remove <names>=<effect>` - End it early.
+### Applying and ending effects
+`effect/add <names>=<effect>[/<option>...]`: Applies an effect to one or more characters.
+%t **Examples**:
+%t `effect/add Aria Bram=heroism/rank 6`
+%t `effect/add Bram=resist energy/rank 4/fire`
+`effect/remove <names>=<effect>`: Ends an effect on one or more characters early.
+%t **Note:** These commands are for the GM of the encounter here, and work on anyone in that encounter. Effects apply to a character's encounter copy, never to their own sheet.
 
-These are for a DM, or the GM of the encounter here, and work on whoever is in it. An effect is on a
-character as they stand in that encounter; their own sheet never carries one.
+Options after an effect's name include details that need to be manually added:
 
-The options after an effect's name are what only the one applying it knows:
+- `rank <n>`: The rank the spell was cast at. For example, *heroism* at 6th rank gives a +2 bonus instead of +1.
+- `value <n>`: For an effect that counts something, how many.
+- Some effects ask you to make a choice. Add your choice as an option. For example, *resist energy* asks which type of energy to resist, so add `fire` to resist fire.
 
-* `rank <n>` - the rank a spell was cast at. *Heroism* at 6th rank is a +2 bonus rather than +1.
-* `value <n>` - for an effect that counts something, how many.
-* anything else answers what the effect asks: `fire` for which energy *resist energy* resists.
+### How long effects last
+Effects follow the encounter's clock. A round is one full pass through the initiative order, and a minute is ten rounds. Durations count from the turn the effect was applied, so "until the start of your next turn" means the next turn of whoever applied it, as the rules say. An effect that can't outlast the fight (one measured in rounds or minutes, or one that lasts "until the end of the encounter") ends when the encounter does.
 
-    effect/add Aria Bram=heroism/rank 6
-    effect/add Bram=resist energy/rank 4/fire
+A night's rest ends any effect shorter than a day and takes one night off any effect measured in days.
 
-### How long they last
-An effect keeps time with its encounter. A round is a turn of the order, a minute is
-ten rounds, and the count runs from the turn it was applied on - so "until the start of your next turn"
-is the turn of whoever applied it, as the rules say. An effect that could not outlast the fight - one
-measured in rounds, in minutes, or "until the end of the encounter" - ends when the encounter does.
-
-A night's rest ends anything shorter than a day, and counts a night off anything measured in days.
-
-### What an effect brings with it
-Some effects make you something as well - off-guard, prone, clumsy - and some conditions do too: a
-grabbed character is off-guard, and a dying one is unconscious, blinded and prone. What was brought
-along goes when the thing that brought it does, except where the rules say otherwise: you wake from
-unconsciousness still on the ground. The sheet says what brought a condition, as `Off-Guard (Grabbed)`.
+### Conditions that come with effects
+Some effects also give you conditions, such as off-guard, prone, or clumsy, and some conditions give you other conditions: a grabbed character is off-guard, and a dying character is unconscious, blinded, and prone. A condition added this way ends when its source ends, unless the rules say otherwise. For example, you're still prone when you wake up. The sheet shows where each condition came from, as in `Off-Guard (Grabbed)`.

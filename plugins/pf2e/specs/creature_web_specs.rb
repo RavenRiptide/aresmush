@@ -105,7 +105,7 @@ module AresMUSH
           answer = asked(PF2CreatureHandler, @pm, { 'ref' => "saved:#{@draft.id}" })
 
           expect(answer[:lines].join("\n")).to include('Barrow Hound', 'AC 18')
-          expect([ answer[:add], answer[:addable] ]).to eq [ "+e/add c:#{@draft.id}", true ]
+          expect([ answer[:add], answer[:addable] ]).to eq [ "e/add c:#{@draft.id}", true ]
           expect(answer[:history].map { |one| one[:kind] }).to eq [ 'created' ]
           expect([ answer[:block]['ac'], answer[:editing_revision] ]).to eq [ 18, 1 ]
         end
@@ -130,7 +130,7 @@ module AresMUSH
           open = asked(PF2CreatureHandler, @player, { 'ref' => 'bestiary:Goblin Warrior' })
           shut = Bestiary.index.find { |_name, one| !Gm.open_bestiaries.include?(one['pack']) }.first
 
-          expect([ open[:addable], open[:add] ]).to eq [ true, '+e/add Goblin Warrior' ]
+          expect([ open[:addable], open[:add] ]).to eq [ true, 'e/add Goblin Warrior' ]
           expect(asked(PF2CreatureHandler, @player, { 'ref' => "bestiary:#{shut}" })[:addable]).to be false
         end
       end

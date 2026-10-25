@@ -114,8 +114,8 @@ module AresMUSH
       # `targets` is every combatant it is aimed at, where more than one was named; only a creature's
       # ability that deals damage against a save takes more than one.
       # Actions done with a command of their own, which using them as an action points at.
-      COMMANDS = { 'quick-alchemy' => '+e/alchemy <item>', 'refocus' => '+e/refocus',
-                   'cast-a-spell' => '+e/cast <spell>=<target>' }.freeze
+      COMMANDS = { 'quick-alchemy' => 'e/alchemy <item>', 'refocus' => 'e/refocus',
+                   'cast-a-spell' => 'e/cast <spell>=<target>' }.freeze
 
       def self.act(scene, term, words, targets: nil)
         follow = Actors.of(scene.actor.holder).follow_up(term)
@@ -1093,7 +1093,7 @@ module AresMUSH
 
         AttackAnswers.dealt(scene.target.holder)
         AttackAnswers.offered(scene.target.holder).each do |reaction|
-          out['lines'] << told('pf2e.act_follow_up', :effect => reaction, :command => "+e/act #{reaction.downcase}")
+          out['lines'] << told('pf2e.act_follow_up', :effect => reaction, :command => "e/act #{reaction.downcase}")
         end
       end
 
@@ -1111,7 +1111,7 @@ module AresMUSH
         Array(attack['effects']).each do |effect|
           if FOLLOW_UPS.key?(Domains.slug(effect))
             out['lines'] << told('pf2e.act_follow_up', :effect => effect,
-                                                    :command => "+e/as #{scene.actor.ref}=act #{Domains.slug(effect).tr('-', ' ')}=#{scene.target.ref}")
+                                                    :command => "e/as #{scene.actor.ref}=act #{Domains.slug(effect).tr('-', ' ')}=#{scene.target.ref}")
           elsif (affliction = Afflictions.of_creature(scene.actor.holder, effect))
             # A venom the Strike carries: whoever it hit saves against it now.
             Afflictions.catch(scene, scene.target, affliction, out)
@@ -1281,7 +1281,7 @@ module AresMUSH
 
         return unless ShieldBlock.offered?(whom.holder)
 
-        command = Actors.of(whom.holder).creature? ? "+e/as ##{whom.holder.number}=act shield block" : '+e/act shield block'
+        command = Actors.of(whom.holder).creature? ? "e/as ##{whom.holder.number}=act shield block" : 'e/act shield block'
         out['lines'] << told('pf2e.act_follow_up', :effect => ShieldBlock::NAME, :command => command)
       end
 
@@ -1338,7 +1338,7 @@ module AresMUSH
         elsif standing == true && now == false
           out['lines'] << told('pf2e.act_down', :target => whom.label)
           offered_when_down(whom.holder).each do |name|
-            out['lines'] << told('pf2e.act_follow_up', :effect => name, :command => "+e/as ##{whom.holder.number}=act #{name.downcase}")
+            out['lines'] << told('pf2e.act_follow_up', :effect => name, :command => "e/as ##{whom.holder.number}=act #{name.downcase}")
           end
         elsif standing.is_a?(Integer) && now.is_a?(Integer) && now > standing
           out['lines'] << told('pf2e.act_dying', :target => whom.label, :value => now)

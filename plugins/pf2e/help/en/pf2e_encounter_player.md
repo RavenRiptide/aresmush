@@ -7,14 +7,16 @@ aliases:
 ---
 # Pathfinder 2E Encounters - Taking Part
 
-Everyone in an encounter has an id, shown by `+e/view` as `#1`, `#2` and so on: see `help encounter`.
+`encounter/view` shows each combatant's ID: `#1`, `#2`, and so on. See `help encounter` or [read it on the web](/help/pf2e_combat) for how IDs work.
 
-**You fight with what you carried in.** Joining an encounter takes a copy of your gear, what you have equipped and invested, and your money. Your Strikes, AC and everything you use there come from that copy, so anything you buy, sell or equip on your own sheet afterwards is not part of this encounter. `+e/gear` shows what you carry here, and `+e/equip` draws a weapon or puts on armour from it. Your own items that went in with you can't be used or sold on your sheet until the encounter ends. `help encounter actions` has the details, under "What you carry".
+**You fight with what you carried in your inventory.** When you join an encounter, the game copies your gear, the items you have equipped and invested, and your money totals into the encounter. Your Strikes, your AC, and every item you use in the encounter come from that copy. Anything you buy, sell, or equip on your own sheet after you join isn't part of the encounter. Until the encounter ends, you can't use or sell the items you brought into it from your own sheet. `encounter/gear` lists what you're carrying in the encounter, and `encounter/equip` draws a weapon or puts on armor from it. See `help encounter_gear` or [read it on the web](/help/pf2e_encounter_gear) for details.
 
-`encounter/join [<encounter ID>=][<stat>]`: Joins an encounter, rolling initiative on the statistic its GM named - Perception unless they said otherwise. If the GM tells you to roll something else, name it: Perception, a skill, or an ability, in any case, by its first letters or an ability's three: `encounter/join 12=stealth`, `encounter/join dex`.
-`+e/sheet[ <#id or name>][/<section>]`: A character's sheet as they stand in this encounter: their Hit Points, conditions and what they are under, which `sheet` does not show. Sections are those of `sheet`.
-`encounter/view [<encounter ID>]`: View the initiative table for the encounter in question: each combatant's id, initiative, conditions, and the cover and concealment set on them, and the address of its page on the web, which the scene's Play menu on the web also links to. (Alias `tinit <encounter ID>`)
-`+e/creature <#id>`: A creature's name and conditions. Its stat block and hit points are its GM's to see.
-`hero`, `hero/reroll`, `hero/boost`, `hero/survive`: Your Hero Points in the scene, and spending one to roll your last check again, to add 10 to it, or all of them not to die. See `help hero points`.
+`encounter/join [<encounter ID>=][<stat>]`: Joins an encounter and rolls your initiative on the statistic the GM chose (Perception by default).
+%t **Note:** If the GM asks you to roll a different statistic, name it: Perception, a skill, or an ability, such as `encounter/join 12=stealth` or `encounter/join dex`. Capitalization doesn't matter, and you can type just the first few letters of a skill, or an ability's three-letter abbreviation.
+`encounter/sheet[ <#id or name>][/<section>]`: Shows your sheet, or another combatant's, as it stands in this encounter, including the Hit Points, conditions, and effects that `sheet` doesn't show. Add `/<section>` to show one section; the sections are the same as `sheet`'s.
+`encounter/view [<encounter ID>]`: Shows the encounter's initiative table: each combatant's ID, initiative, conditions, cover, and concealment. It also gives a link to the encounter's web page, which you can also open from the scene's Play menu on the web. (Alias: `tinit <encounter ID>`)
+`encounter/creature <#id>`: Shows a creature's name and conditions.
+%t **Note:** Only the encounter's GM can see a creature's stat block and hit points.
+`hero`: Shows your Hero Points in the scene. `hero/reroll` rerolls your last check, `hero/boost` adds 10 to it, and `hero/survive` spends all your Hero Points to avoid dying. See `help hero points` or [read it on the web](/help/pf2e_hero_points).
 
-Acting in an encounter - actions, Strikes and spells - is in `help encounter actions`.
+For actions, Strikes, and spells, see `help encounter actions` or [read it on the web](/help/pf2e_encounter_actions).

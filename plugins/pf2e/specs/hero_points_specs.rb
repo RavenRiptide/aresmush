@@ -118,7 +118,7 @@ module AresMUSH
 
           expect(refused).to eq []
           expect(rat_damage).to be > 0
-          expect(heard).to include('spends a Hero Point to roll again a check that rolled 1', '- hit')
+          expect(heard).to include('spends a Hero Point to reroll a check that rolled 1', '- hit')
           expect(points).to eq 0
           expect(History.entries(encounter).size).to eq entries
           expect(History.latest(encounter).hero_spent).to eq(@hero.name => 1)

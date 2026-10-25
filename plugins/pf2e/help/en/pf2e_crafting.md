@@ -1,6 +1,6 @@
 ---
 toc: Pathfinder Second Edition
-summary: Formulas, and an alchemist's preparations.
+summary: Formulas and alchemy preparations.
 aliases:
 - crafting
 - craft
@@ -9,33 +9,23 @@ aliases:
 - alchemy
 ---
 
-# Formulas and Crafting on Emblem of Ea
+# Formulas and Alchemy
 
-A formula is knowing how something is made. It is yours, not an encounter's: what you know is the same
-inside a fight and out of one, and nothing in an encounter gives you a formula or takes one away.
+Formulas are formalized instructions for making items. For full rules on formulas and crafting, see [Crafting](/wiki/mechanics:crafting).
 
-## Formulas
+## Commands
 
-`formulas [<character>]`: The formulas a character knows.
-`formula/buy <category>=<item>`: Buys a common formula. PF2e prices a formula by the level of the item it makes, not by that item's own price, and the money comes out of your purse.
+`formulas [<character>]`: Lists the formulas you know, or the formulas another character knows.
+`formula/buy <category>=<item>`: Buys a common formula, and takes its price out of your money. In PF2e, a formula's price depends on the item's level, not on the item's own price.
+%t **Note:** You can't buy uncommon or rarer formulas.
 
-An uncommon or rarer formula is not simply bought; staff give those.
+## Alchemy preparations
 
-## For staff
+An alchemist's infused reagents make a day's worth of items. Put the items you want to craft on your list, and your next rest makes them. Those items last until your next daily preparations after that. You join an encounter rested, so the game makes the items on your list when you join.
 
-`formulas/add <character>=<category>/<item>`: Gives a character a formula.
-`formulas/remove <character>=<category>/<item>`: Takes one back.
+`alchemy [<character>]`: Shows your reagents and preparations, or another character's. In an encounter, it shows how many batches you have left today and what you've made with them. Outside an encounter, it shows what a rest will give you and how many batches your list leaves over.
+`alchemy/prepare <item>[/<how many>]`: Adds an item to your list. The item must have the alchemical trait, must not be higher level than you, and must be an item whose formula you know.
+`alchemy/clear [<item>]`: Removes an item from your list, or empties the whole list.
+`encounter/alchemy <item>`: Performs Quick Alchemy in an encounter, using one batch of reagents to make one item that lasts until your next turn.
 
-## An alchemist's preparations
-
-An alchemist's infused reagents make a day's items. Say what to make, and your next rest makes it; what it
-makes lasts until your next preparations after that. You join an encounter rested, so what is on your list
-when you join is made as you do.
-
-`alchemy [<character>]`: Your reagents and your preparations. In an encounter it shows the batches you have left today and what you have made of them; out of one, what a rest gives you and what your list will leave of it.
-`alchemy/prepare <item>[/<how many>]`: Puts an item on the list. It must be alchemical, no higher level than you are, and one whose formula you know.
-`alchemy/clear [<item>]`: Takes one off the list, or empties it.
-`+e/alchemy <item>`: Quick Alchemy in an encounter: a batch of reagents for one item, to hand until your next turn.
-
-Each batch of reagents makes two items at a rest, or one on the spot. What a rest does not spend is left
-for Quick Alchemy.
+Each batch of reagents makes two items during a rest, or one item with Quick Alchemy. Batches a rest doesn't use are left over for Quick Alchemy.

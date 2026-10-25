@@ -257,7 +257,7 @@ module AresMUSH
           admin_types('creature/reject barrow hound=Its howl is above extreme.')
 
           hero_types('creature barrow hound')
-          expect(heard).to include('Sent back: Its howl is above extreme.')
+          expect(heard).to include('Returned: Its howl is above extreme.')
         end
 
         it "should not be the approver's work for a player" do
@@ -276,7 +276,7 @@ module AresMUSH
           expect(refused).to eq [ t('pf2e.creature_share_who', :name => @hero.name) ]
 
           gm_types("creature/share barrow hound=#{@admin.name}")
-          expect(heard).to include("Barrow Hound is now for: #{@admin.name}")
+          expect(heard).to include("Barrow Hound is now shared with: #{@admin.name}")
         end
 
         it "should keep a share with every Plotmaster beside shares with named ones, and take each back alone" do
@@ -310,7 +310,7 @@ module AresMUSH
         gm_types(HOUND)
         gm_types('creature/check barrow hound')
 
-        expect(heard).to include('a level 3 creature', 'Nothing keeps it from being saved', 'AC 18: moderate', 'Jaws attack 11: moderate')
+        expect(heard).to include('a level 3 creature', 'Nothing prevents it from being saved', 'AC 18: moderate', 'Jaws attack 11: moderate')
       end
 
       it "should keep a history of who did what" do
@@ -327,7 +327,7 @@ module AresMUSH
         gm_types(HOUND)
         gm_types('creature/retire barrow hound')
         gm_types('+e/add barrow hound')
-        expect(refused.join).to include('No creature you may use')
+        expect(refused.join).to include('No creature you can use')
 
         gm_types('creature/restore barrow hound')
         expect(hound.status).to eq 'draft'

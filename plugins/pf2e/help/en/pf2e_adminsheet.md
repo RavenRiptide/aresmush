@@ -8,7 +8,7 @@ aliases:
 
 # Pathfinder 2E -- Admin Commands for Character Sheets
 
-Game admins and those they designate can make some modifications to characters' sheets. 
+Staff can make some modifications to characters' sheets.
 
 ### Setting ability scores
 **Command**:
@@ -17,8 +17,7 @@ Game admins and those they designate can make some modifications to characters' 
 **Key**:
 `<character>`: The character's name.
 `<ability name>`: The name of the ability. For example, Charisma.
-`<ability score>`: The number to set the score to. Attribute boosts the character earns at later
-levels still apply on top of it, so setting a score at 1st level does not freeze it.
+`<ability score>`: The number to set the score to. Attribute boosts the character earns at later levels still apply on top of it, so setting a score at 1st level does not freeze it.
 
 ### Setting character features
 **Command**:
@@ -29,18 +28,15 @@ levels still apply on top of it, so setting a score at 1st level does not freeze
 `[add|delete]`: Choose `add` to add a feature; `delete` to delete a feature.
 `<feature name>`: The name of the feature.
 
-### Setting what a character chose
+### Setting a chosen option for a feat or class feature
 **Command**:
-`admin/set <character>/choice = <feat or choice>: <what was chosen>`
-`admin/set <character>/choice = delete <feat or choice>: <what was chosen>`
+`admin/set <character>/choice = <feat or choice>: <what was chosen>`: Sets a choice for a character's feat or class feature with a choice to choose.
+`admin/set <character>/choice = delete <feat or choice>: <what was chosen>`: Deletes a choice for a character's feat or class feature with a choice to choose.
 
 **Key**:
-`<feat or choice>`: The feat or class choice it was for, as the character holds it: `Assurance`, `Domain Initiate`.
-`<what was chosen>`: The pick: `Arcana`, `Family`.
-
-What a character chose for a feat is what its rules read - Assurance's skill, a cleric's domain. Characters
-approved before choices were kept may have lost them; `Pf2e::ChoiceRecovery.recover_all!` in tinker reads
-back every one it can from what the choice left on the sheet, and names the rest for this command.
+`<character>`: The character's name.
+`<feat or choice>`: The feat or class feature the choice is for, as it appears on the character's sheet, such as `Assurance` or `Domain Initiate`.
+`<what was chosen>`: The option the character picked, such as `Arcana` or `Family`.
 
 ### Setting skills
 **Command**:
@@ -52,17 +48,12 @@ back every one it can from what the choice left on the sheet, and names the rest
 `<proficiency level>`: `untrained`, `trained`, `expert`, `master`, `legendary`
 
 ### Changing feats
-Feats cannot be set directly. To change a character's feats, use `admin/rollback` to send them back to the level where the
-choice was made and let them redo it, or `admin/respec` to let them rebuild the character from scratch while keeping their XP.
+Feats cannot be set directly. To change a character's feats, use `admin/rollback` to send them back to the level where the choice was made and let them redo it, or `admin/respec` to let them rebuild the character from scratch while keeping their XP.
 
 ### Rolling a character back to an earlier level
 **Command**:
-`admin/rollback <character> = <level>`
-`admin/unrollback <character>`
-
-`admin/rollback` puts a character back to just before the level you name, so they can make that level's choices again with `advance`. Everything they chose at that level and above is set aside, the XP those levels cost is refunded, and they are told in-game (if they are connected).
-
-Nothing is thrown away. `admin/unrollback` undoes the last rollback on that character and puts the choices back exactly as they were, which is the command to reach for if you rolled back the wrong person or the wrong level.
+`admin/rollback <character> = <level>`: Puts a character back to just before the level you name, so they can make that level's choices again with `advance`. Everything they chose at that level and above is set aside, the XP those levels cost is refunded, and they are told in-game (if they are connected).
+`admin/unrollback <character>`: Undoes the last rollback on the character and puts the choices back exactly as they were, which is the command to reach for if you rolled back the wrong person or the wrong level.
 
 Two things a rollback deliberately leaves alone:
 - **Boons** granted outside the leveling process. A boon that takes effect at a level the character no longer has goes quiet until they level back up to it, while a boon granted with no level at all is never touched.
@@ -77,12 +68,22 @@ Two things a rollback deliberately leaves alone:
 `admin/set <character>/alignment = <alignment>`
 `admin/set <character>/deity = <deity>`
 
-%xrWARNING%xn: 
-- Do not use these commands on a character with the Champion class or a character with the Champion Archetype, due to how their class works. 
-- Do not use the deity command to change a Cleric's deity or a character with the Cleric Archetype's deity, due to how their class works. 
+%xrWARNING%xn:
+- Do not use these commands on a character with the Champion class or a character with the Champion Archetype, due to how their class works.
+- Do not use the deity command to change a Cleric's deity or a character with the Cleric Archetype's deity, due to how their class works.
 Offer respecs to these characters instead if they want to redo their sheet!
 
 **Key**:
 `<character>`: The character's name.
 `<alignment>`: Alignment code (such as, `OT`, `BT`, or `WT`).
 `<deity>`: The deity's name.
+
+### Adding formulas
+**Command**:
+`formulas/add <character> = <category>/<item>`: Give a character a formula.
+`formulas/remove <character> = <category>/<item>`: Take one away.
+
+**Key**:
+`<character>`: The character's name.
+`<category>`: The item category. See `help vendor` for category types.
+`<item>`: The name of the item for the formula.

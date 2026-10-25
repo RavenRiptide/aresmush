@@ -13,4 +13,5 @@ This page primarily serves as a directory to helpfiles for staff. Staff/admin pe
 Sheet commands for staff: `help pf2eadmin_sheet`
 Magic commands for staff: `help pf2eadmin_magic`
 Gear/inventory commands for staff: `help pf2eadmin_gear`
-Miscelleaneous commands for staff (RPP, respecs/resets, and other admin duties): `help pf2eadmin_other`.
+Encounter reward commands for staff: `help pf2eadmin_rewards`
+Miscelleaneous commands for staff (RPP, respecs/resets, and other admin duties): `help pf2eadmin_other`

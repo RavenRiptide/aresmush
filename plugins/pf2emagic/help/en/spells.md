@@ -13,11 +13,11 @@ Many characters in Pathfinder 2e have access to magic. This page acts as a refer
 ## Basic Magic Commands
 **Commands**:
 `spell <spell name>`: Quickly looks up the details of a spell. This command will accept partial matches, but spell details are only given if there is exactly one match. (For a more robust spell search command, see `help spell search` to learn more about the `spell/search` command.)
-`magic`: Your magic by class, innate spell access and archetype, and your focus spells. In an encounter, it shows what you have left to cast there since the GM last rested you.
-`magic <character>`: Another character's, the same way.
+`magic`: Shows your magic by class, innate spell access, and archetype, plus your focus spells. In an encounter, it shows what you have left to cast since the GM last rested you.
+`magic <character>`: Shows the same for another character.
 
 ## Preparing Spells
-If you're a prepared spellcaster, what you prepare is what a rest in an encounter gives you to cast. For more information about preparing spells and resting and a full list of spell preparation commands, see `help prepare` and `help rest`.
+If you're a prepared spellcaster, the spells you prepare are the ones you can cast after the GM rests you in an encounter. For more information about preparing spells and resting and a full list of spell preparation commands, see `help prepare` and `help rest`.
 
 ## Learning Spells
 If you keep a spellbook (a wizard's spellbook or a witch's familiar) or a book a feat gives you (Esoteric Polymath, Arcane Evolution), you can Learn a Spell to add a common spell of its tradition to it. You roll the tradition's skill (Arcana, Nature, Occultism or Religion) against a DC set by the spell's rank, and pay for the materials:
@@ -47,5 +47,4 @@ Casting spells depends on what type of spell you'd like to cast. For more inform
 ## Searching Spells
 The `spell/search` command provides a robust search function to help you find spells for your character to learn. See `help spell search` for more information.
 
-To see only the spells you could actually put in a slot - the right tradition, at a rank you can
-cast - use `spell/eligible <level>`, or `spell/eligible` on its own to see which traditions you draw on.
+To see only the spells you could actually put in a slot - the right tradition, at a rank you can cast - use `spell/eligible <level>`, or `spell/eligible` on its own to see which traditions you draw on.

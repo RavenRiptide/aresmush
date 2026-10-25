@@ -7,7 +7,8 @@ aliases:
 ---
 
 # Pathfinder 2E -- Admin Commands for Magic
-Game admins and those they designate can make some modifications to characters' sheets. 
+
+Staff can make some modifications to characters' sheets. 
 
 ### Setting spellbook or repertoire spells
 **Command**:

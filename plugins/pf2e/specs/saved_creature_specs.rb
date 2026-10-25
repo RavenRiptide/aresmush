@@ -277,7 +277,7 @@ module AresMUSH
           expect(Jobs).to receive(:create_job) do |category, title, description, author|
             expect([ category, author.id ]).to eq [ Jobs.request_category, @player.id ]
             expect(title).to include('Barrow Hound', "c:#{creature.id}")
-            expect(description).to include('for the barrow', "its author's storylines", 'AC 18')
+            expect(description).to include('for the barrow', "the author's storylines", 'AC 18')
             { :job => @job, :error => nil }
           end
 

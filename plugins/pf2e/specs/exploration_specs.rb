@@ -208,7 +208,7 @@ module AresMUSH
 
         # Everyone is already in it, so the call to stop and join would mislead.
         it "should tell the room everyone exploring is in it, rather than to join" do
-          expect(said_lines.join).to include('Everyone exploring is in the fight')
+          expect(said_lines.join).to include('Everyone exploring joins the fight')
           expect(said_lines.join).to_not include('join the encounter')
         end
 

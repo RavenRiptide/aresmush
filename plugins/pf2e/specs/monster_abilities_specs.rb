@@ -310,7 +310,7 @@ module AresMUSH
         it "should be offered to the GM when the creature drops" do
           run(PF2DamagePlayerCmd, "damage #2=#{npc.hp_left}")
 
-          expect(heard).to include('+e/as #2=act ferocity')
+          expect(heard).to include('e/as #2=act ferocity')
         end
 
         it "should not be used at Wounded 3" do
@@ -717,7 +717,7 @@ module AresMUSH
         it "should cast one it prepared without a word" do
           as(2, "cast fear=#{@hero.name}")
 
-          expect(heard).to_not include('yours to allow')
+          expect(heard).to_not include('whether to allow it')
         end
 
         it "should warn its GM when it casts one again that it prepared once, and go ahead" do
@@ -731,7 +731,7 @@ module AresMUSH
         it "should cast one it prepared twice, twice" do
           2.times { as(2, "cast heal=#{@hero.name}") }
 
-          expect(heard).to_not include('yours to allow')
+          expect(heard).to_not include('whether to allow it')
 
           as(2, "cast heal=#{@hero.name}")
 
@@ -741,7 +741,7 @@ module AresMUSH
         it "should cast a cantrip as often as it likes" do
           3.times { as(2, "cast divine lance=#{@hero.name}") }
 
-          expect(heard).to_not include('yours to allow')
+          expect(heard).to_not include('whether to allow it')
         end
 
         it "should cast an innate spell once a day" do
@@ -779,7 +779,7 @@ module AresMUSH
         it "should warn its GM when the slots of a rank are spent, and go ahead" do
           3.times { as(2, "cast harm=#{@hero.name}") }
 
-          expect(heard).to_not include('yours to allow')
+          expect(heard).to_not include('whether to allow it')
 
           as(2, "cast harm=#{@hero.name}")
 
@@ -789,7 +789,7 @@ module AresMUSH
         it "should cast a spell it has at will as often as it likes" do
           3.times { as(2, 'cast ventriloquism (at will)') }
 
-          expect(heard).to_not include('yours to allow')
+          expect(heard).to_not include('whether to allow it')
         end
 
         it "should show the slots it has" do
@@ -1005,7 +1005,7 @@ module AresMUSH
           as(2, "strike #{@hero.name}")
           as(2, "strike #{@hero.name}")
 
-          expect(heard).to_not include('actions this turn holds')
+          expect(heard).to_not include('actions this turn, more than')
 
           as(2, "strike #{@hero.name}")
 
@@ -1065,7 +1065,7 @@ module AresMUSH
         it "should be offered the block when something physical hits it" do
           clawed
 
-          expect(heard).to include('Shield Block may follow: +e/as #2=act shield block')
+          expect(heard).to include('Shield Block may follow: e/as #2=act shield block')
         end
 
         it "should take the shield's Hardness off the hit, and share the rest with the shield" do
@@ -1233,7 +1233,7 @@ module AresMUSH
           npc.update(:damage => 29)
           hero_types('e/strike #2=claw', 0.9)
 
-          expect(heard).to include('loses a segment: 3 are left')
+          expect(heard).to include('loses a segment. 3 are left')
         end
 
         it "should be down, and nothing more, at no hit points" do

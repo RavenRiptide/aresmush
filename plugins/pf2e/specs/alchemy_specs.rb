@@ -284,7 +284,7 @@ module AresMUSH
         end
 
         it "should show an alchemist in no encounter what a rest gives them" do
-          expect(shown).to include('5 batches', '10 items a day', '5 batches left')
+          expect(shown).to include('5 batches', '10 items a day', '5 batches for Quick Alchemy')
         end
 
         it "should list what is on their preparations" do

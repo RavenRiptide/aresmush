@@ -292,11 +292,16 @@ module AresMUSH
 
         it "should keep combat to what is not exploration or downtime" do
           expect(available('combat')).to include 'Stride'
-          expect(available('combat')).to_not include 'Avoid Notice', 'Earn Income'
+          expect(available('combat')).to_not include 'Avoid Notice', 'Subsist'
         end
 
         it "should keep downtime to downtime activities" do
-          expect(available('downtime')).to include 'Earn Income'
+          expect(available('downtime')).to include 'Subsist'
+        end
+
+        it "should leave out the downtime activities the game does not run" do
+          expect(available('downtime')).to_not include 'Deconstruct', 'Earn Income', 'Grow', 'Learn Name',
+                                                       'Long-Term Rest', 'Retraining'
         end
 
         it "should keep reactions to reactions" do
@@ -310,7 +315,7 @@ module AresMUSH
 
           expect(@client.failures).to eq []
           expect(@client.said.first).to include 'Exploration Actions', 'Avoid Notice'
-          expect(@client.said.last).to include 'Downtime Actions', 'Earn Income'
+          expect(@client.said.last).to include 'Downtime Actions', 'Subsist'
         end
 
         it "should say what modes there are for one it does not know" do

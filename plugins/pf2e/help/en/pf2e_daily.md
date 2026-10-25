@@ -1,6 +1,6 @@
 ---
 toc: Pathfinder Second Edition
-summary: Resting and the day's preparations, in an encounter.
+summary: Resting in an encounter.
 aliases:
 - rest
 - refocus
@@ -9,18 +9,10 @@ aliases:
 
 # Resting
 
-Time in a story is the story's, not the clock's: a scene can cover a minute or a year. So a night's rest
-happens when the GM says it does, in an encounter.
+Rests aren't tied to real time. A scene can cover a minute or weeks, so the GM decides when a night passes by using `encounter/rest` in an encounter.
 
-`+e/rest [<who>,<who>...]` - The GM says a night has passed for everyone in the encounter here, or for
-those named. Each recovers a night's Hit Points, has their once-a-day uses back, a full focus pool, the
-day's spells from what they have prepared, their reagents, and what they invest; anything lasting less
-than a day ends, and anything measured in days is a night shorter. The GM may rest people as often as
-the story needs, and takes a mistaken rest back with `+e/undo`.
+`encounter/rest [<who>,<who>...]`: Declares that a night has passed for everyone in the encounter, or only for the characters you name. Each character recovers a night's worth of Hit Points and gets back their once-a-day uses, a full focus pool, the day's spells from what they prepared, their reagents, and their invested items. Anything lasting less than a day, such as most effects, ends, and anything measured in days has one night taken off its duration.
+%t **Note:** Only the GM can use this. The GM can rest characters as often as the story needs, and can reverse an accidental rest with `encounter/undo`.
+`encounter/refocus [<who>]`: Performs the Refocus activity, which restores a Focus Point (or more, if you have certain feats) when your focus pool isn't full. The GM can refocus anyone.
 
-`+e/refocus [<who>]` - Refocus: a Focus Point back, or more where your feats say so, while your pool is
-short of full. The GM may refocus anyone.
-
-An encounter can carry on from an earlier one (`help encounter_runner`): whoever was in both starts the new one
-as they left the old, so a day of several encounters is one day until the GM rests it. Your own sheet
-never changes when you rest - what a rest restores is what an encounter spent.
+An encounter can continue from an earlier one (see `help encounter_runner` or [read it on the web](/help/pf2e_encounter_runner)). Anyone who was in both encounters starts the new one in the same state they left the old one, so several encounters can make up a single day until the GM rests the group. Resting never changes your own sheet; it only restores what an encounter used up.

@@ -5,7 +5,7 @@ en:
     ambiguous_item: "I have more than one item matching that name. Please be more specific."
     bad_use: "That is not something this item does. It can be used for: %{options}."
     item_used_up: "That was your last %{name}."
-    item_in_encounter: "Your %{item} went into encounter %{id} with you, and is the encounter's until it ends: use it there with +e/use. Your own is yours to use or sell again once the encounter is over."
+    item_in_encounter: "Your %{item} is in encounter %{id} with you. Use it there with e/use. It's back on your sheet when the encounter ends."
     approved_players_only: "You must be approved for play to use this command."
     already_set_for_investment: "That item is already set for investment."
 
@@ -63,8 +63,8 @@ en:
     rune_power_gt_potency: "You cannot add a Striking or Resilient rune greater than the item's Potency rune."
     rune_potency_gt_power: "You cannot set a Potency rune lower than the item's Striking or Resilient rune."
     rune_property_set: "%{rune_name} %{operation} on %{char}'s %{item_name}."
-    rune_property_unknown: "There is no %{rune_name} rune. `browse runes` lists the ones there are."
-    rune_property_wrong_kind: "%{rune_name} is a %{kind} rune, and cannot go on that."
+    rune_property_unknown: "There's no %{rune_name} rune. `browse runes` lists them all."
+    rune_property_wrong_kind: "%{rune_name} is a %{kind} rune and can't go on that item."
     rune_property_no_slot: "That item has room for %{slots} property runes, and they are all taken. Etch a higher potency rune first."
     
 

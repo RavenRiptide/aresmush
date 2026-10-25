@@ -1,6 +1,6 @@
 ---
 toc: Pathfinder Second Edition
-summary: Hero Points - a scene's, spent to roll again, to add 10, or not to die.
+summary: Hero Points - reroll a check, add 10 to it, or avoid dying.
 aliases:
 - hero
 - hero points
@@ -9,49 +9,34 @@ aliases:
 
 # Hero Points
 
-Hero Points belong to a scene. Every player character in a scene starts it with one and may hold three;
-whoever runs the scene holds none. They do not carry over: the next scene starts everyone at one again.
+Hero Points belong to a scene. Every player character starts a scene with one Hero Point and can hold up to three, and whoever runs the scene has none. Hero Points don't carry over: everyone starts the next scene with one again.
 
-`hero` - The Hero Points you hold in the scene you are in. Whoever runs the scene sees the party's.
+The person running the scene is whoever runs an encounter in it, or the scene's owner if there's no encounter.
 
-They are also on your combat sheet (`sheet/combat`) and under your row of `encounter/scan`.
+`hero`: Shows your Hero Points in the current scene. If you're running the scene, it shows everyone's.
+%t **Note:** Your Hero Points also appear on your combat sheet (`sheet/combat`) and in your row of `encounter/scan`.
 
-## Spending one
+## Spending a Hero Point
 
-Spending a Hero Point is not an action, and you can spend one when you cannot act.
+Spending a Hero Point isn't an action, and you can spend one even when you can't act.
 
-`hero/reroll` - Rolls your last check again. The second roll stands, whatever it is.
-`hero/boost` - Adds 10 to your last check, if its die came up under 10.
+`hero/reroll`: Rerolls your last check. The new roll stands, whatever it is.
+`hero/boost`: Adds 10 to your last check, if the die rolled under 10.
+%t **Note:** Both are fortune effects, so you can spend only one Hero Point per check, and none on a check that was already rolled twice because of another fortune or misfortune effect.
 
-Both are fortune effects, so a check takes one Hero Point and no more, and none if it was already rolled
-twice for another fortune or misfortune effect.
+Your last check is the one from the most recent thing that happened in the encounter: your own Strike, spell, or action, or your save against something the GM just did. The game undoes that action and replays it with only your die rerolled; every other die stays the same. Whatever followed from the old roll is undone, and whatever follows from the new roll (damage, conditions, actions spent) happens instead. Nobody else's roll changes. Outside an encounter, your last check is your last `roll` in the scene.
 
-Your last check is the one you made in the last thing that happened in the encounter: your own Strike,
-spell or action, or your save against what the GM just did. The game takes that back and does it again
-with every die as it fell but yours, so what followed from the old roll is undone and what follows from
-the new one happens - the damage, the condition, the action spent - and nobody else's roll changes.
-Outside an encounter it is your last `roll` in the scene.
+Spend a Hero Point right after your roll. Once someone else has acted, it's too late: the game refuses the Hero Point and you keep it, though the GM can still rewind the fight with `encounter/undo`. The game also refuses it, and you keep it, while the GM whose action you rolled against is working in another encounter.
 
-Spend it before the scene moves on. Once someone else has acted, the moment has passed and the Hero
-Point is refused and kept; the GM can still take the fight back with `+e/undo`. It is also refused and
-kept while the GM whose action it was is working in another encounter.
+If the GM uses `encounter/undo` on a change you spent a Hero Point on, you get the Hero Point back, and `encounter/redo` spends it again. The same goes for `hero/survive`.
 
-If the GM takes back with `+e/undo` a change you spent a Hero Point in, you have it back, and `+e/redo`
-spends it again. The same goes for `hero/survive`.
+## Avoiding death
 
-## Not dying
+`hero/survive`: Spends all your Hero Points (you need at least one) to keep you from dying. You stop dying and are unconscious at 0 HP, and your Wounded value doesn't go up.
+%t **Note:** You can use `hero/survive` in an encounter while you're dying, and even after your Dying value has risen high enough to kill you, for as long as that encounter lasts. When a dying character has Hero Points that could save them, the game reminds the room.
 
-`hero/survive` - Spends every Hero Point you hold, and at least one. You stop dying: unconscious with no
-Hit Points, and no more wounded than you were. You can do this in an encounter while you are dying, and
-after a worsening has killed you, for as long as that encounter runs. The room is reminded when it would
-save you.
+## Getting more Hero Points
 
-## Getting more
-
-`hero/award [<why>]` - Whoever runs the scene gives every player character in it a Hero Point, up to
-three. The room is told.
-`hero/buy` - Buys a Hero Point for 3 RPP. The room is told. You cannot spend RPP you do not have, or hold
-more than three.
-`hero/give <name>` - Gives one of yours to someone in the scene who has none.
-
-Whoever runs the scene is whoever runs an encounter in it, or its owner where it has no encounter.
+`hero/award [<why>]`: Gives every player character in the scene a Hero Point, up to a maximum of three. Only the person running the scene can use this, and the game tells the room.
+`hero/buy`: Buys a Hero Point for 3 RPP, and tells the room. You can't spend RPP you don't have, or hold more than three Hero Points.
+`hero/give <name>`: Gives one of your Hero Points to someone in the scene who has none.

@@ -7,59 +7,40 @@ aliases:
 ---
 # Pathfinder 2E Encounters - Running a Creature
 
-`+e/as <#id>=strike <target>[=<Strike>]`, `=act <ability>[=<targets>]`, `=cast <spell>=<targets>` and
-`=enter <aura>=<targets>` act for a creature. What its stat block gives it is run where the rules can
-be:
+`encounter/as <#id>=<command>`: Acts for a creature, using the same commands players use: `strike <target>[=<Strike>]`, `act <ability>[=<targets>]`, `cast <spell>=<targets>`, or `enter <aura>=<targets>`. See `help encounter actions` or [read it on the web](/help/pf2e_encounter_actions).
 
-- **A Strike's follow-up** - Grab, Knockdown, Push and their Improved forms - is offered when the Strike
-  that lists it hits, and is its very next action: `+e/as #5=act grab=#2`. A Grab on someone it already
-  holds tightens the hold to the end of its next turn, without a roll.
-- **Constrict** crushes everyone it holds, or those you name among them. **Swallow Whole** needs it to
-  hold the target; **Engulf** and **Trample** take every target you name. **Rend** needs two hits
-  running with its listed Strike. **Ferocity** is offered when it drops.
-- **An ability that calls for a save** - a breath, a gaze, a swarm's bites - is aimed at as many as you
-  name, and each rolls it: `+e/as #5=act flame breath=#1,#2,#3`. What its outcomes name is left on
-  them, and damage in its words is dealt by the save.
-- **An aura with a save** - Frightful Presence, Stench - is rolled by whoever you put inside it with
-  `+e/as #5=enter frightful presence=#1,#2`. Whoever has saved is immune for as long as its words say.
-- **A venom or disease** on its Strike is saved against as the Strike hits, and runs its stages from
-  there. `+e/affliction <who>=<name>/<stage>` moves it by hand: a stage counted in days, a cure with 0.
-- **An ability that Strikes each of several targets** - a hydra's Storm of Jaws - Strikes each one you
-  name under the one penalty, which moves on once they are all made. One whose Strike follows a failed
-  save - a harpy's Hungry Winds - rolls the save, and Strikes whoever fails.
-- **An ability that takes one action or more** - a troop's attack, `1 to 3` on its first line - deals
-  what the actions you spend deal: `+e/as #5=act shambling onslaught=#1,#2/actions 2`. One, unless you say.
-- **A shield** on its stat block is raised and blocked with as a character's is: `+e/as #5=act raise a
-  shield`, and `+e/as #5=act shield block` when a hit it could block says so. `+e/creature #5` shows
-  what the shield has taken.
-- **Hardness** comes off each hit it takes, and adamantine as hard as it halves that: `damage #5=12
-  slashing adamantine`.
-- **A troop** loses a segment as its hit points fall below each threshold, which is then the most it has.
-- **What its dropping triggers** - a vampire's Mist Escape, Ferocity - is offered as it drops, and is
-  all it can still do.
-- **A breath that takes rounds to come back**, a reaction already spent, and an ability used more often
-  than its Frequency allows are yours to allow: you are told when the breath is back, and warned if you
-  use any of them early.
-- **What it is for good** - a zombie's Slowed 1 and its having no reactions - is on it from the start,
-  and stays whatever is cleared.
-- **A Strike that takes loading** is shot once: `+e/as #5=reload` loads it again.
-- **Its spells** are counted: each preparation of a prepared spell, the slots of a rank for a
-  spontaneous caster, once a day for an innate spell unless its stat block says otherwise. Past that
-  you are warned, and it is cast.
-- **Immunity to magic** keeps out a spell and all it does, but for the spells it names.
-- **A shape** - a werecreature's hybrid, humanoid or animal - decides which of
-  its Strikes it has: a werewolf has its weapons, jaws and claws as a hybrid, its weapons and fist as a
-  human, and only its jaws and claws as a wolf. Its stat block says which Strike is offered in which
-  shape. It changes shape with its ability, which takes the ability's actions: `+e/as #5=act change
-  shape/animal`. You see the shape each is in with `+e/creature #5` and on the encounter's page; the
-  players do not. `+e/add werewolf/animal` adds one already changed.
-- **A circumstance** its stat block makes a toggle - Pack Attack, a charge - is off until you say it
-  holds: `/pack attack` on the Strike, or `+e/option #5=pack-attack/on`.
-- **Immunities, weaknesses and resistances** apply by what the damage is: a swarm resists a blade and
-  is hurt more by a fireball; a devil's resistance lets silver through. `encounter/scan` lists them.
-  What a creature is counts without its stat block saying so: a construct, a mindless creature and a
-  swarm have their kind's immunities, vitality harms only the undead, and void only the living.
-  `damage` tells you what was taken where that is not what you named.
-- **The incapacitation trait** moves the outcome a degree for a creature too strong for the effect.
+The game runs as much of a creature's stat block as the rules allow. When the creature uses anything else in its stat block, the game shows the room the text as written, for you to resolve.
 
-Anything else on its stat block is told with its words when used, for you to run.
+## Strikes
+
+- **Strike follow-ups:** When a Strike that lists Grab, Knockdown, or Push (or their Improved versions) hits, the game offers the follow-up, which must be the creature's next action: `encounter/as #5=act grab=#2`. A Grab on someone the creature is already holding extends the hold to the end of its next turn, with no roll.
+- **Abilities that Strike several targets**, such as a hydra's Storm of Jaws, Strike each target you name at the same multiple attack penalty, which increases once all the Strikes are made. An ability whose Strike follows a failed save, such as a harpy's Hungry Winds, rolls the save, then Strikes everyone who fails it.
+- **Poisons and diseases** on a Strike: the target saves when the Strike hits, and the affliction runs through its stages from there. `encounter/affliction <who>=<name>/<stage>` sets the stage by hand for stages measured in days, and stage 0 cures it.
+- **Strikes that need reloading** fire once. `encounter/as #5=reload` reloads them.
+- **Optional circumstances** from the stat block, such as Pack Attack or a charge, are off until you turn them on: add `/pack attack` to the Strike, or use `encounter/option #5=pack-attack/on`.
+
+## Abilities
+
+- **Constrict** damages everyone the creature is holding, or only the ones you name. **Swallow Whole** only works on a target the creature is holding. **Engulf** and **Trample** hit every target you name. **Rend** needs two hits in a row with the Strike it lists.
+- **Abilities with a save**, such as a breath weapon, a gaze, or a swarm's bites, target everyone you name, and each target rolls the save: `encounter/as #5=act flame breath=#1,#2,#3`. The game applies the conditions named in each outcome, and deals the damage in the ability's text according to each target's result.
+- **Auras with a save**, such as Frightful Presence or Stench: each combatant you place inside the aura with `encounter/as #5=enter frightful presence=#1,#2` rolls the save. Anyone who succeeds is immune for as long as the aura's text says.
+- **Abilities with a variable action cost**, such as a troop's attack marked `1 to 3`, deal damage based on how many actions you spend: `encounter/as #5=act shambling onslaught=#1,#2/actions 2`. Without `/actions`, the creature spends one action.
+- **Abilities triggered by dropping**, such as Ferocity or a vampire's Mist Escape, are offered when the creature drops to 0 HP, and are the only things it can still do.
+- **Recharging abilities, spent reactions, and limited-use abilities** are up to you. The game tells you when a recharging ability is back, and warns you if you use any of them early.
+
+## Defenses
+
+- **Shields** on a stat block work the same way a character's do: raise the shield with `encounter/as #5=act raise a shield`, then use `encounter/as #5=act shield block` when the game says a hit can be blocked. `encounter/creature #5` shows how much damage the shield has taken.
+- **Hardness** reduces each hit the creature takes. Adamantine halves Hardness of 10 or less: `damage #5=12 slashing adamantine`.
+- **Immunities, weaknesses, and resistances** apply based on the damage: a swarm resists blades and takes extra damage from a fireball, and a devil's resistance doesn't apply to silver. `encounter/scan` lists each creature's immunities, weaknesses, and resistances. If the damage the creature took differs from what you entered, `damage` tells you.
+%t **Note:** A creature's type counts even if its stat block doesn't mention it: constructs, mindless creatures, and swarms have their type's immunities, vitality damage only hurts the undead, and void damage only hurts the living.
+- **Immunity to magic** blocks a spell and all its effects, except for any spells the immunity lists.
+- **The incapacitation trait** improves the outcome by one degree for a creature too high-level for the effect.
+- **Troops** lose a segment each time their hit points drop below a threshold, and that threshold becomes their new maximum.
+- **Permanent conditions**, such as a zombie's Slowed 1 and lack of reactions, apply from the start of the encounter, and stay even when the creature's other conditions are cleared.
+
+## Spells and shapes
+
+- **Spells** are tracked: each prepared copy of a prepared spell, each rank's slots for a spontaneous caster, and once a day for innate spells unless the stat block says otherwise. Past that limit, the game warns you, but still casts the spell.
+- **Shapes**, such as a werecreature's hybrid, humanoid, or animal form, decide which Strikes the creature has. For example, a werewolf has its weapons, jaws, and claws in hybrid form; its weapons and fist in human form; and only its jaws and claws in wolf form. The stat block says which Strikes go with which shape. The creature changes shape with its ability, spending that ability's actions: `encounter/as #5=act change shape/animal`. `encounter/add werewolf/animal` adds a werewolf already in wolf form.
+%t **Note:** You can see each creature's shape with `encounter/creature #5` and on the encounter's web page. Players can't.

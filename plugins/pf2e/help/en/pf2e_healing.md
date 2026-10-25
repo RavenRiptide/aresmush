@@ -8,37 +8,30 @@ aliases:
 ---
 # Pathfinder 2E - Damage and Healing
 
-Damage, healing and conditions happen in an encounter, to a character as they stand in it. A character's
-own sheet stays whole: `sheet` shows them as they are, and `+e/sheet` shows them in the encounter here,
-with what it has done to them. Outside an encounter these commands have nobody to change.
+Damage, healing, and conditions only apply inside an encounter, to a character's encounter copy. These commands never change a character's own sheet: `sheet` shows a character as they normally are, and `encounter/sheet` shows them in the encounter here, with everything the encounter has done to them. Outside an encounter, these commands have no one to affect.
 
-A target may be a combatant's id from `+e/view`: `damage #3=5 fire`.
+You can target a combatant by their ID from `encounter/view`, such as `damage #3=5 fire`.
 
 ## Anyone in the encounter
 
-`heal <list>=<amount>[ <action>]`: Heals each of them for `<amount>`, up to their maximum Hit Points. Name the action - `treat wounds` - and a bonus to healing from it applies.
+`heal <list>=<amount>[ <action>]`: Heals each combatant in `<list>` for `<amount>`, up to their maximum Hit Points. Name the action, such as `treat wounds`, to apply any healing bonus for that action.
 
 ## The GM
 
-`damage[/ndc] <list>=<amount>[ <kind>[ <what else>...]]`: Damages each of them for `<amount>`. After the kind, say what else is so of the damage - `silver`, `cold iron`, `magical`, `holy`, `area`, `splash`, `spell`, `nonlethal` - for a weakness or a resistance that asks: `damage #3=12 slashing silver`. Naming the kind - `fire`, `cold`, `persistent-damage` - lets anything they are immune to, weak to, or resistant to apply before the damage lands; without one, nothing resists it. From a Plotmaster or staff it may kill a character whose dying value reaches death, unless `/ndc` says not; from anyone else it never does, and leaves them unconscious instead.
-`condition/set <list>=<condition>[/<value>]`: Sets `<condition>` on each of them. `<value>` is 1-5; 0 clears the condition. Drained and Doomed are a Plotmaster's or staff's to give a character; anyone running the encounter may lower or clear them. `condition/set <who>=dead` is a Plotmaster's or staff's to say of a character, and `condition/set <who>=dead/0` brings them back, unconscious with no hit points.
+`damage[/ndc] <list>=<amount>[ <kind>[ <what else>...]]`: Damages each combatant in `<list>` for `<amount>`. Name the damage type (such as `fire`, `cold`, or `persistent-damage`) to apply the target's immunities, weaknesses, and resistances before the damage lands; without a type, nothing resists the damage. After the type, add any other properties of the damage (`silver`, `cold iron`, `magical`, `holy`, `area`, `splash`, `spell`, or `nonlethal`), so that weaknesses and resistances that depend on them apply: `damage #3=12 slashing silver`.
+%t **Note:** Damage from a Plotmaster or staff can kill a character whose Dying value reaches the death threshold, unless you add `/ndc`. Damage from anyone else never kills a character; it leaves them unconscious instead.
+`condition/set <list>=<condition>[/<value>]`: Sets `<condition>` on each combatant in `<list>`. `<value>` is 1-5, and 0 clears the condition.
+%t **Note:** Only a Plotmaster or staff can give a character Drained or Doomed, but anyone running the encounter can lower or clear them. Only a Plotmaster or staff can mark a character dead with `condition/set <who>=dead`, and `condition/set <who>=dead/0` brings the character back, unconscious at 0 HP.
 
-## No hit points left
+## At 0 hit points
 
-A character reduced to no hit points is dying: Dying 1, or 2 from a critical hit, and one more for each
-point of Wounded. From then on they act directly before whoever's turn they fell in. They roll a
-recovery check as each of their turns starts, and can do nothing meanwhile but answer the hit that
-dropped them with a reaction that could have stopped it.
+A character reduced to 0 HP is dying: Dying 1, or Dying 2 from a critical hit, plus their Wounded value. From then on, their turn comes right before the turn of whoever was acting when they fell, and they roll a recovery check at the start of each of their turns. While dying, they can't act, except to use a reaction that could have prevented the hit that dropped them.
 
-- **A nonlethal blow** knocks them out and does not kill: unconscious with no hit points, not dying,
-  and awake again when healed.
-- **Damage of twice their hit points or more in one blow** is death outright, where the encounter may
-  kill.
-- **`+e/act administer first aid=<who>/stabilize`** is Medicine against 5 more than their recovery DC.
-  A success leaves them no longer dying, unconscious still, and wounded one more; a critical failure
-  brings them nearer death.
-- **`+e/act administer first aid=<who>/stop bleeding/<dc>`** is against the DC of what made them
-  bleed. A success gives them a flat check against DC 10 to end it; a critical failure deals them the
-  bleed at once.
-- **`+e/act assisted recovery[=<who>][/<kind>][/<dc>]`** spends two actions putting out what burns or
-  staunching what bleeds: another flat check now, against its DC or the one the GM allows.
+- **A nonlethal hit** knocks a character out without killing them: they're unconscious at 0 HP, not dying, and wake up once healed.
+- **Damage of at least twice their maximum HP in a single hit** kills a character outright, if the encounter allows death.
+
+## First aid and recovery
+
+`encounter/act administer first aid=<who>/stabilize`: Rolls Medicine against the dying character's recovery DC + 5. On a success, they're no longer dying, but they're still unconscious and their Wounded value goes up by one. On a critical failure, they move closer to death.
+`encounter/act administer first aid=<who>/stop bleeding/<dc>`: Rolls Medicine against the DC of whatever made the character bleed. On a success, they get a DC 10 flat check to end the bleeding; on a critical failure, they take the bleed damage immediately.
+`encounter/act assisted recovery[=<who>][/<kind>][/<dc>]`: Spends two actions putting out flames or staunching bleeding on a character with persistent damage. They get an extra flat check right away, against the damage's DC or the DC the GM allows.
