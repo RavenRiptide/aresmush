@@ -43,7 +43,7 @@ Each time you save a creature, you create a new revision of it. An encounter kee
 
 ## On the web
 
-The web portal's Creature Builder (`/pf2/creatures`) does all of this with a friendly user interface. From the Creature Builder, you can view your own custom creatures, custom creatures shared with you, published creatures shared with the playerbase, and the bestiary. You can start a new creature from an existing one, from a description, or from scratch. The editor checks the creature as you work and shows what the game will do with each Strike and ability.
+The web portal's [Creature Builder](/pf2/creatures) does all of this with a friendly user interface. From the Creature Builder, you can view your own custom creatures, custom creatures shared with you, published creatures shared with the playerbase, and the bestiary. You can start a new creature from an existing one, from a description, or from scratch. The editor checks the creature as you work and shows what the game will do with each Strike and ability.
 
 ## Reviewing creatures
 

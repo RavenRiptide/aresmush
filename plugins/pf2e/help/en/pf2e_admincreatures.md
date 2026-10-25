@@ -34,4 +34,4 @@ The game also writes every public creature to `game/bestiary/house.yml`, so publ
 
 ## On the web
 
-You can do all of the commands listed in this file instead through the web portal's Creature Builder.
+You can do all of the commands listed in this file instead through the web portal's [Creature Builder](/pf2/creatures). Its [approval queue](/pf2/creatures/queue) lists the creatures awaiting approval.

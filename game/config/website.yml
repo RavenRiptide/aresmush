@@ -48,6 +48,8 @@ website:
       route: scenes-unshared
     - title: Start New Scene
       route: scene-create
+    - title: Creature Builder
+      route: pf2-creatures
     - divider: true
     - title: Who's Online
       route: who
@@ -132,9 +134,6 @@ website:
     - title: Ancestries
       route: wiki-page
       id: mechanics:ancestry
-    - title: <i class="fas fa-caret-right" aria-hidden="true"></i> Limited Heritages
-      route: wiki-page
-      id: mechanics:limited-heritages
     - title: <i class="fas fa-caret-right" aria-hidden="true"></i> Versatile Heritages
       route: wiki-page
       id: mechanics:versatile-heritages
