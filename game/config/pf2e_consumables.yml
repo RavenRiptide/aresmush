@@ -253,6 +253,7 @@ pf2e_consumables:
     heal: 1d6
     effect: 'Effect: Elixir of Life'
   Forensic Dye:
+    subcategory: tool
     bulk: 0.1
     level: 1
     price: 300
@@ -314,6 +315,7 @@ pf2e_consumables:
       splash: 1
       range: 20
   Ghost Ink:
+    subcategory: tool
     bulk: 0.1
     level: 1
     price: 300
@@ -330,6 +332,7 @@ pf2e_consumables:
       - injury
       - poison
   Glow Rod:
+    subcategory: tool
     bulk: 0.1
     level: 1
     price: 300
@@ -437,6 +440,7 @@ pf2e_consumables:
       - expandable
       - magical
   Matchstick:
+    subcategory: tool
     bulk: 0
     level: 1
     price: 20
@@ -605,6 +609,7 @@ pf2e_consumables:
       - polymorph
     effect: 'Effect: Silvertongue Mutagen (Lesser)'
   Smoke Ball (Lesser):
+    subcategory: tool
     bulk: 0.1
     level: 1
     price: 300
@@ -612,6 +617,7 @@ pf2e_consumables:
       - alchemical
       - consumable
   Snake Oil:
+    subcategory: tool
     bulk: 0.1
     level: 1
     price: 200
@@ -895,6 +901,7 @@ pf2e_consumables:
       - magical
       - talisman
   Silver Salve:
+    subcategory: tool
     bulk: 0.1
     level: 2
     price: 600
@@ -1566,6 +1573,7 @@ pf2e_consumables:
       - elixir
       - healing
   Timeless Salts:
+    subcategory: tool
     bulk: 0.1
     level: 4
     price: 1400
@@ -1598,6 +1606,7 @@ pf2e_consumables:
       - elixir
   # Item Level 5
   Absolute Solvent (Lesser):
+    subcategory: tool
     bulk: 0.1
     level: 5
     price: 2100
@@ -2049,6 +2058,7 @@ pf2e_consumables:
       - potion
       - sonic
   Everlasting Adhesive:
+    subcategory: tool
     bulk: 0.1
     level: 7
     price: 5500
@@ -2096,6 +2106,7 @@ pf2e_consumables:
       - magical
       - potion
   Skinstitch Salve:
+    subcategory: tool
     bulk: 0.1
     level: 7
     price: 5500
@@ -2105,6 +2116,7 @@ pf2e_consumables:
       - healing
     effect: 'Effect: Skinstitch Salve'
   Smoke Ball (Greater):
+    subcategory: tool
     bulk: 0.1
     level: 7
     price: 5300
@@ -2957,6 +2969,7 @@ pf2e_consumables:
       - magical
   # Item Level 12
   Absolute Solvent (Moderate):
+    subcategory: tool
     bulk: 0.1
     level: 12
     price: 32500
@@ -4101,6 +4114,7 @@ pf2e_consumables:
       - magical
   # Item Level 18
   Absolute Solvent (Greater):
+    subcategory: tool
     bulk: 0.1
     level: 18
     price: 325000
@@ -4319,6 +4333,7 @@ pf2e_consumables:
       - snare
       - trap
   Philosopher's Stone:
+    subcategory: tool
     bulk: 2
     level: 20
     price: 0

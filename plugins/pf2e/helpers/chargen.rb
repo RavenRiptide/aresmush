@@ -432,7 +432,7 @@ module AresMUSH
       choice_names.uniq!
 
       unless choice_names.empty?
-        choice_names.each { |name| Pf2e.open_feat_choice(to_assign, name) }
+        choice_names.each { |name| Pf2e.open_feat_choice(to_assign, name, Pf2e.choice_count(enactor, Pf2e.find_choice_block(enactor, name))) }
 
         client.emit_ooc t('pf2e.has_feat_choices', :options => choice_names.sort.join(", "))
       end

@@ -24,13 +24,14 @@ module AresMUSH
             'when' => lambda { |ctx| ctx[:bucket] },
             'deltas' => lambda { |ctx| [ Slots.fill([ 'feats', ctx[:bucket] ], ctx[:feat]) ] }
           },
-          # A feat that carries its own choice opens one, for the player to resolve with
-          # advance/option. `opens_choice` is worked out by the caller, because whether a
-          # choice opens depends on how many times the feat has been taken.
+          # A feat that carries its own choice opens it, for the player to resolve with
+          # advance/option. `opens_choice` and `choice_count` are worked out by the caller, because
+          # whether a choice opens depends on how many times the feat has been taken, and how many
+          # picks it holds can depend on the character.
           {
             'name' => 'its own choice',
             'when' => lambda { |ctx| ctx[:opens_choice] },
-            'deltas' => lambda { |ctx| [ Slots.open([ 'feat choice', ctx[:feat] ]) ] }
+            'deltas' => lambda { |ctx| [ Slots.open([ 'feat choice', ctx[:feat] ], :count => ctx[:choice_count]) ] }
           }
         ].freeze
 
@@ -38,12 +39,14 @@ module AresMUSH
         #
         #   bucket        the feat list it goes into, or nil to record it without spending a slot
         #   opens_choice  whether the feat's choice opens on this taking
-        def self.deltas(feat, details, bucket: nil, opens_choice: false)
+        #   choice_count  how many picks it opens
+        def self.deltas(feat, details, bucket: nil, opens_choice: false, choice_count: 1)
           ctx = {
             :feat => feat,
             :details => details || {},
             :bucket => bucket,
-            :opens_choice => opens_choice
+            :opens_choice => opens_choice,
+            :choice_count => choice_count
           }
 
           RULES.flat_map do |rule|

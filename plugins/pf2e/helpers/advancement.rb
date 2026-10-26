@@ -358,12 +358,31 @@ module AresMUSH
 
       # Feat choices this level opens.
       granted_choice_names(info).each do |name|
-        open_feat_choice(to_assign, name)
-
         block = find_choice_block(char, name)
+        count = choice_count(char, block)
+
+        next if count < 1
+
+        open_feat_choice(to_assign, name, count)
         summary = block ? choice_summary(block) : 'eligible option'
 
         return_msg << t('pf2e.adv_item_feat_choice', :choice => name, :summary => with_article(summary))
+      end
+
+      # Repeat picks on feats they hold that come due at this level, such as Cauldron's formula at 4th.
+      DraftSheet.of(char).feat_names.uniq.each do |feat|
+        found = get_feat_details(feat)
+        next if found.is_a?(String)
+
+        level_choices_due(found[1], char.pf2_level + 1).each do |name, block|
+          count = choice_count(char, block)
+
+          next if count < 1
+
+          open_feat_choice(to_assign, name, count)
+
+          return_msg << t('pf2e.adv_item_feat_choice', :choice => name, :summary => with_article(choice_summary(block)))
+        end
       end
 
       return_msg.concat(open_each_rank_picks(char, to_assign, advancement))

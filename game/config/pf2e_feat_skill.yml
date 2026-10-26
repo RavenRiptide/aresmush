@@ -38,6 +38,13 @@ pf2e_feats:
     prereq:
       level: 1
   Alchemical Crafting:
+    feat_choice:
+      summary: common 1st-level alchemical item formula
+      count: 4
+      from_formulas:
+        traits:
+          - alchemical
+        max_level: 1
     feat_type:
       - Skill
       - General
@@ -722,6 +729,13 @@ pf2e_feats:
         mode: "upgrade"
         value: 1
   Snare Crafting:
+    feat_choice:
+      summary: common 1st-level snare formula
+      count: 4
+      from_formulas:
+        traits:
+          - snare
+        max_level: 1
     feat_type:
       - Skill
       - General
@@ -1210,6 +1224,19 @@ pf2e_feats:
       skill: Society/expert
     uncommon: True
   Magical Crafting:
+    feat_choice:
+      summary: common magic item formula of 2nd level or lower
+      count: 4
+      from_formulas:
+        category:
+          - magicitem
+          - consumables
+          - runes
+          - armor
+          - shields
+        traits:
+          - magical
+        max_level: 2
     feat_type:
       - Skill
       - General

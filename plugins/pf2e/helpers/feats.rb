@@ -287,7 +287,7 @@ module AresMUSH
       names = recorded_choices(char).map(&:first) + (in_flight.is_a?(Hash) ? in_flight.keys : [])
 
       names.map(&:to_s).uniq { |n| n.downcase }.filter_map do |name|
-        block = feat_choice_block_for(name) || class_choice_block_for(char, name)
+        block = feat_side_choice_block(char, name) || class_choice_block_for(char, name)
 
         next unless block.is_a?(Hash) && block[flag]
 
@@ -815,12 +815,28 @@ module AresMUSH
     # Athletics reads as "Assurance (Nature), Assurance (Athletics)" rather than collapsing
     # to a single entry. A then_choose feat records several picks for one taking, so those
     # are shown together, slash-joined: "Adapted Cantrip (Primal/Electric Arc)".
+    # A bucket of features as a sheet shows it. A feature the class table grants by its general name
+    # ("Fifth Doctrine") is named once, by the version a specialty grants alongside it
+    # ("Fifth Doctrine (Cloistered)").
+    def self.feature_display_list(char, bucket)
+      held = Array((char.pf2_features || {})[bucket]).map(&:to_s)
+
+      held.reject { |name| held.any? { |other| other.start_with?("#{name} (") } }.sort
+    end
+
     def self.feat_display_list(char, feat_names)
       names = Array(feat_names).compact.map(&:to_s)
       labels = []
 
       names.uniq.each do |name|
         count = names.count { |n| n.casecmp?(name) }
+
+        # The formulas a feat's choice gave are in the formula book, which `formulas` lists.
+        if formula_choice?(feat_choice_block_for(name))
+          labels << (count > 1 ? "#{name} (x#{count})" : name)
+          next
+        end
+
         depth = choice_sequence_depth(name)
 
         # choice_labels_for is flat; a then_choose feat contributes `depth` labels per
@@ -1081,7 +1097,9 @@ module AresMUSH
         'apply' => lambda { |ctx|
           to_assign = ctx[:char].pf2_to_assign
 
-          Array(ctx[:value]).compact.each { |name| Pf2e.open_feat_choice(to_assign, name.to_s) }
+          Array(ctx[:value]).compact.each do |name|
+            Pf2e.open_feat_choice(to_assign, name.to_s, Pf2e.choice_count(ctx[:char], Pf2e.find_choice_block(ctx[:char], name.to_s)))
+          end
 
           ctx[:char].update(:pf2_to_assign => to_assign)
 
@@ -1101,7 +1119,7 @@ module AresMUSH
             next if Array((to_assign['feat choice'] || {})[key]).include?('open')
             next if Pf2e.choice_labels_for(ctx[:char], key).any?
 
-            Pf2e.open_feat_choice(to_assign, key)
+            Pf2e.open_feat_choice(to_assign, key, Pf2e.choice_count(ctx[:char], Pf2e.find_choice_block(ctx[:char], key)))
           end
 
           ctx[:char].update(:pf2_to_assign => to_assign)
@@ -1156,6 +1174,27 @@ module AresMUSH
           ctx[:char].update(:pf2_special => Pf2e.with_senses(ctx[:char].pf2_special, gained))
 
           gained.map { |sense| [ 'pf2e.feat_grants_special', { :special => sense } ] }
+        }
+      },
+      # Formulas by catalogue: `formula: { consumables: [ "Philosopher's Stone" ] }`. A draft writes the
+      # book and its commit records it; anywhere else the ledger records it now.
+      'formula' => {
+        'timing' => 'advance',
+        'apply' => lambda { |ctx|
+          char = ctx[:char]
+          drafting = Ledger.drafting?(char)
+
+          (ctx[:value] || {}).flat_map do |category, names|
+            Array(names).map do |name|
+              if drafting
+                Crafting.write_formula(char, category.to_s, name.to_s)
+              else
+                Crafting.learn!(char, category.to_s, name.to_s, :source_type => 'feat', :source_ref => name.to_s)
+              end
+
+              [ 'pf2e.feat_grants_formula', { :formula => name.to_s } ]
+            end
+          end
         }
       }
     }.freeze
@@ -1481,6 +1520,8 @@ module AresMUSH
         choice_spell_pool(char, block['from_spells'], choice_name)
       elsif block.key?('from_lores')
         choice_lore_pool(char, block['from_lores'])
+      elsif block['from_formulas'].is_a?(Hash)
+        Crafting.pool(char, block['from_formulas'])
       elsif block['from']
         choice_dynamic_options(char, block['from'], block, choice_name)
       else
@@ -1530,6 +1571,10 @@ module AresMUSH
       meets_prereqs?(char, prereq, cl)
     end
 
+    def self.formula_choice?(block)
+      block.is_a?(Hash) && block['from_formulas'].is_a?(Hash)
+    end
+
     def self.choice_grants_feat?(block)
       block.is_a?(Hash) && block['from_feats'].is_a?(Hash)
     end
@@ -1558,6 +1603,12 @@ module AresMUSH
       return substitute_choice_label(block['grants'], label) if block.is_a?(Hash) && block['grants'].is_a?(Hash)
 
       return { 'skill' => [ label ] } if block.is_a?(Hash) && block.key?('from_lores')
+
+      if block.is_a?(Hash) && block['from_formulas'].is_a?(Hash)
+        category, named = Crafting.pool_category(block['from_formulas'], label)
+
+        return named ? { 'formula' => { category => [ named ] } } : nil
+      end
 
       if block.is_a?(Hash) && block['from_spells'].is_a?(Hash)
         focus_type = block['from_spells']['focus_type']
@@ -1846,6 +1897,47 @@ module AresMUSH
       details.is_a?(Hash) ? details['at_level'] : nil
     end
 
+    # A feat's repeat picks: named choices, each with its own count and pool, that open on the levels
+    # they name while the character holds the feat. `levels` is a list, or `{ from:, every:, to: }`.
+    def self.level_choices(details)
+      blocks = details.is_a?(Hash) ? details['level_choices'] : nil
+
+      blocks.is_a?(Hash) ? blocks.select { |_name, block| block.is_a?(Hash) } : {}
+    end
+
+    def self.level_choices_due(details, level)
+      level_choices(details).select { |_name, block| level_choice_due?(block['levels'], level.to_i) }
+    end
+
+    def self.level_choice_due?(levels, level)
+      return Array(levels).map(&:to_i).include?(level) unless levels.is_a?(Hash)
+
+      from = (levels['from'] || 1).to_i
+      every = [ (levels['every'] || 1).to_i, 1 ].max
+
+      level.between?(from, (levels['to'] || 20).to_i) && ((level - from) % every).zero?
+    end
+
+    # A repeat pick's block, found among the feats the character holds or is taking.
+    def self.held_level_choice_block(char, choice_name)
+      feats = Global.read_config('pf2e_feats') || {}
+
+      DraftSheet.of(char).feat_names.uniq.each do |name|
+        key = feats.keys.find { |k| k.to_s.casecmp?(name.to_s) }
+        blocks = key ? level_choices(feats[key]) : {}
+        found = blocks.keys.find { |k| k.to_s.casecmp?(choice_name.to_s) }
+
+        return blocks[found] if found
+      end
+
+      nil
+    end
+
+    # A choice a feat carries: the one it opens when taken, or one of its repeat picks.
+    def self.feat_side_choice_block(char, choice_name)
+      feat_choice_block_for(choice_name) || held_level_choice_block(char, choice_name)
+    end
+
     def self.choice_option_at_level(block, label)
       option = choice_option_def(block, label)
       return option['at_level'] if option && option['at_level']
@@ -1912,7 +2004,7 @@ module AresMUSH
     end
 
     def self.find_choice_block(char, choice_name, source = nil)
-      feat_block = source.to_s != 'charclass' && feat_choice_block_for(choice_name)
+      feat_block = source.to_s != 'charclass' && feat_side_choice_block(char, choice_name)
 
       if feat_block
         return advance_choice_steps(feat_block, feat_choice_step(char, choice_name))
@@ -2038,7 +2130,56 @@ module AresMUSH
     # A choice a feat carries is a slot like any other, so opening one is the slot vocabulary
     # rather than an inline array append - see Pf2e::Slots.
     def self.open_feat_choice(to_assign, choice_name, count = 1)
+      return to_assign if count.to_i < 1
+
       to_assign.replace(Slots.apply(to_assign, [ Slots.open([ 'feat choice', choice_name ], :count => count) ]))
+    end
+
+    # How many picks a choice opens: one, the number its block names, or an ability modifier with a
+    # floor, as Improbable Elixirs' `count: { ability: Intelligence, min: 1 }`. A formula choice opens
+    # no more than its pool can give, which can be none.
+    def self.choice_count(char, block)
+      count = block.is_a?(Hash) ? block['count'] : nil
+
+      wanted = if count.is_a?(Hash)
+        modifier = Pf2eAbilities.abilmod(Pf2eAbilities.get_score(char, count['ability'].to_s))
+
+        [ modifier, (count['min'] || 1).to_i ].max
+      else
+        [ count.to_i, 1 ].max
+      end
+
+      formula_choice?(block) ? [ wanted, Crafting.pool(char, block['from_formulas']).size ].min : wanted
+    end
+
+    # A formula pick with nothing left to offer closes: another choice took the last formula it could
+    # have given. Answers what it tells the player.
+    def self.close_exhausted_formula_choices(char)
+      to_assign = char.pf2_to_assign || {}
+      slots = (to_assign['feat choice'] || {}).dup
+
+      closed = slots.keys.select do |name|
+        open = Array(slots[name]).count { |slot| slot.to_s.casecmp?('open') }
+        next false if open.zero?
+
+        block = find_choice_block(char, name)
+        next false unless formula_choice?(block)
+
+        spare = open - choice_options(char, name, block).size
+        next false unless spare.positive?
+
+        kept = Array(slots[name]).dup
+        spare.times { kept.delete_at(kept.rindex { |slot| slot.to_s.casecmp?('open') }) }
+        kept.empty? ? slots.delete(name) : slots[name] = kept
+
+        true
+      end
+
+      return [] if closed.empty?
+
+      char.update(:pf2_to_assign => to_assign.merge('feat choice' => slots))
+
+      closed.map { |name| t('pf2e.choice_formulas_exhausted', :choice => name) }
     end
 
     def self.fill_feat_choice(to_assign, choice_name, value)
@@ -2116,7 +2257,7 @@ module AresMUSH
 
       unless block
         if source.present? && find_choice_block(char, key)
-          actual = feat_choice_block_for(key) ? 'feat' : 'charclass'
+          actual = feat_side_choice_block(char, key) ? 'feat' : 'charclass'
 
           return t('pf2e.choice_wrong_source',
             :choice => key,
@@ -2917,8 +3058,11 @@ module AresMUSH
       return [] unless block
       return [] unless feat_choice_opens_at?(block, feat_taken_count(char, fname))
 
+      count = choice_count(char, block)
+      return [] if count < 1
+
       to_assign = char.pf2_to_assign
-      open_feat_choice(to_assign, fname)
+      open_feat_choice(to_assign, fname, count)
 
       store_choice_filter(to_assign, fname, filter)
       char.update(pf2_to_assign: to_assign)
@@ -2945,11 +3089,13 @@ module AresMUSH
     # A choice resolved to a value, applied at whichever boundary is open. Chargen writes it to the
     # character now; an open level stages it for advance/done to carry out.
     def self.resolve_feat_choice(char, choice_name, block, value, client)
-      if DraftSheet.of(char).drafting?
+      msgs = if DraftSheet.of(char).drafting?
         stage_feat_choice(char, choice_name, block, value, client)
       else
         apply_feat_choice(char, choice_name, block, value, client)
       end
+
+      msgs + close_exhausted_formula_choices(char)
     end
 
     def self.apply_feat_choice(char, choice_name, block, value, client)
@@ -2974,7 +3120,7 @@ module AresMUSH
 
         if nested
           nested_assign = char.pf2_to_assign
-          open_feat_choice(nested_assign, fname)
+          open_feat_choice(nested_assign, fname, choice_count(char, nested))
           char.update(pf2_to_assign: nested_assign)
 
           msgs << t('pf2e.choice_opened', :choice => fname, :summary => choice_summary(nested), :cmd => choice_info_cmd(char))

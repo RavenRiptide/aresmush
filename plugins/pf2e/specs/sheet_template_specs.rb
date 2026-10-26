@@ -18,15 +18,25 @@ module AresMUSH
       it "should say None for a bucket the fold never made" do
         template = rendered_for('charclass_features' => [ 'Rage' ])
 
-        expect(template.archetype_features).to eq 'None'
+        expect(template.archetype_features).to eq 'None.'
         expect(template.class_features).to eq 'Rage'
       end
 
       it "should say None for an empty bucket" do
         template = rendered_for('charclass_features' => [], 'archetype_features' => [])
 
-        expect(template.class_features).to eq 'None'
-        expect(template.archetype_features).to eq 'None'
+        expect(template.class_features).to eq 'None.'
+        expect(template.archetype_features).to eq 'None.'
+      end
+
+      it "should say None for a character with no senses or special abilities, and list them otherwise" do
+        template = rendered_for({})
+
+        allow(template.instance_variable_get(:@char)).to receive(:pf2_special).and_return([])
+        expect(template.specials).to eq 'None.'
+
+        allow(template.instance_variable_get(:@char)).to receive(:pf2_special).and_return([ 'Low-Light Vision', 'Darkvision' ])
+        expect(template.specials).to eq 'Darkvision, Low-Light Vision'
       end
 
       it "should list what a bucket holds, in order" do
@@ -56,7 +66,7 @@ module AresMUSH
       end
 
       it "should cope with no features hash at all" do
-        expect(rendered_for(nil).class_features).to eq 'None'
+        expect(rendered_for(nil).class_features).to eq 'None.'
       end
     end
 

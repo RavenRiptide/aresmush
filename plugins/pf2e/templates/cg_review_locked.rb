@@ -96,6 +96,51 @@ module AresMUSH
         stage == 'final'
       end
 
+      # The finished sheet's senses and class features, and while any pick is still to make, every
+      # choice chargen opened.
+      def show_choices
+        show_other || choices_open
+      end
+
+      def choices_open
+        (stage == 'feats' || stage == 'final') && PF2CGReviewLockDisplay.any_open?(choice_list)
+      end
+
+      def choice_list
+        @choice_list ||= PF2CGReviewLockDisplay.choice_rows(Pf2e.pending_feat_choices(@char)) do |name|
+          block = Pf2e.find_choice_block(@char, name)
+
+          block ? Pf2e.choice_summary(block) : 'eligible option'
+        end
+      end
+
+      # A choice, what has been picked for it, and how many picks are left, by name.
+      def self.choice_rows(pending)
+        pending.keys.sort_by(&:downcase).map do |name|
+          slots = Array(pending[name])
+          picked = slots.reject { |slot| slot.to_s.casecmp?('open') }.map(&:to_s).sort
+
+          { :choice => name, :picked => picked, :open => slots.size - picked.size, :summary => yield(name) }
+        end
+      end
+
+      def self.any_open?(rows)
+        rows.any? { |row| row[:open].positive? }
+      end
+
+      def choices
+        choice_list.map do |row|
+          line = "#{item_color}#{row[:choice]}%xn: #{row[:picked].join(', ')}"
+
+          next line if row[:open].zero?
+
+          left = t('pf2e.cg_choice_open', :count => row[:open], :summary => row[:summary])
+          line = row[:picked].empty? ? "#{item_color}#{row[:choice]}%xn: #{left}" : "#{line}; #{left}"
+
+          "#{line}%r%t#{t('pf2e.cg_choice_pointer', :choice => row[:choice])}"
+        end.join("%r")
+      end
+
       def magic_plugin?
         AresMUSH.const_defined?("Pf2emagic")
       end
@@ -296,7 +341,15 @@ module AresMUSH
       end
 
       def specials
-        @char.pf2_special.join(", ")
+        held = Array(@char.pf2_special)
+
+        held.empty? ? "None" : held.join(", ")
+      end
+
+      def class_features
+        held = Pf2e.feature_display_list(@char, 'charclass_features')
+
+        held.empty? ? "None" : held.join(", ")
       end
 
       # Through DraftSheet: a language the player picked is in the draft until the sheet commits,
@@ -650,8 +703,14 @@ module AresMUSH
         Pf2eSkills.language_messages(@char) || []
       end
 
+      # The choices still open are listed in their own section, so they share one line here.
       def feat_messages
-        Pf2e.feat_messages(@char) || []
+        msgs = Pf2e.feat_messages(@char) || []
+        open = choice_list.select { |row| row[:open].positive? }.map { |row| t('pf2e.unassigned_feat_choice', :choice => row[:choice]) }
+
+        return msgs if open.empty?
+
+        (msgs - open) + [ t('pf2e.cg_choices_left') ]
       end
 
       def magic_messages

@@ -93,7 +93,7 @@ module AresMUSH
 
         named, info = found.state
 
-        return Err.new(:not_alchemical, 'pf2e.alchemy_not_alchemical', 'item' => named) unless alchemical?(info)
+        return Err.new(:not_alchemical, 'pf2e.alchemy_not_alchemical', 'item' => named) unless makes?(char, named, info)
         return Err.new(:too_high, 'pf2e.alchemy_too_high', 'item' => named, 'level' => info['level']) if info['level'].to_i > char.pf2_level.to_i
         return Err.new(:no_formula, 'pf2e.alchemy_no_formula', 'item' => named) unless Crafting.known?(char, 'consumables', named)
 
@@ -109,6 +109,12 @@ module AresMUSH
 
       def self.alchemical?(info)
         Array(info['traits']).map(&:to_s).map(&:downcase).include?('alchemical')
+      end
+
+      # What they can make of reagents: anything alchemical, and a potion they took through Improbable
+      # Elixirs, which they make as an alchemical elixir.
+      def self.makes?(holder, named, info)
+        alchemical?(info) || Pf2e.choice_labels_for(holder, 'Improbable Elixirs').any? { |one| one.to_s.casecmp?(named) }
       end
 
       def self.clear!(char, name = nil)
@@ -148,7 +154,7 @@ module AresMUSH
 
         named, info = found.state
 
-        return Err.new(:not_alchemical, 'pf2e.alchemy_not_alchemical', 'item' => named) unless alchemical?(info)
+        return Err.new(:not_alchemical, 'pf2e.alchemy_not_alchemical', 'item' => named) unless makes?(holder, named, info)
         return Err.new(:too_high, 'pf2e.alchemy_too_high', 'item' => named, 'level' => info['level']) if info['level'].to_i > holder.pf2_level.to_i
         return Err.new(:no_formula, 'pf2e.alchemy_no_formula', 'item' => named) unless Crafting.known?(holder, 'consumables', named)
         return Err.new(:no_reagents_left, 'pf2e.alchemy_none_left') unless left(holder).positive?

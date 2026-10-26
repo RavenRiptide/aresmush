@@ -2,6 +2,13 @@
 pf2e_feats:
   # Level 2 Dedication Feats
   Alchemist Dedication:
+    feat_choice:
+      summary: common alchemical item formula
+      count: 4
+      from_formulas:
+        traits:
+          - alchemical
+        max_level: level
     assoc_archetype:
       - Alchemist Archetype
     assoc_class:

@@ -1,7 +1,10 @@
 <%= header %>
 <%= center("#{title_color}#{title}", 78) %>%xn
 <%= divider %>
-<% formulas.each do |item| -%>
-<%= item -%>
+<% if empty? %>
+<%= none %>
+<% end %>
+<% sections.each do |section| %>
+<%= section %>
 <% end %>
 <%= footer %>

@@ -1,10 +1,20 @@
 ---
 pf2e_class:
   Alchemist:
+    feat_choice:
+      Formula Book:
+        summary: common alchemical item formula of your level or lower
+        count: 2
+        from_formulas:
+          traits:
+            - alchemical
+          max_level: level
     key_abil:
       - Intelligence
     HP: 8
     chargen:
+      grant_choice:
+        - Formula Book
       choose_feat:
         - charclass
       charclass_feature:
@@ -40,19 +50,27 @@ pf2e_class:
         alchemist: [0, 0, 0]
     advance:
       2:
+        grant_choice:
+          - Formula Book
         choose_feat:
           - charclass
           - skill
       3:
+        grant_choice:
+          - Formula Book
         choose_feat:
           - general
         raise:
           - skill
       4:
+        grant_choice:
+          - Formula Book
         choose_feat:
           - charclass
           - skill
       5:
+        grant_choice:
+          - Formula Book
         raise:
           - ability
           - skill
@@ -62,10 +80,14 @@ pf2e_class:
           - Field Discovery
           - Powerful Alchemy
       6:
+        grant_choice:
+          - Formula Book
         choose_feat:
           - charclass
           - skill
       7:
+        grant_choice:
+          - Formula Book
         combat_stats:
           weapon_prof:
             simple: expert
@@ -81,10 +103,14 @@ pf2e_class:
         raise:
           - skill
       8:
+        grant_choice:
+          - Formula Book
         choose_feat:
           - charclass
           - skill
       9:
+        grant_choice:
+          - Formula Book
         combat_stats:
           class_dc: expert
           perception: expert
@@ -97,12 +123,16 @@ pf2e_class:
         raise:
           - skill
       10:
+        grant_choice:
+          - Formula Book
         raise:
           - ability
         choose_feat:
           - charclass
           - skill
       11:
+        grant_choice:
+          - Formula Book
         choose_feat:
           - general
         raise:
@@ -114,10 +144,14 @@ pf2e_class:
           - Advanced Vials
           - Chemical Hardness
       12:
+        grant_choice:
+          - Formula Book
         choose_feat:
         - charclass
         - skill
       13:
+        grant_choice:
+          - Formula Book
         choose_feat:
           - ancestry
         raise:
@@ -131,10 +165,14 @@ pf2e_class:
             light: expert
             unarmored: expert
       14:
+        grant_choice:
+          - Formula Book
         choose_feat:
           - charclass
           - skill
       15:
+        grant_choice:
+          - Formula Book
         combat_stats:
           weapon_prof:
             simple: master
@@ -151,10 +189,14 @@ pf2e_class:
           - Alchemical Weapon Mastery
           - Explosion Dodger
       16:
+        grant_choice:
+          - Formula Book
         choose_feat:
           - charclass
           - skill
       17:
+        grant_choice:
+          - Formula Book
         choose_feat:
           - ancestry
         combat_stats:
@@ -165,10 +207,14 @@ pf2e_class:
         raise:
           - skill
       18:
+        grant_choice:
+          - Formula Book
         choose_feat:
           - charclass
           - skill
       19:
+        grant_choice:
+          - Formula Book
         choose_feat:
           - general
         raise:
@@ -181,6 +227,8 @@ pf2e_class:
             medium: master
             unarmored: master
       20:
+        grant_choice:
+          - Formula Book
         raise:
           - ability
         choose_feat:

@@ -60,6 +60,13 @@ module AresMUSH
             'when' => lambda { |_ctx| true },
             'apply' => lambda { |ctx| FeatGain.choice(ctx) }
           },
+          # Its repeat picks due at the level it is taken at. Earlier ones are not owed: a repeat pick
+          # is for each level gained while holding the feat.
+          {
+            'name' => 'repeat picks',
+            'when' => lambda { |ctx| Pf2e.level_choices(ctx[:details]).any? },
+            'apply' => lambda { |ctx| FeatGain.level_choices(ctx) }
+          },
           # A book of spells beside the repertoire, with how to learn into it and prepare from it.
           {
             'name' => 'spell book',
@@ -260,13 +267,17 @@ module AresMUSH
 
           return [] unless block
 
+          count = Pf2e.choice_count(ctx[:char], block)
+
+          return [] if count < 1
+
           automatic = Pf2e.auto_choice?(block)
           label = automatic ? Pf2e.auto_choice_label(ctx[:char], block, ctx[:advancement]) : nil
 
           # Opening the feat's own choice is the same operation as opening any other slot, and
           # FeatSlots is what says so.
           if !automatic || label
-            apply_slots(ctx, FeatSlots.deltas(ctx[:feat], ctx[:details], :opens_choice => true))
+            apply_slots(ctx, FeatSlots.deltas(ctx[:feat], ctx[:details], :opens_choice => true, :choice_count => count))
           end
 
           return opened(ctx, block) unless automatic
@@ -284,6 +295,22 @@ module AresMUSH
           end
 
           []
+        end
+
+        def self.level_choices(ctx)
+          Pf2e.level_choices_due(ctx[:details], ctx[:level]).filter_map do |name, block|
+            count = Pf2e.choice_count(ctx[:char], block)
+
+            next if count < 1
+
+            Pf2e.open_feat_choice(ctx[:to_assign], name, count)
+
+            [ 'pf2e.choice_opened', {
+                :choice => name,
+                :summary => Pf2e.choice_summary(block),
+                :cmd => Pf2e.choice_info_cmd(ctx[:char])
+              } ]
+          end
         end
 
         def self.opened(ctx, block)

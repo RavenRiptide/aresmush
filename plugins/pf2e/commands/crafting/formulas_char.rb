@@ -22,11 +22,10 @@ module AresMUSH
 
         if !char
           client.emit_failure t('pf2e.not_found')
+          return
         end
 
-        book = char.pf2_formula_book
-
-        template = PF2FormulaTemplate.new(book, char)
+        template = PF2FormulaTemplate.new(char.pf2_formula_book, char, client)
 
         client.emit template.render
 

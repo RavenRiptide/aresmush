@@ -563,7 +563,9 @@ module AresMUSH
         # character's materialised sheet currently reflects. Diffing against the new level
         # would read anything that falls due there - a boon written for this level, dormant
         # until now - as something the advancement removed, and revoke it on arrival.
-        plan = Ledger.sync_plan(derived(char, :at_level => level.to_i - 1), {
+        before = derived(char, :at_level => level.to_i - 1)
+
+        plan = Ledger.sync_plan(before, {
           'skills' => skills,
           # The level's picks are in the draft and the levels before it are on the sheet, so the
           # diff needs both: a fragment holding only the draft would read every earlier feat as
@@ -579,6 +581,9 @@ module AresMUSH
           # attribute from the fold, so it already carries chargen's, and `raise ability` adds this
           # level's on top. A fragment holding only this level's would read chargen's as gone.
           'boosts' => char.pf2_boosts,
+          # A level adds formulas and takes none away. One bought while the level was open is on the
+          # ledger already but not in the book the draft holds, so the book alone would read as losing it.
+          'formulas' => (before['formulas'] || {}).merge(char.pf2_formula_book || {}) { |_category, held, drafted| (Array(held) + Array(drafted)).uniq },
           # Only enumerated casters contribute: a Cleric prepares from the whole divine list, so
           # there is nothing to record and nothing a rollback could take away.
           'spells' => Pf2emagic::Entries.known_lists(char),
@@ -700,6 +705,12 @@ module AresMUSH
           end
 
           DraftSheet.of(char).languages.each { |l| txn.grant('add_language', 'language' => l) }
+
+          # The formulas chargen's picks wrote into the book.
+          (char.pf2_formula_book || {}).each_pair do |category, names|
+            Array(names).each { |name| txn.grant('grant_formula', 'category' => category, 'formula' => name) }
+          end
+
           Array(char.pf2_traits).each { |t| txn.grant('add_trait', 'trait' => t) }
           Array(char.pf2_special).each { |s| txn.grant('add_special', 'special' => s) }
 

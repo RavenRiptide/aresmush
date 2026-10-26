@@ -57,6 +57,13 @@ module AresMUSH
             expect(opened).to eq('feat choice/Additional Lore' => 1)
           end
 
+          it "should open as many picks as the choice counts" do
+            opened = FeatSlots.openings('Alchemical Crafting', skill_feat,
+              :bucket => 'skill', :opens_choice => true, :choice_count => 4)
+
+            expect(opened).to eq('feat choice/Alchemical Crafting' => 4)
+          end
+
           it "should say nothing opens when nothing does" do
             expect(FeatSlots.openings('Assurance', skill_feat, :bucket => 'skill')).to eq({})
           end

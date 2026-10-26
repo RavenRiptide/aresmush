@@ -236,7 +236,9 @@ module AresMUSH
       end
 
       def specials
-        @char.pf2_special.sort.join(", ")
+        held = Array(@char.pf2_special)
+
+        held.empty? ? "None." : held.sort.join(", ")
       end
 
       # Including the ones another brought with it, and saying which: a grabbed character is off-guard,
@@ -269,14 +271,11 @@ module AresMUSH
         feature_list('archetype_features')
       end
 
-      # The fold only makes a bucket that has something in it, so a bucket may be missing. A feature
-      # the class table grants by its general name ("Fifth Doctrine") is named once, by the version
-      # a specialty grants alongside it ("Fifth Doctrine (Cloistered)").
+      # The fold only makes a bucket that has something in it, so a bucket may be missing.
       def feature_list(bucket)
-        held = Array((@char.pf2_features || {})[bucket])
-        held = held.reject { |name| held.any? { |other| other.start_with?("#{name} (") } }
+        held = Pf2e.feature_display_list(@char, bucket)
 
-        held.empty? ? "None" : held.sort.join(", ")
+        held.empty? ? "None." : held.join(", ")
       end
 
       # Through DraftSheet, so a language picked during chargen or an open level-up shows on the
@@ -402,7 +401,7 @@ module AresMUSH
       end
 
       def no_magic_msg
-        "%r#{t('pf2emagic.not_caster')}"
+        t('pf2emagic.not_caster')
       end
 
       def magic_header

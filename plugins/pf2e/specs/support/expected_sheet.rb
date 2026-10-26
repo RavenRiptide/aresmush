@@ -124,7 +124,6 @@ module AresMUSH
         'reagents' => lambda { |_acc, _value, _lv| nil },
         'familiar' => lambda { |_acc, _value, _lv| nil },
         'companion' => lambda { |_acc, _value, _lv| nil },
-        'formula_book' => lambda { |_acc, _value, _lv| nil },
         'curse' => lambda { |_acc, _value, _lv| nil },
         'anathema' => lambda { |_acc, _value, _lv| nil },
         'tradition' => lambda { |_acc, _value, _lv| nil }

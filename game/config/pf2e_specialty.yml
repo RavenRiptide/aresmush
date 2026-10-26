@@ -7,8 +7,16 @@ pf2e_specialty:
         reaction: []
         feat: []
         magic_stats: {}
-        formula_book:
-          Bombs: 2
+        feat_choice:
+          Research Field Formulas:
+            summary: common 1st-level alchemical bomb formula
+            count: 2
+            from_formulas:
+              all_traits:
+                - alchemical
+              traits:
+                - bomb
+              max_level: 1
         skills: []
     Chirurgeon:
       chargen:
@@ -16,8 +24,16 @@ pf2e_specialty:
         reaction: []
         feat: []
         magic_stats: {}
-        formula_book:
-          Healing: 2
+        feat_choice:
+          Research Field Formulas:
+            summary: common 1st-level alchemical healing elixir formula
+            count: 2
+            from_formulas:
+              all_traits:
+                - alchemical
+                - elixir
+                - healing
+              max_level: 1
         skills: []
     Mutagenist:
       chargen:
@@ -25,8 +41,16 @@ pf2e_specialty:
         reaction: []
         feat: []
         magic_stats: {}
-        formula_book:
-          Mutagen: 2
+        feat_choice:
+          Research Field Formulas:
+            summary: common 1st-level alchemical mutagen formula
+            count: 2
+            from_formulas:
+              all_traits:
+                - alchemical
+              traits:
+                - mutagen
+              max_level: 1
         skills: []
     Toxicologist:
       chargen:
@@ -34,8 +58,16 @@ pf2e_specialty:
         reaction: []
         feat: []
         magic_stats: {}
-        formula_book:
-          Poison: 2
+        feat_choice:
+          Research Field Formulas:
+            summary: common 1st-level alchemical poison formula
+            count: 2
+            from_formulas:
+              all_traits:
+                - alchemical
+              traits:
+                - poison
+              max_level: 1
         skills: []
   Barbarian:
     Animal:
@@ -467,14 +499,96 @@ pf2e_specialty:
   Fighter: {}
   Investigator:
     Alchemical Sciences:
+      feat_choice:
+        Alchemical Sciences Formula Book:
+          summary: common 1st-level alchemical elixir or tool formula
+          count: 2
+          from_formulas:
+            all_traits:
+              - alchemical
+            traits:
+              - elixir
+            subcategory:
+              - tool
+            max_level: 1
+        Alchemical Sciences Formulas:
+          summary: common alchemical elixir or tool formula of your level or lower
+          count: 1
+          from_formulas:
+            all_traits:
+              - alchemical
+            traits:
+              - elixir
+            subcategory:
+              - tool
+            max_level: level
+      advance:
+        2:
+          grant_choice:
+            - Alchemical Sciences Formulas
+        3:
+          grant_choice:
+            - Alchemical Sciences Formulas
+        4:
+          grant_choice:
+            - Alchemical Sciences Formulas
+        5:
+          grant_choice:
+            - Alchemical Sciences Formulas
+        6:
+          grant_choice:
+            - Alchemical Sciences Formulas
+        7:
+          grant_choice:
+            - Alchemical Sciences Formulas
+        8:
+          grant_choice:
+            - Alchemical Sciences Formulas
+        9:
+          grant_choice:
+            - Alchemical Sciences Formulas
+        10:
+          grant_choice:
+            - Alchemical Sciences Formulas
+        11:
+          grant_choice:
+            - Alchemical Sciences Formulas
+        12:
+          grant_choice:
+            - Alchemical Sciences Formulas
+        13:
+          grant_choice:
+            - Alchemical Sciences Formulas
+        14:
+          grant_choice:
+            - Alchemical Sciences Formulas
+        15:
+          grant_choice:
+            - Alchemical Sciences Formulas
+        16:
+          grant_choice:
+            - Alchemical Sciences Formulas
+        17:
+          grant_choice:
+            - Alchemical Sciences Formulas
+        18:
+          grant_choice:
+            - Alchemical Sciences Formulas
+        19:
+          grant_choice:
+            - Alchemical Sciences Formulas
+        20:
+          grant_choice:
+            - Alchemical Sciences Formulas
       chargen:
+        grant_choice:
+          - Alchemical Sciences Formula Book
         reaction: []
         magic_stats: {}
         skills:
         - Crafting
         feat:
         - Alchemical Crafting
-        formula_book: 2
         action:
         - Quick Tincture
     Empiricism:

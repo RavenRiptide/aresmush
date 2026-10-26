@@ -70,6 +70,16 @@
 <%= section_line("Feats") %>
 <%= "#{item_color}Feats%xn: #{feats}" %>
 <% end %>
+<% if show_choices %>
+<%= section_line("Class Features & Other Choices") %>
+<% if show_other %>
+<%= "#{item_color}Special Senses and Abilities%xn: #{specials}" %>
+<%= "#{item_color}Class Features%xn: #{class_features}" %>
+<% end %>
+<% if choices_open %>
+<%= choices %>
+<% end %>
+<% end %>
 <% if show_magic %>
 <%= section_line("Magic") %>
 <% if divine_font %>
@@ -84,10 +94,6 @@
 <% if magic_notes %>
 <%= magic_notes %>
 <% end %>
-<% end %>
-<% if show_other %>
-<%= section_line("Other Stuff") %>
-<%= "#{item_color}Special Senses and Abilities%xn: #{specials}" %>
 <% end %>
 <% if show_message_section %>
 <%= section_line("Messages") %>

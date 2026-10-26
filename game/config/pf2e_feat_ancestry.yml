@@ -145,6 +145,22 @@ pf2e_feats:
         text: "When you successfully Demoralize a foe, that foe takes ]{1d4 mental damage} at the start of each of its turns as long as it remains Frightened and continues to engage in combat with you. If you have master proficiency in Intimidation, the damage increases to 2d4, and if you have legendary proficiency, the damage increases to 3d4."
         predicate: ["action:demoralize"]
   Alchemical Scholar:
+    feat_choice:
+      summary: common 1st-level alchemical item formula
+      from_formulas:
+        traits:
+          - alchemical
+        max_level: 1
+    level_choices:
+      Alchemical Scholar Formulas:
+        summary: common alchemical item formula of your level
+        levels:
+          from: 2
+        from_formulas:
+          traits:
+            - alchemical
+          min_level: level
+          max_level: level
     feat_type:
       - Ancestry
     assoc_ancestry:

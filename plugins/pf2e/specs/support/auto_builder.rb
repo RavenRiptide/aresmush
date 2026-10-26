@@ -375,29 +375,31 @@ module AresMUSH
 
         if ta['feat choice'].is_a?(Hash)
           ta['feat choice'].each_pair do |name, slots|
-            next unless Array(slots).include?('open')
+            # A choice can hold several picks, Alchemical Crafting's four formulas among them, and
+            # each pick narrows what the next one offers.
+            Array(slots).count('open').times do
+              block = (Pf2e.find_choice_block(@char, name) rescue nil)
 
-            block = (Pf2e.find_choice_block(@char, name) rescue nil)
+              # The game can enumerate a choice block's legal options, including 'from' and
+              # 'from_feats' blocks whose options are computed rather than listed.
+              options = begin
+                block ? Array(Pf2e.choice_options(@char, name, block)) : []
+              rescue StandardError => e
+                # Noted rather than swallowed: a raise here is usually a bug in the game, not here.
+                note "!! choice_options raised for #{name.inspect}: #{e.class}: #{e.message}"
+                []
+              end
+              pick = options.first
+              pick ||= Array(block && block['options']).first
+              pick ||= lore_pick if name.to_s.downcase.include?('lore')
 
-            # The game can enumerate a choice block's legal options, including 'from' and
-            # 'from_feats' blocks whose options are computed rather than listed.
-            options = begin
-              block ? Array(Pf2e.choice_options(@char, name, block)) : []
-            rescue StandardError => e
-              # Noted rather than swallowed: a raise here is usually a bug in the game, not here.
-              note "!! choice_options raised for #{name.inspect}: #{e.class}: #{e.message}"
-              []
+              if !pick
+                note "!! cannot resolve feat choice #{name.inspect} (block keys: #{block ? block.keys.inspect : 'nil'})"
+                break
+              end
+
+              run("#{option_cmd(context)} #{name}=#{pick}"); runs += 1
             end
-            pick = options.first
-            pick ||= Array(block && block['options']).first
-            pick ||= lore_pick if name.to_s.downcase.include?('lore')
-
-            if !pick
-              note "!! cannot resolve feat choice #{name.inspect} (block keys: #{block ? block.keys.inspect : 'nil'})"
-              next
-            end
-
-            run("#{option_cmd(context)} #{name}=#{pick}"); runs += 1
           end
         end
 

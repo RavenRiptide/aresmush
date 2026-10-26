@@ -200,6 +200,25 @@ pf2e_feats:
       - witch
     init_magic: true
   Cauldron:
+    feat_choice:
+      summary: common 1st-level oil or potion formula
+      count: 4
+      from_formulas:
+        traits:
+          - oil
+          - potion
+        max_level: 1
+    level_choices:
+      Cauldron Formulas:
+        summary: common oil or potion formula of your level or lower
+        levels:
+          from: 4
+          every: 2
+        from_formulas:
+          traits:
+            - oil
+            - potion
+          max_level: level
     assoc_charclass:
       - Witch
     feat_type:
@@ -2870,6 +2889,19 @@ pf2e_feats:
         base_level: 2
         focus_type: warden
   Alchemical Discoveries:
+    level_choices:
+      Alchemical Discoveries Formulas:
+        summary: common alchemical elixir or tool formula
+        levels:
+          from: 5
+        from_formulas:
+          all_traits:
+            - alchemical
+          traits:
+            - elixir
+          subcategory:
+            - tool
+          max_level: level
     assoc_charclass:
       - Investigator
     feat_type:
@@ -12048,6 +12080,15 @@ pf2e_feats:
         label: "Impossible Volley"
         predicate: ["impossible-volley", "volley-30", "reload-0"]
   Improbable Elixirs:
+    feat_choice:
+      summary: potion of 9th level or lower, made as an alchemical elixir
+      count:
+        ability: Intelligence
+        min: 1
+      from_formulas:
+        traits:
+          - potion
+        max_level: 9
     assoc_charclass:
       - Alchemist
     feat_type:
@@ -12727,6 +12768,10 @@ pf2e_feats:
       - rage
       - visual
   Craft Philosopher's Stone:
+    grants:
+      formula:
+        consumables:
+          - Philosopher's Stone
     assoc_charclass:
       - Alchemist
     feat_type:

@@ -37,9 +37,81 @@ module AresMUSH
         Ok.new(:state => found)
       end
 
-      # Only a common formula is simply bought; anything rarer is the GM's to hand out.
+      # Only a common formula is simply bought; anything rarer is the GM's to hand out. A rune says so in
+      # its own `rarity` rather than in its traits.
       def self.common?(info)
-        (Array(info['traits']).map(&:to_s).map(&:downcase) & %w{uncommon rare unique}).empty?
+        rarity = info['rarity'].to_s.downcase
+
+        (Array(info['traits']).map(&:to_s).map(&:downcase) & %w{uncommon rare unique}).empty? &&
+          (rarity.empty? || rarity == 'common')
+      end
+
+      # What a class or feat lets a character pick a formula from: the common items a `from_formulas`
+      # filter names, less the formulas they know or have picked in the level they are taking.
+      #
+      #   category      catalogues to search, in order; consumables when absent
+      #   traits        the item carries at least one
+      #   all_traits    the item carries every one
+      #   subcategory   the item's grouping where no trait marks it, such as an alchemical tool
+      #   min_level     a number, or 'level' for the level the character is reaching
+      #   max_level     the same
+      def self.pool(char, filter)
+        filter = {} unless filter.is_a?(Hash)
+        reaching = char.pf2_level.to_i + (char.advancing ? 1 : 0)
+        bound = lambda { |value| value.to_s.casecmp?('level') ? reaching : value.to_i }
+
+        any = words(filter['traits'])
+        every = words(filter['all_traits'])
+        groups = words(filter['subcategory'])
+        known = known_or_picked(char)
+
+        found = pool_categories(filter).flat_map do |category|
+          (Global.read_config("pf2e_#{category}") || {}).select do |name, info|
+            next false unless info.is_a?(Hash) && common?(info)
+            next false if filter.key?('min_level') && info['level'].to_i < bound.call(filter['min_level'])
+            next false if filter.key?('max_level') && info['level'].to_i > bound.call(filter['max_level'])
+
+            traits = words(info['traits'])
+            grouped = groups.include?(info['subcategory'].to_s.downcase)
+
+            next false unless every.all? { |one| traits.include?(one) }
+            next false unless (any.empty? && groups.empty?) || (any & traits).any? || grouped
+
+            true
+          end.keys
+        end
+
+        found.uniq { |name| name.downcase }.reject { |name| known.include?(name.downcase) }.sort
+      end
+
+      # The catalogue a pick is filed under, and the name as the catalogue spells it: the first
+      # catalogue in the filter's order that holds it.
+      def self.pool_category(filter, label)
+        pool_categories(filter).each do |category|
+          named = (Global.read_config("pf2e_#{category}") || {}).keys.find { |name| name.casecmp?(label.to_s) }
+
+          return [ category, named ] if named
+        end
+
+        nil
+      end
+
+      def self.pool_categories(filter)
+        listed = Array((filter.is_a?(Hash) ? filter : {})['category']).map(&:to_s)
+
+        listed.empty? ? [ 'consumables' ] : listed
+      end
+
+      def self.words(list)
+        Array(list).map { |one| one.to_s.downcase }
+      end
+
+      # Mid-level, a formula picked in this level is staged rather than in the book yet.
+      def self.known_or_picked(char)
+        staged = char.advancing ? ((char.pf2_advancement || {})['grants'] || {}).values : []
+        books = [ char.pf2_formula_book || {} ] + staged.map { |grants| grants.is_a?(Hash) ? grants['formula'] : nil }.compact
+
+        books.flat_map { |book| book.is_a?(Hash) ? book.values : [] }.flatten.map { |one| one.to_s.downcase }
       end
 
       def self.known?(char, category, name)
