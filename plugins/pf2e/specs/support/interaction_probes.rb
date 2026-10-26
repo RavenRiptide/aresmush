@@ -29,8 +29,16 @@ module AresMUSH
         held.is_a?(Hash) ? held['value'].to_i : (held ? 1 : 0)
       end
 
+      # Who makes the probes' Strikes: someone with a weapon who can Strike at all. A restrained one
+      # cannot, and a probe would read a defence nobody rolled.
       def martial
-        able.find { |char| weapon_of(char) } || @party.first
+        free = able.reject { |char| restrained?(char) }
+        free.find { |char| weapon_of(char) } || free.first || @party.first
+      end
+
+      def restrained?(char)
+        state = state_of(char)
+        state && Pf2e.held_conditions(state).key?('Restrained')
       end
 
       def weapon_of(char)
@@ -66,8 +74,11 @@ module AresMUSH
         probe('standard cover is +2 circumstance to AC') do
           covered, holder = aim
           type(@gm, "e/cover #{covered}=standard")
-          type(striker, "e/strike #{covered}=#{weapon}")
+          struck = type(striker, "e/strike #{covered}=#{weapon}")
           type(@gm, "e/cover #{covered}=none")
+          # A Strike refused rolled nothing, and the defence read would be another's.
+          next [ false, "the Strike was refused: #{struck.status}" ] unless struck.ok?
+
           rows = rows_of(@audit.last_defence(holder.name))
           found = rows.find { |row| row['type'] == 'circumstance' && row['value'].to_i == 2 }
           [ found, "no +2 circumstance in #{rows.inspect[0, 300]}" ]
@@ -75,7 +86,9 @@ module AresMUSH
 
         probe('flanking leaves the target off-guard, -2 circumstance to AC') do
           ref, holder = aim
-          type(striker, "e/strike #{ref}=#{weapon}/flanking")
+          struck = type(striker, "e/strike #{ref}=#{weapon}/flanking")
+          next [ false, "the Strike was refused: #{struck.status}" ] unless struck.ok?
+
           found = defence_rows(holder).find { |row| row['type'] == 'circumstance' && row['value'].to_i == -2 }
           [ found, "no -2 circumstance in #{defence_rows(holder).inspect[0, 300]}" ]
         end
@@ -224,8 +237,12 @@ module AresMUSH
         if shield
           probe('Raise a Shield is +2 circumstance to AC against the next Strike') do
             ref, _holder = aim
-            type(shield, 'e/act raise a shield')
-            type(@gm, "e/as #{ref}=strike #{shield.name}")
+            raised = type(shield, 'e/act raise a shield')
+            next [ false, "Raise a Shield was refused: #{raised.status}" ] unless raised.ok?
+
+            struck = type(@gm, "e/as #{ref}=strike #{shield.name}")
+            next [ false, "the creature's Strike was refused: #{struck.status}" ] unless struck.ok?
+
             rows = rows_of(@audit.last_defence(shield.name))
             [ rows.any? { |row| row['type'] == 'circumstance' && row['value'].to_i == 2 }, "no +2 circumstance: #{rows.inspect[0, 300]}" ]
           end

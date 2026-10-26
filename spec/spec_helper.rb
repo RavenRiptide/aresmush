@@ -65,8 +65,83 @@ module AresMUSH
 end
 
 
+module AresMUSH
+  # CUSTOM CODE ADD FOR EMBLEM OF EA: specs keep their data in a Redis database of their own (15, or
+  # SPEC_REDIS_DB), never the running game's (0). Sharing it, the game's empty-scene cleanup stopped
+  # scenes a spec was playing in, and every spec wrote its characters and scenes into the game.
+  module SpecDatabase
+    DB = Integer(ENV.fetch('SPEC_REDIS_DB', '15'))
+
+    # Database#load_config, connecting to the spec database instead of the game's.
+    module Connecting
+      def load_config
+        password = Global.read_config("secrets", "database", "password")
+        host_and_port = Global.read_config("database", "url")
+        Ohm.redis = Redic.new("#{Database.build_url(host_and_port, password)}/#{SpecDatabase::DB}")
+        SpecDatabase.seed_once
+      end
+    end
+
+    # A connection a spec opens names the spec database, or is refused before it is made. This is what
+    # keeps Install.init_db's fallback - which reconnects without naming a database, flushes it, and
+    # rewrites the server's password - from ever reaching the game's.
+    module Guarded
+      def new(url = "redis://127.0.0.1:6379", *rest)
+        unless url.to_s.end_with?("/#{SpecDatabase::DB}")
+          raise SecurityError, "a spec tried to connect to #{url.to_s.sub(/:[^:@\/]*@/, ':***@')}, " \
+                               "not Redis database #{SpecDatabase::DB}"
+        end
+
+        super
+      end
+    end
+
+    def self.install!
+      raise "SPEC_REDIS_DB must not be 0, the game's own database" if DB.zero?
+
+      Redic.singleton_class.prepend(Guarded)
+      Database.prepend(Connecting)
+    end
+
+    # Once a run: confirm the connection really is on the spec database, empty it, and set it up the
+    # way a new game is set up. Anything going wrong stops the run rather than carrying on elsewhere.
+    def self.seed_once
+      return if @seeded
+
+      @seeded = true
+      held = Ohm.redis.call!('CLIENT', 'INFO').to_s
+      unless held.match?(/\bdb=#{DB}\b/)
+        abort "The spec database check failed: the connection is on #{held[/db=\d+/] || 'an unknown database'}, " \
+              "not db=#{DB}. The run is stopped."
+      end
+
+      Ohm.redis.call!('FLUSHDB')
+      require File.expand_path('../install/init_db', __dir__)
+      quietly { Install.init_db }
+    rescue StandardError, SecurityError => e
+      abort "Setting up the spec database failed, and the run is stopped: #{e.class}: #{e.message}"
+    end
+
+    # Install.init_db narrates as it goes, for someone installing a game; a spec run has no use for it.
+    def self.quietly
+      require 'stringio'
+      shown = $stdout
+      $stdout = StringIO.new
+      yield
+    ensure
+      $stdout = shown
+    end
+  end
+end
+
+
 RSpec.configure do |c|
   c.include AresMUSH::SpecHelpers
+
+  # The spec database, set up once the specs have loaded the engine (see AresMUSH::SpecDatabase).
+  c.before(:suite) do
+    AresMUSH::SpecDatabase.install! if defined?(AresMUSH::Database) && defined?(Redic)
+  end
 
   # List each example for easier test debugging
   # c.default_formatter = 'doc'

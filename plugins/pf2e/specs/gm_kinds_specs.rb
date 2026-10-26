@@ -53,7 +53,9 @@ module AresMUSH
 
         @client = GmKindClient.new
         @room = Room.create(:name => "Field#{rand(1000000)}")
-        @scene = Scene.create(:room => @room)
+        # A temporary room's, so the running game's empty-scene cleanup leaves it be (see
+        # ExplorationPlay#stage_scene!).
+        @scene = Scene.create(:room => @room, :temp_room => true)
         @room.update(:scene => @scene)
         @runner = Character.create(:name => "Runner#{rand(1000000)}", :room => @room)
         @plotmaster = Character.create(:name => "Plot#{rand(1000000)}", :room => @room)

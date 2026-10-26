@@ -51,6 +51,11 @@ module AresMUSH
 
         raise "#{@name}: the GM could not start a scene" unless @scene
 
+        # The running game shares this database, and its empty-scene cleanup (:15 and :45 past each hour)
+        # stops a scene in an ordinary room nobody is connected to. A temporary room's scene it leaves for
+        # days, so a play-through long enough to cross the hour keeps its scene.
+        @scene.update(:temp_room => true)
+
         type(@gm, "scene/title #{@name}")
         type(@gm, 'emit/set A muddy road winds toward the ruins; something has been dragging carcasses along it.')
         say ''
@@ -62,10 +67,10 @@ module AresMUSH
       def explore!(from: nil, recovering: false)
         say "## Exploring#{from ? " after encounter #{from.id}" : ''}"
 
-        type(@gm, from ? "e/explore=#{from.id}" : 'e/explore')
+        started = type(@gm, from ? "e/explore=#{from.id}" : 'e/explore')
         @encounter = PF2Encounter.scene_active_encounter(Scene[@scene.id])
 
-        raise "#{@name}: the GM could not start an exploration" unless @encounter
+        raise unstarted('an exploration', started) unless @encounter
 
         @encounters << @encounter
         @explorations << @encounter

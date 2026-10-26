@@ -158,7 +158,9 @@ module AresMUSH
 
       def stage!
         @room = Room.create(:name => "#{@name} Hall #{rand(1000000)}")
-        @scene = Scene.create(:room => @room, :title => @name)
+        # A temporary room's, so the running game's empty-scene cleanup does not stop it mid-play
+        # (see ExplorationPlay#stage_scene!).
+        @scene = Scene.create(:room => @room, :title => @name, :temp_room => true)
         @room.update(:scene => @scene)
         seat_gm!
 
@@ -324,16 +326,30 @@ module AresMUSH
         @encounter && PF2Encounter[@encounter.id]
       end
 
+      # Why a start left no encounter running in the scene: what the game said to the command, how the
+      # scene stands, and every encounter its GM still runs, wherever it is - the likeliest thing in the way.
+      def unstarted(what, outcome)
+        scene = Scene[@scene.id]
+        held = scene.encounters.to_a.map { |one| "##{one.id} #{one.is_active ? 'active' : 'ended'}" }
+        running = PF2Encounter.find(:owner_id => @gm.id).to_a.select(&:is_active)
+                              .map { |one| "##{one.id} (#{one.mode || 'fight'}) in scene #{one.scene&.id || 'none'}" }
+
+        [ "#{@name}: the GM could not start #{what}",
+          "the game said: #{outcome.status}#{outcome.said.empty? ? '' : " - #{outcome.said.map { |line| clean(line) }.join(' / ')[0, 300]}"}",
+          "scene #{scene.id} #{scene.completed ? 'stopped' : 'running'}, holding #{held.empty? ? 'no encounter' : held.join(', ')}",
+          "the GM still runs #{running.empty? ? 'no encounter' : running.join(', ')}" ].join('; ')
+      end
+
       # A fight: carrying on from the one before, or - started while the party explores - taking over
       # from the exploration, which brings everyone into it with initiative rolled.
       def fight!(wave, carries_on: nil, from_exploration: false)
         @wave = wave
         say "## Encounter: #{wave.map { |entry| adding(entry) }.join(', ')}"
 
-        type(@gm, carries_on ? "encounter =#{carries_on.id}" : 'encounter')
+        started = type(@gm, carries_on ? "encounter =#{carries_on.id}" : 'encounter')
         @encounter = PF2Encounter.scene_active_encounter(Scene[@scene.id])
 
-        raise "#{@name}: the GM could not start an encounter" unless @encounter
+        raise unstarted('an encounter', started) unless @encounter
 
         @encounters << @encounter
 
