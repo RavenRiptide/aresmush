@@ -274,6 +274,41 @@ module AresMUSH
 
         expect(Pf2e::Damage.formula(reread, strike)).to match(/\A2d8/)
       end
+
+      # Slag May's claws are cold iron by a second rule that names them by the slug the first gave them,
+      # so the granted attack has to answer to that slug and not only to its name.
+      it "should make Slag May's claws cold iron and unarmed" do
+        @char.update(:pf2_feats => { 'ancestry' => [ 'Slag May' ] })
+        claw = granted.find { |one| one['source'] == 'Slag May' }
+
+        expect(claw['materials']).to eq [ 'cold-iron' ]
+        expect(claw['traits']).to include 'unarmed'
+      end
+    end
+
+    # A rule may pick its attacks by category: Metal Strikes makes every unarmed attack cold iron and
+    # silver. Each kind of attack has to say which category it is for that to reach it.
+    describe "an attack chosen by category" do
+      it "should reach an unarmed attack the character has by nature" do
+        @char.update(:pf2_features => { 'class' => [ 'Metal Strikes' ] })
+        fist = Pf2eCombat.unarmed_descriptor('Fist', { 'damage' => '1d4', 'group' => 'Brawling' }, 'trained', reread)
+
+        expect(fist['materials']).to include('cold-iron', 'silver')
+      end
+
+      it "should reach an unarmed attack a feat granted" do
+        @char.update(:pf2_feats => { 'ancestry' => [ 'Hag Claws' ] }, :pf2_features => { 'class' => [ 'Metal Strikes' ] })
+        claw = Pf2eCombat.granted_strikes(reread).first
+
+        expect(claw['materials']).to include('cold-iron', 'silver')
+      end
+
+      it "should not reach an attack of another category" do
+        descriptor = { 'name' => 'Longsword', 'category' => 'martial', 'damage_type' => 'S' }
+
+        expect(Pf2eCombat.attack_options(descriptor)).to include 'item:category:martial'
+        expect(Pf2eCombat.attack_options(descriptor)).to_not include 'item:category:unarmed'
+      end
     end
 
     # Initiative is a Perception check that also answers to `initiative`, so a feat written against

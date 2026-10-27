@@ -406,8 +406,8 @@ module AresMUSH
     def self.granted_strikes(char)
       Pf2e::Rules.strikes(Pf2e::Effects.sources(char), Pf2e::Effects.options(char)).map do |strike|
         adjusted_strike(char, {
-          'id' => nil, 'name' => strike['name'], 'source' => strike['source'],
-          'prof' => get_unarmed_prof(char, strike['name']),
+          'id' => nil, 'name' => strike['name'], 'source' => strike['source'], 'slug' => strike['slug'],
+          'category' => strike['category'], 'prof' => get_unarmed_prof(char, strike['name']),
           'group' => strike['group'], 'base' => strike['base'],
           'traits' => strike['traits'], 'ranged' => !strike['range'].nil?,
           'unarmed' => strike['category'].to_s != 'martial',
@@ -462,14 +462,17 @@ module AresMUSH
 
     # What an attack answers to when a rule asks which attacks it means, in Foundry's spelling - the
     # vocabulary their `definition` and their predicates are written in. Reading it off the descriptor
-    # rather than the weapon is what lets a granted attack answer the same questions.
+    # rather than the weapon is what lets a granted attack answer the same questions. A granted attack
+    # answers to the slug its rule gave it, which is how a sibling rule names it: Slag May's claws are
+    # `slag-may-claw`, and that is what makes them cold iron.
     def self.attack_options(descriptor, char = nil)
       damage = Pf2e::Domains.slug(DAMAGE_WORDS[descriptor['damage_type'].to_s.downcase] ||
                                   descriptor['damage_type'])
       thrown = Pf2e.has_trait?(descriptor['traits'], 'thrown')
 
       [ "item:id:#{descriptor['id']}",
-        "item:slug:#{Pf2e::Domains.slug(descriptor['name'])}",
+        "item:slug:#{Pf2e::Domains.slug(descriptor['slug'] || descriptor['name'])}",
+        descriptor['category'] ? "item:category:#{Pf2e::Domains.slug(descriptor['category'])}" : nil,
         "item:base:#{Pf2e::Domains.slug(descriptor['base'])}",
         "item:group:#{Pf2e::Domains.slug(descriptor['group'])}",
         descriptor['ranged'] ? 'item:ranged' : 'item:melee',
@@ -545,7 +548,7 @@ module AresMUSH
       damage = twohand && weapon.wp_damage_2h ? weapon.wp_damage_2h : weapon.wp_damage
 
       adjusted_strike(char, { 'id' => weapon.id.to_s, 'name' => weapon.name,
-        'prof' => get_weapon_prof(char, weapon.name),
+        'prof' => get_weapon_prof(char, weapon.name), 'category' => info['category'],
         'group' => info['group'], 'base' => info['base'] || weapon.name,
         'traits' => weapon.traits, 'ranged' => weapon.wp_type == 'ranged',
         'unarmed' => Pf2e.has_trait?(weapon.traits, 'unarmed'),
@@ -568,7 +571,7 @@ module AresMUSH
       bomb = info['bomb'] || {}
 
       adjusted_strike(char, { 'id' => item.id.to_s, 'name' => item.name,
-        'prof' => get_weapon_prof(char, item.name),
+        'prof' => get_weapon_prof(char, item.name), 'category' => info['category'],
         'group' => 'bomb', 'base' => item.name, 'traits' => Array(info['traits']), 'ranged' => true,
         'unarmed' => false, 'bomb' => true,
         'die' => bomb['die'], 'dice' => bomb['die'] ? bomb['dice'].to_i : nil, 'flat' => bomb['die'] ? 0 : bomb['dice'].to_i,
@@ -583,7 +586,7 @@ module AresMUSH
     def self.unarmed_descriptor(name, info, prof, char = nil)
       written = info['damage'].to_s.match(/\A(\d*)(d\d+)\z/)
       descriptor = { 'id' => nil, 'name' => name, 'prof' => prof, 'group' => info['group'],
-                     'base' => name, 'traits' => info['traits'], 'ranged' => false, 'unarmed' => true,
+                     'category' => 'unarmed', 'base' => name, 'traits' => info['traits'], 'ranged' => false, 'unarmed' => true,
                      'bomb' => false, 'die' => written ? written[2] : info['damage'],
                      'dice' => written && !written[1].empty? ? written[1].to_i : nil, 'range' => 0,
                      'materials' => [], 'runes' => [],

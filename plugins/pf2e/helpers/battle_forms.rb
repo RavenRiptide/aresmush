@@ -209,7 +209,7 @@ module AresMUSH
           traits = (Array(strike['traits']) + [ 'magical' ]).uniq
 
           { 'id' => nil, 'name' => strike['label'] || slug.split('-').map(&:capitalize).join(' '),
-            'source' => effect.name, 'slug' => slug,
+            'source' => effect.name, 'slug' => slug, 'category' => strike['category'],
             'prof' => Pf2eCombat.get_unarmed_prof(char, slug),
             'group' => strike['group'], 'base' => strike['baseType'] || slug,
             'traits' => traits, 'ranged' => !strike['range'].nil?, 'range' => strike['range'].to_i,
