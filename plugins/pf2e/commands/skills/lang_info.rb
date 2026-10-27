@@ -13,8 +13,10 @@ module AresMUSH
         [ self.type ]
       end
 
+      # Every group the language config has, so a group added there - rare, for one - can be listed
+      # without a change here.
       def check_valid_type
-        types = %w(common uncommon secret)
+        types = (Global.read_config('pf2e_languages') || {}).keys
 
         return nil if types.include?(self.type)
         return t('pf2e.bad_option', :element=>'language type', :options=>types.join(", "))

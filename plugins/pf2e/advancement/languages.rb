@@ -18,7 +18,7 @@ module AresMUSH
 
           chosen = options.find { |l| l.casecmp?(language) }
 
-          return Err.new(:bad_option, 'pf2e.bad_option', 'element' => 'language', 'options' => options.sort.join(", ")) unless chosen
+          return Chargen::Languages.refusal(state, language) unless chosen
 
           slots = Array(state['to_assign'][SLOT])
 

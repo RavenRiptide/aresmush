@@ -35,15 +35,28 @@ module AresMUSH
             expect(result.grants.first['payload']['language']).to eq 'Silya'
           end
 
-          it "should refuse a rare language, which players may not select" do
-            result = Languages.learn(state, 'language' => 'Mynsandraal')
+          # The refusal used to list every selectable language, which ran to fifty names.
+          it "should refuse a rare language, and say RPP is how to learn one" do
+            result = Languages.learn(state, 'language' => 'mynsandraal')
 
-            expect(result.code).to eq :bad_option
-            expect(result.args['element']).to eq 'language'
+            expect(result.code).to eq :not_selectable
+            expect(result.key).to eq 'pf2e.language_rare_not_selectable'
+            expect(result.args['language']).to eq 'Mynsandraal'
           end
 
-          it "should refuse the druid-only secret language" do
-            expect(Languages.learn(state, 'language' => 'Wildsong').code).to eq :bad_option
+          it "should refuse the druid-only secret language, naming its group" do
+            result = Languages.learn(state, 'language' => 'Wildsong')
+
+            expect(result.code).to eq :not_selectable
+            expect(result.key).to eq 'pf2e.language_not_selectable'
+            expect(result.args['group']).to eq 'secret'
+          end
+
+          it "should say there is no such language, and point at the lists to choose from" do
+            result = Languages.learn(state, 'language' => 'Sylvan')
+
+            expect(result.code).to eq :not_a_language
+            expect(result.args['lists']).to eq '`lang/info common` or `lang/info uncommon`'
           end
 
           it "should allow an uncommon language" do

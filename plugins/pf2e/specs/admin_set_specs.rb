@@ -14,7 +14,11 @@ module AresMUSH
             'spontaneous_casters' => [ 'Bard' ],
             'focus_type_by_source' => { 'Cleric' => 'divine' }
           },
-          'pf2e_deities' => { 'Pharasma' => { 'allowed_alignments' => [ 'N' ] } }
+          'pf2e_deities' => { 'Pharasma' => { 'allowed_alignments' => [ 'N' ] } },
+          'pf2e_languages' => {
+            'common' => { 'Kamin' => 'The trade tongue.' },
+            'rare' => { 'Elder Sylhart' => 'The oldest feytongue.' }
+          }
         )
       end
 
@@ -26,7 +30,8 @@ module AresMUSH
             'features' => { 'charclass_features' => [ 'Arcane Bond' ] },
             'feats' => { 'skill' => [ 'Assurance' ] },
             'feat_choices' => { 'Assurance' => [ 'Arcana' ] },
-            'lores' => { 'Sailing Lore' => 'trained' }
+            'lores' => { 'Sailing Lore' => 'trained' },
+            'languages' => [ 'Kamin' ]
           },
           :config => config
         )
@@ -47,7 +52,8 @@ module AresMUSH
 
         it "should name every target in the help text" do
           expect(AdminSet.targets).to include('skill', 'feature', 'spellbook', 'repertoire',
-                                              'focus', 'ability', 'divine font', 'alignment', 'deity')
+                                              'focus', 'language', 'ability', 'divine font',
+                                              'alignment', 'deity')
         end
       end
 
@@ -132,6 +138,48 @@ module AresMUSH
 
         it "should need both the choice and the pick" do
           expect(plan('choice', 'Assurance').code).to eq :bad_syntax
+        end
+      end
+
+      # Rare languages are bought with RPP and secret ones learned in RP; neither can be selected,
+      # so staff granting them is the only way onto a sheet.
+      describe "a language" do
+        it "should grant a rare language through the ledger" do
+          result = plan('language', 'Add', 'Elder', 'Sylhart')
+
+          expect(result.ok?).to be true
+          expect(result.grants).to eq [ { 'kind' => 'add_language',
+                                          'payload' => { 'language' => 'Elder Sylhart' } } ]
+        end
+
+        it "should use the config's spelling of the name" do
+          result = plan('language', 'Add', 'elder', 'sylhart')
+
+          expect(result.grants.first['payload']['language']).to eq 'Elder Sylhart'
+        end
+
+        it "should refuse one the character already knows" do
+          expect(plan('language', 'Add', 'Kamin').code).to eq :already_knows
+        end
+
+        it "should refuse one the game does not have" do
+          expect(plan('language', 'Add', 'Klingon').code).to eq :bad_language
+        end
+
+        it "should revoke one it is told to delete" do
+          result = plan('language', 'Delete', 'Kamin')
+
+          expect(result.grants).to be_empty
+          expect(result.revocations).to eq [ { 'kind' => 'add_language',
+                                              'match' => { 'language' => 'Kamin' } } ]
+        end
+
+        it "should refuse to delete one the character does not know" do
+          expect(plan('language', 'Delete', 'Elder', 'Sylhart').code).to eq :not_in_list
+        end
+
+        it "should need an instruction and a language" do
+          expect(plan('language', 'Elder').code).to eq :bad_syntax
         end
       end
 

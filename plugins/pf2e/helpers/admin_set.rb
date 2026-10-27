@@ -54,6 +54,10 @@ module AresMUSH
           'syntax' => '[add|delete] <charclass> [cantrip|spell] <spell name>',
           'plan' => lambda { |words, state, target| AdminSet.plan_focus(words, state, target) }
         },
+        'language' => {
+          'syntax' => '[add|delete] <language>',
+          'plan' => lambda { |words, state, target| AdminSet.plan_language(words, state, target) }
+        },
         'ability' => {
           'syntax' => '<ability name> <ability score>',
           'plan' => lambda { |words, state, target| AdminSet.plan_ability(words, state, target) }
@@ -221,6 +225,33 @@ module AresMUSH
                                         'granted_by' => source)
         else
           ok(state, element).with_revocation('focus_spell', 'type' => focus_type, 'kind' => kind, 'spell' => spell)
+        end
+      end
+
+      # Any language the game has, whatever its group. Staff are how a rare language, bought with
+      # RPP, or a secret one, learned in RP, reaches a character, since neither can be selected.
+      def self.plan_language(words, state, target)
+        return short(target) if words.size < 2
+
+        instruction = words.first.to_s.downcase
+        name = words[1..-1].join(' ')
+
+        return bad_instruction unless INSTRUCTIONS.include?(instruction)
+
+        held = Array(state['sheet']['languages']).find { |l| l.to_s.casecmp?(name) }
+
+        if instruction == 'add'
+          groups = state['config'].read('pf2e_languages') || {}
+          language = groups.values.flat_map { |group| (group || {}).keys }.find { |l| l.to_s.casecmp?(name) }
+
+          return Err.new(:bad_language, 'pf2e.bad_value', 'item' => 'language') unless language
+          return Err.new(:already_knows, 'pf2e.already_knows_language', 'language' => language) if held
+
+          ok(state, 'Language').with_grant('add_language', 'language' => language)
+        else
+          return Err.new(:not_in_list, 'pf2e.not_in_list', 'option' => name) unless held
+
+          ok(state, 'Language').with_revocation('add_language', 'language' => held)
         end
       end
 

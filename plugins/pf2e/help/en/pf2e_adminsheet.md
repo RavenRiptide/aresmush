@@ -47,6 +47,17 @@ Staff can make some modifications to characters' sheets.
 `<skill name>`: The name of the skill to train, or a lore ending in `Lore`.
 `<proficiency level>`: `untrained`, `trained`, `expert`, `master`, `legendary`
 
+### Setting languages
+**Command**:
+`admin/set <character>/language = [add|delete] <language>`
+
+Players can spend RPP to learn a common, uncommon, or rare language. Spend the RPP with `rpp/spend` first, then add the language with this command. Spending RPP is the only way a character can learn a rare language. Secret languages cannot be bought with RPP: specific game features grant some of them, such as the druid's Wildsong, and the rest are not available to player characters. A language you add stays on the sheet through any rollback.
+
+**Key**:
+`<character>`: The character's name.
+`[add|delete]`: Choose `add` to teach the character a language; `delete` to remove one they know.
+`<language>`: The language's name. Use `lang/info <type>` to see each type's languages, where `<type>` is `common`, `uncommon`, `rare`, or `secret`.
+
 ### Changing feats
 Feats cannot be set directly. To change a character's feats, use `admin/rollback` to send them back to the level where the choice was made and let them redo it, or `admin/respec` to let them rebuild the character from scratch while keeping their XP.
 

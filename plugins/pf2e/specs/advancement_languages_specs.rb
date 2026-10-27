@@ -41,11 +41,20 @@ module AresMUSH
           expect(Languages.pick(state, 'language' => 'Silya').grants).to be_empty
         end
 
-        it "should refuse a language the game does not let players select" do
+        it "should refuse a rare language, and say RPP is how to learn one" do
           result = Languages.pick(state, 'language' => 'Mynsandraal')
 
-          expect(result.code).to eq :bad_option
-          expect(result.args['element']).to eq 'language'
+          expect(result.code).to eq :not_selectable
+          expect(result.key).to eq 'pf2e.language_rare_not_selectable'
+        end
+
+        # The refusal used to list every selectable language, which ran to fifty names.
+        it "should say there is no such language, and point at the lists to choose from" do
+          result = Languages.pick(state, 'language' => 'Sylvan')
+
+          expect(result.code).to eq :not_a_language
+          expect(result.key).to eq 'pf2e.language_not_found'
+          expect(result.args['lists']).to eq '`lang/info common` or `lang/info uncommon`'
         end
 
         it "should refuse a language the character already has" do

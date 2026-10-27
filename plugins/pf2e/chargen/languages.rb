@@ -16,9 +16,7 @@ module AresMUSH
 
           available = selectable(state)
 
-          unless available.any? { |l| l.casecmp?(language.to_s) }
-            return Err.new(:bad_option, 'pf2e.bad_option', 'element' => 'language', 'options' => available.sort.join(", "))
-          end
+          return refusal(state, language) unless available.any? { |l| l.casecmp?(language.to_s) }
 
           return Err.new(:cannot_assign, 'pf2e.cannot_assign_type', 'element' => 'language') if state['to_assign']['open languages'].nil?
 
@@ -66,6 +64,25 @@ module AresMUSH
           buckets = Array(config.read('pf2e', 'can_select_language'))
 
           buckets.flat_map { |bucket| (config.read('pf2e_languages', bucket) || {}).keys }
+        end
+
+        # Why a name is not one the player may choose: there is no such language, or it is in a
+        # group they cannot select. Chargen and a level-up both answer with this. It points at the
+        # lang/info lists rather than naming every choice, which ran to fifty languages.
+        def self.refusal(state, language)
+          config = state['config']
+          lists = Array(config.read('pf2e', 'can_select_language')).map { |group| "`lang/info #{group}`" }.join(' or ')
+
+          group, names = (config.read('pf2e_languages') || {}).find do |_group, entries|
+            (entries || {}).keys.any? { |l| l.casecmp?(language.to_s) }
+          end
+
+          return Err.new(:not_a_language, 'pf2e.language_not_found', 'language' => language, 'lists' => lists) unless group
+
+          name = names.keys.find { |l| l.casecmp?(language.to_s) }
+          key = group.to_s.casecmp?('rare') ? 'pf2e.language_rare_not_selectable' : 'pf2e.language_not_selectable'
+
+          Err.new(:not_selectable, key, 'language' => name, 'group' => group, 'lists' => lists)
         end
 
         def self.known?(state, language)
