@@ -12,8 +12,8 @@ website:
   character_gallery_subgroup: ''
   hide_searchbox: true
   left_sidebar: false
-  max_folder_size_kb: 2000
-  max_upload_size_kb: 300
+  max_folder_size_kb: 100000
+  max_upload_size_kb: 8000
   permissions:
     manage_theme: Edit web portal CSS and colors.
     manage_wiki: Create and delete restricted wiki pages.
