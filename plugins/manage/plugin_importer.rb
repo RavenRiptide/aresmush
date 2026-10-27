@@ -32,7 +32,7 @@ module AresMUSH
         existing = import_plugin
         if (existing)
           Global.logger.info "Plugin previously installed - skipping game directory."
-          Global.logger.info "If want to overwrite your configuration, you'll have to copy the game/config files manually from #{@source_dir} to your aresmush/game directory."
+          Global.logger.info "If you want to overwrite your configuration, you'll have to copy the game files manually from #{@source_dir} to your aresmush/game directory."
         else
           import_game
         end
@@ -110,6 +110,7 @@ module AresMUSH
           FileUtils.cp_r(f, dest_path)
         end
       end
+      
       
       def update_extras
         Manage.add_extra_plugin_to_config(self.plugin_name)
