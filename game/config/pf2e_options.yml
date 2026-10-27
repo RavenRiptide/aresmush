@@ -58,6 +58,32 @@ pf2e:
     # answers to `advance` as well.
     advance/font: dfont
   max_level: 20
+  # Turns on the playtest's self-service commands: selfaward/xp, selfaward/gold and selfapprove. Set
+  # false on a live game, where staff award XP and approve characters.
+  playtest: true
+  # What selfaward/gold pays, by level, in gp: GM Core's lump sum for a new character (Treasure for
+  # New Characters, pg. 61). The starting money every character already holds comes off it.
+  playtest_wealth:
+    1: 15
+    2: 30
+    3: 75
+    4: 140
+    5: 270
+    6: 450
+    7: 720
+    8: 1100
+    9: 1600
+    10: 2300
+    11: 3200
+    12: 4500
+    13: 6400
+    14: 9300
+    15: 13500
+    16: 20000
+    17: 30000
+    18: 45000
+    19: 69000
+    20: 112000
   # Hero Points, which are a scene's: what each player character starts a scene with, the most one may
   # hold, and what one costs in RPP.
   hero_points:

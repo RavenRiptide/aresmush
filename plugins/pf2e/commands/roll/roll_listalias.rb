@@ -8,7 +8,7 @@ module AresMUSH
 
       def check_approval
         return nil if (enactor.is_approved?) || (enactor.is_admin?)
-        return t('chargen.not_approved')
+        return t('pf2e.not_approved')
       end
 
       def handle

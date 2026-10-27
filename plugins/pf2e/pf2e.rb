@@ -95,7 +95,9 @@ module AresMUSH
       when "selfaward"
         case cmd.switch
         when "xp"
-          return PF2AwardXPCmd
+          return PF2SelfAwardXPCmd
+        when "gold"
+          return PF2SelfAwardGoldCmd
         end
       when "cg"
         case cmd.switch

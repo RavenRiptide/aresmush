@@ -25,6 +25,11 @@ module AresMUSH
         self.doing = words
       end
 
+      def check_approval
+        return nil if (enactor.is_approved?) || (enactor.is_admin?)
+        return t('pf2e.not_approved')
+      end
+
       def check_valid_dc
         return nil if !self.dc
         if self.dc.between?(5,50)

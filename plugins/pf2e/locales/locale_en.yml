@@ -441,6 +441,10 @@ en:
     path_perfection_needs_earlier: "Third Path to Perfection has to raise a save you already chose for Path to Perfection or Second Path to Perfection. %{option} is not one of them."
     path_perfection_needs_new: "You have already chosen %{option} for an earlier Path to Perfection. Pick a different save."
     player_added: "%{player} can now view the following section of your sheet: %{section}."
+    playtest_gold_claimed: "You claim %{amount} of starting wealth for level %{level}."
+    playtest_gold_none: "You get no additional gold, because you are level %{level}."
+    playtest_only: "That command is only available during the playtest."
+    playtest_self_only: "You can only award XP to yourself."
     prp_rewarded_ok: "You reward a %{ptype} PRP to %{ttype}: %{targets}."
 
     remaster_renamed: "%xw%{old}%xr was renamed %xw%{new}%xr in the Remaster. Look that name up instead."

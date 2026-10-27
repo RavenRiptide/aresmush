@@ -12,9 +12,7 @@ module AresMUSH
     HELP_ROOT = File.expand_path('..', __dir__)
 
     # Commands deliberately left out of player help, and why.
-    UNDOCUMENTED_ON_PURPOSE = {
-      'selfaward/xp' => 'a playtest-only self-service command; on a live game staff award XP'
-    }.freeze
+    UNDOCUMENTED_ON_PURPOSE = {}.freeze
 
     def self.dispatch_source
       @dispatch_source ||= Dir[File.join(HELP_ROOT, 'plugins', 'pf2e*', '*.rb')].map { |path| File.read(path) }.join("\n")
