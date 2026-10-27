@@ -17,7 +17,7 @@ module AresMUSH
       # Not part of a draft: a balance, a condition, a display preference, or a timestamp. Undoing
       # a pick must not take back an XP award that happened to land during the same command.
       NOT_DRAFT = %w{
-        pf2_xp pf2_money pf2_conditions pf2_is_dead pf2_last_refresh pf2_viewsheet
+        pf2_xp pf2_money pf2_conditions pf2_is_dead pf2_viewsheet
         pf2_roll_aliases pf2_known_for pf2_gear pf2_invested_list pf2_ledger_entries
       }.freeze
 
