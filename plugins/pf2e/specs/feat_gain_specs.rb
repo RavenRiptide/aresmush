@@ -134,14 +134,47 @@ module AresMUSH
         it "should not mistake the placeholder for a duplicate skill" do
           out = gain('Natural Skill', :bucket => 'ancestry')
 
-          expect(out[:result][:messages]).to_not include(
-            [ 'pf2e.adv_duplicate_skill_open', { :item => 'Natural Skill feat' } ])
+          expect(out[:result][:messages].map(&:first)).to_not include('pf2e.adv_duplicate_skill_open')
         end
 
         it "should open one unrestricted slot per pick" do
           out = gain('Natural Skill', :bucket => 'ancestry')
 
           expect(Array(out[:to_assign]['raise skill'])).to eq [ 'open', 'open' ]
+        end
+      end
+
+      # Changeling Lore grants Deception. A player who already had it was told only that "a skill"
+      # was a duplicate, and could not tell which of the feat's skills had become a free one.
+      describe "a granted skill the character already has" do
+        before(:each) do
+          Pf2eSkills.create_skill_for_char('Deception', @char)
+          Pf2eSkills.update_skill_for_char('Deception', @char, 'trained')
+        end
+
+        it "should name the skill at a level-up" do
+          out = gain('Changeling Lore', :bucket => 'ancestry')
+
+          expect(out[:result][:messages]).to include([ 'pf2e.adv_duplicate_skill_open',
+            { :item => 'Changeling Lore feat', :skills => 'Deception', :count => 1 } ])
+        end
+
+        it "should name the skill in chargen" do
+          @char.update(:advancing => false)
+
+          out = gain('Changeling Lore', :bucket => 'ancestry', :run_after_save => true)
+          expected = I18n.t('pf2e.feat_grants_duplicate_skill', :skills => 'Deception', :count => 1)
+
+          expect(out[:deferred]).to include([ nil, expected ])
+          expect(expected).to include('already trained in Deception')
+        end
+
+        it "should name several duplicates in one message" do
+          message = Pf2e.duplicate_skill_message({ :duplicates => [ 'Deception', 'Stealth' ] }, 'deity')
+
+          expect(message).to eq [ 'pf2e.adv_duplicate_skill_open',
+            { :item => 'deity', :skills => 'Deception and Stealth', :count => 2 } ]
+          expect(I18n.t(message.first, **message.last)).to include('2 skill trainings')
         end
       end
 
@@ -203,7 +236,7 @@ module AresMUSH
           out = gain('Natural Skill', :bucket => 'ancestry', :run_after_save => true)
 
           expect(out[:deferred]).to include([ nil, I18n.t('pf2e.feat_grants_free_skill') ])
-          expect(out[:deferred]).to_not include([ nil, I18n.t('pf2e.feat_grants_duplicate_skill') ])
+          expect(out[:deferred].map(&:last).join(' ')).to_not include('already trained')
         end
 
         # The feat is still the player's however the grants were applied.

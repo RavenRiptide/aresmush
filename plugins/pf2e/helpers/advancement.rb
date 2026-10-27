@@ -251,10 +251,11 @@ module AresMUSH
     # get, which PF2e turns into a free pick rather than wasting.
     def self.add_training_skills(char, skills, to_assign, advancement)
       cleaned = Array(skills).map { |s| s.to_s.strip }.reject(&:empty?)
-      return { assigned: [], free_count: 0, open_count: 0, open_lore_count: 0 } if cleaned.empty?
+      return { assigned: [], duplicates: [], free_count: 0, open_count: 0, open_lore_count: 0 } if cleaned.empty?
 
       pending = pending_skill_names(to_assign, advancement)
       assigned = []
+      duplicates = []
       free_count = 0
       open_count = 0
       open_lore_count = 0
@@ -273,6 +274,8 @@ module AresMUSH
         already_pending = pending.include?(normalized)
 
         if already_trained || already_pending
+          duplicates << skill
+
           if lore_skill?(skill)
             open_lore_count += 1
           else
@@ -295,7 +298,19 @@ module AresMUSH
       open_count.times { add_open_skill_slot(to_assign, advancement, false, true) }
       open_lore_count.times { add_open_skill_slot(to_assign, advancement, true, true) }
 
-      { assigned: assigned, free_count: free_count, open_count: open_count, open_lore_count: open_lore_count }
+      { assigned: assigned, duplicates: duplicates, free_count: free_count, open_count: open_count,
+        open_lore_count: open_lore_count }
+    end
+
+    # The message for the skills add_training_skills found already trained, or nil when there were
+    # none. `item` is what granted them - "Changeling Lore feat", "deity".
+    def self.duplicate_skill_message(result, item)
+      duplicates = Array(result[:duplicates])
+
+      return nil if duplicates.empty?
+
+      [ 'pf2e.adv_duplicate_skill_open',
+        { :item => item, :skills => Pf2emagic.join_with_and(duplicates), :count => duplicates.size } ]
     end
 
     # A feat that adds a repertoire spell of each rank the character can cast (Deep Lore, Greater

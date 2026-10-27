@@ -171,9 +171,8 @@ module AresMUSH
               messages << [ 'pf2e.adv_free_skill_open', { :item => "#{ctx[:feat]} feat" } ]
             end
 
-            if result[:open_count].to_i > 0 || result[:open_lore_count].to_i > 0
-              messages << [ 'pf2e.adv_duplicate_skill_open', { :item => "#{ctx[:feat]} feat" } ]
-            end
+            duplicate = Pf2e.duplicate_skill_message(result, "#{ctx[:feat]} feat")
+            messages << duplicate if duplicate
 
             later = later.reject { |key, _v| key == 'skill' }
             later = nil if later.empty?

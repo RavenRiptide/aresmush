@@ -1372,11 +1372,13 @@ module AresMUSH
     end
 
     # A skill a feat grants. One the character is already trained in becomes a free skill to assign
-    # instead, which is the rule PF2e states for a duplicate.
+    # instead, which is the rule PF2e states for a duplicate. The duplicates are named together in
+    # one message, so the player can tell which of the feat's skills turned into a free one.
     def self.grant_skills(ctx)
       char = ctx[:char]
+      duplicates = []
 
-      Array(ctx[:value]).flat_map do |skill|
+      messages = Array(ctx[:value]).flat_map do |skill|
         open_choice = OPEN_SKILL_VALUES.include?(skill.to_s.downcase)
         held = open_choice || Pf2eSkills.get_skill_prof(char, skill) != 'untrained'
 
@@ -1388,8 +1390,16 @@ module AresMUSH
         char.update(:pf2_to_assign => to_assign)
         char.update(:pf2_skills_locked => false)
 
-        [ [ open_choice ? 'pf2e.feat_grants_free_skill' : 'pf2e.feat_grants_duplicate_skill', {} ] ]
+        next [ [ 'pf2e.feat_grants_free_skill', {} ] ] if open_choice
+
+        duplicates << skill
+        []
       end
+
+      return messages if duplicates.empty?
+
+      messages + [ [ 'pf2e.feat_grants_duplicate_skill',
+                     { :skills => Pf2emagic.join_with_and(duplicates), :count => duplicates.size } ] ]
     end
 
     def self.grant_one_skill(char, skill)

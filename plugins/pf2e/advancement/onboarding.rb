@@ -361,7 +361,8 @@ module AresMUSH
           msgs = []
 
           msgs << [ key, args ] if result[:assigned].any?
-          msgs << [ 'pf2e.adv_duplicate_skill_open', { :item => item } ] if result[:open_count].to_i > 0 || result[:open_lore_count].to_i > 0
+          duplicate = Pf2e.duplicate_skill_message(result, item)
+          msgs << duplicate if duplicate
 
           msgs
         end
