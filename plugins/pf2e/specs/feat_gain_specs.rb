@@ -212,6 +212,25 @@ module AresMUSH
 
           expect(out[:advancement]['feats']['ancestry']).to eq [ 'Natural Skill' ]
         end
+
+        # Storm's Lash carries a named innate cantrip in its magic_stats. Staged in the draft, it
+        # was gone at approval, and the character was told they had no magical ability.
+        describe "a feat that grants an innate spell" do
+          it "should give the character the spell" do
+            gain("Storm's Lash", :bucket => 'ancestry', :run_after_save => true)
+
+            magic = Character[@char.id].magic
+
+            expect(Pf2emagic::Entries.knows_innate?(magic, 'Electric Arc')).to be true
+            expect(Pf2emagic.is_caster?(Character[@char.id])).to be true
+          end
+
+          it "should stage nothing in the draft" do
+            out = gain("Storm's Lash", :bucket => 'ancestry', :run_after_save => true)
+
+            expect(out[:advancement]['magic_stats']).to be_nil
+          end
+        end
       end
     end
   end

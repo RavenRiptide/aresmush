@@ -226,13 +226,33 @@ module AresMUSH
           updated
         end
 
+        # Chargen applies a feat's magic outright, for the reason `grants` does: staged in the
+        # draft, an innate spell is discarded at approval and the character never has it.
         def self.magic(ctx)
+          return apply_magic_now(ctx) if ctx[:chargen]
+
           options = Pf2e.stage_feat_magic_stats(ctx[:char], ctx[:feat], ctx[:details], ctx[:to_assign], ctx[:advancement])
 
           return [ [ 'pf2e.feat_grants_magic', {} ] ] if options.empty?
 
           # Already rendered text rather than locale keys.
           Pf2e.magic_option_messages(options).map { |msg| [ nil, msg ] }
+        end
+
+        # Through the path chargen already takes for the feats a class or background hands over.
+        # Deferred for the reason apply_grants_now is: update_magic writes pf2_to_assign itself.
+        def self.apply_magic_now(ctx)
+          char = ctx[:char]
+          details = ctx[:details]
+          client = ctx[:client]
+          charclass = char.pf2_base_info['charclass']
+
+          ctx[:after_save] << lambda do
+            # do_feat_magic_stats renders its own text, so it is passed through already rendered.
+            Pf2e.do_feat_magic_stats(char, details, charclass, client).map { |msg| [ nil, msg ] }
+          end
+
+          []
         end
 
         # Clauses keyed to a level the character has already reached, including the one they
