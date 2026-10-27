@@ -52,7 +52,7 @@ module AresMUSH
     end
 
     def self.web_list
-      chars_looking_for_rp.map { |c| { name: c.name, icon: Website.icon_for_char(c) , lfrp_type: c.looking_for_rp_type} }
+      chars_looking_for_rp.map { |c| { name: c.name, avatar: Website.avatar_info(c), lfrp_type: c.looking_for_rp_type} }
     end
 
     def self.char_names
@@ -62,7 +62,7 @@ module AresMUSH
     def build_web_LFRP_data(char)
       {
         name: char.name,
-        icon: Website.icon_for_char(char),
+        avatar: Website.avatar_info(char),
         lfrp_type: char.looking_for_rp_type
       }
     end
