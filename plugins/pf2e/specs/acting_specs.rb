@@ -358,7 +358,8 @@ module AresMUSH
         it "should log a Strike's result in the scene as a line its shared log keeps" do
           run(PF2EncounterStrikeCmd, 'e/strike #3=fist', @hero)
 
-          expect(Scenes).to have_received(:add_to_scene).with(anything, a_string_including('strikes Goblin Warrior #3'))
+          expect(Scenes).to have_received(:add_to_scene)
+            .with(anything, a_string_including('strikes Goblin Warrior #3'), anything, nil, nil, nil, hash_including(:system_line => 'action'))
         end
 
         # "Make a slashing or piercing Strike" is a Strike as much as "Make a Strike" is.

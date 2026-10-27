@@ -18,8 +18,12 @@ module AresMUSH
         raw_pose: pose.pose,
         can_edit: pose.can_edit?(viewer),
         can_delete: pose.restarted_scene_pose ? false : pose.can_edit?(viewer),
-        pose: Website.format_markdown_for_html(pose.pose),
-        live_update: live_update
+        # Emblem of Ea: a line the game told is marked with its prefix at the viewer's own level.
+        pose: Website.format_markdown_for_html(Pf2e::SystemPrefix.pose_text(pose, viewer)),
+        live_update: live_update,
+        # Emblem of Ea: which encounter notice a pose is, and its details (see scene_pose.rb).
+        encounter_notice: pose.encounter_notice,
+        encounter_notice_details: pose.encounter_notice_details
       }
     end
     

@@ -168,7 +168,7 @@ module AresMUSH
         message = t('pf2e.loot_given', :name => enactor.name, :item => name, :many => self.quantity, :who => found.state.label)
 
         client.emit_success message
-        enactor_room.emit_ooc message
+        Pf2e::SystemPrefix.emit(enactor_room, message, 'system', :ooc => true)
       end
 
       # The item by name, exactly or as the only one holding the words typed.

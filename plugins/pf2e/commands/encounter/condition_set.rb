@@ -107,7 +107,7 @@ module AresMUSH
         if encounter
           Pf2e::Encounters::Announce.tell(PF2Encounter[encounter.id], lines, :room => enactor_room, :story => true)
         else
-          enactor_room.emit lines
+          Pf2e::SystemPrefix.emit(enactor_room, lines, 'action')
         end
       end
 

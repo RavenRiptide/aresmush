@@ -129,6 +129,8 @@ module AresMUSH
         when "alias"
           return PF2ChangeRollAliasCmd
         end
+      when "rollprefix"
+        return PF2RollPrefixCmd
       when "boost"
         case cmd.switch
         when "set"

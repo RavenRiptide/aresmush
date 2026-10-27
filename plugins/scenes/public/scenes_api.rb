@@ -18,11 +18,14 @@ module AresMUSH
       autospace_str.gsub(/\%n/i, Demographics.name_and_nickname(enactor))
     end
     
-    def self.add_to_scene(scene, pose, character = Game.master.system_character, is_setpose = nil, is_ooc = nil, place_name = nil)
+    # Emblem of Ea: `encounter_notice`, `encounter_notice_details`, `system_line` and `system_text` added
+    # (see scene_pose.rb), set as the pose is made so the live update below carries them.
+    def self.add_to_scene(scene, pose, character = Game.master.system_character, is_setpose = nil, is_ooc = nil, place_name = nil, encounter_notice: nil, encounter_notice_details: nil, system_line: nil, system_text: nil)
       return nil if !scene.logging_enabled
       return nil if !pose
-      
-      scene_pose = ScenePose.create(pose: pose, character: character, scene: scene, is_setpose: is_setpose, is_ooc: is_ooc, place_name: place_name ? place_name : character.place_name(scene.room))
+
+      # Emblem of Ea: `encounter_notice`, `encounter_notice_details`, `system_line` and `system_text` added.
+      scene_pose = ScenePose.create(pose: pose, character: character, scene: scene, is_setpose: is_setpose, is_ooc: is_ooc, place_name: place_name ? place_name : character.place_name(scene.room), encounter_notice: encounter_notice, encounter_notice_details: encounter_notice_details, system_line: system_line, system_text: system_text)
       if (!scene_pose.is_system_pose?)
         Scenes.add_participant(scene, character, character)
       end

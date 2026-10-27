@@ -10,12 +10,15 @@ module AresMUSH
         AnsiFormatter.strip_ansi(MushFormatter.format(text.to_s)).gsub(/\r?\n/, "\n").chomp
       end
 
-      # The log's last lines, each with its kind - `start`, `end` or `line` - and its text with the game's
-      # colours, for the page's AnsiFormat. The start banner's fields are its own, to lay out as the page's.
-      def self.log(encounter, last = 30)
-        Array(encounter.messages).last(last).map do |_time, message, kind, fields|
+      # The log's last lines, each with its text in the game's colours, for the page's AnsiFormat, a line
+      # the game told marked with its prefix at the reader's level. An encounter notice - `start`, `end`,
+      # `round` or `turn` - also has its notice details, for the page to lay out as its own.
+      def self.log(encounter, viewer = nil, last = 30)
+        Array(encounter.messages).last(last).map do |_time, message, notice, notice_details, line|
+          text = line ? SystemPrefix.for(viewer, message, line) : message
+
           # The formatter ends every message with a line break, which a line of the page does not need.
-          { kind: kind || 'line', text: Website.format_output_for_html(message.to_s).chomp, fields: fields }.compact
+          { notice: notice, text: Website.format_output_for_html(text.to_s).chomp, notice_details: notice_details }.compact
         end
       end
 
@@ -81,7 +84,7 @@ module AresMUSH
                  trusted: Array(encounter.trusted),
                  history: EncounterWeb.history(encounter),
                  combatants: listed.map { |one| EncounterWeb.combatant(encounter, one, enactor, gm) },
-                 log: EncounterWeb.log(encounter) }
+                 log: EncounterWeb.log(encounter, enactor) }
 
         # The difficulty is the GM's alone, so it is not sent to anyone else.
         page[:difficulty] = EncounterWeb.plain(Difficulty.shown(encounter)).strip if gm

@@ -102,14 +102,15 @@ module AresMUSH
         run("e/end #{fight.id}")
 
         log = EncounterWeb.log(PF2Encounter[fight.id])
-        start = log.find { |one| one[:kind] == 'start' }
+        start = log.find { |one| one[:notice] == 'start' }
 
-        expect(start[:fields]).to include('organizer' => @gm.name, 'id' => fight.id, 'init_stat' => fight.init_stat)
-        expect(start[:fields]['instruction']).to start_with('Please stop all actions').and end_with('commands.')
+        expect(start[:notice_details]).to include('organizer' => @gm.name, 'id' => fight.id, 'init_stat' => fight.init_stat)
+        expect(start[:notice_details]['instruction']).to eq t('pf2e.encounter_start_join')
         expect(@logged.join).to include(PF2Encounter.page_url(fight))
-        expect(log.last[:kind]).to eq 'end'
-        expect(EncounterWeb.plain(log.last[:text]).strip).to eq t('pf2e.encounter_complete', :id => fight.id)
-        expect(log.map { |one| one[:kind] } - %w{start end}).to all(eq 'line')
+        expect(log.last[:notice]).to eq 'end'
+        expect(EncounterWeb.plain(log.last[:text])).to include(t('pf2e.encounter_complete', :id => fight.id))
+        expect(log.last[:notice_details]).to eq('id' => fight.id)
+        expect(log.map { |one| one[:notice] }.compact).to eq %w{start end}
         expect(log.map { |one| one[:text] }.grep(/\n(\e\[0m)?\z/)).to eq []
       end
 

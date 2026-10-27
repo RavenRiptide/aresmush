@@ -18,6 +18,20 @@ The roll commands on this game have been constructed to be reasonably familiar t
 
 Public rolls appear in the log and are sent to everyone in the room.
 
+## Roll prefix
+
+The game puts a prefix, such as `[PF]`, in front of the lines it writes for you, so you can tell them apart from poses. You choose how much of it you see in the game and on the web portal.
+
+`rollprefix`: Shows what setting you've chosen for roll prefixes.
+
+`rollprefix all`: Shows the prefix on every system-level line (with the exception of the start and end of an encounter, as well as encounter round and turn notifications). This includes lines indented under another (such as damage and saving throws) and encounter bookkeeping, such as who joins, cover and concealment, and when the GM undoes or redoes an action.
+
+`rollprefix actions`: Shows the prefix only on the first line of each action and public roll, such as making a Strike, casting a spell, or using an item. This is the default option.
+
+`rollprefix off`: Hides the prefix.
+
+%t **Note:** Your setting affects only what you see. Everyone else sees their chosen prefix setting.
+
 ## Bonuses for specific actions
 
 Some bonuses only apply to a particular action. For example, a Skeleton Key helps you pick a lock, but doesn't help with other Thievery checks. To claim a bonus like this, name the action after a slash.

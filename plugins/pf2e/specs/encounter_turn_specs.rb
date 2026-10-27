@@ -85,6 +85,24 @@ module AresMUSH
           end
         end
 
+        describe "framing the announcement" do
+          it "should set a new round between the header and footer lines" do
+            expect(Turn.framed('Round 2', true)).to eq '%lh%rRound 2%r%lf'
+          end
+
+          it "should set an ordinary turn between two dividers" do
+            expect(Turn.framed('Next up', false)).to eq '%ld%rNext up%r%ld'
+          end
+
+          it "should say whose turn it is and whose is next, for the encounter's page" do
+            order = [ Combatants::Combatant.new(nil, 'Aria', 1, 18.0), Combatants::Combatant.new(nil, 'Goblin', 2, 15.2) ]
+            state = move('next', :at => 1, :size => 2).state
+
+            expect(Turn.notice_details(state, order)).to eq('round' => 3, 'label' => t('pf2e.init_advances'), 'init' => 15,
+                                                    'current' => 'Goblin', 'next' => 'Aria')
+          end
+        end
+
         it "should have a locale entry for each direction's label" do
           locale = YAML.load_file(File.join(Pf2e.plugin_dir, 'locales', 'locale_en.yml'))['en']['pf2e']
           labels = Turn::DIRECTIONS.values.map { |row| row['label'].sub('pf2e.', '') }

@@ -67,7 +67,7 @@ module AresMUSH
 
         expect(@client.failures).to eq []
         expect(@heard[@room.id].join).to include("END OF ENCOUNTER #{@encounter.id}")
-        expect(@logged).to include([ @scene.id, t('pf2e.encounter_complete', :id => @encounter.id) ])
+        expect(@logged).to include([ @scene.id, a_string_including(t('pf2e.encounter_complete', :id => @encounter.id)) ])
       end
 
       it "should log setting cover in the scene as OOC" do
@@ -88,6 +88,16 @@ module AresMUSH
         expect(PF2Encounter[@encounter.id].is_active).to be false
         expect(@logged.map(&:last).join).to include(t('pf2e.encounter_ended_with_scene', :id => @encounter.id))
         expect(@heard[@room.id].join).to include(t('pf2e.encounter_ended_with_scene', :id => @encounter.id))
+        expect(PF2Encounter[@encounter.id].messages.last.last(2)).to eq [ 'end', { 'id' => @encounter.id, 'with_scene' => true } ]
+      end
+
+      # The end as the game client shows it: centered, between the lines the start banner has.
+      it "should set the end between the start banner's lines, centered" do
+        run("e/end #{@encounter.id}")
+
+        told = @heard[@room.id].join
+        expect(told).to start_with('%lh%r').and end_with('%r%lf')
+        expect(told).to match(/%r {10,}\S*\*\*\* END OF ENCOUNTER/)
       end
     end
   end

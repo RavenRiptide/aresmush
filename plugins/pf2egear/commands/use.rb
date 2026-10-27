@@ -58,14 +58,7 @@ module AresMUSH
 
         # Consumables get their own, much simpler, handling, and do not require a use entry.
         if self.category.match? "consumable"
-          message = t('pf2egear.item_use_ok', :name => enactor.name, :item => item.name)
-
-          enactor_room.emit message
-
-          scene = enactor_room.scene
-          if scene
-            Scenes.add_to_scene(scene, message)
-          end
+          Pf2e::SystemPrefix.tell_room(enactor_room, t('pf2egear.item_use_ok', :name => enactor.name, :item => item.name), 'action')
 
           consumed(item)
 
@@ -121,14 +114,7 @@ module AresMUSH
         base_msg = t('pf2egear.item_use_ok', :name => enactor.name, :item => item.name)
         use_option_msg = t('pf2egear.use_option', :use => selected_use)
 
-        message = base_msg + "%b" + use_option_msg
-
-        enactor_room.emit message
-
-        scene = enactor_room.scene
-        if scene
-          Scenes.add_to_scene(scene, message)
-        end
+        Pf2e::SystemPrefix.tell_room(enactor_room, base_msg + "%b" + use_option_msg, 'action')
 
         # Now that the item has been used, can it be used again? If not, destroy it.
 

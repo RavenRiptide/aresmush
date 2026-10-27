@@ -684,12 +684,20 @@ wiki-header-right {
     padding: 0px;
 }
 
+.log-wrap {
+    border-radius: 0px;
+    border-image: linear-gradient(to bottom right, #CBC0AD, #CBC0AD52, #CBC0AD) 1;
+    margin: 0px;
+    margin-bottom: 8px;
+}
+
 .scene-log {
     border: 1px solid #dbb0b0; /* Pale Chestnut */
     border-image: radial-gradient(ellipse farthest-corner at top left, #E1B07E 40%, transparent 100%) 1; /* Tumbleweed */
     padding: 0px;
     padding-left: 10px;
     padding-right: 10px;
+    padding-top: 10px;
 }
 
 .scene-pose-header {
@@ -733,9 +741,45 @@ wiki-header-right {
     font-style: normal;
 }
 
+.scene-set-pose {
+    margin: 0px 0px 0px 0px;
+    font-style: normal;
+    padding: 10px 10px 0px 10px;
+    border: 1px solid #74a7bb;
+    border-image: linear-gradient(to bottom right, #74a7bb, #74a7bb2e, #74a7bb) 1;
+    background: #74a7bb29;
+}
+
 .scene-system-pose p {
     margin-bottom: 0px;
     padding-top: 5px
+}
+
+.pf2-encounter-start {
+    color: #E3DCD0;
+    border: 3px solid;
+    border-image: linear-gradient(to bottom right, #CBC0AD, #CBC0AD52, #CBC0AD) 1;
+    text-align: center;
+}
+
+.pf2-encounter-turn {
+    border-left: 2px solid;
+    margin-bottom: 10px;
+}
+
+.pf2-encounter-round {
+    border-top: 1px solid;
+    border-bottom: 1px solid;
+    border-image: linear-gradient(to right, #CBC0AD, transparent) 1;
+    color: #CBC0AD;
+}
+
+.pf2-encounter-end {
+    color: #E3DCD0;
+    border: 3px solid;
+    border-image: linear-gradient(to bottom right, #CBC0AD, #CBC0AD52, #CBC0AD) 1;
+    text-align: center;
+    height: 3em;
 }
 
 .timestamp-tip {

@@ -58,7 +58,9 @@ module AresMUSH
           :round => round_text
         )
 
-        Pf2e::Encounters::Announce.tell(encounter, @message, :room => enactor_room)
+        Pf2e::Encounters::Announce.tell(encounter, Pf2e::Encounters::Turn.framed(@message, new_round),
+                                        :room => enactor_room, :notice => new_round ? 'round' : 'turn',
+                                        :notice_details => Pf2e::Encounters::Turn.notice_details(moved.state, initlist))
 
         # If the current initiative is a PC, shoot them a global notifier.
 

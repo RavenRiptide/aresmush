@@ -72,6 +72,12 @@ pf2e:
     - BT
     - WT
   roll_channel: 'Rolls'
+  # Put before the lines the game tells - a Strike, a spell, damage, a public roll - so players can tell
+  # them from a pose. Blank for none. Each player picks how much of it they see with `rollprefix`:
+  # `all`, `actions` or `off`. `system_prefix_level` is the level for a player who has not picked one,
+  # and for the logs a finished scene keeps.
+  system_prefix: '[PF]'
+  system_prefix_level: actions
   # The job category a creature submitted for approval is discussed in. Left out, the game's request
   # category; blank, no job.
   creature_approval_category: REQ

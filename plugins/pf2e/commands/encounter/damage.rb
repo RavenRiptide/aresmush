@@ -82,7 +82,7 @@ module AresMUSH
         changed.each { |line| client.emit_ooc line }
 
         # The room is told who it dropped, as a Strike tells it.
-        Pf2e::Telling.lines(dropped['lines']).each { |line| enactor_room.emit line.strip }
+        Pf2e::Telling.lines(dropped['lines']).each { |line| Pf2e::SystemPrefix.emit(enactor_room, line.strip, 'action') }
 
       end
 

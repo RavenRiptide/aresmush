@@ -13,7 +13,20 @@ module AresMUSH
     attribute :is_deleted, :type => DataType::Boolean
     attribute :restarted_scene_pose, :type => DataType::Boolean
     attribute :history, :type => DataType::Array, :default => []
-    
+
+    # Emblem of Ea: which encounter notice a pose is - `start`, `end`, `round` or `turn` - and its details
+    # (whose turn, the round, the GM), for the live scene page to lay out as the encounter's own page does
+    # rather than show its text. Written by `Scenes.add_to_scene` and sent by
+    # `Scenes.build_scene_pose_web_data`. Declared here rather than in pf2e's scene_mods.rb because this
+    # plugin loads after pf2e.
+    attribute :encounter_notice
+    attribute :encounter_notice_details, :type => DataType::Hash
+
+    # Emblem of Ea: a line the game told - `action` or `system` - and its text as told, before the prefix
+    # that marks it, so each viewer can be shown it marked at their own level (see pf2e's SystemPrefix).
+    attribute :system_line
+    attribute :system_text
+
     def move_to_history
       entries = self.history || []
       entries << "#{Time.now} #{character ? character.name : t('global.deleted_character')} -- #{pose}"

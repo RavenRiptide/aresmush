@@ -51,6 +51,8 @@ module AresMUSH
 
       return "You are the organizer" if is_organizer
 
+      return "Already in this encounter" if PF2Encounter.in_encounter?(char, encounter)
+
       active_encounter = PF2Encounter.in_active_encounter? char
 
       return "In another encounter" if active_encounter

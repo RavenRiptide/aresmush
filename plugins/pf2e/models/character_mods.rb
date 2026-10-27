@@ -6,6 +6,9 @@ module AresMUSH
     attribute :pf2_checkpoint, :default => 'start'
     attribute :pf2_reset, :type => DataType::Boolean
     attribute :advancing, :type => DataType::Boolean
+    # How much of what the game tells is marked with its prefix for this player: `all`, `actions` or
+    # `off`. Unset, the game's default (see `SystemPrefix`).
+    attribute :pf2_roll_prefix
 
     attribute :pf2_base_info, :type => DataType::Hash, :default => { 'ancestry'=>"", 'heritage'=>"", 'background'=>"", 'charclass'=>"", "specialize"=>"", 'specialize_info'=>"" }
     attribute :pf2_level, :type => DataType::Integer, :default => 1

@@ -57,6 +57,23 @@ module AresMUSH
             'label' => row['label']
           })
         end
+
+        # The turn announcement set apart from the scene around it: a new round between the header and
+        # footer lines the encounter's start banner uses, an ordinary turn between two dividers.
+        def self.framed(message, new_round)
+          top, bottom = new_round ? [ '%lh', '%lf' ] : [ '%ld', '%ld' ]
+
+          "#{top}%r#{message}%r#{bottom}"
+        end
+
+        # What the announcement says, for the encounter's page to lay out as its own. `order` is the
+        # order's combatants, as the move was made over.
+        def self.notice_details(state, order)
+          current = order[state['current']]
+
+          { 'round' => state['round'], 'label' => t(state['label']), 'init' => current.init.to_i,
+            'current' => current.label, 'next' => order[state['upcoming']].label }
+        end
       end
     end
   end

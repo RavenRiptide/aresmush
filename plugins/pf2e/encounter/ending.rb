@@ -29,8 +29,21 @@ module AresMUSH
         def self.scene_stopping(scene)
           scene.encounters.select(&:is_active).each do |encounter|
             end!(encounter)
-            Announce.tell(PF2Encounter[encounter.id], t('pf2e.encounter_ended_with_scene', :id => encounter.id))
+            tell_ended(PF2Encounter[encounter.id], t('pf2e.encounter_ended_with_scene', :id => encounter.id), :with_scene => true)
           end
+        end
+
+        # Tells everyone the encounter has ended: the game client a banner between the lines its start
+        # banner has, a page the notice's details to lay out as its own.
+        def self.tell_ended(encounter, said, room: nil, with_scene: false)
+          # As text whatever it was found by: Ohm keeps the id an object was looked up with.
+          details = { 'id' => encounter.id.to_s, 'with_scene' => with_scene || nil }.compact
+
+          Announce.tell(encounter, banner(said), :room => room, :notice => 'end', :notice_details => details)
+        end
+
+        def self.banner(said)
+          "%lh%r#{SubstitutionFormatter.center("#{Global.read_config('pf2e', 'title_color')}#{said}%xn", 78)}%r%lf"
         end
       end
     end

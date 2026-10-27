@@ -48,7 +48,11 @@ module AresMUSH
           :round => t(moved.state['label'])
         )
 
-        Pf2e::Encounters::Announce.tell(encounter, @message, :room => enactor_room)
+        # Backing up says "Initiative backs up" even across a round boundary, so it keeps the turn's
+        # dividers rather than the new round's banner.
+        Pf2e::Encounters::Announce.tell(encounter, Pf2e::Encounters::Turn.framed(@message, false),
+                                        :room => enactor_room, :notice => 'turn',
+                                        :notice_details => Pf2e::Encounters::Turn.notice_details(moved.state, initlist))
 
         # If the current initiative is a PC, shoot them a global notifier.
 

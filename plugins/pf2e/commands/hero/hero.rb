@@ -23,8 +23,8 @@ module AresMUSH
       end
 
       def tell_scene(message)
-        enactor_room.emit_ooc message
-        Scenes.add_to_scene(scene, message, Game.master.system_character, false, true)
+        SystemPrefix.emit(enactor_room, message, 'system', :ooc => true)
+        SystemPrefix.log(scene, message, 'system', :ooc => true)
       end
     end
 

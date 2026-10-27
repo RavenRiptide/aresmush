@@ -75,7 +75,7 @@ module AresMUSH
         if encounter
           Pf2e::Encounters::Announce.tell(encounter, message, :room => enactor_room, :story => true)
         else
-          enactor_room.emit message
+          SystemPrefix.emit(enactor_room, message, 'action')
         end
 
         tell_gm(encounter, out['gm'])

@@ -74,17 +74,20 @@ module AresMUSH
         )
 
         banner = PF2EncounterStart.new(encounter)
-        tell(scene, encounter, banner.render, :kind => 'start', :fields => banner.fields)
+        tell(scene, encounter, banner.render, :notice => 'start', :notice_details => banner.notice_details)
 
         # Everyone exploring comes into the fight, rolling initiative as their activity has it.
         Exploration.bring_into(encounter, PF2Encounter[exploring.id]).each { |line| tell(scene, encounter, line) } if exploring
       end
 
-      # To the room, the encounter's log and the scene's, as an OOC line.
-      def tell(scene, encounter, message, kind: nil, fields: nil)
-        enactor_room.emit message
-        PF2Encounter.send_to_encounter(encounter, message, :kind => kind, :fields => fields)
-        Scenes.add_to_scene(scene, message, Game.master.system_character, false, true)
+      # To the room, the encounter's log and the scene's, as an OOC line. Anything but its banner is
+      # bookkeeping, marked with the game's prefix for each who hears it.
+      def tell(scene, encounter, message, notice: nil, notice_details: nil)
+        line = notice ? nil : 'system'
+
+        line ? Pf2e::SystemPrefix.emit(enactor_room, message, line) : enactor_room.emit(message)
+        PF2Encounter.send_to_encounter(encounter, message, :notice => notice, :notice_details => notice_details, :line => line)
+        Pf2e::Encounters::Announce.log(scene, message, :notice => notice, :notice_details => notice_details)
       end
 
     end

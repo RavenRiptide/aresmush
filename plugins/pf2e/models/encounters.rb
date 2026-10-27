@@ -60,8 +60,15 @@ module AresMUSH
 
     ##### CLASS METHODS #####
 
+    # A character is in an encounter while it has a place for them in its order. `char.encounters` is
+    # only where to look: joining adds to it, but nothing that takes them out of the order - `+e/remove`,
+    # `+e/undo` - takes them out of it.
     def self.in_active_encounter?(char)
-      char.encounters.any? { |e| e.is_active }
+      active_encounters(char).any?
+    end
+
+    def self.in_encounter?(char, encounter)
+      encounter.is_active && Pf2e::Combatants.rows(encounter).any? { |row| row['char'].to_s == char.id.to_s }
     end
 
     def self.scene_active_encounter(scene)
@@ -74,14 +81,16 @@ module AresMUSH
     end
 
     def self.active_encounters(char)
-      char.encounters.select { |e| e.is_active }
+      char.encounters.select { |e| in_encounter?(char, e) }
     end
 
-    # The encounter's log: `[time, message]`, and for a banner its kind - `start` or `end` - and, for the
-    # start, what it says, for a page to lay out as its own.
-    def self.send_to_encounter(enc, msg, kind: nil, fields: nil)
+    # The encounter's log: `[time, message]`, then for an encounter notice - `start`, `end`, `round` or
+    # `turn` - which notice it is and its details, for a page to lay out as its own, and for a line the
+    # game told what kind it is - `action` or `system` - for a page to mark it for its reader (see
+    # `SystemPrefix`). A line the game told is kept as told, without the prefix.
+    def self.send_to_encounter(enc, msg, notice: nil, notice_details: nil, line: nil)
       message_list = enc.messages
-      message_list << ([ Time.now, msg ] + (kind ? [ kind, fields ] : []))
+      message_list << [ Time.now, msg, notice, notice_details, line ].reverse.drop_while(&:nil?).reverse
       enc.update(messages: message_list)
     end
 

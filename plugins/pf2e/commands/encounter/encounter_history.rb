@@ -27,9 +27,9 @@ module AresMUSH
         moved = encounter.scene ? HeroPoints.moved!(encounter.scene, done.state.hero_spent, undoing) : []
         message += "%r#{t(undoing ? 'pf2e.hero_returned' : 'pf2e.hero_respent', :list => moved.join(', '))}" if moved.any?
 
-        enactor_room.emit_ooc message
-        PF2Encounter.send_to_encounter(encounter, message)
-        Scenes.add_to_scene(encounter.scene, message, Game.master.system_character, false, true) if encounter.scene
+        SystemPrefix.emit(enactor_room, message, 'system', :ooc => true)
+        PF2Encounter.send_to_encounter(encounter, message, :line => 'system')
+        SystemPrefix.log(encounter.scene, message, 'system', :ooc => true)
       end
     end
 

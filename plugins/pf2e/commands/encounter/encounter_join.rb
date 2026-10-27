@@ -81,16 +81,8 @@ module AresMUSH
           :name => enactor.name
         )
 
-        # Emit to the room.
-        enactor_room.emit @message
-
-        # Log to the encounter.
-        PF2Encounter.send_to_encounter(encounter, @message)
-
-        # Log to the scene as an OOC message.
-
-        scene = encounter.scene
-        Scenes.add_to_scene(scene, @message, Game.master.system_character, false, true)
+        # To the room, the encounter's log and the scene's, as an OOC line.
+        Pf2e::Encounters::Announce.tell(encounter, @message, :room => enactor_room)
 
       end
 
@@ -101,9 +93,7 @@ module AresMUSH
 
         message = t('pf2e.explore_joined', :name => enactor.name, :encounter => encounter.id)
 
-        enactor_room.emit message
-        PF2Encounter.send_to_encounter(encounter, message)
-        Scenes.add_to_scene(encounter.scene, message, Game.master.system_character, false, true)
+        Pf2e::Encounters::Announce.tell(encounter, message, :room => enactor_room)
       end
     end
   end
