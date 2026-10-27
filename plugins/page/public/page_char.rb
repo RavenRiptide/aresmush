@@ -2,7 +2,9 @@ module AresMUSH
   class Character
     attribute :last_paged, :type => DataType::Array, :default => []
     attribute :page_do_not_disturb, :type => DataType::Boolean
-    attribute :page_autospace, :default => "%r"
+    # Emblem of Ea: Deliberate change from stock Ares, which defaults to "%r" (a blank line before every page and
+    # OOC remark). Players who want the spacing back can set it with pm/autospace.
+    attribute :page_autospace
     attribute :page_color
     attribute :page_monitor, :type => DataType::Hash, :default => {}
 

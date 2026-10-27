@@ -1,7 +1,9 @@
 module AresMUSH
   class Character
     attribute :pose_nospoof, :type => DataType::Boolean
-    attribute :pose_autospace, :default => "%r"
+    # Emblem of Ea: Deliberate change from stock Ares, which defaults to "%r" (a blank line before every pose).
+    # Players who want the spacing back can set it with the autospace command.
+    attribute :pose_autospace
     attribute :pose_quote_color
     attribute :pose_nudge, :type => DataType::Boolean, :default => true
     attribute :pose_nudge_muted, :type => DataType::Boolean
