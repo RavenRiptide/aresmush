@@ -313,7 +313,7 @@ module AresMUSH
             result = SpellSlots.entry_to_fill([ 'Magic Missile' ], nil, 'repertoire')
 
             expect(result.code).to eq :no_free
-            expect(result.args['element']).to eq 'repertoire slot'
+            expect(result.args['element']).to eq 'repertoire slots'
           end
 
           it "should refuse to replace a spell the list does not hold" do

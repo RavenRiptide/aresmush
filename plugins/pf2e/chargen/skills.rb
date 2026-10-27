@@ -41,7 +41,7 @@ module AresMUSH
             'spend' => lambda { |slots, skill, _duplicate|
               index = Array(slots).index('open')
 
-              next Err.new(:no_free, 'pf2e.no_free', 'element' => 'free') if index.nil?
+              next Err.new(:no_free, 'pf2e.no_free', 'element' => 'free skill selections') if index.nil?
 
               filled = slots.dup
               filled[index] = skill
@@ -64,7 +64,7 @@ module AresMUSH
 
               selected = slots['selected']
 
-              next Err.new(:no_free, 'pf2e.no_free', 'element' => 'choice') if selected && selected != 'open'
+              next Err.new(:no_free, 'pf2e.no_free', 'element' => 'selections for that skill choice') if selected && selected != 'open'
 
               options = Array(slots['options'])
 

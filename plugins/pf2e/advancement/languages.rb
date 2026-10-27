@@ -28,7 +28,7 @@ module AresMUSH
 
           index = slots.index { |l| l.to_s.casecmp?('open') }
 
-          return Err.new(:no_free, 'pf2e.no_free', 'element' => SLOT) if index.nil?
+          return Err.new(:no_free, 'pf2e.no_free', 'element' => Slots.describe(SLOT)) if index.nil?
 
           filled = slots.dup
           filled[index] = chosen

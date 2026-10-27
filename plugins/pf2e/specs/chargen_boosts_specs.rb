@@ -78,7 +78,7 @@ module AresMUSH
             result = Boosts.set(state, 'type' => 'charclass', 'ability' => 'Wisdom')
 
             expect(result.code).to eq :no_free
-            expect(result.args['element']).to eq 'charclass'
+            expect(result.args['element']).to eq 'class boosts'
           end
 
           it "should report the assignment to the player" do

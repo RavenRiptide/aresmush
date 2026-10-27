@@ -34,7 +34,7 @@ module AresMUSH
             'check' => lambda { |ctx|
               next nil if Array(ctx[:slot]).include?('open')
 
-              Err.new(:no_free, 'pf2e.no_free', 'element' => "#{ctx[:type]} feat")
+              Err.new(:no_free, 'pf2e.no_free', 'element' => Slots.describe([ 'feats', ctx[:type] ]))
             }
           },
           {
@@ -82,7 +82,7 @@ module AresMUSH
           slots = Array(feats[type.to_s]).dup
           index = slots.index('open')
 
-          return Err.new(:no_free, 'pf2e.no_free', 'element' => "#{type} feat") if index.nil?
+          return Err.new(:no_free, 'pf2e.no_free', 'element' => Slots.describe([ 'feats', type ])) if index.nil?
 
           slots[index] = feat
 

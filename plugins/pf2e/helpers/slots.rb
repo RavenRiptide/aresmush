@@ -41,7 +41,7 @@ module AresMUSH
             .map { |token| slots.index { |s| s.to_s.casecmp?(token.to_s) } }
             .find { |i| !i.nil? }
 
-          next Err.new(:no_free, 'pf2e.no_free', 'element' => Slots.label(delta[:path])) if index.nil?
+          next Err.new(:no_free, 'pf2e.no_free', 'element' => Slots.describe(delta[:path])) if index.nil?
 
           slots[index] = delta[:value]
           slots
@@ -67,7 +67,7 @@ module AresMUSH
             .map { |token| slots.index { |s| s.to_s.casecmp?(token.to_s) } }
             .find { |i| !i.nil? }
 
-          next Err.new(:no_free, 'pf2e.no_free', 'element' => Slots.label(delta[:path])) if index.nil?
+          next Err.new(:no_free, 'pf2e.no_free', 'element' => Slots.describe(delta[:path])) if index.nil?
 
           slots.delete_at(index)
           slots
@@ -150,6 +150,37 @@ module AresMUSH
 
       def self.label(path)
         Array(path).join("/")
+      end
+
+      # The pool keys a player reads as something else. A key missing here is named by the key.
+      NAMES = {
+        'open skills' => 'free skill selections',
+        'open languages' => 'language selections',
+        'raise skill' => 'skill increases',
+        'spells' => 'spell selections'
+      }.freeze
+
+      SPELL_LISTS = %w(spellbook repertoire signature).freeze
+
+      # What a slot is called in a message to the player. `label` stays the pool's own spelling,
+      # because `openings` counts by it.
+      def self.describe(path)
+        root, *rest = Array(path).map(&:to_s)
+
+        case root
+        when 'feats' then "#{rest.first} feat slots"
+        when 'feat choice' then "selections for #{rest.first}"
+        when *SPELL_LISTS then spell_list_name(root, rest.last)
+        else NAMES[root] || "#{root} selections"
+        end
+      end
+
+      # A spell list's path ends in its rank, or in an any-rank pool, or in the class it is for.
+      def self.spell_list_name(list, rank)
+        return "#{list} slots" unless rank && Pf2e.level_key?(rank) && !Pf2emagic.any_rank?(rank)
+        return "cantrip #{list} slots" if rank.casecmp?('cantrip') || rank.to_i.zero?
+
+        "#{Pf2emagic.ordinal_level(rank)}-rank #{list} slots"
       end
 
       # ------------------------------------------------------------------------------

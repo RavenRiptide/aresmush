@@ -28,7 +28,7 @@ module AresMUSH
 
           index = slots.index('open')
 
-          return Err.new(:no_free, 'pf2e.no_free', 'element' => 'open languages') if index.nil?
+          return Err.new(:no_free, 'pf2e.no_free', 'element' => 'language selections') if index.nil?
 
           slots[index] = canonical
           to_assign = state['to_assign'].merge('open languages' => slots)

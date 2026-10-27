@@ -62,6 +62,13 @@ module AresMUSH
             expect(result.code).to eq :no_free
           end
 
+          # The message is "You have no %{element} left to assign", and this read "No free free".
+          it "should name the free selections in a way that reads" do
+            result = Skills.train(state('open skills' => [ 'Crafting' ]), 'type' => 'free', 'skill' => 'Arcana')
+
+            expect(result.args['element']).to eq 'free skill selections'
+          end
+
           it "should take a background skill from its list of choices" do
             result = Skills.train(state('bgskill' => [ 'Religion', 'Crafting' ]), 'type' => 'background', 'skill' => 'Religion')
 

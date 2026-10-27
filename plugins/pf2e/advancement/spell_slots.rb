@@ -146,7 +146,7 @@ module AresMUSH
           open = Array(picks).find { |entry| entry.to_s.casecmp?('open') }
 
           return Ok.new(:state => { 'token' => open }) if open
-          return Err.new(:no_free, 'pf2e.no_free', 'element' => "#{type} slot") if replacing.to_s.strip.empty?
+          return Err.new(:no_free, 'pf2e.no_free', 'element' => Slots.describe(type)) if replacing.to_s.strip.empty?
 
           held = Array(picks).find { |entry| entry.to_s.downcase.include?(replacing.to_s.downcase) }
 

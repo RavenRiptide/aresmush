@@ -167,7 +167,35 @@ module AresMUSH
           result = Slots.apply({}, deltas)
 
           expect(result).to be_a Err
-          expect(result.args['element']).to eq 'open languages'
+          expect(result.args['element']).to eq 'language selections'
+        end
+      end
+
+      # The name a player reads when a slot is spent, which is not the pool's own key.
+      describe :describe do
+        it "should name a feat slot by its type" do
+          expect(Slots.describe([ 'feats', 'skill' ])).to eq 'skill feat slots'
+        end
+
+        it "should name a feat's choice by the feat" do
+          expect(Slots.describe([ 'feat choice', 'Natural Ambition' ])).to eq 'selections for Natural Ambition'
+        end
+
+        it "should name the pools whose keys are not words a player uses" do
+          expect(Slots.describe('open skills')).to eq 'free skill selections'
+          expect(Slots.describe('open languages')).to eq 'language selections'
+          expect(Slots.describe('raise skill')).to eq 'skill increases'
+        end
+
+        it "should name a spell list by its rank" do
+          expect(Slots.describe([ 'repertoire', '1' ])).to eq '1st-rank repertoire slots'
+          expect(Slots.describe([ 'repertoire', 'Sorcerer', 'cantrip' ])).to eq 'cantrip repertoire slots'
+          expect(Slots.describe([ 'spellbook', 'any' ])).to eq 'spellbook slots'
+          expect(Slots.describe('signature')).to eq 'signature slots'
+        end
+
+        it "should leave openings counted by the pool's own key" do
+          expect(Slots.openings([ Slots.open([ 'feats', 'skill' ]) ])).to eq('feats/skill' => 1)
         end
       end
 

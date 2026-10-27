@@ -36,7 +36,7 @@ module AresMUSH
             result = Feats.check_slot(state('skill' => [ 'Assurance' ]), 'skill', 'intimidating glare', skill_feat)
 
             expect(result.code).to eq :no_free
-            expect(result.args['element']).to eq 'skill feat'
+            expect(result.args['element']).to eq 'skill feat slots'
           end
 
           it "should refuse a feat of the wrong type for the slot" do

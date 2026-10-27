@@ -416,7 +416,7 @@ en:
     unknown_slot_op: "Something asked for a draft operation this game does not have (%{op}). Please put in a request to code staff."
     unknown_slot_key: "Something asked for a draft slot this game does not have (%{key}). Please put in a request to code staff."
     unknown_action: "Something asked for a character change this game does not have (%{action}). Please put in a request to code staff."
-    no_free: "No free %{element} left to assign."
+    no_free: "You have no %{element} left to assign."
     no_sheet_yet: "This command cannot be used until the character has committed their base options."
     not_approved: "You must be approved for play to use this command."
     not_advancing: "You are not currently advancing. Enter '%xwhelp advance%xn%xr' for help."

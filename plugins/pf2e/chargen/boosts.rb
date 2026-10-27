@@ -25,10 +25,10 @@ module AresMUSH
 
           slots = working[type]
           return Err.new(:no_duplicate_boosts, 'pf2e.no_duplicate_boosts') if slots.include?(ability)
-          return Err.new(:no_free, 'pf2e.no_free', 'element' => type) if slots.is_a?(String)
+          return Err.new(:no_free, 'pf2e.no_free', 'element' => boost_name(type)) if slots.is_a?(String)
 
           index = slot_for(slots, ability)
-          return Err.new(:no_free, 'pf2e.no_free', 'element' => type) if index.nil?
+          return Err.new(:no_free, 'pf2e.no_free', 'element' => boost_name(type)) if index.nil?
 
           slots[index] = ability
           working[type] = slots
@@ -78,6 +78,11 @@ module AresMUSH
           end
 
           slots.index('open')
+        end
+
+        # "free boosts", "ancestry boosts" - and "class boosts", since the type is named charclass.
+        def self.boost_name(type)
+          "#{type.to_s.casecmp?('charclass') ? 'class' : type} boosts"
         end
 
         def self.abilities_for(state)
