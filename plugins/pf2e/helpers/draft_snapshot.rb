@@ -100,9 +100,12 @@ module AresMUSH
         'abilities' => {
           'read' => lambda { |char| DraftSnapshot.ability_scores(char) },
           'write' => lambda { |char, values|
-            # A score of nil would mean the step created the row, which nothing does: the six rows
-            # are made together when the character is.
-            values.each_pair { |name, score| Ledger.apply_ability_score(char, name, score) unless score.nil? }
+            # A score of nil means the step created the row. Committing base options does that, after
+            # the info checkpoint is taken, and the stage then boosts the new rows - so the row goes
+            # back to the score it was created with, not the one the boosts left it at.
+            values.each_pair do |name, score|
+              Ledger.apply_ability_score(char, name, score.nil? ? 10 : score)
+            end
           }
         },
         'magic' => side_slice('magic'),

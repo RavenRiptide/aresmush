@@ -100,6 +100,34 @@ module AresMUSH
         expect(char.pf2_abilities_locked).to be_falsey
       end
 
+      # The six ability rows are made while base options commits, after its checkpoint is taken, so
+      # the checkpoint has no score for them. They go back to the score they were made with, not to
+      # what the ancestry and the abilities stage boosted them to.
+      it "should put the ability scores back to 10 when the base options stage is rewound" do
+        built
+
+        expect(DraftSnapshot.ability_scores(Character[@char.id]).values.uniq).to_not eq [ 10 ]
+
+        scores = DraftSnapshot.ability_scores(restore('info'))
+
+        expect(scores.size).to eq 6
+        expect(scores.values.uniq).to eq [ 10 ]
+      end
+
+      # Committing base options again finds the rows already there and builds on them, so the
+      # boosts spent before the rewind must not still be in them. The builder's ancestry moves no
+      # score at this stage, so every score is still the one the row was made with.
+      it "should start the abilities stage from fresh scores when base options is committed again" do
+        built
+        restore('info')
+
+        @builder.clear
+        @builder.run "commit info"
+
+        expect(@builder.failures).to be_empty
+        expect(DraftSnapshot.ability_scores(Character[@char.id]).values.uniq).to eq [ 10 ]
+      end
+
       # The picks the stage needed were restored with it, so there is nothing left open and the
       # stage commits straight away.
       it "should let the rewound stage be committed again" do
