@@ -3212,6 +3212,14 @@ pf2e_feats:
     traits:
       - aesa
       - niasa
+    feat_choice:
+      summary: a kind of energy to resist
+      options:
+        Acid: {}
+        Cold: {}
+        Electricity: {}
+        Fire: {}
+        Sonic: {}
     shortdesc: "You resist energy like your extraplanar predecessors. Choose one of the following energy damage types: acid, cold, electricity, fire, or sonic. You gain resistance 5 to that damage type.%r%rThe damage type typically matches an extraplanar entity associated with your bloodline. For instance, an angelkin might choose resistance to cold, while a hellspawn might choose resistance to fire."
     prereq:
       level: 5

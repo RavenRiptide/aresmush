@@ -105,6 +105,33 @@ module AresMUSH
 
         expect(Pf2e::IWR.of(reread)['resistance']).to eq []
       end
+
+      # The question is asked when the feat is taken, and the label the player picks is what the
+      # level records.
+      it "should ask which kind when the feat is taken during a level-up" do
+        found = Pf2e.get_feat_details('Nephilim Resistance')
+        to_assign = {}
+        advancement = {}
+        @char.update(:advancing => true, :pf2_base_info => { 'charclass' => 'Fighter', 'ancestry' => 'Human' })
+
+        Pf2e::Advancement::FeatGain.apply(@char, found[0], found[1],
+          :bucket => 'ancestry', :to_assign => to_assign, :advancement => advancement)
+        @char.update(:pf2_to_assign => to_assign, :pf2_advancement => advancement)
+
+        key, block = Pf2e.validate_feat_choice(reread, 'Nephilim Resistance')
+
+        expect(Pf2e.choice_options(reread, key, block)).to eq %w(Acid Cold Electricity Fire Sonic)
+
+        Pf2e.resolve_feat_choice(reread, key, block, Pf2e.match_choice_option(reread, key, block, 'fire'), nil)
+
+        expect(reread.pf2_to_assign['feat_choices']['Nephilim Resistance']).to eq [ 'Fire' ]
+      end
+
+      it "should resist the kind named by the label the level records" do
+        take('Nephilim Resistance', 'ancestry', 'Fire')
+
+        expect(Pf2e::IWR.of(reread)['resistance'].map { |one| one['type'] }).to eq [ 'fire' ]
+      end
     end
 
     # The other half: an answer that says where a value is written rather than what it is worth.
