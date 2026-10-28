@@ -66,21 +66,25 @@ module AresMUSH
 
           item_id = found.state
 
-          if Array(item_id.traits).include? 'invested'
+          if Pf2e.has_trait?(item_id.traits, 'invested')
 
+            # Invested now as well as at each day's preparations, so the sheet has it at once. One set
+            # for the day already is counted in the limit; it only wants investing.
             if item_id.invest_on_refresh
-              client.emit_failure t('pf2egear.already_set_for_investment')
-              return
+              if item_id.invested
+                client.emit_failure t('pf2egear.already_set_for_investment')
+                return
+              end
+            else
+              counter = counter + 1
+
+              if counter > max_investable
+                client.emit_failure t('pf2egear.too_many_invested', :max => max_investable)
+                return
+              end
             end
 
-            counter = counter + 1
-
-            if counter > max_investable
-              client.emit_failure t('pf2egear.too_many_invested', :max => max_investable)
-              return
-            end
-
-            item_id.update(invest_on_refresh: true)
+            item_id.update(invest_on_refresh: true, invested: true)
 
           else
             client.emit_ooc t('pf2egear.not_investible_item', :item => Pf2egear.get_item_name(item_id))

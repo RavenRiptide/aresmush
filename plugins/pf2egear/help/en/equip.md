@@ -12,7 +12,7 @@ aliases:
 
 In order for weapons, armor, shields, and magic items to be useful, they must be equipped, invested, or both, depending on what they are. Weapons, armor, and shields can be equipped; weapons, armor, and magic items with the _invested_ trait can be invested.
 
-Equipping an item takes effect immediately. Investing an item is part of your daily preparations: set your list of items to invest, and the investment takes effect the next time the GM rests you in an encounter (see `help rest`).
+Equipping and investing an item both take effect immediately. Your daily preparations invest the same items again each day, so an item stays invested until you `uninvest` it.
 
 A few things to be aware of: 
 * You cannot equip or invest an item that is in a bag. The item must be in your main inventory.
@@ -24,5 +24,7 @@ A few things to be aware of:
 `gear/equip <category> = <item number>`: Equips the specified item in `<category>`. (Alias: `equip`)
 `gear/unequip <category> = <item number>`: Unequips the specified item in `<category>`. (Alias: `unequip`)
 
-`gear/invest <category>/<item number>`: Sets a specified list of items for investment at next daily refresh. Note that some magic items are treated as weapons or armor. (Alias: `invest`) Multiple 
-`gear/uninvest <category>/<item number>`: Uninvest items. (Alias: `uninvest`)
+`gear/invest <category>/<item number>`: Invests the item numbered `<item number>` in `<category>`, now and at each day's preparations. List several items separated by spaces to invest them all at once. (Alias: `invest`)
+%t **Note:** Some magic items, such as handwraps of mighty blows, are in the weapons or armor category.
+%t **Note:** In an encounter that's already running, a newly invested item takes effect the next time the GM rests you (see `help rest`).
+`gear/uninvest <category>/<item number>`: Uninvests the item numbered `<item number>` in `<category>`, now and at each day's preparations. (Alias: `uninvest`)

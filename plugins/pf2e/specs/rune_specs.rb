@@ -95,6 +95,94 @@ module AresMUSH
       end
     end
 
+    # Handwraps of mighty blows are not attacked with. Invested, their runes are every unarmed attack's.
+    describe "handwraps of mighty blows" do
+      before(:each) do
+        @combat.update(:weapon_prof => { 'unarmed' => 'trained' },
+                       :unarmed_attacks => { 'Fist' => { 'damage' => '1d4', 'damage_type' => 'B', 'group' => 'Brawling',
+                                                         'traits' => %w(agile finesse nonlethal unarmed) } })
+      end
+
+      def handwraps(invested: true, runes: [])
+        item = weapon('Handwraps of Mighty Blows (+1 Striking)', :runes => runes)
+        item.update(:invested => invested,
+                    :runes => { 'fundamental' => { 'potency' => 1, 'power' => 1 }, 'property' => { 'list' => runes } })
+        item
+      end
+
+      def fist
+        Pf2eCombat.unarmed_descriptor('Fist', reread.combat.unarmed_attacks['Fist'], 'trained', reread)
+      end
+
+      it "should give an unarmed attack their potency and striking runes once invested" do
+        before = Pf2e::Stat.total(reread, 'attack', fist)
+        handwraps
+
+        expect(Pf2e::Stat.total(reread, 'attack', fist)).to eq before + 1
+        expect(Pf2e::Damage.formula(reread, fist)).to start_with '2d4'
+      end
+
+      it "should give nothing while they are not invested" do
+        handwraps(:invested => false)
+
+        expect(fist['rune']).to eq 0
+        expect(Pf2e::Damage.formula(reread, fist)).to start_with '1d4'
+      end
+
+      # A property rune's rules name the item it is etched on, which for handwraps is not the fist.
+      it "should give an unarmed attack their property runes" do
+        handwraps(:runes => [ 'Flaming' ])
+
+        expect(Pf2e::Damage.formula(reread, fist)).to include '1d6 fire'
+      end
+
+      it "should not offer them as a Strike of their own" do
+        handwraps
+
+        names = Pf2e::Actors.of(reread).attacks.map { |names, _attack| names.first }
+
+        expect(names).to include 'Fist'
+        expect(names.grep(/Handwraps/)).to eq []
+      end
+
+      def typed(klass, text)
+        cmd = klass.new(double.as_null_object, Command.new(text), reread)
+        cmd.parse_args
+        cmd.handle
+      end
+
+      # Their catalogue writes the trait `Invested`, the magic item catalogue `invested`. Investing takes
+      # effect at once, and the day's preparations invest it again.
+      it "should be invested at once by invest, and every day after" do
+        item = handwraps(:invested => false)
+
+        typed(Pf2egear::PF2InvestCmd, 'invest weapons/0')
+
+        expect(PF2Weapon[item.id].invested).to be true
+        expect(PF2Weapon[item.id].invest_on_refresh).to be true
+        expect(Pf2e::Damage.formula(reread, fist)).to start_with '2d4'
+      end
+
+      it "should finish investing an item already set for the day" do
+        item = handwraps(:invested => false)
+        item.update(:invest_on_refresh => true)
+
+        typed(Pf2egear::PF2InvestCmd, 'invest weapons/0')
+
+        expect(PF2Weapon[item.id].invested).to be true
+      end
+
+      it "should stop at once on uninvest" do
+        item = handwraps
+        item.update(:invest_on_refresh => true)
+
+        typed(Pf2egear::PF2UninvestCmd, 'uninvest weapons/0')
+
+        expect(PF2Weapon[item.id].invested).to be false
+        expect(PF2Weapon[item.id].invest_on_refresh).to be false
+      end
+    end
+
     describe "a rune that adds damage" do
       it "should add its die to the weapon it is on" do
         plain = damage(weapon)['formula']

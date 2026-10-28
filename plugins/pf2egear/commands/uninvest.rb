@@ -56,7 +56,7 @@ module AresMUSH
 
           next if Pf2e::CharState.emit_error!(client, found)
 
-          found.state.update(:invest_on_refresh => false)
+          found.state.update(:invest_on_refresh => false, :invested => false)
 
           uninvest_list << found.state.name
 

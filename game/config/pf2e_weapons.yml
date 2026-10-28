@@ -1014,6 +1014,7 @@ pf2e_weapons:
     bulk: 0.1
     group: Crossbow
   Handwraps of Mighty Blows (+1):
+    unarmed_runes: true
     wp_type: melee
     category: simple
     traits:
@@ -1028,7 +1029,11 @@ pf2e_weapons:
     reload: 0
     bulk: 0
     group: Brawling
+    runes:
+      fundamental:
+        potency: 1
   Handwraps of Mighty Blows (+1 Striking):
+    unarmed_runes: true
     level: 4
     price: 10000
     wp_type: melee
@@ -1048,6 +1053,7 @@ pf2e_weapons:
         potency: 1
         power: 1
   Handwraps of Mighty Blows (+2 Striking):
+    unarmed_runes: true
     level: 10
     price: 100000
     wp_type: melee
@@ -1067,6 +1073,7 @@ pf2e_weapons:
         potency: 2
         power: 1
   Handwraps of Mighty Blows (+2 Greater Striking):
+    unarmed_runes: true
     level: 12
     price: 200000
     wp_type: melee
@@ -1086,6 +1093,7 @@ pf2e_weapons:
         potency: 2
         power: 2
   Handwraps of Mighty Blows (+3 Greater Striking):
+    unarmed_runes: true
     level: 16
     price: 1000000
     wp_type: melee
@@ -1105,6 +1113,7 @@ pf2e_weapons:
         potency: 3
         power: 2
   Handwraps of Mighty Blows (+3 Major Striking):
+    unarmed_runes: true
     level: 19
     price: 4000000
     wp_type: melee

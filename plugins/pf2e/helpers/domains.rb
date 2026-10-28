@@ -140,6 +140,7 @@ module AresMUSH
         [ attack['base'] ? "#{slug(attack['base'])}-base-attack-roll" : nil,
           attack['group'] ? "#{slug(attack['group'])}-group-attack-roll" : nil,
           attack['id'] ? "#{attack['id']}-attack" : nil,
+          attack['rune_item'] ? "#{attack['rune_item']}-attack" : nil,
           attack['name'] ? "#{slug(attack['name'])}-attack" : nil,
           attack['name'] ? "#{slug(attack['name'])}-attack-roll" : nil,
           "#{kind}-attack-roll",
@@ -162,6 +163,9 @@ module AresMUSH
 
         [ attack['id'] ? "#{attack['id']}-damage" : nil,
           attack['id'] ? "#{attack['id']}-#{reach}-damage" : nil,
+          # Handwraps lend an unarmed attack their property runes, whose rules name the handwraps.
+          attack['rune_item'] ? "#{attack['rune_item']}-damage" : nil,
+          attack['rune_item'] ? "#{attack['rune_item']}-#{reach}-damage" : nil,
           attack['name'] ? "#{slug(attack['name'])}-damage" : nil,
           "#{reach}-#{action}-damage",
           "#{reach}-damage",

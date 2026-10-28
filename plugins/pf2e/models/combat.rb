@@ -517,6 +517,7 @@ module AresMUSH
     # (`finesse` lets Dexterity attack with it, `thrown` adds Strength to its damage), what it is made
     # of, the property runes it has the effects of, and how far it throws.
     def self.adjusted_strike(char, descriptor)
+      descriptor = with_unarmed_runes(char, descriptor)
       changes = Pf2e::Rules.strike_adjustments(Pf2e::Effects.sources(char),
                                                Pf2e::Effects.options(char),
                                                attack_options(descriptor, char))
@@ -525,6 +526,35 @@ module AresMUSH
 
       # And what an effect changes about the weapon itself while it lasts: Magic Weapon's runes.
       Pf2e::Alterations.attack(char, adjusted)
+    end
+
+    # Handwraps of mighty blows are not a weapon to Strike with. Invested, they give their runes to every
+    # unarmed attack, and the catalogue marks an item that does so `unarmed_runes`.
+    def self.rune_lender?(name)
+      !!(weapon_info(name) || {})['unarmed_runes']
+    end
+
+    # The invested item whose runes the character's unarmed attacks have, the better of two.
+    def self.unarmed_rune_item(char)
+      Pf2egear::Inventory.held(char, 'weapons')
+                         .select { |item| item.invested && rune_lender?(item.name) }
+                         .max_by { |item| [ Pf2egear.get_rune_value(item, 'fundamental', 'potency').to_i,
+                                            Pf2egear.get_rune_value(item, 'fundamental', 'power').to_i ] }
+    end
+
+    # An unarmed attack the character has by nature or by a feat, with those runes. A property rune's
+    # rules name the item it is etched on, so the attack answers to that item's id as `rune_item`.
+    def self.with_unarmed_runes(char, descriptor)
+      return descriptor unless descriptor['id'].nil? && descriptor['category'].to_s == 'unarmed'
+
+      lender = unarmed_rune_item(char)
+
+      return descriptor unless lender
+
+      descriptor.merge('rune' => Pf2egear.get_rune_value(lender, 'fundamental', 'potency').to_i,
+                       'striking' => Pf2egear.get_rune_value(lender, 'fundamental', 'power').to_i,
+                       'runes' => (Array(descriptor['runes']) + Pf2egear.property_runes(lender)).uniq,
+                       'rune_item' => lender.id.to_s)
     end
 
     def self.adjust_strike!(descriptor, change)

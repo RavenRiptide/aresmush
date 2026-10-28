@@ -227,7 +227,8 @@ module AresMUSH
       # Its attacks by what a player would call them: the weapons equipped, unarmed attacks, and what a
       # feat or an item granted.
       def attacks
-        weapons = Pf2egear::Inventory.held(@holder, 'weapons').select(&:equipped).map do |weapon|
+        weapons = Pf2egear::Inventory.held(@holder, 'weapons').select(&:equipped)
+                                     .reject { |weapon| Pf2eCombat.rune_lender?(weapon.name) }.map do |weapon|
           [ [ weapon.name, weapon.nickname ].compact, Pf2eCombat.attack_descriptor(@holder, weapon) ]
         end
 

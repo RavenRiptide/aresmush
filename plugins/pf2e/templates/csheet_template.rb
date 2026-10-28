@@ -142,7 +142,24 @@ module AresMUSH
         # because to a player they are the same thing: something else to hit with.
         Pf2eCombat.granted_strikes(@char).each { |strike| list << format_strike(@char, strike) }
 
-        list
+        list + rune_lenders
+      end
+
+      # Handwraps, which are not attacked with: what their runes do for the attacks above.
+      def rune_lenders
+        lending = Pf2eCombat.unarmed_rune_item(@char)
+
+        Pf2egear::Inventory.held(@char, 'weapons').select { |w| Pf2eCombat.rune_lender?(w.name) }.map do |w|
+          said = if lending && lending.id == w.id
+                   t('pf2e.unarmed_runes_apply')
+                 elsif w.invested
+                   t('pf2e.unarmed_runes_outdone')
+                 else
+                   t('pf2e.unarmed_runes_not_invested')
+                 end
+
+          "#{item_color}#{Pf2egear.get_item_name(w)}:%xn #{said}%r"
+        end
       end
 
       def format_strike(char, strike)
@@ -161,7 +178,7 @@ module AresMUSH
         list = []
 
         weapon_list.each_with_index do |w,i|
-          next if !w.equipped
+          next if !w.equipped || Pf2eCombat.rune_lender?(w.name)
 
           list << format_weapon(char, w, i)
         end
