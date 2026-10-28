@@ -1795,11 +1795,16 @@ module AresMUSH
 
     THE_TRADITIONS = %w(arcane divine occult primal)
 
+    # The traditions the character casts spells from through a class or archetype that grants
+    # spellcasting. A Ranger's or Champion's entry carries a tradition only for its focus spells and
+    # has no prepared or spontaneous category, so it is not one of them.
     def self.own_traditions(char)
       magic = char.magic
       return [] unless magic
 
-      Pf2emagic::Entries.casting(magic).each_with_object({}) { |e, h| h[e['name']] = [ e['tradition'], e['proficiency'] ] }
+      Pf2emagic::Entries.casting(magic)
+        .select { |e| [ 'prepared', 'spontaneous' ].include?(e['category'].to_s) }
+        .each_with_object({}) { |e, h| h[e['name']] = [ e['tradition'], e['proficiency'] ] }
         .values
         .map { |entry| Array(entry).first.to_s.downcase }
         .reject(&:empty?)
