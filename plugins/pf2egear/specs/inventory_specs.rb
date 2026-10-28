@@ -55,6 +55,29 @@ module AresMUSH
         end
       end
 
+      # invest took `weapons/1` while equip, listed beside it in help, took `weapons = 1`.
+      describe "what invest and uninvest read" do
+        it "should read the = that equip takes, with or without spaces" do
+          expect(Inventory.item_list('weapons=1')).to eq %w(weapons=1)
+          expect(Inventory.item_list('weapons = 1 armor= 0')).to eq %w(weapons=1 armor=0)
+        end
+
+        it "should still read the / invest used to take" do
+          expect(Inventory.item_list('weapons/1 magicitem / 2')).to eq %w(weapons=1 magicitem=2)
+        end
+
+        it "should give the category and number of an item" do
+          expect(Inventory.investable_ref('weapons=1')).to eq [ 'weapons', 1 ]
+          expect(Inventory.investable_ref('Weapons=1')).to eq [ 'Weapons', 1 ]
+        end
+
+        it "should not read a category that cannot be invested, or a number that isn't one" do
+          expect(Inventory.investable_ref('shields=1')).to be_nil
+          expect(Inventory.investable_ref('weapons=one')).to be_nil
+          expect(Inventory.investable_ref('weapons')).to be_nil
+        end
+      end
+
       describe "what a bag holds" do
         # The character keeps magic items in `magic_items` and a bag keeps them in `magicitem`.
         # bag/store guessed the character's spelling wrong and raised NoMethodError.

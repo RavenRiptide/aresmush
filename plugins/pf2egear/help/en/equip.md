@@ -24,7 +24,7 @@ A few things to be aware of:
 `gear/equip <category> = <item number>`: Equips the specified item in `<category>`. (Alias: `equip`)
 `gear/unequip <category> = <item number>`: Unequips the specified item in `<category>`. (Alias: `unequip`)
 
-`gear/invest <category>/<item number>`: Invests the item numbered `<item number>` in `<category>`, now and at each day's preparations. List several items separated by spaces to invest them all at once. (Alias: `invest`)
+`gear/invest <category> = <item number>`: Invests the item numbered `<item number>` in `<category>`, now and at each day's preparations. List several items separated by spaces to invest them all at once. (Alias: `invest`)
 %t **Note:** Some magic items, such as handwraps of mighty blows, are in the weapons or armor category.
 %t **Note:** In an encounter that's already running, a newly invested item takes effect the next time the GM rests you (see `help rest`).
-`gear/uninvest <category>/<item number>`: Uninvests the item numbered `<item number>` in `<category>`, now and at each day's preparations. (Alias: `uninvest`)
+`gear/uninvest <category> = <item number>`: Uninvests the item numbered `<item number>` in `<category>`, now and at each day's preparations. (Alias: `uninvest`)

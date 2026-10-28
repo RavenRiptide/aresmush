@@ -128,6 +128,23 @@ module AresMUSH
         !!(row(category) || {})['investable']
       end
 
+      # The items invest and uninvest were given, each one `<category>=<number>`, with spaces between
+      # them. `=` is what equip takes; `/` was invest's own and still works. Spaces either side are
+      # allowed too, so `weapons = 1` is one item rather than three.
+      def self.item_list(text)
+        text&.gsub(/\s*[=\/]\s*/, '=')&.split(' ')
+      end
+
+      # One of those items as its category and number, or nil when it is not an investable category
+      # and a number.
+      def self.investable_ref(item)
+        category, num = item.split('=', 2)
+
+        return nil unless investable?(category) && num&.to_i.to_s == num
+
+        [ category, num.to_i ]
+      end
+
       # What has to be true of the item before it can be used: worn for armour and a weapon,
       # invested for a magic item, nothing for a consumable.
       def self.config(category)
