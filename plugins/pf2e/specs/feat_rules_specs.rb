@@ -284,6 +284,13 @@ module AresMUSH
         expect(claw['materials']).to eq [ 'cold-iron' ]
         expect(claw['traits']).to include 'unarmed'
       end
+
+      it "should say on the combat sheet that Slag May's claws are cold iron" do
+        @char.update(:pf2_feats => { 'ancestry' => [ 'Slag May' ] })
+        line = Pf2e::PF2CombatSheetTemplate.new(reread, nil).unarmed_attacks.find { |one| one.include?('Slag May') }
+
+        expect(line).to include 'slashing (cold iron)'
+      end
     end
 
     # Vicious Incisors changes an attack the character already has: the Kailli jaws become a d6 with

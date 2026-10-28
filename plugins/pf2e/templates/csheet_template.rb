@@ -168,8 +168,15 @@ module AresMUSH
         bonus = Pf2e::Stat.total(char, 'attack', strike)
 
         "#{item_color}#{strike['name']}:%xn #{bonus} (#{strike['prof'][0].upcase}) " \
-          "#{damage['formula']}\n#{item_color}From:%xn #{strike['source']}" \
+          "#{damage['formula']}#{materials(strike)}\n#{item_color}From:%xn #{strike['source']}" \
           "#{traits.empty? ? '' : "\n#{item_color}Traits:%xn #{traits}"}%r"
+      end
+
+      # What an attack counts as being made of, after its damage: Slag May's claws are cold iron.
+      def materials(attack)
+        named = Array(attack['materials']).map { |one| one.to_s.tr('-', ' ') }
+
+        named.empty? ? '' : " (#{named.join(', ')})"
       end
 
       def weapons
@@ -303,7 +310,7 @@ module AresMUSH
         traits = Array(attack['traits']).map { |t| titleize_trait(t) }.join(", ")
         bonus = Pf2e::Stat.total(char, 'attack', attack)
 
-        "#{item_color}#{atk_name}:%xn #{bonus} (#{unarmed_prof[0].upcase}) #{damage['formula']}\n" \
+        "#{item_color}#{atk_name}:%xn #{bonus} (#{unarmed_prof[0].upcase}) #{damage['formula']}#{materials(attack)}\n" \
           "#{item_color}Traits:%xn #{traits}%r"
       end
 
