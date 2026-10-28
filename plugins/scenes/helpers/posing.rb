@@ -128,6 +128,10 @@ module AresMUSH
     end
     
     def self.notify_next_person(room)
+      # Emblem of Ea: No nudges while the scene has a fight on: the encounter's own turn order runs it.
+      fight = room.scene && PF2Encounter.scene_active_encounter(room.scene)
+      return if fight && !Pf2e::Exploration.exploring?(fight)
+
       notify_chars = self.next_pose_chars(room)
  
       notify_chars.each do |char|

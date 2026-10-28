@@ -16,6 +16,8 @@ Pose order tracking is a tool to help you keep track of whose turn it is.  This 
 `pose/nudge <on, off or gag>` - Controls whether the game tells you when it's your turn. Gag just disables until your next login.
 `pose/drop <name>` - Skips someone's turn if they're idle. As soon as they pose again, they'll jump in at their new spot.
 
+%t **Note:** The game sends no pose nudges while the scene has a fight running. The fight's initiative order sets the turns instead. Nudges start again when the fight ends. Explorations don't stop them.
+
 For large scenes, you can switch from regular order to 3-pose order, where someone can pose again after three other people have posed.
 
 `pose/ordertype <normal, 3-per>`

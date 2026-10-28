@@ -55,6 +55,31 @@ module AresMUSH
         expect(PF2Encounter[@encounter.id]).to be_nil
         expect(Pf2eCombatantState[state.id]).to be_nil
       end
+
+      describe "pose nudges" do
+        before(:each) { @room = Room.create(:scene => @scene) }
+        after(:each) { @room.delete }
+
+        it "should not nudge anyone while the scene has a fight on" do
+          expect(Scenes).not_to receive(:next_pose_chars)
+
+          Scenes.notify_next_person(Room[@room.id])
+        end
+
+        it "should nudge as usual while the scene is only exploring" do
+          PF2Encounter[@encounter.id].update(:mode => Exploration::MODE)
+          expect(Scenes).to receive(:next_pose_chars).and_return([])
+
+          Scenes.notify_next_person(Room[@room.id])
+        end
+
+        it "should nudge as usual once the fight is over" do
+          PF2Encounter[@encounter.id].update(:is_active => false)
+          expect(Scenes).to receive(:next_pose_chars).and_return([])
+
+          Scenes.notify_next_person(Room[@room.id])
+        end
+      end
     end
   end
 end
