@@ -424,9 +424,14 @@ module AresMUSH
         tradition = @magic.tradition || {}
         charclasses = tradition.keys - ['innate', 'innate ']
 
-        caster_types = charclasses.map { |cc| Pf2emagic.get_caster_type(cc) }
-                                 .select { |type| ['prepared', 'spontaneous'].include?(type) }
-                                 .uniq
+        caster_types = charclasses.filter_map do |cc|
+          type = Pf2emagic.get_caster_type(cc)
+
+          # A Cleric or Druid prepares from the whole tradition list, so keeps no spellbook.
+          next if type == 'prepared' && !Entries.enumerated?(cc)
+
+          type if ['prepared', 'spontaneous'].include?(type)
+        end.uniq
 
         return '' if caster_types.empty?
         return t('pf2emagic.spellbook_help') if caster_types == ['prepared']
