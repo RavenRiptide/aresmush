@@ -12,6 +12,7 @@ aliases:
 `sheet/<section>`: Views <section> of your sheet. See Valid Sections below.
 `sheet/<section> <name>`: Views <section> of <name>'s sheet. Depending on your game configuration and on the other player's setting, this may or may not be permitted.
 `csheet` and `csheet <name>`: Alias for `sheet/combat`.
+%t **Note:** The combat sheet is available once a character is approved. During chargen, use `sheet` instead.
 `sheet/why <figure>`: Shows the math behind one number on your sheet: its base value, and every bonus and penalty applied to it. `<figure>` can be `hp`, `ac`, `speed`, `perception`, a save (`fortitude`, `reflex`, or `will`), `class dc`, or a skill or lore by name.
 %t **Note:** A modifier that the stacking rules don't count is listed and marked, so you can see when a new item changes nothing because you already have a better bonus of the same type. Bonuses that only apply while you're doing something specific are listed separately, with the circumstance each one needs; see "Bonuses for specific actions" in `help roll` for how to claim them.
 `sheet/why <figure>=<name>`: Shows the same for someone else's sheet, if you're allowed to view their sheet with `sheet <name>`.

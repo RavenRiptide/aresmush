@@ -426,6 +426,7 @@ en:
     no_free: "You have no %{element} left to assign."
     no_sheet_yet: "This command cannot be used until the character has committed their base options."
     not_approved: "You must be approved for play to use this command."
+    csheet_not_approved: "The combat sheet is available once the character is approved. Until then, use %xcsheet%xn to see the character so far."
     not_advancing: "You are not currently advancing. Enter '%xwhelp advance%xn%xr' for help."
     not_enough_xp: "You do not have enough XP to advance."
     not_found: "I didn't find that name."

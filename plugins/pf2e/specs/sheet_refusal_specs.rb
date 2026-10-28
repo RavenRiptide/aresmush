@@ -95,6 +95,17 @@ module AresMUSH
 
           expect(client.failures.size).to eq 1
         end
+
+        # Chargen's feats are a draft until approval, so a combat sheet before then would leave out
+        # the attacks and bonuses they grant.
+        it "should refuse a character who is not approved yet" do
+          unapproved = caster_less
+          allow(unapproved).to receive(:is_approved?).and_return(false)
+
+          client = run(PF2DisplayCombatSheetCmd, unapproved, 'sheet/combat')
+
+          expect(client.failures).to eq [ t('pf2e.csheet_not_approved') ]
+        end
       end
 
       describe PF2StatBreakdownCmd do

@@ -18,8 +18,11 @@ module AresMUSH
           return
         end
 
+        # Not before approval: until then the feats picked in chargen are only a draft, and their
+        # attacks and bonuses are not on the sheet this reads.
         outcome = Pf2e::Sheet.viewable?(enactor, char, 'combat')
                     .and_then { Pf2e::Sheet.available(char, 'combat') }
+                    .and_then { char.is_approved? ? Ok.new(:state => 'combat') : Err.new(:csheet_not_approved) }
 
         return if Pf2e::CharState.emit_error!(client, outcome)
 
