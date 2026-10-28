@@ -88,7 +88,9 @@ module AresMUSH
           'fields' => %w{key selector diceNumber dieSize damageType category critical predicate slug
                          label override tags},
           # Dice added to a damage roll. `category` separates persistent, precision and splash damage,
-          # which are rolled and applied apart from the rest.
+          # which are rolled and applied apart from the rest. An `override` changes the weapon's own
+          # dice instead of adding any - Vicious Incisors makes the jaws a d6 - and is what the damage
+          # reader takes such a row out by.
           'contribute' => lambda { |row, source, context|
             { 'source' => source['name'],
               'slug' => row['slug'] || Domains.slug(source['name']),
@@ -96,7 +98,8 @@ module AresMUSH
               'die' => row['dieSize'],
               'damage_type' => row['damageType'],
               'category' => row['category'],
-              'critical' => row['critical'] }
+              'critical' => row['critical'],
+              'override' => row['override'] }
           }
         },
         {

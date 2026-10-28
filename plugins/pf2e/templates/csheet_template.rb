@@ -278,17 +278,16 @@ module AresMUSH
         "#{left("#{save}: #{bonus} (#{prof})", 26)}"
       end
 
+      # Read as a Strike reads it rather than as chargen stored it, so what a feat or an effect does to
+      # the attack shows: Vicious Incisors' jaws are a d6 with backstabber.
       def format_unarmed(char, atk_name, atk_info, unarmed_prof)
-        damage = atk_info['damage'] + "%b" + atk_info['damage_type']
+        attack = Pf2eCombat.unarmed_descriptor(atk_name, atk_info, unarmed_prof, char)
+        damage = Pf2eCombat.damage_breakdown(char, atk_name, nil, false, [], attack)
+        traits = Array(attack['traits']).map { |t| titleize_trait(t) }.join(", ")
+        bonus = Pf2e::Stat.total(char, 'attack', attack)
 
-        traits = atk_info['traits']
-
-        bonus = Pf2eCombat.get_unarmed_bonus(char, atk_name, atk_info, unarmed_prof)
-        p_str = unarmed_prof[0].upcase
-
-        traits = traits.map { |t| titleize_trait(t) }.join(", ")
-
-        "#{item_color}#{atk_name}:%xn #{bonus} (#{p_str}) #{damage}\n#{item_color}Traits:%xn #{traits}%r"
+        "#{item_color}#{atk_name}:%xn #{bonus} (#{unarmed_prof[0].upcase}) #{damage['formula']}\n" \
+          "#{item_color}Traits:%xn #{traits}%r"
       end
 
 

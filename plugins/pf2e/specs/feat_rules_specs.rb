@@ -286,6 +286,37 @@ module AresMUSH
       end
     end
 
+    # Vicious Incisors changes an attack the character already has: the Kailli jaws become a d6 with
+    # backstabber. The combat sheet has to show the attack as a Strike rolls it, not as chargen stored it.
+    describe "a feat that changes an unarmed attack" do
+      before(:each) do
+        @combat.update(:weapon_prof => { 'unarmed' => 'trained' },
+                       :unarmed_attacks => { 'Jaws' => { 'damage' => '1d4', 'damage_type' => 'P', 'group' => 'Brawling',
+                                                         'traits' => %w(agile finesse unarmed) } })
+        @char.update(:pf2_feats => { 'ancestry' => [ 'Vicious Incisors' ] })
+      end
+
+      def jaws_line
+        Pf2e::PF2CombatSheetTemplate.new(reread, nil).unarmed_attacks.find { |line| line.include?('Jaws') }
+      end
+
+      it "should roll the jaws at a d6" do
+        expect(Pf2eCombat.get_damage(reread, 'Jaws')).to start_with '1d6'
+      end
+
+      it "should show the jaws at a d6 with backstabber on the combat sheet" do
+        expect(jaws_line).to include('1d6')
+        expect(jaws_line).to include('Backstabber')
+      end
+
+      it "should show the jaws as stored for a character without the feat" do
+        @char.update(:pf2_feats => { 'ancestry' => [] })
+
+        expect(jaws_line).to include('1d4')
+        expect(jaws_line).to_not include('Backstabber')
+      end
+    end
+
     # A rule may pick its attacks by category: Metal Strikes makes every unarmed attack cold iron and
     # silver. Each kind of attack has to say which category it is for that to reach it.
     describe "an attack chosen by category" do
