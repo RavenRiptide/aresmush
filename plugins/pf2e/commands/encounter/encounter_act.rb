@@ -274,8 +274,19 @@ module AresMUSH
       # The caster's magic spends the spell and answers with what it was cast at, or says why it could not.
       def spend_the_spell(char)
         said = Acting.said(self.words, false)
-        charclass = said['class'] ? said['class'].split.map(&:capitalize).join(' ') : casting_class(char)
         kind = self.words.map(&:downcase).find { |word| KINDS.include?(word) }
+
+        # A spell a feat grants innately - Storm's Lash's Electric Arc - is cast as one without the
+        # player having to say so, where no class they cast from knows it. A Fighter has no class to
+        # cast from at all, and was told they had no magical ability.
+        kind ||= 'innate' if !said['class'] && innate_by_default?(char)
+
+        charclass = if said['class']
+          said['class'].split.map(&:capitalize).join(' ')
+        elsif kind != 'innate'
+          casting_class(char)
+        end
+
         level = said['rank'] ? said['rank'].to_s : nil
 
         return t('pf2emagic.not_caster') unless charclass || kind == 'innate'
@@ -292,6 +303,19 @@ module AresMUSH
         knows = entries.find { |entry| knows_spell?(char.magic, entry['name']) }
 
         (knows || entries.first)&.dig('name')
+      end
+
+      # Known innately, by the name the cast itself would resolve, and known to none of their classes.
+      def innate_by_default?(char)
+        magic = char.magic
+        return false unless magic
+
+        found = Pf2emagic.get_spell_details(self.spell)
+        name = found.is_a?(Array) ? found[0] : self.spell
+
+        return false unless Pf2emagic::Entries.knows_innate?(magic, name)
+
+        Pf2emagic::Entries.casting(magic).none? { |entry| knows_spell?(magic, entry['name']) }
       end
 
       def knows_spell?(magic, source)

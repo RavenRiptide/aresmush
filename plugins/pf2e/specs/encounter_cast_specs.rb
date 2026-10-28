@@ -166,6 +166,46 @@ module AresMUSH
         expect(Array(standing.magic.spells_today['Wizard']['2'])).to eq []
       end
 
+      # Storm's Lash grants Electric Arc innately. A Fighter has no class to cast from, so the command
+      # found none and told them they had no magical ability unless they typed /innate.
+      describe "a spell a feat grants innately" do
+        def grant_electric_arc
+          @magic.update(:innate_spells => [ { 'name' => 'Electric Arc', 'level' => 'cantrip',
+                                              'tradition' => 'primal', 'cast_stat' => 'Charisma' } ])
+        end
+
+        it "should cast it as innate for a character with no casting class" do
+          @magic.update(:tradition => { 'innate' => [ 'innate', 'trained' ] }, :spell_abil => {},
+                        :spells_per_day => {}, :repertoire => {})
+          @hero.update(:pf2_base_info => { 'charclass' => 'Fighter' })
+          grant_electric_arc
+
+          cast("e/cast Electric Arc=#{@hero.name}")
+
+          expect(@client.failures).to eq []
+        end
+
+        # Before, a caster fell back to their own class, which does not know it.
+        it "should cast it as innate when none of their classes knows it" do
+          grant_electric_arc
+          rested
+
+          cast("e/cast Electric Arc=#{@hero.name}")
+
+          expect(@client.failures).to eq []
+          expect(slots_left).to eq 3
+        end
+
+        it "should still cast from a class that knows the spell" do
+          grant_electric_arc
+
+          ordered = PF2EncounterCastCmd.new(@client, Command.new('e/cast Charm'), Character[@hero.id])
+          ordered.parse_args
+
+          expect(ordered.innate_by_default?(Character[@hero.id])).to be false
+        end
+      end
+
       it "should say which class casts it, so the lookup cannot quietly answer nothing" do
         expect(PF2EncounterCastCmd.new(@client, Command.new('e/cast Charm'), Character[@hero.id])
                  .casting_class(Character[@hero.id])).to eq 'Sorcerer'
