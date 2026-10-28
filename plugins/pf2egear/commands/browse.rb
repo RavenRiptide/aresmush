@@ -32,7 +32,9 @@ module AresMUSH
 
         template = Pf2eBrowseGearTemplate.new(enactor, self.category, available_items.sort.to_h)
 
-        client.emit template.render
+        # Every row asks whether the character is proficient, which reads their effects and feats.
+        # Holding the sheet reads them once for the list rather than once per item.
+        client.emit Pf2e::SheetReads.holding(enactor) { template.render }
 
       end
 

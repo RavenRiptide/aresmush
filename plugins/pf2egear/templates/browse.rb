@@ -36,7 +36,7 @@ module AresMUSH
       end
 
       def format_item(char, category, name, bulk, price)
-        if category == ("weapons" || "armor")
+        if %w(weapons armor).include?(category)
           prof = Pf2e.is_proficient?(char, category, name) ? "" : "%xh%xx"
         else
           prof = ""
