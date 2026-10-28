@@ -14,7 +14,8 @@ module AresMUSH
       case cmd.root
       when "page"
         case cmd.switch
-        when "autospace"
+        # Emblem of Ea: autospace/after added.
+        when "autospace", "autospace/after"
           return PageAutospaceCmd
         when "color"
           return PageColorCmd

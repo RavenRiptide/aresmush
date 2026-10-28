@@ -4,6 +4,8 @@ module AresMUSH
     # Emblem of Ea: Deliberate change from stock Ares, which defaults to "%r" (a blank line before every pose).
     # Players who want the spacing back can set it with the autospace command.
     attribute :pose_autospace
+    # Emblem of Ea: text shown after every pose, set with autospace/after.
+    attribute :pose_autospace_after
     attribute :pose_quote_color
     attribute :pose_nudge, :type => DataType::Boolean, :default => true
     attribute :pose_nudge_muted, :type => DataType::Boolean

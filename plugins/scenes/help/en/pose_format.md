@@ -18,6 +18,10 @@ AresMUSH provides a few commands to help make poses and emits more readable.
 The autospace command automatically inserts a blank line or other characters between poses, to help you tell where one ends and the next begins.  This is particularly helpful when there are multi-paragraph poses.  Autospace can contain formatting codes and `%n` to include the poser's name.
 
 `autospace <text>` - Sets your autospace text.  Leave blank to clear it.
+`autospace/after <text>`: Sets the text you see after every pose, such as a closing border. Type `autospace/after` with no text to clear it.
+%t **Examples**:
+%t `autospace %xh------- %n -------%xn%r`
+%t `autospace/after %r%xh------------------------%xn`
   
 > Note: This applies only to poses.  There is another command (see [Pages](/help/page)) that lets you format a similar autospace before pages and OOC remarks.
 

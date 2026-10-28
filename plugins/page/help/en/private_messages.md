@@ -32,6 +32,7 @@ When you PM someone who's offline, idle, AFK, in 'do not disturb' (DND) mode, or
 ## PM Format
 
 `pm/autospace <text before messages>` - Format the text that appears before each PM (using a blank line or other marker).
+`pm/autospace/after <text>`: Sets the text you see after every PM and OOC pose. Enter `pm/autospace/after` with no text to clear it.
 `pm/color <ansi code>` - Customize the color of the PM marker.
 
 ## Muting PMs

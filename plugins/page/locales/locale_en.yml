@@ -4,8 +4,9 @@ en:
         target_not_found: "%{name} is not someone you can PM."
         recipient_indicator: "%xh%xx(to %{recipients})%xn "
         page_indicator: "%{color}%{start_marker}PM%{end_marker}%xn"
-        to_sender: "%{autospace}%{pm} %{recipients}%{message}"
-        to_recipient: "%{autospace}%{pm} %{recipients}%{message}"
+        # Emblem of Ea: %{autospace_after} added to to_sender and to_recipient.
+        to_sender: "%{autospace}%{pm} %{recipients}%{message}%{autospace_after}"
+        to_recipient: "%{autospace}%{pm} %{recipients}%{message}%{autospace_after}"
         recipient_not_online: "%{name} is not online."
         invalid_recipient: "%{name} is not someone you can PM."
         recipient_is_afk: "%{name} is AFK and may not respond right away. %{message}"
@@ -18,6 +19,9 @@ en:
 
         autospace_set: "PMs will now look like this:%xn%RA message.%r%{option}%% (to You): Someone waves."
         autospace_cleared: "You will no longer see anything between poses."
+        # Emblem of Ea: autospace_after_set and autospace_after_cleared added.
+        autospace_after_set: "PMs will now look like this:%xn%RA message.%{option}"
+        autospace_after_cleared: "You will no longer see anything after PMs."
         color_set: "PMs will now appear with this marker: %{option}%%%xn"
         
         ignore_added: "%{name} has been added to your PM ignore list."

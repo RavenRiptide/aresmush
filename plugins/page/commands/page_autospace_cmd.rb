@@ -2,16 +2,28 @@ module AresMUSH
   module Page
     class PageAutospaceCmd
       include CommandHandler
-      
-      attr_accessor :option
-      
+
+      # Emblem of Ea: after added, for pm/autospace/after.
+      attr_accessor :option, :after
+
       def parse_args
         self.option = trim_arg(cmd.args)
+        self.after = cmd.switch_is?("autospace/after")
       end
 
       def handle
-        
-        if (!self.option)
+
+        # Emblem of Ea: pm/autospace/after sets page_autospace_after, with its own messages.
+        if (self.after)
+          if (!self.option)
+            enactor.update(page_autospace_after: nil)
+            message = t('page.autospace_after_cleared')
+          else
+            enactor.update(page_autospace_after: self.option)
+            formatted = Scenes.format_autospace(enactor, self.option)
+            message = t('page.autospace_after_set', :option => formatted)
+          end
+        elsif (!self.option)
           enactor.update(page_autospace: nil)
           message = t('page.autospace_cleared')
         else
@@ -19,7 +31,7 @@ module AresMUSH
           formatted = Scenes.format_autospace(enactor, self.option)
           message = t('page.autospace_set', :option => formatted)
         end
-        
+
         client.emit_success message
         AresCentral.warn_if_setting_linked_preference(client, enactor)
       end

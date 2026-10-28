@@ -57,8 +57,10 @@ module AresMUSH
       if (client)
         client.emit t('page.to_sender', 
           :pm => Page.format_page_indicator(enactor),
-          :autospace => Scenes.format_autospace(enactor, enactor.page_autospace), 
-          :recipients => recipient_names, 
+          :autospace => Scenes.format_autospace(enactor, enactor.page_autospace),
+          # Emblem of Ea: autospace_after added.
+          :autospace_after => Scenes.format_autospace(enactor, enactor.page_autospace_after),
+          :recipients => recipient_names,
           :message => message)
       end
       Page.mark_thread_read(thread, enactor)
@@ -69,8 +71,10 @@ module AresMUSH
         if (recipient_client)
           recipient_client.emit t('page.to_recipient', 
             :pm => Page.format_page_indicator(recipient),
-            :autospace => Scenes.format_autospace(enactor, recipient.page_autospace), 
-            :recipients => recipient_names, 
+            :autospace => Scenes.format_autospace(enactor, recipient.page_autospace),
+            # Emblem of Ea: autospace_after added.
+            :autospace_after => Scenes.format_autospace(enactor, recipient.page_autospace_after),
+            :recipients => recipient_names,
             :message => message)
           Page.mark_thread_read(thread, recipient)
         end

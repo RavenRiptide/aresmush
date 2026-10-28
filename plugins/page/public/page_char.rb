@@ -5,6 +5,8 @@ module AresMUSH
     # Emblem of Ea: Deliberate change from stock Ares, which defaults to "%r" (a blank line before every page and
     # OOC remark). Players who want the spacing back can set it with pm/autospace.
     attribute :page_autospace
+    # Emblem of Ea: text shown after every page and OOC remark, set with pm/autospace/after.
+    attribute :page_autospace_after
     attribute :page_color
     attribute :page_monitor, :type => DataType::Hash, :default => {}
 

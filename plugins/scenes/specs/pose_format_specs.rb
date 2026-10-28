@@ -15,6 +15,9 @@ module AresMUSH
           allow(@char).to receive(:pose_quote_color) { nil }
           allow(@char).to receive(:pose_nospoof) { nil }
           allow(@char).to receive(:pose_autospace) { "" }
+          # Emblem of Ea: pose_autospace_after and page_autospace_after stubs added.
+          allow(@char).to receive(:pose_autospace_after) { nil }
+          allow(@char).to receive(:page_autospace_after) { nil }
           allow(Scenes).to receive(:format_autospace) do |enactor, format|
             format
           end
@@ -44,6 +47,26 @@ module AresMUSH
           expect(Scenes.custom_format("Test", @room, @char, @enactor, false, true)).to eq "-%R-Test"
         end
         
+        # Emblem of Ea: autospace after specs.
+        it "should include autospace after if set" do
+          allow(@char).to receive(:pose_autospace_after) { "%R" }
+          expect(Scenes).to receive(:format_autospace).with(@enactor, "%R") { "-%R-" }
+          expect(Scenes.custom_format("Test", @room, @char, @enactor)).to eq "Test-%R-"
+        end
+
+        it "should include autospace before and after if both set" do
+          allow(@char).to receive(:pose_autospace) { "B" }
+          allow(@char).to receive(:pose_autospace_after) { "A" }
+          expect(Scenes.custom_format("Test", @room, @char, @enactor)).to eq "BTestA"
+        end
+
+        it "should use page autospace after for an OOC remark" do
+          allow(@char).to receive(:page_autospace) { "" }
+          allow(@char).to receive(:page_autospace_after) { "%R" }
+          expect(Scenes).to receive(:format_autospace).with(@enactor, "%R") { "-%R-" }
+          expect(Scenes.custom_format("Test", @room, @char, @enactor, false, true)).to eq "Test-%R-"
+        end
+
         it "should include nospoof if set and if an emit" do
           allow(@char).to receive(:pose_nospoof) { true }
           expect(Scenes.custom_format("Test", @room, @char, @enactor, true)).to eq "%xc%% scenes.emit_nospoof_from%xn%RTest"

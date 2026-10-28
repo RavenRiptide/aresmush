@@ -104,6 +104,9 @@ en:
         emit_nospoof_from: "Emit from %{name}:"
         autospace_set: "Poses will now look like this:%xn%RA pose.%r%{option}Another pose."
         autospace_cleared: "You will no longer see anything between poses."
+        # Emblem of Ea: autospace_after_set and autospace_after_cleared added.
+        autospace_after_set: "Poses will now look like this:%xn%RA pose.%{option}"
+        autospace_after_cleared: "You will no longer see anything after poses."
 
         quote_color_set: "You set your pose quotation color to %xn %{option}this%xn."
         quote_color_cleared: "Quotation color cleared."

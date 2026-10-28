@@ -255,7 +255,9 @@ module AresMUSH
       formatted_pose = Scenes.format_quote_color(formatted_pose, char, is_ooc)
             
       autospace = Scenes.format_autospace(enactor, is_ooc ? char.page_autospace : char.pose_autospace)
-      "#{autospace}#{nospoof}#{formatted_pose}"
+      # Emblem of Ea: autospace_after added, shown after the pose.
+      autospace_after = Scenes.format_autospace(enactor, is_ooc ? char.page_autospace_after : char.pose_autospace_after)
+      "#{autospace}#{nospoof}#{formatted_pose}#{autospace_after}"
     end  
     
     def self.format_last_posed(time)
