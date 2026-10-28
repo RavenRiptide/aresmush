@@ -32,7 +32,7 @@ en:
     cg_font_note_start: "%xcNote:%xn You'll choose your divine font later in chargen."
     cg_prepared_list_note: "%xcNote:%xn You prepare spells from the entire %xc%{tradition}%xn spell list, so you have no spells to learn in chargen."
     cg_prepared_list_note_plain: "%xcNote:%xn You prepare spells from your tradition's entire spell list, so you have no spells to learn in chargen."
-    cg_prepare_after_approval_note: "%xcNote:%xn You'll be able to prepare spells with the %xcrest%xn command once your character is approved."
+    cg_prepare_after_approval_note: "%xcNote:%xn You'll be able to prepare spells once your character is approved."
     cg_no_spells_note: "%xcNote:%xn Your class doesn't have spells to learn, but your feat choices later might give you spells or spell options."
     cg_magic_note: "%xcNote:%xn Use the %xcmagic%xn command to see your current magic stats."
     cg_repertoire_note: "Use the %xcrepertoire%xn command to see your current repertoire."
