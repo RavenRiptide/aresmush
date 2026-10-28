@@ -19,9 +19,6 @@ The autospace command automatically inserts a blank line or other characters bet
 
 `autospace <text>` - Sets your autospace text.  Leave blank to clear it.
 `autospace/after <text>`: Sets the text you see after every pose, such as a closing border. Type `autospace/after` with no text to clear it.
-%t **Examples**:
-%t `autospace %xh------- %n -------%xn%r`
-%t `autospace/after %r%xh------------------------%xn`
   
 > Note: This applies only to poses.  There is another command (see [Pages](/help/page)) that lets you format a similar autospace before pages and OOC remarks.
 
