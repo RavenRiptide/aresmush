@@ -29,4 +29,4 @@ After approval, you can spend RPP to learn a common, uncommon, or rare language.
 
 `lang/set <lang>`: Chooses an extra language.
 `lang/unset <lang>`: Deletes a language from your sheet. You cannot delete languages granted by your ancestry, background, and character class selections.
-`lang/info <input>`: Shows one of the language lists. <input> can be `common`, `uncommon`, `rare`, or `secret`.
+`lang/info <input>`: Shows one of the language lists. `<input>` can be `common`, `uncommon`, `rare`, or `secret`.

@@ -18,11 +18,10 @@ In this step, you will choose your free skills. Your choice of ancestry, heritag
 ## Skill commands
 `skills`: Displays the base skills. `skills <input>` searches them for your input. Lore skills are listed by group with `skills/lore`.
 `skills/lore`: Lists the lore groups. `skills/lore <group>` lists the lores in that group. For example, `skills/lore deity` lists every Deity Lore. A long group such as `city` is split into pages; `skills/lore2 city` shows page 2.
-`cg/skill <input>=<skill>` and `cg/unskill <input>=<skill>` are the same two commands under `cg`,
-the way every advancement pick is a switch of `advance`. Both spellings work.
-
-`skill/set <input>=<skill>`: Sets a skill. `<input>` can be `free`, `bgchoice`, `classchoice`, or `specialtychoice`. 
+`skill/set <input>=<skill>`: Sets a skill. `<input>` can be `free`, `bgchoice`, `classchoice`, or `specialtychoice`.
+%t **Note:** `cg/skill <input>=<skill>` does the same thing.
 `skill/unset <input>=<skill>`: Deletes your selected skill. You cannot delete skills granted by your ancestry, character class, and some background selections. `<input>` can be `free`, `bgchoice`, `classchoice`, or `specialtychoice`.
+%t **Note:** `cg/unskill <input>=<skill>` does the same thing.
 
 ## List of skills
 

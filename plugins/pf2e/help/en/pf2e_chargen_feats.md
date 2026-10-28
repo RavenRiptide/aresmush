@@ -8,7 +8,7 @@ aliases:
 
 # Pathfinder 2E Chargen - Feats
 
-Now that you have locked your skills and selected your languages, it’s time to choose your feats. Feats in Pathfinder are special abilities that are tied to a character's development and offer customization of a character's abilities. Your choice of ancestry, heritage, character class, and background will have offered you a set of base feats.
+Now that you have locked your skills and selected your languages, it's time to choose your feats. Feats in Pathfinder are special aspects that are tied to a character's development and offer customization of a character's abilities. Your choice of ancestry, heritage, character class, and background all offer you access to different feats.
 
 ## Commands
 

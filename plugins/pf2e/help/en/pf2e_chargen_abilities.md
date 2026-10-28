@@ -10,8 +10,7 @@ aliases:
 Now you can start assigning attribute boosts to your attributes. Some of your stats already have boosts from your Background and Class choices, but you will need to assign other attribute boosts before you can move on. Your attribute options are **Strength, Dexterity, Constitution, Wisdom, Intelligence, and Charisma**. For more information about attributes, see [Archives of Nethys's page on character creation](https://2e.aonprd.com/Rules.aspx?ID=2027).
 
 ## Setting attribute boost commands
-Every chargen pick can also be made as a switch of `cg`, the way every advancement pick is a switch
-of `advance`: `cg/boost` is `boost/set` and `cg/unboost` is `boost/unset`. Both spellings work.
+You can also use `cg/boost` in place of `boost/set`.
 
 `boost/set ancestry=<attribute>`: Sets one of your two ancestry boosts to `<attribute>`.
 %t On Emblem of Ea MUSH, **ancestry attributes are open.**
@@ -21,12 +20,5 @@ of `advance`: `cg/boost` is `boost/set` and `cg/unboost` is `boost/unset`. Both 
 %t **Not all classes have a charclass boost choice.** See your class's wiki page for details.
 `boost/set free=<attribute>`: Sets one of your free boosts to `<attribute>`.
 
-## Unsetting attribute boost commands
-If you make a mistake, you can unset a boost that you set.
-
-`boost/unset ancestry=<attribute>`: Unassigns your ancestry `<attribute>` boost.
-`boost/unset background=<attribute>`: Unassigns your background `<attribute>` boost.
-`boost/unset charclass=<attribute>`: Unassigns your class `<attribute>` boost.
-`boost/unset free=<attribute>`: Unassigns your free `<attribute>` boost.
-
-**NOTE:** `boost/unset` is currently unavailable. `cg/undo` takes back your most recent boost, and `cg/restore info` followed by `commit info` resets them all.
+## Undoing attribute boosts
+`boost/unset` and `cg/unboost` are currently disabled. To fix a mistake, use `cg/undo` to take back your most recent boost. To clear all your boosts, run `cg/restore info` and then `commit info`.

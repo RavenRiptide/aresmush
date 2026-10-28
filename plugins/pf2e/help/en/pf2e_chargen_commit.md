@@ -1,6 +1,6 @@
 ---
 toc: Pathfinder Second Edition
-summary: Starting character generation - committing and restoring chargen stages.
+summary: Starting character generation - committing, restoring, and undoing chargen stages.
 aliases:
 - commit
 - restore
@@ -9,32 +9,31 @@ aliases:
 - cg_undo
 ---
 
-# Pathfinder 2E Chargen - Committing and Restoring Chargen Stages
+# Pathfinder 2E Chargen - Committing and Restoring Stages
 
-Currently, the Pathfinder 2e sheet sections of chargen is done in stages, as later choices depend on information being written earlier on. The `commit` command records changes and moves on to the next stage, while the `cg/restore` command restores the chargen step to a 'checkpoint' before committing information and proceeding to the next stage. 
+You build your Pathfinder 2e sheet in stages, because later choices depend on earlier ones. When you finish a stage, `commit` locks in your choices and moves you to the next stage. If you change your mind later, `cg/restore` takes you back to the start of a committed stage.
 
 ## Stages
-The stages are as follows: 
 
-`info`: The basic information screen, where you select ancestry, heritage, background, charclass, specializations, and more.
-`abilities`: The ability attributes screen, where you select ability boosts to determine your final ability scores.
-`skills`: The skills selection screen, where you select skills and languages.
+`info`: Choose your ancestry, heritage, background, class, specializations, and other basic details.
+`abilities`: Assign attribute boosts to set your final attribute scores.
+`skills`: Choose your skills and languages.
 
-Feats (and potentially magic, if your character has magic capabilities) are the last thing you assign, and there is no stage to commit after them. Once nothing is left outstanding, `cg/review` shows your finished sheet and how to submit it for approval.
+You assign feats last, along with magic if your character casts spells. Feats have no stage to commit. Once nothing is left to assign, `cg/review` shows your finished sheet and tells you how to submit it for approval.
 
-## Taking a choice back
+## Undoing a choice
 
-`cg/undo` takes back the last thing you did, one step at a time, newest first. Because it works
-backwards, a choice that something later depends on comes back into play only once you have taken
-that later choice back too - so a class feat you took before a skill feat that needs it is undone
-second.
+`cg/undo` takes back your choices one at a time, starting with the newest. Because it works backward, a later choice always comes off before any earlier choice it depends on. For example, if you took a class feat and then a skill feat that requires it, `cg/undo` removes the skill feat first and the class feat second.
 
-It reaches only as far as the start of chargen. Once your character is approved, changing what they
-have is staff's to do with `admin/rollback`.
+`cg/undo` reaches back only as far as the start of chargen. After your character is approved, only staff can change it.
 
 ## Commands
 
-`commit <stage>` (or `cg/commit <stage>`): If you're satisfied with your selections in a given stage, this command records changes and moves on to the next stage of chargen. 
-`cg/restore <stage>`: If you would like to change your base info, ability scores or skills after you have committed them, this command restores your character to the point before you initially committed your choices. **Note:** You will have to input `commit <stage>` again after using `cg/restore` to return to a previous stage. For example, Sandy decides to `cg/restore info` to redo her choice of ancestry and background. Sandy must `commit info` again before proceeding to the next stage.
-`cg/undo`: Takes back your most recent choice, whatever it was - a pick, a boost, a language, a feat. Run it again to take back the one before that. `cg/redo` puts back the last thing you took back.
-`commit featskills`: Some feats grant a skill of your choice, or a skill you are already trained in, which gives you a free skill to assign instead. Either one unlocks your skills so you can assign it with `skill/set free=<skill>`; `commit featskills` locks them again when you're done. Your skills must be locked to take a feat, so finish the free skill and `commit featskills` before taking your next one. 
+`commit <stage>`: Locks in your choices for `<stage>` and moves you to the next stage. `cg/commit <stage>` does the same thing.
+`cg/restore <stage>`: Returns your character to the point before you committed `<stage>`, so you can change your basic info, attribute boosts, or skills.
+%t **Note:** After you make your changes, run `commit <stage>` again to move on.
+%t **Example:** To change your ancestry and background, run `cg/restore info`, make your changes, and then run `commit info`.
+`cg/undo`: Takes back your most recent choice, such as a pick, a boost, a language, or a feat. Run it again to take back the choice before that.
+`cg/redo`: Puts back the last choice you took back with `cg/undo`.
+`commit featskills`: Locks your skills again after a feat unlocked them.
+%t **Note:** Some feats grant a skill of your choice, or grant a skill you're already trained in and give you a free skill instead. Either kind unlocks your skills so you can assign the skill with `skill/set free=<skill>`. You must lock your skills again before you take another feat, so assign the skill and run `commit featskills` first.
