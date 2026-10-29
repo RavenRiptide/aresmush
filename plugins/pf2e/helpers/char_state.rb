@@ -12,6 +12,16 @@ module AresMUSH
       # Attributes a core may read, mapped to their state key. Anything not listed here is
       # deliberately invisible to the cores.
       def self.of(char, config: ConfigView.live, at_level: nil)
+        # The fold, except for the languages: a draft's picks are not in the ledger yet, and a
+        # core asking whether the character already has a language has to see them. Chargen's
+        # own guard read the fold alone, which is empty before approval, so a player could take
+        # a language their ancestry had already given them.
+        sheet = Ledger.derived(char, :at_level => at_level).merge('languages' => DraftSheet.of(char).languages)
+
+        # Skills likewise, until approval: chargen trains the skill rows directly, so the fold had
+        # none and a player could spend every free pick on one skill, then not unset it.
+        sheet = sheet.merge('skills' => Ledger.held_skills(char)) unless Ledger.finalized?(char)
+
         build({
             'base_info' => char.pf2_base_info,
             'faith' => char.pf2_faith,
@@ -46,11 +56,7 @@ module AresMUSH
             'saves' => (char.combat && char.combat.saves) || {},
             'cg_skills' => char.skills.to_a.select { |s| s.cg_skill }.map { |s| s.name }
           },
-          # The fold, except for the languages: a draft's picks are not in the ledger yet, and a
-          # core asking whether the character already has a language has to see them. Chargen's
-          # own guard read the fold alone, which is empty before approval, so a player could take
-          # a language their ancestry had already given them.
-          :sheet => Ledger.derived(char, :at_level => at_level).merge('languages' => DraftSheet.of(char).languages),
+          :sheet => sheet,
           :config => config
         )
       end

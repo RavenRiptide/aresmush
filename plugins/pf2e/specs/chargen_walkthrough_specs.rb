@@ -217,6 +217,41 @@ module AresMUSH
         expect(Character[@char.id].pf2_to_assign['open languages']).to eq [ 'open' ]
       end
 
+      # The same blind spot for skills: chargen trains the skill rows directly, the guard read the
+      # fold, and a player could spend every free pick on one skill.
+      it "should refuse a free skill pick of a skill the character already has" do
+        @char.update(:pf2_abilities_locked => true, :pf2_to_assign => { 'open skills' => [ 'open', 'open' ] })
+
+        run PF2SkillSetCmd, "skill/set free=Athletics"
+        run PF2SkillSetCmd, "skill/set free=Athletics"
+
+        expect(@client.failures.size).to eq 1
+        expect(@char.pf2_to_assign['open skills']).to eq [ 'Athletics', 'open' ]
+      end
+
+      it "should take a chargen free skill pick back" do
+        @char.update(:pf2_abilities_locked => true, :pf2_to_assign => { 'open skills' => [ 'open' ] })
+
+        run PF2SkillSetCmd, "skill/set free=Athletics"
+        run PF2SkillUnSetCmd, "skill/unset free=Athletics"
+
+        expect_no_failures
+        expect(@char.pf2_to_assign['open skills']).to eq [ 'open' ]
+        expect(Pf2eSkills.get_skill_prof(@char, 'Athletics')).to eq 'untrained'
+      end
+
+      it "should turn a chargen skill choice the character already has into a free pick" do
+        @char.update(:pf2_abilities_locked => true,
+                     :pf2_to_assign => { 'class skill choice' => { 'options' => [ 'Athletics' ], 'selected' => 'open' },
+                                         'open skills' => [] })
+        Pf2e::Ledger.apply_skill(@char, 'Athletics', 'trained')
+
+        run PF2SkillSetCmd, "skill/set classchoice=Athletics"
+
+        expect_no_failures
+        expect(@char.pf2_to_assign['open skills']).to eq [ 'open' ]
+      end
+
       # A language picked during a level-up is part of that level's draft, so abandoning the
       # level takes it back. It used to be written to the sheet as the player typed it.
       it "should take back a language picked in an abandoned advancement" do

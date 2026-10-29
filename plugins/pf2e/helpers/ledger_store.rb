@@ -133,15 +133,10 @@ module AresMUSH
 
       # What the live character currently holds, in the shape `plan` diffs against.
       def self.current_state(char)
-        skills = {}
-        char.skills.each do |s|
-          skills[s.name] = s.prof_level unless s.prof_level.to_s == 'untrained'
-        end
-
         {
           'level' => char.pf2_level,
           'xp' => char.pf2_xp,
-          'skills' => skills,
+          'skills' => held_skills(char),
           'feats' => char.pf2_feats,
           'features' => char.pf2_features,
           'traits' => char.pf2_traits,
@@ -158,6 +153,13 @@ module AresMUSH
           # What the derived scores are compared against.
           'ability_scores' => char.abilities.each_with_object({}) { |a, h| h[a.name] = a.base_val }
         }
+      end
+
+      # The skill rows' trained-or-better ranks, by name: the fold's shape, read off the live objects.
+      def self.held_skills(char)
+        char.skills.each_with_object({}) do |s, skills|
+          skills[s.name] = s.prof_level unless s.prof_level.to_s == 'untrained'
+        end
       end
 
       # True once the ledger is this character's source of truth. Before approval a character
