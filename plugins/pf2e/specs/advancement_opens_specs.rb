@@ -39,6 +39,27 @@ module AresMUSH
           end
         end
 
+        # Stylish Tricks: "an additional skill increase you can apply only to Acrobatics or the skill
+        # from your swashbuckler's style" (Player Core 2). `specialty` stands for the style's skill.
+        describe "a restricted increase" do
+          def swashbuckler(style)
+            double(:pf2_level => 2, :pf2_base_info => { 'charclass' => 'Swashbuckler', 'specialize' => style })
+          end
+
+          it "should open a choice of the skills it names, with the specialty's skill" do
+            result = opened({ 'raise_skill_choice' => [ 'Acrobatics', 'specialty' ] }, swashbuckler('Wit'))
+
+            expect(result[:pool]['raise skill choice']).to eq %w(Acrobatics Diplomacy)
+            expect(result[:messages]).to eq [ [ 'pf2e.adv_item_skill_choice_from', { :options => 'Acrobatics or Diplomacy' } ] ]
+          end
+
+          it "should leave the specialty out when the character has none" do
+            result = opened({ 'raise_skill_choice' => [ 'Acrobatics', 'specialty' ] }, swashbuckler(nil))
+
+            expect(result[:pool]['raise skill choice']).to eq %w(Acrobatics)
+          end
+        end
+
         describe "a class feature with options" do
           it "should open the choice with its options listed" do
             result = opened('charclass_choice' => { 'choice_name' => 'Path to Perfection',

@@ -55,6 +55,16 @@ module AresMUSH
         end.keys.map(&:to_i).sort
       end
 
+      # Stylish Tricks: an additional increase, held to Acrobatics or the style skill, at 3rd, 7th
+      # and 15th (Player Core 2). It sits beside the ordinary increase, so `raise` stays on schedule.
+      it "should give a swashbuckler Stylish Tricks' increase at 3, 7 and 15" do
+        table = Global.read_config('pf2e_class', 'Swashbuckler', 'advance') || {}
+        levels = table.select { |_level, data| data.is_a?(Hash) && data['raise_skill_choice'] }.keys.map(&:to_i).sort
+
+        expect(levels).to eq [ 3, 7, 15 ]
+        expect(table[3]['raise_skill_choice']).to eq [ 'Acrobatics', 'specialty' ]
+      end
+
       class_names.each do |charclass|
         context charclass do
           it "should grant class feats at even levels" do

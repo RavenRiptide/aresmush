@@ -117,26 +117,27 @@ module AresMUSH
 
           return Err.new(:bad_skill_choice, 'pf2e.bad_skill_choice', 'options' => allowed.join(", ")) unless skill
 
-          level_failure = too_low?(state, skill)
+          # One pick, so an earlier one is being replaced rather than added to.
+          level_failure = too_low?(state, skill, key)
           return level_failure if level_failure
 
           staged(state, key, skill)
         end
 
         def self.spend_skill_slot(state, key, skill)
-          level_failure = too_low?(state, skill)
-          return level_failure if level_failure
-
           slots = Array(state['to_assign'][key])
           open = slots.select { |s| Pf2e.open_skill_token?(s) }
 
           # Nothing open means the slot holds an earlier pick rather than markers, and picking
           # again replaces it - which is how the command has always behaved.
-          if open.empty?
-            return staged(state, key, skill)
-          end
+          replacing = open.empty? ? key : nil
 
-          untrained = current_prof(state, skill).to_s.casecmp?('untrained')
+          level_failure = too_low?(state, skill, replacing)
+          return level_failure if level_failure
+
+          return staged(state, key, skill) if replacing
+
+          untrained = level_prof(state, skill).to_s.casecmp?('untrained')
 
           # Which markers this skill is allowed to spend, most specific first. Slots.fill takes
           # the first of them that is actually open.
@@ -182,9 +183,39 @@ module AresMUSH
           key ? held[key] : 'untrained'
         end
 
-        def self.next_prof(state, skill)
+        # Where an increase lands is measured from the rank this level already leaves the skill at, so
+        # the regular increase and a restricted one - an archetype's, Stylish Tricks' - cannot both
+        # spend themselves on one skill and carry it past what the level allows.
+        STAGED_RAISE_KEYS = [ 'raise skill', 'raise skill choice' ].freeze
+
+        # Raises this level holds for one skill: picks made, and a feat's `raise_skill` grant waiting
+        # for advance/done. `replacing` names a key whose pick is being replaced, so it does not count.
+        def self.staged_raises(state, skill, replacing = nil)
+          advancement = state['advancement'] || {}
+
+          staged = STAGED_RAISE_KEYS.reject { |k| k == replacing }.flat_map { |k| Array(advancement[k]) }
+
+          (advancement['grants'] || {}).each_value do |payload|
+            staged += Array(payload['raise_skill']) if payload.is_a?(Hash)
+          end
+
+          staged.reject { |s| s.to_s.strip.empty? || Pf2e.open_skill_token?(s) }
+                .count { |s| s.to_s.casecmp?(skill.to_s) }
+        end
+
+        def self.level_prof(state, skill, replacing = nil)
           progression = Array(state['config'].read('pf2e', 'prof_progression'))
-          index = progression.index(current_prof(state, skill).to_s)
+          held = current_prof(state, skill).to_s
+          index = progression.index(held)
+
+          return held unless index
+
+          progression[[ index + staged_raises(state, skill, replacing), progression.size - 1 ].min]
+        end
+
+        def self.next_prof(state, skill, replacing = nil)
+          progression = Array(state['config'].read('pf2e', 'prof_progression'))
+          index = progression.index(level_prof(state, skill, replacing).to_s)
 
           index ? progression[index + 1] : nil
         end
@@ -200,8 +231,8 @@ module AresMUSH
         end
 
         # The raise applies at the level being gained, which is one past where they are now.
-        def self.too_low?(state, skill)
-          required = min_level(state, next_prof(state, skill)).to_i
+        def self.too_low?(state, skill, replacing = nil)
+          required = min_level(state, next_prof(state, skill, replacing)).to_i
 
           return nil if state['level'].to_i + 1 >= required
 

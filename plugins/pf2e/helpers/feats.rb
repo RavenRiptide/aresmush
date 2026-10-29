@@ -1563,6 +1563,46 @@ module AresMUSH
       filter.merge('assoc_skill' => picked)
     end
 
+    SPECIALTY_SKILL = 'specialty'.freeze
+
+    # A skill list in config may name `specialty` for the skills the character's specialty trains: a
+    # swashbuckler's style skill. A level's restricted increase and a feat pool both read it here, so
+    # they agree on what it means. A character with no specialty contributes nothing.
+    def self.resolve_skill_list(char, list)
+      Array(list).flat_map { |s| s.to_s.casecmp?(SPECIALTY_SKILL) ? specialty_skills(char) : [ s ] }.uniq
+    end
+
+    def self.specialty_skills(char)
+      info = char.pf2_base_info || {}
+      return [] if info['charclass'].blank? || info['specialize'].blank?
+
+      Array((Global.read_config('pf2e_specialty', info['charclass'], info['specialize']) || {}).dig('chargen', 'skills'))
+    end
+
+    def self.resolve_specialty_skills(char, filter)
+      return filter unless Array(filter['assoc_skill']).any? { |s| s.to_s.casecmp?(SPECIALTY_SKILL) }
+
+      filter.merge('assoc_skill' => resolve_skill_list(char, filter['assoc_skill']))
+    end
+
+    # A feat that picks its skill when taken - Assurance - rather than naming one.
+    def self.skill_choice_feat?(details)
+      block = feat_choice_def(details)
+
+      Array(details['assoc_skill']).compact.empty? && block.is_a?(Hash) && block['from_skills'].is_a?(Hash)
+    end
+
+    # A feat taken from a pool held to some skills, whose own pick is a skill, is held to the same
+    # skills: Stylish Tricks' Assurance is for Acrobatics or the style skill. Nil when nothing narrows.
+    def self.pool_skill_narrowing(char, choice_name, block, details)
+      filter = block.is_a?(Hash) ? block['from_feats'] : nil
+      return nil unless filter.is_a?(Hash) && filter['assoc_skill'] && skill_choice_feat?(details)
+
+      skills = resolve_specialty_skills(char, resolve_prior_steps(char, choice_name, filter))['assoc_skill']
+
+      { 'options' => Array(skills) }
+    end
+
     def self.match_choice_option(char, choice_name, block, label)
       return nil if label.blank?
 
@@ -2197,7 +2237,7 @@ module AresMUSH
       closed.map { |name| t('pf2e.choice_formulas_exhausted', :choice => name) }
     end
 
-    def self.fill_feat_choice(to_assign, choice_name, value)
+    def self.fill_feat_choice(to_assign, choice_name, value, char = nil)
       choices = to_assign['feat choice'] || {}
       key = choices.keys.find { |k| k.to_s.casecmp?(choice_name.to_s) }
       return false unless key
@@ -2209,19 +2249,63 @@ module AresMUSH
       slots = Array(to_assign['feat choice'][key])
 
       # A narrowing only applies while the slot it was opened for is still open.
-      clear_choice_filter(to_assign, key) unless slots.include?('open')
+      if slots.include?('open')
+        spend_choice_filter(to_assign, key, value, char)
+      else
+        clear_choice_filter(to_assign, key)
+      end
 
       true
     end
 
+    # A choice's narrowings are one entry per restricted open slot; open slots beyond the entries are
+    # unrestricted. One taking of a repeatable feat can be held to a few skills while another taking
+    # in the same level is not, so a narrowing belongs to a slot, not to the feat's name.
     def self.store_choice_filter(to_assign, choice_name, filter)
       return to_assign unless filter.is_a?(Hash) && !filter.empty?
 
       filters = to_assign['feat choice filter'] || {}
-      filters[choice_name] = filter
+      filters[choice_name] = choice_filter_entries(filters[choice_name]) + [ filter ]
       to_assign['feat choice filter'] = filters
 
       to_assign
+    end
+
+    # A single hash is one entry, as a draft open before narrowings became a list still holds it.
+    def self.choice_filter_entries(held)
+      (held.is_a?(Hash) ? [ held ] : Array(held)).select { |entry| entry.is_a?(Hash) && !entry.empty? }
+    end
+
+    # The options one entry allows, or nil for one that names nothing this understands.
+    def self.choice_filter_allows(char, entry)
+      if entry['options']
+        Array(entry['options']).compact
+      elsif entry['from']
+        choice_dynamic_options(char, entry['from'])
+      elsif entry['same_as']
+        choice_labels_for(char, entry['same_as'])
+      end
+    end
+
+    # A pick spends the most restrictive entry it fits, as a skill increase spends the most specific
+    # marker. A pick no entry allows went to an unrestricted slot and leaves the entries alone.
+    def self.spend_choice_filter(to_assign, key, value, char)
+      filters = to_assign['feat choice filter']
+      return unless filters.is_a?(Hash)
+
+      held = filters.keys.find { |k| k.to_s.casecmp?(key.to_s) }
+      entries = choice_filter_entries(held && filters[held])
+
+      fitting = entries.each_with_index.filter_map do |entry, index|
+        allowed = choice_filter_allows(char, entry)
+        [ allowed.size, index ] if allowed&.any? { |a| a.to_s.casecmp?(value.to_s) }
+      end
+
+      return if fitting.empty?
+
+      entries.delete_at(fitting.min[1])
+      entries.empty? ? filters.delete(held) : filters[held] = entries
+      to_assign['feat choice filter'] = filters
     end
 
     def self.clear_choice_filter(to_assign, choice_name)
@@ -2236,28 +2320,28 @@ module AresMUSH
       to_assign
     end
 
-    def self.stored_choice_filter(char, choice_name)
-      filters = (char.pf2_to_assign || {})['feat choice filter']
-      return nil unless filters.is_a?(Hash)
+    def self.stored_choice_filters(to_assign, choice_name)
+      filters = to_assign['feat choice filter']
+      return [] unless filters.is_a?(Hash)
 
       key = filters.keys.find { |k| k.to_s.casecmp?(choice_name.to_s) }
-      key && filters[key]
+      choice_filter_entries(key && filters[key])
     end
 
+    # Everything, while an open slot has no entry; otherwise what any entry allows.
     def self.narrow_choice_options(char, choice_name, options)
-      filter = stored_choice_filter(char, choice_name)
-      return options unless filter.is_a?(Hash)
+      to_assign = char.pf2_to_assign || {}
+      entries = stored_choice_filters(to_assign, choice_name)
+      return options if entries.empty?
 
-      allowed = if filter['options']
-        Array(filter['options']).compact
-      elsif filter['from']
-        choice_dynamic_options(char, filter['from'])
-      elsif filter['same_as']
-        choice_labels_for(char, filter['same_as'])
-      end
+      slots = to_assign['feat choice'] || {}
+      key = slots.keys.find { |k| k.to_s.casecmp?(choice_name.to_s) }
+      return options if Array(key && slots[key]).count('open') > entries.size
 
-      return options unless allowed
+      allowed = entries.map { |entry| choice_filter_allows(char, entry) }
+      return options if allowed.any?(&:nil?)
 
+      allowed = allowed.flatten
       options.select { |o| allowed.any? { |a| a.to_s.casecmp?(o.to_s) } }
     end
 
@@ -2331,6 +2415,7 @@ module AresMUSH
 
     # Feats matching a from_feats filter that the character does not already have.
     def self.choice_feat_pool(char, filter)
+      filter = resolve_specialty_skills(char, filter) if filter.is_a?(Hash)
       feats = Global.read_config('pf2e_feats') || {}
 
       # Tallied once rather than rebuilt inside the loop by has_feat?. A repeatable feat
@@ -2416,10 +2501,15 @@ module AresMUSH
         return false unless opened
       end
 
-      # Narrows to the skill feats hanging off one named skill
+      # Narrows to the skill feats hanging off one named skill. A feat that picks its skill when
+      # taken hangs off any skill it could pick.
       if filter['assoc_skill']
         wanted = Array(filter['assoc_skill']).compact.map { |s| s.to_s.downcase }
         skills = Array(details['assoc_skill']).compact.map { |s| s.to_s.downcase }
+
+        if skill_choice_feat?(details)
+          skills = choice_skill_pool(char, feat_choice_def(details)['from_skills']).map { |s| s.to_s.downcase }
+        end
 
         return false unless wanted.any? { |w| skills.include?(w) }
       end
@@ -3079,7 +3169,7 @@ module AresMUSH
       to_assign = char.pf2_to_assign
       open_feat_choice(to_assign, fname, count)
 
-      store_choice_filter(to_assign, fname, filter)
+      count.times { store_choice_filter(to_assign, fname, filter) }
       char.update(pf2_to_assign: to_assign)
 
       option = label.blank? ? nil : match_choice_option(char, fname, block, label)
@@ -3135,7 +3225,11 @@ module AresMUSH
 
         if nested
           nested_assign = char.pf2_to_assign
-          open_feat_choice(nested_assign, fname, choice_count(char, nested))
+          nested_count = choice_count(char, nested)
+          narrowing = pool_skill_narrowing(char, choice_name, block, fdetails)
+
+          open_feat_choice(nested_assign, fname, nested_count)
+          nested_count.times { store_choice_filter(nested_assign, fname, narrowing) }
           char.update(pf2_to_assign: nested_assign)
 
           msgs << t('pf2e.choice_opened', :choice => fname, :summary => choice_summary(nested), :cmd => choice_info_cmd(char))
@@ -3157,7 +3251,7 @@ module AresMUSH
 
       # Re-read, because do_feat_grants writes to_assign itself.
       to_assign = char.pf2_to_assign
-      fill_feat_choice(to_assign, choice_name, value)
+      fill_feat_choice(to_assign, choice_name, value, char)
       char.update(pf2_to_assign: to_assign)
 
       record_choice(char, choice_name, value)
@@ -3188,7 +3282,8 @@ module AresMUSH
           :bucket => Array(fdetails['feat_type']).first.to_s.downcase,
           :to_assign => to_assign,
           :advancement => advancement,
-          :client => client)
+          :client => client,
+          :choice_filter => pool_skill_narrowing(char, choice_name, block, fdetails))
 
         msgs.concat(Advancement::FeatGain.render(gained[:messages]))
         deferred.concat(gained[:after_save])
@@ -3214,7 +3309,7 @@ module AresMUSH
         msgs << t('pf2e.choice_level_clause_applied', :choice => choice_name, :value => value, :level => lvl)
       end
 
-      fill_feat_choice(to_assign, choice_name, value)
+      fill_feat_choice(to_assign, choice_name, value, char)
 
       choices = to_assign['feat_choices'] || {}
       existing = Array(choices[choice_name])

@@ -96,8 +96,12 @@ module AresMUSH
         expect(offered).to include('Quick Climb', 'Shadow Mark')
 
         # Some feats hang off two skills - Slippery Prey is Acrobatics or Athletics - and count for
-        # either of theirs.
+        # either of theirs. Assurance hangs off whichever skill it is taken for.
+        expect(offered).to include('Assurance')
+
         offered.each do |name|
+          next if name == 'Assurance'
+
           skills = Array(Pf2e.get_feat_details(name)[1]['assoc_skill'])
 
           expect(skills & %w(Athletics Stealth)).to_not be_empty, name

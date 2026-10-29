@@ -85,7 +85,10 @@ module AresMUSH
         #
         # `bucket` is the feat list it belongs in. advance/feat uses the slot the player is
         # filling; a feat arriving from a choice uses the feat's own first type.
-        def self.apply(char, fname, details, bucket:, to_assign:, advancement:, client: nil)
+        #
+        # `choice_filter` narrows the feat's own choice for this taking only, as a pool held to some
+        # skills holds an Assurance taken from it to the same skills.
+        def self.apply(char, fname, details, bucket:, to_assign:, advancement:, client: nil, choice_filter: nil)
           # DraftSheet is the one place that knows whether a level is open, and which level a rule
           # is measured against while it is. Chargen has nothing that drains staged grants, so it
           # applies a feat's block outright - see `grants`.
@@ -102,6 +105,7 @@ module AresMUSH
             :client => client,
             :chargen => chargen,
             :level => draft.level,
+            :choice_filter => choice_filter,
             :after_save => []
           }
 
@@ -298,6 +302,9 @@ module AresMUSH
           if !automatic || label
             apply_slots(ctx, FeatSlots.deltas(ctx[:feat], ctx[:details], :opens_choice => true, :choice_count => count))
           end
+
+          # One entry per slot this taking opened, so each of its picks is held to the narrowing.
+          count.times { Pf2e.store_choice_filter(ctx[:to_assign], ctx[:feat], ctx[:choice_filter]) } unless automatic
 
           return opened(ctx, block) unless automatic
           return [ [ 'pf2e.choice_auto_none', { :choice => ctx[:feat] } ] ] unless label

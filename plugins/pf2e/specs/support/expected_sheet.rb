@@ -78,6 +78,9 @@ module AresMUSH
           end
         },
 
+        # An increase held to a few skills - Stylish Tricks' - is one more skill increase.
+        'raise_skill_choice' => lambda { |acc, _value, _lv| acc['skill_increases'] += 1 },
+
         'combat_stats' => lambda { |acc, value, _lv| ExpectedSheet.absorb_combat(acc, value) },
         'magic_stats' => lambda { |acc, value, lv| ExpectedSheet.absorb_magic(acc, value, lv) },
 

@@ -176,6 +176,68 @@ module AresMUSH
           end
         end
 
+        # A level can hold more than one increase - the regular one beside an archetype's skill choice,
+        # Stylish Tricks', or a feat's staged grant - and each is judged at the rank the ones before it
+        # leave, so two of them cannot carry a skill past what the level allows.
+        describe "two increases to one skill in a level" do
+          def choice(level:, advancement:)
+            state(:to_assign => { 'raise skill choice' => [ 'Acrobatics', 'Stealth' ] }, :level => level,
+                  :skills => { 'Acrobatics' => 'trained' }, :advancement => advancement)
+          end
+
+          it "should refuse the second raise to master before 7th level" do
+            result = Raises.set(choice(:level => 2, :advancement => { 'raise skill' => [ 'Acrobatics' ] }),
+                                'type' => 'skill choice', 'value' => 'Acrobatics')
+
+            expect(result.code).to eq :not_minimum_level
+            expect(result.args['level']).to eq 7
+          end
+
+          it "should allow it at 7th level" do
+            result = Raises.set(choice(:level => 6, :advancement => { 'raise skill' => [ 'Acrobatics' ] }),
+                                'type' => 'skill choice', 'value' => 'Acrobatics')
+
+            expect(result.ok?).to be true
+          end
+
+          it "should judge the regular increase after the restricted one the same way" do
+            result = Raises.set(
+              state(:to_assign => { 'raise skill' => [ 'open' ] }, :level => 2, :skills => { 'Acrobatics' => 'trained' },
+                    :advancement => { 'raise skill choice' => 'Acrobatics' }),
+              'type' => 'skill', 'value' => 'Acrobatics'
+            )
+
+            expect(result.code).to eq :not_minimum_level
+          end
+
+          it "should count a feat's raise waiting for advance/done" do
+            grants = { 'Skill Mastery (Rogue) (Acrobatics)' => { 'raise_skill' => [ 'Acrobatics' ] } }
+            result = Raises.set(choice(:level => 2, :advancement => { 'grants' => grants }),
+                                'type' => 'skill choice', 'value' => 'Acrobatics')
+
+            expect(result.code).to eq :not_minimum_level
+          end
+
+          it "should not count a pick that is being replaced" do
+            result = Raises.set(
+              state(:to_assign => { 'raise skill' => [ 'Acrobatics' ] }, :level => 2, :skills => { 'Acrobatics' => 'trained' },
+                    :advancement => { 'raise skill' => [ 'Acrobatics' ] }),
+              'type' => 'skill', 'value' => 'Acrobatics'
+            )
+
+            expect(result.ok?).to be true
+          end
+
+          it "should refuse a skill another raise is training for a slot reserved for untrained ones" do
+            result = Raises.set(
+              state(:to_assign => { 'raise skill' => [ 'open untrained' ] }, :advancement => { 'raise skill choice' => 'Stealth' }),
+              'type' => 'skill', 'value' => 'Stealth'
+            )
+
+            expect(result.code).to eq :untrained_only
+          end
+        end
+
         it "should refuse a raise the level did not offer" do
           result = Raises.set(state(:to_assign => {}), 'type' => 'skill', 'value' => 'Arcana')
 

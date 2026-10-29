@@ -64,6 +64,17 @@ module AresMUSH
               end
             }
           },
+          # An increase held to the skills it names, as Stylish Tricks' is to Acrobatics or the style
+          # skill. `specialty` in the list stands for the skill the character's specialty trains.
+          'raise_skill_choice' => {
+            'open' => lambda { |ctx|
+              skills = Pf2e.resolve_skill_list(ctx[:char], ctx[:value])
+
+              ctx[:pool]['raise skill choice'] = (Array(ctx[:pool]['raise skill choice']) + skills).uniq
+
+              [ [ 'pf2e.adv_item_skill_choice_from', { :options => skills.join(" or ") } ] ]
+            }
+          },
           'choose' => { 'open' => lambda { |ctx| Opens.class_option(ctx) } },
           'charclass_choice' => { 'open' => lambda { |ctx| Opens.class_option(ctx) } }
         }.freeze

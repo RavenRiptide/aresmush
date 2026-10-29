@@ -326,10 +326,13 @@ module AresMUSH
           end
         end
 
-        if ta['raise skill choice'].is_a?(Hash)
-          opts = Array(ta['raise skill choice']['options'])
-          pick = opts.first
-          if pick then run("advance/raise skill=#{pick}"); runs += 1 end
+        # An increase held to a list, which stays a list until it is taken. A skill already at the
+        # highest rank the level allows is refused, so try each in turn.
+        if ta['raise skill choice'].is_a?(Array)
+          ta['raise skill choice'].each do |pick|
+            run("advance/raise skill choice=#{pick}"); runs += 1
+            break unless (@char.pf2_to_assign || {})['raise skill choice'].is_a?(Array)
+          end
         end
 
         # Ability boosts arrive as a set; the command wants them in one comma list.

@@ -84,6 +84,7 @@ en:
     adv_archetype_key_ability_assigned: "You have selected %{ability} as the key attribute for your %{archetype}."
     adv_dont_use_class_for_class_feats: "Use '%xwcharclass%xn%xr' instead of '%xwclass%xn%xr' when selecting class feats. Try your input again with '%xwadvance/feat charclass=%{feat}%xn%xr'."
     adv_item_skill_choice: "You need to make a skill choice."
+    adv_item_skill_choice_from: "You have a skill increase for %{options}. Use '%xwadvance/raise skill choice=<skill>%xn%xc' to apply it."
     adv_item_language: "You have %{count} language(s) to select."
     adv_int_mod_bonus: "Since your Intelligence modifier has been raised to a higher number, you get training in a skill you aren't trained in and a language you don't know."
     adv_item_raise: "You have a %{item} to raise."

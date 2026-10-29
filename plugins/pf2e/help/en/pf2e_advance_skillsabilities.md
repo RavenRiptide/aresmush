@@ -18,6 +18,7 @@ At level 5, 10, 15, and 20, you can raise four attributes to the next step up. A
 `advance/raise ability = <attribute1> <attribute2> <attribute3> <attribute4>`: Boosts attribute scores to the next step. 
 `advance/raise skill = <skill>`: Raises a skill to the next step of proficiency. For example, `advance/raise skill=Nature` raises the Nature skill.
 `advance/raise skill choice = <skill>`: If you have a skill training choice, such as from a Dedication feat, this command raises the chosen skill to the next step of proficiency.
+%t **Note:** A swashbuckler's Stylish Tricks gives a skill choice at levels 3, 7, and 15, for Acrobatics or your style's skill. It comes in addition to the regular skill increase at those levels.
 `advance/language <language>`: Learns a language, if you gain a language from raising Intelligence to a higher modifier or from a feat.
 `lang/info <category>`: Lists the languages in your specified `<category>`. `<category>` types are `common`, `uncommon`, `rare`, or `secret`. Use it to find a language to learn with `advance/language`.
 %t **Note:** You can learn common and uncommon languages with `advance/language`. You can also spend RPP to learn a common, uncommon, or rare language. (See [Character Spends](/wiki/mechanics:characterspends) for more information.) Spending RPP is the only way to learn a rare language. Secret languages can only be learned through specific game features, such as the druid's Wildsong.

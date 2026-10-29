@@ -22,7 +22,7 @@ module AresMUSH
         # check that a level giving something nothing applies would otherwise pass silently: the
         # Bard's 7th-level tradition raise did exactly that.
         it "should have a row for every key a class table puts in the draft" do
-          handled_at_start = %w{choose_feat feat_choice grant_choice raise choose charclass_choice}
+          handled_at_start = %w{choose_feat feat_choice grant_choice raise raise_skill_choice choose charclass_choice}
 
           keys = [ 'pf2e_class', 'pf2e_archetype', 'pf2e_specialty' ].flat_map do |section|
             level_block_keys(Global.read_config(section))

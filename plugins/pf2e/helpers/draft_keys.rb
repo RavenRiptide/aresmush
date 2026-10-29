@@ -26,7 +26,7 @@ module AresMUSH
         'open languages' => [ TO_ASSIGN, 'language picks, as open markers and filled names' ],
         'open skills' => [ TO_ASSIGN, 'free skill increases, as open markers' ],
         'feat choice' => [ TO_ASSIGN, 'open slots for a choice a feat or feature carries, by choice name' ],
-        'feat choice filter' => [ TO_ASSIGN, 'what narrows one of those choices, by choice name' ],
+        'feat choice filter' => [ TO_ASSIGN, 'what narrows one of those choices, by choice name: one entry per restricted open slot' ],
         'feat_choices' => [ TO_ASSIGN, 'labels already chosen for a choice, by choice name' ],
         'bg skill choice' => [ TO_ASSIGN, 'the background skill pick, as options and selected' ],
         'class skill choice' => [ TO_ASSIGN, 'the class skill pick, as options and selected' ],

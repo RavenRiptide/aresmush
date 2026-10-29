@@ -3112,9 +3112,12 @@ pf2e_class:
         source: Vivacious Speed
     feat_choice:
       Stylish Tricks:
-        summary: skill feat
+        summary: Acrobatics or style skill feat
         from_feats:
           feat_type: Skill
+          assoc_skill:
+            - Acrobatics
+            - specialty
     key_abil:
       - Dexterity
     HP: 10
@@ -3160,6 +3163,9 @@ pf2e_class:
           - skill
         grant_choice:
           - Stylish Tricks
+        raise_skill_choice:
+          - Acrobatics
+          - specialty
         charclass_feature:
           - Fortitude Expertise
           - Opportune Riposte
@@ -3199,6 +3205,9 @@ pf2e_class:
           - skill
         grant_choice:
           - Stylish Tricks
+        raise_skill_choice:
+          - Acrobatics
+          - specialty
         charclass_feature:
           - Confident Evasion
           - Vivacious Speed (+15 feet)
@@ -3274,6 +3283,9 @@ pf2e_class:
           - general
         grant_choice:
           - Stylish Tricks
+        raise_skill_choice:
+          - Acrobatics
+          - specialty
         charclass_feature:
           - Greater Weapon Specialization
           - Keen Flair
