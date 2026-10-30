@@ -1589,7 +1589,15 @@ div.letter-style-3 {
 
 /* Footer stuff */
 
+footer {
+    padding-top: 0px;
+}
+
 div.footer-version a {
+    color: #74a7bb;
+}
+
+div.footer-tos a {
     color: #74a7bb;
 }
 
