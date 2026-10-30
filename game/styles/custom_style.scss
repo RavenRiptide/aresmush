@@ -875,6 +875,10 @@ div.card-body.markdown-editor {
     border-radius: 0px;
 }
 
+i.fa.fa-trash {
+    color: #df8f84;
+}
+
 /* Commented out for future use
 .btn-secondary, .btn-secondary:hover, .btn-secondary:focus, .btn-secondary:active {
     wip lol
@@ -1581,6 +1585,12 @@ div.letter-style-3 {
         width: 100%;
         padding: 30px 5px 30px 10px;
     }
+}
+
+/* Footer stuff */
+
+div.footer-version a {
+    color: #74a7bb;
 }
 
 /* Looking for Roleplay styling */
