@@ -852,6 +852,18 @@ div.card-body.markdown-editor {
     border-radius: 0px;
 }
 
+.btn-primary {
+    border-radius: 0px;
+    border: 1px solid #CBC0AD;
+    border-image: linear-gradient(to bottom right, #CBC0AD, #CBC0AD69, #CBC0AD) 1;
+}
+
+.btn-secondary {
+    background-color: #251C1C;
+    border-color: #000;
+    border-radius: 0px;
+}
+
 /* Commented out for future use
 .btn-secondary, .btn-secondary:hover, .btn-secondary:focus, .btn-secondary:active {
     wip lol
