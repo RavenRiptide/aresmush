@@ -92,7 +92,12 @@ ul.dropdown-menu {
     padding: 0px;
 }
 
-/* Float-end user-bar drop-shadow */
+/* Account actions styling */
+
+div.account-actions {
+    margin-right: 1em;
+    margin-top: 1.5em;
+}
 
 .float-end.user-bar {
     text-shadow: 2px 2px 5px black;
@@ -144,10 +149,11 @@ div.site-title {
     font-weight: bold;
     text-transform: revert;
     font-variant: small-caps;
+    height: 1.1em;
 }  
 
 div.site-subtitle {
-    font-style: italic;
+    padding-left: .2em;
 }
 
 /* Container styling */
