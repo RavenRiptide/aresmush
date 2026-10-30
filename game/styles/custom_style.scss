@@ -858,7 +858,7 @@ div.card-body.markdown-editor {
     border-image: linear-gradient(to bottom right, #CBC0AD, #CBC0AD69, #CBC0AD) 1;
 }
 
-.btn-secondary {
+.btn-secondary, .btn-secondary:hover {
     background-color: #251C1C;
     border-color: #000;
     border-radius: 0px;
