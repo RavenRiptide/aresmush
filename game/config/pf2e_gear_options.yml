@@ -4,6 +4,7 @@ pf2e_gear_options:
     i: gear
     in: gear
     inv: gear
+    inventory: gear
     equip: gear/equip
     unequip: gear/unequip
     bag/put: bag/store
