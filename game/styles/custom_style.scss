@@ -137,13 +137,13 @@ div.jumbotron {
 
 div.site-title,
 div.site-subtitle {
-    text-shadow: 2px 2px 5px black;
+    text-shadow: 2px 2px 5px #000000b2;
 }
 
 div.site-title {
     font-weight: bold;
-    width: 150%;
     text-transform: revert;
+    font-variant: small-caps;
 }  
 
 div.site-subtitle {
@@ -270,6 +270,17 @@ h4, .h4 {
     margin: revert;
     background-image: linear-gradient(to right, #466671, transparent); /* Deep Space Sparkle */
     background-color: transparent;
+    padding: .1em 1.2em;
+    font-weight: bold;
+    border: 3px solid #CBC0AD;
+    letter-spacing: 0.1em;
+    border-top-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-left-style: double;
+    border-left-width: 8px;
+    border-right-style: none;
+    border-image: linear-gradient(to right, #CBC0AD, transparent) 1;
+    font-size: 2.5rem;
 }
 
 .profile-wrap {
@@ -281,7 +292,7 @@ h4, .h4 {
     background: #000000c7;
     border: 1px solid #E1B07E;
     border-radius: 0px;
-    border-image: linear-gradient(to bottom right, #E1B07E, #4666712e, #E1B07E) 1;
+    border-image: linear-gradient(to bottom right, #E1B07E, #E1B07E61, #E1B07E) 1;
 }
 
 .profile-divider {
@@ -301,7 +312,7 @@ h4, .h4 {
     background-color: transparent;
     border-color: #89d2e1; /* Sky Blue */
     background-image: linear-gradient(to right,#43676f,transparent); /* Deep Space Sparkle 2 */
-    padding-top: .5em;
+    padding-top: .6em;
 }
 
 .relationship-icon-container {
