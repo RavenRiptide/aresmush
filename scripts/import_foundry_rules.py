@@ -185,8 +185,9 @@ KINDS = {
     'AdjustDegreeOfSuccess': {'key', 'selector', 'adjustment', 'predicate', 'type', 'slug', 'label'},
     'BaseSpeed': {'key', 'selector', 'value', 'predicate', 'slug', 'label'},
     # img is the icon their sheet shows; fist is a flag about replacing the default unarmed attack.
+    # replaceAll makes it the only attack the character has, as a monk's stance does.
     'Strike': {'key', 'slug', 'label', 'category', 'group', 'baseType', 'damage', 'traits', 'otherTags',
-               'range', 'predicate', 'img', 'fist'},
+               'range', 'predicate', 'img', 'fist', 'replaceAll'},
     'MartialProficiency': {'key', 'slug', 'definition', 'sameAs', 'maxRank', 'label'},
     'CriticalSpecialization': {'key', 'predicate', 'slug', 'label'},
     'Sense': {'key', 'selector', 'acuity', 'range', 'predicate', 'slug', 'label'},
@@ -268,7 +269,7 @@ ORDER = ['key', 'add', 'remove', 'recoverable', 'reevaluateOnUpdate', 'required'
          'allowNoSelection', 'path', 'mode', 'merge',
          'property', 'definition', 'sameAs', 'maxRank',
          'acuity', 'range', 'category', 'group',
-         'baseType', 'damage', 'traits', 'otherTags', 'fist', 'exceptions', 'doubleVs',
+         'baseType', 'damage', 'traits', 'otherTags', 'fist', 'replaceAll', 'exceptions', 'doubleVs',
          'selector', 'selectors', 'adjustment', 'suppress', 'relabel',
          'maxApplications', 'type', 'ability',
          'value', 'min', 'max', 'diceNumber', 'dieSize', 'damageType', 'damageCategory',

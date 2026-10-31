@@ -43706,6 +43706,14 @@ pf2e_effects:
     traits: []
     description: "Granted by Cobra Stance%rThe only Strikes you can make are cobra fang unarmed attacks. These deal 1d4 piercing damage; are in the brawling group; and have the agile, deadly d10, finesse, unarmed, and venomous traits.%rYou gain a +1 circumstance bonus to Fortitude saves and your Fortitude DC, and you gain poison resistance equal to half your level."
     rules:
+      - key: "Strike"
+        range: null
+        category: "unarmed"
+        group: "brawling"
+        damage: {"base": {"damageType": "piercing", "dice": 1, "die": "d4"}}
+        traits: ["agile", "deadly-d10", "finesse", "unarmed", "venomous"]
+        replaceAll: true
+        label: "Cobra Fang"
       - key: "FlatModifier"
         selector: "fortitude"
         type: "circumstance"
@@ -43721,6 +43729,14 @@ pf2e_effects:
     traits: []
     description: "Granted by Cobra Stance if you have Cobra Envenom, which increases the circumstance bonus to Fortitude saves and Fortitude DC to +2.%rThe only Strikes you can make are cobra fang unarmed attacks. These deal 1d4 poison damage; are in the brawling group; and have the agile, deadly d10, finesse, nonlethal, poison, and unarmed traits.%rYou gain a +2 circumstance bonus to Fortitude saves and your Fortitude DC, and you gain poison resistance equal to half your level."
     rules:
+      - key: "Strike"
+        range: null
+        category: "unarmed"
+        group: "brawling"
+        damage: {"base": {"damageType": "poison", "dice": 1, "die": "d4"}}
+        traits: ["agile", "deadly-d10", "finesse", "poison", "unarmed", "nonlethal"]
+        replaceAll: true
+        label: "Cobra Fang"
       - key: "FlatModifier"
         selector: "fortitude"
         type: "circumstance"
@@ -43735,6 +43751,15 @@ pf2e_effects:
     traits: []
     description: "Granted by Crane Stance%rYou gain a +1 circumstance bonus to AC, but the only Strikes you can make are crane wing attacks. These deal 1d6 bludgeoning damage; are in the brawling group; and have the agile, finesse, nonlethal, and unarmed traits.%rReduce the DC for High Jump and Long Jump by 5, and when you Leap, you can move an additional 5 feet horizontally or 2 feet vertically."
     rules:
+      - key: "Strike"
+        range: null
+        category: "unarmed"
+        group: "brawling"
+        damage: {"base": {"damageType": "bludgeoning", "dice": 1, "die": "d6"}}
+        traits: ["agile", "finesse", "unarmed", "nonlethal"]
+        replaceAll: true
+        slug: "crane-wing"
+        label: "Crane Wing"
       - key: "FlatModifier"
         selector: "ac"
         type: "circumstance"
@@ -44255,6 +44280,14 @@ pf2e_effects:
     traits: []
     description: "Granted by Mountain Stance%rThe only Strikes you can make are falling stone unarmed attacks. These deal 1d8 bludgeoning damage; are in the brawling group; and have the forceful, nonlethal, and unarmed traits.%rYou gain a +4 item bonus to AC and a +2 circumstance bonus to any defenses against being Shoved or Tripped. However, you have a Dexterity modifier cap to your AC of +0, meaning you don't add your Dexterity to your AC, and your Speeds are all reduced by 5 feet. The item bonus to AC from Mountain Stance is cumulative with armor potency runes on your explorer's clothing, mage armor, and…"
     rules:
+      - key: "Strike"
+        range: null
+        category: "unarmed"
+        group: "brawling"
+        damage: {"base": {"damageType": "bludgeoning", "dice": 1, "die": "d8"}}
+        traits: ["forceful", "unarmed", "nonlethal"]
+        replaceAll: true
+        label: "Falling Stone"
       - key: "DexterityModifierCap"
         value: 0
         predicate: [{"nor": ["feat:mountain-stronghold", "feat:mountain-quake"]}]
@@ -44604,6 +44637,14 @@ pf2e_effects:
     traits: []
     description: "Granted by Stumbling Stance%rYou gain a +1 circumstance bonus to Deception checks to Feint.%rThe only Strikes you can make are stumbling swing unarmed attacks. These deal 1d8 bludgeoning damage; are in the brawling group; and have the agile, backstabber, finesse, nonlethal, and unarmed traits. If an enemy hits you with a melee Strike while in this stance, it becomes off-guard against the next stumbling swing Strike you make against it before the end of your next turn."
     rules:
+      - key: "Strike"
+        range: null
+        category: "unarmed"
+        group: "brawling"
+        damage: {"base": {"damageType": "bludgeoning", "dice": 1, "die": "d8"}}
+        traits: ["agile", "backstabber", "finesse", "unarmed", "nonlethal"]
+        replaceAll: true
+        label: "Stumbling Swing"
       - key: "FlatModifier"
         selector: "deception"
         type: "circumstance"

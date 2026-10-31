@@ -413,7 +413,8 @@ module AresMUSH
           'unarmed' => strike['category'].to_s != 'martial',
           'bomb' => false, 'die' => strike['die'], 'dice' => strike['dice'],
           'range' => strike['range'].to_i, 'materials' => [], 'runes' => [],
-          'damage_type' => strike['damage_type'] || 'B', 'striking' => 0, 'rune' => 0
+          'damage_type' => strike['damage_type'] || 'B', 'striking' => 0, 'rune' => 0,
+          'replace_all' => strike['replace_all']
         })
       end
     end

@@ -225,8 +225,13 @@ module AresMUSH
       end
 
       # Its attacks by what a player would call them: the weapons equipped, unarmed attacks, and what a
-      # feat or an item granted.
+      # feat or an item granted. A stance whose attack replaces all others leaves only that one.
       def attacks
+        granted = Pf2eCombat.granted_strikes(@holder).map { |one| [ [ one['name'] ], one ] }
+        only = granted.select { |_names, one| one['replace_all'] }
+
+        return only if only.any?
+
         weapons = Pf2egear::Inventory.held(@holder, 'weapons').select(&:equipped)
                                      .reject { |weapon| Pf2eCombat.rune_lender?(weapon.name) }.map do |weapon|
           [ [ weapon.name, weapon.nickname ].compact, Pf2eCombat.attack_descriptor(@holder, weapon) ]
@@ -242,7 +247,7 @@ module AresMUSH
           [ [ item.name ], Pf2eCombat.bomb_descriptor(@holder, item) ]
         end
 
-        weapons + unarmed + Pf2eCombat.granted_strikes(@holder).map { |one| [ [ one['name'] ], one ] } + bombs
+        weapons + unarmed + granted + bombs
       end
 
       # The attack as made with the weapon in two hands, where that deals more: nothing where it does not.

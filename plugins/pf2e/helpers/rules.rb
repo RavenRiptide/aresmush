@@ -233,10 +233,11 @@ module AresMUSH
         {
           'key' => 'Strike',
           'fields' => %w{key slug label category group baseType damage traits otherTags range
-                         predicate fist},
+                         predicate fist replaceAll},
           # An attack the character would not otherwise have: a shield's lion head, a torch swung as a
           # club, the claws a stance grants. It becomes an unarmed-style attack, described the same way
-          # a catalogue weapon is, so everything that reads an attack reads this one too.
+          # a catalogue weapon is, so everything that reads an attack reads this one too. `replaceAll`
+          # makes it the only attack there is while it lasts: "the only Strikes you can make are...".
           'contribute' => lambda { |row, source, _context|
             base = (row['damage'] || {})['base'] || {}
 
@@ -250,7 +251,8 @@ module AresMUSH
               'dice' => base['dice'] || 1,
               'die' => base['die'],
               'damage_type' => base['damageType'],
-              'range' => row['range'] }
+              'range' => row['range'],
+              'replace_all' => row['replaceAll'] == true }
           }
         },
         {
