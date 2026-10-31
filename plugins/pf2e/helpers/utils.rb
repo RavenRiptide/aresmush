@@ -250,11 +250,14 @@ module AresMUSH
     # A skill term in a roll string is a check rather than a figure, so it carries the circumstances a
     # check establishes: that it is a skill check, and which skill. Deafened's own rule is predicated on
     # exactly those.
+    #
+    # The name is the one `Stat.identify` gives, so `cooking lore` reaches Cooking Lore and a lore the
+    # catalogue does not hold is still a lore. Anything else it names - hit points, AC - is no check.
     def self.skill_keyword_bonus(char, word, options = [])
-      name = word.capitalize
-      return 0 unless Global.read_config('pf2e_skills').keys.include?(name)
+      kind, name = Stat.identify(word)
+      return 0 unless %w{skill lore}.include?(kind)
 
-      Check.of(char, Pf2eSkills.lore?(name) ? 'lore' : 'skill', name, options)
+      Check.of(char, kind, name, options)
     end
 
     # Every die in the game is rolled here, so one change's dice can be kept and fall the same again

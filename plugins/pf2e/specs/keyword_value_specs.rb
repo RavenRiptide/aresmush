@@ -88,6 +88,32 @@ module AresMUSH
         expect(Pf2e.get_keyword_value(char, 'melee')).to eq 0
       end
 
+      it "should resolve a skill through a check" do
+        allow(Global).to receive(:read_config).with('pf2e_skills').and_return('Athletics' => {})
+        expect(Pf2e::Check).to receive(:of).with(anything, 'skill', 'Athletics', anything)
+                                           .and_return(a_check(7))
+
+        expect(Pf2e.get_keyword_value(char, 'athletics')).to eq 7
+      end
+
+      # A lore's name is more than one word, so capitalising the first letter alone never matched the
+      # catalogue, and the roll was a bare d20.
+      it "should resolve a lore the catalogue holds" do
+        allow(Global).to receive(:read_config).with('pf2e_skills').and_return('Cooking Lore' => {})
+        expect(Pf2e::Check).to receive(:of).with(anything, 'lore', 'Cooking Lore', anything)
+                                           .and_return(a_check(6))
+
+        expect(Pf2e.get_keyword_value(char, 'cooking lore')).to eq 6
+      end
+
+      it "should resolve a lore the catalogue does not hold" do
+        allow(Global).to receive(:read_config).with('pf2e_skills').and_return({})
+        expect(Pf2e::Check).to receive(:of).with(anything, 'lore', 'Sailing Lore', anything)
+                                           .and_return(a_check(3))
+
+        expect(Pf2e.get_keyword_value(char, 'Sailing Lore')).to eq 3
+      end
+
       it "should give nothing for a word it does not know" do
         allow(Global).to receive(:read_config).with('pf2e_skills').and_return({})
 
