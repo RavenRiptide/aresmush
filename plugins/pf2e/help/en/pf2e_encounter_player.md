@@ -14,6 +14,8 @@ aliases:
 `encounter/join [<encounter ID>=][<stat>]`: Joins an encounter and rolls your initiative on the statistic the GM chose (Perception by default).
 %t **Note:** If the GM asks you to roll a different statistic, name it: Perception, a skill, or an ability, such as `encounter/join 12=stealth` or `encounter/join dex`. Capitalization doesn't matter, and you can type just the first few letters of a skill, or an ability's three-letter abbreviation.
 `encounter/sheet[ <#id or name>][/<section>]`: Shows your sheet, or another combatant's, as it stands in this encounter, including the Hit Points, conditions, and effects that `sheet` doesn't show. Add `/<section>` to show one section; the sections are the same as `sheet`'s.
+`encounter/csheet[ <#id or name>]`: Shows your combat sheet, or another combatant's, as it stands in this encounter: the Strikes you can make with what you carry in the encounter, with their attack bonuses and damage, and your AC, saves, and conditions. `csheet` shows the same sheet outside the encounter.
+%t **Note:** While you're in a stance that limits your Strikes, such as Stumbling Stance, the sheet lists only the stance's attack.
 `encounter/view [<encounter ID>]`: Shows the encounter's initiative table: each combatant's ID, initiative, conditions, cover, and concealment. It also gives a link to the encounter's web page, which you can also open from the scene's Play menu on the web. (Alias: `tinit <encounter ID>`)
 `encounter/creature <#id>`: Shows a creature's name and conditions.
 %t **Note:** Only the encounter's GM can see a creature's stat block and hit points.

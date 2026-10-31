@@ -257,6 +257,19 @@ module AresMUSH
           expect(standing.consumables.to_a.map(&:name)).to include('Antidote (Lesser)', 'Minor Healing Potion')
         end
 
+        # Investing and etching are the sheet's to say, for a player who forgot to invest before joining.
+        it "should take whether an item is invested, and its runes, from their sheet" do
+          standing.weapons.to_a.first.update(:equipped => false)
+          @sword.update(:invested => true, :invest_on_refresh => true,
+                        :runes => { 'fundamental' => { 'potency' => 1 }, 'property' => {} })
+
+          resync
+
+          copy = standing.weapons.to_a.first
+          expect([ copy.invested, copy.invest_on_refresh, copy.runes.dig('fundamental', 'potency') ]).to eq [ true, true, 1 ]
+          expect(copy.equipped).to be false
+        end
+
         it "should put what they bought in the copy of its bag" do
           torch = PF2Gear.create(:name => 'Torch', :character => @hero, :bag => @bag)
 

@@ -140,8 +140,16 @@ module AresMUSH
 
       end
 
+      # Whether an item is invested, for every kind of item listed in columns. One without the invested
+      # trait has nothing to invest: `-`.
+      def invested(item)
+        return "-" unless item.respond_to?(:invested) && Pf2e.has_trait?(item.traits, 'invested')
+
+        item.invested ? "Yes" : "No"
+      end
+
       def header_wp_armor
-        "%b%b#{left("#", 3)}%b#{left("Name", 43)}%b#{left("Bulk", 8)}%b#{left("Prof", 10)}%b#{left("Equip?", 9)}"
+        "%b%b#{left("#", 3)}%b#{left("Name", 37)}%b#{left("Bulk", 6)}%b#{left("Prof", 6)}%b#{left("Equip?", 8)}%b#{left("Invest?", 8)}"
       end
 
       def format_wp(char,w,i)
@@ -149,7 +157,7 @@ module AresMUSH
         bulk = w.bulk == 0.1 ? "L" : w.bulk.to_i
         prof = Pf2eCombat.get_weapon_prof(char, w.name)[0].upcase
         equip = w.equipped ? "Yes" : "No"
-        "%b%b#{left(i, 3)}%b#{left(name, 43)}%b#{left(bulk, 8)}%b#{left(prof, 10)}%b#{left(equip, 9)}"
+        "%b%b#{left(i, 3)}%b#{left(name, 37)}%b#{left(bulk, 6)}%b#{left(prof, 6)}%b#{left(equip, 8)}%b#{left(invested(w), 8)}"
       end
 
       def format_armor(char,a,i)
@@ -157,11 +165,11 @@ module AresMUSH
         bulk = a.bulk == 0.1 ? "L" : a.bulk.to_i
         prof = Pf2eCombat.get_armor_prof(char, a.name)[0].upcase
         equip = a.equipped ? "Yes" : "No"
-        "%b%b#{left(i, 3)}%b#{left(name, 43)}%b#{left(bulk, 8)}%b#{left(prof, 10)}%b#{left(equip, 9)}"
+        "%b%b#{left(i, 3)}%b#{left(name, 37)}%b#{left(bulk, 6)}%b#{left(prof, 6)}%b#{left(equip, 8)}%b#{left(invested(a), 8)}"
       end
 
       def header_shields
-        "%b%b#{left("#", 3)}%b#{left("Name", 43)}%b#{left("Bulk", 8)}%b#{left("HP", 10)}%b#{left("Equip?", 9)}"
+        "%b%b#{left("#", 3)}%b#{left("Name", 33)}%b#{left("Bulk", 6)}%b#{left("HP", 10)}%b#{left("Equip?", 8)}%b#{left("Invest?", 8)}"
       end
 
       def format_shields(char,s,i)
@@ -170,7 +178,7 @@ module AresMUSH
         disp_hp = Pf2egear.display_shield_hp(s)
         equip = s.equipped ? "Yes" : "No"
 
-        "%b%b#{left(i, 3)}%b#{left(name, 43)}%b#{left(bulk, 8)}%b#{left(disp_hp,10)}%b#{left(equip, 9)}"
+        "%b%b#{left(i, 3)}%b#{left(name, 33)}%b#{left(bulk, 6)}%b#{left(disp_hp,10)}%b#{left(equip, 8)}%b#{left(invested(s), 8)}"
       end
 
       def format_gear(item,i)
@@ -188,9 +196,7 @@ module AresMUSH
       def format_mi(mi, i)
         name = Pf2egear.get_item_name(mi)
         bulk = mi.bulk == 0.1 ? "L" : mi.bulk.to_i
-        invest = mi.invested ? "Yes" : "No"
-
-        "%b%b#{left(i, 3)}%b#{left(name, 52)}%b#{left(bulk, 8)}%b#{left(invest, 10)}"
+        "%b%b#{left(i, 3)}%b#{left(name, 52)}%b#{left(bulk, 8)}%b#{left(invested(mi), 10)}"
       end
 
       def header_bags

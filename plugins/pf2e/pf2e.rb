@@ -242,6 +242,8 @@ module AresMUSH
           return PF2EncounterOptionCmd
         when "sheet"
           return PF2EncounterSheetCmd
+        when "csheet"
+          return PF2EncounterCombatSheetCmd
         when "undo", "redo"
           return PF2EncounterUndoCmd
         when "rest"

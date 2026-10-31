@@ -48,7 +48,7 @@ What an encounter can do depends on who runs it:
 `encounter/mod [<encounter ID>=]<#id or name>=<new init>`: Sets a combatant's initiative. The current turn stays where it is.
 `encounter/remove [<encounter ID>=]<#id or name>`: Removes a combatant from the initiative order. A removed creature is gone for good. (Alias: `rminit`)
 `encounter/scan`: Shows everyone in the encounter by ID, as they currently are: each combatant's hit points, AC, Perception, saves, and whether they have Reactive Strike; each creature's level and any elite or weak adjustment; and each combatant's immunities, weaknesses, and resistances. (Alias: `tscan`)
-`encounter/resync [<encounter ID>=]<#id or name>`: Updates a character's encounter gear from their sheet, for something they had to buy after joining. The game adds the items they bought since joining, and sets their money to match their sheet. Items they already had stay as they are in the encounter (drawn or stowed, minus anything used), and so does anything the encounter gave them. `encounter/undo` reverses a resync.
+`encounter/resync [<encounter ID>=]<#id or name>`: Updates a character's encounter gear from their sheet, for something they forgot to buy or invest before joining. The game adds the items they bought since joining, takes each item's investment and runes from their sheet, and sets their money to match their sheet. Items they already had otherwise stay as they are in the encounter (drawn or stowed, minus anything used), and so does anything the encounter gave them. `encounter/undo` reverses a resync.
 
 ## Party, difficulty, and rewards
 

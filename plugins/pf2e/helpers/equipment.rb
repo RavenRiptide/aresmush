@@ -105,8 +105,9 @@ module AresMUSH
       end
 
       # What a character carries in an encounter made what their sheet holds now, for a GM who lets them
-      # have what they bought since joining. What they had already is kept as they have it here - drawn,
-      # stowed, its charges spent - and a consumable less what they used of it here. What their sheet no
+      # have what they bought since joining, or invest what they forgot to. What they had already is kept
+      # as they have it here - drawn, stowed, its charges spent - except whether it is invested and what
+      # runes it has, which are the sheet's; and a consumable less what they used of it here. What their sheet no
       # longer holds goes, and what the encounter gave them stays. Their money is their sheet's.
       def self.resync!(state, char)
         copied = {}
@@ -132,6 +133,9 @@ module AresMUSH
               left.positive? ? copy.update(:quantity => left) : copy.delete
             elsif Pf2egear::Inventory.stackable?(collection)
               copy.update(:quantity => item.quantity)
+            else
+              facts = facts_of(model, item)
+              copy.update(facts) unless facts.empty?
             end
 
             copied[[ model, item.id ]] = copy
@@ -143,6 +147,16 @@ module AresMUSH
         # The consumables they came in with are now their sheet's, and what is used of them settles from there.
         baseline = char.consumables.to_a.to_h { |one| [ one.id.to_s, { 'quantity' => one.quantity.to_i, 'name' => one.name } ] }
         state.update(:pf2_money => char.pf2_money.to_i, :consumables_at_start => baseline)
+      end
+
+      # What an item is, which the sheet decides even mid-encounter: whether it is invested and what runes
+      # it has. Whether it is drawn, and what is spent of it, happened in the encounter and stays.
+      FACTS = %i{invested invest_on_refresh runes}.freeze
+
+      def self.facts_of(model, item)
+        held = model.attributes.map(&:to_sym)
+
+        FACTS.select { |field| held.include?(field) }.to_h { |field| [ field, item.public_send(field) ] }
       end
 
       # Whether a copy is of something on the character's own sheet, or was: the encounter's own - what it

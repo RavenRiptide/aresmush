@@ -136,6 +136,20 @@ module AresMUSH
         expect(Pf2e::Damage.formula(reread, fist)).to include '1d6 fire'
       end
 
+      # The inventory says whether an item is invested in every category, and `-` for one with nothing to
+      # invest.
+      it "should say in the inventory whether they are invested" do
+        wraps = handwraps(:invested => false)
+        listing = Pf2egear::Pf2eDisplayGearTemplate.new(reread, double(:screen_reader => false))
+
+        expect(listing.format_wp(reread, wraps, 0)).to match(/No\s*\z/)
+
+        wraps.update(:invested => true)
+
+        expect(listing.format_wp(reread, PF2Weapon[wraps.id], 0)).to match(/Yes\s*\z/)
+        expect(listing.format_wp(reread, weapon, 1)).to match(/-\s*\z/)
+      end
+
       it "should not offer them as a Strike of their own" do
         handwraps
 

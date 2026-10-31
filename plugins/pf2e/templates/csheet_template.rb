@@ -129,7 +129,14 @@ module AresMUSH
         ac + shield_bonus
       end
 
+      # Attacks a stance makes the only ones there are while it lasts: Stumbling Stance's stumbling swing.
+      def replacing
+        @replacing ||= Pf2eCombat.granted_strikes(@char).select { |strike| strike['replace_all'] }
+      end
+
       def unarmed_attacks
+        return replacing.map { |strike| format_strike(@char, strike) } + rune_lenders if replacing.any?
+
         list = []
 
         attack_list = combat_stats.unarmed_attacks
@@ -145,13 +152,14 @@ module AresMUSH
         list + rune_lenders
       end
 
-      # Handwraps, which are not attacked with: what their runes do for the attacks above.
+      # Handwraps, which are not attacked with: what their runes do for the unarmed attacks.
       def rune_lenders
         lending = Pf2eCombat.unarmed_rune_item(@char)
 
         Pf2egear::Inventory.held(@char, 'weapons').select { |w| Pf2eCombat.rune_lender?(w.name) }.map do |w|
+          runes = rune_words(w)
           said = if lending && lending.id == w.id
-                   t('pf2e.unarmed_runes_apply')
+                   runes.empty? ? t('pf2e.unarmed_runes_none') : t('pf2e.unarmed_runes_apply', :runes => runes.join(', '))
                  elsif w.invested
                    t('pf2e.unarmed_runes_outdone')
                  else
@@ -160,6 +168,17 @@ module AresMUSH
 
           "#{item_color}#{Pf2egear.get_item_name(w)}:%xn #{said}%r"
         end
+      end
+
+      STRIKING = [ nil, 'striking', 'greater striking', 'major striking' ].freeze
+
+      # An item's runes as a player names them: "+1 potency, striking, flaming".
+      def rune_words(item)
+        potency = Pf2egear.get_rune_value(item, 'fundamental', 'potency').to_i
+        power = Pf2egear.get_rune_value(item, 'fundamental', 'power').to_i
+
+        [ potency.positive? ? "+#{potency} potency" : nil, STRIKING[power] ].compact +
+          Pf2egear.property_runes(item).map { |one| one.to_s.downcase }
       end
 
       def format_strike(char, strike)
@@ -180,6 +199,11 @@ module AresMUSH
       end
 
       def weapons
+        if replacing.any?
+          return [ t('pf2e.csheet_strikes_replaced', :source => replacing.first['source'].to_s.sub(/\AStance: /, ''),
+                     :attacks => replacing.map { |strike| strike['name'] }.join(', ')) ]
+        end
+
         weapon_list = Pf2egear::Inventory.held(@char, 'weapons')
 
         list = []

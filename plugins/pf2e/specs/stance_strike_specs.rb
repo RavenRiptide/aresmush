@@ -105,6 +105,32 @@ module AresMUSH
       expect(Pf2e::Damage.formula(reread, attack('Stumbling Swing'))).to start_with '2d8'
     end
 
+    def combat_sheet
+      Pf2e::PF2CombatSheetTemplate.new(reread, double(:screen_reader => false))
+    end
+
+    it "should list only the stance's attack on the combat sheet, and say why there are no weapons" do
+      enter('Stance: Stumbling Stance')
+
+      expect(combat_sheet.unarmed_attacks.join).to include 'Stumbling Swing'
+      expect(combat_sheet.unarmed_attacks.join).to_not include 'Fist:'
+      expect(combat_sheet.weapons).to eq [ t('pf2e.csheet_strikes_replaced', :source => 'Stumbling Stance',
+                                                                             :attacks => 'Stumbling Swing') ]
+    end
+
+    # The handwraps line says what they add, so a pair with no runes does not read as working.
+    it "should name the runes invested handwraps give" do
+      handwraps
+
+      expect(combat_sheet.rune_lenders.join).to include t('pf2e.unarmed_runes_apply', :runes => '+1 potency, striking')
+    end
+
+    it "should say when invested handwraps have no runes" do
+      item('Handwraps of Mighty Blows (+1)').update(:invested => true, :runes => { 'fundamental' => {}, 'property' => {} })
+
+      expect(combat_sheet.rune_lenders.join).to include t('pf2e.unarmed_runes_none')
+    end
+
     # Every stance action the catalogue offers whose effect grants an attack, with damage of its own, as
     # the only one there is. Monastic Archer Stance limits Strikes to bows the character already has.
     it "should give every stance whose attack replaces the others an attack to make" do
