@@ -283,6 +283,11 @@ module AresMUSH
         true
       end
 
+      # Whether it may cast the spell at all: a character's magic says, when the spell is spent.
+      def lists_spell?(_spell)
+        true
+      end
+
       # Which record an effect it is under belongs to.
       def effect_owner_field
         :character
@@ -449,9 +454,12 @@ module AresMUSH
       # ------------------------------------------------------------------------------
       # Acting
 
-      # A creature is run by the GM, who may use any action for it.
+      # The actions anyone may use. Its own abilities are found by name before this is asked; anything
+      # else is the GM's to force.
       def may_use(name)
-        Ok.new(:state => name)
+        return Ok.new(:state => name) if Actions.info(name)['for'] == 'everyone'
+
+        Err.new(:not_creatures, 'pf2e.action_not_creatures', 'action' => name, 'actor' => @holder.name)
       end
 
       def own_ability(term)
@@ -504,6 +512,10 @@ module AresMUSH
       # Its spells are its stat block's, cast as often as the GM says.
       def spends_spells?
         false
+      end
+
+      def lists_spell?(spell)
+        Npcs.lists_spell?(@holder, spell)
       end
 
       # The rank the stat block lists the spell at; a cantrip is half its level, rounded up.

@@ -67,6 +67,7 @@ Bows, crossbows, and slings always have ordinary ammunition, which the game does
 %t `encounter/cast fireball=#3,#4,#5/rank 4`
 %t `encounter/cast heal=#2/actions 2`
 %t **Note:** For a spell that can be cast more than one way, name the way: `/actions 2` for Heal's two-action version, which heals more at range, or a word from the variant's name, such as `/silver` for silver Needle Darts.
+%t **Note:** Force Barrage fires one shard for each action you spend: `encounter/cast force barrage=#3/actions 3`. Every target you name takes all of the shards, so to split them between targets, name one target and the GM settles the rest.
 %t **Note:** For a save that isn't basic, the damage for each outcome comes from the spell's text. If the text doesn't say, the game shows the room the damage, and the GM settles it.
 
 ## Circumstance bonuses and penalties
@@ -78,6 +79,7 @@ Bows, crossbows, and slings always have ordinary ammunition, which the game does
 `piercing`, `slashing`, `bludgeoning`: Chooses the damage type a versatile weapon deals this time.
 `nonlethal`, `lethal`: Makes a nonlethal attack with a lethal weapon, or a lethal attack with a nonlethal weapon, at -2 to hit. A nonlethal hit that drops someone to 0 HP knocks them out.
 `volley`: Marks the target as within a volley weapon's short range (-2 to hit).
+`force`: Lets the GM have a creature use an action or cast a spell its stat block doesn't give it. See `help encounter_gm`.
 `silver`, `cold iron`, `holy`, `magical`, and so on: Tells the game what your weapon is made of or carries, which it can't see on its own. A creature with a weakness to that material takes more damage, and a resistance that makes an exception for it doesn't apply: `encounter/strike #3=longsword/cold iron`.
 
 Any other circumstance is one the rules can check for, such as `unintelligible`, a skill for Aid, or a variant like `stabilize`.

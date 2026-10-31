@@ -160,6 +160,8 @@ module AresMUSH
       def scene_checks!
         poses = scene_poses
         text = poses.map { |pose| clean(pose.pose) }
+        # A game line is kept marked with the system prefix, and as told beside it.
+        told = poses.map { |pose| clean(pose.system_text.to_s) }
         scene = Scene[@scene.id]
 
         @audit.counts['scene lines checked'] += poses.size
@@ -170,7 +172,7 @@ module AresMUSH
           @audit.find('scene', "encounter #{one.id}", 'still running after its scene stopped') if encounter.is_active
 
           Array(encounter.messages).each do |_time, message|
-            next if text.include?(clean(message))
+            next if text.include?(clean(message)) || told.include?(clean(message))
 
             @audit.find('scene', "encounter #{one.id}", "its line is not in the scene log: #{clean(message)[0, 120]}")
           end

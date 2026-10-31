@@ -20,6 +20,9 @@ These commands are for the GM of an encounter. For starting and running the enco
 
 Use a creature's abilities by name: `encounter/as #3=act goblin scuttle`. The game applies the rules of a creature's abilities on its own, such as a bonus to its saves, extra damage on a Strike, fast healing, or an aura you place with `encounter/as #3=enter <aura>=<ids>`.
 
+A creature can use the basic actions anyone can (Stride, Trip, Demoralize, Raise a Shield, and so on), its own abilities, and the spells its stat block lists. To have it use another action or cast another spell, add `/force`: `encounter/as #3=cast force barrage=aria/force`. A spell cast this way is cast at the creature's highest rank, which is half its level rounded up, unless you add `/rank <n>`.
+%t **Note:** A creature with no spell attack bonus on its stat block can't roll a spell attack, so you roll it. A creature with no spell DC can't set one for a save, so you set it.
+
 When an ability's text gives its damage and save, such as Constrict or a breath weapon, the game rolls each target's save and deals the damage as a basic save: `encounter/as #6=act magma breath=#1,#2,aria`. You apply anything else in the ability's text.
 
 When a creature's Strike lists Grab, Knockdown, or Push, a hit tells you so and gives you the command to use, such as `encounter/as #3=act knockdown=#1`. Each one is a separate Grapple, Trip, or Shove that doesn't use or add to the multiple attack penalty. The Improved version is a free action.

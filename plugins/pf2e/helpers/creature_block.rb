@@ -129,7 +129,7 @@ module AresMUSH
         counted = ->(value) { hash(value).filter_map { |key, number| int(number).nil? ? nil : [ word(key, 60), int(number) ] }.to_h }
 
         { 'name' => word(raw['name'], 60), 'tradition' => word(raw['tradition'], 20), 'type' => word(raw['type'], 20),
-          'dc' => int(raw['dc']).to_i, 'attack' => int(raw['attack']).to_i, 'spells' => spells }
+          'dc' => int(raw['dc']), 'attack' => int(raw['attack']), 'spells' => spells }
           .merge(raw['slots'].is_a?(Hash) ? { 'slots' => counted.call(raw['slots']) } : {})
           .merge(raw['uses'].is_a?(Hash) ? { 'uses' => counted.call(raw['uses']) } : {})
       end

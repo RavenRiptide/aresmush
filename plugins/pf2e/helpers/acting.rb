@@ -58,6 +58,7 @@ module AresMUSH
           elsif (found = lower.match(/\Aactions?\s+(\d+)\z/)) then out['actions'] = found[1].to_i
           elsif (found = lower.match(/\Aclass\s+(.+)\z/)) then out['class'] = found[1].strip
           elsif %w{flanking flanked flank}.include?(lower) then out['flanking'] = true
+          elsif lower == 'force' then out['force'] = true
           elsif COVER_WORDS.key?(lower)
             permitted ? out['cover'] = COVER_WORDS[lower] : out['refused'] << word
           elsif Resolve::CONCEALMENT.key?(lower)
@@ -119,7 +120,7 @@ module AresMUSH
 
       def self.act(scene, term, words, targets: nil)
         follow = Actors.of(scene.actor.holder).follow_up(term)
-        name = follow ? follow['action'] : action_named(scene, term)
+        name = follow ? follow['action'] : action_named(scene, term, words)
 
         return name if name.is_a?(Err)
 
@@ -363,8 +364,8 @@ module AresMUSH
       end
 
       # The action the actor means: one of the catalogue's they may use, or - for a creature - one of its
-      # own abilities by name.
-      def self.action_named(scene, term)
+      # own abilities by name. The GM may force one they may not, improvising.
+      def self.action_named(scene, term, words = [])
         actor = Actors.of(scene.actor.holder)
         own = actor.own_ability(term)
 
@@ -376,7 +377,20 @@ module AresMUSH
 
         allowed = actor.may_use(found.state)
 
-        allowed.err? ? allowed : found.state
+        allowed.err? && !forced?(scene, words) ? allowed : found.state
+      end
+
+      # `/force`, said by the encounter's GM: what the actor's sheet or stat block does not give them,
+      # done anyway.
+      def self.forced?(scene, words)
+        said(words, false)['force'] && Combatants.gm?(scene.enactor, scene.encounter) ? true : false
+      end
+
+      # A creature casts the spells its stat block lists, and others only where the GM forces them.
+      def self.unlisted_spell(scene, spell, words)
+        return nil if Actors.of(scene.actor.holder).lists_spell?(spell) || forced?(scene, words)
+
+        Err.new(:spell_not_listed, 'pf2e.cast_not_listed', 'actor' => scene.actor.label, 'spell' => spell_mechanics(spell).first)
       end
 
       def self.own_text(scene, name)
@@ -1572,7 +1586,8 @@ module AresMUSH
       end
 
       # The rank a spell is cast at: what the caster said, what the slot was, or its own; a cantrip is half
-      # the caster's level, rounded up.
+      # the caster's level, rounded up. A creature casting one its stat block does not list - forced by the
+      # GM - casts it at that same highest rank, never below the spell's own.
       def self.spell_rank(holder, spell, mechanics, said, cast)
         return said['rank'] if said['rank']
 
@@ -1583,9 +1598,13 @@ module AresMUSH
         listed = Actors.of(holder).listed_spell_rank(spell)
         return listed if listed
 
-        return (holder.pf2_level / 2.0).ceil.clamp(1, 10) if mechanics && mechanics['rank'].to_i.zero?
+        highest = (holder.pf2_level / 2.0).ceil.clamp(1, 10)
+        own = (mechanics && mechanics['rank']).to_i
 
-        (mechanics && mechanics['rank']).to_i.clamp(1, 10)
+        return highest if mechanics && own.zero?
+        return [ highest, own ].max.clamp(1, 10) if Actors.of(holder).creature?
+
+        own.clamp(1, 10)
       end
 
       # A spell's damage at a rank, heightened: an interval adds its damage each step above the spell's own
@@ -1620,7 +1639,12 @@ module AresMUSH
 
       # A spell attack's outcomes are the attack's own: Briny Bolt's critical hit blinds what it hits.
       def self.spell_attack(scene, spell, mechanics, casting, formulas, said, out)
-        options = TurnState.map_options(scene.actor.holder) + options_for(scene, said) + [ 'action:cast-a-spell' ]
+        # A creature whose stat block gives it no spell attack - one forced to cast - has the GM roll it.
+        if Actors.of(scene.actor.holder).creature? && spell_figure(scene.actor.holder, 'spell_attack', casting || {}).nil?
+          return out['lines'] << told('pf2e.act_spell_attack_gm', :target => scene.target.label)
+        end
+
+        options =TurnState.map_options(scene.actor.holder) + options_for(scene, said) + [ 'action:cast-a-spell' ]
         check = Check.of(scene.actor.holder, 'spell_attack', casting || {}, options)
         extra = attack_penalty(scene.actor.holder)
 

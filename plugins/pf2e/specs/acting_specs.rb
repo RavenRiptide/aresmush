@@ -178,7 +178,7 @@ module AresMUSH
 
         it "should put Bon Mot's critical penalty on the target" do
           @dice = 1.0
-          run(PF2EncounterAsCmd, 'e/as #2=act bon mot=#3')
+          run(PF2EncounterAsCmd, 'e/as #2=act bon mot=#3/force')
 
           expect(ActiveEffects.on(npc(3)).map(&:name)).to eq [ 'Effect: Bon Mot' ]
           expect(Resolve.defence(npc(3), 'will')['dc']).to eq 10 + 3 - 3
@@ -834,7 +834,7 @@ module AresMUSH
 
         it "should tell an area's dice once, and what each target's save made of them" do
           @dice = 0.5
-          run(PF2EncounterAsCmd, 'e/as #2=cast fireball=#3')
+          run(PF2EncounterAsCmd, 'e/as #2=cast fireball=#3/force')
 
           expect(said).to include('Fireball rolls 6d6: 3, 3, 3, 3, 3, 3 = 18 fire for everything in its area.')
           expect(said).to match(/Damage to Goblin Warrior #3: 18 fire\./)
@@ -847,7 +847,7 @@ module AresMUSH
             sides.to_i == 20 ? [ 2 ] * amount.to_i : Array.new(amount.to_i) { |at| (rolled.size + at) % 6 + 1 }
           end
 
-          run(PF2EncounterAsCmd, 'e/as #2=cast fireball=#3,#4,#5')
+          run(PF2EncounterAsCmd, 'e/as #2=cast fireball=#3,#4,#5/force')
 
           expect(@client.failures).to eq []
           expect(rolled).to eq [ 6 ]
@@ -877,7 +877,7 @@ module AresMUSH
         # Daze's stun is in a sentence of its own rather than an outcome's paragraph.
         it "should stun a target that critically fails Daze's save" do
           @dice = 0.05
-          run(PF2EncounterAsCmd, 'e/as #2=cast daze=#3')
+          run(PF2EncounterAsCmd, 'e/as #2=cast daze=#3/force')
 
           expect(Pf2e.condition_level(npc(3), 'Stunned')).to eq 1
         end
@@ -885,7 +885,7 @@ module AresMUSH
         # A critical success on a basic save takes nothing, and the room is told so, not of 0 damage.
         it "should say a target that critically succeeds a basic save takes no damage" do
           @dice = 1.0
-          run(PF2EncounterAsCmd, 'e/as #2=cast daze=#3')
+          run(PF2EncounterAsCmd, 'e/as #2=cast daze=#3/force')
 
           expect(said).to include(t('pf2e.act_unharmed', :target => 'Goblin Warrior #3').strip)
           expect(said).to_not include('Damage to Goblin Warrior #3')
@@ -895,7 +895,7 @@ module AresMUSH
         # half on a success, double on a critical failure.
         it "should halve the persistent damage on a success" do
           @dice = 0.95
-          run(PF2EncounterAsCmd, 'e/as #2=cast blistering invective=#3')
+          run(PF2EncounterAsCmd, 'e/as #2=cast blistering invective=#3/force')
 
           expect(said).to include('Will', 'success')
           expect(npc(3).pf2_persistent).to eq [ { 'formula' => '1d6', 'type' => 'fire', 'dc' => 15 } ]
@@ -903,7 +903,7 @@ module AresMUSH
 
         it "should double the persistent damage on a critical failure" do
           @dice = 0.05
-          run(PF2EncounterAsCmd, 'e/as #2=cast blistering invective=#3')
+          run(PF2EncounterAsCmd, 'e/as #2=cast blistering invective=#3/force')
 
           expect(npc(3).pf2_persistent).to eq [ { 'formula' => '4d6', 'type' => 'fire', 'dc' => 15 } ]
         end
@@ -913,7 +913,7 @@ module AresMUSH
           state = CombatantStates.of(@encounter, Character[@hero.id])
           Pf2eHP.get_hp_obj(state).update(:damage => Pf2eHP.get_max_hp(state))
           Pf2e.set_condition(state, 'Dying', 1)
-          run(PF2EncounterAsCmd, "e/as #2=cast stabilize=#{@hero.name}")
+          run(PF2EncounterAsCmd, "e/as #2=cast stabilize=#{@hero.name}/force")
 
           expect(@client.failures).to eq []
           expect(Pf2e.condition_level(CombatantStates.of(PF2Encounter[@encounter.id], Character[@hero.id]), 'Dying')).to eq 0
@@ -924,7 +924,7 @@ module AresMUSH
         it "should heal a living target with Lay on Hands" do
           state = CombatantStates.of(@encounter, Character[@hero.id])
           Pf2eHP.get_hp_obj(state).update(:damage => 10)
-          run(PF2EncounterAsCmd, "e/as #2=cast lay on hands=#{@hero.name}")
+          run(PF2EncounterAsCmd, "e/as #2=cast lay on hands=#{@hero.name}/force")
 
           expect(@client.failures).to eq []
           expect(Pf2eHP.get_hp_obj(CombatantStates.of(PF2Encounter[@encounter.id], Character[@hero.id])).damage).to eq 4
@@ -933,7 +933,7 @@ module AresMUSH
         # What Command does is the target's to do; the room is told what that is.
         it "should tell the room what an outcome does where it sets no condition" do
           @dice = 0.05
-          run(PF2EncounterAsCmd, 'e/as #2=cast command=#3')
+          run(PF2EncounterAsCmd, 'e/as #2=cast command=#3/force')
 
           expect(said).to include('The target must use all its actions on its next turn to obey your command.')
         end
@@ -941,7 +941,7 @@ module AresMUSH
         # A spell attack's outcomes are the attack's: Briny Bolt's critical hit blinds and dazzles.
         it "should leave what a spell attack's outcome says on what it hits" do
           @dice = 1.0
-          run(PF2EncounterAsCmd, 'e/as #2=cast briny bolt=#3')
+          run(PF2EncounterAsCmd, 'e/as #2=cast briny bolt=#3/force')
 
           expect(npc(3).pf2_conditions.keys).to include('Blinded', 'Dazzled')
         end

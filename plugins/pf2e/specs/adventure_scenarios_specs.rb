@@ -34,7 +34,7 @@ module AresMUSH
         # The scene's log is written for real; only what it would tell web clients and a game's other
         # players is stubbed. A pose is logged when its event is handled, which here is at once.
         allow(Global).to receive(:client_monitor).and_return(double(:notify_web_clients => nil, :emit_all_ooc => nil,
-                                                                    :logged_in => {}, :find_client => nil,
+                                                                    :logged_in => {}, :find_client => nil, :game_clients => [],
                                                                     :web_clients => []))
         allow(Global.dispatcher).to receive(:spawn)
         allow(Global.dispatcher).to receive(:queue_timer)

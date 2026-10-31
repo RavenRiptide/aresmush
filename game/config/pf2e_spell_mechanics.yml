@@ -5214,8 +5214,10 @@ pf2e_spell_mechanics:
     traits: ["concentrate", "force", "manipulate"]
     time: "1 to 3"
     damage: [{"formula": "1d4+1", "type": "force", "category": null, "kinds": ["damage"]}]
+    heightening: {"interval": 2, "damage": ["1d4+1"]}
     target: "1 creature"
     range: "120 feet"
+    variants: [{"name": null, "time": "1", "damage": [{"formula": "1d4+1", "type": "force", "category": null, "kinds": ["damage"]}], "heightening": {"interval": 2, "damage": ["1d4+1"]}}, {"name": null, "time": "2", "damage": [{"formula": "2d4+2", "type": "force", "category": null, "kinds": ["damage"]}], "heightening": {"interval": 2, "damage": ["2d4+2"]}}, {"name": null, "time": "3", "damage": [{"formula": "3d4+3", "type": "force", "category": null, "kinds": ["damage"]}], "heightening": {"interval": 2, "damage": ["3d4+3"]}}]
   "Force Bolt":
     rank: 1
     traits: ["focus", "force", "manipulate", "wizard"]

@@ -33,9 +33,10 @@ module AresMUSH
                     'ability' => ->(_name) { 'Intelligence' } },
         'attack' => { 'base' => ->(_block, strike) { strike['bonus'] },
                       'ability' => ->(strike) { Stat.attack_abilities(strike) } },
-        'spell_attack' => { 'base' => ->(_block, casting) { casting['attack'] },
+        # A spell attack or DC of 0 is a blank the web editor once kept as 0: no stat block has one.
+        'spell_attack' => { 'base' => ->(_block, casting) { casting['attack'].to_i.zero? ? nil : casting['attack'] },
                             'ability' => ->(_casting) { nil } },
-        'spell_dc' => { 'base' => ->(_block, casting) { casting['dc'] },
+        'spell_dc' => { 'base' => ->(_block, casting) { casting['dc'].to_i.zero? ? nil : casting['dc'] },
                         'ability' => ->(_casting) { nil } }
       }.freeze
 
@@ -191,6 +192,15 @@ module AresMUSH
 
         entries.find { |one| (one['spells'] || {}).values.flatten.any? { |name| spell_base(name).casecmp?(wanted) } } ||
           entries.first
+      end
+
+      # Whether any of its spellcasting lists the spell.
+      def self.lists_spell?(npc, spell)
+        wanted = spell_base(spell)
+
+        Array(npc.stat_block['spellcasting']).any? do |one|
+          (one['spells'] || {}).values.flatten.any? { |name| spell_base(name).casecmp?(wanted) }
+        end
       end
 
       # A spell as a stat block lists it, without the notes after its name: `Charm (At Will)` is Charm.

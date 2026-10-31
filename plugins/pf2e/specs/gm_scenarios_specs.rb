@@ -30,7 +30,7 @@ module AresMUSH
         allow(Scenes).to receive(:add_to_scene)
         allow(Scenes).to receive(:create_log)
         allow(Global).to receive(:client_monitor).and_return(double(:notify_web_clients => nil, :emit_all_ooc => nil,
-                                                                    :logged_in => {}, :find_client => nil))
+                                                                    :logged_in => {}, :find_client => nil, :game_clients => []))
       end
 
       after(:each) do

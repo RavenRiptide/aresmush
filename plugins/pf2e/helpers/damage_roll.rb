@@ -11,6 +11,8 @@ module AresMUSH
     #
     # `dice` is how they fell, for the room to check the total against: nil where nothing was rolled.
     #
+    # Dice rolled deal at least 1, however far penalties take them below it; resistance applies after.
+    #
     # A critical hit doubles, which is the rule's default: the doubling pile's total twice, then what
     # never doubles, then what only a critical adds. What deadly and fatal add is `Damage`'s to say, for
     # a character's weapon and a creature's alike, so the roll and the sheet's critical line agree.
@@ -50,9 +52,10 @@ module AresMUSH
                    (critical ? extra_fell.sum + instance['crit_only_modifier'].to_i : 0)
           parts = [ [ doubling, fell, instance['modifier'], critical ], [ fixed, fixed_fell, instance['fixed_modifier'], false ],
                     [ extra, extra_fell, instance['crit_only_modifier'], false ] ]
+          least = (fell + fixed_fell + extra_fell).any? ? 1 : 0
 
           { 'type' => kind(instance['damage_type']), 'category' => instance['category'],
-            'amount' => [ amount, 0 ].max, 'formula' => formula.gsub('+-', '-'), 'dice' => fallen(parts) }
+            'amount' => [ amount, least ].max, 'formula' => formula.gsub('+-', '-'), 'dice' => fallen(parts) }
         end
 
         merged(rows)
@@ -65,9 +68,10 @@ module AresMUSH
           formula = fatal_formula(formula, attack) if critical && index.zero?
 
           thrown = Pf2e.thrown_formula(formula)
+          least = formula.to_s.match?(/d\d/) ? 1 : 0
 
           { 'type' => kind(type), 'category' => category,
-            'amount' => [ thrown['total'] * (critical ? 2 : 1), 0 ].max,
+            'amount' => [ thrown['total'] * (critical ? 2 : 1), least ].max,
             'formula' => critical ? doubled(formula) : formula.to_s,
             'dice' => critical ? scaled_note(thrown['shown'], thrown['total'], 'doubled') : thrown['shown'] }
         end

@@ -29,10 +29,22 @@ module AresMUSH
         { 'code' => code, 'key' => "pf2e.#{code}", 'args' => args }
       end
 
-      # What is warned of and not refused: a word the game does not know, and a figure above the highest
-      # GM Core gives for the creature's level.
+      # What is warned of and not refused: a word the game does not know, a figure above the highest GM
+      # Core gives for the creature's level, and spells with no DC.
       def self.warnings(block)
-        CreatureVocabulary.warnings(block) + CreatureBenchmarks.warnings(block)
+        CreatureVocabulary.warnings(block) + CreatureBenchmarks.warnings(block) + spell_dcs(block)
+      end
+
+      # A spell DC left blank is the GM's to set at every cast; the level's moderate one is offered.
+      def self.spell_dcs(block)
+        level = block['level'].to_i
+
+        Array(block['spellcasting']).select { |casting| casting['dc'].to_i.zero? }.map do |casting|
+          named = casting['name'].to_s.strip.empty? ? 'its spells' : casting['name']
+
+          found(:creature_casting, 'casting' => named, 'what' => t('pf2e.creature_casting_dc', :level => level,
+                                                                     :dc => CreatureBenchmarks.figure_at('spell', level, 'moderate_dc')))
+        end
       end
 
       def self.errors(block)

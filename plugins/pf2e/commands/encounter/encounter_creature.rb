@@ -46,7 +46,9 @@ module AresMUSH
 
         Array(block['spellcasting']).each do |casting|
           spells = (casting['spells'] || {}).map { |rank, names| "#{rank_words(casting, rank)}: #{spell_words(casting, names)}" }
-          lines << "#{casting['name']} DC #{casting['dc']}, attack #{signed(casting['attack'])}; #{spells.join('; ')}"
+          figures = [ casting['dc'].to_i.zero? ? nil : "DC #{casting['dc']}",
+                      casting['attack'].to_i.zero? ? nil : "attack #{signed(casting['attack'])}" ].compact
+          lines << "#{[ casting['name'], figures.join(', ') ].reject { |one| one.to_s.empty? }.join(' ')}; #{spells.join('; ')}"
         end
 
         Array(block['actions']).each do |ability|
