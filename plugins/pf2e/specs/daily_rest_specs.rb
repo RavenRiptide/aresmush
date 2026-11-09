@@ -121,10 +121,72 @@ module AresMUSH
         expect(standing.damage).to eq 4
       end
 
+      # The day's choices are the character's, not the encounter's, and a rest clears them: taking the
+      # rest back has to give them back too, or the player picks the day over again.
+      it "should give the day's choices back when it is taken back" do
+        picks = { 'staff' => { 'pick' => 'Staff of Fire', 'item' => '1', 'charges' => 3, 'expended' => [],
+                               'source' => 'Staff', 'locked' => true } }
+        @char.update(:pf2_daily_choices => picks)
+
+        rest
+        expect(Character[@char.id].pf2_daily_choices).to eq({})
+
+        History.undo(PF2Encounter[@encounter.id])
+        expect(Character[@char.id].pf2_daily_choices).to eq picks
+
+        History.redo(PF2Encounter[@encounter.id])
+        expect(Character[@char.id].pf2_daily_choices).to eq({})
+      end
+
+      it "should put back nothing else of the character's when it is taken back" do
+        @char.update(:pf2_daily_choices => { 'staff' => { 'pick' => 'Staff of Fire', 'item' => '1' } })
+
+        rest
+        Character[@char.id].update(:pf2_level => 4, :pf2_xp => 77)
+        History.undo(PF2Encounter[@encounter.id])
+
+        char = Character[@char.id]
+
+        expect(char.pf2_level).to eq 4
+        expect(char.pf2_xp).to eq 77
+        expect(char.name).to eq @char.name
+      end
+
       it "should be the GM's to call" do
         rest('e/rest', @char)
 
         expect(@client.failures).to eq [ t('pf2e.not_organizer') ]
+      end
+
+      # An alchemist gathering reagents in exploration, for as long as the GM says.
+      describe "gathering vials" do
+        def gather(text, who = @gm)
+          PF2EncounterGatherCmd.new(@client, Command.new(text), Character[who.id]).on_command
+        end
+
+        before(:each) do
+          @char.update(:pf2_base_info => { 'charclass' => 'Alchemist' })
+          Pf2e.rest(standing)
+          Alchemy.vials(standing).first.update(:quantity => 1)
+        end
+
+        it "should give an alchemist vials back for the time the GM says" do
+          gather("e/gather #{@char.name}")
+
+          expect(@client.failures).to eq []
+          expect(Alchemy.left(standing)).to eq 3
+
+          gather("e/gather #{@char.name}=5")
+
+          expect(Alchemy.left(standing)).to eq 4
+        end
+
+        it "should be the GM's to call" do
+          gather("e/gather #{@char.name}", @char)
+
+          expect(@client.failures).to eq [ t('pf2e.not_organizer') ]
+          expect(Alchemy.left(standing)).to eq 1
+        end
       end
     end
   end

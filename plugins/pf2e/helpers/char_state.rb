@@ -54,11 +54,21 @@ module AresMUSH
             'abilities' => char.abilities.to_a.map { |a| a.name },
             'ability_scores' => char.abilities.to_a.each_with_object({}) { |a, h| h[a.name] = a.base_val },
             'saves' => (char.combat && char.combat.saves) || {},
-            'cg_skills' => char.skills.to_a.select { |s| s.cg_skill }.map { |s| s.name }
+            'cg_skills' => char.skills.to_a.select { |s| s.cg_skill }.map { |s| s.name },
+            'makeshift' => makeshift_of(char)
           },
           :sheet => sheet,
           :config => config
         )
+      end
+
+      # A Staff Nexus wizard's makeshift staff: its spells by slot, and what their spellbook holds at each
+      # slot's rank, which is what it may hold. Empty for anyone else.
+      def self.makeshift_of(char)
+        return {} unless Staves.nexus?(char) && char.respond_to?(:magic) && char.magic
+
+        { 'spells' => Staves.makeshift_picks(char),
+          'book' => Staves::MAKESHIFT_SLOTS.to_h { |slot| [ slot, Staves.spellbook_at(char, slot) ] } }
       end
 
       def self.build(data, sheet: nil, config: nil)
@@ -103,6 +113,8 @@ module AresMUSH
           'ability_scores' => data['ability_scores'] || {},
           'saves' => data['saves'] || {},
           'cg_skills' => data['cg_skills'] || [],
+          # { 'spells' => { slot => spell }, 'book' => { slot => [ spells ] } }, for a Staff Nexus wizard.
+          'makeshift' => data['makeshift'] || {},
           'sheet' => {
             'level' => sheet['level'] || (data['level'] || 1).to_i,
             'skills' => sheet['skills'] || {},

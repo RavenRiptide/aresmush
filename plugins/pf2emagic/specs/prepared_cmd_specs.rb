@@ -6,12 +6,22 @@ module AresMUSH
     # `prepared` tells someone who casts no spells so, and a caster with nothing prepared that instead.
     describe PF2DisplayPreparedCmd do
 
-      def run(magic)
+      def run(magic, daily = [])
         client = double('client')
         enactor = double('enactor', :is_approved? => true, :magic => magic)
         allow(client).to receive(:emit_failure) { |message| @said = message }
+        allow(client).to receive(:emit) { |message| @shown = message }
+        allow(Pf2e::DailyChoices).to receive(:listing).and_return(daily)
 
         PF2DisplayPreparedCmd.new(client, Command.new('prepared'), enactor).handle
+      end
+
+      # Daily choices a feat has them make are theirs whether or not they cast, and are what they see then.
+      it "should show someone who casts nothing their daily choices instead" do
+        run(nil, [ 'prepare/longevity (Ancestral Longevity): Athletics' ])
+
+        expect(@said).to be_nil
+        expect(@shown).to include 'prepare/longevity'
       end
 
       it "should tell someone with no magic that they cast no spells" do

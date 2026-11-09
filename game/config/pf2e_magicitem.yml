@@ -2327,3 +2327,21 @@ pf2e_magicitem:
         selector: "deception"
         type: "item"
         value: 3
+
+  # Items a feat hands over (bound items): never browsed, bought, sold or learned as a formula, made at the
+  # commit boundaries for whoever holds the feat, and usable only while they still hold it. The level is
+  # the character's own, kept in step as they level.
+  Egalrin Feather Fan:
+    traits:
+      - magical
+      - primal
+    level: 5
+    price: 0
+    bulk: 0.1
+    made_only: true
+    holds:
+      spells:
+        - { name: Gust of Wind, rank: 1 }
+      activations: 1
+      max_activations: 3
+    shortdesc: "A fan of an egalrin's own feathers, bound together to focus their ancestral magic. Only the egalrin who made it can use it.%r%r**Activate--Wave Fan** (manipulate); **Frequency** once per day; **Effect** You cast your choice of one spell contained in your fan. You can instead cast a cantrip you've gained from a heritage or an ancestry feat; this doesn't use up one of the fan's daily activations. This activation takes the spell's normal number of actions. The spell's DC is your class DC or spell DC, whichever is higher."

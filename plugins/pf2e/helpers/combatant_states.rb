@@ -30,7 +30,7 @@ module AresMUSH
       end
 
       # The neutral sheet, rested: every hit point, a full focus pool, the day's spells from what they have
-      # prepared, the day's reagents and what an alchemist prepared of them, and nothing on them. What
+      # prepared, the day's snares, an alchemist's vials and prepared items, and nothing on them. What
       # their feats and features work out - sneak attack's dice - is worked out for them as they stand
       # here, with what they carried in.
       def self.fresh(encounter, char)
@@ -41,10 +41,16 @@ module AresMUSH
         Pf2emagic.generate_spells_today(state) if char.magic
         Equipment.copy!(state, char)
         # Rested: anything an earlier day made is gone before this day's is made.
-        %w{turn rest}.each { |lasting| Equipment.lapse!(state, lasting) }
+        %w{turn_end turn rest}.each { |lasting| Equipment.lapse!(state, lasting) }
         Pf2e.daily_refresh_reagents(state)
         Alchemy.at_rest!(state)
+        WeaponPoison.at_rest!(state)
+        DailyChoices.brew!(state)
         Paths.apply_all!(state)
+        # What someone's designation of them gives today: a Root Magic pouch, the mark of a witch's charge.
+        DailyChoices.given_on_join!(state, char)
+        # The staff they prepared today, charged, and the spells they expended on it spent.
+        Staves.on_join!(state, char)
 
         state
       end

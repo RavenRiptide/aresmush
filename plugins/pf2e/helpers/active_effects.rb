@@ -38,8 +38,26 @@ module AresMUSH
         Global.read_config('pf2e_effects') || {}
       end
 
+      # An effect's catalogue entry, with what is kept by hand laid over the imported one
+      # (`pf2e_effect_overrides.yml`): a duration merged over its duration, and rules merged over its rules
+      # by position.
       def self.info(name)
-        catalogue[name] || {}
+        entry = catalogue[name] || {}
+        kept = (Global.read_config('pf2e_effect_overrides') || {})[name]
+
+        return entry unless kept.is_a?(Hash) && !entry.empty?
+
+        out = entry.dup
+        out['duration'] = (entry['duration'] || {}).merge(kept['duration']) if kept['duration'].is_a?(Hash)
+
+        if kept['rules'].is_a?(Array)
+          out['rules'] = Array(entry['rules']).each_with_index.map do |row, at|
+            over = kept['rules'][at]
+            row.is_a?(Hash) && over.is_a?(Hash) ? row.merge(over) : row
+          end
+        end
+
+        out
       end
 
       # The catalogue entry a player means, by the name they typed.
@@ -84,15 +102,20 @@ module AresMUSH
                                                         effect.answers, 0, BattleForms.rows(char, effect), effect) }
       end
 
+      # `origin` is whoever put the effect on them, as Foundry's `@item.origin` reads it: Root Magic's bonus is
+      # the giver's Occultism rank (`@item.origin.skills.occultism.rank`).
       def self.instance_item(effect)
         { 'id' => effect.id.to_s, '_id' => effect.id.to_s, 'level' => effect.level.to_i,
-          'badge' => { 'value' => effect.badge.to_i } }
+          'badge' => { 'value' => effect.badge.to_i },
+          'origin' => ((effect.origin || {})['actor'] || {}) }
       end
 
       # `extra` is what the effect gives through the ordinary rules beyond its own - a battle form's
       # senses, size and resistances.
       def self.source_and_derived(char, name, item, answers, depth, extra = [], effect = nil)
-        rules = Array(info(name)['rules']) + extra
+        # A mutagen whose benefits a later polymorph ended, or whose drawbacks a field vial quiets, keeps only
+        # the other half.
+        rules = Mutagens.rules_of(effect, Array(info(name)['rules'])) + extra
         built = Effects.with_selections(char, Effects.source(name, rules, 'item' => item,
                                                              'chosen' => answers,
                                                              'options' => parent_options(name, effect)))
@@ -130,8 +153,9 @@ module AresMUSH
 
       # An origin as `apply` takes it. `item` is what brought the effect, as a hash of its name or slug,
       # level, type, traits and tags; `by` is whoever used it, a character or a creature; `outcome` is
-      # the degree of success of the check that brought it, 0 to 3.
-      def self.origin(item: nil, by: nil, outcome: nil)
+      # the degree of success of the check that brought it, 0 to 3. `skills` adds the user's skill ranks, 0
+      # to 4 (`{ 'occultism' => { 'rank' => 2 } }`), for an effect whose rules read them.
+      def self.origin(item: nil, by: nil, outcome: nil, skills: false)
         out = {}
 
         thing = (item || {}).reject { |_key, value| value.nil? || value == [] }
@@ -140,11 +164,23 @@ module AresMUSH
         if by.respond_to?(:pf2_level)
           out['actor'] = { 'level' => by.pf2_level.to_i,
                            'traits' => Array(by.respond_to?(:pf2_traits) ? by.pf2_traits : []) }
+          out['actor']['skills'] = skill_ranks(by) if skills
         end
 
         out['outcome'] = outcome.to_i unless outcome.nil?
 
         out
+      end
+
+      def self.skill_ranks(by)
+        (Global.read_config('pf2e_skills') || {}).keys.each_with_object({}) do |skill, out|
+          out[Domains.slug(skill)] = { 'rank' => Pf2e.prof_rank(Pf2eSkills.get_skill_prof(by, skill)).to_i }
+        end
+      end
+
+      # Whether an effect's rules read its origin's skills, so the origin should carry them.
+      def self.reads_origin_skills?(name)
+        Array(info(name)['rules']).any? { |row| row.to_s.include?('origin.skills') }
       end
 
       # Foundry's spelling of an effect's origin (`effect/document.ts` `getRollOptions`): the item that
@@ -260,6 +296,9 @@ module AresMUSH
         effect.update(:sustained => true, :sustained_round => sustained_through(effect, encounter)) if duration['sustained'] && encounter
 
         grant_stored(char, effect, encounter)
+
+        # A polymorph ends the benefits of the mutagens before it (`Mutagens`).
+        Mutagens.began!(char, effect)
 
         # What the effect writes is derived, so it is rebuilt with the effect among the sources before
         # anything reads it - Rage's temporary hit points are a number its own write leaves behind.

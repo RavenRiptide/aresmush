@@ -219,6 +219,21 @@ pf2e_feats:
             - oil
             - potion
           max_level: level
+    # The day's batch: copies of one oil or potion they know the formula for, more as their spell DC
+    # rises. A rest brews it, and it lapses at the next.
+    daily_choice:
+      switch: cauldron
+      pick: formula
+      formulas:
+        category: consumables
+        traits:
+          - oil
+          - potion
+      brews:
+        trained: 1
+        master: 2
+        legendary: 3
+      lasts: until_changed
     assoc_charclass:
       - Witch
     feat_type:
@@ -555,19 +570,14 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 1
-    shortdesc: You've collected a cross-section of information on various disciplines you can refer to when preparing for various tasks. During your daily preparations, you can cram on a certain subject to become temporarily trained in one skill of your choice. This proficiency lasts until you prepare again. As this proficiency is temporary, you can't use it as a prerequisite for a permanent character option like a skill increase or a feat.
+    shortdesc: "You've collected a cross-section of information on various disciplines you can refer to when preparing for various tasks. During your daily preparations, you can cram on a certain subject to become temporarily trained in one skill of your choice. This proficiency lasts until you prepare again. As this proficiency is temporary, you can't use it as a prerequisite for a permanent character option like a skill increase or a feat.%r%r**Note:** Pick the skill with `prepare/studies <skill>`. Your pick is locked until the GM next rests you, and that rest clears it so you can pick again."
     traits:
       - investigator
-    rules:
-      - key: "RollOption"
-        option: "flexible-studies"
-        toggleable: true
-        alwaysActive: true
-        suboptions: {"config": "skills", "predicate": ["skill:{choice|value}:rank:0"]}
-      - key: "ActiveEffectLike"
-        path: "system.skills.{item|flags.system.rulesSelections.flexibleStudies}.rank"
-        mode: "upgrade"
-        value: 1
+    daily_choice:
+      switch: studies
+      pick: skill
+      trains: true
+      lasts: day
   Flying Blade:
     assoc_charclass:
       - Swashbuckler
@@ -794,6 +804,9 @@ pf2e_feats:
     shortdesc: You have trained with the weaponry of your monastery or school. You gain access to uncommon weapons with the monk trait and become trained in simple and martial monk weapons. When your proficiency for unarmed attacks increases to expert or master, your proficiency rank for these weapons increases to expert or master as well. If you have familiarity with an agile or finesse weapon (such as from the Sildanyari Weapon Familiarity feat), that weapon also gains the monk trait for you. You can use melee monk weapons with any of your monk feats or monk abilities that normally require unarmed attacks, though not if the feat or ability requires you to use a single specific type of attack, such as Crane Stance. If you gain the critical specialization benefit for unarmed attacks—with the expert strikes class feature, for example—you also gain it with monk weapons.
     traits:
       - monk
+    item_access:
+      - category: weapons
+        traits: [ monk ]
     rules:
       - key: "MartialProficiency"
         definition: ["item:trait:monk", {"or": ["item:category:simple", "item:category:martial"]}]
@@ -860,19 +873,20 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 1
-    shortdesc: "You lay a finger on the scales of life and death to heal a creature, regardless of whether it's living or undead. You restore Hit Points equal to 2 + double your level to one creature within 30 feet.%r%rIn addition, you can mediate during your daily preparations to place yourself on one side of the scales. Choose life or death. If you align yourself with life, you can be targeted and healed by vitality healing effects, as normal for most living creatures; if you align yourself with death, you gain the void healing ability, and can instead be targeted and healed by void effects and other effects that restore Hit Points to undead creatures.."
+    shortdesc: "You lay a finger on the scales of life and death to heal a creature, regardless of whether it's living or undead. You restore Hit Points equal to 2 + double your level to one creature within 30 feet.%r%rIn addition, you can mediate during your daily preparations to place yourself on one side of the scales. Choose life or death. If you align yourself with life, you can be targeted and healed by vitality healing effects, as normal for most living creatures; if you align yourself with death, you gain the void healing ability, and can instead be targeted and healed by void effects and other effects that restore Hit Points to undead creatures.%r%r**Note:** Choose your side with `prepare/scales life` or `prepare/scales death`. Your choice is locked until the GM next rests you, and that rest clears it so you can choose again."
     traits:
       - cursebound
       - divine
       - healing
       - oracle
       - spirit
-    rules:
-      - key: "RollOption"
-        option: "nudge-the-scales"
-        toggleable: true
-        alwaysActive: true
-        suboptions: [{"label": "Life", "value": "life"}, {"label": "Death", "value": "death"}]
+    daily_choice:
+      switch: scales
+      pick: listed
+      choices: [ life, death ]
+      facts:
+        death: [ "self:void-healing" ]
+      lasts: day
   One for All:
     assoc_charclass:
       - Swashbuckler
@@ -3725,7 +3739,7 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 4
-    shortdesc: "**Requirements** You are wielding a weapon.%r%rYou apply a contact poison or injury poison to the required weapon; if you have a free hand, you can Interact to draw a poison as part of this action. This poison can be one of the simple injury poisons you can create due to this feat, or another contact or injury poison you've acquired.%r%r**Special** During your daily preparations, you can prepare a number of simple injury poisons equal to your level. These follow the rules for injury poisons, except that they deal 1d4 poison damage with no saving throw. Only you can apply these poisons properly, and they expire the next time you prepare."
+    shortdesc: "**Requirements** You are wielding a weapon.%r%rYou apply a contact poison or injury poison to the required weapon; if you have a free hand, you can Interact to draw a poison as part of this action. This poison can be one of the simple injury poisons you can create due to this feat, or another contact or injury poison you've acquired.%r%r**Special** During your daily preparations, you can prepare a number of simple injury poisons equal to your level. These follow the rules for injury poisons, except that they deal 1d4 poison damage with no saving throw. Only you can apply these poisons properly, and they expire the next time you prepare.%r%r**Note:** Each rest, and each encounter you join fresh, gives you your simple injury poisons. Apply one, or any injury poison you carry, with `encounter/poison <weapon>=<poison>`, which takes you one action."
     traits:
       - manipulate
       - rogue
@@ -5859,6 +5873,14 @@ pf2e_feats:
         property: "traits"
         mode: "add"
         value: "{actor|system.proficiencies.aliases.witch}"
+    # The day's charge: a record for the witch and the GM, with an effect on the charge so they see the
+    # link. Awareness and 30-foot touch spells are the players' and the GM's, since range isn't tracked.
+    daily_choice:
+      switch: charge
+      pick: creature
+      count: 1
+      gives: "Effect: Witch's Charge"
+      lasts: day
   Wolf Drag:
     assoc_charclass:
       - Monk
@@ -6711,6 +6733,15 @@ pf2e_feats:
     prereq:
       level: 8
     shortdesc: During your daily preparations, you can review stratagems for the day's adventures with up to five allies. Later, you can quickly advise them on your schemes using the Inspired Stratagem reaction.
+    # The allies reviewed with. `limits_action` lets the reaction reach only them, each once until the
+    # next daily preparations.
+    daily_choice:
+      switch: stratagem
+      pick: creature
+      count: 5
+      not_self: true
+      limits_action: Inspired Stratagem
+      lasts: day
     traits:
       - rogue
   Instinctive Strike:
@@ -7694,6 +7725,9 @@ pf2e_feats:
       feat:
         - Cauldron
     shortdesc: For each temporary oil or potion you brew during your daily preparations, you brew two copies of it. This allows you to brew two temporary oils or potions each day, four if you have master proficiency in spell DC, or six if you have legendary proficiency.
+    # Multiplies what the daily choice under each switch brews.
+    daily_brew_copies:
+      cauldron: 2
     traits:
       - witch
   Elemental Shape:
@@ -8258,9 +8292,10 @@ pf2e_feats:
       level: 10
       feature:
         - Blessed Armament
-    shortdesc: "Your blessed armament radiates power, further enhancing your chosen weapon. When you choose the weapon for your blessed armament during your daily preparations, add the *astral* and *brilliant* property runes to the list of effects you can choose from. If you're holy, also add the *holy* rune, and if you're unholy, also add the *unholy* rune.%r%rIn addition, you can change the rune you've selected for the day to a different rune from your list as a 10-minute activity that has the concentrate, divine, and exploration traits. Changing the rune doesn't restore abilities that can be used only a limited number of times, such as Holy Healing for the *holy* rune."
+    shortdesc: "Your blessed armament radiates power, further enhancing your chosen weapon. When you choose the weapon for your blessed armament during your daily preparations, add the *astral* and *brilliant* property runes to the list of effects you can choose from. If you're holy, also add the *holy* rune, and if you're unholy, also add the *unholy* rune.%r%rIn addition, you can change the rune you've selected for the day to a different rune from your list as a 10-minute activity that has the concentrate, divine, and exploration traits. Changing the rune doesn't restore abilities that can be used only a limited number of times, such as Holy Healing for the *holy* rune.%r%r**Note:** Pick your blessed armament with `prepare/armament <weapon>: <rune>`, and this feat's runes are among those offered. To change the rune, ask the GM, who can let you pick again with `encounter/reprepare`. Pick the same weapon with your new rune."
     traits:
       - champion
+    daily_reprepare: [ armament ]
   Reflexive Riposte:
     assoc_charclass:
       - Swashbuckler
@@ -8748,6 +8783,10 @@ pf2e_feats:
       feat:
         - Witch's Charge
     shortdesc: You can keep watch over multiple charges. Each day during your preparations, you can designate a number of charges equal to your Intelligence modifier instead of just one.
+    # Raises how many the daily choice under each switch names. At least one, as before.
+    daily_choice_count:
+      charge:
+        plus: Intelligence
     traits:
       - witch
 # Level 12 Class Feats
@@ -9922,9 +9961,18 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 12
-    shortdesc: "A broom is the only steed you need to fly through the night sky. During your daily preparations, you can anoint a single broom, staff, polearm, or similarly shaped object with a flying ointment made of special herbs and oils. Until the next time you make your daily preparations, it gains the magical trait, and you can ride on it while you're holding it with at least 1 hand. It moves at a fly Speed of 20 feet. The broom takes a –10-foot penalty to its Speed if laden with more than 20 Bulk, and crashes to the ground if it carries more than 30 Bulk. The broom can't be controlled by anyone but you. If you anoint a weapon or other held item, you can't ride the broom and wield it at the same time.%r%rYou can Craft your broomstick into a *flying broomstick* as though you had the formula for that item. If you anoint an item that's already a flying broomstick, the broom gains a +10-foot status bonus to its Speed and you can choose whether it works for anyone or only you."
+    shortdesc: "A broom is the only steed you need to fly through the night sky. During your daily preparations, you can anoint a single broom, staff, polearm, or similarly shaped object with a flying ointment made of special herbs and oils. Until the next time you make your daily preparations, it gains the magical trait, and you can ride on it while you're holding it with at least 1 hand. It moves at a fly Speed of 20 feet. The broom takes a –10-foot penalty to its Speed if laden with more than 20 Bulk, and crashes to the ground if it carries more than 30 Bulk. The broom can't be controlled by anyone but you. If you anoint a weapon or other held item, you can't ride the broom and wield it at the same time.%r%rYou can Craft your broomstick into a *flying broomstick* as though you had the formula for that item. If you anoint an item that's already a flying broomstick, the broom gains a +10-foot status bonus to its Speed and you can choose whether it works for anyone or only you.%r%r**Note:** Anoint a broom, staff, or polearm you're carrying with `prepare/broom <item>`. Your sheet then shows a fly Speed of 20 feet until the GM next rests you. You fly only while holding the item, and the Bulk limits and the flying broomstick's bonus are the GM's to apply."
     traits:
       - witch
+    daily_choice:
+      switch: broom
+      pick: item
+      items:
+        weapon_groups: [ polearm ]
+        name_includes: [ broom, staff ]
+      movement:
+        - fly: 20
+      lasts: day
 # Level 14 Class Feats
   Allegro:
     assoc_charclass:
@@ -13391,9 +13439,19 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 20
-    shortdesc: "Your experience keeps you on your toes, helping you adopt complex strategies on the fly and face the most dangerous challenges. When you gain a fighter feat using combat flexibility, you gain three fighter feats instead of two. While the first feat must still be 8th level or lower, the second feat can be up to 14th level, and the third feat can be up to 18th level.%r%rYou can use the first feat to meet the prerequisites of the second or third feats and the second feat to meet the prerequisites of the third feat. You must meet all three feats' other prerequisites normally.%r%rIn addition, you can adapt to the battlefield's challenges by spending 1 hour to train. If you do, you can reselect the feats chosen with combat flexibility as if you had made your daily preparations. You can't trade out limited-use abilities that you've already used, such as Determination."
+    shortdesc: "Your experience keeps you on your toes, helping you adopt complex strategies on the fly and face the most dangerous challenges. When you gain a fighter feat using combat flexibility, you gain three fighter feats instead of two. While the first feat must still be 8th level or lower, the second feat can be up to 14th level, and the third feat can be up to 18th level.%r%rYou can use the first feat to meet the prerequisites of the second or third feats and the second feat to meet the prerequisites of the third feat. You must meet all three feats' other prerequisites normally.%r%rIn addition, you can adapt to the battlefield's challenges by spending 1 hour to train. If you do, you can reselect the feats chosen with combat flexibility as if you had made your daily preparations. You can't trade out limited-use abilities that you've already used, such as Determination.%r%r**Note:** Pick the third feat with `prepare/ultimateflexibility <feat>`. Your first and second feats count towards its prerequisites. For the hour of training, ask the GM, who can let you pick all three again with `encounter/reprepare`."
     traits:
       - fighter
+    daily_choice:
+      switch: ultimateflexibility
+      pick: feat
+      from_feats:
+        feat_type: Charclass
+        assoc_charclass: [ Fighter ]
+        max_level: 18
+      also_counts: [ flexibility, improvedflexibility ]
+      lasts: day
+    daily_reprepare: [ flexibility, improvedflexibility, ultimateflexibility ]
   Ultimate Polymath:
     assoc_charclass:
       - Bard

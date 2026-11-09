@@ -33,6 +33,9 @@ module AresMUSH
           return
         end
 
+        # Chargen records its sheet only for a character with no grants, so a formula waits for approval.
+        return client.emit_failure(t('pf2e.formula_not_approved', :char => char.name)) unless char.is_approved?
+
         found = Pf2e::Crafting.entry(self.category, self.name)
 
         return if Pf2e::CharState.emit_error!(client, found)

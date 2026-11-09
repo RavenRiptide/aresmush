@@ -55,6 +55,8 @@ module AresMUSH
       # Taking one off is always allowed, which is what lets an over-runed item be put right.
       def check_rune_fits
         return nil if etched?
+        # A staff takes fundamental runes, never property runes.
+        return t('pf2egear.rune_property_staff', :item_name => @item.name) if Pf2e::Staves.staff?(@item)
 
         wanted = Pf2egear.rune_entry(@rune)['kind'].to_s
         kind = Pf2egear::Inventory.canonical(self.category).to_s

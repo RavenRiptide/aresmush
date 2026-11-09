@@ -107,6 +107,11 @@ module AresMUSH
 
         return events unless holder
 
+        # What was made to last only until the end of this turn: a Quick Vial, a field vial on a weapon, and
+        # a Toxicologist's spray not used.
+        Equipment.lapse!(holder, 'turn_end')
+        WeaponPoison.turn_ended(holder)
+
         events + less_frightened(holder) + PersistentDamage.end_of_turn(holder) + Holding.turn_ended(encounter, participant) +
           Afflictions.turn_ended(encounter, participant, round)
       end

@@ -25,6 +25,18 @@ module AresMUSH
     attribute :invest_on_refresh, :type => DataType::Boolean
     attribute :use, :type => DataType::Hash, :default => {}
 
+    # An injury poison on it, waiting for the first Strike that hits: `{ 'name', 'dc', 'damage', 'by' }`.
+    # Empty when there is none. Pf2e::WeaponPoison reads and writes it.
+    attribute :poison, :type => DataType::Hash, :default => {}
+
+    # What a class feature handed over, by the feature: a Staff Nexus wizard's makeshift staff
+    # (`Pf2e::BoundItems`).
+    attribute :bound_to
+
+    # A staff's charges left today, on the encounter's copy of it. Its preparer's daily preparations set them
+    # (`Pf2e::Staves`).
+    attribute :staff_charges, :type => DataType::Integer, :default => 0
+
     reference :character, "AresMUSH::Character"
     # An encounter's copy of a character's item, taken as they entered it: the encounter reads and changes
     # this, never the item itself. `copied_from` is the character's own item.

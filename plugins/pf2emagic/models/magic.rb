@@ -42,6 +42,9 @@ module AresMUSH
     # spell => { 'level', 'at' }: a failed Learn a Spell, which blocks trying that spell again.
     attribute :learn_failures, :type => DataType::Hash, :default => {}
     attribute :divine_font
+    # { 'cantrip' => spell, '1' => spell }: the two spells a Staff Nexus wizard's makeshift staff holds,
+    # picked from their spellbook in chargen and changed only by staff (Pf2e::Staves).
+    attribute :makeshift_spells, :type => DataType::Hash, :default => {}
 
     reference :character, "AresMUSH::Character"
 
@@ -378,6 +381,10 @@ module AresMUSH
           else
             magic.update(divine_font: value.first)
           end
+        when 'makeshift_staff'
+          # Staff Nexus: the makeshift staff's cantrip and 1st-rank spell, picked from the spellbook with
+          # addspell makeshift/<rank>.
+          to_assign[Pf2e::Staves::ASSIGN] = Pf2e::Staves::MAKESHIFT_SLOTS.to_h { |slot| [ slot, 'open' ] }
         when 'grant_choice'
           Array(value).compact.each { |name| Pf2e.open_feat_choice(to_assign, name.to_s) }
         when 'gated_spell'

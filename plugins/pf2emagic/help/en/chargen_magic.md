@@ -34,6 +34,10 @@ Some class specialties or choices grant you extra spells that must be resolved w
 
 **Commands**:
 `addspell innate/<level> = <spell name>`: Chooses an open innate spell, if you've been given one by a feat.
+`addspell makeshift/cantrip = <spell name>`: Chooses your makeshift staff's cantrip from your spellbook, if you're a wizard with the Staff Nexus thesis.
+`addspell makeshift/1 = <spell name>`: Chooses your makeshift staff's 1st-rank spell from your spellbook.
+`addspell makeshift/[cantrip|1] = <old spell>/<new spell>`: Swaps one of your makeshift staff's spells for another.
+%t **Note:** After approval, only staff can change your makeshift staff's spells. A spell in your makeshift staff can't be removed from your spellbook.
 
 ## Adding Divine Fonts
 

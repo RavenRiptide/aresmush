@@ -15,6 +15,9 @@ module AresMUSH
     # What its characters carry is the encounter's own copy (`Equipment`), so it is recorded and put back
     # like anything else, and nothing outside the encounter can move it.
     #
+    # One thing of a character's own is recorded too: the day's choices, which a rest in the encounter
+    # clears. Taking the rest back puts them back, and only them (`CHARACTER_FIELDS`).
+    #
     # The history is one line: `history_at` is how many of its entries are in effect, and recording a new
     # one drops any past that point, which could only have been redone.
     #
@@ -23,6 +26,11 @@ module AresMUSH
 
       # What an encounter holds of its own that a change can move.
       FIELDS = %w{participants next_init round last_number cover concealment trusted current}.freeze
+
+      # The one thing of a character's own that a change in an encounter moves: the day's choices, which a
+      # rest clears. Only these fields of a character are held and put back, never the character itself,
+      # which is never made or deleted by taking a change back.
+      CHARACTER_FIELDS = %w{pf2_daily_choices}.freeze
 
       # What an encounter owns, each by id: the states and creatures in it, and the effects on them. Asked
       # for rather than held in a constant, because the models load after this file.
@@ -36,7 +44,30 @@ module AresMUSH
           held["items:#{collection}"] = [ model, ->(encounter) { encounter.states.to_a.flat_map { |one| one.public_send(collection).to_a } } ]
         end
 
+        # And its characters' day's choices (`CHARACTER_FIELDS`).
+        held['characters'] = [ Character, ->(encounter) { encounter.states.to_a.filter_map(&:character) } ]
+
         held
+      end
+
+      # The fields of a model that are held, when only some are: a character's. Nil for every other model,
+      # which is held whole.
+      def self.only_fields(model)
+        model <= Character ? CHARACTER_FIELDS : nil
+      end
+
+      def self.held_attributes(record)
+        attributes = record.attributes.except(*STAMPS)
+        only = only_fields(record.class)
+
+        only ? only.to_h { |field| [ field, attributes[field.to_sym] ] } : attributes
+      end
+
+      # Puts a character's held fields back, and nothing else of theirs.
+      def self.restore_fields(model, id, attributes)
+        found = model[id]
+
+        found&.update(only_fields(model).to_h { |field| [ field.to_sym, (attributes || {})[field] ] })
       end
 
       KEY = :pf2e_recording
@@ -50,7 +81,7 @@ module AresMUSH
 
         owned.each do |name, (_model, members)|
           held[name] = members.call(encounter).to_h do |one|
-            [ one.id.to_s, plain(one.attributes.except(*STAMPS)) ]
+            [ one.id.to_s, plain(held_attributes(one)) ]
           end
         end
 
@@ -100,6 +131,11 @@ module AresMUSH
         owned.each do |name, (model, members)|
           wanted = held[name] || {}
 
+          if only_fields(model)
+            wanted.each { |id, attributes| restore_fields(model, id, attributes) }
+            next
+          end
+
           members.call(encounter).each { |one| one.delete unless wanted.key?(one.id.to_s) }
 
           # What had nothing in it then has no place in the copy, and is emptied again.
@@ -124,6 +160,11 @@ module AresMUSH
         PF2Encounter[encounter.id].update(held['encounter'].transform_keys(&:to_sym)) if held['encounter']
 
         owned.each do |name, (model, _members)|
+          if only_fields(model)
+            (held[name] || {}).each { |id, attributes| restore_fields(model, id, attributes) unless attributes.nil? }
+            next
+          end
+
           unset = (model.attributes - STAMPS).to_h { |field| [ field, nil ] }
 
           (held[name] || {}).each do |id, attributes|
@@ -257,6 +298,7 @@ module AresMUSH
         ours = lambda { |encounter_id| encounter_id.to_s == held['encounter'] }
 
         case record
+        when Character then cast(held).include?(record.id.to_s) ? 'characters' : nil
         when Pf2eCombatantState then ours.call(record.encounter_id) ? 'states' : nil
         when Pf2eNpc then ours.call(record.encounter_id) ? 'npcs' : nil
         when Pf2eEffect then ours.call(record.encounter_id) ? 'effects' : nil
@@ -268,10 +310,16 @@ module AresMUSH
         end
       end
 
+      # The ids of the characters in the encounter being recorded, read once a change.
+      def self.cast(held)
+        held['cast'] ||= Pf2eCombatantState.find(:encounter_id => held['encounter']).to_a
+                                           .filter_map { |state| state.character_id&.to_s }
+      end
+
       def self.as_stored(model, id)
         found = model[id]
 
-        found ? plain(found.attributes.except(*STAMPS)) : nil
+        found ? plain(held_attributes(found)) : nil
       end
 
       def self.fields_of(id)

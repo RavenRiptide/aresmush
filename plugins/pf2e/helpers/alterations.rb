@@ -86,7 +86,9 @@ module AresMUSH
 
         return held if reaching.empty?
 
-        facts = Effects.character_facts(char) + Array(options)
+        # What the player has switched on counts too: a Bomber's field vials alter a vial only while
+        # `bomber-field-vials` is on. Read from what they set, since what is on is worked out from these.
+        facts = Effects.character_facts(char) + Array(options) + RollOptions.switched_on(char)
 
         reaching.each_with_object(held.dup) do |row, out|
           next if row['itemId'] ? row['itemId'].to_s != id.to_s : row['itemType'].to_s != kind

@@ -113,10 +113,11 @@ module AresMUSH
 
         # The keys that are records of a pick rather than a pick still to make.
         # Records of a pick already made, and 'open skills', which is chargen's - a free skill
-        # increase at a level lands in 'raise skill'.
+        # increase at a level lands in 'raise skill'. 'makeshift staff' is chargen's too: a thesis is
+        # chosen only there.
         settled = [ 'open skills', 'feat choice filter', 'feat_choices', 'bgskill', 'bg_lore', 'bgfeat',
                     'bg skill choice', 'class skill choice', 'specialty skill choice',
-                    'divine font', 'archetype',
+                    'divine font', 'makeshift staff', 'archetype',
                     'archetype sanctification' ]
 
         expect(holders - settled - PENDING.keys).to eq []

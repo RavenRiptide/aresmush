@@ -28,7 +28,29 @@ module AresMUSH
         return t('pf2egear.bad_quantity')
       end
 
+      # `buy/rank5 scroll=Fireball`: a heightened scroll or wand. Nil for the spell's own rank. A switch can't
+      # hold digits, so the command reads as switch `rank` with the number left over, which is taken from what
+      # was typed.
+      def rank
+        return nil unless cmd.switch == 'rank'
+
+        found = cmd.raw.to_s.match(%r{/rank\s*(\d+)}i)
+
+        found ? found[1].to_i : nil
+      end
+
+      def check_switch
+        return nil if cmd.switch.nil? || rank
+
+        t('pf2e.spell_item_bad_switch', :switch => cmd.switch)
+      end
+
       def handle
+        kind = Pf2e::SpellItems.kind(self.category)
+
+        return buy_spell_item(kind) if kind
+        return client.emit_failure(t('pf2e.spell_item_bad_switch', :switch => cmd.switch)) if cmd.switch
+
         charlevel = enactor.pf2_level
 
         # If no quantity is specified, assume they want just one.
@@ -45,7 +67,8 @@ module AresMUSH
         end
 
         # The list of items in that category gets filtered by character level.
-        available_items = list.select { |k,v| v['level'] <= charlevel }
+        # What only a class feature makes - a versatile vial - is never for sale.
+        available_items = list.select { |k,v| v['level'] <= charlevel && !v['made_only'] }
 
         # Does that item exist in that category?
         item = available_items.select { |k,v| k.downcase.include? (self.item_name) }
@@ -68,7 +91,16 @@ module AresMUSH
           item_info = item.values.first
         end
 
-        #  If it's gear or a consumable, multiples are allowed, otherwise only one.
+        # A stocked specialty wand holds no spell of its own; it's bought with the spell it holds.
+        if Pf2e::SpellItems.specialty_catalogue?(item_name)
+          client.emit_failure t('pf2e.spell_item_specialty_buy', :item => item_name)
+          return
+        end
+
+        if !Pf2e::ItemAccess.accessible?(enactor, self.category, item_name, item_info)
+          client.emit_failure t('pf2egear.no_access', :item => item_name, :rarity => Pf2e::ItemAccess.rarity(item_info))
+          return
+        end
 
         # Only gear and consumables stack; a weapon has its own runes, so each is its own item.
         if q > 1 && !Pf2egear::Inventory.stackable?(self.category)
@@ -99,6 +131,37 @@ module AresMUSH
 
         client.emit_ooc warning if warning
 
+      end
+
+      # A scroll or a wand: one generic item carrying its spell, priced by the spell's rank
+      # (`Pf2e::SpellItems`).
+      def buy_spell_item(kind)
+        found = Pf2e::SpellItems.for_sale(enactor, kind, self.item_name, rank)
+
+        return if Pf2e::CharState.emit_error!(client, found)
+
+        name, info = found.state
+        category = Pf2e::SpellItems.table[kind]['category']
+        many = self.quantity || 1
+
+        if many > 1 && !Pf2egear::Inventory.stackable?(category)
+          client.emit_ooc t('pf2egear.quantity_one_only')
+          many = 1
+        end
+
+        cost = info['price'] * many
+
+        return client.emit_failure(t('pf2egear.not_enough_you', :item => 'money to buy that')) if cost > enactor.pf2_money.to_i
+
+        before = Pf2egear::Bulk.standing(enactor)
+
+        Pf2egear.create_item(enactor, category, name, many, info)
+        Pf2egear.pay_player(enactor, -cost, 'Item Vendor', "Purchase #{name}")
+
+        client.emit_success t('pf2egear.item_bought_ok', :item => name, :cost => Pf2egear.display_money(cost), :quantity => many)
+
+        warning = Pf2egear::Bulk.warning(enactor, before)
+        client.emit_ooc warning if warning
       end
 
     end

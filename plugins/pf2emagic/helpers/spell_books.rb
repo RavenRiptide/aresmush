@@ -119,10 +119,11 @@ module AresMUSH
                           'spell' => ctx['spell'], 'tradition' => ctx['target']['tradition'])
           }
         },
-        # An uncommon spell needs access that only the GM can give, so staff add it.
+        # An uncommon spell needs access, which staff give by unlocking it (`admin/access`).
         {
           'name' => 'common',
           'check' => lambda { |ctx|
+            next nil if ctx['unlocked']
             next nil unless Array(ctx['details']['traits']).any? { |trait| RARE.include?(trait.to_s.downcase) }
 
             Pf2e::Err.new(:not_common, 'pf2emagic.learn_not_common', 'spell' => ctx['spell'])
@@ -266,6 +267,7 @@ module AresMUSH
 
       checked = LearnSpell.check(
         'target' => target, 'spell' => spell, 'details' => details, 'known' => target['known'],
+        'unlocked' => Pf2e::SpellUnlocks.unlocked?(char, spell),
         'blocked' => LearnSpell.retry_blocked?(failure, :level => char.pf2_level, :now => Time.now.to_i,
                                                :retry_after_days => rules[:retry_after_days]),
         'money' => char.pf2_money, 'price' => terms['price']

@@ -80,6 +80,19 @@ module AresMUSH
         end.compact.uniq
       end
 
+      # What the player has switched on, as a predicate reads it, from what they set alone: an option, and
+      # with its choice after a colon where they gave one. Asked where working out every declaration would
+      # read the very sources being assembled.
+      def self.switched_on(char)
+        held = char.respond_to?(:pf2_roll_options) ? (char.pf2_roll_options || {}) : {}
+
+        held.flat_map do |option, said|
+          next [] if said.nil? || said == false
+
+          said.is_a?(String) ? [ option.to_s, "#{option}:#{said}" ] : [ option.to_s ]
+        end
+      end
+
       def self.about?(domain, domains)
         return true if domain.nil? || domain.to_s == Domains::ALL
 

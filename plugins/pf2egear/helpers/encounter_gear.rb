@@ -40,7 +40,14 @@ module AresMUSH
         found = Pf2egear::Inventory.item(holder, self.category, self.item_num)
 
         return nil if found.err? || !found.state
-        return t('pf2e.consumable_throw_it', :item => found.state.name) if Pf2e::Consumables.bomb?(found.state.name)
+        # A scroll casts its spell, at whomever its spell is aimed, rather than being taken.
+        return nil if Pf2e::SpellItems.spell_item?(found.state)
+        # A bomb is thrown, not used - but for a versatile vial a research field has them drink: a
+        # Chirurgeon's heals, and a Mutagenist's quiets a mutagen's drawbacks.
+        if Pf2e::Consumables.bomb?(found.state.name) &&
+           !Pf2e::ResearchField.drinkable_vial?(holder, Pf2e::Consumables.info(found.state.name))
+          return t('pf2e.consumable_throw_it', :item => found.state.name)
+        end
 
         material = Pf2e::Ammunition.material(found.state.name)
         return t('pf2e.ammunition_shoot_it', :item => found.state.name, :material => material.tr('-', ' ')) if material
@@ -75,10 +82,111 @@ module AresMUSH
       # It takes an action to use.
       def consumed(item)
         encounter = Pf2e::Combatants.encounter_here(enactor)
-        out = Pf2e::Consumables.take(encounter, enactor.name, @taker, item.name)
+        out = Pf2e::Consumables.take(encounter, enactor.name, @taker, item.name, :made_by => item.granted_by,
+                                     :user => @user.state.holder)
 
         Pf2e::TurnState.spend(@user.state.holder, 'Interact', :cost => 1, :type => 'action')
         tell(encounter, out, @user.state)
+      end
+
+      # `+e/use consumables=<n>[/<who>[, <who>]][/<word>...]` on a scroll, and `magicitem=<n>` on a wand:
+      # the spell it holds, cast as `+e/cast` casts it. After the number come the targets, then the spell's
+      # own words, each after a slash.
+      def spell_parts
+        _number, targets, *words = cmd.args.to_s.partition('=').last.split('/').map(&:strip)
+
+        [ targets.to_s.split(',').map(&:strip).reject(&:empty?), words.reject(&:empty?) ]
+      end
+
+      def overcharge?
+        false
+      end
+
+      def used_spell_item(item)
+        encounter = Pf2e::Combatants.encounter_here(enactor)
+        actor = acting_as(encounter)
+
+        return if Pf2e::CharState.emit_error!(client, actor)
+
+        named, words = spell_parts
+        targets, missing = Pf2e::Combatants.resolve_all(enactor, named, encounter)
+
+        return client.emit_failure(t('pf2e.no_combatant', :target => missing.join(', '))) unless missing.empty?
+
+        scene = scene_for(encounter, actor.state, targets.first)
+        done = if Pf2e::WaveFan.fan?(item)
+                 Pf2e::WaveFan.cast!(scene, item, targets, words)
+               elsif Pf2e::Staves.staff?(item)
+                 Pf2e::Staves.cast!(scene, item, targets, words)
+               else
+                 Pf2e::SpellItems.cast!(scene, item, targets, words, :overcharge => overcharge?)
+               end
+
+        return if Pf2e::CharState.emit_error!(client, done)
+
+        tell(encounter, done.state, actor.state)
+      end
+    end
+
+    # `+e/overcharge magicitem=<n>[/<who>][/<word>...]`: casts from a wand already used today, then rolls a
+    # DC 10 flat check. A success breaks the wand and a failure destroys it. A wand already overcharged today
+    # is destroyed, and casts nothing. It inherits `+e/use`'s history recording.
+    class PF2EncounterOverchargeCmd < PF2EncounterUseCmd
+      def overcharge?
+        true
+      end
+
+      def check_overcharging_a_wand
+        return nil unless holder
+
+        found = Pf2egear::Inventory.item(holder, self.category, self.item_num)
+
+        return nil if found.err? || !found.state
+        return t('pf2e.wand_overcharge_only_wands') unless Pf2e::SpellItems.wand?(found.state)
+
+        nil
+      end
+    end
+
+    # `+e/repair <who>=<number>`: the GM mends a wand an overcharge broke, as it stands in the encounter.
+    class PF2EncounterRepairCmd
+      include CommandHandler
+
+      attr_accessor :who, :number
+
+      def parse_args
+        args = cmd.parse_args(ArgParser.arg1_equals_arg2)
+        self.who = trim_arg(args.arg1)
+        self.number = integer_arg(args.arg2)
+      end
+
+      def required_args
+        [ self.who, self.number ]
+      end
+
+      def handle
+        encounter = Pf2e::Combatants.encounter_here(enactor)
+
+        return client.emit_failure(t('pf2e.no_encounter_here')) unless encounter
+        return client.emit_failure(t('pf2e.not_organizer')) unless Pf2e::Combatants.gm?(enactor, encounter)
+
+        found = Pf2e::Combatants.find(encounter, self.who)
+
+        return if Pf2e::CharState.emit_error!(client, found)
+        return client.emit_failure(t('pf2e.encounter_sheet_creature', :ref => found.state.ref)) if found.state.creature?
+
+        item = Pf2egear::Inventory.item(found.state.holder, 'magicitem', self.number)
+
+        return if Pf2e::CharState.emit_error!(client, item)
+        return client.emit_failure(t('pf2egear.not_found')) unless item.state
+
+        mended = Pf2e::SpellItems.repair!(item.state)
+
+        return if Pf2e::CharState.emit_error!(client, mended)
+
+        message = t('pf2e.wand_repaired', :name => enactor.name, :who => found.state.label, :item => mended.state)
+
+        Pf2e::Encounters::Announce.tell(PF2Encounter[encounter.id], message, :room => enactor_room, :story => true)
       end
     end
 
@@ -190,6 +298,6 @@ module AresMUSH
     end
 
     [ PF2EncounterUseCmd, PF2EncounterEquipCmd, PF2EncounterUnequipCmd,
-      PF2EncounterLootCmd ].each { |command| command.prepend(Pf2e::Recorded) }
+      PF2EncounterLootCmd, PF2EncounterRepairCmd ].each { |command| command.prepend(Pf2e::Recorded) }
   end
 end

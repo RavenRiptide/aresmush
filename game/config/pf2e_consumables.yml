@@ -324,6 +324,8 @@ pf2e_consumables:
       - alchemical
       - consumable
   Giant Centipede Venom:
+    affliction: "Saving Throw DC 17 Fortitude%rMaximum Duration 6 rounds%rStage 1 1d4 poison damage (1 round)%rStage 2 1d4 poison damage and fatigued (1 round)%rStage 3 1d4 poison damage, clumsy 1, and fatigued (1 round)"
+    activate: 2
     bulk: 0.1
     level: 1
     price: 400
@@ -707,6 +709,8 @@ pf2e_consumables:
       - ingested
       - poison
   Black Adder Venom:
+    affliction: "Saving Throw DC 18 Fortitude%rMaximum Duration 3 rounds%rStage 1 1d4 poison damage (1 round)%rStage 2 1d6 poison damage (1 round)%rStage 3 1d8 poison damage (1 round)"
+    activate: 2
     bulk: 0.1
     level: 2
     price: 600
@@ -843,6 +847,8 @@ pf2e_consumables:
       - magical
       - talisman
   Lethargy Poison:
+    affliction: "Saving Throw DC 18 Fortitude%rMaximum Duration 4 hours%rStage 1 slowed 1 (1 round)%rStage 2 slowed 1 (1 minute)%rStage 3 unconscious with no Perception check to wake up (1 round)%rStage 4 unconscious with no Perception check to wake up (1d4 hours)"
+    activate: 1
     bulk: 0.1
     level: 2
     price: 700
@@ -1070,6 +1076,8 @@ pf2e_consumables:
       - polymorph
     effect: 'Effect: Cognitive Mutagen (Moderate)'
   Cytillesh Oil:
+    affliction: "Saving Throw DC 19 Fortitude%rMaximum Duration 4 rounds%rStage 1 1d8 poison damage (1 round)%rStage 2 1d10 poison damage (1 round)%rStage 3 2d8 poison damage (1 round)"
+    activate: 2
     bulk: 0.1
     level: 3
     price: 1000
@@ -1214,6 +1222,8 @@ pf2e_consumables:
         text: "On a critical hit, -15-foot Speed penalty for 1 minute and Immobilized for 1 round."
         effects: ["Effect: Glue Bomb"]
   Graveroot:
+    affliction: "Saving Throw DC 19 Fortitude%rMaximum Duration 4 rounds%rStage 1 1d8 poison damage (1 round)%rStage 2 1d10 poison damage and stupefied 1 (1 round)%rStage 3 2d6 poison damage and stupefied 2 (1 round)"
+    activate: 2
     bulk: 0.1
     level: 3
     price: 1000
@@ -1476,6 +1486,8 @@ pf2e_consumables:
       - mental
       - talisman
   Fearflower Nectar:
+    affliction: "Saving Throw DC 21 Fortitude%rMaximum Duration 6 rounds%rStage 1 1d6 poison damage and frightened 1 (1 round)%rStage 2 1d6 poison damage and frightened 2 (1 round)%rStage 3 1d6 poison damage and frightened 3 (1 round)"
+    activate: 2
     bulk: 0.1
     level: 4
     price: 1600
@@ -1506,6 +1518,8 @@ pf2e_consumables:
       - magical
       - potion
   Leadenleg:
+    affliction: "Saving Throw DC 20 Fortitude%rMaximum Duration 6 rounds%rStage 1 1d10 poison damage and –5-foot status penalty to all Speeds (1 round)%rStage 2 2d6 poison damage and –10-foot status penalty to all Speeds (1 round)%rStage 3 2d6 poison damage and –20-foot status penalty to all Speeds (1 round)"
+    activate: 2
     bulk: 0.1
     level: 4
     price: 1500
@@ -1741,6 +1755,8 @@ pf2e_consumables:
       - consumable
       - magical
   Spider Venom:
+    affliction: "Saving Throw DC 22 Fortitude%rMaximum Duration 6 rounds%rStage 1 1d10 poison damage and sickened 1 (1 round)%rStage 2 1d12 poison damage, clumsy 1, and sickened 2 (1 round)%rStage 3 2d6 poison damage, clumsy 2, and sickened 3 (1 round)"
+    activate: 2
     bulk: 0.1
     level: 5
     price: 2500
@@ -1806,6 +1822,8 @@ pf2e_consumables:
       - consumable
       - elixir
   Giant Scorpion Venom:
+    affliction: "Saving Throw DC 22 Fortitude%rMaximum Duration 6 rounds%rStage 1 2d6 poison damage and enfeebled 1 (1 round)%rStage 2 2d8 poison damage and enfeebled 1 (1 round)%rStage 3 2d10 poison damage and enfeebled 2 (1 round)"
+    activate: 2
     bulk: 0.1
     level: 6
     price: 4000
@@ -2328,6 +2346,8 @@ pf2e_consumables:
       - elixir
       - healing
   Wyvern Poison:
+    affliction: "Saving Throw DC 26 Fortitude%rMaximum Duration 6 rounds%rStage 1 3d6 poison damage (1 round)%rStage 2 3d8 poison damage (1 round)%rStage 3 3d10 poison damage (1 round)"
+    activate: 2
     bulk: 0.1
     level: 8
     price: 8000
@@ -2526,6 +2546,8 @@ pf2e_consumables:
       - talisman
     effect: 'Effect: Mummified Bat'
   Nethershade:
+    affliction: "Saving Throw DC 29 Fortitude%rMaximum Duration 6 rounds%rStage 1 2d6 void damage and 2d6 poison damage (1 round)%rStage 2 3d6 void damage, 2d6 poison damage, and enfeebled 1 (1 round)%rStage 3 3d6 void damage, 3d6 poison damage, and enfeebled 2 (1 round)"
+    activate: 2
     bulk: 0.1
     level: 10
     price: 16000
@@ -3026,6 +3048,8 @@ pf2e_consumables:
       - elixir
       - healing
   Cave Worm Venom:
+    affliction: "Saving Throw DC 32 Fortitude%rMaximum Duration 6 rounds%rStage 1 5d6 poison damage and enfeebled 2 (1 round)%rStage 2 6d6 poison damage and enfeebled 2 (1 round)%rStage 3 8d6 poison and enfeebled 2 (1 round)"
+    activate: 2
     bulk: 0.1
     level: 12
     price: 50000
@@ -3663,6 +3687,8 @@ pf2e_consumables:
       - inhaled
       - poison
   Cerulean Scourge:
+    affliction: "Saving Throw DC 37 Fortitude%rMaximum Duration 6 rounds%rStage 1 10d6 poison damage (1 round)%rStage 2 12d6 poison damage (1 round)%rStage 3 14d6 poison damage (1 round)"
+    activate: 2
     bulk: 0.1
     level: 16
     price: 145000
@@ -4367,3 +4393,110 @@ pf2e_consumables:
       - contact
       - poison
       - virulent
+  # An alchemist's versatile vials (Player Core 2, p. 56). Made by Versatile Vials, Alchemist Dedication and
+  # Quick Alchemy, never bought or crafted from a formula, which `made_only` says. Each is a bomb Strike, or
+  # fuel for Quick Alchemy; Pf2e::Alchemy hands out the highest type the maker's level reaches.
+  Versatile Vial (Lesser):
+    category: martial
+    group: Bomb
+    base: Versatile Vial
+    slug: versatile-vial
+    made_only: true
+    bulk: 0
+    level: 1
+    price: 0
+    traits:
+      - acid
+      - alchemical
+      - bomb
+      - consumable
+      - infused
+      - splash
+    bomb:
+      dice: 1
+      die: d6
+      damage_type: acid
+      splash: 1
+      range: 20
+  Versatile Vial (Moderate):
+    category: martial
+    group: Bomb
+    base: Versatile Vial
+    slug: versatile-vial
+    made_only: true
+    bulk: 0
+    level: 4
+    price: 0
+    traits:
+      - acid
+      - alchemical
+      - bomb
+      - consumable
+      - infused
+      - splash
+    bomb:
+      dice: 2
+      die: d6
+      damage_type: acid
+      splash: 2
+      bonus: 1
+      range: 20
+  Versatile Vial (Greater):
+    category: martial
+    group: Bomb
+    base: Versatile Vial
+    slug: versatile-vial
+    made_only: true
+    bulk: 0
+    level: 12
+    price: 0
+    traits:
+      - acid
+      - alchemical
+      - bomb
+      - consumable
+      - infused
+      - splash
+    bomb:
+      dice: 3
+      die: d6
+      damage_type: acid
+      splash: 3
+      bonus: 2
+      range: 20
+  Versatile Vial (Major):
+    category: martial
+    group: Bomb
+    base: Versatile Vial
+    slug: versatile-vial
+    made_only: true
+    bulk: 0
+    level: 18
+    price: 0
+    traits:
+      - acid
+      - alchemical
+      - bomb
+      - consumable
+      - infused
+      - splash
+    bomb:
+      dice: 4
+      die: d6
+      damage_type: acid
+      splash: 4
+      bonus: 3
+      range: 20
+  # Poison Weapon's simple injury poison: made at daily preparations, as many as the rogue's level, and
+  # applied with Poison Weapon. 1d4 poison damage with no saving throw.
+  Simple Injury Poison:
+    made_only: true
+    bulk: 0
+    level: 0
+    price: 0
+    traits:
+      - consumable
+      - injury
+      - poison
+    poison_damage: 1d4 poison
+    activate: 1

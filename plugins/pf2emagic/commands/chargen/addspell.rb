@@ -79,6 +79,16 @@ module AresMUSH
           return
         end
 
+        # Staff Nexus: the makeshift staff's cantrip and 1st-rank spell, from their spellbook.
+        if self.caster_class&.casecmp?('makeshift')
+          outcome = Pf2e::Staves.choose_makeshift!(enactor, level, self.old_spell, self.new_spell)
+
+          return if Pf2e::CharState.emit_error!(client, outcome)
+
+          client.emit_success t('pf2e.staff_makeshift_picked', :spell => outcome.state['spell'], :slot => outcome.state['slot'])
+          return
+        end
+
         # A switch on this command indicates a gate on the spell. Divert to different processing.
         if cmd.switch
           msg = Pf2emagic.select_gated_spell(enactor, self.caster_class, level, self.old_spell, self.new_spell, cmd.switch, false, true)

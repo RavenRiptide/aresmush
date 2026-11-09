@@ -3,7 +3,7 @@ module AresMUSH
 
     CRIT_SPEC_PROF_ORDER = %w{untrained trained expert master legendary}
 
-    # The ancestry weapon familiarity feats and Ciith Armaments both read "At 5th level..."
+    # Ciith Armaments reads "At 5th level..."
     CRIT_SPEC_ANCESTRY_LEVEL = 5
 
     # The critical specialization effect text for a weapon group, or nil if the group has no entry.
@@ -109,23 +109,50 @@ module AresMUSH
 
       sources << 'Monastic Weaponry' if has_feat?(char, 'Monastic Weaponry') && unarmed_crit_spec?(char)
 
-      familiarity = ancestry_familiarity_feat(char)
-      sources << familiarity if familiarity && has_feat?(char, familiarity)
-
       sources << 'Ciith Armaments' if ciith_armament_crit_spec?(char)
 
-      sources.uniq
+      (sources + granted_crit_spec_sources(char)).uniq
+    end
+
+    # Feats and items whose own rule grants the critical specialization effect for one of the
+    # character's attacks, now. A rule that waits for 5th level names nothing before then.
+    def self.granted_crit_spec_sources(char)
+      attacks = crit_spec_attacks(char)
+
+      return [] if attacks.empty?
+
+      options = Pf2e::Effects.options(char)
+      facts = Pf2e::Effects.facts(char)
+
+      Pf2e::Effects.sources(char).select do |source|
+        attacks.any? do |name, info|
+          Pf2e::Rules.critical_specialization?([ source ], options, Pf2eCombat.weapon_options(name, info, char) + facts)
+        end
+      end.map { |source| source['name'] }.compact
+    end
+
+    # The unarmed attacks and equipped weapons crit_spec_access looks at, as [ name, info ] pairs.
+    def self.crit_spec_attacks(char)
+      combat = char.combat
+
+      return [] if !combat
+
+      unarmed = (combat.unarmed_attacks || {}).select { |_name, info| info.is_a?(Hash) }.to_a
+      weapons = equipped_weapon_names(char).filter_map do |name|
+        info = Global.read_config('pf2e_weapons', name)
+        info ? [ name, info ] : nil
+      end
+
+      unarmed + weapons
     end
 
     # --- individual rules ---------------------------------------------------------------
 
     # Whether a feat or an item says outright that this attack has the critical specialisation effect.
-    #
-    # Alongside the branches below rather than instead of them: those cover this setting's own ancestries,
-    # whose names are not the ones Foundry's data knows, so a rule about goblin weapons reaches nothing
-    # here while the branch about ancestry familiarity reaches Sildanyari ones.
+    # The ancestry weapon familiarity feats say so this way, naming the setting's own ancestry traits.
+    # The branches below are class features whose reach depends on proficiency or on other features.
     def self.granted_crit_spec?(char, name, info)
-      options = Pf2eCombat.weapon_options(name, info) +
+      options = Pf2eCombat.weapon_options(name, info, char) +
                 Pf2e::Effects.facts(char)
 
       Pf2e::Rules.critical_specialization?(Pf2e::Effects.sources(char),
@@ -152,9 +179,6 @@ module AresMUSH
       if has_feat?(char, 'Monastic Weaponry') && weapon_has_trait?(info, 'monk')
         return true if unarmed_crit_spec?(char)
       end
-
-      # The ancestry weapon familiarity feats, from 5th level, over that ancestry's weapons.
-      return true if ancestry_familiarity_crit_spec?(char, info)
 
       false
     end
@@ -192,32 +216,6 @@ module AresMUSH
       (combat.unarmed_attacks || {}).any? do |name, info|
         info.is_a?(Hash) && crit_spec_unarmed?(char, name, info)
       end
-    end
-
-    def self.ancestry_familiarity_crit_spec?(char, info)
-      return false if char.pf2_level.to_i < CRIT_SPEC_ANCESTRY_LEVEL
-
-      ancestry_list = info['ancestry']
-      return false if !ancestry_list
-
-      char_ancestry = char.pf2_base_info['ancestry'].to_s.downcase
-      return false if !ancestry_list.include?(char_ancestry)
-
-      feat = ancestry_familiarity_feat(char)
-
-      feat ? has_feat?(char, feat) : false
-    end
-
-    # Built the same way get_weapon_prof builds it, so the two agree on what the feat for an
-    # ancestry is called.
-    def self.ancestry_familiarity_feat(char)
-      char_ancestry = char.pf2_base_info['ancestry'].to_s.downcase
-
-      return nil if char_ancestry.empty?
-
-      %w{sildanyar khazad}.include?(char_ancestry) ?
-        "#{char_ancestry}i Weapon Familiarity" :
-        "#{char_ancestry} Weapon Familiarity"
     end
 
     def self.ciith_armament_crit_spec?(char)

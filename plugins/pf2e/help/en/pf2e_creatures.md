@@ -39,7 +39,7 @@ Each time you save a creature, you create a new revision of it. An encounter kee
 `creature/unset <name>=shape`: Makes the creature start a fight in its stat block's default shape again.
 `creature/rename <name>=<new name>`: Renames the creature.
 `creature/notes <name>=<notes>`: Adds your own notes to the creature. The notes aren't part of its stat block.
-`creature/describe <name>`: Shows the one-line description that recreates the creature, and lists anything the description can't hold (such as spellcasting or an ability's traits). Those parts are kept only in the saved creature.
+`creature/describe <name>`: Shows the one-line description that recreates the creature, and lists anything the description can't include (such as spellcasting or an ability's traits). Those parts are kept only in the saved creature.
 
 ## On the web
 

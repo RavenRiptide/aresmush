@@ -1953,6 +1953,9 @@ pf2e_specialty:
           Spell Blending:
           Spell Substitution:
           Staff Nexus:
+            chargen:
+              magic_stats:
+                makeshift_staff: true
     Department of Accordant Conjury:
       curriculum:
         cantrip:
@@ -2100,6 +2103,9 @@ pf2e_specialty:
           Spell Blending:
           Spell Substitution:
           Staff Nexus:
+            chargen:
+              magic_stats:
+                makeshift_staff: true
     Department of Urban Thaumaturgy:
       curriculum:
         cantrip:
@@ -2247,6 +2253,9 @@ pf2e_specialty:
           Spell Blending:
           Spell Substitution:
           Staff Nexus:
+            chargen:
+              magic_stats:
+                makeshift_staff: true
     Department of Defensive Cerebralism:
       curriculum:
         cantrip:
@@ -2394,6 +2403,9 @@ pf2e_specialty:
           Spell Blending:
           Spell Substitution:
           Staff Nexus:
+            chargen:
+              magic_stats:
+                makeshift_staff: true
     Department of Mutable Modification:
       curriculum:
         cantrip:
@@ -2541,6 +2553,9 @@ pf2e_specialty:
           Spell Blending:
           Spell Substitution:
           Staff Nexus:
+            chargen:
+              magic_stats:
+                makeshift_staff: true
     Department of Null's Purview:
       curriculum:
         cantrip:
@@ -2688,6 +2703,9 @@ pf2e_specialty:
           Spell Blending:
           Spell Substitution:
           Staff Nexus:
+            chargen:
+              magic_stats:
+                makeshift_staff: true
     School of Unified Magical Theory:
       feat_choice:
         Unified Magical Theory:
@@ -2724,6 +2742,9 @@ pf2e_specialty:
           Spell Blending:
           Spell Substitution:
           Staff Nexus:
+            chargen:
+              magic_stats:
+                makeshift_staff: true
   Swashbuckler:
     Battledancer:
       chargen:

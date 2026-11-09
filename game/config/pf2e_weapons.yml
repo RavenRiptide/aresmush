@@ -39,6 +39,11 @@ pf2e_weapons:
         value: 2
         label: "Animal Staff (identify animals)"
         predicate: ["target:trait:animal", {"or": ["action:recall-knowledge", "action:identify"]}]
+    staff:
+      of: Animal Staff
+      spells:
+        cantrip: [ Know the Way ]
+        1: [ Runic Body, Summon Animal ]
   Animal Staff (Greater):
     wp_type: melee
     category: simple
@@ -63,6 +68,11 @@ pf2e_weapons:
         value: 2
         label: "Animal Staff (identify animals)"
         predicate: ["target:trait:animal", {"or": ["action:recall-knowledge", "action:identify"]}]
+    staff:
+      of: Animal Staff
+      spells:
+        2: [ Animal Messenger, Speak with Animals, Summon Animal ]
+        3: [ Animal Form, Summon Animal ]
   Animal Staff (Major):
     wp_type: melee
     category: simple
@@ -87,6 +97,11 @@ pf2e_weapons:
         value: 2
         label: "Animal Staff (identify animals)"
         predicate: ["target:trait:animal", {"or": ["action:recall-knowledge", "action:identify"]}]
+    staff:
+      of: Animal Staff
+      spells:
+        4: [ Summon Animal ]
+        5: [ Animal Form, Moon Frenzy, Summon Animal ]
   Arbalest:
     wp_type: ranged
     category: martial
@@ -665,6 +680,11 @@ pf2e_weapons:
         type: "circumstance"
         value: 2
         predicate: ["action:identify-magic", {"or": ["item:trait:morph", "item:trait:polymorph"]}]
+    staff:
+      of: Fluid Form Staff
+      spells:
+        1: [ Pest Form ]
+        2: [ Animal Form, Enlarge, Shrink ]
   Fluid Form Staff (Greater):
     wp_type: melee
     category: simple
@@ -688,6 +708,11 @@ pf2e_weapons:
         type: "circumstance"
         value: 2
         predicate: ["action:identify-magic", {"or": ["item:trait:morph", "item:trait:polymorph"]}]
+    staff:
+      of: Fluid Form Staff
+      spells:
+        3: [ Feet to Fins, Insect Form ]
+        4: [ Aerial Form, Animal Form, Dinosaur Form ]
   Fluid Form Staff (Major):
     wp_type: melee
     category: simple
@@ -711,6 +736,11 @@ pf2e_weapons:
         type: "circumstance"
         value: 2
         predicate: ["action:identify-magic", {"or": ["item:trait:morph", "item:trait:polymorph"]}]
+    staff:
+      of: Fluid Form Staff
+      spells:
+        5: [ Animal Form, Insect Form ]
+        6: [ Cursed Metamorphosis, Dragon Form, Plant Form ]
   Flying Talon:
     wp_type: melee
     category: advanced
@@ -1592,6 +1622,11 @@ pf2e_weapons:
         value: 2
         label: "Mentalist's Staff (identifying mental magic)"
         predicate: ["action:identify-magic", "mental"]
+    staff:
+      of: "Mentalist's Staff"
+      spells:
+        cantrip: [ Daze ]
+        1: [ Mindlink, Phantom Pain ]
   Mentalist's Staff (Greater):
     wp_type: melee
     category: simple
@@ -1600,7 +1635,7 @@ pf2e_weapons:
       - Staff
       - Two-Handed
     level: 8
-    price: 45000
+    price: 46000
     wp_damage: d4
     wp_damage_type: B
     wp_damage_2h: d8
@@ -1616,6 +1651,11 @@ pf2e_weapons:
         value: 2
         label: "Mentalist's Staff (identifying mental magic)"
         predicate: ["action:identify-magic", "mental"]
+    staff:
+      of: "Mentalist's Staff"
+      spells:
+        2: [ Paranoia ]
+        3: [ Hypercognition, Phantom Pain ]
   Mentalist's Staff (Major):
     wp_type: melee
     category: simple
@@ -1640,6 +1680,11 @@ pf2e_weapons:
         value: 2
         label: "Mentalist's Staff (identifying mental magic)"
         predicate: ["action:identify-magic", "mental"]
+    staff:
+      of: "Mentalist's Staff"
+      spells:
+        4: [ Rewrite Memory, Telepathy ]
+        5: [ Hallucination, Phantom Pain, Synaptic Pulse ]
   Morningstar:
     wp_type: melee
     category: simple
@@ -2210,6 +2255,29 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+  # A Staff Nexus wizard's own staff, made for them and never sold. Its two spells are the ones they pick
+  # in chargen with addspell makeshift/<rank>, which only staff change after that.
+  Makeshift Staff:
+    wp_type: melee
+    category: simple
+    traits:
+      - Magical
+      - Staff
+      - Two-Handed
+    level: 0
+    price: 0
+    wp_damage: d4
+    wp_damage_type: B
+    wp_damage_2h: d8
+    hands: 1
+    range: 0
+    reload: 0
+    bulk: 1
+    group: Club
+    made_only: true
+    staff:
+      of: Makeshift Staff
+      makeshift: true
   Staff of Arcane Might:
     wp_type: melee
     category: simple
@@ -2228,6 +2296,15 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    staff:
+      of: Staff of Arcane Might
+      spells:
+        cantrip: [ Detect Magic ]
+        1: [ Phantasmal Minion ]
+        2: [ Everlight ]
+        3: [ Force Barrage, Paralyze ]
+        4: [ Dispelling Globe, Mystic Armor, Translocate ]
+        5: [ Fireball, Force Barrage, Lightning Bolt ]
   Staff of Arcane Might (Greater):
     wp_type: melee
     category: simple
@@ -2246,6 +2323,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    staff:
+      of: Staff of Arcane Might
+      spells:
+        6: [ Disintegrate, Mystic Armor, Wall of Force ]
+        7: [ Howling Blizzard, Fireball, Lightning Bolt ]
   Staff of Arcane Might (Major):
     wp_type: melee
     category: simple
@@ -2264,6 +2346,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    staff:
+      of: Staff of Arcane Might
+      spells:
+        8: [ Mystic Armor, Wall of Force ]
+        9: [ Dispel Magic, Falling Stars, Howling Blizzard ]
   Staff of Control:
     wp_type: melee
     category: simple
@@ -2287,6 +2374,12 @@ pf2e_weapons:
         type: "status"
         value: 1
         predicate: ["action:request"]
+    staff:
+      of: Staff of Control
+      spells:
+        cantrip: [ Daze ]
+        1: [ Charm, Command ]
+        2: [ Laughing Fit, Stupefy ]
   Staff of Control (Greater):
     wp_type: melee
     category: simple
@@ -2310,6 +2403,11 @@ pf2e_weapons:
         type: "status"
         value: 1
         predicate: ["action:request"]
+    staff:
+      of: Staff of Control
+      spells:
+        3: [ Enthrall ]
+        4: [ Charm, Confusion, Suggestion ]
   Staff of Control (Major):
     wp_type: melee
     category: simple
@@ -2334,6 +2432,11 @@ pf2e_weapons:
         type: "status"
         value: 1
         predicate: ["action:request"]
+    staff:
+      of: Staff of Control
+      spells:
+        5: [ Command, Subconscious Suggestion ]
+        6: [ Dominate, Never Mind ]
   Staff of Elemental Power:
     wp_type: melee
     category: simple
@@ -2357,6 +2460,12 @@ pf2e_weapons:
         type: "circumstance"
         value: 2
         predicate: ["target:trait:elemental", {"or": ["action:recall-knowledge", "action:identify"]}]
+    staff:
+      of: Staff of Elemental Power
+      spells:
+        cantrip: [ Frostbite ]
+        1: [ Breathe Fire, Pummeling Rubble, Thunderstrike ]
+        2: [ Blazing Bolt, Resist Energy ]
   Staff of Elemental Power (Greater):
     wp_type: melee
     category: simple
@@ -2380,6 +2489,11 @@ pf2e_weapons:
         type: "circumstance"
         value: 2
         predicate: ["target:trait:elemental", {"or": ["action:recall-knowledge", "action:identify"]}]
+    staff:
+      of: Staff of Elemental Power
+      spells:
+        3: [ Fireball, Lightning Bolt ]
+        4: [ Resist Energy, Wall of Fire ]
   Staff of Elemental Power (Major):
     wp_type: melee
     category: simple
@@ -2403,6 +2517,11 @@ pf2e_weapons:
         type: "circumstance"
         value: 2
         predicate: ["target:trait:elemental", {"or": ["action:recall-knowledge", "action:identify"]}]
+    staff:
+      of: Staff of Elemental Power
+      spells:
+        5: [ Howling Blizzard, Wall of Ice ]
+        6: [ Chain Lightning, Fireball ]
   Staff of Fire:
     wp_type: melee
     category: simple
@@ -2420,6 +2539,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    staff:
+      of: Staff of Fire
+      spells:
+        cantrip: [ Ignition ]
+        1: [ Breathe Fire ]
   Staff of Fire (Greater):
     wp_type: melee
     category: simple
@@ -2437,6 +2561,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    staff:
+      of: Staff of Fire
+      spells:
+        2: [ Breathe Fire, Floating Flame ]
+        3: [ Floating Flame, Fireball ]
   Staff of Fire (Major):
     wp_type: melee
     category: simple
@@ -2454,6 +2583,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    staff:
+      of: Staff of Fire
+      spells:
+        4: [ Fire Shield, Fireball, Wall of Fire ]
+        5: [ Fireball, Wall of Fire ]
   Staff of Healing:
     wp_type: melee
     category: simple
@@ -2471,6 +2605,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    staff:
+      of: Staff of Healing
+      spells:
+        cantrip: [ Stabilize ]
+        1: [ Heal ]
   Staff of Healing (Greater):
     wp_type: melee
     category: simple
@@ -2488,6 +2627,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    staff:
+      of: Staff of Healing
+      spells:
+        2: [ Clear Mind, Heal, Sound Body ]
+        3: [ Cleanse Affliction, Heal ]
   Staff of Healing (Major):
     wp_type: melee
     category: simple
@@ -2505,6 +2649,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    staff:
+      of: Staff of Healing
+      spells:
+        4: [ Cleanse Affliction, Clear Mind, Sound Body ]
+        5: [ Breath of Life, Heal ]
   Staff of Healing (True):
     wp_type: melee
     category: simple
@@ -2522,6 +2671,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    staff:
+      of: Staff of Healing
+      spells:
+        6: [ Clear Mind, Field of Life, Heal ]
+        7: [ Heal, Regenerate ]
   Staff of Illumination:
     wp_type: melee
     category: simple
@@ -2539,6 +2693,12 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    staff:
+      of: Staff of Illumination
+      spells:
+        cantrip: [ Light ]
+        2: [ Everlight ]
+        3: [ Everlight, Holy Light ]
   Staff of Impossible Visions:
     wp_type: melee
     category: simple
@@ -2557,6 +2717,12 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    staff:
+      of: Staff of Impossible Visions
+      spells:
+        cantrip: [ Daze ]
+        1: [ Fear, Phantom Pain ]
+        2: [ Augury, Paranoia ]
   Staff of Impossible Visions (Greater):
     wp_type: melee
     category: simple
@@ -2575,6 +2741,12 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    staff:
+      of: Staff of Impossible Visions
+      spells:
+        3: [ Hypnotize, Paralyze ]
+        4: [ Countless Eyes, Vision of Death ]
+        5: [ Strange Geometry ]
   Staff of Impossible Visions (Major):
     wp_type: melee
     category: simple
@@ -2593,6 +2765,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    staff:
+      of: Staff of Impossible Visions
+      spells:
+        6: [ Blinding Fury, Phantasmal Calamity ]
+        7: [ Visions of Danger, Warp Mind ]
   Staff of Impossible Visions (True):
     wp_type: melee
     category: simple
@@ -2611,6 +2788,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    staff:
+      of: Staff of Impossible Visions
+      spells:
+        8: [ Spirit Song, Uncontrollable Dance ]
+        9: [ Unfathomable Song, Phantasmagoria ]
   Staff of Phantasms:
     wp_type: melee
     category: simple
@@ -2634,6 +2816,12 @@ pf2e_weapons:
         type: "status"
         value: 2
         predicate: ["item:trait:illusion"]
+    staff:
+      of: Staff of Phantasms
+      spells:
+        cantrip: [ Figment ]
+        1: [ Illusory Disguise, Illusory Object ]
+        2: [ Illusory Creature, Illusory Object, Item Facade ]
   Staff of Phantasms (Greater):
     wp_type: melee
     category: simple
@@ -2657,6 +2845,11 @@ pf2e_weapons:
         type: "status"
         value: 2
         predicate: ["item:trait:illusion"]
+    staff:
+      of: Staff of Phantasms
+      spells:
+        3: [ Illusory Disguise, Item Facade ]
+        4: [ Illusory Creature, Illusory Disguise ]
   Staff of Phantasms (Major):
     wp_type: melee
     category: simple
@@ -2680,6 +2873,11 @@ pf2e_weapons:
         type: "status"
         value: 2
         predicate: ["item:trait:illusion"]
+    staff:
+      of: Staff of Phantasms
+      spells:
+        5: [ Illusory Creature, Illusory Scene ]
+        6: [ Hallucination, Mislead ]
   Staff of Protection:
     wp_type: melee
     category: simple
@@ -2703,6 +2901,12 @@ pf2e_weapons:
         type: "circumstance"
         value: 1
         predicate: [{"or": ["action:trip", "action:shove"]}]
+    staff:
+      of: Staff of Protection
+      spells:
+        cantrip: [ Shield ]
+        1: [ Alarm, Mystic Armor ]
+        2: [ Dispel Magic, Environmental Endurance, Resist Energy ]
   Staff of Protection (Greater):
     wp_type: melee
     category: simple
@@ -2726,6 +2930,11 @@ pf2e_weapons:
         type: "circumstance"
         value: 1
         predicate: [{"or": ["action:trip", "action:shove"]}]
+    staff:
+      of: Staff of Protection
+      spells:
+        3: [ Alarm, Safe Passage ]
+        4: [ Dispel Magic, Mystic Armor, Resist Energy ]
   Staff of Protection (Major):
     wp_type: melee
     category: simple
@@ -2749,6 +2958,11 @@ pf2e_weapons:
         type: "circumstance"
         value: 1
         predicate: [{"or": ["action:trip", "action:shove"]}]
+    staff:
+      of: Staff of Protection
+      spells:
+        5: [ Environmental Endurance, Safe Passage ]
+        6: [ Dispel Magic, Mystic Armor, Repulsion ]
   Staff of Providence:
     wp_type: melee
     category: simple
@@ -2777,6 +2991,12 @@ pf2e_weapons:
         type: "item"
         value: 1
         predicate: ["action:recall-knowledge"]
+    staff:
+      of: Staff of Providence
+      spells:
+        cantrip: [ Guidance ]
+        1: [ Bless, Create Water ]
+        2: [ Augury, Create Food, See the Unseen, Status ]
   Staff of Providence (Greater):
     wp_type: melee
     category: simple
@@ -2805,6 +3025,11 @@ pf2e_weapons:
         type: "item"
         value: 1
         predicate: ["action:recall-knowledge"]
+    staff:
+      of: Staff of Providence
+      spells:
+        3: [ Safe Passage, "Wanderer's Guide" ]
+        4: [ Cleanse Affliction, Dispelling Globe, Status ]
   Staff of Providence (Major):
     wp_type: melee
     category: simple
@@ -2833,6 +3058,11 @@ pf2e_weapons:
         type: "item"
         value: 1
         predicate: ["action:recall-knowledge"]
+    staff:
+      of: Staff of Providence
+      spells:
+        5: [ Dispelling Globe, Scouting Eye, See the Unseen ]
+        6: [ Dispelling Globe, Scintillating Safeguard, Truesight ]
   Staff of Providence (True):
     wp_type: melee
     category: simple
@@ -2861,6 +3091,12 @@ pf2e_weapons:
         type: "item"
         value: 1
         predicate: ["action:recall-knowledge"]
+    staff:
+      of: Staff of Providence
+      spells:
+        7: [ Dispelling Globe, Energy Aegis ]
+        8: [ Dispelling Globe, Divine Inspiration ]
+        9: [ Dispelling Globe, Foresight, Overwhelming Presence ]
   Staff of Summoning:
     wp_type: melee
     category: simple
@@ -2878,6 +3114,12 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    staff:
+      of: Staff of Summoning
+      spells:
+        cantrip: [ Tangle Vine ]
+        1: [ Summon Animal ]
+        2: [ Marvelous Mount, Mist, Summon Animal, Summon Elemental ]
   Staff of Summoning (Greater):
     wp_type: melee
     category: simple
@@ -2895,6 +3137,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    staff:
+      of: Staff of Summoning
+      spells:
+        3: [ Summon Animal, Summon Elemental ]
+        4: [ Marvelous Mount, Summon Animal, Summon Elemental ]
   Staff of Summoning (Major):
     wp_type: melee
     category: simple
@@ -2912,6 +3159,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    staff:
+      of: Staff of Summoning
+      spells:
+        5: [ Summon Animal, Summon Dragon, Summon Elemental ]
+        6: [ Marvelous Mount, Summon Animal, Summon Dragon, Summon Elemental ]
   Staff of the Dead:
     wp_type: melee
     category: simple
@@ -2929,6 +3181,12 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    staff:
+      of: Staff of the Dead
+      spells:
+        cantrip: [ Void Warp ]
+        1: [ Grim Tendrils, Summon Undead ]
+        2: [ Peaceful Rest, Summon Undead ]
   Staff of the Dead (Greater):
     wp_type: melee
     category: simple
@@ -2946,6 +3204,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    staff:
+      of: Staff of the Dead
+      spells:
+        3: [ Summon Undead, Vampiric Feast ]
+        4: [ Summon Undead, Vision of Death ]
   Staff of the Dead (Major):
     wp_type: melee
     category: simple
@@ -2963,6 +3226,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    staff:
+      of: Staff of the Dead
+      spells:
+        5: [ Invoke Spirits, Peaceful Rest, Summon Undead ]
+        6: [ Summon Undead, Vampiric Exsanguination ]
   Staff of the Tempest:
     wp_type: melee
     category: simple
@@ -2980,6 +3248,13 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    staff:
+      of: Staff of the Tempest
+      spells:
+        cantrip: [ Electric Arc ]
+        1: [ Hydraulic Push, Thunderstrike ]
+        2: [ Mist, Resist Energy, Thunderstrike ]
+      note: Its 2nd-rank Resist Energy resists electricity only.
   Staff of the Tempest (Greater):
     wp_type: melee
     category: simple
@@ -2997,6 +3272,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    staff:
+      of: Staff of the Tempest
+      spells:
+        3: [ Lightning Bolt, Wall of Wind ]
+        4: [ Hydraulic Torrent, Lightning Bolt ]
   Staff of the Tempest (Major):
     wp_type: melee
     category: simple
@@ -3014,6 +3294,11 @@ pf2e_weapons:
     reload: 0
     bulk: 1
     group: Club
+    staff:
+      of: Staff of the Tempest
+      spells:
+        5: [ Hydraulic Torrent, Lightning Storm ]
+        6: [ Chain Lightning, Hydraulic Torrent ]
   Staff of the Unblinking Eye:
     wp_type: melee
     category: simple
@@ -3038,6 +3323,12 @@ pf2e_weapons:
         type: "status"
         value: 1
         predicate: ["check:type:initiative"]
+    staff:
+      of: Staff of the Unblinking Eye
+      spells:
+        cantrip: [ Detect Magic ]
+        1: [ Sure Strike ]
+        2: [ Darkvision, See the Unseen, Translate ]
   Staff of the Unblinking Eye (Greater):
     wp_type: melee
     category: simple
@@ -3062,6 +3353,11 @@ pf2e_weapons:
         type: "status"
         value: 1
         predicate: ["check:type:initiative"]
+    staff:
+      of: Staff of the Unblinking Eye
+      spells:
+        3: [ Darkvision, Mind Reading ]
+        4: [ Clairvoyance, Detect Scrying, Telepathy ]
   Staff of the Unblinking Eye (Major):
     wp_type: melee
     category: simple
@@ -3086,6 +3382,11 @@ pf2e_weapons:
         type: "status"
         value: 1
         predicate: ["check:type:initiative"]
+    staff:
+      of: Staff of the Unblinking Eye
+      spells:
+        5: [ Mind Probe, Scouting Eye ]
+        6: [ Telepathy, Truesight ]
   Starknife:
     wp_type: melee
     category: martial
@@ -3290,6 +3591,12 @@ pf2e_weapons:
         type: "circumstance"
         value: 2
         predicate: [{"or": ["target:trait:plant", "target:trait:fungus"]}, {"or": ["action:recall-knowledge", "action:identify"]}]
+    staff:
+      of: Verdant Staff
+      spells:
+        cantrip: [ Tangle Vine ]
+        1: [ Runic Body, Runic Weapon ]
+        2: [ Entangling Flora, Oaken Resilience, One with Plants, Shape Wood ]
   Verdant Staff (Greater):
     wp_type: melee
     category: simple
@@ -3313,6 +3620,12 @@ pf2e_weapons:
         type: "circumstance"
         value: 2
         predicate: [{"or": ["target:trait:plant", "target:trait:fungus"]}, {"or": ["action:recall-knowledge", "action:identify"]}]
+    staff:
+      of: Verdant Staff
+      spells:
+        3: [ Wall of Thorns, Speak with Plants ]
+        4: [ Oaken Resilience, Speak with Plants ]
+        5: [ Plant Form, Wall of Thorns ]
   Wakizashi:
     wp_type: melee
     category: martial

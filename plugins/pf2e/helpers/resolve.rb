@@ -50,12 +50,19 @@ module AresMUSH
                    'face' => substitution['value'].to_i }
         end
 
-        dice = DiceTape.for_check(roller(checks), keep) do
+        dice = DiceTape.for_check(roller(checks), keep, :about => about(checks)) do
           keep ? [ Pf2e.roll_dice(1, 20).first, Pf2e.roll_dice(1, 20).first ] : Pf2e.roll_dice(1, 20)
         end
         natural = keep == 'keep-lower' ? dice.min : dice.max
 
         { 'die' => natural, 'dice' => dice, 'kept' => keep, 'substitution' => nil, 'face' => natural }
+      end
+
+      # What the roll is, for the record of the dice: `save:fortitude`, `skill:athletics`.
+      def self.about(checks)
+        check = Array(checks).find { |one| one.respond_to?(:kind) && one.respond_to?(:name) }
+
+        check ? "#{check.kind}:#{Domains.slug(check.name.is_a?(Hash) ? check.name['name'] : check.name)}" : nil
       end
 
       # Whose roll it is, by name, for the record of the dice. A creature's is marked as one, so it is

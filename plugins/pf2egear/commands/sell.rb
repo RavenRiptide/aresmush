@@ -62,6 +62,13 @@ module AresMUSH
 
         return client.emit_failure(t('pf2egear.item_in_encounter', :item => item_id.name, :id => held.id)) if held
 
+        # What a feat or a class feature made isn't the vendor's to buy: a feather fan, a versatile vial.
+        info = list[item_id.name]
+        made_only = info.is_a?(Hash) && info['made_only']
+
+        return client.emit_failure(t('pf2egear.cannot_sell_made', :item => item_id.name)) if
+          Pf2e::BoundItems.bound?(item_id) || made_only
+
         # Gear and consumables are held as one row with a quantity, so selling one is a decrement.
         item_qty = item_id.quantity if Pf2egear::Inventory.stackable?(category)
 

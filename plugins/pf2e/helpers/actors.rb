@@ -87,6 +87,12 @@ module AresMUSH
         Effects.sheet_sources(@holder)
       end
 
+      # The conditions their feats and class features grant for good: Abundant Vials' and the paragon
+      # feats' quickened, Scion Transformation's clumsy. Derived, so they go with the feat.
+      def permanent_conditions
+        Effects.held_condition_grants(@holder)
+      end
+
       def options(domains = nil)
         facts + RollOptions.active(@holder, domains)
       end
@@ -279,7 +285,7 @@ module AresMUSH
       end
 
       def proficiency(kind, name)
-        kind == 'skill' ? Pf2eSkills.get_skill_prof(@holder, name).to_s.downcase : 'trained'
+        kind == 'skill' ? Pf2eSkills.rolling_prof(@holder, name).to_s.downcase : 'trained'
       end
 
       # A character's spell is spent through their magic, which answers with the casting; that is it.

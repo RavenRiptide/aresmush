@@ -10,7 +10,8 @@ module AresMUSH
       # The correction that does not go through the grant ledger, because a divine font is not part
       # of the fold. `AdminSet` asks for it by name.
       MAGIC_OPS = {
-        'update' => lambda { |char, client, op| PF2Magic.update_magic(char, op['charclass'], op['info'], client) }
+        'update' => lambda { |char, client, op| PF2Magic.update_magic(char, op['charclass'], op['info'], client) },
+        'makeshift' => lambda { |char, _client, op| Staves.write_makeshift!(char, op['slot'], op['spell']) }
       }.freeze
 
       def parse_args

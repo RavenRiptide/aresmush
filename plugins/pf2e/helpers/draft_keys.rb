@@ -36,6 +36,7 @@ module AresMUSH
         'bgfeat' => [ TO_ASSIGN, 'background feats to choose between, which breaks the spacing convention' ],
         'class option' => [ TO_ASSIGN, 'a class feature option awaiting a pick' ],
         'divine font' => [ TO_ASSIGN, 'the divine font choice, when a deity offers both' ],
+        'makeshift staff' => [ TO_ASSIGN, "a Staff Nexus wizard's makeshift staff spells, by slot" ],
         'archetype' => [ TO_ASSIGN, 'the archetype being joined this level' ],
         'archetype_specialty' => [ TO_ASSIGN, 'the archetype specialty pick, which breaks the spacing convention' ],
         'archetype specialty choice' => [ TO_ASSIGN, 'a choice an archetype specialty carries, by archetype' ],

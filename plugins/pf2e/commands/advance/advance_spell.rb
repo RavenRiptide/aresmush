@@ -294,7 +294,7 @@ module AresMUSH
 
         return t('pf2emagic.innate_spell_to_delete_not_found') unless old
 
-        hash = Pf2emagic.find_common_spells
+        hash = Pf2emagic.find_common_spells(enactor)
         match = hash.keys.select { |s| s.downcase == value.downcase }
 
         return t('pf2emagic.innate_no_such_spell') if match.empty?

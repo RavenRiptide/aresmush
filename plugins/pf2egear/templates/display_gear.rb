@@ -174,6 +174,7 @@ module AresMUSH
 
       def format_mi(mi, i)
         name = Pf2egear.get_item_name(mi)
+        name = "#{name} #{t('pf2e.bound_item_inert_mark')}" if Pf2e::BoundItems.inert_for(@char, mi)
         bulk = mi.bulk == 0.1 ? "L" : mi.bulk.to_i
         "%b%b#{left(i, 3)}%b#{left(name, 52)}%b#{left(bulk, 8)}%b#{left(invested(mi), 10)}"
       end

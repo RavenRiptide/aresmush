@@ -106,6 +106,12 @@ module AresMUSH
           'key' => 'formula', 'sheet' => 'formulas', 'sync' => 'bucketed', 'default_bucket' => 'consumables',
           'apply' => lambda { |sheet, p| Ledger.add_to_bucket(sheet['formulas'], p['category'] || 'consumables', p['formula']) }
         },
+        # An uncommon or rare spell staff unlocked for the character to learn (`SpellUnlocks`). Permission
+        # only: the spell itself is learned the usual way, and recorded as `spell_access`.
+        'spell_unlock' => {
+          'key' => 'spell', 'sheet' => 'spell_unlocks',
+          'apply' => lambda { |sheet, p| Ledger.add_to_list(sheet['spell_unlocks'], p['spell']) }
+        },
         # A focus spell or cantrip, with the focus type it is cast as and what granted it. The record
         # is the whole payload, since one spell can come from two sources.
         'focus_spell' => {
@@ -175,6 +181,7 @@ module AresMUSH
           'focus' => [],
           'profs' => {},
           'formulas' => {},
+          'spell_unlocks' => [],
           'unsupported' => []
         }
       end

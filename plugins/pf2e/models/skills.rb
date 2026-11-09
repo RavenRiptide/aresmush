@@ -56,6 +56,20 @@ module AresMUSH
       prof
     end
 
+    # The rank a check or roll uses: their own, or a temporary one a daily choice gives (Ancestral
+    # Longevity), whichever is better. Prerequisites and skill increases read `get_skill_prof` instead,
+    # because a temporary rank can't count towards either.
+    def self.rolling_prof(char, name)
+      held = get_skill_prof(char, name)
+      temporary = Pf2e::DailyChoices.temporary_rank(char, name)
+
+      return held unless temporary
+
+      progression = %w{untrained trained expert master legendary}
+
+      (progression.index(temporary.to_s) || 0) > (progression.index(held.to_s.downcase) || 0) ? temporary : held
+    end
+
     def self.create_skill_for_char(name, char)
       Pf2eSkills.create(name: name, prof_level: 'untrained', character: char)
     end

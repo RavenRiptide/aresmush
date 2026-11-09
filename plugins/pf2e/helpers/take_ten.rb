@@ -28,7 +28,7 @@ module AresMUSH
 
     # Proficiency bonus only, which is what a take-10 result adds to the flat 10.
     def self.take_ten_bonus(char, skill_name)
-      get_prof_bonus(char, Pf2eSkills.get_skill_prof(char, skill_name))
+      get_prof_bonus(char, Pf2eSkills.rolling_prof(char, skill_name))
     end
 
     def self.match_char_skills(char, term)

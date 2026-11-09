@@ -260,8 +260,10 @@ module AresMUSH
       prof_list = [ 'untrained' ] + granted_weapon_prof(char, name, wp_info)
 
       # Its own category, and any a choice lets it count as: Advanced Weapon Training's advanced
-      # weapons count as martial weapons of their group.
-      categories = [ wp_cat.to_s ] + Pf2e.weapon_counts_as(char, wp_cat, wp_group)
+      # weapons count as martial weapons of their group, and Unconventional Weaponry's weapon counts
+      # one category simpler.
+      categories = [ wp_cat.to_s ] + Pf2e.weapon_counts_as(char, wp_cat, wp_group) +
+                   Pf2e.familiar_weapon_categories(char, name, wp_cat)
 
       categories.each do |category|
         prof_list << char_wp_prof[category] if %w(unarmed simple martial advanced).include?(category)
@@ -273,19 +275,6 @@ module AresMUSH
       if charclass_list
         if charclass_list.include?(char.pf2_base_info['charclass'])
           prof_list << char_wp_prof['charclass']
-        end
-      end
-
-      # Check for ancestry weapon familiarity.
-      ancestry_list = wp_info['ancestry']
-
-      if ancestry_list
-        char_ancestry = char.pf2_base_info['ancestry'].downcase
-        Global.logger.debug "Char Ancestry - #{char_ancestry}"
-        anc_wp_feat = (["sildanyar","khazad"].include? char_ancestry) ? char_ancestry + "i Weapon Familiarity" : char_ancestry + " Weapon Familiarity"
-        Global.logger.debug "anc_wp_feat - #{anc_wp_feat}"
-        if (Pf2e.has_feat?(char, anc_wp_feat) && ancestry_list.include?(char_ancestry))
-          prof_list << char_wp_prof['ancestry']
         end
       end
 
@@ -425,15 +414,19 @@ module AresMUSH
     end
 
     # What a weapon answers to when a rule asks which weapons it means: its category, its group, its
-    # base type and its traits, in Foundry's spelling.
-    def self.weapon_options(name, info)
+    # base type and its traits, in Foundry's spelling, and, given whose it is, whether it is their deity's
+    # favored weapon.
+    def self.weapon_options(name, info, char = nil)
       info ||= weapon_info(name) || {}
+      favored = char && favored?(char, { 'name' => name, 'base' => info['base'] })
 
       [ "item:slug:#{Pf2e::Domains.slug(name)}",
         "item:category:#{Pf2e::Domains.slug(info['category'])}",
         "item:group:#{Pf2e::Domains.slug(info['group'])}",
-        "item:base:#{Pf2e::Domains.slug(info['base'] || name)}" ] +
-        Array(info['traits']).map { |trait| "item:trait:#{Pf2e::Domains.slug(trait)}" }
+        "item:base:#{Pf2e::Domains.slug(info['base'] || name)}",
+        favored ? 'item:deity-favored' : nil ].compact +
+        Array(info['traits']).map { |trait| "item:trait:#{Pf2e::Domains.slug(trait)}" } +
+        (char ? Pf2e::DailyChoices.weapon_options(char, name) : [])
     end
 
     # Proficiencies a feat grants over a kind of weapon: "monk weapons count as your unarmed
@@ -445,7 +438,7 @@ module AresMUSH
       return [] unless combat
 
       held = (combat.weapon_prof || {})
-      options = weapon_options(name, info)
+      options = weapon_options(name, info, char)
 
       Pf2e::Rules.martial_proficiencies(Pf2e::Effects.sources(char), Pf2e::Effects.options(char))
                  .select { |one| Pf2e::Predicate.test(one['definition'], options) }
@@ -606,15 +599,22 @@ module AresMUSH
       info = weapon_info(item.name) || {}
       bomb = info['bomb'] || {}
 
-      adjusted_strike(char, { 'id' => item.id.to_s, 'name' => item.name,
+      thrown = { 'id' => item.id.to_s, 'name' => item.name, 'slug' => info['slug'],
         'prof' => get_weapon_prof(char, item.name), 'category' => info['category'],
-        'group' => 'bomb', 'base' => item.name, 'traits' => Array(info['traits']), 'ranged' => true,
+        'group' => 'bomb', 'base' => info['base'] || item.name, 'traits' => Array(info['traits']), 'ranged' => true,
         'unarmed' => false, 'bomb' => true,
         'die' => bomb['die'], 'dice' => bomb['die'] ? bomb['dice'].to_i : nil, 'flat' => bomb['die'] ? 0 : bomb['dice'].to_i,
         'damage_type' => bomb['damage_type'], 'range' => bomb['range'].to_i, 'reload' => 0, 'hands' => 1,
         'materials' => [], 'runes' => [], 'striking' => 0, 'rune' => bomb['bonus'].to_i,
         'persistent' => bomb['persistent'], 'persistent_type' => bomb['persistent_type'],
-        'splash' => bomb['splash'].to_i, 'effect' => info['effect'], 'consumable' => item.id.to_s })
+        'splash' => bomb['splash'].to_i, 'effect' => info['effect'], 'consumable' => item.id.to_s,
+        # What made it, which the bomb is spent before its effect is applied, so it travels with the attack.
+        'made_by' => item.respond_to?(:granted_by) ? item.granted_by : nil,
+        # Its maker's DC, where Powerful Alchemy stamped one: what its notes' saves are told at.
+        'maker_dc' => item.respond_to?(:dc) ? item.dc : nil }
+
+      # What the thrower's research field does to it: a Bomber's splash and vial material.
+      adjusted_strike(char, Pf2e::ResearchField.bomb(char, info, thrown))
     end
 
     # An unarmed attack's damage is written with its count, `1d4`, where a weapon's is its die alone; both

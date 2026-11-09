@@ -38,6 +38,7 @@ module AresMUSH
         @abilities = Pf2e::ABILITIES.map { |name| Pf2eAbilities.create(:character => @char, :name => name, :base_val => 14) }
 
         allow(Pf2e).to receive(:roll_dice) { |amount = 1, sides = 20| [ [ (sides.to_i * 0.75).ceil, 1 ].max ] * amount.to_i }
+        allow_any_instance_of(Character).to receive(:is_approved?).and_return(true)
       end
 
       after(:each) do
@@ -71,6 +72,18 @@ module AresMUSH
         expect(@client.failures).to eq []
         expect(known).to eq [ 'Healing Potion (Minor)' ]
         expect(char.pf2_money).to eq purse - Crafting.price(1)
+      end
+
+      # Chargen records its sheet only for a character with no grants, so a formula bought before approval
+      # would keep chargen from ever being recorded.
+      it "should refuse a character who isn't approved yet" do
+        allow_any_instance_of(Character).to receive(:is_approved?).and_return(false)
+
+        run(PF2FormulaBuyCmd, 'formula/buy consumables=healing potion (minor)')
+
+        expect(@client.failures).to eq [ t('pf2e.not_approved') ]
+        expect(known).to eq []
+        expect(char.grants.count).to eq 0
       end
 
       it "should refuse one they already know, and one they cannot afford" do

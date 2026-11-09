@@ -80,7 +80,9 @@ module AresMUSH
 
         tell_gm(encounter, out['gm'])
 
-        enactor.update(:pf2_last_roll => out['detail'])
+        # Onto the character as the action left it. Ohm saves every attribute, so `enactor`, loaded before the
+        # action ran, would put back whatever the action wrote to them.
+        Character[enactor.id].update(:pf2_last_roll => out['detail'])
       end
 
       # Said, and not refused, when what was just done takes someone past the actions their turn holds:

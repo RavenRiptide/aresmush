@@ -93,8 +93,28 @@ Offer respecs to these characters instead if they want to redo their sheet!
 **Command**:
 `formulas/add <character> = <category>/<item>`: Give a character a formula.
 `formulas/remove <character> = <category>/<item>`: Take one away.
+%t **Note:** You can add formulas only for an approved character.
 
 **Key**:
 `<character>`: The character's name.
 `<category>`: The item category. See `help vendor` for category types.
 `<item>`: The name of the item for the formula.
+
+### Unlocking uncommon and rare spells
+**Command**:
+`admin/access <character>`: Lists the uncommon and rare spells unlocked for the character.
+`admin/access <character>/spell = <spell>`: Unlocks an uncommon or rare spell, so the character can learn it the usual way: with a spell pick when they level up, or with `spell/learn` for a spellbook.
+`admin/unaccess <character>/spell = <spell>`: Takes back an unlock.
+%t **Note:** Taking back an unlock doesn't remove a spell the character already learned. It only stops them learning it again.
+
+Players spend RPP through a request to unlock an uncommon or rare spell. Spend the RPP with `rpp/spend` first, then unlock the spell with this command. You can unlock spells only for an approved character. An unlock stays on the sheet through any rollback.
+
+**Key**:
+`<character>`: The character's name.
+`<spell>`: The spell's name.
+
+### Uncommon and rare items
+Players can buy common items from the vendor. They can also buy an uncommon or rare item there when a feat, class feature, or class names it, such as Khazadi Weapon Familiarity or a cleric's uncommon favored weapon. Players get any other uncommon or rare item through requests: they buy its formula with RPP and money, which you record with `formulas/add`, and then request to have the item crafted for themselves or another character.
+### Wands
+`wand/repair <character>=<number>`: Repairs a wand that overcharging broke, on the character's own sheet. The number is the wand's number in their `gear` list.
+%t **Note:** If the wand is in an encounter with them, the GM repairs it there with `encounter/repair <who>=<number>`.

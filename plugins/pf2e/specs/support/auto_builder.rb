@@ -232,7 +232,7 @@ module AresMUSH
         'bg skill choice','class skill choice','specialty skill choice','bgskill','open skills','open languages',
         'feats','raise skill','raise skill choice','raise ability','languages','charclass_feature option',
         'spellbook','repertoire','signature','archetype_deity','archetype_sanctification','grants','innate','repertoire_swap',
-        'class option','archetype','feat choice','feat_choices'
+        'class option','archetype','feat choice','feat_choices','makeshift staff'
       ]
 
       # Resolving a choice is `cg/option` during chargen and `advance/option` afterwards; the wrong
@@ -488,6 +488,24 @@ module AresMUSH
           end
         end
 
+        # Staff Nexus: the makeshift staff's two spells, the first in the spellbook at each slot's rank.
+        # After the spellbook loop, so the book is filled.
+        makeshift = (@char.pf2_to_assign || {})['makeshift staff']
+
+        if context == :chargen && makeshift.is_a?(Hash)
+          makeshift.each_pair do |slot, held|
+            next unless held.to_s.casecmp?('open')
+
+            pick = Pf2e::Staves.spellbook_at(Character[@char.id], slot).first
+
+            if pick
+              run("addspell makeshift/#{slot}=#{pick}"); runs += 1
+            else
+              note "!! no spellbook spell for the makeshift staff's #{slot}"
+            end
+          end
+        end
+
         unknown = ta.keys.reject { |k| KNOWN_KEYS.include?(k) }
         note "?? unhandled to_assign keys: #{unknown.inspect}" unless unknown.empty?
 
@@ -499,7 +517,8 @@ module AresMUSH
       # ------------------------------------------------------------------------------
 
       # Chargen: base info, the four commits, boosts, skills, languages and feats.
-      def build_level_one(charclass, ancestry: 'Khazad', heritage: 'Forge', background: 'Acolyte')
+      # `option` names the specialty's option to take, such as a wizard's thesis; the first one otherwise.
+      def build_level_one(charclass, ancestry: 'Khazad', heritage: 'Forge', background: 'Acolyte', option: nil)
         @char.update(:chargen_stage => 4)
         Pf2eAbilities.factory_default(@char)
         Pf2eSkills.factory_default(@char)
@@ -528,7 +547,7 @@ module AresMUSH
         if specialty
           run "cg/set specialize=#{specialty}"
           choose = (specialties[specialty] || {})['choose']
-          option = choose ? (choose['options'] || {}).keys.first : nil
+          option ||= choose ? (choose['options'] || {}).keys.first : nil
           run "cg/set specialize_info=#{option}" if option
         end
 

@@ -156,7 +156,10 @@ module AresMUSH
         # A row with no proficiency at all is not one the player has trained, and `untrained` was
         # the only value being filtered - so a blank one reached format_skill and `nil[0]` took
         # the whole sheet down.
-        filter_skills = skills.to_a.reject { |s| s.prof_level.to_s.strip.empty? || s.prof_level == 'untrained' }
+        # A skill a daily choice trains them in for the day is listed at that rank.
+        filter_skills = skills.to_a.reject do |s|
+          s.prof_level.to_s.strip.empty? || Pf2eSkills.rolling_prof(@char, s.name).to_s == 'untrained'
+        end
 
         sort_skills = filter_skills.sort_by { |s| s.name }
 
@@ -258,6 +261,11 @@ module AresMUSH
           Pf2e.feat_display_list(@char, Pf2e::DraftSheet.of(@char).feats_by_bucket[type] || []).each do |name|
             list << format_feat(name, type)
           end
+        end
+
+        # A feat a daily choice lends them for the day (Combat Flexibility), marked as such.
+        Pf2e::DailyChoices.feats(@char).each do |lent|
+          list << format_feat(Pf2e::DailyChoices.label('pick' => lent['feat'], 'choice' => lent['choice']), 'day')
         end
 
         list.sort.join(", ")
@@ -468,7 +476,7 @@ module AresMUSH
         linked_attr = print_linked_attr(name)
         skill_mod = "%xh#{Pf2eSkills.get_skill_bonus(char, name)}%xn"
         linebreak = i % 2 == 1 ? "" : "%r"
-        proflevel = " (#{s.prof_level.to_s[0].to_s.upcase})"
+        proflevel = " (#{Pf2eSkills.rolling_prof(char, name).to_s[0].to_s.upcase})"
         "#{linebreak}#{left(fmt_name + linked_attr,21)} #{left(skill_mod + proflevel, 17)}"
       end
 

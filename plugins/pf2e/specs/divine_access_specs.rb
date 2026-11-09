@@ -134,7 +134,7 @@ module AresMUSH
 
           it "should offer the deities who grant one of the mystery's domains" do
             expect(Pf2e.choice_options(char, 'Divine Access', block))
-              .to eq %w(Althea Daeus Gunahkar Illotha Serriel Vardama)
+              .to eq %w(Althea Daeus Illotha Serriel Vardama)
           end
 
           it "should then offer that deity's cleric spells" do

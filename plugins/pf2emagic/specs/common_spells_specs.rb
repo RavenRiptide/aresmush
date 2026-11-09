@@ -4,8 +4,8 @@ module AresMUSH
   module Pf2emagic
 
     # The spells a player may pick by name in chargen and at a level-up. A spell with any rarity
-    # trait is left out, except where the class has access to it on its own terms. Granted spells
-    # reach the sheet without passing through these lists at all.
+    # trait is left out, except where the class has access to it on its own terms or staff unlocked it
+    # for the character. Granted spells reach the sheet without passing through these lists at all.
     describe "picking a spell by name" do
 
       let(:spells) do
@@ -35,6 +35,15 @@ module AresMUSH
         it "should treat a spell with no traits as common" do
           expect(Pf2emagic.find_common_spells.keys).to include 'Traitless'
         end
+
+        # Staff unlock an uncommon or rare spell for one character after they spend RPP on it.
+        it "should keep a spell unlocked for the character asking" do
+          char = double
+          allow(Pf2e::SpellUnlocks).to receive(:unlocked).with(char).and_return([ 'Wish' ])
+
+          expect(Pf2emagic.find_common_spells(char).keys).to include 'Wish'
+          expect(Pf2emagic.find_common_spells(char).keys).to_not include 'Talking Corpse'
+        end
       end
 
       # A Wizard's school teaches its curriculum, uncommon spells included, so those are the
@@ -50,6 +59,7 @@ module AresMUSH
         end
 
         before(:each) do
+          allow(Pf2e::SpellUnlocks).to receive(:unlocked).and_return([])
           allow(Global).to receive(:read_config).with('pf2e_specialty', 'Wizard', 'Department of Mana Syntaxia')
             .and_return('curriculum' => { 9 => [ 'Detonate Magic' ] })
           allow(Global).to receive(:read_config).with('pf2e_specialty', 'Wizard', 'Department of Urban Thaumaturgy')
@@ -74,6 +84,12 @@ module AresMUSH
 
         it "should offer every common spell" do
           expect(pickable('Department of Mana Syntaxia', '9')).to include('Fireball', 'Traitless')
+        end
+
+        it "should offer an uncommon spell staff unlocked" do
+          allow(Pf2e::SpellUnlocks).to receive(:unlocked).and_return([ 'Talking Corpse' ])
+
+          expect(pickable('Department of Urban Thaumaturgy', '9')).to include 'Talking Corpse'
         end
       end
     end

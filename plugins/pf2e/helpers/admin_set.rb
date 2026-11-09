@@ -66,6 +66,10 @@ module AresMUSH
           'syntax' => '[heal|harm]',
           'plan' => lambda { |words, state, target| AdminSet.plan_divine_font(words, state, target) }
         },
+        'makeshift' => {
+          'syntax' => '[cantrip|1] <spell name>',
+          'plan' => lambda { |words, state, target| AdminSet.plan_makeshift(words, state, target) }
+        },
         'alignment' => {
           'syntax' => '<alignment>',
           'plan' => lambda { |words, state, target| AdminSet.plan_alignment(words, state, target) }
@@ -191,11 +195,19 @@ module AresMUSH
         # not the keyword staff happened to type.
         element = caster['mode'] == 'prepared' ? 'Spellbook' : 'Repertoire'
 
-        if instruction == 'add'
-          ok(state, element).with_grant('spell_access', 'source' => source, 'rank' => spell_rank(rank), 'spell' => spell)
-        else
-          ok(state, element).with_revocation('spell_access', 'source' => source, 'spell' => spell)
+        return ok(state, element).with_grant('spell_access', 'source' => source, 'rank' => spell_rank(rank), 'spell' => spell) if
+          instruction == 'add'
+
+        # A spell their Staff Nexus makeshift staff holds stays in their spellbook: set the makeshift staff
+        # a different spell first.
+        held = Staves.leaving_book_refusal((state['makeshift'] || {})['spells'], source, spell)
+
+        if held
+          return Err.new(:makeshift_holds, 'pf2e.admin_spellbook_makeshift', 'char' => state['name'], 'spell' => held['spell'],
+                         'slot' => held['slot'])
         end
+
+        ok(state, element).with_revocation('spell_access', 'source' => source, 'spell' => spell)
       end
 
       def self.plan_focus(words, state, target)
@@ -279,6 +291,36 @@ module AresMUSH
         # The word itself, because every reader of the font compares it against 'heal' or 'harm'.
         with_magic(state, 'Divine font', 'op' => 'update', 'charclass' => 'charclass',
                    'info' => { 'divine_font' => [ font ] })
+      end
+
+      # A Staff Nexus wizard's makeshift staff spell: the slot's rank, and from their spellbook, as in
+      # chargen. Staff can't set one outside the spellbook; they add it to the spellbook first.
+      def self.plan_makeshift(words, state, target)
+        return short(target) if words.size < 2
+
+        key = Staves.makeshift_slot(words.first)
+        name = words.drop(1).join(' ')
+
+        return Err.new(:not_nexus, 'pf2e.admin_makeshift_not_nexus', 'char' => state['name']) unless
+          ((state['base_info'] || {})['specialize_info']).to_s.casecmp?(Staves::THESIS)
+        return Err.new(:bad_slot, 'pf2e.bad_option', 'element' => 'makeshift staff slot', 'options' => 'cantrip, 1') unless key
+
+        spell = match_spell(name, state)
+
+        return Err.new(:not_unique, 'pf2e.not_unique') unless spell
+
+        details = state['config'].read('pf2e_spells', spell) || {}
+        book = ((state['makeshift'] || {})['book'] || {})[key]
+        refused = Staves.makeshift_refusal(key, spell, details, book)
+
+        if refused&.code == :not_in_book
+          return Err.new(:not_in_book, 'pf2e.admin_makeshift_book', 'char' => state['name'], 'spell' => spell,
+                         'slot' => Staves.slot_word(key))
+        end
+
+        return refused if refused
+
+        with_magic(state, 'Makeshift staff', 'op' => 'makeshift', 'slot' => key, 'spell' => spell)
       end
 
       def self.plan_alignment(words, state, target)

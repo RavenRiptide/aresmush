@@ -24,7 +24,3 @@ pf2e_crafting:
     18: 120000
     19: 200000
     20: 350000
-  # An alchemist's preparations: each batch of infused reagents makes this many items at a rest, and one
-  # in the moment with Quick Alchemy.
-  alchemy:
-    items_per_batch: 2

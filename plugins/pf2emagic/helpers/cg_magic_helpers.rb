@@ -17,6 +17,16 @@ module AresMUSH
 
     end
 
+    # Why a spell can't be swapped out of their spellbook, or nil: their Staff Nexus makeshift staff holds
+    # it. Staff change the makeshift staff's spell first.
+    def self.makeshift_holds(char, charclass, spell)
+      return nil if spell.blank?
+
+      held = Pf2e::Staves.leaving_book_refusal(Pf2e::Staves.makeshift_picks(char), charclass, spell)
+
+      held ? t('pf2emagic.spell_in_makeshift_staff', :spell => held['spell'], :slot => held['slot']) : nil
+    end
+
     # Writes a spell into the list its class keeps - a spellbook for a prepared caster, a
     # repertoire for a spontaneous one - replacing `old_spname` when this is a swap rather than an
     # addition. Returns nil on success and a player-facing string when the spell being replaced is
@@ -251,7 +261,13 @@ module AresMUSH
 
       return t('pf2emagic.no_new_spells') unless new_spells_to_assign
 
-      hash = common_only ? find_common_spells : Global.read_config('pf2e_spells')
+      unless old_spell.blank?
+        held = makeshift_holds(char, charclass, get_spells_by_name(old_spell).first)
+
+        return held if held
+      end
+
+      hash = common_only ? find_common_spells(char) : Global.read_config('pf2e_spells')
       match = hash.keys.select { |s| s.downcase == new_spell.downcase }
 
       return no_such_spell_message(new_spell, hash) if match.empty?
@@ -350,6 +366,10 @@ module AresMUSH
         i = new_spells_for_level.index old_spname
 
         return t('pf2emagic.not_in_list') unless i
+
+        held = makeshift_holds(char, charclass, old_spname)
+
+        return held if held
       end
 
       # Every rule that is not about how the name was resolved, from the one place a level-up asks
@@ -411,7 +431,7 @@ module AresMUSH
         return t('pf2emagic.innate_no_new_spells') unless source_info
       end
 
-      hash = common_only ? find_common_spells : Global.read_config('pf2e_spells')
+      hash = common_only ? find_common_spells(char) : Global.read_config('pf2e_spells')
       match = hash.keys.select { |s| s.downcase == new_spell.downcase }
 
       return t('pf2emagic.innate_no_such_spell') if match.empty?
@@ -447,19 +467,26 @@ module AresMUSH
 
     RARITY_TRAITS = %w{uncommon rare unique}.freeze
 
-    # The spells anyone may pick by name. A granted spell reaches the sheet without this list, so a
-    # mystery's uncommon spell is still theirs.
-    def self.find_common_spells
-      Global.read_config('pf2e_spells').select { |_name, details| (Array(details['traits']) & RARITY_TRAITS).empty? }
-    end
-
-    # The spells this class may pick by name at a rank: every common spell, and the school's
-    # curriculum at that rank whatever its rarity, because the school teaches it.
-    def self.pickable_spells(char, charclass, level)
-      curriculum = curriculum_spells(char, charclass, level).map(&:downcase)
+    # The spells anyone may pick by name, and, given whose pick it is, the uncommon and rare ones staff
+    # unlocked for them. A granted spell reaches the sheet without this list, so a mystery's uncommon
+    # spell is still theirs.
+    def self.find_common_spells(char = nil)
+      unlocked = char ? Pf2e::SpellUnlocks.unlocked(char).map(&:downcase) : []
 
       Global.read_config('pf2e_spells').select do |name, details|
-        curriculum.include?(name.downcase) || (Array(details['traits']) & RARITY_TRAITS).empty?
+        (Array(details['traits']) & RARITY_TRAITS).empty? || unlocked.include?(name.downcase)
+      end
+    end
+
+    # The spells this class may pick by name at a rank: every common spell, the school's curriculum at
+    # that rank whatever its rarity, because the school teaches it, and any spell staff unlocked.
+    def self.pickable_spells(char, charclass, level)
+      curriculum = curriculum_spells(char, charclass, level).map(&:downcase)
+      unlocked = Pf2e::SpellUnlocks.unlocked(char).map(&:downcase)
+
+      Global.read_config('pf2e_spells').select do |name, details|
+        curriculum.include?(name.downcase) || unlocked.include?(name.downcase) ||
+          (Array(details['traits']) & RARITY_TRAITS).empty?
       end
     end
 
@@ -482,6 +509,7 @@ module AresMUSH
       msg << t('pf2emagic.config_error', :code => "NO OBJECT") unless magic
 
       msg << t('pf2emagic.choose_divine_font') if to_assign['divine font'].is_a? Array
+      msg << t('pf2emagic.choose_makeshift_spells') if Pf2e::Staves.makeshift_open?(to_assign)
 
       msg << innate_prompt(magic ? Entries.pending_innate(magic) : []).to_s.then { |line| line.empty? ? nil : line }
       msg.compact!

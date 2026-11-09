@@ -20,8 +20,8 @@ module AresMUSH
       end
     end
 
-    # `formula/buy <category>=<item>` - buys a common formula at the price PF2e sets for an item of its
-    # level, from the character's own money.
+    # `formula/buy <category>=<item>` - buys a formula at the price PF2e sets for an item of its level, from
+    # the character's own money. A formula for an uncommon or rare item needs access to the item.
     class PF2FormulaBuyCmd
       include CommandHandler
       include LearnsFormulas
@@ -39,11 +39,18 @@ module AresMUSH
         [ self.category, self.name ]
       end
 
+      # Chargen records its sheet only for a character with no grants, so buying a formula waits for
+      # approval.
+      def check_is_approved
+        return t('pf2e.not_approved') unless enactor.is_approved?
+      end
+
       def handle
         named, info = entry.state
         price = Crafting.price(info['level'])
 
-        return client.emit_failure(t('pf2e.formula_not_common', :formula => named)) unless Crafting.common?(info)
+        return client.emit_failure(t('pf2e.formula_not_common', :formula => named)) unless
+          ItemAccess.accessible?(enactor, self.category, named, info)
         return client.emit_failure(t('pf2egear.not_enough_you', :item => 'money for that formula')) if price > enactor.pf2_money.to_i
 
         Pf2egear.pay_player(enactor, -price, enactor.name, t('pf2e.formula_bought_reason', :formula => named))

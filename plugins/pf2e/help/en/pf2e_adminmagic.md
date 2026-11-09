@@ -50,3 +50,14 @@ Staff can make some modifications to characters' sheets.
 **Key**:
 `<character>`: The character's name.
 `[heal|harm]`: Choose `heal` to set healing font; choose `harm` to set harming font.
+
+### Setting makeshift staff spells
+**Command**:
+`admin/set <character>/makeshift = [cantrip|1] <spell name>`
+
+**Key**:
+`<character>`: The character's name. They must be a wizard with the Staff Nexus thesis.
+`[cantrip|1]`: Choose `cantrip` to set the makeshift staff's cantrip; `1` to set its 1st-rank spell.
+`<spell name>`: The name of the spell. It must be in their spellbook at that rank.
+
+%t **Note:** A spell in their makeshift staff can't be removed from their spellbook. To remove one, set the makeshift staff a different spell first.

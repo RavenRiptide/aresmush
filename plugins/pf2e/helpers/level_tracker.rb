@@ -130,6 +130,12 @@ module AresMUSH
       return t('pf2e.rollback_not_that_high', :level => char.pf2_level) if target > char.pf2_level
       return t('pf2e.rollback_nothing', :level => target) if Ledger.rollback_targets(Ledger.rows(char), target).empty?
 
+      # A spell their Staff Nexus makeshift staff holds stays in their spellbook, as it does against
+      # admin/set: staff set the makeshift staff a different spell first.
+      lost = Staves.lost_on_rollback(char, target)
+
+      return t('pf2e.rollback_makeshift', :char => char.name, :spell => lost['spell'], :slot => lost['slot'], :level => target) if lost
+
       nil
     end
 

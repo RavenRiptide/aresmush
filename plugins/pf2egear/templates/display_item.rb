@@ -61,10 +61,12 @@ module AresMUSH
           fmt_list << "%b#{left("#{item_color}Reload:%xn #{@item.reload}", 18)}"
           fmt_list << "%b#{left("#{item_color}Range:%xn #{@item.hands}", 18)}%r"
 
-          # Can this item be used? 
+          # Can this item be used? A staff casts the spells it holds.
           usable = @item.use.empty? ? "This item cannot be used." : "#{item_color}Use Effects:%xn #{@item.use}"
 
-          fmt_list << "%b%b#{usable}%r"
+          fmt_list << "%b%b#{usable}%r" unless Pf2e::Staves.staff?(@item)
+          Pf2e::Staves.describe(@char, @item).each { |line| fmt_list << "%b%b#{line}%r" }
+          Pf2e::BoundItems.describe(@char, @item).each { |line| fmt_list << "%b%b#{line}%r" }
         when "armor"
           fmt_list << "%b%b#{left("#{item_color}Category:%xn #{@item.category.capitalize}", 37)}"
           fmt_list << "%b#{left("#{item_color}Group:%xn #{@item.group}", 37)}%r"
@@ -76,10 +78,19 @@ module AresMUSH
           fmt_list << "%b#{left("#{item_color}Max Dex Bonus:%xn #{@item.dex_cap}", 26)}%r"
         when "magicitem"
 
-          # Can this item be used? 
+          # Can this item be used? A wand casts the spell it holds.
           usable = @item.use.empty? ? "This item cannot be used." : "#{item_color}Use Effects:%xn #{@item.use}"
 
-          fmt_list << "%b%b#{usable}%r"
+          fmt_list << "%b%b#{usable}%r" unless Pf2e::SpellItems.spell_item?(@item) || Pf2e::WaveFan.fan?(@item)
+          Pf2e::SpellItems.describe(@item).each { |line| fmt_list << "%b%b#{line}%r" }
+
+          # A bound item says what it holds, and which feat it belongs to.
+          Pf2e::BoundItems.describe(@char, @item).each { |line| fmt_list << "%b%b#{line}%r" }
+
+        when "consumable", "consumables"
+
+          # A scroll says the spell it holds.
+          Pf2e::SpellItems.describe(@item).each { |line| fmt_list << "%b%b#{line}%r" }
 
         when "shield", "shields"
 

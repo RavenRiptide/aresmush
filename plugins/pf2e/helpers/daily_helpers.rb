@@ -3,8 +3,8 @@ module AresMUSH
 
     # A night's rest and the day's preparations, for someone as they stand in an encounter: the night's
     # Hit Points, an end to what lasts less than a day, the day's once-a-day uses, a full focus pool, the
-    # day's spells from what they have prepared, reagents, and what they invest. The GM rests them with
-    # `+e/rest`, as often as the story says a night has passed.
+    # day's spells from what they have prepared, snares, what they invest, and an alchemist's vials and
+    # prepared items. The GM rests them with `+e/rest`, as often as the story says a night has passed.
     def self.rest(holder)
       # What the last day's preparations made lapses before this day's are made.
       Equipment.lapse!(holder, 'rest')
@@ -22,9 +22,40 @@ module AresMUSH
 
       daily_refresh_reagents(holder)
       do_daily_investiture(holder)
+      # A wand's daily casting, and the day's overcharge, come back.
+      SpellItems.rested!(holder)
+      WaveFan.rested!(holder)
+      # A staff's charges fade, and it is prepared again with the day's other choices.
+      Staves.rested!(holder)
 
-      # Their reagents are refreshed before what they prepared is made of them.
-      Alchemy.at_rest!(holder)
+      # An alchemist's versatile vials and prepared items for the day, and a rogue's simple injury poisons.
+      made = Alchemy.at_rest!(holder)
+      WeaponPoison.at_rest!(holder)
+
+      # The day's choices open again. One that should have held but no longer can is said, so the player
+      # knows to pick again.
+      person = Actors.of(holder).person
+
+      DailyChoices.rested!(holder).each do |dropped|
+        next unless person
+
+        Login.emit_ooc_if_logged_in(person, t('pf2e.daily_dropped', :source => dropped['source'],
+                                              :pick => dropped['pick'], :switch => dropped['switch']))
+      end
+
+      # The day's batches from the picks still in force: a witch's cauldron.
+      DailyChoices.brew!(holder)
+
+      # A Shield Paragon's destroyed shield comes back mended.
+      repaired = ShieldBlock.paragon_repair!(holder)
+
+      if repaired && person
+        Login.emit_ooc_if_logged_in(person, t('pf2e.shield_paragon_repaired', :name => holder.name,
+                                              :shield => repaired.nickname || repaired.name))
+      end
+
+      # What the alchemist's preparations made, which is what a caller asks of a rest.
+      made
     end
 
     # A full night's rest recovers Constitution modifier times level, doubled by Fast Recovery and its
@@ -44,21 +75,13 @@ module AresMUSH
 
     SNARES_BY_RANK = { 'expert' => 4, 'master' => 6, 'legendary' => 8 }.freeze
 
-    # The day's reagents: an alchemist's batches, `[ total, allocated, remaining ]`, and a snare-maker's
-    # snares, `[ total, remaining ]`. An alchemist is one by their Advanced Alchemy whether or not their
-    # reagents were ever recorded, which chargen does not do.
+    # A snare-maker's snares for the day, `[ total, remaining ]`, kept in `pf2_reagents` under `snares`.
+    # An alchemist's day is `Pf2e::Alchemy`'s: the `alchemist` key a legacy alchemist left there is not
+    # read.
     def self.daily_refresh_reagents(char)
       reagents = (char.pf2_reagents || {}).dup
-      reagents['alchemist'] ||= [ 0, 0, 0 ] if Pf2e::Alchemy.alchemist?(char)
 
       return nil if reagents.empty?
-
-      if reagents['alchemist']
-        total = Pf2e::Alchemy.capacity(char)
-        allocated = char.pf2_alloc_reagents.to_i
-
-        reagents['alchemist'] = [ total, allocated, total - allocated ]
-      end
 
       if reagents['snares']
         # Snares prepared each day, by Crafting: 4 for an expert, 6 for a master, 8 for a legend.

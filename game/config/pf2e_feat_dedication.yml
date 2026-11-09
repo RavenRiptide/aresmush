@@ -34,11 +34,14 @@ pf2e_feats:
       level: 2
       ability:
         - Intelligence/14
-    shortdesc: "You put your alchemical interest into practice. You become trained in alchemical bombs, the alchemist class DC, and Crafting; if you were already trained in Crafting, you instead become trained in a skill of your choice.%r%rYou gain the Quick Alchemy benefits, creating up to 4 versatile vials during your daily preparations. Add the formulas for four additional common alchemical items to your formula book, in addition to those you gain from Alchemical Crafting."
+    shortdesc: "You put your alchemical interest into practice. You become trained in alchemical bombs, the alchemist class DC, and Crafting; if you were already trained in Crafting, you instead become trained in a skill of your choice.%r%rYou gain the Quick Alchemy benefits, creating up to 4 versatile vials during your daily preparations. Add the formulas for four additional common alchemical items to your formula book, in addition to those you gain from Alchemical Crafting.%r%r**Note:** Each versatile vial is one batch of reagents, and each batch makes one item with Quick Alchemy (`encounter/alchemy`)."
     traits:
       - archetype
       - dedication
       - multiclass
+    # Quick Alchemy's versatile vials, one batch of reagents each. Pf2e::Alchemy reads it.
+    alchemy:
+      vials: 4
     rules:
       - key: "ActiveEffectLike"
         path: "system.skills.crafting.rank"
@@ -717,9 +720,12 @@ pf2e_feats:
       level: 4
       feat:
         - Alchemist Dedication
-    shortdesc: You gain the advanced alchemy benefits, and you can create 4 alchemical consumables during your daily preparations.
+    shortdesc: "You gain the advanced alchemy benefits, and you can create 4 alchemical consumables during your daily preparations.%r%r**Note:** Put the items on your list with `alchemy/prepare`, and each rest makes them. They don't use your versatile vials, which stay for Quick Alchemy."
     traits:
       - archetype
+    # The items its preparations make, apart from the dedication's vials. Pf2e::Alchemy reads it.
+    alchemy:
+      prepared: 4
   Arcane School Spell:
     feat_choice:
       auto: subclass_spell

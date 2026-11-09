@@ -724,8 +724,19 @@ module AresMUSH
       key && skills[key]
     end
 
+    # Whether a feat is in play for them: held, or lent for the day by a daily choice (Combat
+    # Flexibility). Every caller asks while playing. A prerequisite reads `DraftSheet#feat_names`, which a
+    # lent feat never reaches.
     def self.has_feat?(char, feat)
-      DraftSheet.of(char).feat_names.include?(feat.upcase)
+      wanted = feat.to_s.upcase
+
+      DraftSheet.of(char).feat_names.include?(wanted) ||
+        DailyChoices.feat_names(char).any? { |one| one.to_s.upcase == wanted }
+    end
+
+    # The feats in play for them, by name: their own, and those a daily choice lends them for the day.
+    def self.feats_in_play(char)
+      (char.pf2_feats || {}).values.flatten + DailyChoices.feat_names(char)
     end
 
     # How many times this feat may be taken in total. Infinity when uncapped.
@@ -2751,6 +2762,12 @@ module AresMUSH
 
       weapons = Global.read_config('pf2e_weapons') || {}
 
+      # Advanced weapons offered only to someone trained in the category named: Unconventional
+      # Weaponry's "If you are trained in all martial weapons, you can instead choose ... an advanced weapon".
+      gate = filter['advanced_if_trained']
+      advanced_ok = gate.blank? ||
+                    Pf2e.prof_at_least?(((char.combat&.weapon_prof) || {})[gate.to_s.downcase], 'trained')
+
       list = weapons.keys.select do |name|
         details = weapons[name]
         next false unless details.is_a?(Hash)
@@ -2758,6 +2775,13 @@ module AresMUSH
         if filter['category']
           wanted = Array(filter['category']).compact.map { |c| c.to_s.downcase }
           next false unless wanted.include?(details['category'].to_s.downcase)
+        end
+
+        next false if !advanced_ok && details['category'].to_s.casecmp?('advanced')
+
+        if filter['rarity']
+          wanted = Array(filter['rarity']).compact.map { |r| r.to_s.downcase }
+          next false unless wanted.include?(ItemAccess.rarity(details))
         end
 
         if filter['group']
@@ -2785,14 +2809,36 @@ module AresMUSH
     end
 
     # Weapon names the character has chosen through any feat whose choice draws from the
-    # weapon list, such as Weapon Proficiency.
+    # weapon list for the `chosen` proficiency, such as Weapon Proficiency. A choice that gives
+    # familiarity instead is read by familiar_weapon_categories.
     def self.chosen_weapons(char)
       recorded_choices(char).filter_map do |name, label, _level|
         block = find_choice_block(char, name)
-        next unless block.is_a?(Hash) && block['from_weapons']
+        next unless block.is_a?(Hash) && block['from_weapons'] && !block['familiarity']
 
         label
       end.uniq
+    end
+
+    # Familiarity with a weapon picked by a choice whose block says `familiarity: true`, such as
+    # Unconventional Weaponry's, or by a daily choice that says so, such as Egalrin Weapon Familiarity's
+    # sword practice: for proficiency, a martial one counts as simple and an advanced one as martial.
+    FAMILIAR_AS = { 'martial' => 'simple', 'advanced' => 'martial' }.freeze
+
+    def self.familiar_weapon_categories(char, name, category)
+      as = FAMILIAR_AS[category.to_s.downcase]
+
+      return [] unless as
+      return [ as ] if DailyChoices.familiar?(char, name)
+
+      picked = recorded_choices(char).any? do |choice, label, _level|
+        next false unless label.to_s.casecmp?(name.to_s)
+
+        block = find_choice_block(char, choice)
+        block.is_a?(Hash) && block['from_weapons'] && block['familiarity']
+      end
+
+      picked ? [ as ] : []
     end
 
     # The categories a weapon also counts as for this character: Advanced Weapon Training's chosen

@@ -29,6 +29,9 @@ module AresMUSH
         # The draft becomes history: everything chargen produced is written as one chargen
         # transaction, and from here the ledger is the source of truth for this sheet.
         Pf2e::Ledger.commit_chargen!(char)
+
+        # The items their feats hand over are theirs from here, and not before.
+        Pf2e::BoundItems.settle!(Character[char.id])
       end
     end
   end

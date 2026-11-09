@@ -45,8 +45,9 @@ module AresMUSH
         Pf2egear.build_item(holder, category, name, info).update(:quantity => quantity, :granted_by => granted_by, :expires => expires)
       end
 
-      # How soon each kind of lasting ends, soonest first; what they keep lasts longest.
-      LASTS = [ 'turn', 'encounter', 'rest', nil ].freeze
+      # How soon each kind of lasting ends, soonest first; what they keep lasts longest. `turn_end` goes as
+      # its maker's turn ends (a Quick Vial), and `turn` as their next one starts (Quick Alchemy's items).
+      LASTS = [ 'turn_end', 'turn', 'encounter', 'rest', nil ].freeze
 
       # Items with the ones that will be gone soonest first, which is the one to use up of two alike.
       def self.soonest_first(items)
@@ -201,6 +202,9 @@ module AresMUSH
         char = state.character
 
         return [] unless char
+
+        # A wand an overcharge broke or destroyed is broken or gone on their own sheet too.
+        SpellItems.settle!(state)
 
         now = state.consumables.to_a
         held = now.select(&:copied_from).to_h { |one| [ one.copied_from.to_s, one ] }

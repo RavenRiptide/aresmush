@@ -63,7 +63,8 @@ All rolls are public, meaning that everyone in the scene sees each roll and its 
 %t `encounter/strike #3`
 %t `encounter/strike #3=longsword/flanking`
 %t `encounter/strike #4=shortbow/range 2`
-%t **Note:** You throw bombs the same way: `encounter/strike #3=alchemist's fire`. The bomb is used up whether or not it hits. Its persistent damage applies on a hit, and its splash damages the target even on a miss (but not on a critical miss). The GM decides who else is in the splash.
+%t **Note:** You throw bombs the same way: `encounter/strike #3=alchemist's fire`. The bomb is used up whether or not it hits. Its persistent damage applies on a hit, and its splash damages the target even on a miss (but not on a critical miss).
+%t **Note:** To splash others standing near the target, name them after `splash`: `encounter/strike #3=alchemist's fire/splash #4, #5`. Each takes the splash damage unless you critically miss. The game can't see where anyone stands, so the GM decides who is close enough.
 
 ### Ammunition and reloading
 

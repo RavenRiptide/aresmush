@@ -259,6 +259,18 @@ module AresMUSH
           return PF2EncounterUndoCmd
         when "rest"
           return PF2EncounterRestCmd
+        when "reprepare"
+          return PF2EncounterReprepareCmd
+        when "gather"
+          return PF2EncounterGatherCmd
+        when "poison"
+          return PF2EncounterPoisonCmd
+        when "spray"
+          return PF2EncounterSprayCmd
+        when "mutagenreroll"
+          return PF2MutagenRerollCmd
+        when "persistentmutagen"
+          return PF2PersistentMutagenCmd
         when "level"
           return PF2EncounterLevelCmd
         when "focus"
@@ -267,13 +279,17 @@ module AresMUSH
           return Pf2egear::PF2EncounterGearCmd
         when "use"
           return Pf2egear::PF2EncounterUseCmd
+        when "overcharge"
+          return Pf2egear::PF2EncounterOverchargeCmd
+        when "repair"
+          return Pf2egear::PF2EncounterRepairCmd
         when "equip"
           return Pf2egear::PF2EncounterEquipCmd
         when "unequip"
           return Pf2egear::PF2EncounterUnequipCmd
         when "loot"
           return Pf2egear::PF2EncounterLootCmd
-        when "alchemy"
+        when "alchemy", "alchemy/vial"
           return PF2EncounterAlchemyCmd
         when "owner"
           return PF2EncounterOwnerCmd
@@ -328,6 +344,10 @@ module AresMUSH
           return PF2AdminRollbackCmd
         when "unrollback"
           return PF2AdminRollbackRedoCmd
+        when "access"
+          return PF2AdminAccessCmd
+        when "unaccess"
+          return PF2AdminUnaccessCmd
         end
       when "advance"
         if cmd.switch&.start_with?("language=")

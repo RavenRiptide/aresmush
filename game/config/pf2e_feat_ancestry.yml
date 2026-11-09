@@ -180,19 +180,14 @@ pf2e_feats:
       - Sildanyar
     traits:
       - sildanyar
-    shortdesc: You have accumulated a vast array of lived knowledge over the years. During your daily preparations, you can reflect upon your life experiences to gain the trained proficiency rank in one skill of your choice. This proficiency lasts until you prepare again. Since this proficiency is temporary, you can't use it as a prerequisite for a skill increase or a permanent character option like a feat.
+    shortdesc: "You have accumulated a vast array of lived knowledge over the years. During your daily preparations, you can reflect upon your life experiences to gain the trained proficiency rank in one skill of your choice. This proficiency lasts until you prepare again. Since this proficiency is temporary, you can't use it as a prerequisite for a skill increase or a permanent character option like a feat.%r%r**Note:** Pick the skill with `prepare/longevity <skill>`. Your pick is locked until the GM next rests you, and that rest clears it so you can pick again."
     prereq:
       level: 1
-    rules:
-      - key: "RollOption"
-        option: "ancestral-longevity"
-        toggleable: true
-        alwaysActive: true
-        suboptions: {"config": "skills", "predicate": ["skill:{choice|value}:rank:0"]}
-      - key: "ActiveEffectLike"
-        path: "system.skills.{item|flags.system.rulesSelections.ancestralLongevity}.rank"
-        mode: "upgrade"
-        value: 1
+    daily_choice:
+      switch: longevity
+      pick: skill
+      trains: true
+      lasts: day
   Ancestral Suspicion:
     feat_type:
       - Ancestry
@@ -310,6 +305,22 @@ pf2e_feats:
     shortdesc: "You gain access to all uncommon weapons with the arvek trait. You have familiarity with weapons with the arvek trait plus the composite longbow, composite shortbow, glaive, longbow, longsword, and shortbow—for the purpose of proficiency, you treat any of these that are martial weapons as simple weapons and any that are advanced weapons as martial weapons.%r%rAt 5th level, whenever you get a critical hit with one of these weapons, you get its critical specialization effect."
     prereq:
       level: 1
+    item_access:
+      - category: weapons
+        traits: [ arvek ]
+    rules:
+      - key: "MartialProficiency"
+        definition: [{"or": [{"and": ["item:trait:arvek", "item:category:martial"]}, "item:base:composite-longbow", "item:base:composite-shortbow", "item:base:glaive", "item:base:longbow", "item:base:longsword", "item:base:shortbow"]}]
+        sameAs: "simple"
+        slug: "martial-arvek-weapons"
+        label: "Martial Arvek Weapons"
+      - key: "MartialProficiency"
+        definition: ["item:trait:arvek", "item:category:advanced"]
+        sameAs: "martial"
+        slug: "advanced-arvek-weapons"
+        label: "Advanced Arvek Weapons"
+      - key: "CriticalSpecialization"
+        predicate: [{"gte": ["self:level", 5]}, {"or": ["item:trait:arvek", "item:base:composite-longbow", "item:base:composite-shortbow", "item:base:glaive", "item:base:longbow", "item:base:longsword", "item:base:shortbow"]}]
   Ashen One Lore:
     feat_type:
       - Ancestry
@@ -388,6 +399,14 @@ pf2e_feats:
     prereq:
       level: 1
       heritage: Ashen One
+    rules:
+      - key: "MartialProficiency"
+        definition: [{"or": ["item:base:bo-staff", "item:base:longbow", "item:base:composite-longbow", "item:base:scythe"]}]
+        sameAs: "simple"
+        slug: "martial-ashen-one-weapons"
+        label: "Martial Ashen One Weapons"
+      - key: "CriticalSpecialization"
+        predicate: [{"gte": ["self:level", 5]}, {"or": ["item:base:bo-staff", "item:base:longbow", "item:base:composite-longbow", "item:base:scythe", "item:base:staff"]}]
   Athletic Might:
     feat_type:
       - Ancestry
@@ -462,6 +481,22 @@ pf2e_feats:
     shortdesc: "You favor traditional bassin weapons, so you've learned how to use them more effectively. You gain access to all uncommon weapons with the bassin trait. You have familiarity with weapons with the bassin trait plus the sling and shortsword—for the purposes of proficiency, you treat any of these that are martial weapons as simple weapons and any that are advanced weapons as martial weapons.%r%rAt 5th level, whenever you get a critical hit with one of these weapons, you get its critical specialization effect."
     prereq:
       level: 1
+    item_access:
+      - category: weapons
+        traits: [ bassin ]
+    rules:
+      - key: "MartialProficiency"
+        definition: [{"or": [{"and": ["item:trait:bassin", "item:category:martial"]}, "item:base:sling", "item:base:shortsword"]}]
+        sameAs: "simple"
+        slug: "martial-bassin-weapons"
+        label: "Martial Bassin Weapons"
+      - key: "MartialProficiency"
+        definition: ["item:trait:bassin", "item:category:advanced"]
+        sameAs: "martial"
+        slug: "advanced-bassin-weapons"
+        label: "Advanced Bassin Weapons"
+      - key: "CriticalSpecialization"
+        predicate: [{"gte": ["self:level", 5]}, {"or": ["item:trait:bassin", "item:base:sling", "item:base:shortsword"]}]
   Beast Trainer:
     feat_type:
       - Ancestry
@@ -1537,10 +1572,12 @@ pf2e_feats:
       - Egalrin
     traits:
       - egalrin
-    # This feat hands over a magic item, which the grant vocabulary cannot express, so it grants
-    # nothing - and never itself, which a feat's grants block cannot be without recursing.
-    # PF2e's Tengu Feather Fan is the same feat under its original name, and Wind God's Fan is the
-    # follow-up that adds spells and activations to it.
+    # The fan is a bound item, made at the commit boundaries and usable only while this feat is held.
+    # PF2e's Tengu Feather Fan is the same feat under its original name, and Wind God's Fan and
+    # Thunder God's Fan are the follow-ups that add spells and activations to it.
+    bound_item:
+      category: magicitem
+      item: Egalrin Feather Fan
     shortdesc: "You've learned to bind some of your feathers together into a fan to focus your ancestral magic. You gain a *egalrin feather fan*: a magic item of light Bulk with a level equal to your level and the primal trait. You (and only you) can cast egalrin magic with the Wave Fan activation. If your fan is lost or destroyed, you can create a replacement during your daily preparations; if you do so, your previous fan falls apart into mundane feathers.%r%rYour *egalrin feather fan* contains a 1st-rank *gust of wind* spell. Further feats might add more spells and grant you additional activations of your egalrin feather fan, but you can never have more than three activations per day, no matter how many such feats you have.%r%r**Activate—Wave Fan** (manipulate)%r%r**Frequency** once per day%r%r**Effect** You cast your choice of one spell contained in your *egalrin feather fan*. You can instead cast a cantrip you've gained from a heritage or an ancestry feat; this doesn't use up one of the fan's daily activations. This activation takes the spell's normal number of actions. The spell's DC is your class DC or spell DC, whichever is higher."
     prereq:
       level: 5
@@ -1568,9 +1605,32 @@ pf2e_feats:
       - Egalrin
     traits:
       - egalrin
-    shortdesc: "You gain access to all uncommon weapons with the egalrin trait plus the katana, khakkara, temple sword, and wakizashi. You have familiarity with these weapons—for the purpose of proficiency, you treat any of these that are martial weapons as simple weapons and any that are advanced weapons as martial weapons.%r%rDuring your daily preparations, you can practice with a weapon from the sword group that's in your possession. You gain familiarity with that weapon as well. This lasts until you practice with a different sword in the same way.%r%rAt 5th level, whenever you get a critical hit with one of these weapons, you get its critical specialization effect."
+    shortdesc: "You gain access to all uncommon weapons with the egalrin trait plus the katana, khakkara, temple sword, and wakizashi. You have familiarity with these weapons—for the purpose of proficiency, you treat any of these that are martial weapons as simple weapons and any that are advanced weapons as martial weapons.%r%rDuring your daily preparations, you can practice with a weapon from the sword group that's in your possession. You gain familiarity with that weapon as well. This lasts until you practice with a different sword in the same way.%r%rAt 5th level, whenever you get a critical hit with one of these weapons, you get its critical specialization effect.%r%r**Note:** Practice with a sword using `prepare/swordpractice <weapon>`. Your pick is locked until the GM next rests you. It stays in force after that rest until you pick a different sword."
     prereq:
       level: 1
+    daily_choice:
+      switch: swordpractice
+      pick: weapon
+      group: sword
+      familiarity: true
+      lasts: until_changed
+    item_access:
+      - category: weapons
+        traits: [ egalrin ]
+        names: [ Katana, Khakkhara, Temple Sword, Wakizashi ]
+    rules:
+      - key: "MartialProficiency"
+        definition: [{"or": [{"and": ["item:trait:egalrin", "item:category:martial"]}, "item:base:katana", "item:base:khakkhara", "item:base:temple-sword", "item:base:wakizashi"]}]
+        sameAs: "simple"
+        slug: "martial-egalrin-weapons"
+        label: "Martial Egalrin Weapons"
+      - key: "MartialProficiency"
+        definition: ["item:trait:egalrin", "item:category:advanced"]
+        sameAs: "martial"
+        slug: "advanced-egalrin-weapons"
+        label: "Advanced Egalrin Weapons"
+      - key: "CriticalSpecialization"
+        predicate: [{"gte": ["self:level", 5]}, {"or": ["item:trait:egalrin", "item:base:katana", "item:base:khakkhara", "item:base:temple-sword", "item:base:wakizashi", "item:daily-choice:swordpractice"]}]
   Energized Font:
     feat_type:
       - Ancestry
@@ -2034,6 +2094,10 @@ pf2e_feats:
     shortdesc: "You favor unusual weapons tied to your people, such as blades with curved and peculiar shapes. You gain access to kukris and all uncommon weapons with the gnome trait. You have familiarity with weapons with the gnome trait plus the glaive and kukri—for the purposes of proficiency, you treat any of these that are martial weapons as simple weapons and any that are advanced weapons as martial weapons.%r%rAt 5th level, whenever you get a critical hit with one of these weapons, you get its critical specialization effect."
     prereq:
       level: 1
+    item_access:
+      - category: weapons
+        traits: [ gnome ]
+        names: [ Kukri ]
     rules:
       - key: "MartialProficiency"
         definition: [{"or": [{"and": ["item:trait:gnome", "item:category:martial"]}, "item:base:glaive", "item:base:kukri"]}]
@@ -2105,6 +2169,9 @@ pf2e_feats:
     shortdesc: "Others might look upon them with disdain, but you know that the weapons of your people are as effective as they are sharp. You gain access to all uncommon weapons with the goblin trait. You have familiarity with weapons with the goblin trait—for the purposes of proficiency, you treat any of these that are martial weapons as simple weapons and any that are advanced weapons as martial weapons.%r%rAt 5th level, whenever you get a critical hit with one of these weapons, you get its critical specialization effect."
     prereq:
       level: 1
+    item_access:
+      - category: weapons
+        traits: [ goblin ]
     rules:
       - key: "MartialProficiency"
         definition: ["item:trait:goblin", "item:category:martial"]
@@ -2693,6 +2760,22 @@ pf2e_feats:
     shortdesc: "Your kin have instilled in you an affinity for hard-hitting weapons, and you prefer these to more elegant arms. You gain access to all uncommon weapons with the khazad trait. You have familiarity with weapons with the khazad trait plus the battle axe, pick, and warhammer—for the purposes of proficiency, you treat any of these that are martial weapons as simple weapons and any that are advanced weapons as martial weapons.%r%rAt 5th level, whenever you get a critical hit with one of these weapons, you get its critical specialization effect."
     prereq:
       level: 1
+    item_access:
+      - category: weapons
+        traits: [ khazad ]
+    rules:
+      - key: "MartialProficiency"
+        definition: [{"or": [{"and": ["item:trait:khazad", "item:category:martial"]}, "item:base:battle-axe", "item:base:pick", "item:base:warhammer"]}]
+        sameAs: "simple"
+        slug: "martial-khazadi-weapons"
+        label: "Martial Khazadi Weapons"
+      - key: "MartialProficiency"
+        definition: ["item:trait:khazad", "item:category:advanced"]
+        sameAs: "martial"
+        slug: "advanced-khazadi-weapons"
+        label: "Advanced Khazadi Weapons"
+      - key: "CriticalSpecialization"
+        predicate: [{"gte": ["self:level", 5]}, {"or": ["item:trait:khazad", "item:base:battle-axe", "item:base:pick", "item:base:warhammer"]}]
   Kneecap:
     feat_type:
       - Ancestry
@@ -3426,6 +3509,22 @@ pf2e_feats:
     shortdesc: "In combat, you favor the brutal weapons that are traditional for your oruch ancestors. You gain access to all uncommon weapons with the oruch trait. You have familiarity with weapons with the oruch trait plus the falchion and greataxe—for the purposes of proficiency, you treat any of these that are martial weapons as simple weapons and any that are advanced weapons as martial weapons.%r%rAt 5th level, whenever you get a critical hit with one of these weapons, you get its critical specialization effect."
     prereq:
       level: 1
+    item_access:
+      - category: weapons
+        traits: [ oruch ]
+    rules:
+      - key: "MartialProficiency"
+        definition: [{"or": [{"and": ["item:trait:oruch", "item:category:martial"]}, "item:base:falchion", "item:base:greataxe"]}]
+        sameAs: "simple"
+        slug: "martial-oruch-weapons"
+        label: "Martial Oruch Weapons"
+      - key: "MartialProficiency"
+        definition: ["item:trait:oruch", "item:category:advanced"]
+        sameAs: "martial"
+        slug: "advanced-oruch-weapons"
+        label: "Advanced Oruch Weapons"
+      - key: "CriticalSpecialization"
+        predicate: [{"gte": ["self:level", 5]}, {"or": ["item:trait:oruch", "item:base:falchion", "item:base:greataxe"]}]
   Otherworldly Acumen:
     feat_type:
       - Ancestry
@@ -4173,6 +4272,22 @@ pf2e_feats:
     shortdesc: "You favor bows and other elegant weapons. You gain access to all uncommon weapons with the sildanyar trait. You have familiarity with weapons with the sildanyar trait plus longbows, composite longbows, rapiers, shortbows, and composite shortbows—for the purposes of proficiency, you treat any of these that are martial weapons as simple weapons and any that are advanced weapons as martial weapons.%r%rAt 5th level, whenever you get a critical hit with one of these weapons, you get its critical specialization effect."
     prereq:
       level: 1
+    item_access:
+      - category: weapons
+        traits: [ sildanyar ]
+    rules:
+      - key: "MartialProficiency"
+        definition: [{"or": [{"and": ["item:trait:sildanyar", "item:category:martial"]}, "item:base:longbow", "item:base:composite-longbow", "item:base:rapier", "item:base:shortbow", "item:base:composite-shortbow"]}]
+        sameAs: "simple"
+        slug: "martial-sildanyari-weapons"
+        label: "Martial Sildanyari Weapons"
+      - key: "MartialProficiency"
+        definition: ["item:trait:sildanyar", "item:category:advanced"]
+        sameAs: "martial"
+        slug: "advanced-sildanyari-weapons"
+        label: "Advanced Sildanyari Weapons"
+      - key: "CriticalSpecialization"
+        predicate: [{"gte": ["self:level", 5]}, {"or": ["item:trait:sildanyar", "item:base:longbow", "item:base:composite-longbow", "item:base:rapier", "item:base:shortbow", "item:base:composite-shortbow"]}]
   Skillful Tail:
     feat_type:
       - Ancestry
@@ -4780,6 +4895,11 @@ pf2e_feats:
     traits:
       - egalrin
     shortdesc: Your fan unleashes the fury of the storm. You can use the Wave Fan activation one additional time per day. Add a 5th-rank *lightning bolt* spell to the spells contained within your fan.
+    bound_item_adds:
+      item: Egalrin Feather Fan
+      spells:
+        - { name: Lightning Bolt, rank: 5 }
+      activations: 1
     prereq:
       level: 13
       feat:
@@ -4929,6 +5049,18 @@ pf2e_feats:
     shortdesc: "You've familiarized yourself with a particular weapon, potentially from another ancestry or culture. Choose an uncommon simple or martial weapon with a trait corresponding to an ancestry (such as khazad, goblin, or oruch) or that is common in another culture. You gain access to that weapon, and for the purpose of proficiency, you treat it as a simple weapon.%r%rIf you are trained in all martial weapons, you can instead choose an uncommon advanced weapon that has an ancestry's trait or is common in another culture. You gain access to that weapon and have familiarity with that weapon. For the purpose of proficiency, you treat it as a martial weapon."
     prereq:
       level: 1
+    # Any uncommon weapon, since "common in another culture" is not something the catalogue records.
+    # An advanced one is offered only to a character trained in martial weapons.
+    feat_choice:
+      summary: uncommon weapon
+      from_weapons:
+        category: [ simple, martial, advanced ]
+        rarity: [ uncommon ]
+        advanced_if_trained: martial
+      familiarity: true
+    item_access:
+      - category: weapons
+        from_choice: true
   Undead Slayer:
     feat_type:
       - Ancestry
@@ -5303,6 +5435,11 @@ pf2e_feats:
     traits:
       - egalrin
     shortdesc: Your fan can stir up even more powerful winds. You can use the Wave Fan activation one additional time per day. Add a 3rd-rank *wall of wind* spell to the spells contained within your fan.
+    bound_item_adds:
+      item: Egalrin Feather Fan
+      spells:
+        - { name: Wall of Wind, rank: 3 }
+      activations: 1
     prereq:
       level: 9
       feat:

@@ -28,6 +28,8 @@ module AresMUSH
         return Err.new(:bad_category, 'pf2e.bad_option', 'element' => 'category',
                        'options' => Pf2egear::Inventory.categories.join(', ')) unless list
 
+        # What only a class feature makes - a versatile vial - has no formula to buy, learn or prepare from.
+        list = list.reject { |_named, info| info.is_a?(Hash) && info['made_only'] }
         wanted = name.to_s.strip.downcase
         found = list.find { |named, _info| named.downcase == wanted } ||
                 list.select { |named, _info| named.downcase.include?(wanted) }.then { |some| some.size == 1 ? some.first : nil }
@@ -37,13 +39,9 @@ module AresMUSH
         Ok.new(:state => found)
       end
 
-      # Only a common formula is simply bought; anything rarer is the GM's to hand out. A rune says so in
-      # its own `rarity` rather than in its traits.
+      # A choice's pool offers common formulas only; anything rarer is bought with access or given by staff.
       def self.common?(info)
-        rarity = info['rarity'].to_s.downcase
-
-        (Array(info['traits']).map(&:to_s).map(&:downcase) & %w{uncommon rare unique}).empty? &&
-          (rarity.empty? || rarity == 'common')
+        ItemAccess.common?(info)
       end
 
       # What a class or feat lets a character pick a formula from: the common items a `from_formulas`
@@ -68,6 +66,7 @@ module AresMUSH
         found = pool_categories(filter).flat_map do |category|
           (Global.read_config("pf2e_#{category}") || {}).select do |name, info|
             next false unless info.is_a?(Hash) && common?(info)
+            next false if info['made_only']
             next false if filter.key?('min_level') && info['level'].to_i < bound.call(filter['min_level'])
             next false if filter.key?('max_level') && info['level'].to_i > bound.call(filter['max_level'])
 

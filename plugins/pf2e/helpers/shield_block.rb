@@ -43,6 +43,26 @@ module AresMUSH
         shield.hp.to_i.positive? && shield.damage.to_i * 2 >= shield.hp.to_i
       end
 
+      def self.destroyed?(shield)
+        shield.hp.to_i.positive? && shield.damage.to_i >= shield.hp.to_i
+      end
+
+      # Shield Paragon: a shield that would be destroyed goes to their deity's realm to be mended, and
+      # returns fully repaired at their next daily preparations. The blessed shield they chose isn't
+      # recorded, so it is the shield they have equipped. Answers the shield, or nil.
+      PARAGON = 'Shield Paragon'.freeze
+
+      def self.paragon_repair!(holder)
+        return nil unless Pf2e.has_feat?(holder, PARAGON)
+
+        shield = Actors.of(holder).shield
+
+        return nil unless shield.respond_to?(:damage) && destroyed?(shield)
+
+        shield.update(:damage => 0)
+        shield
+      end
+
       def self.physical?(type)
         PHYSICAL.include?(Domains.slug(type))
       end

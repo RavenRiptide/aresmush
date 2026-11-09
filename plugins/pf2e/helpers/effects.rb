@@ -66,7 +66,7 @@ module AresMUSH
       def self.sheet_sources(char)
         SheetReads.memo(char, :effect_sources) do
           conditions(char) + feats(char) + features(char) + actions(char) + items(char) + runes(char) +
-            ActiveEffects.sources(char)
+            ActiveEffects.sources(char) + DailyChoices.sources(char) + ResearchField.sources(char)
         end
       end
 
@@ -142,11 +142,12 @@ module AresMUSH
           named('ancestry', [ info['ancestry'] ]) +
           named('class', [ info['charclass'] ]) +
           named('background', [ info['background'] ]) +
-          named('feat', (char.pf2_feats || {}).values.flatten) +
+          named('feat', Pf2e.feats_in_play(char)) +
           named('feature', (char.pf2_features || {}).values.flatten) +
           skill_facts(char) +
           proficiency_facts(char) +
-          attribute_facts(char)
+          attribute_facts(char) +
+          DailyChoices.facts(char)
       end
 
       # The effects a character is under, as Foundry names them for a predicate: the effect's slug without
@@ -329,7 +330,7 @@ module AresMUSH
       # The rules of an action the character has of their own - Rage's +2 to melee damage while raging.
       # The basic actions everyone has are not anyone's to carry rules for.
       def self.actions(char)
-        held = ((char.pf2_feats || {}).values.flatten + (char.pf2_features || {}).values.flatten +
+        held = (Pf2e.feats_in_play(char) + (char.pf2_features || {}).values.flatten +
                 (char.respond_to?(:pf2_actions) ? (char.pf2_actions || {}).values_at('actions', 'reactions').flatten.compact : []))
                .map { |one| Domains.slug(feature_named(one.to_s)) }
 
@@ -349,7 +350,7 @@ module AresMUSH
       end
 
       def self.feats(char)
-        (char.pf2_feats || {}).values.flatten.uniq.map do |name|
+        held = (char.pf2_feats || {}).values.flatten.uniq.map do |name|
           info = Global.read_config('pf2e_feats', name)
 
           next nil unless info && info['rules']
@@ -359,6 +360,42 @@ module AresMUSH
 
           with_selections(char, built)
         end.compact
+
+        held + lent_feats(char)
+      end
+
+      # The conditions a feat or class feature in play for them grants for as long as they have it, as
+      # `held_conditions` seeds its list from: `[ [ grant, source name ] ]`. Only a grant whose own
+      # condition holds of them.
+      def self.held_condition_grants(char)
+        SheetReads.memo(char, :held_condition_grants) do
+          feats = Pf2e.feats_in_play(char).uniq.map { |name| [ name, Global.read_config('pf2e_feats', name) ] }
+          features = (char.pf2_features || {}).values.flatten.map { |one| feature_named(one.to_s) }.uniq
+                                              .map { |name| [ name, Global.read_config('pf2e_class_features', name) ] }
+
+          (feats + features).flat_map do |name, info|
+            next [] unless info.is_a?(Hash) && info['rules']
+
+            Grants.of(info['rules']).select { |grant| grant['catalogue'] == 'conditions' && ActiveEffects.granted?(char, grant) }
+                                    .map { |grant| [ grant, name ] }
+          end
+        end
+      end
+
+      # The feats a daily choice lends them for the day (Combat Flexibility). A lent feat's own choice is
+      # answered with the pick, not with anything recorded on the sheet.
+      def self.lent_feats(char)
+        DailyChoices.feats(char).filter_map do |lent|
+          info = Global.read_config('pf2e_feats', lent['feat'])
+
+          next nil unless info && info['rules']
+
+          built = source(lent['feat'], info['rules'],
+                         'id' => Domains.slug(lent['feat']), 'kind' => DOES, 'item' => { 'level' => char.pf2_level.to_i },
+                         'chosen' => [ lent['choice'] ].compact)
+
+          with_selections(char, built)
+        end
       end
 
       # The answers to the choices a source asked for.
@@ -373,13 +410,14 @@ module AresMUSH
       # here reads the character's facts, which are still being assembled when a source is built.
       def self.with_selections(char, built)
         sets = Rules.choice_sets(built)
+        picked = roll_option_selections(char, built)
 
-        return built unless sets.any?
+        return built unless sets.any? || picked.any?
 
         # An effect carries the answers it was applied with; a feat's are recorded with the feat.
         chosen = built['chosen'] || chosen_for(char, built['name'])
         declared = Array(built['options']) + cast_from(built['chosen'])
-        selections = {}
+        selections = picked
 
         # A set may ask something of the character - Azarim's choice is from 11th level - and what is
         # true of them without asking what they are under is safe to read while sources are gathered.
@@ -399,6 +437,32 @@ module AresMUSH
         built.merge('item' => (built['item'] || {}).merge(
                       'flags' => { 'system' => { 'rulesSelections' => selections } }),
                     'options' => declared)
+      end
+
+      # A toggle with suboptions is answered too: Foundry files the suboption chosen under the option's own
+      # name, camel-cased (`bomber-field-vials` is `bomberFieldVials`), so a rule reads it the way it reads a
+      # choice. Only a suboption the player switched it to - or its first, where they switched it on - counts.
+      # Read straight from what the player set, because what is switched on is worked out from these sources.
+      def self.roll_option_selections(char, built)
+        chosen = char.respond_to?(:pf2_roll_options) ? (char.pf2_roll_options || {}) : {}
+
+        return {} if chosen.empty?
+
+        Rules.of_kind(built, 'RollOption').each_with_object({}) do |row, out|
+          values = Array(row['suboptions']).select { |one| one.is_a?(Hash) && one['value'] }.map { |one| one['value'].to_s }
+          said = chosen[row['option'].to_s]
+
+          next if values.empty? || said.nil? || said == false
+
+          value = said.is_a?(String) && values.include?(said) ? said : values.first
+          out[camel(row['option'])] = value
+        end
+      end
+
+      def self.camel(option)
+        first, *rest = option.to_s.split('-')
+
+        ([ first ] + rest.map(&:capitalize)).join
       end
 
       # The tradition an effect was cast from, where it was applied saying so: `tradition primal`. Dragon

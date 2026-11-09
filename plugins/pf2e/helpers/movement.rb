@@ -152,7 +152,8 @@ module AresMUSH
       def self.entries_for(char)
         level = char.pf2_level.to_i
 
-        (heritage_entries(char) + feat_entries(char) + class_entries(char, level)).select do |entry|
+        # A daily choice's movement is today's: Witch's Broom's fly Speed.
+        (heritage_entries(char) + feat_entries(char) + class_entries(char, level) + DailyChoices.movement(char)).select do |entry|
           entry['prereq'].nil? || Pf2e.meets_prereqs?(char, entry['prereq'], level)
         end
       end
@@ -173,7 +174,7 @@ module AresMUSH
       def self.feat_entries(char)
         config = Global.read_config('pf2e_feats') || {}
 
-        (char.pf2_feats || {}).values.flatten.uniq.flat_map do |name|
+        Pf2e.feats_in_play(char).uniq.flat_map do |name|
           key = config.keys.find { |k| k.to_s.casecmp?(name.to_s) }
           details = key && config[key]
           next [] unless details.is_a?(Hash)

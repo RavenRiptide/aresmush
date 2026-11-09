@@ -48,10 +48,12 @@ module AresMUSH
       end
 
       # The d20 rolled in the block is `who`'s check; `kept` says it is rolled twice, and which is kept.
-      # A check inside one already named keeps that name where it has none of its own.
-      def self.for_check(who, kept = nil)
+      # `about` says what the check was, such as `save:fortitude`, for what may only change a check of one
+      # kind: a Mutagenist's reroll of a Fortitude save. A check inside one already named keeps that name
+      # where it has none of its own.
+      def self.for_check(who, kept = nil, about: nil)
         previous = Thread.current[CHECK]
-        Thread.current[CHECK] = { 'who' => who || (previous || {})['who'], 'kept' => kept }.compact
+        Thread.current[CHECK] = { 'who' => who || (previous || {})['who'], 'kept' => kept, 'about' => about }.compact
 
         yield
       ensure

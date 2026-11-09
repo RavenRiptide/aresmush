@@ -676,6 +676,15 @@ pf2e_feats:
     prereq:
       level: 1
       skill: Occultism/trained
+    # The ally given the pouch. Its effect reads the giver's Occultism rank, and ends after the first save
+    # it helps (`pf2e_effect_overrides.yml`).
+    daily_choice:
+      switch: rootmagic
+      pick: creature
+      count: 1
+      not_self: true
+      gives: "Effect: Root Magic"
+      lasts: day
   Schooled in Secrets:
     feat_type:
       - Skill

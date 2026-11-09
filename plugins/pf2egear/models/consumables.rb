@@ -10,6 +10,14 @@ module AresMUSH
     attribute :quantity, :type => DataType::Integer, :default => 1
     attribute :use, :type => DataType::Hash, :default => {}
 
+    # The DC a save against it uses where its maker's is higher than its own: an alchemist's class DC,
+    # stamped by Powerful Alchemy on what they make. Reads 0 for anything else.
+    attribute :dc, :type => DataType::Integer
+
+    # A scroll's spell and the rank it holds it at (`Pf2e::SpellItems`). Nil for anything else.
+    attribute :spell
+    attribute :spell_rank, :type => DataType::Integer
+
     reference :character, "AresMUSH::Character"
     # An encounter's copy of a character's item, taken as they entered it: the encounter reads and changes
     # this, never the item itself. `copied_from` is the character's own item.

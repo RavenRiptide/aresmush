@@ -833,6 +833,7 @@ module AresMUSH
       to_assign = char.pf2_to_assign
 
       return true if to_assign['divine font'].is_a?(Array)
+      return true if Pf2e::Staves.makeshift_open?(to_assign)
 
       %w(repertoire spellbook).each do |list|
         spells = to_assign[list]

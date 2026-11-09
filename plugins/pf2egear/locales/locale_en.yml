@@ -56,7 +56,9 @@ en:
     no_items: "You don't have any items in that category."
     not_investible_item: "%{item} is not an investible item."
     not_found: "I didn't find that item in that category."
+    no_access: "%{item} is %{rarity}, so the vendor doesn't sell it to you. To get its formula and have it crafted, put in a request."
     not_usable: "This item has no properties that allow it to be used."
+    cannot_sell_made: "Your %{item} came from a feat or a class feature, so the vendor won't buy it."
     nothing_to_do: "Nothing to do."
 
     quantity_one_only: "You can only buy one of this type of item at a time. Creating one item..."
@@ -72,6 +74,7 @@ en:
     rune_property_set: "%{rune_name} %{operation} on %{char}'s %{item_name}."
     rune_property_unknown: "There's no %{rune_name} rune. `browse runes` lists them all."
     rune_property_wrong_kind: "%{rune_name} is a %{kind} rune and can't go on that item."
+    rune_property_staff: "%{item_name} is a staff. A staff takes fundamental runes, but not property runes."
     rune_property_no_slot: "That item has room for %{slots} property runes, and they are all taken. Etch a higher potency rune first."
     
 

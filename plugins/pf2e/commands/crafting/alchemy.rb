@@ -69,18 +69,28 @@ module AresMUSH
       end
     end
 
-    # `+e/alchemy <item>` - Quick Alchemy: a batch of reagents for one item, to hand until your next turn.
+    # Quick Alchemy:
+    #
+    #   `encounter/alchemy <item>[, <item>]`  spends a versatile vial for each item, to hand until your next
+    #                                         turn; two at once with Double Brew
+    #   `encounter/alchemy/vial`              makes a Quick Vial, which spends nothing and lasts until the
+    #                                         end of your turn
     class PF2EncounterAlchemyCmd
       include CommandHandler
 
-      attr_accessor :name
+      attr_accessor :names
 
       def parse_args
-        self.name = trim_arg(cmd.args)
+        self.names = cmd.args.to_s.split(',').map(&:strip).reject(&:empty?)
       end
 
-      def required_args
-        [ self.name ]
+      def quick_vial?
+        cmd.switch.to_s.casecmp?('alchemy/vial')
+      end
+
+      def check_names
+        return nil if quick_vial? || self.names.any?
+        return t('dispatcher.invalid_syntax', :cmd => 'encounter/alchemy')
       end
 
       def handle
@@ -92,11 +102,15 @@ module AresMUSH
 
         return client.emit_failure(t('pf2e.encounter_gear_not_in')) unless standing
 
-        made = Alchemy.quick!(standing, self.name)
+        made = quick_vial? ? Alchemy.quick_vial!(standing) : Alchemy.quick!(standing, self.names)
 
         return if CharState.emit_error!(client, made)
 
-        message = t('pf2e.alchemy_quick', :name => enactor.name, :item => made.state)
+        message = if quick_vial?
+                    t('pf2e.alchemy_quick_vial', :name => enactor.name, :item => made.state)
+                  else
+                    t('pf2e.alchemy_quick', :name => enactor.name, :item => made.state.join(' and '))
+                  end
 
         Pf2e::Encounters::Announce.tell(PF2Encounter[encounter.id], message, :room => enactor_room, :story => true)
       end

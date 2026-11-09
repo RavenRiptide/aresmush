@@ -67,6 +67,11 @@ module AresMUSH
         end
       when "use"
         return PF2UseItemCmd
+      when "wand"
+        case cmd.switch
+        when "repair"
+          return PF2WandRepairCmd
+        end
       when "listmoney"
         return PF2ListMoneyCmd
       when "etch"

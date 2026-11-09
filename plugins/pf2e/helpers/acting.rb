@@ -57,6 +57,8 @@ module AresMUSH
           elsif (found = lower.match(/\Arank\s+(\d+)\z/)) then out['rank'] = found[1].to_i
           elsif (found = lower.match(/\Aactions?\s+(\d+)\z/)) then out['actions'] = found[1].to_i
           elsif (found = lower.match(/\Aclass\s+(.+)\z/)) then out['class'] = found[1].strip
+          # Who else a bomb's splash reaches, which the game can't see without positions: `splash orc, ogre`.
+          elsif (found = lower.match(/\Asplash\s+(.+)\z/)) then out['splash'] = found[1].split(',').map(&:strip).reject(&:empty?)
           elsif %w{flanking flanked flank}.include?(lower) then out['flanking'] = true
           elsif lower == 'force' then out['force'] = true
           elsif COVER_WORDS.key?(lower)
@@ -200,6 +202,11 @@ module AresMUSH
         return sustain_effect(scene, name, entry, words) if name == Sustaining::NAME
         return dismiss_effect(scene, name, entry, words) if name == Dismissing::NAME
         return attack_answer(scene, name, entry) if entry['type'] == 'reaction' && AttackAnswers.answer(scene.actor.holder, name)
+
+        # An action a daily choice limits reaches only whom it named: Inspired Stratagem's allies.
+        limited = DailyChoices.limit_refusal(scene.actor.holder, name, scene.target, scene.encounter)
+        return limited if limited
+
         said = said(words, scene.permitted)
         out = report
         refused(out, said)
@@ -223,6 +230,7 @@ module AresMUSH
         end
 
         spend(scene, name, entry, out)
+        DailyChoices.limit_used!(scene.actor.holder, name, scene.target)
 
         Ok.new(:state => out)
       end
@@ -1080,6 +1088,12 @@ module AresMUSH
           splash(scene, attack, check, out)
         end
 
+        # An injury poison on the weapon: a hit exposes the target, a critical miss wastes it.
+        WeaponPoison.after_strike(scene, attack, rolled.dig('result', 'degree'), out)
+
+        # The others a bomb's splash reaches, as the thrower named them.
+        splash_others(scene, attack, check, said['splash'], rolled.dig('result', 'degree'), out) if attack['bomb'] && said['splash']
+
         # A bomb is thrown whatever it does, and what was shot is shot.
         Consumables.spend!(scene.actor.holder, attack['consumable']) if attack['consumable']
         Ammunition.shoot!(scene.actor.holder, shooting.state, out)
@@ -1214,11 +1228,15 @@ module AresMUSH
         # What the hit goes on to do, it does to the living.
         return if Pf2e.dead?(scene.target.holder)
 
-        Consumables.effect(scene.encounter, scene.actor.label, scene.target, attack['effect'], out) if attack['bomb'] && attack['effect']
+        if attack['bomb'] && attack['effect']
+          Consumables.effect(scene.encounter, scene.actor.label, scene.target, attack['effect'], out,
+                             :lasts => Consumables.quick_cap(attack['effect'], attack['made_by']))
+        end
 
         # The damage's notes: a Debilitating Strike's choices, a Frost Vial's slowing.
-        NoteEffects.tell(scene, Damage.notes(scene.actor.holder, attack, check.options, result['degree']), out,
-                         :degree => result['degree'], :done => [ attack['bomb'] && attack['effect'] ].compact)
+        notes = Consumables.at_makers_dc(Damage.notes(scene.actor.holder, attack, check.options, result['degree']),
+                                         attack['maker_dc'])
+        NoteEffects.tell(scene, notes, out, :degree => result['degree'], :done => [ attack['bomb'] && attack['effect'] ].compact)
 
         follow_ups(scene, attack, out)
 
@@ -1229,6 +1247,26 @@ module AresMUSH
         AttackAnswers.dealt(scene.target.holder)
         AttackAnswers.offered(scene.target.holder).each do |reaction|
           out['lines'] << told('pf2e.act_follow_up', :effect => reaction, :command => "e/act #{reaction.downcase}")
+        end
+      end
+
+      # A bomb's splash on the others the thrower named: each takes the splash damage on anything but a
+      # critical miss. Who stands near enough is the GM's to judge - 5 feet, or 10 for a Bomber's Greater
+      # Field Discovery - because the game has no positions.
+      def self.splash_others(scene, attack, check, names, degree, out)
+        return if degree.nil? || degree == Degree::CRITICAL_FAILURE
+
+        rows = Actors.of(scene.actor.holder).strike_damage(attack, check, false).select { |row| row['category'] == 'splash' }
+
+        return if rows.empty?
+
+        names.each do |name|
+          found = Combatants.find(scene.encounter, name)
+
+          next out['lines'] << told('pf2e.splash_not_found', :name => name) unless found.ok?
+          next if found.state.label == scene.target.label
+
+          deal(scene, found.state, rows, out)
         end
       end
 
@@ -1839,7 +1877,10 @@ module AresMUSH
           return
         end
 
-        check = Check.of(target.holder, 'save', save, Resolve.seen_as(scene.actor.holder, 'origin') + Array(mechanics['traits']))
+        # A save against a spell knows it is one (`item:type:spell`), which a bonus to saves against spells
+        # asks: Root Magic, and the like.
+        check = Check.of(target.holder, 'save', save, Resolve.seen_as(scene.actor.holder, 'origin') + Array(mechanics['traits']) +
+                                                      DamageAbout.spell(spell))
         # Standard or greater cover helps a Reflex save against an area.
         extra = save == 'reflex' && mechanics['area'] ? [ Resolve.cover_modifier(cover_of(scene, {}), 'reflex') ].compact : []
         spared = Incapacitation.spares?(mechanics['traits'], target.holder, :rank => mechanics['cast_rank'],

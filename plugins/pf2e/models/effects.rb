@@ -61,6 +61,12 @@ module AresMUSH
     # effect with different numbers. Empty when nothing said - an effect a GM added by hand.
     attribute :origin, :type => DataType::Hash, :default => {}
 
+    # A mutagen's halves, which the polymorph rule and a Mutagenist's field vial part (`Pf2e::Mutagens`):
+    # whether a later polymorph has ended its benefits, keeping its drawbacks, and the encounter round until
+    # which a field vial suppresses its drawbacks.
+    attribute :benefits_lost, :type => DataType::Boolean, :default => false
+    attribute :drawbacks_until, :type => DataType::Integer, :default => 0
+
     # Who is under it: a character in an encounter, or a creature in one. `character` is a character
     # outside any encounter, which only an effect from before encounters held their own state can be.
     reference :character, "AresMUSH::Character"

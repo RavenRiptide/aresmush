@@ -80,7 +80,7 @@ module AresMUSH
       def self.owned?(char, name)
         wanted = Domains.slug(name)
         given = char.respond_to?(:pf2_actions) ? (char.pf2_actions || {}).values_at('actions', 'reactions') : []
-        held = (char.pf2_feats || {}).values.flatten + (char.pf2_features || {}).values.flatten + given.flatten.compact
+        held = Pf2e.feats_in_play(char) + (char.pf2_features || {}).values.flatten + given.flatten.compact
 
         held.any? { |one| Domains.slug(one) == wanted }
       end

@@ -18,12 +18,19 @@ module AresMUSH
       when "prepared"
         return PF2DisplayPreparedCmd
       when "prepare"
-        # A switch names a book a feat keeps (prepare/esotericpolymath), or a feat that changes what
-        # a slot holds (prepare/splitslot, prepare/spellmastery). Each feat's data names its own.
+        # A switch names a book a feat keeps (prepare/esotericpolymath), a feat that changes what a slot
+        # holds (prepare/splitslot, prepare/spellmastery), or a daily choice a feat has the character make
+        # (prepare/longevity). Each feat's data names its own.
+        # prepare/staff prepares a staff for the day (Pf2e::Staves).
         return PF2PrepareSpellCmd unless cmd.switch
+        return Pf2e::PF2PrepareStaffCmd if cmd.switch.downcase == 'staff'
+        return Pf2e::PF2PrepareDailyCmd if Pf2e::DailyChoices.switch?(cmd.switch)
         return SlotFeats.switch?(cmd.switch) ? PF2PrepareSlotFeatCmd : PF2PrepareFromBookCmd
       when "unprepare"
-        return cmd.switch ? PF2UnprepareSlotFeatCmd : PF2UnprepareSpellCmd
+        return PF2UnprepareSpellCmd unless cmd.switch
+        return Pf2e::PF2UnprepareStaffCmd if cmd.switch.downcase == 'staff'
+        return Pf2e::PF2UnprepareDailyCmd if Pf2e::DailyChoices.switch?(cmd.switch)
+        return PF2UnprepareSlotFeatCmd
       when "spell"
         case cmd.switch
         when "search"

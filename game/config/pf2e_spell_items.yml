@@ -1,0 +1,71 @@
+---
+# Scrolls and wands: one generic item each, carrying the spell it holds (`Pf2e::SpellItems`). A spell at a
+# rank gives the item's level and price from these tables (GM Core, Scrolls p. 262 and Wands p. 282), so
+# the catalogues hold no entry per spell. Prices are in copper, as the catalogues' are.
+#
+#   category   the inventory category the item is kept in
+#   name       what the item is called, with the spell and its rank filled in
+#   max_rank   the highest rank the item can hold
+#   ranks      by spell rank: the item's level and price
+pf2e_spell_items:
+  scroll:
+    category: consumables
+    name: "Scroll of %{spell} (rank %{rank})"
+    bulk: 0.1
+    traits:
+      - consumable
+      - magical
+      - scroll
+    max_rank: 10
+    ranks:
+      1: { level: 1, price: 400 }
+      2: { level: 3, price: 1200 }
+      3: { level: 5, price: 3000 }
+      4: { level: 7, price: 7000 }
+      5: { level: 9, price: 15000 }
+      6: { level: 11, price: 30000 }
+      7: { level: 13, price: 60000 }
+      8: { level: 15, price: 130000 }
+      9: { level: 17, price: 300000 }
+      10: { level: 19, price: 800000 }
+  wand:
+    category: magicitem
+    name: "Wand of %{spell} (rank %{rank})"
+    bulk: 0.1
+    traits:
+      - magical
+      - wand
+    max_rank: 9
+    ranks:
+      1: { level: 3, price: 6000 }
+      2: { level: 5, price: 16000 }
+      3: { level: 7, price: 36000 }
+      4: { level: 9, price: 70000 }
+      5: { level: 11, price: 140000 }
+      6: { level: 13, price: 300000 }
+      7: { level: 15, price: 650000 }
+      8: { level: 17, price: 1500000 }
+      9: { level: 19, price: 4000000 }
+    # Specialty wands: a wand that holds only some spells and changes them as they're cast. Bought as
+    # `buy wand=<spell> (<specialty>)`. Each rank's level and price are the stocked catalogue entry's,
+    # named by `catalogue` with the rank's ordinal (1st, 2nd, 3rd...).
+    #
+    #   actions    the casting times the spell may have, in actions
+    #   area       the spell must have an area of these shapes, a burst at least `min_burst` feet across
+    #   duration   the spell must have no duration (`none`), or one between `min_minutes` and `max_minutes`
+    #   extra      how many more actions casting from it takes
+    specialties:
+      widening:
+        name: "Wand of Widening (%{spell}, rank %{rank})"
+        catalogue: "Wand of Widening (%{ordinal}-Rank Spell)"
+        actions: [ 1, 2 ]
+        area: [ burst, cone, line ]
+        min_burst: 10
+        duration: none
+        extra: 1
+      continuation:
+        name: "Wand of Continuation (%{spell}, rank %{rank})"
+        catalogue: "Wand of Continuation (%{ordinal}-Rank Spell)"
+        actions: [ 1, 2 ]
+        duration: { min_minutes: 10, max_minutes: 60 }
+        extra: 1

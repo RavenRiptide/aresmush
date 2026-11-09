@@ -56,6 +56,13 @@ module AresMUSH
 
         return client.emit_failure(t('pf2egear.item_in_encounter', :item => item.name, :id => held.id)) if held
 
+        inert = Pf2e::BoundItems.inert_for(holder, item)
+
+        return client.emit_failure(t('pf2e.bound_item_cannot_use', :item => item.name, :feat => inert)) if inert
+
+        # A scroll or a wand casts the spell it holds, and a feather fan or a staff one of its own.
+        return used_spell_item(item) if Pf2e::SpellItems.spell_item?(item) || Pf2e::WaveFan.fan?(item) || Pf2e::Staves.staff?(item)
+
         # Consumables get their own, much simpler, handling, and do not require a use entry.
         if self.category.match? "consumable"
           Pf2e::SystemPrefix.tell_room(enactor_room, t('pf2egear.item_use_ok', :name => enactor.name, :item => item.name), 'action')
@@ -136,6 +143,42 @@ module AresMUSH
 
         end
 
+      end
+
+      # Outside an encounter nothing is rolled: the room is told the spell is cast, and a scroll is used up.
+      def used_spell_item(item)
+        return used_fan(item) if Pf2e::WaveFan.fan?(item)
+        return used_staff(item) if Pf2e::Staves.staff?(item)
+
+        done = Pf2e::SpellItems.use_outside!(enactor, item)
+
+        return if Pf2e::CharState.emit_error!(client, done)
+
+        Pf2e::SystemPrefix.tell_room(enactor_room, t('pf2e.spell_item_cast_outside', :name => enactor.name, :item => done.state['item'],
+                                                                                    :spell => done.state['spell'], :rank => done.state['rank']), 'action')
+      end
+
+      # `use magicitem=<n>[/<spell>]` on a feather fan, outside an encounter: the room is told which spell.
+      def used_fan(item)
+        words = cmd.args.to_s.partition('=').last.split('/').map(&:strip).drop(1).reject(&:empty?)
+        done = Pf2e::WaveFan.use_outside!(enactor, item, words)
+
+        return if Pf2e::CharState.emit_error!(client, done)
+
+        Pf2e::SystemPrefix.tell_room(enactor_room, t('pf2e.wave_fan_outside', :name => enactor.name, :spell => done.state['spell'],
+                                                                              :item => item.name), 'action')
+      end
+
+      # `use weapons=<n>[/<spell>]` on a staff they prepared today, outside an encounter: the room is told
+      # which spell, and no charge is counted.
+      def used_staff(item)
+        words = cmd.args.to_s.partition('=').last.split('/').map(&:strip).drop(1).reject(&:empty?)
+        done = Pf2e::Staves.use_outside!(enactor, item, words)
+
+        return if Pf2e::CharState.emit_error!(client, done)
+
+        Pf2e::SystemPrefix.tell_room(enactor_room, t('pf2e.staff_cast_outside', :name => enactor.name, :spell => done.state['name'],
+                                                                                :item => item.name), 'action')
       end
 
     end

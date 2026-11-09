@@ -491,6 +491,10 @@ module AresMUSH
       # one level_up transaction attributed to the level just gained, XP spend included.
       Pf2e::Ledger.commit_level_up!(char, new_level)
 
+      # The level is finished, so a feat taken in it hands over its item now, and an item they hold
+      # already keeps their level.
+      Pf2e::BoundItems.settle!(Character[char.id])
+
       # History now, so the draft goes.
       char.update(:pf2_to_assign => {})
       char.update(:pf2_advancement => {})

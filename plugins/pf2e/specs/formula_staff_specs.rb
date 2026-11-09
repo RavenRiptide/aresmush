@@ -35,6 +35,7 @@ module AresMUSH
         @char = Character.create(:name => "Crafter#{rand(1000000)}", :pf2_level => 5)
         allow_any_instance_of(Character).to receive(:has_permission?).and_return(false)
         allow_any_instance_of(Character).to receive(:has_permission?).with('manage_sheet') { |char, _| char.id == @staff.id }
+        allow_any_instance_of(Character).to receive(:is_approved?).and_return(true)
       end
 
       after(:each) do
@@ -65,6 +66,17 @@ module AresMUSH
         run(PF2FormulaAddCmd, "formulas/add Nobody#{rand(1000000)}=consumables/Alchemist's Fire (Lesser)")
 
         expect(@client.failures).to eq [ t('pf2e.not_found') ]
+      end
+
+      # Chargen records its sheet only for a character with no grants, so a formula added before approval
+      # would keep chargen from ever being recorded.
+      it "should refuse a character who isn't approved yet" do
+        allow_any_instance_of(Character).to receive(:is_approved?).and_return(false)
+
+        run(PF2FormulaAddCmd, "formulas/add #{@char.name}=consumables/Alchemist's Fire (Lesser)")
+
+        expect(@client.failures).to eq [ t('pf2e.formula_not_approved', :char => @char.name) ]
+        expect(Character[@char.id].grants.count).to eq 0
       end
 
       it "should be staff's alone" do

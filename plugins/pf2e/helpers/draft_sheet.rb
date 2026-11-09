@@ -17,6 +17,20 @@ module AresMUSH
         new(char)
       end
 
+      COUNTING = :pf2e_draft_sheet_counting
+
+      # Counts these feats as held while the block runs, for a prerequisite one rule lets another feat
+      # meet: Improved Flexibility's second feat may build on the first, which is lent for the day and
+      # held nowhere. Nothing else sees them.
+      def self.counting(feats)
+        before = Thread.current[COUNTING]
+        Thread.current[COUNTING] = Array(before) + Array(feats).map { |one| one.to_s.upcase }
+
+        yield
+      ensure
+        Thread.current[COUNTING] = before
+      end
+
       def initialize(char)
         @char = char
       end
@@ -32,7 +46,7 @@ module AresMUSH
 
       # Feat names, upcased, because every caller compares them that way.
       def feat_names
-        (held_feats + staged_feats).uniq
+        (held_feats + staged_feats + Array(Thread.current[COUNTING])).uniq
       end
 
       # Class and archetype feature names, counting the ones this level grants. A class option is
@@ -77,7 +91,8 @@ module AresMUSH
       end
 
       def skill_prof(name)
-        held = Pf2eSkills.get_skill_prof(@char, name)
+        # A Chirurgeon's Crafting rank stands for their Medicine rank, as a prerequisite and anything else.
+        held = ResearchField.held_prof(@char, name)
         raises = staged_raises_for(name)
 
         return held if raises.zero?

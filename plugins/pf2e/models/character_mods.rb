@@ -44,6 +44,14 @@ module AresMUSH
     # has touched is absent, and follows whatever declared it.
     attribute :pf2_roll_options, :type => DataType::Hash, :default => {}
 
+    # Choices a feat has them make at daily preparations, such as Ancestral Longevity's skill, by the
+    # `prepare` switch that makes each. Daily state rather than sheet history, so never in the ledger.
+    # Pf2e::DailyChoices reads and writes it.
+    attribute :pf2_daily_choices, :type => DataType::Hash, :default => {}
+    # The ids of characters whose daily choices named this one (a witch's charge, a Root Magic ally): a hint
+    # for joining an encounter, always checked against the giver's own picks (`DailyChoices.given_on_join!`).
+    attribute :pf2_designated_by, :type => DataType::Array, :default => []
+
     # Values an effect wrote that nothing else owns: counters other rules ask about, a lowered recovery
     # DC, extra carrying capacity. Derived rather than chosen, so it is rewritten whenever the effects
     # that set it change. Pf2e::Paths is the registry of what may be written here and how.
@@ -66,10 +74,13 @@ module AresMUSH
     attribute :pf2_is_dead, :type => DataType::Boolean
     attribute :pf2_known_for, :type => DataType::Array, :default => []
     attribute :pf2_formula_book, :type => DataType::Hash, :default => {}
+    # A snare-maker's daily snares, under `snares`. An `alchemist` key a legacy alchemist left here, and
+    # `pf2_alloc_reagents`, are no longer read: an alchemist's vials are items (Pf2e::Alchemy). Both
+    # attributes stay because records that hold them would fail to load without them.
     attribute :pf2_reagents, :type => DataType::Hash, :default => {}
     attribute :pf2_alloc_reagents, :type => DataType::Integer, :default => 0
 
-    # What an alchemist will make of their reagents at their next preparations: `{ item => how many }`.
+    # What an alchemist will make at their next preparations with Advanced Alchemy: `{ item => how many }`.
     attribute :pf2_alchemy_plan, :type => DataType::Hash, :default => {}
     attribute :pf2_cnotes, :type => DataType::Hash, :default => {}
 

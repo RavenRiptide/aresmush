@@ -68,12 +68,13 @@ module AresMUSH
               rune(char, 'power') ]
           } },
 
+        # A Chirurgeon's Medicine is their Crafting: its rank and Intelligence (`ResearchField`).
         { 'name' => 'skill',
-          'ability' => ->(_char, name) { Pf2eSkills.get_linked_attr(name) },
-          'base' => ->(char, name) { Pf2e.get_prof_bonus(char, Pf2eSkills.get_skill_prof(char, name)) },
-          'rank' => ->(char, name) { Pf2eSkills.get_skill_prof(char, name) },
+          'ability' => ->(char, name) { Pf2eSkills.get_linked_attr(ResearchField.skill_used(char, name)) },
+          'base' => ->(char, name) { Pf2e.get_prof_bonus(char, ResearchField.rolling_prof(char, name)) },
+          'rank' => ->(char, name) { ResearchField.rolling_prof(char, name) },
           'intrinsic' => ->(char, name) {
-            [ ability_mod(char, Pf2eSkills.get_linked_attr(name)), armor_check_penalty(char, name) ]
+            [ ability_mod(char, Pf2eSkills.get_linked_attr(ResearchField.skill_used(char, name))), armor_check_penalty(char, name) ]
           } },
 
         { 'name' => 'lore',

@@ -18,7 +18,9 @@ Some classes record spells and cantrips in a spellbook, or otherwise 'prepare' s
 `unprepare <caster class>/<level> = <spell name>`: Removes `<spell name>` at the defined `<level>` from your prepared list.
 `prepare <caster class>/<cantrip> = <spell name>`: Prepares the cantrip `<spell name>`.
 `unprepare <caster class>/<cantrip> = <spell name>`: Removes the cantrip `<spell name>` from your prepared list.
-`prepared [<caster class>]`: Shows your currently prepared spell list. If `<caster class>` is omitted, it will show you all spell lists. 
+`prepared [<caster class>]`: Shows your currently prepared spell list. If `<caster class>` is omitted, it will show you all spell lists and your daily choices. 
+
+Some feats have you make other choices during your daily preparations, such as the skill Ancestral Longevity trains you in. See `help daily_choices`.
 
 ## A cleric's deity spells
 
@@ -26,7 +28,7 @@ A cleric can prepare their deity's cleric spells as if they were on the divine l
 
 ## Preparing from a book: Esoteric Polymath and Arcane Evolution
 
-A bard with **Esoteric Polymath** keeps a Book of Occult Spells, and a sorcerer with **Arcane Evolution** keeps a list of arcane spells. Each holds every spell in your repertoire, plus any spell you learn into it with `spell/learn` (see `help spells`). Each day, before you `rest`, you pick one spell from it:
+A bard with **Esoteric Polymath** keeps a Book of Occult Spells, and a sorcerer with **Arcane Evolution** keeps a list of arcane spells. Each includes every spell in your repertoire, plus any spell you learn into it with `spell/learn` (see `help spells`). Each day, before you `rest`, you pick one spell from it:
 
 - A spell already in your repertoire becomes a **signature spell** until your next rest.
 - A spell that isn't joins your **repertoire** until your next rest, at its own rank or a higher one you have slots for.
@@ -56,6 +58,22 @@ A wizard with one of these feats prepares through its own switch. `prepared` and
 `unprepare/spellmastery <spell>`: Stops mastering `<spell>`.
 
 To cast from one of these slots, cast the spell as usual. A combined spell is cast by naming either of its spells.
+
+## Staves
+
+You can prepare one staff a day, if at least one of its spells is on a spell list you cast from. Only you can cast from it that day. To cast from it, see `help encounter_gear`.
+
+**Commands**:
+`prepare/staff <staff>`: Prepares a staff you carry for the day. It gets charges equal to the rank of your highest spell slot.
+`prepare/staff <staff>/<rank> = <spell>`: Expends a spell you prepared at `<rank>` and haven't cast, adding `<rank>` charges to the staff. A prepared caster can expend one spell a day on a staff. If you've already prepared the staff today, this adds to it.
+`prepare/staff`: Shows the staff you prepared today, its charges, and the spells you expended on it.
+`unprepare/staff`: Takes back today's staff and returns the spells you expended on it. You can't take it back once you've cast from it.
+%t **Note:** A wizard with the Staff Nexus thesis can expend two spells from 8th level and three from 16th. Expend each with its own `prepare/staff` command, such as `prepare/staff Staff of Fire/3 = fireball`, then `prepare/staff Staff of Fire/2 = mist`.
+%t **Note:** Your staff's charges fade when the GM rests you, and you prepare a staff again.
+
+**Staff Nexus**:
+`prepare/staff makeshift staff`: Prepares your makeshift staff on its own.
+%t **Note:** You choose your makeshift staff's two spells in chargen; see `help addspell`. Prepared on its own, it has no charges until you expend a spell on it. Any other staff you prepare contains your makeshift staff's two spells as well as its own, and gets its usual charges.
 
 ## Preparing sets of spells
 
