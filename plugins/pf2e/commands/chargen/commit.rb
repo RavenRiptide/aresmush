@@ -37,7 +37,7 @@ module AresMUSH
       end
 
       def apply_stage_effects
-        case self.commit
+        case Pf2e::Chargen::Lifecycle.stage_for(self.commit)
         when 'info'
           Pf2e.cg_lock_base_options(enactor, client)
         when 'abilities'

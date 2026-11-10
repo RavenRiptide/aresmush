@@ -5,10 +5,8 @@ module AresMUSH
 
     # Which sections of a sheet exist, and whether this character has one.
     #
-    # Three commands each carried their own copy of the list and they disagreed: `sheet` did not
-    # accept `combat`, which `sheet/show` did, so a player could grant someone a section that
-    # `sheet` would then refuse to render - and only `sheet` checked that a character casts
-    # before showing them a magic section.
+    # The sheet commands each carried their own copy of the list once, and they disagreed about
+    # which sections existed and which needed the character to cast.
     describe Sheet do
 
       def caster
@@ -21,7 +19,12 @@ module AresMUSH
 
       describe :sections do
         it "should include every section a player can be shown" do
-          expect(Sheet.sections).to include('all', 'info', 'ability', 'skills', 'feats', 'features', 'languages', 'magic', 'combat')
+          expect(Sheet.sections).to include('all', 'info', 'attributes', 'skills', 'feats', 'features', 'languages', 'magic', 'combat')
+        end
+
+        # PF2e's Remaster renamed ability scores to attributes; there is no alias for the old word.
+        it "should not recognise the old ability section" do
+          expect(Sheet.section?('ability')).to be false
         end
 
         it "should recognise a section" do
@@ -45,7 +48,6 @@ module AresMUSH
           expect(outcome.code).to eq :bad_section
         end
 
-        # The check `sheet` had and `sheet/show` did not.
         it "should refuse the magic section to a character who does not cast" do
           outcome = Sheet.available(mundane, 'magic')
 
@@ -79,61 +81,6 @@ module AresMUSH
           admin = double(:magic => nil, :pf2_baseinfo_locked => true, :is_admin? => true, :name => 'Staff')
 
           expect(Sheet.available(admin, 'magic').code).to eq :admin_no_sheet
-        end
-      end
-
-      # Whether a *viewer* may see a section, which is a different question from whether the section
-      # exists. A grant a player makes with `sheet/show` is one of the reasons to allow it, alongside
-      # the `open_sheets` config and the staff `view_sheets` permission.
-      describe :viewable? do
-        def viewer(permission: false)
-          double(:name => 'Viewer', :has_permission? => permission, :is_admin? => false)
-        end
-
-        def shown(grants = {})
-          double(:name => 'Subject', :pf2_viewsheet => grants, :is_admin? => false,
-                 :has_permission? => false, :pf2_baseinfo_locked => true, :magic => nil)
-        end
-
-        before(:each) { allow(Global).to receive(:read_config).with('pf2e', 'open_sheets').and_return(false) }
-
-        it "should let anyone see any sheet when the game says sheets are open" do
-          allow(Global).to receive(:read_config).with('pf2e', 'open_sheets').and_return(true)
-
-          expect(Sheet.viewable?(viewer, shown, 'skills')).to be_ok
-        end
-
-        it "should let staff with the permission see a sheet" do
-          expect(Sheet.viewable?(viewer(:permission => true), shown, 'skills')).to be_ok
-        end
-
-        it "should let a character see their own sheet" do
-          char = shown
-
-          expect(Sheet.viewable?(char, char, 'skills')).to be_ok
-        end
-
-        it "should refuse someone who was never granted anything" do
-          outcome = Sheet.viewable?(viewer, shown, 'skills')
-
-          expect(outcome).to be_err
-          expect(outcome.code).to eq :cannot_view_sheet
-        end
-
-        it "should honour a grant of that section" do
-          expect(Sheet.viewable?(viewer, shown('skills' => [ 'Viewer' ]), 'skills')).to be_ok
-        end
-
-        it "should honour a grant of the whole sheet" do
-          expect(Sheet.viewable?(viewer, shown('all' => [ 'Viewer' ]), 'skills')).to be_ok
-        end
-
-        it "should not let a grant of one section open another" do
-          expect(Sheet.viewable?(viewer, shown('skills' => [ 'Viewer' ]), 'feats')).to be_err
-        end
-
-        it "should match the granted name however it was capitalised" do
-          expect(Sheet.viewable?(viewer, shown('skills' => [ 'viewer' ]), 'skills')).to be_ok
         end
       end
     end

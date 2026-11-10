@@ -10,14 +10,14 @@ aliases:
 
 Staff can make some modifications to characters' sheets.
 
-### Setting ability scores
+### Setting attributes
 **Command**:
-`admin/set <character>/ability = <ability name> <ability score>`
+`admin/set <character>/attribute = <attribute name> <attribute score>`
 
 **Key**:
 `<character>`: The character's name.
-`<ability name>`: The name of the ability. For example, Charisma.
-`<ability score>`: The number to set the score to. Attribute boosts the character earns at later levels still apply on top of it, so setting a score at 1st level does not freeze it.
+`<attribute name>`: The name of the attribute. For example, Charisma.
+`<attribute score>`: The score behind the modifier the sheet shows. A score of 10 is +0, and each 2 points add 1, so 18 is +4. An odd score above 18 is a partial boost, which the sheet marks (P): 19 is +4 (P). Attribute boosts the character earns at later levels still apply on top of it, so setting a score at 1st level does not freeze it.
 
 ### Setting character features
 **Command**:

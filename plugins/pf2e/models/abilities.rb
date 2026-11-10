@@ -25,6 +25,17 @@ module AresMUSH
       (score - 10) / 2
     end
 
+    # An attribute as PF2e's Remaster states it: a signed modifier, never a score. Scores are
+    # still what the sheet stores, because that is how a partial boost is held - a boost to a
+    # modifier of +4 or more is half a step, which leaves the score odd - and (P) marks one.
+    def self.display_mod(score)
+      score = score.to_i
+      mod = abilmod(score)
+      shown = mod.negative? ? mod.to_s : "+#{mod}"
+
+      score > 18 && score.odd? ? "#{shown} (P)" : shown
+    end
+
     def self.get_score(char, ability)
       object = Pf2e::SheetReads.rows(char, :abilities).find { |a| a.name_upcase == ability.upcase }
 
@@ -124,7 +135,7 @@ module AresMUSH
 
     def self.cg_lock_abilities(enactor)
       # Did they do this already?
-      return t('pf2e.cg_locked', :cp => 'abilities') if enactor.pf2_abilities_locked
+      return t('pf2e.cg_locked', :cp => 'attributes') if enactor.pf2_abilities_locked
 
       # Any issues that would stop them from locking?
       errors = Pf2eAbilities.abilities_messages(enactor)

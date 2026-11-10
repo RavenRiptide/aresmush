@@ -17,14 +17,18 @@ module AresMUSH
         # order already says. Committing and rewinding each used to set the three booleans by hand,
         # three `if`s apiece, and a stage added to the list without its three lines would have left a
         # lock stuck.
+        #
+        # `name` is what a character's checkpoint stores; `command` is the word a player types after
+        # `commit` or `cg/restore`. They differ only for attributes, whose stage is stored as
+        # `abilities` from before PF2e's Remaster renamed them.
         STAGES = [
-          { 'name' => 'start', 'lock' => nil },
-          { 'name' => 'info', 'lock' => 'baseinfo' },
-          { 'name' => 'abilities', 'lock' => 'abilities' },
-          { 'name' => 'skills', 'lock' => 'skills' },
+          { 'name' => 'start', 'command' => 'start', 'lock' => nil },
+          { 'name' => 'info', 'command' => 'info', 'lock' => 'baseinfo' },
+          { 'name' => 'abilities', 'command' => 'attributes', 'lock' => 'abilities' },
+          { 'name' => 'skills', 'command' => 'skills', 'lock' => 'skills' },
           # Feats come after skills and have no stage of their own to lock; `commit featskills` is
           # how the skills lock goes back on after a feat handed over a skill the character had.
-          { 'name' => 'featskills', 'lock' => nil }
+          { 'name' => 'featskills', 'command' => 'featskills', 'lock' => nil }
         ].freeze
 
         # One exception to the derivation, and it is real: a feat that grants a skill the character is
@@ -36,6 +40,16 @@ module AresMUSH
 
         def self.stage_at(name)
           CHECKPOINTS.index(name.to_s)
+        end
+
+        # The stored stage name for the word a player typed, or nil when no stage answers to it.
+        def self.stage_for(command)
+          STAGES.find { |stage| stage['command'] == command.to_s.downcase }&.fetch('name')
+        end
+
+        # The word a player types for a stored stage name.
+        def self.command_for(name)
+          STAGES.find { |stage| stage['name'] == name.to_s }&.fetch('command') || name.to_s
         end
 
         # The locks a character standing at this stage holds: every stage up to and including it is
@@ -51,13 +65,14 @@ module AresMUSH
         end
 
         def self.commit(state, args)
-          stage = args['stage'].to_s
+          typed = args['stage'].to_s
+          stage = stage_for(typed)
 
           return Err.new(:not_in_chargen, 'pf2e.only_in_chargen') if state['chargen_stage'].nil? || state['approved']
 
           index = CHECKPOINTS.index(stage)
 
-          return Err.new(:bad_option, 'pf2e.bad_option', 'element' => 'commit', 'options' => (CHECKPOINTS - [ 'start' ]).join(", ")) if index.nil? || stage == 'start'
+          return Err.new(:bad_option, 'pf2e.bad_option', 'element' => 'commit', 'options' => (STAGES.map { |s| s['command'] } - [ 'start' ]).join(", ")) if index.nil? || stage == 'start'
           return Err.new(:wrong_stage, 'pf2e.wrong_stage') unless CHECKPOINTS[index - 1] == state['checkpoint']
 
           if stage == 'info'
@@ -70,7 +85,7 @@ module AresMUSH
 
               return Err.new(:incomplete, 'pf2e.cg_commit_failed',
                              'msg' => missing.map { |stem| t("pf2e.#{stem}", **(stem_args[stem] || {})) }.join(" "),
-                             'missing' => missing, 'option' => stage)
+                             'missing' => missing, 'option' => typed)
             end
           end
 
@@ -79,7 +94,8 @@ module AresMUSH
         end
 
         def self.restore(state, args)
-          checkpoint = args['checkpoint'].to_s
+          typed = args['checkpoint'].to_s
+          checkpoint = stage_for(typed)
           restorable = %w(info abilities skills)
 
           return Err.new(:bad_option, 'pf2e.cg_restore_help') unless restorable.include?(checkpoint)
@@ -88,14 +104,14 @@ module AresMUSH
           target = CHECKPOINTS.index(checkpoint)
 
           return Err.new(:bad_option, 'pf2e.cg_restore_help') if current.nil?
-          return Err.new(:stage_not_reached, 'pf2e.cg_cant_restore_to_stage_you_dont_have', 'checkpoint' => checkpoint) if current < target
+          return Err.new(:stage_not_reached, 'pf2e.cg_cant_restore_to_stage_you_dont_have', 'checkpoint' => typed) if current < target
 
           # Rewinding to a stage reopens it and everything after it, so the character stands at the
           # stage before it - with that stage's locks, and with it as the next thing to commit.
           standing = CHECKPOINTS[target - 1]
 
           Ok.new(:state => state.merge('checkpoint' => standing, 'locks' => state['locks'].merge(locks_at(standing))))
-            .with_message('pf2e.cg_restore_ok', 'checkpoint' => checkpoint)
+            .with_message('pf2e.cg_restore_ok', 'checkpoint' => typed)
         end
 
         # Two-step confirmation, kept as data: the first bare call arms the reset, the second

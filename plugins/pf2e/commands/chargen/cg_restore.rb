@@ -20,7 +20,7 @@ module AresMUSH
 
         # The snapshot moves the character; the core decides where that leaves them, so it
         # commits over the values the snapshot put back.
-        Pf2e::Checkpoints.restore!(enactor, self.checkpoint)
+        Pf2e::Checkpoints.restore!(enactor, Pf2e::Chargen::Lifecycle.stage_for(self.checkpoint))
         Pf2e::CharState.commit!(enactor, before, outcome, :source_type => 'chargen',
                                 :source_ref => "restore #{self.checkpoint}", :effective_level => 1)
 

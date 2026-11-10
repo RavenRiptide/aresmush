@@ -39,7 +39,7 @@ module AresMUSH
           end
 
           it "should take all four boosts at once" do
-            result = Raises.set(boost_state, 'type' => 'ability', 'value' => 'Strength, Dexterity, Wisdom, Charisma')
+            result = Raises.set(boost_state, 'type' => 'attributes', 'value' => 'Strength, Dexterity, Wisdom, Charisma')
 
             expect(result.ok?).to be true
             expect(result.state['to_assign']['raise ability']).to eq %w(Charisma Dexterity Strength Wisdom)
@@ -47,26 +47,26 @@ module AresMUSH
           end
 
           it "should refuse fewer than four" do
-            result = Raises.set(boost_state, 'type' => 'ability', 'value' => 'Strength, Dexterity')
+            result = Raises.set(boost_state, 'type' => 'attributes', 'value' => 'Strength, Dexterity')
 
             expect(result.code).to eq :boost_count
           end
 
           it "should refuse the same ability twice" do
-            result = Raises.set(boost_state, 'type' => 'ability', 'value' => 'Strength, Strength, Wisdom, Charisma')
+            result = Raises.set(boost_state, 'type' => 'attributes', 'value' => 'Strength, Strength, Wisdom, Charisma')
 
             expect(result.code).to eq :boost_unique
           end
 
           it "should refuse an ability that is not one of the six" do
-            result = Raises.set(boost_state, 'type' => 'ability', 'value' => 'Luck, Dexterity, Wisdom, Charisma')
+            result = Raises.set(boost_state, 'type' => 'attributes', 'value' => 'Luck, Dexterity, Wisdom, Charisma')
 
             expect(result.code).to eq :bad_option
           end
 
           it "should refuse an ability already boosted at this level" do
             slots = [ 'Strength', 'open', 'open', 'open' ]
-            result = Raises.set(state(:to_assign => { 'raise ability' => slots }), 'type' => 'ability', 'value' => 'Strength, Dexterity, Wisdom, Charisma')
+            result = Raises.set(state(:to_assign => { 'raise ability' => slots }), 'type' => 'attributes', 'value' => 'Strength, Dexterity, Wisdom, Charisma')
 
             expect(result.code).to eq :no_free
           end
@@ -74,7 +74,7 @@ module AresMUSH
           # Raising Intelligence past an even score moves the modifier, and PF2e hands out a
           # skill and a language when it does.
           it "should hand out a skill and a language when the Intelligence modifier moves" do
-            result = Raises.set(boost_state(:scores => { 'Intelligence' => 12 }), 'type' => 'ability', 'value' => 'Intelligence, Dexterity, Wisdom, Charisma')
+            result = Raises.set(boost_state(:scores => { 'Intelligence' => 12 }), 'type' => 'attributes', 'value' => 'Intelligence, Dexterity, Wisdom, Charisma')
 
             expect(result.ok?).to be true
             expect(result.state['to_assign']['raise skill']).to eq [ 'open untrained' ]
@@ -85,7 +85,7 @@ module AresMUSH
           # At 18 and above a boost is worth 1 rather than 2, so 18 -> 19 leaves the
           # modifier where it was and nothing extra is owed.
           it "should not hand anything out when the modifier does not move" do
-            result = Raises.set(boost_state(:scores => { 'Intelligence' => 18 }), 'type' => 'ability', 'value' => 'Intelligence, Dexterity, Wisdom, Charisma')
+            result = Raises.set(boost_state(:scores => { 'Intelligence' => 18 }), 'type' => 'attributes', 'value' => 'Intelligence, Dexterity, Wisdom, Charisma')
 
             expect(result.ok?).to be true
             expect(result.state['to_assign']['raise skill']).to be_nil
@@ -240,6 +240,13 @@ module AresMUSH
 
         it "should refuse a raise the level did not offer" do
           result = Raises.set(state(:to_assign => {}), 'type' => 'skill', 'value' => 'Arcana')
+
+          expect(result.code).to eq :bad_option
+        end
+
+        # Attribute boosts are `advance/raise attributes`; the old word has no alias.
+        it "should refuse the old ability word for attribute boosts" do
+          result = Raises.set(state(:to_assign => { 'raise ability' => %w(open open open open) }), 'type' => 'ability', 'value' => 'Strength, Dexterity, Wisdom, Charisma')
 
           expect(result.code).to eq :bad_option
         end

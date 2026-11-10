@@ -459,8 +459,7 @@ module AresMUSH
       def format_ability(abil, score, i)
         name = "#{item_color}#{abil.capitalize}%xn"
         linebreak = i % 3 == 0 ? "%r" : ""
-        mod = "(#{Pf2eAbilities.abilmod(score)})"
-        "#{linebreak}#{left(name, 13)}: #{left(score, 2)} #{left(mod, 9)}"
+        "#{linebreak}#{left(name, 13)}: #{left(Pf2eAbilities.display_mod(score), 11)}"
       end
 
 

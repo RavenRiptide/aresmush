@@ -111,7 +111,7 @@ module AresMUSH
       end
 
       it "should show every section for all" do
-        expect(shown('all')).to include('Basic Information', 'Abilities', 'Stats', 'Skills', 'Languages', 'Feats', 'Magic')
+        expect(shown('all')).to include('Basic Information', 'Attributes', 'Stats', 'Skills', 'Languages', 'Feats', 'Magic')
       end
     end
   end

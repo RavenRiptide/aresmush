@@ -1,6 +1,6 @@
 ---
 toc: Pathfinder Second Edition
-summary: Commands related to advancement, skills, and abilities.
+summary: Commands related to advancement, skills, and attributes.
 aliases:
 - advancefeats
 - advancefeatures

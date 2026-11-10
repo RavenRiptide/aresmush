@@ -19,11 +19,9 @@ module AresMUSH
           return
         end
 
-        # Whether this viewer may see it, and whether the section exists at all, are both
-        # Pf2e::Sheet's business - including the grants `sheet/show` writes, which nothing used
-        # to read.
-        outcome = Pf2e::Sheet.viewable?(enactor, char, self.section)
-                    .and_then { Pf2e::Sheet.available(char, self.section) }
+        # Whether the section exists at all is Pf2e::Sheet's business. Every sheet is open, so who
+        # is asking does not matter.
+        outcome = Pf2e::Sheet.available(char, self.section)
 
         return if Pf2e::CharState.emit_error!(client, outcome)
 

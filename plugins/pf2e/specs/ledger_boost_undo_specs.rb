@@ -139,6 +139,15 @@ module AresMUSH
         expect(Pf2eAbilities.abilmod(19)).to eq 4
         expect(Pf2eAbilities.abilmod(20)).to eq 5
       end
+
+      # What the sheet shows: the modifier alone, with (P) for a partial boost toward the next.
+      it "should show an attribute as a signed modifier, marking a partial boost" do
+        expect(Pf2eAbilities.display_mod(18)).to eq '+4'
+        expect(Pf2eAbilities.display_mod(19)).to eq '+4 (P)'
+        expect(Pf2eAbilities.display_mod(20)).to eq '+5'
+        expect(Pf2eAbilities.display_mod(10)).to eq '+0'
+        expect(Pf2eAbilities.display_mod(8)).to eq '-1'
+      end
     end
   end
 end

@@ -33,7 +33,6 @@ module AresMUSH
             'skills_locked' => char.pf2_skills_locked,
             'to_assign' => char.pf2_to_assign,
             'roll_aliases' => char.pf2_roll_aliases,
-            'viewsheet' => char.pf2_viewsheet,
             'cnotes' => char.pf2_cnotes,
             'known_for' => char.pf2_known_for,
             'advancement' => char.pf2_advancement,
@@ -90,10 +89,9 @@ module AresMUSH
             'skills' => !!data['skills_locked']
           },
           'to_assign' => data['to_assign'] || {},
-          # Four small things a character owns outright: their roll shorthands, who they have shown
-          # a sheet section to, the notes staff keep on them, and what they are known for.
+          # Three small things a character owns outright: their roll shorthands, the notes staff
+          # keep on them, and what they are known for.
           'roll_aliases' => data['roll_aliases'] || {},
-          'viewsheet' => data['viewsheet'] || {},
           'cnotes' => data['cnotes'] || {},
           'known_for' => data['known_for'] || [],
           # The advancement draft: what has been picked since `advance` and not yet
@@ -146,7 +144,6 @@ module AresMUSH
         'boosts_working' => 'pf2_boosts_working',
         'chargen_stage' => 'chargen_stage',
         'roll_aliases' => 'pf2_roll_aliases',
-        'viewsheet' => 'pf2_viewsheet',
         'cnotes' => 'pf2_cnotes',
         'known_for' => 'pf2_known_for'
       }.freeze

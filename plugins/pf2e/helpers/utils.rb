@@ -496,8 +496,7 @@ module AresMUSH
     # What a character earned rather than built. A respec keeps these; a reset does not.
     EARNED = {
       :pf2_xp => 0,
-      :pf2_level => 1,
-      :pf2_viewsheet => {}
+      :pf2_level => 1
     }.freeze
 
     # A respec: the character keeps their level, XP, money and inventory, and rebuilds everything

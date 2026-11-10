@@ -87,11 +87,11 @@ module AresMUSH
 
       # Rewinding a stage reopens that stage and nothing before it, so what base options built -
       # the ancestry's traits and size, the class's features - is still there.
-      it "should keep the base options stage's work when the abilities stage is rewound" do
+      it "should keep the base options stage's work when the attributes stage is rewound" do
         built
         features = Character[@char.id].pf2_features
 
-        char = restore('abilities')
+        char = restore('attributes')
 
         expect(char.pf2_traits).to include 'khazad'
         expect(char.pf2_movement['Size']).to_not be_blank

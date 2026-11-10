@@ -85,10 +85,18 @@ module AresMUSH
           expect(of(shown(Character[@hero.id], false), @hero.name)[:hero_points]).to eq 1
         end
 
-        it "should be shown to nobody who may not see that character's combat sheet" do
-          allow(Sheet).to receive(:viewable?).and_return(Err.new(:not_yours, 'pf2e.not_found'))
+        # Every sheet is open, so a player outside the fight sees them too.
+        it "should be shown to any other player" do
+          expect(of(shown(Character[@stranger.id], false), @hero.name)[:hero_points]).to eq 1
+        end
 
-          expect(of(shown(Character[@stranger.id], false), @hero.name)[:hero_points]).to be_nil
+        # Open to players, not to the web at large: a visitor who has not logged in sees neither a
+        # character's Hero Points nor their hit points.
+        it "should be shown to nobody who has not logged in" do
+          row = of(shown(nil, false), @hero.name)
+
+          expect(row[:hero_points]).to be_nil
+          expect(row[:hp]).to be_nil
         end
 
         it "should say in the history who spent one in a change" do

@@ -50,9 +50,14 @@ module AresMUSH
           expect(result.args['options']).to include 'divine font'
         end
 
+        # Attributes are set with `attribute`; the pre-Remaster word has no alias.
+        it "should not answer to the old ability keyword" do
+          expect(AdminSet.plan(state, 'ability', [ 'Strength', '15' ]).code).to eq :unknown_target
+        end
+
         it "should name every target in the help text" do
           expect(AdminSet.targets).to include('skill', 'feature', 'spellbook', 'repertoire',
-                                              'focus', 'language', 'ability', 'divine font',
+                                              'focus', 'language', 'attribute', 'divine font',
                                               'alignment', 'deity')
         end
       end
@@ -230,20 +235,20 @@ module AresMUSH
         end
       end
 
-      describe "an ability score" do
+      describe "an attribute score" do
         it "should record the score outright, since no count of boosts reaches 15" do
-          result = plan('ability', 'Strength', '15')
+          result = plan('attribute', 'Strength', '15')
 
           expect(result.grants).to eq [ { 'kind' => 'set_ability_score',
                                           'payload' => { 'ability' => 'Strength', 'to' => 15 } } ]
         end
 
         it "should refuse a score that is not positive" do
-          expect(plan('ability', 'Strength', '0').code).to eq :bad_score
+          expect(plan('attribute', 'Strength', '0').code).to eq :bad_score
         end
 
         it "should refuse an attribute the character has not got" do
-          expect(plan('ability', 'Charisma', '15').code).to eq :bad_ability
+          expect(plan('attribute', 'Charisma', '15').code).to eq :bad_ability
         end
       end
 

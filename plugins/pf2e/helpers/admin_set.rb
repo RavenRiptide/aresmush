@@ -58,8 +58,9 @@ module AresMUSH
           'syntax' => '[add|delete] <language>',
           'plan' => lambda { |words, state, target| AdminSet.plan_language(words, state, target) }
         },
-        'ability' => {
-          'syntax' => '<ability name> <ability score>',
+        # Staff set the stored score, not a modifier: a score is what holds a partial boost.
+        'attribute' => {
+          'syntax' => '<attribute name> <attribute score>',
           'plan' => lambda { |words, state, target| AdminSet.plan_ability(words, state, target) }
         },
         'divine font' => {
@@ -278,7 +279,7 @@ module AresMUSH
 
         # A score is checked for being a positive number and no further: staff correcting a sheet
         # are allowed to put a character outside what chargen would have produced.
-        return Err.new(:bad_score, 'pf2e.bad_value', 'item' => 'ability score') unless score > 0
+        return Err.new(:bad_score, 'pf2e.bad_value', 'item' => 'attribute score') unless score > 0
 
         ok(state, ability).with_grant('set_ability_score', 'ability' => ability, 'to' => score)
       end

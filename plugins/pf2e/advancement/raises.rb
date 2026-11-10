@@ -30,7 +30,7 @@ module AresMUSH
 
           return Err.new(:bad_option, 'pf2e.adv_not_an_option') unless spec
 
-          key = "raise #{type}"
+          key = spec['slot']
 
           return Err.new(:bad_option, 'pf2e.adv_not_an_option') if state['to_assign'][key].nil?
 
@@ -49,11 +49,11 @@ module AresMUSH
 
           names = wanted.map { |w| Array(state['abilities']).find { |a| a.to_s.casecmp?(w) } }
 
-          return Err.new(:bad_option, 'pf2e.bad_option', 'element' => 'ability', 'options' => Array(state['abilities']).join(", ")) unless names.all?
+          return Err.new(:bad_option, 'pf2e.bad_option', 'element' => 'attribute', 'options' => Array(state['abilities']).join(", ")) unless names.all?
 
           slots = Array(state['to_assign'][key])
 
-          return Err.new(:no_free, 'pf2e.no_free', 'element' => 'ability boosts') if slots.count('open') < BOOSTS_PER_LEVEL
+          return Err.new(:no_free, 'pf2e.no_free', 'element' => 'attribute boosts') if slots.count('open') < BOOSTS_PER_LEVEL
 
           taken = slots.reject { |s| s == 'open' }
 
@@ -239,10 +239,13 @@ module AresMUSH
           Err.new(:not_minimum_level, 'pf2e.not_minimum_level', 'level' => required)
         end
 
+        # Keyed by the word the player types after `advance/raise`. `slot` is the to_assign key it
+        # spends, which keeps its stored name: attribute boosts were once typed as `ability`, and
+        # drafts in progress and the class table's `raise:` lists still call the slot that.
         TYPES = {
-          'ability' => { 'spend' => lambda { |state, key, value| Raises.boost(state, key, value) } },
-          'skill' => { 'spend' => lambda { |state, key, value| Raises.increase(state, key, value) } },
-          'skill choice' => { 'spend' => lambda { |state, key, value| Raises.increase_choice(state, key, value) } }
+          'attributes' => { 'slot' => 'raise ability', 'spend' => lambda { |state, key, value| Raises.boost(state, key, value) } },
+          'skill' => { 'slot' => 'raise skill', 'spend' => lambda { |state, key, value| Raises.increase(state, key, value) } },
+          'skill choice' => { 'slot' => 'raise skill choice', 'spend' => lambda { |state, key, value| Raises.increase_choice(state, key, value) } }
         }.freeze
       end
     end

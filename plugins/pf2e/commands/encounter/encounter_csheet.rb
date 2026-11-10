@@ -24,9 +24,6 @@ module AresMUSH
         return client.emit_failure(t('pf2e.encounter_sheet_creature', :ref => found.state.ref)) if found.state.creature?
 
         holder = found.state.holder
-        outcome = Sheet.viewable?(enactor, Actors.of(holder).person, 'combat')
-
-        return if CharState.emit_error!(client, outcome)
 
         client.emit SheetReads.holding(holder) { PF2CombatSheetTemplate.new(holder, client).render }
       end

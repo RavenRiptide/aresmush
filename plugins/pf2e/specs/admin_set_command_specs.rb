@@ -47,7 +47,7 @@ module AresMUSH
       end
 
       it "should keep a score staff set through the next fold" do
-        set('ability', 'strength 15')
+        set('attribute', 'strength 15')
 
         expect(score('Strength')).to eq 15
 
@@ -58,7 +58,7 @@ module AresMUSH
       end
 
       it "should record the correction as staff history rather than a level's" do
-        set('ability', 'strength 15')
+        set('attribute', 'strength 15')
 
         row = Character[@char.id].grants.to_a.find { |g| g.kind == 'set_ability_score' }
 
@@ -69,7 +69,7 @@ module AresMUSH
       end
 
       it "should leave a rollback alone, since a correction is not something a level gave" do
-        set('ability', 'strength 15')
+        set('attribute', 'strength 15')
         Pf2e.award_xp(Character[@char.id], 5000, 'spec', 'levels')
 
         Pf2e::Ledger.write(Character[@char.id], :source_type => 'level_up',
@@ -121,8 +121,8 @@ module AresMUSH
           expect(Pf2e::Ledger.drafting?(@draft)).to be true
         end
 
-        it "should set an ability score" do
-          set_draft('ability', 'strength 15')
+        it "should set an attribute score" do
+          set_draft('attribute', 'strength 15')
 
           expect(Character[@draft.id].abilities.to_a.find { |a| a.name == 'Strength' }.base_val).to eq 15
         end
@@ -134,7 +134,7 @@ module AresMUSH
         end
 
         it "should keep a corrected score when the character is approved" do
-          set_draft('ability', 'strength 15')
+          set_draft('attribute', 'strength 15')
 
           Roles.add_role(@draft, 'approved')
           @draft = Character[@draft.id]
@@ -162,7 +162,7 @@ module AresMUSH
       end
 
       it "should say nothing happened when the value makes no sense" do
-        set('ability', 'strength 0')
+        set('attribute', 'strength 0')
 
         expect(score('Strength')).to_not eq 0
         expect(Character[@char.id].grants.to_a.any? { |g| g.kind == 'set_ability_score' }).to be false

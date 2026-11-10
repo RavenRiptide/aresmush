@@ -110,8 +110,6 @@ pf2e:
   can_select_language:
     - common
     - uncommon
-  open_sheets: true
-  open_npc_sheets: false
   title_color: '%x172'
   list_item: '%x229'
   use_alignment: true
@@ -183,7 +181,6 @@ pf2e:
     - pathfinder-monster-core-2
   permissions:
     modify_sheet: Modify character sheets.
-    view_sheets: View other people's character sheets (if sheets are closed).
     kill_pc: (Plotmaster) Runs encounters with any creature, one of their own making among them, which may leave a character Drained, Doomed or dead.
     trusted_gm: (Set by an admin) Gives characters items in an encounter they run, with +e/loot.
   prof_progression:

@@ -60,6 +60,22 @@ module AresMUSH
             expect(result.code).to eq :wrong_stage
           end
 
+          # The player types `attributes`; the checkpoint still stores the stage as `abilities`.
+          it "should commit the attributes stage by the word a player types" do
+            result = Lifecycle.commit(complete_wizard.merge('checkpoint' => 'info'), 'stage' => 'attributes')
+
+            expect(result.ok?).to be true
+            expect(result.state['checkpoint']).to eq 'abilities'
+            expect(result.state['locks']['abilities']).to be true
+          end
+
+          it "should not answer to the old abilities word" do
+            result = Lifecycle.commit(complete_wizard.merge('checkpoint' => 'info'), 'stage' => 'abilities')
+
+            expect(result.code).to eq :bad_option
+            expect(result.args['options']).to eq 'info, attributes, skills, featskills'
+          end
+
           it "should refuse to commit the same stage twice" do
             once = Lifecycle.commit(complete_wizard, 'stage' => 'info')
             twice = Lifecycle.commit(once.state, 'stage' => 'info')
@@ -216,6 +232,18 @@ module AresMUSH
 
           it "should refuse an unknown stage" do
             expect(Lifecycle.restore(complete_wizard, 'checkpoint' => 'vibes').code).to eq :bad_option
+          end
+
+          it "should rewind the attributes stage by the word a player types" do
+            result = Lifecycle.restore(complete_wizard.merge('checkpoint' => 'skills'), 'checkpoint' => 'attributes')
+
+            expect(result.ok?).to be true
+            expect(result.state['checkpoint']).to eq 'info'
+            expect(result.state['locks']['abilities']).to be false
+          end
+
+          it "should not answer to the old abilities word" do
+            expect(Lifecycle.restore(complete_wizard.merge('checkpoint' => 'skills'), 'checkpoint' => 'abilities').code).to eq :bad_option
           end
         end
 

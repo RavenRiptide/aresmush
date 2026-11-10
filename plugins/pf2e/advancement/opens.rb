@@ -60,7 +60,7 @@ module AresMUSH
               Array(ctx[:value]).map do |item|
                 ctx[:pool]["raise #{item}"] = item == 'ability' ? Array.new(4, 'open') : [ 'open' ]
 
-                [ 'pf2e.adv_item_raise', { :item => item } ]
+                item == 'ability' ? [ 'pf2e.adv_item_raise_ability', {} ] : [ 'pf2e.adv_item_raise', { :item => item } ]
               end
             }
           },

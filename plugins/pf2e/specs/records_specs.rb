@@ -59,22 +59,6 @@ module AresMUSH
           end
         end
 
-        describe "showing a sheet section" do
-          it "should add the player to that section" do
-            result = Records.add(state, 'record' => 'viewsheet', 'key' => 'combat', 'value' => 'Bob')
-
-            expect(result.state['viewsheet']).to eq('combat' => [ 'Bob' ])
-          end
-
-          it "should leave it alone when they can already see it" do
-            before = state('viewsheet' => { 'combat' => [ 'Bob' ] })
-            result = Records.add(before, 'record' => 'viewsheet', 'key' => 'combat', 'value' => 'bob')
-
-            expect(result.state['viewsheet']).to eq('combat' => [ 'Bob' ])
-            expect(result.messages.first['key']).to eq 'pf2e.player_added'
-          end
-        end
-
         describe "what they are known for" do
           it "should append to the list" do
             result = Records.add(state('known_for' => [ 'a duel' ]), 'record' => 'known_for', 'value' => 'a song')

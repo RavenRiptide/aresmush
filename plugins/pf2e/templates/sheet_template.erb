@@ -21,9 +21,9 @@
 <%= traits %>
 <% end %>
 <% if section == "all" %>
-<%= section_line("Abilities") -%>
+<%= section_line("Attributes") -%>
 <% end %>
-<% if [ "ability", "all" ].include?(section) -%>
+<% if [ "attributes", "all" ].include?(section) -%>
 <% abilities.each do |a| -%>
 <%= a -%>
 <% end %>

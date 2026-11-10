@@ -342,7 +342,7 @@ module AresMUSH
           if open_count > 0
             abilities = @char.abilities.to_a.sort_by { |a| a.base_val }.reverse.map(&:name)
             picks = abilities.first(open_count)
-            run("advance/raise ability=#{picks.join(', ')}"); runs += 1
+            run("advance/raise attributes=#{picks.join(', ')}"); runs += 1
           end
         end
 
@@ -560,7 +560,7 @@ module AresMUSH
 
         run "commit info"
         assign_boosts
-        run "commit abilities"
+        run "commit attributes"
         3.times { break if resolve_outstanding(:chargen).zero? }
         run "commit skills"
         3.times { break if resolve_outstanding(:chargen).zero? }

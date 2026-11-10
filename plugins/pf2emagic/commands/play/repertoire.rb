@@ -53,13 +53,6 @@ module AresMUSH
 
       end
 
-      def check_permissions
-        return nil if !self.character
-        return nil if Global.read_config('pf2e','open_sheets')
-        return nil if enactor.has_permission?("view_sheets")
-        return t('pf2e.cannot_view_sheet')
-      end
-
       def check_invalid_admin_syntax
         # Admins should not be using this command on themselves.
         return nil unless enactor.has_permission? "manage_alts"

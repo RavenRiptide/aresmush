@@ -9,13 +9,6 @@ module AresMUSH
         self.character = trim_arg(cmd.args)
       end
 
-      def check_can_view
-        return nil if !self.character
-        return nil if Global.read_config('pf2e','open_sheets')
-        return nil if enactor.has_permission?("view_sheets")
-        return t('pf2e.cannot_view_sheet')
-      end
-
       def handle
         char = Pf2e.get_character(self.character, enactor)
 

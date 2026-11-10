@@ -26,7 +26,7 @@ module AresMUSH
 
         holder = found.state.holder
         char = Actors.of(holder).person
-        outcome = Sheet.viewable?(enactor, char, self.section).and_then { Sheet.available(char, self.section) }
+        outcome = Sheet.available(char, self.section)
 
         return if CharState.emit_error!(client, outcome)
 

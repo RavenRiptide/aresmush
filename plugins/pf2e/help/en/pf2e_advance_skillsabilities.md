@@ -15,7 +15,8 @@ See `help advance` for more information about advancement.
 At level 5, 10, 15, and 20, you can raise four attributes to the next step up. At some levels, skills can also be trained to the next proficiency step (or trained from Untrained to Trained).
 
 **Commands**:
-`advance/raise ability = <attribute1> <attribute2> <attribute3> <attribute4>`: Boosts attribute scores to the next step. 
+`advance/raise attributes = <attribute1> <attribute2> <attribute3> <attribute4>`: Boosts four different attributes.
+%t **Note:** A boost to an attribute at +4 or higher is a partial boost, which your sheet marks (P). A second partial boost raises the modifier by 1.
 `advance/raise skill = <skill>`: Raises a skill to the next step of proficiency. For example, `advance/raise skill=Nature` raises the Nature skill.
 `advance/raise skill choice = <skill>`: If you have a skill training choice, such as from a Dedication feat, this command raises the chosen skill to the next step of proficiency.
 %t **Note:** A swashbuckler's Stylish Tricks gives a skill choice at levels 3, 7, and 15, for Acrobatics or your style's skill. It comes in addition to the regular skill increase at those levels.
@@ -26,7 +27,7 @@ At level 5, 10, 15, and 20, you can raise four attributes to the next step up. A
 Sometimes, feats might give training in skills you're already trained in. Those skills are turned into open slots to train an untrained skill into a trained one. Use the regular `advance/raise skill` command to train untrained skills. If you raise your Intelligence score to a higher modifier, you also get training to raise an untrained skill into a trained one.
 
 ### Examples
-Raising attributes: `advance/raise ability=Strength Dexterity Constitution Wisdom` raises Strength, Dexterity, Constitution, and Wisdom.
+Raising attributes: `advance/raise attributes=Strength Dexterity Constitution Wisdom` raises Strength, Dexterity, Constitution, and Wisdom.
 Resolving a choice of skills: If given the choice of Stealth or Thievery, input `advance/raise skill choice=Stealth` to raise the Stealth skill.
 Learning a new language: `advance/language Sylhart` teaches the Sylhart language.
 Finding a language to learn: `lang/info uncommon` lists the uncommon languages.

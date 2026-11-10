@@ -28,10 +28,6 @@ module AresMUSH
           return
         end
 
-        outcome = Pf2e::Sheet.viewable?(enactor, char, 'combat')
-
-        return if Pf2e::CharState.emit_error!(client, outcome)
-
         found = Pf2e::Stat.identify(self.figure)
 
         if !found

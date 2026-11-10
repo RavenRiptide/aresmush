@@ -65,6 +65,9 @@ module AresMUSH
     attribute :pf2_boosts, :type => DataType::Hash, :default => {}
 
     attribute :pf2_lang, :type => DataType::Array, :default => []
+    # Unread. `sheet/show` kept per-viewer sheet shares here before every sheet on the game was open;
+    # it stays because live characters hold it, and Ohm raises on loading a record with an attribute
+    # its model no longer declares.
     attribute :pf2_viewsheet, :type => DataType::Hash, :default => {}
     attribute :pf2_to_assign, :type => DataType::Hash, :default => {}
     attribute :pf2_level_tracker, :type => DataType::Hash, :default => {}

@@ -83,8 +83,6 @@ module AresMUSH
         return PF2DamagePlayerCmd
       when "sheet"
         case cmd.switch
-        when "show"
-          return PF2ShowSheetCmd
         when "combat"
           return PF2DisplayCombatSheetCmd
         when "why"

@@ -1133,11 +1133,8 @@ module AresMUSH
           expect(seen[:history].map { |one| one[:undone] }.uniq).to eq [ false ]
         end
 
-        # The same rule the sheet keeps: a character's hit points are on their combat sheet, and whoever
-        # may not see that may not see them here either.
-        it "should show a character's hit points only to whoever may see their sheet" do
-          allow(Global).to receive(:read_config).and_call_original
-          allow(Global).to receive(:read_config).with('pf2e', 'open_sheets').and_return(false)
+        # A character's hit points are on their combat sheet, and every sheet is open.
+        it "should show every character's hit points to another player" do
           other = Character.create(:name => "Bram#{rand(1000000)}", :room => @room)
           other_hp = Pf2eHP.create(:character => other, :ancestry_hp => 8, :charclass_hp => 10)
           other.update(:hp => other_hp, :pf2_level => 1)
@@ -1148,7 +1145,7 @@ module AresMUSH
           theirs = seen.find { |one| one[:name] == other.name }
 
           expect(mine[:hp]).to_not be_nil
-          expect(theirs[:hp]).to be_nil
+          expect(theirs[:hp]).to_not be_nil
         ensure
           other_hp&.delete
           other&.delete

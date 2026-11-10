@@ -2,12 +2,12 @@ module AresMUSH
   module Pf2e
     module Chargen
 
-      # The four small things a character owns outright, each a list or a map with a name.
+      # The three small things a character owns outright, each a list or a map with a name.
       #
-      # A roll shorthand, who they have shown a sheet section to, the notes staff keep on them, and
-      # what they are known for. None of them is sheet state, so none is a grant - they are the
-      # character's own fields, and `CharState` persists them. What they have in common is the shape
-      # of the edit, which is why they are one table rather than four commands doing it by hand.
+      # A roll shorthand, the notes staff keep on them, and what they are known for. None of them is
+      # sheet state, so none is a grant - they are the character's own fields, and `CharState`
+      # persists them. What they have in common is the shape of the edit, which is why they are one
+      # table rather than three commands doing it by hand.
       #
       #   state   - the key in CharState the record lives under
       #   set     - names a value under a key
@@ -32,10 +32,6 @@ module AresMUSH
             'replaced' => 'pf2e.cnote_updated',
             # Removing one names it loosely, so the name has to pick out exactly one note.
             'match' => true
-          },
-          'viewsheet' => {
-            'state' => 'viewsheet',
-            'add' => 'pf2e.player_added'
           },
           'known_for' => {
             'state' => 'known_for',
@@ -96,33 +92,13 @@ module AresMUSH
             .with_message(row['unset'], 'name' => asked, 'alias' => asked, 'char' => state['name'])
         end
 
-        # Appends to a list, or to a list under a key when the record keeps one list per section.
+        # Appends to a list.
         def self.add(state, args)
           row = row(args['record'])
 
           return unknown(args['record']) unless row && row['add']
 
-          held = state[row['state']]
-          key = args['key']
-
-          return add_to_list(state, row, Array(held), args) if key.blank?
-
-          under = (held || {}).dup
-          list = Array(under[key.to_s])
-
-          if list.any? { |item| item.to_s.casecmp?(args['value'].to_s) }
-            return Ok.new(:state => state).with_message(row['add'], 'player' => args['value'],
-                                                                   'section' => key, 'char' => state['name'])
-          end
-
-          under[key.to_s] = list + [ args['value'] ]
-
-          Ok.new(:state => state.merge(row['state'] => under))
-            .with_message(row['add'], 'player' => args['value'], 'section' => key, 'char' => state['name'])
-        end
-
-        def self.add_to_list(state, row, list, args)
-          Ok.new(:state => state.merge(row['state'] => list + [ args['value'] ]))
+          Ok.new(:state => state.merge(row['state'] => Array(state[row['state']]) + [ args['value'] ]))
             .with_message(row['add'], 'name' => state['name'], 'blurb' => args['value'],
                                       'char' => state['name'])
         end

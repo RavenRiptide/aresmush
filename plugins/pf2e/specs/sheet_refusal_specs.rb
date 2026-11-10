@@ -30,19 +30,15 @@ module AresMUSH
         end
       end
 
-      def viewer(name = 'Viewer')
-        double(:name => name, :is_admin? => false, :has_permission? => false, :pf2_viewsheet => {})
-      end
-
       # A character with no sheet at all, which is what `admin/reset` leaves behind.
       def blank(name = 'Viewer')
         double(:name => name, :is_admin? => false, :has_permission? => false, :magic => nil,
-               :pf2_baseinfo_locked => false, :pf2_viewsheet => {})
+               :pf2_baseinfo_locked => false)
       end
 
       def caster_less(name = 'Viewer')
         double(:name => name, :is_admin? => false, :has_permission? => false, :magic => nil,
-               :pf2_baseinfo_locked => true, :pf2_viewsheet => {})
+               :pf2_baseinfo_locked => true)
       end
 
       def run(klass, char, text, enactor: nil)
@@ -55,11 +51,6 @@ module AresMUSH
         handler.handle
 
         client
-      end
-
-      before(:each) do
-        allow(Global).to receive(:read_config).and_call_original
-        allow(Global).to receive(:read_config).with('pf2e', 'open_sheets').and_return(false)
       end
 
       describe PF2DisplaySheetCmd do
@@ -81,12 +72,6 @@ module AresMUSH
 
           expect(client.failures.size).to eq 1
         end
-
-        it "should refuse a viewer who may not look" do
-          client = run(PF2DisplaySheetCmd, caster_less('Shown'), 'sheet Shown', :enactor => viewer)
-
-          expect(client.failures.size).to eq 1
-        end
       end
 
       describe PF2DisplayCombatSheetCmd do
@@ -105,25 +90,6 @@ module AresMUSH
           client = run(PF2DisplayCombatSheetCmd, unapproved, 'sheet/combat')
 
           expect(client.failures).to eq [ t('pf2e.csheet_not_approved') ]
-        end
-      end
-
-      describe PF2StatBreakdownCmd do
-        it "should refuse a viewer who may not see the figure" do
-          client = run(PF2StatBreakdownCmd, caster_less('Shown'), 'sheet/why ac=Shown', :enactor => viewer)
-
-          expect(client.failures.size).to eq 1
-        end
-      end
-
-      describe PF2ShowSheetCmd do
-        it "should refuse to share a section the sharer has not got" do
-          other = caster_less('Someone')
-          allow(ClassTargetFinder).to receive(:find).and_return(double(:found? => true, :target => other))
-
-          client = run(PF2ShowSheetCmd, caster_less, 'sheet/show Someone=magic')
-
-          expect(client.failures.size).to eq 1
         end
       end
     end

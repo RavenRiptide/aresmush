@@ -220,11 +220,6 @@ module AresMUSH
         return if Pf2e::CharState.emit_error!(client, found)
         return client.emit_failure(t('pf2e.encounter_sheet_creature', :ref => found.state.ref)) if found.state.creature?
 
-        char = Pf2e::Actors.of(found.state.holder).person
-        allowed = Pf2e::Sheet.viewable?(enactor, char, 'combat')
-
-        return if Pf2e::CharState.emit_error!(client, allowed)
-
         client.emit Pf2eDisplayGearTemplate.new(found.state.holder, client).render
       end
     end

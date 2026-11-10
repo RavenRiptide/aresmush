@@ -16,7 +16,7 @@ You build your Pathfinder 2e sheet in stages, because later choices depend on ea
 ## Stages
 
 `info`: Choose your ancestry, heritage, background, class, specializations, and other basic details.
-`abilities`: Assign attribute boosts to set your final attribute scores.
+`attributes`: Assign attribute boosts to set your final attribute modifiers.
 `skills`: Choose your skills and languages.
 
 You assign feats last, along with magic if your character casts spells. Feats have no stage to commit. Once nothing is left to assign, `cg/review` shows your finished sheet and tells you how to submit it for approval.

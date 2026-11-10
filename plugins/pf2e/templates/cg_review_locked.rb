@@ -326,11 +326,9 @@ module AresMUSH
         abilities = %w{Strength Dexterity Constitution Intelligence Wisdom Charisma}
 
         rows = abilities.map do |a|
-          score = Pf2eAbilities.get_score(@char, a)
-          mod = Pf2eAbilities.abilmod(score)
-          sign = mod < 0 ? "" : "+"
+          shown = Pf2eAbilities.display_mod(Pf2eAbilities.get_score(@char, a))
 
-          left("#{item_color}#{a.slice(0,3).upcase}%xn: #{score} (#{sign}#{mod})", 26)
+          left("#{item_color}#{a.slice(0,3).upcase}%xn: #{shown}", 26)
         end
 
         rows.each_slice(3).map { |row| row.join }.join("%r")
@@ -580,7 +578,7 @@ module AresMUSH
       end
 
       STAGE_INFO = {
-        'attributes' => { :help => [ 'cg_attributes' ],           :commit => 'abilities' },
+        'attributes' => { :help => [ 'cg_attributes' ],           :commit => 'attributes' },
         'skills'     => { :help => [ 'cg_skills', 'cg_languages' ], :commit => 'skills' },
         'feats'      => { :help => [ 'cg_feats' ],                :commit => nil },
         'final'      => { :help => [ 'cg' ],                      :commit => nil }

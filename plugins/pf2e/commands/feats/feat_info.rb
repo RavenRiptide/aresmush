@@ -10,14 +10,6 @@ module AresMUSH
         self.target = trim_arg(cmd.args)
       end
 
-      def check_can_view
-        return nil if !self.target
-        return nil if Global.read_config('pf2e','open_sheets')
-        return nil if enactor.has_permission?("view_sheets")
-
-        return t('dispatcher.not_allowed')
-      end
-
       def handle
 
         # If a name was entered, does that player exist?

@@ -45,13 +45,13 @@ module AresMUSH
       end
 
       # The GM sees everyone's. A creature's are the GM's alone. A character's are on their combat sheet,
-      # so whoever may see that - the sheet's own rule, `Sheet.viewable?` - may see them here.
+      # and every sheet is open, so anyone logged in sees them.
       def self.hit_points_seen(holder, viewer, gm)
         return nil unless holder
         return Harm.hit_points(holder) if gm
         return nil if Actors.of(holder).creature? || viewer.nil?
 
-        Sheet.viewable?(viewer, holder, 'combat').ok? ? Harm.hit_points(holder) : nil
+        Harm.hit_points(holder)
       end
 
       # A character's Hero Points in the encounter's scene, for whoever may see their hit points.
@@ -59,7 +59,7 @@ module AresMUSH
         scene = encounter.scene
 
         return nil unless holder && scene && !Actors.of(holder).creature?
-        return nil unless gm || (viewer && Sheet.viewable?(viewer, holder, 'combat').ok?)
+        return nil unless gm || viewer
 
         HeroPoints.held(scene, HeroPoints.character(holder))
       end
