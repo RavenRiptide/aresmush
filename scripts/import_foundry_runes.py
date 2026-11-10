@@ -15,11 +15,22 @@ handful of function-valued fields are taken out. Nothing is translated on the wa
 Selectors are `{item|id}-…`, because a rune belongs to the weapon it is etched on: `Pf2e::Effects`
 builds one source per rune per weapon and the weapon's own damage domain is the one it reaches.
 
+Only runes from GM Core, Player Core, and Player Core 2 come in. The table has no book, and no word on
+what a rune may be etched onto; the rune's item in their equipment pack has both, along with the book's
+level, price, and rarity. So the pack decides which runes come in and what they cost and fit, and the
+table adds what they do. A rune in those books that the table lacks comes in from its pack item alone,
+with no rules.
+
+The fundamental runes - potency, striking, resilient, reinforcing - are written to a file of their own,
+`pf2e_fundamental_runes.yml`, one row per grade, because the vendor prices each grade and a reinforcing rune
+changes the shield's Hardness and HP.
+
 Usage: scripts/import_foundry_runes.py /path/to/foundryvtt-pf2e [--write]
 """
 
 import argparse
 import collections
+import glob
 import json
 import os
 import re
@@ -35,10 +46,42 @@ import import_foundry_rules as wording  # noqa: E402
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG = os.path.join(ROOT, 'game', 'config')
 SOURCE = 'src/module/item/physical/runes.ts'
+PACK = os.path.join('packs', 'pf2e', 'equipment')
 OUT = 'pf2e_runes.yml'
+OUT_FUNDAMENTAL = 'pf2e_fundamental_runes.yml'
 
 # Their price is in gold; this game counts copper.
 GOLD = 100
+COINS = {'pp': 1000, 'gp': 100, 'sp': 10, 'cp': 1}
+
+# The books this game takes runes from, as their packs name them.
+BOOKS = {'Pathfinder GM Core', 'Pathfinder Player Core', 'Pathfinder Player Core 2'}
+
+# What a pack item's `usage` says a rune is etched onto, as the word the fit check reads. A usage not
+# here is refused, so a rune never comes in that nothing can check.
+#
+# Their two holy keys are named backwards: *holy* carries `weapon-wo-holy-rune`, whose label reads "a
+# weapon without an unholy rune". The label is the rule, so each becomes a weapon rune that excludes
+# the other.
+USAGES = {
+    'etched-onto-a-weapon': ('weapon', []),
+    'etched-onto-melee-weapon': ('melee-weapon', []),
+    'etched-onto-thrown-weapon': ('thrown-weapon', []),
+    'etched-onto-bludgeoning-weapon': ('bludgeoning-weapon', []),
+    'etched-onto-slashing-melee-weapon': ('slashing-melee-weapon', []),
+    'etched-onto-piercing-or-slashing-melee-weapon': ('piercing-or-slashing-melee-weapon', []),
+    'etched-onto-weapon-wo-holy-rune': ('weapon', ['unholy']),
+    'etched-onto-weapon-wo-unholy-rune': ('weapon', ['holy']),
+    'etched-onto-armor': ('armor', []),
+    'etched-onto-light-armor': ('light-armor', []),
+    'etched-onto-med-heavy-armor': ('medium-or-heavy-armor', []),
+    'etched-onto-lm-nonmetal-armor': ('light-or-medium-nonmetal-armor', []),
+    'etched-onto-a-shield': ('shield', []),
+}
+
+# The fundamental runes, by the table that holds them and the item they go on.
+FUNDAMENTALS = (('FUNDAMENTAL_WEAPON_RUNE_DATA', 'weapon'), ('FUNDAMENTAL_ARMOR_RUNE_DATA', 'armor'),
+                ('FUNDAMENTAL_SHIELD_RUNE_DATA', 'shield'))
 
 # What a rune may do that we can read, and what each becomes. Everything else is refused below.
 #
@@ -308,12 +351,153 @@ def rules_of(rune, slug, refused, found=None):
     return rows
 
 
-def entry_of(slug, rune, kind, refused, found=None):
-    rules = rules_of(rune, slug, refused, found) if kind == 'weapon' else []
+def joined(name):
+    """The one spelling a rune's table slug and its pack item's name share. The pack writes `Anchoring
+    (Greater)` and `Reinforcing Rune (Minor)` where the table writes `greaterAnchoring` and "Minor
+    Reinforcing": the grade goes in front, the word "rune" goes, and so does everything but letters and
+    digits."""
+    text = re.sub(r'(?<=[a-z])(?=[A-Z])', ' ', name).lower()
+    text = re.sub(r'\brune\b', '', text).strip()
+    graded = re.match(r'(.*?)\s*\((.*)\)\s*$', text)
 
-    return {'slug': slug, 'kind': kind, 'level': rune.get('level', 1),
-            'price': int(rune.get('price', 0) * GOLD), 'rarity': rune.get('rarity', 'common'),
-            'traits': rune.get('traits') or [], 'rules': rules}
+    if graded:
+        text = f'{graded.group(2)} {graded.group(1)}'
+
+    return re.sub(r'[^a-z0-9]', '', text)
+
+
+def shown(name):
+    """A pack item's name as a player types it: `Striking (Greater)` is "Greater Striking", `Weapon
+    Potency (+1)` is "+1 Weapon Potency", and `Reinforcing Rune (Minor)` is "Minor Reinforcing"."""
+    text = re.sub(r'\s+Rune\b', '', name).strip()
+    graded = re.match(r'(.*?)\s*\((.*)\)\s*$', text)
+
+    return f'{graded.group(2)} {graded.group(1)}' if graded else text
+
+
+def slug_of(name):
+    """A slug in the table's own style, for a rune only the pack has: "Greater Energy Resistant" is
+    `greaterEnergyResistant`."""
+    words = re.findall(r'[a-z0-9]+', shown(name).lower().replace("'", ''))
+
+    return words[0] + ''.join(word.capitalize() for word in words[1:])
+
+
+def price_of(price):
+    """A pack item's price, `{"gp": 500}`, in copper."""
+    return sum(int(amount) * COINS[coin] for coin, amount in (price or {}).get('value', price or {}).items()
+               if coin in COINS)
+
+
+def pack_runes(checkout):
+    """Every rune item in their equipment pack, by its joined name: what it is etched onto, its book,
+    level, price, rarity, and traits."""
+    folder = os.path.join(checkout, PACK)
+
+    if not os.path.isdir(folder):
+        raise SystemExit(f'no {PACK} in {checkout}')
+
+    items = {}
+
+    for path in sorted(glob.glob(os.path.join(folder, '**', '*.json'), recursive=True)):
+        for document in wording.documents(json.load(open(path, encoding='utf-8'))):
+            held = document['system']
+            usage = (held.get('usage') or {}).get('value') or ''
+
+            if not usage.startswith('etched-onto-'):
+                continue
+
+            traits = held.get('traits') or {}
+            items[joined(document['name'])] = {
+                'name': document['name'], 'usage': usage,
+                'book': (held.get('publication') or {}).get('title'),
+                'level': (held.get('level') or {}).get('value', 1),
+                'price': price_of(held.get('price')),
+                'rarity': traits.get('rarity', 'common'),
+                'traits': traits.get('value') or []}
+
+    return items
+
+
+def in_books(item):
+    return bool(item) and item['book'] in BOOKS
+
+
+def usage_of(item, refused):
+    """What the rune is etched onto and the runes it can't share an item with, or None when we can't
+    read it."""
+    found = USAGES.get(item['usage'])
+
+    if not found:
+        refused[f"etched onto {item['usage'][len('etched-onto-'):]}, which nothing checks"] += 1
+
+    return found
+
+
+def kind_of(usage):
+    """The kind of item a usage is for, which is what `etch/property` reads."""
+    return next(kind for kind in ('weapon', 'armor', 'shield') if usage.endswith(kind))
+
+
+def entry_of(slug, rune, kind, refused, found=None, item=None):
+    """A property rune: what it does from the table, and from its pack item, when it has one, the book's
+    level, price, and rarity and what it is etched onto."""
+    rules = rules_of(rune, slug, refused, found) if kind == 'weapon' else []
+    entry = {'slug': slug, 'kind': kind, 'level': rune.get('level', 1),
+             'price': int(rune.get('price', 0) * GOLD), 'rarity': rune.get('rarity', 'common'),
+             'traits': rune.get('traits') or [], 'rules': rules}
+
+    if item:
+        usage, excludes = usage_of(item, refused) or (None, [])
+        entry.update(level=item['level'], price=item['price'], rarity=item['rarity'], usage=usage,
+                     excludes=excludes)
+
+    return entry
+
+
+def pack_entry(item, refused):
+    """A property rune in the books that the table lacks. It comes in from its pack item, with no rules."""
+    found = usage_of(item, refused)
+
+    if not found:
+        return None
+
+    usage, excludes = found
+
+    return {'slug': slug_of(item['name']), 'kind': kind_of(usage), 'usage': usage, 'excludes': excludes,
+            'level': item['level'], 'price': item['price'], 'rarity': item['rarity'],
+            'traits': item['traits'], 'rules': []}
+
+
+def fundamentals(text, found, items, dropped):
+    """Each grade of each fundamental rune in the books, as `{weapon: {potency: {1: {...}}}}`, and the
+    joined names of the pack items they took."""
+    out = {}
+    taken = set()
+
+    for table, kind in FUNDAMENTALS:
+        for rune, grades in evaluated(without_functions(literal(text, table), dropped)).items():
+            for grade, data in sorted(grades.items(), key=lambda pair: int(pair[0])):
+                if not data:
+                    continue
+
+                named = found.get(data.get('name')) or titled(data.get('slug') or rune)
+                item = items.get(joined(named))
+
+                if not in_books(item):
+                    continue
+
+                taken.add(joined(named))
+                row = {'name': shown(item['name']), 'level': item['level'], 'price': item['price'],
+                       'rarity': item['rarity']}
+
+                for field, key in (('hardness', 'hardness'), ('maxHP', 'hp')):
+                    if data.get(field):
+                        row[key] = {'increase': data[field]['increase'], 'max': data[field]['max']}
+
+                out.setdefault(kind, {}).setdefault(rune, {})[int(grade)] = row
+
+    return out, taken
 
 
 def yaml_value(value, indent):
@@ -331,8 +515,13 @@ def rendered(entries):
     for name, entry in sorted(entries.items()):
         lines.append(f'  {name}:')
 
-        for field in ('slug', 'kind', 'level', 'price', 'rarity'):
-            lines.append(f'    {field}: {yaml_value(entry[field], 4)}')
+        for field in ('slug', 'kind', 'usage', 'level', 'price', 'rarity'):
+            if field in entry:
+                lines.append(f'    {field}: {yaml_value(entry[field], 4)}')
+
+        if entry.get('excludes'):
+            lines.append('    excludes:')
+            lines.extend(f'      - {yaml_value(one, 6)}' for one in entry['excludes'])
 
         lines.append('    traits:')
         lines.extend(f'      - {yaml_value(trait, 6)}' for trait in entry['traits'])
@@ -353,6 +542,23 @@ def rendered(entries):
     return '\n'.join(lines) + '\n'
 
 
+def rendered_fundamental(fundamental):
+    """The fundamental runes, a file of their own: every config file is one root key."""
+    lines = ['---', 'pf2e_fundamental_runes:']
+
+    for kind, runes in fundamental.items():
+        lines.append(f'  {kind}:')
+
+        for rune, grades in runes.items():
+            lines.append(f'    {rune}:')
+
+            for grade, row in sorted(grades.items()):
+                lines.append(f'      {grade}:')
+                lines.extend(f'        {field}: {yaml_value(value, 8)}' for field, value in row.items())
+
+    return '\n'.join(lines) + '\n'
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('checkout')
@@ -362,28 +568,66 @@ def main():
     text = source_text(args.checkout)
     found = wording.strings(args.checkout)
     wording.effect_ids(args.checkout)
+    items = pack_runes(args.checkout)
     dropped = collections.Counter()
     refused = collections.Counter()
     entries = {}
+    taken = set()
+    elsewhere = []
+    unpacked = []
 
     for name, kind in (('WEAPON_PROPERTY_RUNES', 'weapon'), ('ARMOR_PROPERTY_RUNES', 'armor')):
         table = evaluated(without_functions(literal(text, name), dropped))
 
         for slug, rune in table.items():
-            entries[titled(slug)] = entry_of(slug, rune, kind, refused, found)
+            item = items.get(joined(slug))
 
-    text = rendered(entries)
-    path = os.path.join(CONFIG, OUT)
+            if not item:
+                unpacked.append(titled(slug))
+                continue
+            if not in_books(item):
+                elsewhere.append(titled(slug))
+                continue
+
+            taken.add(joined(slug))
+            entry = entry_of(slug, rune, kind, refused, found, item)
+
+            if entry['usage']:
+                entries[titled(slug)] = entry
+
+    fundamental, graded = fundamentals(text, found, items, dropped)
+    taken |= graded
+    alone = []
+
+    for key, item in sorted(items.items()):
+        if key in taken or not in_books(item):
+            continue
+
+        entry = pack_entry(item, refused)
+
+        if entry:
+            entries[titled(entry['slug'])] = entry
+            alone.append(titled(entry['slug']))
+
+    written = {os.path.join(CONFIG, OUT): rendered(entries),
+               os.path.join(CONFIG, OUT_FUNDAMENTAL): rendered_fundamental(fundamental)}
 
     if args.write:
-        open(path, 'w', encoding='utf-8', newline='\n').write(text)
-        foundry_source.record(args.checkout, __file__, [path])
+        for path, body in written.items():
+            open(path, 'w', encoding='utf-8', newline='\n').write(body)
+
+        foundry_source.record(args.checkout, __file__, list(written))
 
     carrying = sum(1 for entry in entries.values() if entry['rules'])
     rows = sum(len(entry['rules']) for entry in entries.values())
 
     print('written' if args.write else 'dry run')
-    print(f'  {len(entries)} runes, {carrying} of them carrying {rows} rules')
+    print(f'  {len(entries)} property runes, {carrying} of them carrying {rows} rules')
+    print(f'  {sum(len(grades) for runes in fundamental.values() for grades in runes.values())} '
+          'fundamental rune grades')
+    print(f"\nfrom their packs alone, with no rules ({len(alone)}): {', '.join(alone)}")
+    print(f'\nleft out, from another book ({len(elsewhere)}): {", ".join(sorted(elsewhere))}')
+    print(f'\nleft out, with no pack item to give a book ({len(unpacked)}): {", ".join(sorted(unpacked))}')
     print('\nwhat a rune does that is not read:')
 
     for why, count in refused.most_common(10):

@@ -38,13 +38,18 @@ module AresMUSH
         nil
       end
 
-      # Broken at half its Hit Points, its Broken Threshold.
+      # Broken at half its Hit Points, its Broken Threshold. Hit Points and Hardness are read with the
+      # shield's reinforcing rune (`Pf2egear::ShieldRunes`).
       def self.broken?(shield)
-        shield.hp.to_i.positive? && shield.damage.to_i * 2 >= shield.hp.to_i
+        hp = Pf2egear::ShieldRunes.max_hp(shield)
+
+        hp.positive? && shield.damage.to_i * 2 >= hp
       end
 
       def self.destroyed?(shield)
-        shield.hp.to_i.positive? && shield.damage.to_i >= shield.hp.to_i
+        hp = Pf2egear::ShieldRunes.max_hp(shield)
+
+        hp.positive? && shield.damage.to_i >= hp
       end
 
       # Shield Paragon: a shield that would be destroyed goes to their deity's realm to be mended, and
@@ -98,7 +103,7 @@ module AresMUSH
         return Err.new(:nothing_to_block, 'pf2e.shield_block_no_hit') unless hit
         return Err.new(:too_late, 'pf2e.answer_too_late', 'action' => NAME) unless hit['after'] == AttackAnswers.standing(holder)
 
-        blocked = [ shield.hardness.to_i, hit['physical'].to_i ].min
+        blocked = [ Pf2egear::ShieldRunes.hardness(shield), hit['physical'].to_i ].min
         rest = hit['physical'].to_i - blocked
 
         Actors.of(holder).stand_at(hit['before']['damage'], hit['before']['temp_hp'])
@@ -111,7 +116,7 @@ module AresMUSH
         out['lines'] << Telling.event('pf2e.shield_blocked', :actor => scene.actor.label, :shield => name,
                                                             :blocked => blocked, :taken => hit['taken'].to_i - blocked,
                                                             :rest => rest)
-        if shield.hp.to_i.positive? && shield.damage.to_i >= shield.hp.to_i
+        if destroyed?(shield)
           out['lines'] << Telling.event('pf2e.shield_destroyed', :shield => name)
         elsif broken?(shield)
           out['lines'] << Telling.event('pf2e.shield_broken', :shield => name)

@@ -54,7 +54,7 @@ module AresMUSH
 
     describe "the catalogue" do
       it "should have been imported" do
-        expect(Global.read_config('pf2e_runes').size).to be > 100
+        expect(Global.read_config('pf2e_runes').size).to be > 50
       end
 
       it "should carry what a flaming rune does, in the rule vocabulary the rest of config uses" do
@@ -222,19 +222,19 @@ module AresMUSH
         expect(damage(sword)['critical']).to include 'd10'
       end
 
-      # Giant Killing's die is for a giant, which is a circumstance about the target and off until the
+      # Brilliant's spirit die is for a fiend, which is a circumstance about the target and off until the
       # player says otherwise.
       it "should hold a die back until the circumstance it names holds" do
-        sword = weapon(:runes => [ 'Giant Killing' ])
+        sword = weapon(:runes => [ 'Brilliant' ])
 
-        expect(damage(sword)['formula']).to_not include 'mental'
-        expect(damage(sword, [ 'target:trait:giant' ])['formula']).to include 'mental'
+        expect(damage(sword)['formula']).to_not include 'spirit'
+        expect(damage(sword, [ 'target:trait:fiend' ])['formula']).to include 'spirit'
       end
 
       it "should report the one it held back rather than hiding it" do
-        sword = weapon(:runes => [ 'Giant Killing' ])
+        sword = weapon(:runes => [ 'Brilliant' ])
 
-        expect(damage(sword)['conditional'].map { |row| row['source'] }).to include 'Giant Killing'
+        expect(damage(sword)['conditional'].map { |row| row['source'] }).to include 'Brilliant'
       end
     end
 

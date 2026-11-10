@@ -605,6 +605,20 @@ module AresMUSH
           expect(TurnState.turn(state)['reaction']).to be true
         end
 
+        # A minor reinforcing rune takes a steel shield's Hardness from 5 to 8.
+        it "should block with the Hardness its reinforcing rune gives it" do
+          @shield.update(:runes => { 'fundamental' => { 'reinforcing' => 1 } })
+          run(PF2EncounterActCmd, 'e/act raise a shield', @hero)
+          struck
+          taken = damage_taken
+          run(PF2EncounterActCmd, 'e/act shield block', @hero)
+
+          expect(@client.failures).to eq []
+          expect(taken).to be > 8
+          expect(damage_taken).to eq taken - 8
+          expect(PF2Shield[@shield.id].damage).to eq taken - 8
+        end
+
         it "should keep them up when what the shield takes leaves them hit points" do
           run(PF2EncounterActCmd, 'e/act raise a shield', @hero)
           Pf2eHP.get_hp_obj(state).update(:damage => Pf2eHP.get_max_hp(state) - 8)

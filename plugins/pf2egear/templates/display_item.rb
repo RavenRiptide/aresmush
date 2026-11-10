@@ -100,7 +100,7 @@ module AresMUSH
 
           # Other stuffs. 
           fmt_list << "%b#{left("#{item_color}AC Bonus:%xn #{@item.ac_bonus}", 26)}"
-          fmt_list << "%b#{left("#{item_color}Hardness:%xn #{@item.hardness}", 26)}%r"
+          fmt_list << "%b#{left("#{item_color}Hardness:%xn #{Pf2egear::ShieldRunes.hardness(@item)}", 26)}%r"
 
           # Does this shield have a weapon (e.g. boss or spikes) attached?
 
@@ -147,9 +147,12 @@ module AresMUSH
           list << "%b%b#{item_color}Bonuses:%xn #{modifier_summary}" if modifier_summary
 
           
-        elsif @category == ("shield" || "shields")
-          
-          return [ "%b%b#{t('pf2egear.shields_dont_have_magic')}" ]
+        elsif [ "shield", "shields" ].include?(@category)
+
+          # A shield takes a reinforcing rune and nothing else.
+          reinforcing = Pf2egear::ShieldRunes.name(@item) || "None."
+
+          return [ "%b%b#{item_color}Runes:%xn", "%b%b%b%b%xh%xwReinforcing:%xn #{reinforcing}" ]
 
         else
 
@@ -157,7 +160,7 @@ module AresMUSH
 
           unformatted_talismans = @item.talisman.nil? ? [] : @item.talisman
           unformatted_fundamental_runes = @item.runes["fundamental"].nil? ? {} : @item.runes["fundamental"]
-          unformatted_property_runes = @item.runes&.dig("property", "list") || []
+          unformatted_property_runes = Pf2egear.property_list(@item)
 
           talismans = format_talismans(unformatted_talismans)
           fund_runes = format_fund_runes(unformatted_fundamental_runes)

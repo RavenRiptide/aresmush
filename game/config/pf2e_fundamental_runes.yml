@@ -1,0 +1,112 @@
+---
+pf2e_fundamental_runes:
+  weapon:
+    potency:
+      1:
+        name: "+1 Weapon Potency"
+        level: 2
+        price: 3500
+        rarity: "common"
+      2:
+        name: "+2 Weapon Potency"
+        level: 10
+        price: 93500
+        rarity: "common"
+      3:
+        name: "+3 Weapon Potency"
+        level: 16
+        price: 893500
+        rarity: "common"
+    striking:
+      1:
+        name: "Striking"
+        level: 4
+        price: 6500
+        rarity: "common"
+      2:
+        name: "Greater Striking"
+        level: 12
+        price: 106500
+        rarity: "common"
+      3:
+        name: "Major Striking"
+        level: 19
+        price: 3106500
+        rarity: "common"
+  armor:
+    potency:
+      1:
+        name: "+1 Armor Potency"
+        level: 5
+        price: 16000
+        rarity: "common"
+      2:
+        name: "+2 Armor Potency"
+        level: 11
+        price: 106000
+        rarity: "common"
+      3:
+        name: "+3 Armor Potency"
+        level: 18
+        price: 2056000
+        rarity: "common"
+    resilient:
+      1:
+        name: "Resilient"
+        level: 8
+        price: 34000
+        rarity: "common"
+      2:
+        name: "Greater Resilient"
+        level: 14
+        price: 344000
+        rarity: "common"
+      3:
+        name: "Major Resilient"
+        level: 20
+        price: 4944000
+        rarity: "common"
+  shield:
+    reinforcing:
+      1:
+        name: "Minor Reinforcing"
+        level: 4
+        price: 7500
+        rarity: "common"
+        hardness: {"increase": 3, "max": 8}
+        hp: {"increase": 44, "max": 64}
+      2:
+        name: "Lesser Reinforcing"
+        level: 7
+        price: 30000
+        rarity: "common"
+        hardness: {"increase": 3, "max": 10}
+        hp: {"increase": 52, "max": 80}
+      3:
+        name: "Moderate Reinforcing"
+        level: 10
+        price: 90000
+        rarity: "common"
+        hardness: {"increase": 3, "max": 13}
+        hp: {"increase": 64, "max": 104}
+      4:
+        name: "Greater Reinforcing"
+        level: 13
+        price: 250000
+        rarity: "common"
+        hardness: {"increase": 5, "max": 15}
+        hp: {"increase": 80, "max": 120}
+      5:
+        name: "Major Reinforcing"
+        level: 16
+        price: 800000
+        rarity: "common"
+        hardness: {"increase": 5, "max": 17}
+        hp: {"increase": 84, "max": 136}
+      6:
+        name: "Supreme Reinforcing"
+        level: 19
+        price: 3200000
+        rarity: "common"
+        hardness: {"increase": 7, "max": 20}
+        hp: {"increase": 108, "max": 160}

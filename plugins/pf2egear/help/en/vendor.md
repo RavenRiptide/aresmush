@@ -40,6 +40,16 @@ Emblem of Ea's inventory system allows characters to buy and sell items from and
 %t **Note:** A scroll or wand can contain a common spell that isn't a cantrip, focus spell, or ritual. To buy a scroll or wand of an uncommon or rare spell, put in a request with RPP and money, even if the spell is unlocked for you.
 %t **Note:** Find spells with `spell/search`. To cast from a scroll or wand, see `help encounter_gear`.
 
+## Runes
+
+`browse rune`: Lists the fundamental runes at every grade, and the property runes you can buy, with any items they're limited to.
+`buy/rune <category>/<item number>=<rune>`: Buys a rune and etches it onto one of your weapons, armor, or shields, such as `buy/rune weapons/0=+1 Weapon Potency`, `buy/rune weapons/0=Flaming`, or `buy/rune shields/0=Minor Reinforcing`. Find the item number with `gear`.
+%t **Note:** Raising a rune the item already has, such as +1 to +2 potency or *flaming* to *greater flaming*, costs the difference between the two prices.
+%t **Note:** An *energy-resistant* rune needs a damage type: acid, cold, electricity, or fire. Add it in parentheses, such as `buy/rune armor/0=Energy Resistant (Fire)`.
+%t **Note:** The vendor refuses a rune that doesn't fit the item, and says why. A specific magic weapon or armor, such as a *searing blade*, can't gain property runes, but you can raise its fundamental runes.
+%t **Note:** A rune's price is added to the item's, so selling the item returns half of what you paid for its runes.
+%t **Note:** To move a rune to another item, put in a request. Staff etch it and handle the money. To buy an uncommon or rare rune, or one above your level, put in a request with RPP and money.
+
 Weapons, armor, magic items, and shields will only permit you to buy or sell one at a time, and you must specify items in these categories by number, not by name.
 
 A few things to be aware of:

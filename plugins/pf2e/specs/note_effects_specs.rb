@@ -209,9 +209,26 @@ module AresMUSH
       end
 
       # A property rune's words come with its own weapon's roll, and no other's.
+      #
+      # No rune in the books the catalogue takes links an effect from its note, so the rune here is the
+      # one the catalogue held before it was cut to those books: crushing, as it was imported.
       describe "a property rune's note" do
         let(:weapon) { double('weapon', :id => 77, :wp_damage => '1d8') }
         let(:source) { Effects.rune_source(weapon, 'crushing') }
+
+        let(:crushing) do
+          { 'slug' => 'crushing', 'kind' => 'weapon', 'level' => 3, 'rarity' => 'uncommon', 'traits' => [ 'magical' ],
+            'rules' => [ { 'key' => 'Note', 'selector' => '{item|id}-damage', 'slug' => 'crushing',
+                           'outcome' => [ 'criticalSuccess' ], 'title' => 'Crushing',
+                           'text' => 'When you critically hit a target with this weapon, your target becomes Clumsy 1 ' \
+                                     'and Enfeebled 1 until the end of your next turn. Effect: Crushing',
+                           'effects' => [ 'Effect: Crushing' ] } ] }
+        end
+
+        before(:each) do
+          allow(Pf2egear).to receive(:rune_entry).with('crushing').and_return(crushing)
+          allow(Pf2egear).to receive(:rune_named).with('crushing').and_return('Crushing')
+        end
 
         it "should show with its weapon's damage on a critical hit, linking its effect" do
           notes = Rules.notes([ source ], [ '77-damage' ], [])
@@ -227,7 +244,7 @@ module AresMUSH
         end
 
         # Raven's review of #9: an ordinary Longsword hit told Crushing's note and put Effect: Crushing on
-        # the goblin. 42 of the 53 rune notes are for critical hits only.
+        # the goblin. Most rune notes are for critical hits only.
         describe "on a Strike" do
           let(:actor) { double('actor', :holder => double('Character', :id => 1, :pf2_level => 4, :pf2_traits => [ 'human' ]), :label => 'Aria') }
           let(:target) { double('target', :holder => double('Character', :id => 2), :label => 'Goblin Warrior #2') }

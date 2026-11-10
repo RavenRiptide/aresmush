@@ -25,6 +25,7 @@ module AresMUSH
       when "browse"
         return PF2BrowseGearCmd
       when "buy"
+        return PF2BuyRuneCmd if cmd.switch == "rune"
         return PF2BuyCmd
       when "sell"
         return PF2SellCmd
@@ -84,6 +85,8 @@ module AresMUSH
             return PF2EtchPowerCmd
           when "property"
             return PF2EtchPropertyCmd
+          when "reinforcing"
+            return PF2EtchReinforcingCmd
           end
       end
     end

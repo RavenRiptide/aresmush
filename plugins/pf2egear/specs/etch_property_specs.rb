@@ -103,7 +103,7 @@ module AresMUSH
       end
 
       it "should refuse an armour rune on a weapon" do
-        etch 'Glamered'
+        etch 'Slick'
 
         expect(@client.failures).to_not eq []
         expect(etched).to eq []
@@ -132,6 +132,39 @@ module AresMUSH
         etch 'Flaming'
         @sword.update(:runes => @sword.runes.merge('fundamental' => { 'potency' => 0 }))
         etch 'Flaming'
+
+        expect(etched).to eq []
+      end
+
+      # The fit is the vendor's too (`RuneFit`), so a staff etch can't put on what the vendor would refuse.
+      it "should refuse a rune the item isn't the kind it's etched onto" do
+        etch 'Returning'
+
+        expect(@client.failures.join).to include 'a thrown weapon'
+        expect(etched).to eq []
+      end
+
+      it "should put a stronger rune in place of a weaker one of its family" do
+        etch 'Flaming'
+        etch 'Greater Flaming'
+
+        expect(@client.failures).to eq []
+        expect(etched).to eq [ 'Greater Flaming' ]
+        expect(@client.successes.last).to include 'replacing Flaming'
+      end
+
+      # A rune the catalogue no longer has can still be taken off, by the name it was etched with.
+      it "should take off a rune the catalogue no longer has" do
+        @sword.update(:runes => @sword.runes.merge('property' => { 'list' => [ 'Speed' ] }))
+        etch 'Speed'
+
+        expect(@client.failures).to eq []
+        expect(etched).to eq []
+      end
+
+      it "should take off a rune spelled the pack's way by the catalogue's name" do
+        @sword.update(:runes => @sword.runes.merge('property' => { 'list' => [ 'Flaming (Greater)' ] }))
+        etch 'Greater Flaming'
 
         expect(etched).to eq []
       end

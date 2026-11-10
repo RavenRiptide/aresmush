@@ -58,7 +58,7 @@ STEPS = [
      'whole': lambda: [os.path.join(CONFIG, 'pf2e_actions.yml')]},
     {'name': 'consumables', 'script': 'import_foundry_consumables.py', 'whole': lambda: []},
     {'name': 'runes', 'script': 'import_foundry_runes.py',
-     'whole': lambda: [os.path.join(CONFIG, 'pf2e_runes.yml')]},
+     'whole': lambda: [os.path.join(CONFIG, 'pf2e_runes.yml'), os.path.join(CONFIG, 'pf2e_fundamental_runes.yml')]},
     {'name': 'rules', 'script': 'import_foundry_rules.py',
      'whole': lambda: [os.path.join(CONFIG, 'pf2e_class_features.yml')]},
     {'name': 'spells', 'script': 'import_foundry_spells.py',

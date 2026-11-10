@@ -1,94 +1,27 @@
 ---
 pf2e_runes:
-  Acid Resistant:
-    slug: "acidResistant"
-    kind: "armor"
-    level: 8
-    price: 42000
-    rarity: "common"
-    traits:
-      - "magical"
-  Advancing:
-    slug: "advancing"
-    kind: "armor"
-    level: 9
-    price: 62500
-    rarity: "common"
-    traits:
-      - "magical"
-  Aim Aiding:
-    slug: "aimAiding"
-    kind: "armor"
-    level: 6
-    price: 22500
-    rarity: "common"
-    traits:
-      - "magical"
-  Ancestral Echoing:
-    slug: "ancestralEchoing"
+  Animated:
+    slug: "animated"
     kind: "weapon"
-    level: 15
-    price: 950000
-    rarity: "rare"
-    traits:
-      - "dwarf"
-      - "magical"
-      - "saggorak"
-  Anchoring:
-    slug: "anchoring"
-    kind: "weapon"
-    level: 10
-    price: 90000
+    usage: "melee-weapon"
+    level: 13
+    price: 270000
     rarity: "uncommon"
     traits:
       - "magical"
-    rules:
-      - key: "Note"
-        selector: "{item|id}-damage"
-        slug: "anchoring"
-        outcome: ["criticalSuccess"]
-        title: "Anchoring"
-        text: "If you critically hit a target with an anchoring weapon, the weapon casts Dimensional Anchor on the target (DC 27 Will, counteract modifier +17)."
   Antimagic:
     slug: "antimagic"
     kind: "armor"
+    usage: "armor"
     level: 15
     price: 650000
     rarity: "uncommon"
     traits:
       - "magical"
-  Ashen:
-    slug: "ashen"
-    kind: "weapon"
-    level: 9
-    price: 70000
-    rarity: "common"
-    traits:
-      - "magical"
-    rules:
-      - key: "DamageDice"
-        selector: "{item|id}-damage"
-        slug: "ashen"
-        diceNumber: 1
-        dieSize: "d4"
-        damageType: "fire"
-        category: "persistent"
-      - key: "Note"
-        selector: "{item|id}-damage"
-        slug: "ashen"
-        title: "Ashen"
-        text: "This ash clouds the senses, causing the creature to become Confused for 1 round unless it succeeds at a DC 25 Will save."
-  Assisting:
-    slug: "assisting"
-    kind: "armor"
-    level: 5
-    price: 12500
-    rarity: "common"
-    traits:
-      - "magical"
   Astral:
     slug: "astral"
     kind: "weapon"
+    usage: "weapon"
     level: 8
     price: 45000
     rarity: "common"
@@ -102,66 +35,10 @@ pf2e_runes:
         diceNumber: 1
         dieSize: "d6"
         damageType: "spirit"
-  Authorized:
-    slug: "authorized"
-    kind: "weapon"
-    level: 3
-    price: 5000
-    rarity: "common"
-    traits:
-      - "magical"
-  Bane:
-    slug: "bane"
-    kind: "weapon"
-    level: 4
-    price: 10000
-    rarity: "uncommon"
-    traits:
-      - "magical"
-  Bitter:
-    slug: "bitter"
-    kind: "armor"
-    level: 9
-    price: 13500
-    rarity: "uncommon"
-    traits:
-      - "magical"
-      - "poison"
-  Bloodbane:
-    slug: "bloodbane"
-    kind: "weapon"
-    level: 8
-    price: 47500
-    rarity: "uncommon"
-    traits:
-      - "dwarf"
-      - "magical"
-  Bloodthirsty:
-    slug: "bloodthirsty"
-    kind: "weapon"
-    level: 16
-    price: 850000
-    rarity: "uncommon"
-    traits:
-      - "magical"
-    rules:
-      - key: "Note"
-        selector: "{item|id}-damage"
-        slug: "bloodthirsty"
-        outcome: ["criticalSuccess"]
-        title: "Bloodbane"
-        text: "When you critically hit a target that's taking Persistent Bleed Damage, your target becomes Drained 1."
-  Bolkas Blessing:
-    slug: "bolkasBlessing"
-    kind: "weapon"
-    level: 5
-    price: 16000
-    rarity: "uncommon"
-    traits:
-      - "divine"
   Brilliant:
     slug: "brilliant"
     kind: "weapon"
+    usage: "weapon"
     level: 12
     price: 200000
     rarity: "common"
@@ -194,50 +71,10 @@ pf2e_runes:
         outcome: ["criticalSuccess"]
         title: "Brilliant"
         text: "On a critical hit, the target must succeed at a DC 29 Fortitude save or be Blinded for 1 round."
-  Called:
-    slug: "called"
-    kind: "weapon"
-    level: 7
-    price: 35000
-    rarity: "common"
-    traits:
-      - "magical"
-  Coating:
-    slug: "coating"
-    kind: "weapon"
-    level: 9
-    price: 70000
-    rarity: "common"
-    traits:
-      - "extradimensional"
-      - "magical"
-  Cold Resistant:
-    slug: "coldResistant"
-    kind: "armor"
-    level: 8
-    price: 42000
-    rarity: "common"
-    traits:
-      - "magical"
-  Conducting:
-    slug: "conducting"
-    kind: "weapon"
-    level: 7
-    price: 30000
-    rarity: "common"
-    traits:
-      - "magical"
-  Convincing:
-    slug: "convincing"
-    kind: "armor"
-    level: 5
-    price: 4500
-    rarity: "common"
-    traits:
-      - "magical"
   Corrosive:
     slug: "corrosive"
     kind: "weapon"
+    usage: "weapon"
     level: 8
     price: 50000
     rarity: "common"
@@ -257,75 +94,10 @@ pf2e_runes:
         outcome: ["criticalSuccess"]
         title: "Corrosive"
         text: "On a critical hit, the target's armor (if any) takes 3d6 acid damage (before applying Hardness); if the target has a shield raised, the shield takes this damage instead."
-  Crushing:
-    slug: "crushing"
-    kind: "weapon"
-    level: 3
-    price: 5000
-    rarity: "uncommon"
-    traits:
-      - "magical"
-    rules:
-      - key: "Note"
-        selector: "{item|id}-damage"
-        slug: "crushing"
-        outcome: ["criticalSuccess"]
-        title: "Crushing"
-        text: "When you critically hit a target with this weapon, your target becomes Clumsy 1 and Enfeebled 1 until the end of your next turn. Effect: Crushing"
-        effects: ["Effect: Crushing"]
-  Cunning:
-    slug: "cunning"
-    kind: "weapon"
-    level: 5
-    price: 14000
-    rarity: "common"
-    traits:
-      - "magical"
-  Dancing:
-    slug: "dancing"
-    kind: "weapon"
-    level: 13
-    price: 270000
-    rarity: "uncommon"
-    traits:
-      - "magical"
-  Deathdrinking:
-    slug: "deathdrinking"
-    kind: "weapon"
-    level: 7
-    price: 36000
-    rarity: "rare"
-    traits:
-      - "magical"
-    rules:
-      - key: "DamageDice"
-        selector: "{item|id}-damage"
-        slug: "deathdrinking"
-        diceNumber: 1
-        dieSize: "d6"
-        damageType: "void"
-        critical: true
-        predicate: ["target:mode:living", {"not": "target:negative-healing"}]
-      - key: "DamageDice"
-        selector: "{item|id}-damage"
-        slug: "deathdrinking"
-        diceNumber: 1
-        dieSize: "d6"
-        damageType: "vitality"
-        critical: true
-        predicate: ["target:negative-healing"]
-  Deathless:
-    slug: "deathless"
-    kind: "armor"
-    level: 7
-    price: 33000
-    rarity: "uncommon"
-    traits:
-      - "healing"
-      - "magical"
   Decaying:
     slug: "decaying"
     kind: "weapon"
+    usage: "weapon"
     level: 8
     price: 50000
     rarity: "common"
@@ -348,122 +120,28 @@ pf2e_runes:
         damageType: "void"
         category: "persistent"
         critical: true
-  Deflecting:
-    slug: "deflecting"
-    kind: "weapon"
-    level: 6
-    price: 23000
-    rarity: "common"
-    traits:
-      - "magical"
-  Demolishing:
-    slug: "demolishing"
-    kind: "weapon"
-    level: 6
-    price: 22500
-    rarity: "rare"
-    traits:
-      - "magical"
-    rules:
-      - key: "DamageDice"
-        selector: "{item|id}-damage"
-        slug: "demolishing"
-        diceNumber: 1
-        dieSize: "d6"
-        damageType: "force"
-        category: "persistent"
-        predicate: ["target:trait:construct"]
-  Disrupting:
-    slug: "disrupting"
-    kind: "weapon"
-    level: 5
-    price: 15000
-    rarity: "common"
-    traits:
-      - "magical"
-    rules:
-      - key: "DamageDice"
-        selector: "{item|id}-damage"
-        slug: "disrupting"
-        diceNumber: 1
-        dieSize: "d6"
-        damageType: "vitality"
-        category: "persistent"
-        predicate: ["target:negative-healing"]
-      - key: "Note"
-        selector: "{item|id}-damage"
-        slug: "disrupting"
-        outcome: ["criticalSuccess"]
-        predicate: ["target:negative-healing"]
-        title: "Vitalizing"
-        text: "On a critical hit, the undead is also Enfeebled 1 until the end of your next turn."
-  Earthbinding:
-    slug: "earthbinding"
-    kind: "weapon"
-    level: 5
-    price: 12500
-    rarity: "common"
-    traits:
-      - "magical"
-  Electricity Resistant:
-    slug: "electricityResistant"
+  Energy Resistant:
+    slug: "energyResistant"
     kind: "armor"
+    usage: "armor"
     level: 8
     price: 42000
-    rarity: "common"
-    traits:
-      - "magical"
-  Energizing:
-    slug: "energizing"
-    kind: "weapon"
-    level: 6
-    price: 25000
-    rarity: "uncommon"
-    traits:
-      - "magical"
-  Energy Adaptive:
-    slug: "energyAdaptive"
-    kind: "armor"
-    level: 13
-    price: 260000
-    rarity: "common"
-    traits:
-      - "magical"
-  Energy Vulnerability:
-    slug: "energyVulnerability"
-    kind: "weapon"
-    level: 4
-    price: 9000
-    rarity: "common"
-    traits:
-      - "magical"
-  Ethereal:
-    slug: "ethereal"
-    kind: "armor"
-    level: 17
-    price: 1350000
     rarity: "common"
     traits:
       - "magical"
   Extending:
     slug: "extending"
     kind: "weapon"
+    usage: "melee-weapon"
     level: 9
     price: 70000
     rarity: "common"
     traits:
       - "magical"
-  Fanged:
-    slug: "fanged"
-    kind: "weapon"
-    level: 2
-    price: 3000
-    rarity: "uncommon"
-    traits:
-      - "magical"
   Fearsome:
     slug: "fearsome"
     kind: "weapon"
+    usage: "weapon"
     level: 5
     price: 16000
     rarity: "common"
@@ -479,17 +157,10 @@ pf2e_runes:
         outcome: ["criticalSuccess"]
         title: "Fearsome"
         text: "When you critically hit with this weapon, the target becomes Frightened 1."
-  Fire Resistant:
-    slug: "fireResistant"
-    kind: "armor"
-    level: 8
-    price: 42000
-    rarity: "common"
-    traits:
-      - "magical"
   Flaming:
     slug: "flaming"
     kind: "weapon"
+    usage: "weapon"
     level: 8
     price: 50000
     rarity: "common"
@@ -511,33 +182,20 @@ pf2e_runes:
         damageType: "fire"
         category: "persistent"
         critical: true
-  Flickering:
-    slug: "flickering"
-    kind: "weapon"
-    level: 6
-    price: 25000
-    rarity: "uncommon"
+  Forgefathers Seal:
+    slug: "forgefathersSeal"
+    kind: "armor"
+    usage: "armor"
+    level: 24
+    price: 0
+    rarity: "rare"
     traits:
-      - "illusion"
-      - "magical"
-    rules:
-      - key: "Note"
-        selector: "{item|id}-damage"
-        slug: "flickering"
-        outcome: ["criticalSuccess"]
-        title: "Flickering"
-        text: "On a critical hit, the weapon flashes bright pulses of color into the creature's eyes, Dazzling the creature for 1 round (this effect has the visual trait)."
-  Flurrying:
-    slug: "flurrying"
-    kind: "weapon"
-    level: 7
-    price: 36000
-    rarity: "common"
-    traits:
-      - "magical"
+      - "artifact"
+      - "divine"
   Fortification:
     slug: "fortification"
     kind: "armor"
+    usage: "medium-or-heavy-armor"
     level: 12
     price: 200000
     rarity: "common"
@@ -546,6 +204,7 @@ pf2e_runes:
   Frost:
     slug: "frost"
     kind: "weapon"
+    usage: "weapon"
     level: 8
     price: 50000
     rarity: "common"
@@ -568,112 +227,16 @@ pf2e_runes:
   Ghost Touch:
     slug: "ghostTouch"
     kind: "weapon"
+    usage: "weapon"
     level: 4
     price: 7500
     rarity: "common"
     traits:
       - "magical"
-  Giant Killing:
-    slug: "giantKilling"
-    kind: "weapon"
-    level: 8
-    price: 45000
-    rarity: "rare"
-    traits:
-      - "magical"
-    rules:
-      - key: "DamageDice"
-        selector: "{item|id}-damage"
-        slug: "giantKilling"
-        diceNumber: 1
-        dieSize: "d6"
-        damageType: "mental"
-        predicate: ["target:trait:giant"]
-      - key: "Note"
-        selector: "{item|id}-damage"
-        slug: "giantKilling"
-        outcome: ["criticalSuccess"]
-        predicate: ["target:trait:giant"]
-        title: "Giant-Killing"
-        text: "On a critical hit with this weapon, the giant is also Enfeebled 1 until the end of your next turn."
-  Glamered:
-    slug: "glamered"
-    kind: "armor"
-    level: 5
-    price: 14000
-    rarity: "common"
-    traits:
-      - "illusion"
-      - "magical"
-  Gliding:
-    slug: "gliding"
-    kind: "armor"
-    level: 8
-    price: 45000
-    rarity: "common"
-    traits:
-      - "magical"
-  Greater Acid Resistant:
-    slug: "greaterAcidResistant"
-    kind: "armor"
-    level: 12
-    price: 165000
-    rarity: "common"
-    traits:
-      - "magical"
-  Greater Advancing:
-    slug: "greaterAdvancing"
-    kind: "armor"
-    level: 16
-    price: 800000
-    rarity: "common"
-    traits:
-      - "magical"
-  Greater Anchoring:
-    slug: "greaterAnchoring"
-    kind: "weapon"
-    level: 18
-    price: 2200000
-    rarity: "uncommon"
-    traits:
-      - "magical"
-    rules:
-      - key: "Note"
-        selector: "{item|id}-damage"
-        slug: "greaterAnchoring"
-        outcome: ["criticalSuccess"]
-        title: "Greater Anchoring"
-        text: "When you critically hit a target with a weapon with the anchoring rune, the weapon casts 8th-rank Dimensional Anchor on the target (DC 38 Will, counteract modifier +28), except that if the target critically succeeds at its Will save, instead of having no effect, the dimensional anchor lasts for 1 round."
-      - key: "Note"
-        selector: "{item|id}-damage"
-        slug: "greaterAnchoring"
-        outcome: ["success"]
-        title: "Greater Anchoring"
-        text: "When you hit a target with the weapon but don't critically hit, the target is affected by 4th-rank Dimensional Anchor for 1 round without a save (counteract modifier +28)."
-  Greater Ashen:
-    slug: "greaterAshen"
-    kind: "weapon"
-    level: 16
-    price: 900000
-    rarity: "common"
-    traits:
-      - "magical"
-    rules:
-      - key: "DamageDice"
-        selector: "{item|id}-damage"
-        slug: "greaterAshen"
-        diceNumber: 1
-        dieSize: "d8"
-        damageType: "fire"
-        category: "persistent"
-      - key: "Note"
-        selector: "{item|id}-damage"
-        slug: "greaterAshen"
-        title: "Greater Ashen"
-        text: "This ash clouds the senses, causing the creature to become Confused for 1 round unless it succeeds at a DC 35 Will save. On a critical failure, the effect lasts for 1 minute."
   Greater Astral:
     slug: "greaterAstral"
     kind: "weapon"
+    usage: "weapon"
     level: 15
     price: 600000
     rarity: "common"
@@ -687,26 +250,10 @@ pf2e_runes:
         diceNumber: 1
         dieSize: "d6"
         damageType: "spirit"
-  Greater Bloodbane:
-    slug: "greaterBloodbane"
-    kind: "weapon"
-    level: 13
-    price: 280000
-    rarity: "uncommon"
-    traits:
-      - "dwarf"
-      - "magical"
-  Greater Bolkas Blessing:
-    slug: "greaterBolkasBlessing"
-    kind: "weapon"
-    level: 11
-    price: 140000
-    rarity: "uncommon"
-    traits:
-      - "divine"
   Greater Brilliant:
     slug: "greaterBrilliant"
     kind: "weapon"
+    usage: "weapon"
     level: 18
     price: 2400000
     rarity: "common"
@@ -745,25 +292,10 @@ pf2e_runes:
         outcome: ["success"]
         title: "Greater Brilliant"
         text: "Damage dealt by this weapon ignores the target's resistances to fire, spirit, and vitality."
-  Greater Cold Resistant:
-    slug: "greaterColdResistant"
-    kind: "armor"
-    level: 12
-    price: 165000
-    rarity: "common"
-    traits:
-      - "magical"
-  Greater Convincing:
-    slug: "greaterConvincing"
-    kind: "armor"
-    level: 8
-    price: 45000
-    rarity: "common"
-    traits:
-      - "magical"
   Greater Corrosive:
     slug: "greaterCorrosive"
     kind: "weapon"
+    usage: "weapon"
     level: 15
     price: 650000
     rarity: "common"
@@ -789,25 +321,10 @@ pf2e_runes:
         outcome: ["success"]
         title: "Greater Corrosive"
         text: "The acid damage dealt by this weapon ignores the target's acid resistance."
-  Greater Crushing:
-    slug: "greaterCrushing"
-    kind: "weapon"
-    level: 9
-    price: 65000
-    rarity: "uncommon"
-    traits:
-      - "magical"
-    rules:
-      - key: "Note"
-        selector: "{item|id}-damage"
-        slug: "greaterCrushing"
-        outcome: ["criticalSuccess"]
-        title: "Greater Crushing"
-        text: "Your critical hits leave the target Clumsy 2 and Enfeebled 2 until the end of your next turn. Effect: Crushing (Greater)"
-        effects: ["Effect: Crushing (Greater)"]
   Greater Decaying:
     slug: "greaterDecaying"
     kind: "weapon"
+    usage: "weapon"
     level: 15
     price: 650000
     rarity: "common"
@@ -830,77 +347,28 @@ pf2e_runes:
         damageType: "void"
         category: "persistent"
         critical: true
-  Greater Disrupting:
-    slug: "greaterDisrupting"
-    kind: "weapon"
-    level: 14
-    price: 430000
-    rarity: "uncommon"
-    traits:
-      - "magical"
-    rules:
-      - key: "DamageDice"
-        selector: "{item|id}-damage"
-        slug: "greaterDisrupting"
-        diceNumber: 2
-        dieSize: "d6"
-        damageType: "vitality"
-        category: "persistent"
-        predicate: ["target:negative-healing"]
-      - key: "Note"
-        selector: "{item|id}-damage"
-        slug: "greaterDisrupting"
-        outcome: ["criticalSuccess"]
-        predicate: ["target:negative-healing"]
-        title: "Greater Vitalizing"
-        text: "On a critical hit, the undead creature is Enfeebled 1 and Stupefied 1 as long as it has the persistent damage from this rune."
-  Greater Dread:
-    slug: "greaterDread"
+  Greater Energy Resistant:
+    slug: "greaterEnergyResistant"
     kind: "armor"
-    level: 18
-    price: 2100000
-    rarity: "uncommon"
-    traits:
-      - "emotion"
-      - "fear"
-      - "magical"
-      - "mental"
-      - "visual"
-  Greater Electricity Resistant:
-    slug: "greaterElectricityResistant"
-    kind: "armor"
+    usage: "armor"
     level: 12
     price: 165000
-    rarity: "common"
-    traits:
-      - "magical"
-  Greater Energy Vulnerability:
-    slug: "greaterEnergyVulnerability"
-    kind: "weapon"
-    level: 16
-    price: 900000
     rarity: "common"
     traits:
       - "magical"
   Greater Extending:
     slug: "greaterExtending"
     kind: "weapon"
+    usage: "melee-weapon"
     level: 13
     price: 300000
     rarity: "common"
     traits:
       - "magical"
-  Greater Fanged:
-    slug: "greaterFanged"
-    kind: "weapon"
-    level: 8
-    price: 42500
-    rarity: "uncommon"
-    traits:
-      - "magical"
   Greater Fearsome:
     slug: "greaterFearsome"
     kind: "weapon"
+    usage: "weapon"
     level: 12
     price: 200000
     rarity: "common"
@@ -916,17 +384,10 @@ pf2e_runes:
         outcome: ["criticalSuccess"]
         title: "Greater Fearsome"
         text: "When you critically hit with this weapon, the target becomes Frightened 2."
-  Greater Fire Resistant:
-    slug: "greaterFireResistant"
-    kind: "armor"
-    level: 12
-    price: 165000
-    rarity: "common"
-    traits:
-      - "magical"
   Greater Flaming:
     slug: "greaterFlaming"
     kind: "weapon"
+    usage: "weapon"
     level: 15
     price: 650000
     rarity: "common"
@@ -951,7 +412,8 @@ pf2e_runes:
   Greater Fortification:
     slug: "greaterFortification"
     kind: "armor"
-    level: 19
+    usage: "medium-or-heavy-armor"
+    level: 18
     price: 2400000
     rarity: "common"
     traits:
@@ -959,6 +421,7 @@ pf2e_runes:
   Greater Frost:
     slug: "greaterFrost"
     kind: "weapon"
+    usage: "weapon"
     level: 15
     price: 650000
     rarity: "common"
@@ -984,120 +447,29 @@ pf2e_runes:
         outcome: ["success"]
         title: "Greater Frost"
         text: "Cold damage dealt by this weapon ignores the target's cold resistance."
-  Greater Giant Killing:
-    slug: "greaterGiantKilling"
-    kind: "weapon"
-    level: 15
-    price: 600000
-    rarity: "rare"
-    traits:
-      - "magical"
-    rules:
-      - key: "DamageDice"
-        selector: "{item|id}-damage"
-        slug: "greaterGiantKilling"
-        diceNumber: 2
-        dieSize: "d6"
-        damageType: "mental"
-        predicate: ["target:trait:giant"]
-      - key: "Note"
-        selector: "{item|id}-damage"
-        slug: "greaterGiantKilling"
-        outcome: ["criticalSuccess"]
-        predicate: ["target:trait:giant"]
-        title: "Greater Giant-Killing"
-        text: "On a critical hit with this weapon, the giant must attempt a DC 34 Fortitude with the following effects.%rCritical Success The giant is Enfeebled 1 until the end of your next turn.%rSuccess The giant is Enfeebled 2 until the end of your next turn and takes 1d10 mental.%rFailure The giant is Enfeebled 2 for the next minute and takes 2d10 mental.%rCritical Failure The giant is Enfeebled 4 for the next minute and takes 4d10 mental."
-  Greater Hauling:
-    slug: "greaterHauling"
-    kind: "weapon"
-    level: 11
-    price: 130000
-    rarity: "uncommon"
-    traits:
-      - "magical"
-  Greater Impactful:
-    slug: "greaterImpactful"
-    kind: "weapon"
-    level: 17
-    price: 1500000
-    rarity: "common"
-    traits:
-      - "force"
-      - "magical"
-    rules:
-      - key: "DamageDice"
-        selector: "{item|id}-damage"
-        slug: "greaterImpactful"
-        diceNumber: 1
-        dieSize: "d6"
-        damageType: "force"
-      - key: "Note"
-        selector: "{item|id}-damage"
-        slug: "greaterImpactful"
-        outcome: ["criticalSuccess"]
-        title: "Greater Impactful"
-        text: "On a critical hit, you can choose to force the target to succeed at a DC 37 Fortitude save or be pushed 10 feet away from you."
   Greater Invisibility:
     slug: "greaterInvisibility"
     kind: "armor"
+    usage: "light-armor"
     level: 10
     price: 100000
     rarity: "common"
     traits:
       - "illusion"
       - "magical"
-  Greater Kolss Oath:
-    slug: "greaterKolssOath"
-    kind: "weapon"
-    level: 11
-    price: 140000
-    rarity: "uncommon"
-    traits:
-      - "divine"
-  Greater Moonweave:
-    slug: "greaterMoonweave"
-    kind: "armor"
-    level: 13
-    price: 300000
-    rarity: "common"
-    traits:
-      - "magical"
-  Greater Quenching:
-    slug: "greaterQuenching"
-    kind: "armor"
-    level: 10
-    price: 100000
-    rarity: "common"
-    traits:
-      - "magical"
   Greater Ready:
     slug: "greaterReady"
     kind: "armor"
+    usage: "armor"
     level: 11
     price: 120000
     rarity: "common"
     traits:
       - "magical"
-  Greater Rooting:
-    slug: "greaterRooting"
-    kind: "weapon"
-    level: 11
-    price: 140000
-    rarity: "common"
-    traits:
-      - "plant"
-      - "magical"
-      - "wood"
-    rules:
-      - key: "Note"
-        selector: "{item|id}-damage"
-        slug: "greaterRooting"
-        outcome: ["criticalSuccess"]
-        title: "Greater Rooting"
-        text: "When you critically hit a target with this weapon, roots grow from the target. It's immobilized for 1 round (escape dc=28) and Clumsy 1 for as long as the immobilization lasts."
   Greater Shadow:
     slug: "greaterShadow"
     kind: "armor"
+    usage: "light-or-medium-nonmetal-armor"
     level: 9
     price: 65000
     rarity: "common"
@@ -1106,6 +478,7 @@ pf2e_runes:
   Greater Shock:
     slug: "greaterShock"
     kind: "weapon"
+    usage: "weapon"
     level: 15
     price: 650000
     rarity: "common"
@@ -1134,38 +507,16 @@ pf2e_runes:
   Greater Slick:
     slug: "greaterSlick"
     kind: "armor"
+    usage: "armor"
     level: 8
     price: 45000
-    rarity: "common"
-    traits:
-      - "magical"
-  Greater Stanching:
-    slug: "greaterStanching"
-    kind: "armor"
-    level: 9
-    price: 60000
-    rarity: "uncommon"
-    traits:
-      - "magical"
-  Greater Sunweave:
-    slug: "greaterSunweave"
-    kind: "armor"
-    level: 11
-    price: 120000
-    rarity: "common"
-    traits:
-      - "magical"
-  Greater Swallow Spike:
-    slug: "greaterSwallowSpike"
-    kind: "armor"
-    level: 12
-    price: 175000
     rarity: "common"
     traits:
       - "magical"
   Greater Thundering:
     slug: "greaterThundering"
     kind: "weapon"
+    usage: "weapon"
     level: 15
     price: 650000
     rarity: "common"
@@ -1191,17 +542,19 @@ pf2e_runes:
         outcome: ["success"]
         title: "Greater Thundering"
         text: "Sonic damage dealt by this weapon ignores the target's sonic resistance."
-  Greater Trudds Strength:
-    slug: "greaterTruddsStrength"
+  Greater Vitalizing:
+    slug: "greaterVitalizing"
     kind: "weapon"
-    level: 11
-    price: 140000
-    rarity: "uncommon"
+    usage: "melee-weapon"
+    level: 14
+    price: 430000
+    rarity: "common"
     traits:
-      - "divine"
+      - "magical"
   Greater Winged:
     slug: "greaterWinged"
     kind: "armor"
+    usage: "armor"
     level: 19
     price: 3500000
     rarity: "common"
@@ -1210,6 +563,7 @@ pf2e_runes:
   Grievous:
     slug: "grievous"
     kind: "weapon"
+    usage: "weapon"
     level: 9
     price: 70000
     rarity: "common"
@@ -1315,20 +669,15 @@ pf2e_runes:
         predicate: ["item:group:sword"]
         title: "Grievous"
         text: "The target is off-guard until the end of your next turn."
-  Hauling:
-    slug: "hauling"
-    kind: "weapon"
-    level: 6
-    price: 22500
-    rarity: "uncommon"
-    traits:
-      - "magical"
   Holy:
     slug: "holy"
     kind: "weapon"
+    usage: "weapon"
     level: 11
     price: 140000
     rarity: "common"
+    excludes:
+      - "unholy"
     traits:
       - "holy"
       - "magical"
@@ -1347,78 +696,10 @@ pf2e_runes:
         dieSize: "d4"
         damageType: "spirit"
         predicate: ["target:trait:unholy"]
-  Hooked:
-    slug: "hooked"
-    kind: "weapon"
-    level: 5
-    price: 14000
-    rarity: "rare"
-    traits:
-      - "magical"
-  Hopeful:
-    slug: "hopeful"
-    kind: "weapon"
-    level: 11
-    price: 120000
-    rarity: "uncommon"
-    traits:
-      - "magical"
-    rules:
-      - key: "Note"
-        selector: "{item|id}-attack"
-        slug: "hopeful"
-        outcome: ["criticalSuccess"]
-        title: "Hopeful"
-        text: "On a critical hit with this weapon, you inspire your comrades, pushing them to fight harder and stand for your shared convictions. Allies within 30 feet that share at least one alignment component with you gain a +1 status bonus to attack rolls until the end of your next turn."
-  Immovable:
-    slug: "immovable"
-    kind: "armor"
-    level: 12
-    price: 180000
-    rarity: "uncommon"
-    traits:
-      - "magical"
-  Impactful:
-    slug: "impactful"
-    kind: "weapon"
-    level: 10
-    price: 100000
-    rarity: "common"
-    traits:
-      - "force"
-      - "magical"
-    rules:
-      - key: "DamageDice"
-        selector: "{item|id}-damage"
-        slug: "impactful"
-        diceNumber: 1
-        dieSize: "d6"
-        damageType: "force"
-      - key: "Note"
-        selector: "{item|id}-damage"
-        slug: "impactful"
-        outcome: ["criticalSuccess"]
-        title: "Impactful"
-        text: "On a critical hit, you can choose to force the target to succeed at a DC 27 Fortitude save or be pushed 5 feet away from you."
-  Implacable:
-    slug: "implacable"
-    kind: "armor"
-    level: 11
-    price: 120000
-    rarity: "uncommon"
-    traits:
-      - "magical"
-  Impossible:
-    slug: "impossible"
-    kind: "weapon"
-    level: 20
-    price: 7000000
-    rarity: "common"
-    traits:
-      - "magical"
   Invisibility:
     slug: "invisibility"
     kind: "armor"
+    usage: "light-armor"
     level: 8
     price: 50000
     rarity: "common"
@@ -1428,6 +709,7 @@ pf2e_runes:
   Keen:
     slug: "keen"
     kind: "weapon"
+    usage: "piercing-or-slashing-melee-weapon"
     level: 13
     price: 300000
     rarity: "uncommon"
@@ -1439,95 +721,10 @@ pf2e_runes:
         slug: "keen"
         adjustment: {"success": "to-critical-success"}
         predicate: ["check:total:natural:19", {"or": ["item:damage:type:slashing", "item:damage:type:piercing"]}]
-  Kin Warding:
-    slug: "kinWarding"
-    kind: "weapon"
-    level: 3
-    price: 5200
-    rarity: "uncommon"
-    traits:
-      - "dwarf"
-      - "magical"
-  Kolss Oath:
-    slug: "kolssOath"
-    kind: "weapon"
-    level: 5
-    price: 16000
-    rarity: "uncommon"
-    traits:
-      - "divine"
-  Lesser Dread:
-    slug: "lesserDread"
-    kind: "armor"
-    level: 6
-    price: 22500
-    rarity: "uncommon"
-    traits:
-      - "emotion"
-      - "fear"
-      - "magical"
-      - "mental"
-      - "visual"
-  Magnetizing:
-    slug: "magnetizing"
-    kind: "armor"
-    level: 10
-    price: 90000
-    rarity: "common"
-    traits:
-      - "magical"
-  Major Convincing:
-    slug: "majorConvincing"
-    kind: "armor"
-    level: 16
-    price: 900000
-    rarity: "common"
-    traits:
-      - "magical"
-  Major Fanged:
-    slug: "majorFanged"
-    kind: "weapon"
-    level: 15
-    price: 600000
-    rarity: "uncommon"
-    traits:
-      - "magical"
-  Major Moonweave:
-    slug: "majorMoonweave"
-    kind: "armor"
-    level: 17
-    price: 1400000
-    rarity: "common"
-    traits:
-      - "magical"
-  Major Quenching:
-    slug: "majorQuenching"
-    kind: "armor"
-    level: 14
-    price: 450000
-    rarity: "common"
-    traits:
-      - "magical"
-  Major Rooting:
-    slug: "majorRooting"
-    kind: "weapon"
-    level: 15
-    price: 650000
-    rarity: "common"
-    traits:
-      - "plant"
-      - "magical"
-      - "wood"
-    rules:
-      - key: "Note"
-        selector: "{item|id}-damage"
-        slug: "majorRooting"
-        outcome: ["criticalSuccess"]
-        title: "Major Rooting"
-        text: "When you critically hit a target with this weapon, roots grow from the target. It's immobilized for 1 round (escape dc=34) and Clumsy 1 for as long as the immobilization lasts."
   Major Shadow:
     slug: "majorShadow"
     kind: "armor"
+    usage: "light-or-medium-nonmetal-armor"
     level: 17
     price: 1400000
     rarity: "common"
@@ -1536,138 +733,25 @@ pf2e_runes:
   Major Slick:
     slug: "majorSlick"
     kind: "armor"
+    usage: "armor"
     level: 16
     price: 900000
     rarity: "common"
     traits:
       - "magical"
-  Major Stanching:
-    slug: "majorStanching"
-    kind: "armor"
-    level: 13
-    price: 250000
-    rarity: "uncommon"
-    traits:
-      - "magical"
-  Major Sunweave:
-    slug: "majorSunweave"
-    kind: "armor"
-    level: 18
-    price: 2400000
-    rarity: "common"
-    traits:
-      - "magical"
-  Major Swallow Spike:
-    slug: "majorSwallowSpike"
-    kind: "armor"
+  Quickstrike:
+    slug: "quickstrike"
+    kind: "weapon"
+    usage: "weapon"
     level: 16
-    price: 1925000
-    rarity: "common"
-    traits:
-      - "magical"
-  Malleable:
-    slug: "malleable"
-    kind: "armor"
-    level: 9
-    price: 65000
-    rarity: "common"
-    traits:
-      - "magical"
-      - "metal"
-  Merciful:
-    slug: "merciful"
-    kind: "weapon"
-    level: 4
-    price: 7000
-    rarity: "common"
-    traits:
-      - "magical"
-      - "mental"
-  Misleading:
-    slug: "misleading"
-    kind: "armor"
-    level: 16
-    price: 800000
-    rarity: "common"
-    traits:
-      - "illusion"
-      - "magical"
-  Mobile:
-    slug: "mobile"
-    kind: "armor"
-    level: 5
-    price: 6000
-    rarity: "common"
-    traits:
-      - "magical"
-  Moderate Dread:
-    slug: "moderateDread"
-    kind: "armor"
-    level: 12
-    price: 180000
-    rarity: "uncommon"
-    traits:
-      - "emotion"
-      - "fear"
-      - "magical"
-      - "mental"
-      - "visual"
-  Moonweave:
-    slug: "moonweave"
-    kind: "armor"
-    level: 5
-    price: 14000
-    rarity: "common"
-    traits:
-      - "magical"
-  Nightmare:
-    slug: "nightmare"
-    kind: "weapon"
-    level: 9
-    price: 25000
-    rarity: "uncommon"
-    traits:
-      - "magical"
-    rules:
-      - key: "DamageDice"
-        selector: "{item|id}-damage"
-        slug: "nightmare"
-        diceNumber: 1
-        dieSize: "d6"
-        damageType: "mental"
-      - key: "Note"
-        selector: "{item|id}-damage"
-        slug: "nightmare"
-        outcome: ["criticalSuccess"]
-        title: "Nightmare"
-        text: "On a critical hit, the target becomes Stupefied 1 by overwhelming visions in their mind of personal horrors that linger. If you critically hit a creature that's already stupefied, it becomes Frightened 2 as well. These critical hit effects have the emotion, fear, and mental traits."
-  Pacifying:
-    slug: "pacifying"
-    kind: "weapon"
-    level: 5
-    price: 15000
-    rarity: "uncommon"
-    traits:
-      - "magical"
-  Portable:
-    slug: "portable"
-    kind: "armor"
-    level: 9
-    price: 66000
-    rarity: "common"
-    traits:
-      - "magical"
-  Quenching:
-    slug: "quenching"
-    kind: "armor"
-    level: 6
-    price: 25000
-    rarity: "common"
+    price: 1000000
+    rarity: "rare"
     traits:
       - "magical"
   Raiment:
     slug: "raiment"
     kind: "armor"
+    usage: "armor"
     level: 5
     price: 14000
     rarity: "common"
@@ -1677,6 +761,7 @@ pf2e_runes:
   Ready:
     slug: "ready"
     kind: "armor"
+    usage: "armor"
     level: 6
     price: 20000
     rarity: "common"
@@ -1685,6 +770,7 @@ pf2e_runes:
   Returning:
     slug: "returning"
     kind: "weapon"
+    usage: "thrown-weapon"
     level: 3
     price: 5500
     rarity: "common"
@@ -1696,67 +782,10 @@ pf2e_runes:
         slug: "returning"
         title: "Returning"
         text: "When you make a thrown Strike with this weapon, it flies back to your hand after the Strike is complete. If your hands are full when the weapon returns, it falls to the ground in your space."
-  Rock Braced:
-    slug: "rockBraced"
-    kind: "armor"
-    level: 13
-    price: 300000
-    rarity: "rare"
-    traits:
-      - "dwarf"
-      - "magical"
-      - "saggorak"
-  Rooting:
-    slug: "rooting"
-    kind: "weapon"
-    level: 7
-    price: 36000
-    rarity: "common"
-    traits:
-      - "plant"
-      - "magical"
-      - "wood"
-    rules:
-      - key: "Note"
-        selector: "{item|id}-damage"
-        slug: "rooting"
-        outcome: ["criticalSuccess"]
-        title: "Rooting"
-        text: "When you critically hit a target with this weapon, roots grow from the target. It's immobilized for 1 round (escape dc=23) and Clumsy 1 for as long as the immobilization lasts."
-  Safeguarding:
-    slug: "safeguarding"
-    kind: "armor"
-    level: 13
-    price: 260000
-    rarity: "common"
-    traits:
-      - "magical"
-  Self Sealing:
-    slug: "selfSealing"
-    kind: "armor"
-    level: 7
-    price: 32000
-    rarity: "common"
-    traits:
-      - "magical"
-  Serrating:
-    slug: "serrating"
-    kind: "weapon"
-    level: 10
-    price: 100000
-    rarity: "uncommon"
-    traits:
-      - "magical"
-    rules:
-      - key: "DamageDice"
-        selector: "{item|id}-damage"
-        slug: "serrating"
-        diceNumber: 1
-        dieSize: "d4"
-        damageType: "slashing"
   Shadow:
     slug: "shadow"
     kind: "armor"
+    usage: "light-or-medium-nonmetal-armor"
     level: 5
     price: 5500
     rarity: "common"
@@ -1765,6 +794,7 @@ pf2e_runes:
   Shifting:
     slug: "shifting"
     kind: "weapon"
+    usage: "melee-weapon"
     level: 6
     price: 22500
     rarity: "common"
@@ -1773,6 +803,7 @@ pf2e_runes:
   Shock:
     slug: "shock"
     kind: "weapon"
+    usage: "weapon"
     level: 8
     price: 50000
     rarity: "common"
@@ -1795,9 +826,10 @@ pf2e_runes:
   Shockwave:
     slug: "shockwave"
     kind: "weapon"
+    usage: "bludgeoning-weapon"
     level: 13
     price: 300000
-    rarity: "common"
+    rarity: "uncommon"
     traits:
       - "electricity"
       - "magical"
@@ -1816,26 +848,10 @@ pf2e_runes:
         predicate: ["item:melee", "item:damage:type:bludgeoning"]
         title: "Shockwave"
         text: "The attacker is immune to the splash damage."
-  Sidestepping:
-    slug: "sidestepping"
-    kind: "armor"
-    level: 13
-    price: 300000
-    rarity: "uncommon"
-    traits:
-      - "magical"
-  Sinister Knight:
-    slug: "sinisterKnight"
-    kind: "armor"
-    level: 8
-    price: 50000
-    rarity: "uncommon"
-    traits:
-      - "illusion"
-      - "magical"
   Size Changing:
     slug: "sizeChanging"
     kind: "armor"
+    usage: "armor"
     level: 7
     price: 35000
     rarity: "common"
@@ -1844,78 +860,25 @@ pf2e_runes:
   Slick:
     slug: "slick"
     kind: "armor"
+    usage: "armor"
     level: 5
     price: 4500
     rarity: "common"
     traits:
       - "magical"
-  Soaring:
-    slug: "soaring"
-    kind: "armor"
-    level: 14
-    price: 375000
-    rarity: "common"
-    traits:
-      - "magical"
-  Speed:
-    slug: "speed"
+  Spell Reservoir:
+    slug: "spellReservoir"
     kind: "weapon"
-    level: 16
-    price: 1000000
-    rarity: "rare"
-    traits:
-      - "magical"
-  Spell Storing:
-    slug: "spellStoring"
-    kind: "weapon"
+    usage: "melee-weapon"
     level: 13
     price: 270000
     rarity: "uncommon"
     traits:
       - "magical"
-  Spellwatch:
-    slug: "spellwatch"
-    kind: "armor"
-    level: 13
-    price: 300000
-    rarity: "common"
-    traits:
-      - "magical"
-  Stanching:
-    slug: "stanching"
-    kind: "armor"
-    level: 5
-    price: 13000
-    rarity: "uncommon"
-    traits:
-      - "magical"
-  Sunweave:
-    slug: "sunweave"
-    kind: "armor"
-    level: 6
-    price: 35000
-    rarity: "common"
-    traits:
-      - "magical"
-  Swallow Spike:
-    slug: "swallowSpike"
-    kind: "armor"
-    level: 6
-    price: 20000
-    rarity: "common"
-    traits:
-      - "magical"
-  Swarming:
-    slug: "swarming"
-    kind: "weapon"
-    level: 9
-    price: 70000
-    rarity: "common"
-    traits:
-      - "magical"
   Thundering:
     slug: "thundering"
     kind: "weapon"
+    usage: "weapon"
     level: 8
     price: 50000
     rarity: "common"
@@ -1935,62 +898,15 @@ pf2e_runes:
         outcome: ["criticalSuccess"]
         title: "Thundering"
         text: "On a critical hit, the target has to succeed at a DC 24 Fortitude save or be Deafened for 1 minute (or 1 hour on a critical failure)."
-  Trudds Strength:
-    slug: "truddsStrength"
-    kind: "weapon"
-    level: 5
-    price: 16000
-    rarity: "uncommon"
-    traits:
-      - "divine"
-  True Quenching:
-    slug: "trueQuenching"
-    kind: "armor"
-    level: 18
-    price: 2400000
-    rarity: "common"
-    traits:
-      - "magical"
-  True Rooting:
-    slug: "trueRooting"
-    kind: "weapon"
-    level: 19
-    price: 4000000
-    rarity: "common"
-    traits:
-      - "plant"
-      - "magical"
-      - "wood"
-    rules:
-      - key: "Note"
-        selector: "{item|id}-damage"
-        slug: "trueRooting"
-        outcome: ["criticalSuccess"]
-        title: "True Rooting"
-        text: "When you critically hit a target with this weapon, roots grow from the target. It's immobilized for 1 round (escape dc=41) and Clumsy 1 for as long as the immobilization lasts."
-  True Stanching:
-    slug: "trueStanching"
-    kind: "armor"
-    level: 17
-    price: 1250000
-    rarity: "uncommon"
-    traits:
-      - "magical"
-  Underwater:
-    slug: "underwater"
-    kind: "weapon"
-    level: 3
-    price: 5000
-    rarity: "common"
-    traits:
-      - "magical"
-      - "water"
   Unholy:
     slug: "unholy"
     kind: "weapon"
+    usage: "weapon"
     level: 11
     price: 140000
     rarity: "common"
+    excludes:
+      - "holy"
     traits:
       - "unholy"
       - "magical"
@@ -2009,17 +925,19 @@ pf2e_runes:
         dieSize: "d4"
         damageType: "spirit"
         predicate: ["target:trait:holy"]
-  Unnerving:
-    slug: "unnerving"
-    kind: "armor"
-    level: 7
-    price: 35000
+  Vitalizing:
+    slug: "vitalizing"
+    kind: "weapon"
+    usage: "weapon"
+    level: 5
+    price: 15000
     rarity: "common"
     traits:
       - "magical"
   Vorpal:
     slug: "vorpal"
     kind: "weapon"
+    usage: "slashing-melee-weapon"
     level: 17
     price: 1500000
     rarity: "rare"
@@ -2028,6 +946,7 @@ pf2e_runes:
   Winged:
     slug: "winged"
     kind: "armor"
+    usage: "armor"
     level: 13
     price: 250000
     rarity: "common"
@@ -2036,6 +955,7 @@ pf2e_runes:
   Wounding:
     slug: "wounding"
     kind: "weapon"
+    usage: "piercing-or-slashing-melee-weapon"
     level: 7
     price: 34000
     rarity: "common"

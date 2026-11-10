@@ -1,0 +1,18 @@
+  recorded import_foundry_runes: foundryvtt/pf2e 8.6.1 at fda67da2ad6be91aa331d35ba903e7e4eee97148
+written
+  55 property runes, 25 of them carrying 64 rules
+  18 fundamental rune grades
+
+from their packs alone, with no rules (8): Animated, Energy Resistant, Forgefathers Seal, Greater Energy Resistant, Greater Vitalizing, Quickstrike, Spell Reservoir, Vitalizing
+
+left out, from another book (94): Advancing, Aim Aiding, Ancestral Echoing, Anchoring, Ashen, Assisting, Authorized, Bane, Bitter, Bloodthirsty, Bolkas Blessing, Coating, Conducting, Convincing, Crushing, Cunning, Deathdrinking, Deathless, Deflecting, Demolishing, Earthbinding, Energizing, Energy Adaptive, Energy Vulnerability, Ethereal, Fanged, Flickering, Flurrying, Giant Killing, Gliding, Greater Advancing, Greater Anchoring, Greater Ashen, Greater Bolkas Blessing, Greater Convincing, Greater Crushing, Greater Dread, Greater Energy Vulnerability, Greater Fanged, Greater Giant Killing, Greater Hauling, Greater Impactful, Greater Kolss Oath, Greater Moonweave, Greater Quenching, Greater Rooting, Greater Stanching, Greater Sunweave, Greater Swallow Spike, Greater Trudds Strength, Hauling, Hooked, Hopeful, Immovable, Impactful, Implacable, Impossible, Kolss Oath, Lesser Dread, Magnetizing, Major Convincing, Major Fanged, Major Moonweave, Major Quenching, Major Rooting, Major Stanching, Major Sunweave, Major Swallow Spike, Malleable, Merciful, Misleading, Mobile, Moderate Dread, Moonweave, Nightmare, Pacifying, Portable, Quenching, Rooting, Safeguarding, Self Sealing, Sidestepping, Soaring, Spellwatch, Stanching, Sunweave, Swallow Spike, Swarming, Trudds Strength, True Quenching, True Rooting, True Stanching, Underwater, Unnerving
+
+left out, with no pack item to give a book (21): Acid Resistant, Bloodbane, Called, Cold Resistant, Dancing, Disrupting, Electricity Resistant, Fire Resistant, Glamered, Greater Acid Resistant, Greater Bloodbane, Greater Cold Resistant, Greater Disrupting, Greater Electricity Resistant, Greater Fire Resistant, Kin Warding, Rock Braced, Serrating, Sinister Knight, Speed, Spell Storing
+
+what a rune does that is not read:
+     10  ignores a resistance, which is the target's and not reachable from here
+      1  adjusts a modifier by way of a function rather than a value
+      3  adjustWeapon, which is a function in their table
+      2  adjustTraits, which is a function in their table
+      1  test, which is a function in their table
+      1  getNewValue, which is a function in their table

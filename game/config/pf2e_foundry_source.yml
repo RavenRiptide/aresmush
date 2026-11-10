@@ -125,6 +125,9 @@ pf2e_foundry_source:
     game/config/pf2e_consumables.yml:
       by: import_foundry_rules
       sha256: 2166de86fc3e5c9ede9e0561ae3a69e1b3473e99b5d3371f01289b1ebb64faac
+    game/config/pf2e_fundamental_runes.yml:
+      by: import_foundry_runes
+      sha256: 4fd933922db74bcae15373c404d81f8cb9abefbd0f3ce4246baf202f54f1884d
     game/config/pf2e_gear.yml:
       by: import_foundry_rules
       sha256: 8c4437833cc3aa3b703bc16c9d1de564b03c76815588ba8460b4a801cfed617d
@@ -136,7 +139,7 @@ pf2e_foundry_source:
       sha256: 7818680709bcd65e53eb5ed2cddea55c5a7196f187314d5a32c71cf508ddb56a
     game/config/pf2e_runes.yml:
       by: import_foundry_runes
-      sha256: e510eb0fb70bcd448d1bf0737d5b3cef1c555820d2901c6d0520d088fd5a72c2
+      sha256: f6cc6a88201fe2de44b9a1765395c1ee454efcefd957982c3ba9519ca0cbf6ee
     game/config/pf2e_shields.yml:
       by: import_foundry_rules
       sha256: 44439476b06fa653c2383577d661f88eb7371b6c6fb1affead666618a254b718

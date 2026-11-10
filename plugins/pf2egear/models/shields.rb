@@ -11,6 +11,9 @@ module AresMUSH
     attribute :hp, :type => DataType::Integer, :default => 0
     attribute :damage, :type => DataType::Integer, :default => 0
     attribute :ac_bonus, :type => DataType::Integer, :default => 0
+    # A reinforcing rune's grade, 0 to 6, as `{ 'fundamental' => { 'reinforcing' => 2 } }`. `hardness` and
+    # `hp` stay the shield's own; `Pf2egear::ShieldRunes` gives them with the rune.
+    attribute :runes, :type => DataType::Hash, :default => { 'fundamental' => {} }
     attribute :equipped, :type => DataType::Boolean, :default => false
     attribute :nickname
 

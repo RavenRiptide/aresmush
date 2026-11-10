@@ -64,7 +64,7 @@ module AresMUSH
     end
 
     def self.display_shield_hp(item)
-      hp = item.hp
+      hp = ShieldRunes.max_hp(item)
       dmg = item.damage
       cur_hp = hp - dmg
       broken = (cur_hp <= hp / 2) ? "%xr" : ""
@@ -120,6 +120,11 @@ module AresMUSH
       (item_info || {}).each_pair do |key, value|
         item.update("#{key}": value) if known.include?(key.to_s)
       end
+
+      # A specific magic item's catalogue row lists its property runes bare; an item keeps them as a list
+      # under `property`, the shape everything that etches or reads them uses.
+      bare = item.respond_to?(:runes) && (item.runes || {})['property']
+      item.update(:runes => item.runes.merge('property' => { 'list' => bare })) if bare.is_a?(Array)
 
       item
     end
@@ -177,9 +182,21 @@ module AresMUSH
     # The catalogue row an item was made from, which is where its effects live - the same way a feat's
     # effects live in the feat catalogue rather than on the character.
     # The property runes etched on an item, as slugs. `etch/property` keeps them as a list on the item,
-    # which is where Foundry keeps them too.
+    # which is where Foundry keeps them too. Each is read in the catalogue's spelling, so a specific item
+    # that names its rune the pack's way (`Frost (Greater)`) reaches the rune's rules; a name nothing
+    # matches is kept as it is.
     def self.property_runes(item)
-      Array(item.runes&.dig('property', 'list')).map { |one| Pf2e::Domains.slug(one) }
+      property_list(item).map { |one| Pf2e::Domains.slug(rune_spelled(one) || one) }
+    end
+
+    # The property runes on an item, by the names they were etched with. Items keep them as
+    # `{ 'property' => { 'list' => [...] } }`; the catalogue's specific magic items write the list bare
+    # (`property: [ Flaming ]`), and an item made before `build_item` put that right still holds it so.
+    def self.property_list(item)
+      held = ((item.respond_to?(:runes) && item.runes) || {})['property']
+      held = held['list'] if held.is_a?(Hash)
+
+      Array(held)
     end
 
     # The catalogue of property runes, keyed by the slug a rule names. Foundry keeps what a rune does in
@@ -189,14 +206,53 @@ module AresMUSH
       (Global.read_config('pf2e_runes') || {})
     end
 
+    # The grades a property rune's name can start with, which the pack writes last: `Frost (Greater)`.
+    RUNE_GRADES = %w{lesser moderate greater major true supreme}.freeze
+
+    # The runes etched with a choice made when they are, and what it may be. An energy-resistant rune
+    # resists one damage type, chosen by its crafter (GM Core), and is written `Energy Resistant (Fire)`.
+    ENERGY_TYPES = %w{acid cold electricity fire}.freeze
+    RUNE_CHOICES = { 'energyResistant' => ENERGY_TYPES, 'greaterEnergyResistant' => ENERGY_TYPES }.freeze
+
     # A rune answers to its name as a player types it and to the slug their data calls it, which are not
-    # the same word: `giantKilling` slugs to one word and "Giant Killing" to two.
+    # the same word: `giantKilling` slugs to one word and "Giant Killing" to two. It also answers to the
+    # pack's spelling, grade last, and to a choice rune's name with its choice.
     def self.rune_row(name)
+      rune_exact(name) || rune_graded(name) || rune_chosen(name)&.first
+    end
+
+    def self.rune_exact(name)
       wanted = Pf2e::Domains.slug(name)
 
       runes.find do |held, info|
         [ held, info['slug'] ].compact.any? { |one| Pf2e::Domains.slug(one) == wanted }
       end
+    end
+
+    # `Frost (Greater)` is Greater Frost.
+    def self.rune_graded(name)
+      found = name.to_s.match(/\A(.*?)\s*\(\s*(\w+)\s*\)\s*\z/)
+
+      return nil unless found && RUNE_GRADES.include?(found[2].downcase)
+
+      rune_exact("#{found[2]} #{found[1]}")
+    end
+
+    # `Energy Resistant (Fire)`, or its slug `energy-resistant-fire`: the row and the choice.
+    def self.rune_chosen(name)
+      wanted = Pf2e::Domains.slug(name)
+
+      RUNE_CHOICES.each do |slug, choices|
+        choices.each do |choice|
+          next unless wanted.end_with?("-#{choice}")
+
+          row = rune_exact(wanted.delete_suffix("-#{choice}"))
+
+          return [ row, choice ] if row && row.last['slug'] == slug
+        end
+      end
+
+      nil
     end
 
     def self.rune_entry(name)
@@ -205,6 +261,22 @@ module AresMUSH
 
     def self.rune_named(name)
       rune_row(name)&.first
+    end
+
+    # The choice a rune was etched with, `fire` for `Energy Resistant (Fire)`, or nil.
+    def self.rune_choice(name)
+      rune_chosen(name)&.last
+    end
+
+    # A rune in the catalogue's spelling, with its choice: `Energy Resistant (Fire)`, `Greater Frost`.
+    # Nil for a name nothing matches.
+    def self.rune_spelled(name)
+      named = rune_named(name)
+      choice = rune_choice(name)
+
+      return named unless named && choice
+
+      "#{named} (#{choice.capitalize})"
     end
 
     # How many property runes an item can hold: as many as its potency rune is worth, which is the
