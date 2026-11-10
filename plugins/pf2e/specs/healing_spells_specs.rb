@@ -115,6 +115,7 @@ module AresMUSH
               expect(refused).to eq []
               expect(damage_of(kind)).to eq(before - (void_healing ? 0 : amount))
               expect(heard).not_to include('rolls Fortitude')
+              expect(heard.include?('healing has no effect')).to eq void_healing
             end
           end
         end

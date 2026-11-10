@@ -33,7 +33,7 @@ module AresMUSH
                 expect(Harm).to have_received(:heal).with(kind, amount)
               else
                 expect(Harm).not_to have_received(:heal)
-                expect(@out['lines']).to eq []
+                expect(@out['lines']).to eq [ Acting.told('pf2e.act_heal_unaffected', :target => kind.to_s) ]
               end
             end
           end
@@ -47,7 +47,7 @@ module AresMUSH
             expect(Acting).not_to have_received(:deal)
             if kind == :living
               expect(Harm).not_to have_received(:heal)
-              expect(@out['lines']).to eq []
+              expect(@out['lines']).to eq [ Acting.told('pf2e.act_heal_unaffected', :target => kind.to_s) ]
             else
               expect(Harm).to have_received(:heal).with(kind, 4)
             end
@@ -141,7 +141,7 @@ module AresMUSH
           expect(Acting).not_to have_received(:spell_rows)
           expect(Acting).not_to have_received(:deal)
           expect(Harm).not_to have_received(:heal)
-          expect(@out['lines']).to eq []
+          expect(@out['lines']).to eq [ Acting.told('pf2e.act_heal_unaffected', :target => 'Dar') ]
         end
       end
     end

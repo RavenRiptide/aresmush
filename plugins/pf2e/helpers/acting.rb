@@ -1953,12 +1953,12 @@ module AresMUSH
           return
         end
 
-        # Healing that cannot mend this target does nothing, unless the formula also deals damage.
-        # Older formula entries without kinds keep their damage behavior.
+        # Healing that cannot mend this target does nothing, unless the formula also deals damage, and the
+        # room is told so. Older formula entries without kinds keep their damage behavior.
         formulas = formulas.reject do |_formula, _type, _category, kinds|
           Array(kinds).include?('healing') && !Array(kinds).include?('damage')
         end
-        return if formulas.empty?
+        return out['lines'] << told('pf2e.act_heal_unaffected', :target => scene.target.label) if formulas.empty?
 
         factor = degree ? damage_factor(mechanics, degree) : 1
 

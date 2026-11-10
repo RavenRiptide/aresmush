@@ -719,6 +719,7 @@ en:
     act_healed_dice:
       one: "  %{target} recovers 1 Hit Point (%{dice})."
       other: "  %{target} recovers %{count} Hit Points (%{dice})."
+    act_heal_unaffected: "  %{target} is unaffected: healing has no effect."
     act_area_rolled: "  %{spell} rolls %{rolled} for everything in its area."
     consumable_heals:
       one: "  %{target} regains 1 Hit Point from the %{item}."
