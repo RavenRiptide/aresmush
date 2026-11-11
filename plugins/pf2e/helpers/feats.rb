@@ -1445,7 +1445,30 @@ module AresMUSH
 
     CASTER_TYPE_STAT_KEYS = %w(prepared spontaneous)
 
+    # What a feat's magic_stats come to for this character: the block for their kind of caster, and
+    # an innate spell's tradition where the feat takes it from an earlier choice.
     def self.resolve_caster_type_stats(char, magic_stats)
+      resolve_chosen_tradition(char, caster_type_stats(char, magic_stats))
+    end
+
+    # An innate spell whose tradition is `{ from_choice: <choice> }` takes the tradition that choice
+    # was answered with, as the ciith feats after Bone Magic take its primal or occult.
+    def self.resolve_chosen_tradition(char, magic_stats)
+      return magic_stats unless magic_stats.is_a?(Hash) && magic_stats['innate_spell'].is_a?(Hash)
+
+      innate = magic_stats['innate_spell']
+      source = innate['tradition'].is_a?(Hash) ? innate['tradition']['from_choice'] : nil
+
+      return magic_stats unless source
+
+      chosen = choice_labels_for(char, source).first
+
+      Global.logger.warn "#{char.name} has no answer to #{source} for an innate spell's tradition." unless chosen
+
+      magic_stats.merge('innate_spell' => innate.merge('tradition' => chosen&.downcase))
+    end
+
+    def self.caster_type_stats(char, magic_stats)
       return magic_stats unless magic_stats.is_a?(Hash)
       return magic_stats unless magic_stats.keys.any? { |k| CASTER_TYPE_STAT_KEYS.include?(k.to_s.downcase) }
 
@@ -3337,8 +3360,17 @@ module AresMUSH
         value = fname
       else
         grants = choice_grants(char, block, value, choice_name)
+        magic = grants.is_a?(Hash) ? grants['magic_stats'] : nil
+        grants = grants.reject { |key, _| key == 'magic_stats' } if magic
 
-        if grants
+        # Spellcasting a pick hands over is staged as a feat's own is, so a spell it leaves open, such
+        # as Bone Magic's innate cantrip, can be chosen before the level is done.
+        if magic
+          options = stage_feat_magic_stats(char, choice_name, { 'magic_stats' => magic }, to_assign, advancement)
+          msgs.concat(magic_option_messages(options))
+        end
+
+        if grants.is_a?(Hash) && grants.any?
           adv_grants = advancement['grants'] || {}
           adv_grants["#{choice_name} (#{value})"] = grants
           advancement['grants'] = adv_grants

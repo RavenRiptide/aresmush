@@ -681,6 +681,13 @@ pf2e_feats:
       - Ciith
     traits:
       - ciith
+    magic_stats:
+      innate_spell:
+        level: 5
+        name: Dinosaur Form
+        tradition:
+          from_choice: Bone Magic
+        cast_stat: Charisma
     shortdesc: You encase yourself in spiritual dinosaur bones to become a Huge dinosaur. You can cast Dinosaur Form on yourself as a 5th-rank innate spell once per day.
     prereq:
       level: 13
@@ -693,6 +700,25 @@ pf2e_feats:
       - Ciith
     traits:
       - ciith
+    feat_choice:
+      summary: primal or occult innate spells
+      options:
+        Primal:
+          grants:
+            magic_stats:
+              innate_spell:
+                level: cantrip
+                name: open
+                tradition: primal
+                cast_stat: Charisma
+        Occult:
+          grants:
+            magic_stats:
+              innate_spell:
+                level: cantrip
+                name: open
+                tradition: occult
+                cast_stat: Charisma
     shortdesc: "Your connection to your ciith ancestors manifests as a simple primal spell that you cast using a fragment of an ancestor's bones. Choose one cantrip from either the occult spell list or the primal spell list. You can cast this cantrip as an innate spell at will, and it's heightened to a spell rank equal to half your level rounded up.%r%r**Special** Choose when you gain this feat whether your innate spells are primal or occult; this choice applies to all innate spells you gain from ciith ancestry feats that have Bone Magic as a prerequisite."
     prereq:
       level: 1
@@ -1978,6 +2004,13 @@ pf2e_feats:
       - Ciith
     traits:
       - ciith
+    magic_stats:
+      innate_spell:
+        level: 7
+        name: Mask of Terror
+        tradition:
+          from_choice: Bone Magic
+        cast_stat: Charisma
     shortdesc: Using your ancestors' bones, you manifest their spirits around you in a fossilized form. You can cast *mask of terror* on yourself as an innate spell once per day. When you do, you appear as a skeletal ciith ancestor, twisted in a way that inspires the deepest fears of those who observe you.
     prereq:
       level: 17
