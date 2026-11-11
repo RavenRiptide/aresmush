@@ -53,6 +53,11 @@ module AresMUSH
       # answer 1 and 0, which is what their JavaScript booleans are worth in arithmetic. `clamped` is a
       # misspelling of clamp appearing once in the shipped data; accepting it costs nothing, and
       # refusing it would fail an import over someone else's slip.
+      #
+      # `clamp` is Foundry's `Math.min(Math.max(value, low), high)` rather than Ruby's `clamp`, which
+      # raises when its bounds are out of order. Foundry's never raises, and the data leans on that:
+      # Untrained Improvisation writes `clamp(-2, <value>, 0)`, value in the middle, which Foundry's
+      # form answers correctly because its first two arguments are interchangeable.
       FUNCTIONS = {
         :floor => [ :numeric, ->(value) { value.floor } ],
         :ceil => [ :numeric, ->(value) { value.ceil } ],
@@ -66,8 +71,8 @@ module AresMUSH
         :eq => [ :numeric, ->(left, right) { left == right ? 1 : 0 } ],
         :ne => [ :numeric, ->(left, right) { left == right ? 0 : 1 } ],
         :ternary => [ :numeric, ->(test, yes, no) { test.zero? ? no : yes } ],
-        :clamp => [ :numeric, ->(value, low, high) { value.clamp(low, high) } ],
-        :clamped => [ :numeric, ->(value, low, high) { value.clamp(low, high) } ],
+        :clamp => [ :numeric, ->(value, low, high) { [ [ value, low ].max, high ].min } ],
+        :clamped => [ :numeric, ->(value, low, high) { [ [ value, low ].max, high ].min } ],
         :btwn => [ :numeric, ->(value, low, high) { value >= low && value <= high ? 1 : 0 } ],
         :when => [ :numeric, ->(test, then_value) { test.zero? ? NOTHING : then_value } ],
         # Variadic, so Dentaku is handed one argument: it passes an array for a splat-shaped lambda.

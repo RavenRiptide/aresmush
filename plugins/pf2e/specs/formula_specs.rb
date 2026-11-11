@@ -227,6 +227,15 @@ module AresMUSH
           expect(Formula.value('clamp(@actor.level,1,4)', ctx)).to eq 4
         end
 
+        # Untrained Improvisation puts the value in the middle. Foundry's clamp does not mind; Ruby's
+        # raised once the "low" bound passed 0, which took down the sheet of anyone 9th level or up.
+        it "should clamp the way Foundry does when the value is written between the bounds" do
+          formula = '@actor.level + clamp(-2,floor((@actor.level - 7) / 2),0)'
+          answers = [ 3, 5, 7, 9, 20 ].map { |level| Formula.value(formula, 'actor' => { 'level' => level }) }
+
+          expect(answers).to eq [ 1, 4, 7, 9, 20 ]
+        end
+
         it "should choose with ternary on a true test" do
           expect(Formula.value('ternary(gte(@actor.level,5),10,20)', ctx)).to eq 10
         end
