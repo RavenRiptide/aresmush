@@ -19,13 +19,15 @@ module AresMUSH
       def handle
         valid_email = /\A([\w+\-].?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i
 
+        is_email = self.target =~ valid_email
+
         # Use safe navigation operator to force player to nil if character not found.
-        player = self.target =~ valid_email ?
+        player = is_email ?
             AltTracker.find_player_by_email(self.target, enactor) :
             Character.find_one_by_name(self.target)&.player
 
         if !player
-          if self.target =~ valid_email
+          if is_email
             player = Player.create(name: self.target, codeword: self.codeword)
 
             enactor.update(player: player)
@@ -48,7 +50,13 @@ module AresMUSH
           client.emit_failure t('alttracker.max_alts_exceeded', :max_alts => max_alts)
           return
         elsif !(self.codeword == player.codeword)
-          client.emit_failure t('alttracker.invalid_codeword')
+          # A player registering for the first time can pick an email that is already on
+          # file; say so, or a bare "invalid codeword" reads as a broken command.
+          if is_email
+            client.emit_failure t('alttracker.email_already_registered', :email => self.target)
+          else
+            client.emit_failure t('alttracker.invalid_codeword')
+          end
           return
         else
           enactor.update(player: player)

@@ -7,6 +7,7 @@ en:
     must_use_email: "You must provide a valid email address if you have not previously registered here."
     invalid_email: "Invalid email address."
     invalid_codeword: "Invalid codeword."
+    email_already_registered: "%{email} is already registered. Enter the code word you chose when you first registered it, or use a different email address."
     max_alts_exceeded: "You are at the maximum number of alts allowed for this game. Maximum alts on this game: %{max_alts}."
     not_registered: "%{name} is not registered to an email."
     player_banned: "That player has previously been asked to leave this game."

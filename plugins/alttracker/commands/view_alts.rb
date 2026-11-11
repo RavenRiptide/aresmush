@@ -28,7 +28,7 @@ module AresMUSH
         if self.target == enactor
           player = enactor.player
         elsif self.target.to_s =~ valid_email
-          player = AltTracker.find_player_by_email(self.target)
+          player = AltTracker.find_player_by_email(self.target, enactor)
         else
           player = Character.find_one_by_name(self.target)&.player
         end
