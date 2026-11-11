@@ -75,7 +75,7 @@ module AresMUSH
 
       # The template's own words, with every value it asks for stubbed.
       class SectionSheet
-        LISTS = %i{abilities skills saves known_for spell_dcs}.freeze
+        LISTS = %i{abilities skills saves resistances known_for spell_dcs}.freeze
 
         attr_reader :section
 

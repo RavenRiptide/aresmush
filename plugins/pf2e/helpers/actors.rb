@@ -106,6 +106,12 @@ module AresMUSH
         Effects.sheet_character_facts(@holder)
       end
 
+      # What the neutral `sheet` lists under the saves: what is theirs for good. Their encounter state
+      # (`e/sheet`) lists everything they are under there.
+      def sheet_iwr
+        IWR.permanent(@holder)
+      end
+
       def context
         Effects.sheet_context(@holder)
       end
@@ -324,6 +330,10 @@ module AresMUSH
         "state-#{@holder.id}"
       end
 
+      def sheet_iwr
+        IWR.of(@holder)
+      end
+
       def effect_owner_field
         :state
       end
@@ -347,6 +357,11 @@ module AresMUSH
 
       def sources
         Npcs.sources(@holder)
+      end
+
+      # A creature has no sheet; its stat block's, as it stands.
+      def sheet_iwr
+        Npcs.iwr(@holder)
       end
 
       def options(domains = nil)

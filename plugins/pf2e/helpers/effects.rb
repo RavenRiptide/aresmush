@@ -65,7 +65,7 @@ module AresMUSH
 
       def self.sheet_sources(char)
         SheetReads.memo(char, :effect_sources) do
-          conditions(char) + feats(char) + features(char) + actions(char) + items(char) + runes(char) +
+          conditions(char) + heritage(char) + feats(char) + features(char) + actions(char) + items(char) + runes(char) +
             ActiveEffects.sources(char) + DailyChoices.sources(char) + ResearchField.sources(char)
         end
       end
@@ -308,6 +308,17 @@ module AresMUSH
 
           with_selections(char, built)
         end.compact
+      end
+
+      # A heritage's rules, from `pf2e_heritages.yml`: a snow goblin's resistance to cold, which grows
+      # with their level.
+      def self.heritage(char)
+        name = (char.pf2_base_info || {})['heritage'].to_s
+        info = name.empty? ? nil : Global.read_config('pf2e_heritage', name)
+
+        return [] unless info.is_a?(Hash) && info['rules']
+
+        [ source(name, info['rules'], 'id' => Domains.slug(name), 'kind' => DOES, 'item' => { 'level' => char.pf2_level.to_i }) ]
       end
 
       # What a subclass's own question was answered with at chargen: which dragon a Dragon Instinct is.

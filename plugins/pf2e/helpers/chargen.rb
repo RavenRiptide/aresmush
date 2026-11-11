@@ -611,12 +611,6 @@ module AresMUSH
 
       combat.update(unarmed_attacks: unarmed_attacks)
 
-      # Collate and record any special defenses or resistances.
-      if heritage_info['defense']
-        defenses = heritage_info['defense']
-        combat.update(defense: defenses)
-      end
-
       # Starting Magic
 
       # Most characters will be casters in some capacity at some point in their development,

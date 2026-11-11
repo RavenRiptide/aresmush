@@ -36,6 +36,9 @@
 <%= save -%>
 <% end %>
 
+<% resistances.each do |line| %>
+<%= line %>
+<% end %>
 <%= section_line("Conditions") %>
 <%= conditions %>
 <% unless effects.empty? %>

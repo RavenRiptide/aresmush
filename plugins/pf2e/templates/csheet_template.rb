@@ -117,6 +117,12 @@ module AresMUSH
         list
       end
 
+      # What they resist, are immune to and are weak to, with their gear and whatever they are under:
+      # outside a fight for `csheet`, and in it for `e/csheet`, which passes their encounter state.
+      def resistances
+        IWR.sheet_rows(IWR.of(@char)).map { |word, shown| "#{item_color}#{word}%xn: #{shown}" }
+      end
+
       def ac
         Pf2eCombat.calculate_ac(@char)
       end

@@ -34,9 +34,10 @@ pf2e_heritage:
       - Shortshanks Arvek
     traits: []
   Smokeworker:
-    defense:
-      resistances:
-        fire: 1
+    rules:
+      - key: "Resistance"
+        type: "fire"
+        value: "max(1,floor(@actor.level/2))"
     special:
       - Smokeworker Arvek
     action: []
@@ -183,9 +184,10 @@ pf2e_heritage:
     skills: []
     traits: []
   Xalli:
-    defense:
-      resistances:
-        fire: 1
+    rules:
+      - key: "Resistance"
+        type: "fire"
+        value: "max(1,floor(@actor.level/2))"
     special:
       - Xalli Ciith
     action: []
@@ -242,9 +244,10 @@ pf2e_heritage:
     skills: []
     traits: []
   Stormtossed:
-    defense:
-      resistances:
-        electricity: 1
+    rules:
+      - key: "Resistance"
+        type: "electricity"
+        value: "max(1,floor(@actor.level/2))"
     special:
       - Stormtossed Egalrin
     action: []
@@ -375,9 +378,10 @@ pf2e_heritage:
     traits: []
   # Goblin Heritages
   Charhide:
-    defense:
-      resistances:
-        fire: 1
+    rules:
+      - key: "Resistance"
+        type: "fire"
+        value: "max(1,floor(@actor.level/2))"
     special:
       - Charhide Goblin
     traits: []
@@ -413,9 +417,10 @@ pf2e_heritage:
     special: []
     traits: []
   Snow:
-    defense:
-      resistances:
-        cold: 1
+    rules:
+      - key: "Resistance"
+        type: "cold"
+        value: "max(1,floor(@actor.level/2))"
     action: []
     attack: {}
     feat: []
@@ -514,9 +519,10 @@ pf2e_heritage:
     reaction: []
     attack: {}
   Snow Kailli:
-    defense:
-      resistances:
-        cold: 1
+    rules:
+      - key: "Resistance"
+        type: "cold"
+        value: "max(1,floor(@actor.level/2))"
     traits: []
     special:
       - Snow Kailli
@@ -546,9 +552,10 @@ pf2e_heritage:
     reaction: []
     attack: {}
   Forge:
-    defense:
-      resistances:
-        fire: 1
+    rules:
+      - key: "Resistance"
+        type: "fire"
+        value: "max(1,floor(@actor.level/2))"
     action: []
     attack: {}
     feat: []
@@ -566,9 +573,10 @@ pf2e_heritage:
     special: []
     traits: []
   Strong-Blooded:
-    defense:
-      resistances:
-        poison: 1
+    rules:
+      - key: "Resistance"
+        type: "poison"
+        value: "max(1,floor(@actor.level/2))"
     action: []
     attack: {}
     feat: []
@@ -615,9 +623,10 @@ pf2e_heritage:
       - Grave Oruch
     skills: []
     feat: []
-    defense:
-      resistances:
-        void: 1
+    rules:
+      - key: "Resistance"
+        type: "void"
+        value: "max(1,floor(@actor.level/2))"
     action: []
     reaction: []
     attack: {}
@@ -654,9 +663,10 @@ pf2e_heritage:
   # Sildanyar Heritages
   Arctic:
     traits: []
-    defense:
-      resistances:
-        cold: 1
+    rules:
+      - key: "Resistance"
+        type: "cold"
+        value: "max(1,floor(@actor.level/2))"
     circumstance: true
     special: []
     skills: []

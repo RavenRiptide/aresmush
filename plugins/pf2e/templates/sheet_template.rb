@@ -238,6 +238,12 @@ module AresMUSH
         list
       end
 
+      # What they resist, are immune to and are weak to. `sheet` shows what is theirs for good; `e/sheet`
+      # passes their encounter state, and shows everything they are under there.
+      def resistances
+        IWR.sheet_rows(Actors.of(@char).sheet_iwr).map { |word, shown| "#{item_color}#{word}%xn: #{shown}" }
+      end
+
       def specials
         held = Array(@char.pf2_special)
 

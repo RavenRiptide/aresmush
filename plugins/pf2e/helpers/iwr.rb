@@ -42,6 +42,43 @@ module AresMUSH
         held.merge('immunity' => held['immunity'] + of_mode(Effects.facts(char)))
       end
 
+      # What is theirs for good: their heritage, feats, class features, actions and research field, and
+      # none of the conditions, worn gear, effects or daily picks `of` also reads. The neutral `sheet`
+      # shows this; `csheet` and the encounter sheets show `of`.
+      def self.permanent(char)
+        SheetReads.memo(char, :iwr_permanent) do
+          sources = Effects.heritage(char) + Effects.feats(char) + Effects.features(char) + Effects.actions(char) +
+                    ResearchField.sources(char)
+          options = Effects.options(char)
+          context = Effects.context(char)
+
+          KINDS.each_with_object({}) do |kind, out|
+            out[kind.downcase] = Rules.declarations(sources, options, kind, context)
+          end
+        end
+      end
+
+      # What someone holds of each kind, as the words a table shows them in: `{ 'resistance' => [ 'fire 5' ] }`,
+      # with only the kinds they hold any of, in the order of `KINDS`.
+      def self.summary(held)
+        KINDS.map(&:downcase).each_with_object({}) do |kind, out|
+          shown = listed(held[kind]).map { |entry| [ label(entry), entry['value'] ].compact.join(' ') }
+
+          out[kind] = shown if shown.any?
+        end
+      end
+
+      SHEET_WORDS = [ [ 'resistance', 'Resistances' ], [ 'immunity', 'Immunities' ], [ 'weakness', 'Weaknesses' ] ].freeze
+
+      # A sheet's rows under its saves: `[ 'Resistances', 'fire 5, cold 5' ]` for each kind held, or a
+      # single `[ 'Resistances', 'None.' ]` for someone who holds none.
+      def self.sheet_rows(held)
+        shown = summary(held)
+        rows = SHEET_WORDS.filter_map { |kind, word| shown[kind] ? [ word, shown[kind].join(', ') ] : nil }
+
+        rows.empty? ? [ [ 'Resistances', 'None.' ] ] : rows
+      end
+
       # ------------------------------------------------------------------------------
       # What someone is
 

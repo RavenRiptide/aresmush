@@ -76,11 +76,7 @@ module AresMUSH
       # a player character's, in an encounter that is part of a scene.
       def iwr_line(one)
         held = (one.creature? ? CREATURE : CHARACTER)['iwr'].call(one.holder)
-        parts = IWR_WORDS.filter_map do |kind, word|
-          listed = IWR.listed(held[kind]).map { |entry| [ IWR.label(entry), entry['value'] ].compact.join(' ') }
-
-          listed.empty? ? nil : "#{word} #{listed.join(', ')}"
-        end
+        parts = IWR.summary(held).map { |kind, shown| "#{IWR_WORDS[kind]} #{shown.join(', ')}" }
         parts.unshift(hero_points(one)) if hero_points(one)
 
         parts.empty? ? nil : "%b#{' ' * 4}#{parts.join('; ')}"
