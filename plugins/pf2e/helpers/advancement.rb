@@ -91,7 +91,7 @@ module AresMUSH
       stats = assessed['magic_stats'] || {}
       feat_stats, class_stats = split_feat_magic(stats, FEAT_KEYED_MAGIC_STATS)
 
-      advancement['magic_stats'][feat_name] = feat_stats unless feat_stats.empty?
+      advancement['magic_stats'][feat_name] = add_feat_innate(advancement['magic_stats'][feat_name], feat_stats) unless feat_stats.empty?
 
       unless class_stats.empty?
         advancement['magic_stats'][base_class_key] =
@@ -123,6 +123,26 @@ module AresMUSH
       class_stats = stats.reject { |key, _value| feat_keys.include?(key.to_s) }
 
       [ feat_stats, class_stats ]
+    end
+
+    # A feat's innate spells staged on top of the ones it already staged this level, so a choice
+    # making two picks - Celestial Magic's two spells - grants both rather than the second alone.
+    def self.add_feat_innate(existing, added)
+      before = existing.is_a?(Hash) ? existing['innate_spell'] : nil
+      after = added['innate_spell']
+
+      return added unless before.is_a?(Hash) && after.is_a?(Hash)
+
+      # Open slots are each a pick still to make, so only named spells are merged.
+      seen = []
+      names = (Array(before['name']) + Array(after['name'])).select do |name|
+        key = name.to_s.downcase
+        next true if key == 'open'
+
+        seen.include?(key) ? false : (seen << key)
+      end
+
+      existing.merge(added).merge('innate_spell' => after.merge('name' => names))
     end
 
     def self.merge_magic_stats(existing, added)

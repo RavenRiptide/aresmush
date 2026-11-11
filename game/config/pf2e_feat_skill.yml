@@ -754,6 +754,21 @@ pf2e_feats:
       level: 1
       skill: Crafting/trained
   Specialty Crafting:
+    feat_choice:
+      summary: a crafting specialty
+      options:
+        Alchemy: {}
+        Artistry: {}
+        Blacksmithing: {}
+        Bookmaking: {}
+        Glassmaking: {}
+        Leatherworking: {}
+        Pottery: {}
+        Shipbuilding: {}
+        Stonemasonry: {}
+        Tailoring: {}
+        Weaving: {}
+        Woodworking: {}
     feat_type:
       - Skill
       - General
@@ -875,6 +890,12 @@ pf2e_feats:
         predicate: ["terrain:{item|flags.system.rulesSelections.terrain}"]
   Terrain Stalker:
     repeatable: true
+    feat_choice:
+      summary: a type of difficult terrain
+      options:
+        Rubble: {}
+        Snow: {}
+        Underbrush: {}
     feat_type:
       - Skill
       - General
@@ -951,10 +972,21 @@ pf2e_feats:
       - General
     assoc_skill: Performance
     shortdesc: "You have exceptional talent with one type of performance. You gain a +1 circumstance bonus when making a certain type of performance. If you are a master in Performance, this bonus increases to +2. Select one of the following specialties and apply the bonus when attempting Performance checks of that type. If it's unclear whether the specialty applies, the GM decides.%r%rFor more information, see the wiki."
+    feat_choice:
+      summary: a type of performance
+      options:
+        Acting: {}
+        Comedy: {}
+        Dance: {}
+        Keyboards: {}
+        Oratory: {}
+        Percussion: {}
+        Singing: {}
+        Strings: {}
+        Winds: {}
     prereq:
       level: 1
       skill: Performance/trained
-  # Level 2 Feats
     rules:
       - key: "ChoiceSet"
         flag: "performanceType"
@@ -965,6 +997,7 @@ pf2e_feats:
         type: "circumstance"
         value: "ternary(gte(@actor.system.skills.performance.rank,3),2,1)"
         predicate: ["action:perform:{item|flags.system.rulesSelections.performanceType}"]
+  # Level 2 Feats
   Armored Stealth:
     feat_type:
       - Skill

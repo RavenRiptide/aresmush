@@ -271,6 +271,15 @@ module AresMUSH
         end
       end
 
+      describe "devotion spells" do
+        it "should grant the spells named after their feats" do
+          [ "Champion's Sacrifice", 'Spectral Advance' ].each do |name|
+            expect(feat(name)['init_magic']).to be(true), name
+            expect(traits(name)).to include('focus', 'champion'), name
+          end
+        end
+      end
+
       it "should raise Animal Skin's unarmored defense to expert" do
         expect(feat('Animal Skin')['grants']).to eq('combat_stats' => { 'armor_prof' => { 'unarmored' => 'expert' } })
       end

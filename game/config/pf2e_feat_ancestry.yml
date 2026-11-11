@@ -548,6 +548,13 @@ pf2e_feats:
     traits:
       - niasa
     shortdesc: "Part of your body has an animalistic influence from a planar creature. Your hands end in claws, you have hooves instead of feet, sharp teeth fill your mouth, or a tail extends from your spine. You gain your choice of one of the following unarmed attacks. The attack is in the brawling group and has the listed damage die and traits.%r%r* **Claw** 1d4 slashing (agile, finesse, unarmed, versatile piercing)%r%r* **Hoof** 1d6 bludgeoning (finesse, unarmed)%r%r* **Jaws** 1d6 piercing (finesse, unarmed)%r%r**Tail** 1d4 bludgeoning (agile, finesse, unarmed)%r%r**Special** You can select this feat only at 1st level, and you can't retrain into or out of this feat, nor can you change the type of attack you gained."
+    feat_choice:
+      summary: an unarmed attack
+      options:
+        Claw: {}
+        Hoof: {}
+        Jaws: {}
+        Tail: {}
     prereq:
       level: 1
       heritage: Niasa
@@ -1006,6 +1013,34 @@ pf2e_feats:
       - Sildanyar
     traits:
       - aesa
+    feat_choice:
+      summary: two 2nd-rank divine innate spells
+      count: 2
+      options:
+        Clear Mind:
+          grants:
+            magic_stats:
+              innate_spell: { level: 2, name: [ Clear Mind ], tradition: divine, cast_stat: Charisma }
+        Everlight:
+          grants:
+            magic_stats:
+              innate_spell: { level: 2, name: [ Everlight ], tradition: divine, cast_stat: Charisma }
+        Humanoid Form:
+          grants:
+            magic_stats:
+              innate_spell: { level: 2, name: [ Humanoid Form ], tradition: divine, cast_stat: Charisma }
+        Revealing Light:
+          grants:
+            magic_stats:
+              innate_spell: { level: 2, name: [ Revealing Light ], tradition: divine, cast_stat: Charisma }
+        Share Life:
+          grants:
+            magic_stats:
+              innate_spell: { level: 2, name: [ Share Life ], tradition: divine, cast_stat: Charisma }
+        Sure Footing:
+          grants:
+            magic_stats:
+              innate_spell: { level: 2, name: [ Sure Footing ], tradition: divine, cast_stat: Charisma }
     shortdesc: "You possess celestial magic. Choose two of the following spells: *clear mind*, *everlight*, *humanoid form*, *revealing light*, *share life*, or *sure footing*. You can use each of the chosen spells once per day as 2nd-rank divine innate spells.%r%rAngelkin typically take *clear mind* and *humanoid form*, lawbringers typically have *everlight* and *share life*, and musetouched typically have *revealing light* and *sure footing*."
     prereq:
       level: 9
@@ -1792,6 +1827,17 @@ pf2e_feats:
       orheritage:
         - Aesa
         - Niasa
+    feat_choice:
+      summary: a 1st-rank divine innate spell
+      options:
+        Bless:
+          grants:
+            magic_stats:
+              innate_spell: { level: 1, name: [ Bless ], tradition: divine, cast_stat: Charisma }
+        Bane:
+          grants:
+            magic_stats:
+              innate_spell: { level: 1, name: [ Bane ], tradition: divine, cast_stat: Charisma }
   Eyes of Night:
     feat_type:
       - Ancestry
@@ -1910,6 +1956,34 @@ pf2e_feats:
       - Sildanyar
     traits:
       - niasa
+    feat_choice:
+      summary: two 2nd-rank divine innate spells
+      count: 2
+      options:
+        Disguise Magic:
+          grants:
+            magic_stats:
+              innate_spell: { level: 2, name: [ Disguise Magic ], tradition: divine, cast_stat: Charisma }
+        False Vitality:
+          grants:
+            magic_stats:
+              innate_spell: { level: 2, name: [ False Vitality ], tradition: divine, cast_stat: Charisma }
+        Invisibility:
+          grants:
+            magic_stats:
+              innate_spell: { level: 2, name: [ Invisibility ], tradition: divine, cast_stat: Charisma }
+        Paranoia:
+          grants:
+            magic_stats:
+              innate_spell: { level: 2, name: [ Paranoia ], tradition: divine, cast_stat: Charisma }
+        See the Unseen:
+          grants:
+            magic_stats:
+              innate_spell: { level: 2, name: [ See the Unseen ], tradition: divine, cast_stat: Charisma }
+        Shatter:
+          grants:
+            magic_stats:
+              innate_spell: { level: 2, name: [ Shatter ], tradition: divine, cast_stat: Charisma }
     shortdesc: "You possess fiendish magic. Choose two of the following spells: *disguise magic*, *false vitality*, *invisibility*, *see the unseen*, *shatter*, or *paranoia*. You can use each of the chosen spells once per day as 2nd-rank divine innate spells.%r%rGrimspawn typically take *false vitality* and *see the unseen*, pitborn typically take *paranoia* and *shatter*, and hellspawn typically take *invisibility* and *disguise magic*."
     prereq:
       level: 9
@@ -2396,6 +2470,59 @@ pf2e_feats:
     traits:
       - changeling
     shortdesc: "Through your heritage, you can replicate a hag's magic. Choose one common spell of 4th rank or lower from those available to a coven, including the spells contributed to a coven by a hag of your mother's type. You can cast this spell once per day as a 4th-rank occult innate spell.%r%rSpells available to all covens are *augury*, *charm*, *clairaudience*, *clairvoyance*, *dream message*, and *illusory disguise*. The eligible spells granted by the most prominent types of hag are:%r%r**Cuckoo Hag** *nightmare*, *spellwrack*%r%r**Iron Hag** *earthbind*, *spellwrack*%r%r**Sea Hag** *humanoid form*, *mariner's curse*, *water walk*%r%r**Sweet Hag** *charm*, *honeyed words*, *outcast's curse*"
+    # The coven spells and the hag-specific ones of 4th rank or lower. The description also lists
+    # spellwrack (6th) and mariner's curse (5th), which the rank limit leaves out.
+    feat_choice:
+      summary: a 4th-rank occult innate spell
+      options:
+        Augury:
+          grants:
+            magic_stats:
+              innate_spell: { level: 4, name: [ Augury ], tradition: occult, cast_stat: Charisma }
+        Charm:
+          grants:
+            magic_stats:
+              innate_spell: { level: 4, name: [ Charm ], tradition: occult, cast_stat: Charisma }
+        Clairaudience:
+          grants:
+            magic_stats:
+              innate_spell: { level: 4, name: [ Clairaudience ], tradition: occult, cast_stat: Charisma }
+        Clairvoyance:
+          grants:
+            magic_stats:
+              innate_spell: { level: 4, name: [ Clairvoyance ], tradition: occult, cast_stat: Charisma }
+        Dream Message:
+          grants:
+            magic_stats:
+              innate_spell: { level: 4, name: [ Dream Message ], tradition: occult, cast_stat: Charisma }
+        Earthbind:
+          grants:
+            magic_stats:
+              innate_spell: { level: 4, name: [ Earthbind ], tradition: occult, cast_stat: Charisma }
+        Honeyed Words:
+          grants:
+            magic_stats:
+              innate_spell: { level: 4, name: [ Honeyed Words ], tradition: occult, cast_stat: Charisma }
+        Humanoid Form:
+          grants:
+            magic_stats:
+              innate_spell: { level: 4, name: [ Humanoid Form ], tradition: occult, cast_stat: Charisma }
+        Illusory Disguise:
+          grants:
+            magic_stats:
+              innate_spell: { level: 4, name: [ Illusory Disguise ], tradition: occult, cast_stat: Charisma }
+        Nightmare:
+          grants:
+            magic_stats:
+              innate_spell: { level: 4, name: [ Nightmare ], tradition: occult, cast_stat: Charisma }
+        Outcast's Curse:
+          grants:
+            magic_stats:
+              innate_spell: { level: 4, name: [ "Outcast's Curse" ], tradition: occult, cast_stat: Charisma }
+        Water Walk:
+          grants:
+            magic_stats:
+              innate_spell: { level: 4, name: [ Water Walk ], tradition: occult, cast_stat: Charisma }
     prereq:
       level: 13
       heritage: Changeling
@@ -3087,6 +3214,14 @@ pf2e_feats:
       - Human
     traits:
       - human
+    feat_choice:
+      summary: a 2nd-level multiclass dedication feat
+      from_feats:
+        feat_type: Dedication
+        traits:
+          - multiclass
+        max_level: 2
+        ignore_dedication_lock: true
     shortdesc: "You've learned to split your focus between multiple classes with ease. You gain a 2nd-level multiclass dedication feat, even if you normally couldn't take another dedication feat until you take more feats from your current archetype.%r%rIf you have the silyara heritage, you don't need to meet the feat's attribute modifier prerequisites."
     prereq:
       level: 9
@@ -4742,11 +4877,31 @@ pf2e_feats:
     shortdesc: You have a connection to the light or shadow planes, allowing you to summon a divine ally. Choose either *summon celestial* or *summon fiend*. Once per day, you can cast the chosen spell as a 5th-rank divine innate spell, but the creature summoned must be from the same category as your own lineage, such as a creature with the angel trait if you are an angelkin.
     prereq:
       level: 13
-      feat:
-        - any nephilim lineage feat
+      orfeat:
+        - Angelkin
+        - Lawbringer
+        - Musetouched
+        - Grimspawn
+        - Hellspawn
+        - Pitborn
       orheritage:
         - Aesa
         - Niasa
+    feat_choice:
+      summary: a 5th-rank divine innate spell
+      options:
+        Summon Celestial:
+          prereq:
+            orfeat: [ Angelkin, Lawbringer, Musetouched ]
+          grants:
+            magic_stats:
+              innate_spell: { level: 5, name: [ Summon Celestial ], tradition: divine, cast_stat: Charisma }
+        Summon Fiend:
+          prereq:
+            orfeat: [ Grimspawn, Hellspawn, Pitborn ]
+          grants:
+            magic_stats:
+              innate_spell: { level: 5, name: [ Summon Fiend ], tradition: divine, cast_stat: Charisma }
   Supernatural Charm:
     feat_type:
       - Ancestry
@@ -5014,6 +5169,17 @@ pf2e_feats:
     shortdesc: You can transform yourself or the bodies of others to express your displeasure. Once per day, you can cast either *aerial form* or *cursed metamorphosis* as a 7th-rank primal innate spell. You must take the form of a bird when casting this aerial form.
     prereq:
       level: 17
+    feat_choice:
+      summary: a 7th-rank primal innate spell
+      options:
+        Aerial Form:
+          grants:
+            magic_stats:
+              innate_spell: { level: 7, name: [ Aerial Form ], tradition: primal, cast_stat: Charisma }
+        Cursed Metamorphosis:
+          grants:
+            magic_stats:
+              innate_spell: { level: 7, name: [ Cursed Metamorphosis ], tradition: primal, cast_stat: Charisma }
   Tusks (Oruch):
     feat_type:
       - Ancestry

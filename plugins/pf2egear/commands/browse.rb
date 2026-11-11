@@ -19,15 +19,16 @@ module AresMUSH
         return browse_spell_items(kind) if kind
         return browse_runes if %w{rune runes}.include?(self.category)
 
-        list_key = "pf2e_" + category
+        category = Pf2egear::Inventory.shop_category(self.category)
 
-        # Valid category of items?
-        list = Global.read_config(list_key)
-
-        if !list
-          client.emit_failure t('pf2egear.bad_category')
+        unless category
+          client.emit_failure t('pf2egear.bad_shop_category', :category => self.category, :cmd => 'browse',
+                                :categories => (Pf2egear::Inventory.shop_category_names + %w{scroll wand rune}).join(', '))
           return
         end
+
+        self.category = category
+        list = Global.read_config(Pf2egear::Inventory.config(category)) || {}
 
         # The list shows what the character can buy: items of their level or lower, common or ones they
         # have access to, and not something only a class feature makes, such as a versatile vial.

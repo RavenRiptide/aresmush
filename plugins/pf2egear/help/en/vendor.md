@@ -9,7 +9,7 @@ aliases:
 
 # Pathfinder 2E Inventory - Buying and Selling Equipment
 
-Emblem of Ea's inventory system allows characters to buy and sell items from and to the game. There are six categories of items:
+Emblem of Ea's inventory system allows characters to buy and sell items from and to the game. There are seven categories of items:
 
 * Weapons (weapons) - Weapons, including any held item that can be used like a wand or a stave.
 * Armor (armor) - All types of armor.
@@ -27,6 +27,7 @@ Emblem of Ea's inventory system allows characters to buy and sell items from and
 
 `buy <category> = <name>[/<quantity>]`: Buys item in <category> named <name>. Quantity is optional, default is 1.
 `sell <category> = <name>[/quantity>]`: Sells item in <category> named <name> for half of its purchase price. Quantity is optional, default is 1.
+%t **Note:** You can shorten a category to its first few letters, such as `buy magic=Helm of Zeal` or `browse cons`.
 %t **Note:** You can't sell an item a feat or class feature gave you, such as an egalrin feather fan.
 
 ## Scrolls and wands

@@ -76,6 +76,15 @@ module AresMUSH
 
               [ [ nil, Pf2emagic::SpellBooks.instructions(book) ] ]
             }
+          },
+          # A feat staff set up by hand - Bloodline Mutation's traits and benefits, Verdant Weapon's
+          # ikon - tells the player what to put in a request for.
+          {
+            'name' => 'staff request',
+            'when' => lambda { |ctx| ctx[:details]['staff_request'].present? },
+            'apply' => lambda { |ctx|
+              [ [ 'pf2e.feat_staff_request', { :feat => ctx[:feat], :details => ctx[:details]['staff_request'] } ] ]
+            }
           }
         ].freeze
 
@@ -286,7 +295,7 @@ module AresMUSH
           block = Pf2e.feat_choice_def(ctx[:details])
           instance = Pf2e.feat_taken_count(ctx[:char], ctx[:feat]) + 1
 
-          block = nil unless Pf2e.feat_choice_opens_at?(block, instance)
+          block = nil unless Pf2e.feat_choice_opens_at?(block, instance) && Pf2e.feat_choice_open_to?(ctx[:char], block)
 
           return [] unless block
 

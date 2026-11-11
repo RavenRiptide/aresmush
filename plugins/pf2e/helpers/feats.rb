@@ -109,7 +109,10 @@ module AresMUSH
 
     end
 
-    def self.dedication_allowed?(char, details)
+    # `ignore_lock` skips only the second question, for a feat that hands over a dedication "even if
+    # you normally couldn't take another dedication feat until you take more feats from your current
+    # archetype" - Multitalented. Which classes may take the archetype still applies.
+    def self.dedication_allowed?(char, details, ignore_lock = false)
       return true unless details
 
       feat_type = details['feat_type']
@@ -131,7 +134,7 @@ module AresMUSH
 
       # And whether this character may take another dedication yet. PF2e: "You cannot select
       # another dedication feat until you have gained two other feats from the archetype."
-      dedication_archetype_ready?(char)
+      ignore_lock || dedication_archetype_ready?(char)
     end
 
     def self.dedication_archetype_ready?(char)
@@ -184,7 +187,8 @@ module AresMUSH
     end
 
     # Eligibility check for a feat whose details the caller already has.
-    def self.can_take_feat_details?(char, feat, details, effective_level = nil, ignore_charclass = false)
+    def self.can_take_feat_details?(char, feat, details, effective_level = nil, ignore_charclass = false,
+                                    ignore_dedication_lock = false)
       return false if !details
 
       msg = []
@@ -242,7 +246,7 @@ module AresMUSH
       end
 
       # No double-dipping on base class / dedication, per Paizo RAW.
-      msg << 'dedication' unless dedication_allowed?(char, details)
+      msg << 'dedication' unless dedication_allowed?(char, details, ignore_dedication_lock)
 
       # Prereq check, prerequisites includes level
 
@@ -488,7 +492,12 @@ module AresMUSH
         when "has_focus_pool"
           msg << "focus_pool" if Pf2emagic.focus_pool_max(char.magic).zero?
         when "feature"
-          msg << "feature" unless Array(required).all? { |name| holds_feature?(char, name) }
+          # A leading '!' is a feature they must not hold, as `heritage` and `specialize` read it:
+          # Second Blessing offers only the blessings a champion does not already have.
+          banned, wanted = Array(required).map { |name| name.to_s.strip }.partition { |name| name.start_with?('!') }
+
+          msg << "feature" unless wanted.all? { |name| holds_feature?(char, name) }
+          msg << "feature" if banned.any? { |name| holds_feature?(char, name.delete_prefix('!').strip) }
         when "sanctification"
           held = char.pf2_faith['sanctification']
 
@@ -2480,8 +2489,9 @@ module AresMUSH
       feat_types = Array(details['feat_type']).compact.map { |f| f.to_s.downcase }
       return false if feat_types.empty?
 
-      # No double-dipping on base class / dedication, per Paizo RAW.
-      return false unless dedication_allowed?(char, details)
+      # No double-dipping on base class / dedication, per Paizo RAW. A pool may hand over a
+      # dedication regardless of the archetype lock, which is the whole of Multitalented.
+      return false unless dedication_allowed?(char, details, filter['ignore_dedication_lock'])
 
       # A named pair rather than a category: PF2e has features that hand over one of two specific
       # feats, the Druid's Voice of Nature being "your choice of the Animal Empathy or Plant
@@ -2570,7 +2580,7 @@ module AresMUSH
 
       return true if filter['qualify'] == false
 
-      can_take_feat_details?(char, feat_name, details, cap, filter['ignore_charclass'])
+      can_take_feat_details?(char, feat_name, details, cap, filter['ignore_charclass'], filter['ignore_dedication_lock'])
     end
 
     def self.choice_level_cap(char, value)
@@ -2925,6 +2935,16 @@ module AresMUSH
       instance.to_i >= from.to_i
     end
 
+    # A choice may be open only to some takers of its feat: Instinct Ability's free barbarian feat is
+    # the Fury instinct's ability, so its block carries `prereq: { specialize: [ Fury ] }`. Read the
+    # way an option's prereq is, against the level being gained.
+    def self.feat_choice_open_to?(char, block)
+      return false unless block.is_a?(Hash)
+      return true unless block['prereq'].is_a?(Hash)
+
+      choice_option_allowed?(char, block)
+    end
+
     # The subclass a character holds for one archetype, and the initial focus spell it grants.
     def self.archetype_subclass_spell(char, archetype, tier = nil)
       if archetype.blank?
@@ -3236,6 +3256,7 @@ module AresMUSH
       block = feat_choice_def(details)
       return [] unless block
       return [] unless feat_choice_opens_at?(block, feat_taken_count(char, fname))
+      return [] unless feat_choice_open_to?(char, block)
 
       count = choice_count(char, block)
       return [] if count < 1
@@ -3295,7 +3316,7 @@ module AresMUSH
         apply_init_magic_feat(char, fname, fdetails, client)
 
         nested = feat_choice_def(fdetails)
-        nested = nil unless feat_choice_opens_at?(nested, feat_taken_count(char, fname))
+        nested = nil unless feat_choice_opens_at?(nested, feat_taken_count(char, fname)) && feat_choice_open_to?(char, nested)
 
         if nested
           nested_assign = char.pf2_to_assign
@@ -3333,6 +3354,28 @@ module AresMUSH
       msgs.concat(open_chained_choice(char, choice_name, block))
 
       msgs
+    end
+
+    # Answers the choice on a feat a character already has, for a feat that had no choice in the config
+    # when they took it, so the choice never opened. Nothing is drafting, so the answer applies straight
+    # away, as a chargen answer does, and is recorded at the character's current level. Returns an error
+    # string, or the messages the grant produced.
+    def self.answer_held_feat_choice(char, feat_name, label, client = nil)
+      found = get_feat_details(feat_name)
+      return found if found.is_a?(String)
+
+      fname, details = found
+      block = feat_choice_def(details)
+
+      return t('pf2e.held_choice_none', :feat => fname) unless block
+      return t('pf2e.held_choice_not_held', :char => char.name, :feat => fname) unless has_feat?(char, fname)
+      return t('pf2e.held_choice_drafting', :char => char.name, :feat => fname) if Ledger.drafting?(char)
+      return t('pf2e.choice_already_resolved', :choice => fname) if choice_labels_for(char, fname).any?
+
+      matched = match_choice_option(char, fname, block, label)
+      return describe_bad_choice_option(char, fname, block) unless matched
+
+      apply_feat_choice(char, fname, block, matched, client)
     end
 
     # Advancement: staged into pf2_advancement, applied by do_advancement at advance/done.

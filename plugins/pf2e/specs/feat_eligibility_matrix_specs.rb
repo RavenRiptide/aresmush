@@ -51,6 +51,7 @@ module AresMUSH
           'TraditionSkilled' => { 'feat_type' => [ 'General' ], 'prereq' => { 'tradition_skill' => [ 'Sorcerer Archetype/master' ] } },
           'Riposting' => { 'feat_type' => [ 'General' ], 'prereq' => { 'feature' => [ 'Opportune Riposte' ] } },
           'Armament' => { 'feat_type' => [ 'General' ], 'prereq' => { 'feature' => [ 'Blessed Armament' ] } },
+          'NotArmament' => { 'feat_type' => [ 'General' ], 'prereq' => { 'feature' => [ '!Blessed Armament' ] } },
           'Sanctified' => { 'feat_type' => [ 'General' ], 'prereq' => { 'sanctification' => [ 'holy', 'unholy' ] } },
           'Stanced' => { 'feat_type' => [ 'General' ], 'prereq' => { 'stances' => 2 } },
           'Dispeller' => { 'feat_type' => [ 'General' ], 'prereq' => { 'repertoire_spell' => [ 'Dispel Magic' ] } },
@@ -133,6 +134,7 @@ module AresMUSH
       # permission away.
       DENIES = {
         'NotSpecialised' => { :specialize => 'Warpriest' },
+        'NotArmament' => { :features => [ 'Blessing of the Devoted (Blessed Armament)' ] },
         'LineageBound' => { :level => 2 },
         'FighterOnly' => { :charclass => 'Wizard' }
       }.freeze

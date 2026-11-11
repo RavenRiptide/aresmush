@@ -2135,6 +2135,19 @@ pf2e_feats:
         prompt: "Select a divine ally."
         choices: [{"value": "Compendium.pf2e.classfeatures.Item.Blessed Armament"}, {"value": "Compendium.pf2e.classfeatures.Item.Blessed Shield"}, {"value": "Compendium.pf2e.classfeatures.Item.Blessed Swiftness"}]
   Instinct Ability:
+    # The Fury instinct's ability is a 1st-level barbarian feat; the other instincts' abilities are
+    # descriptive and need no choice.
+    feat_choice:
+      summary: a 1st-level barbarian feat
+      prereq:
+        specialize:
+          - Fury
+      from_feats:
+        feat_type: Charclass
+        assoc_charclass:
+          - Barbarian
+        max_level: 1
+        ignore_charclass: true
     assoc_archetype:
       - Barbarian Archetype
     feat_type:

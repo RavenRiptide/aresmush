@@ -24,6 +24,36 @@ module AresMUSH
         expect(Inventory.canonical('sandwich')).to be_nil
       end
 
+      # buy, sell, and browse read their catalogue from the category the player typed. `buy magic=`
+      # once read the witch lessons table as a catalogue and raised on its missing levels.
+      describe "the vendor's categories" do
+        it "should take every spelling and answer with the canonical name" do
+          expect(Inventory.shop_category('weapon')).to eq 'weapons'
+          expect(Inventory.shop_category('Magicitem')).to eq 'magicitem'
+          expect(Inventory.shop_category('consumables')).to eq 'consumables'
+        end
+
+        it "should take the start of exactly one category's name" do
+          expect(Inventory.shop_category('magic')).to eq 'magicitem'
+          expect(Inventory.shop_category('cons')).to eq 'consumables'
+          expect(Inventory.shop_category('shi')).to eq 'shields'
+        end
+
+        it "should refuse a word that is no category, or a config table that is no catalogue" do
+          expect(Inventory.shop_category('sandwich')).to be_nil
+          expect(Inventory.shop_category('magic_lessons')).to be_nil
+          expect(Inventory.shop_category('feat_class')).to be_nil
+          expect(Inventory.shop_category('')).to be_nil
+          expect(Inventory.shop_category(nil)).to be_nil
+        end
+
+        it "should read each category's catalogue from a vendor config" do
+          Inventory.shop_category_names.each do |name|
+            expect(Inventory.config(name)).to eq "pf2e_#{name}"
+          end
+        end
+      end
+
       # PF2e lets a character wear one suit of armour and hold one shield.
       describe "how many may be worn at once" do
         it "should allow one suit of armour and one shield" do

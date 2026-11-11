@@ -10,6 +10,7 @@ en:
     already_set_for_investment: "That item is already set for investment."
 
     bad_category: "Invalid category. See help for assistance."
+    bad_shop_category: "`%{category}` isn't a category the vendor knows. Use one of: %{categories}. For more information about the vendor, see `help %{cmd}`."
     bad_cointype: "Invalid coin type. Use one of: pp gp sp cp"
     bad_format: "I couldn't read `%{item}`. Type `%{cmd} <category>=<number>`, such as `%{cmd} weapons=1`, and separate several items with spaces. Categories you can invest from: %{categories}."
     bad_item_in_list: "One or more of the items you specified were not found. Check your list."

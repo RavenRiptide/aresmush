@@ -56,15 +56,16 @@ module AresMUSH
         # If no quantity is specified, assume they want just one.
         q = self.quantity ? self.quantity : 1
 
-        list_key = "pf2e_" + self.category
+        category = Pf2egear::Inventory.shop_category(self.category)
 
-        # Valid category of items?
-        list = Global.read_config(list_key)
-
-        if !list
-          client.emit_failure t('pf2egear.bad_category')
+        unless category
+          client.emit_failure t('pf2egear.bad_shop_category', :category => self.category, :cmd => 'buy',
+                                :categories => (Pf2egear::Inventory.shop_category_names + %w{scroll wand}).join(', '))
           return
         end
+
+        self.category = category
+        list = Global.read_config(Pf2egear::Inventory.config(category)) || {}
 
         # The list of items in that category gets filtered by character level.
         # What only a class feature makes - a versatile vial - is never for sale.

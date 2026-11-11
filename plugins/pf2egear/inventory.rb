@@ -73,6 +73,26 @@ module AresMUSH
         (row(category) || {})['names']&.first
       end
 
+      # The category a vendor command (buy, sell, browse) means: an exact spelling, or the start of
+      # exactly one category's name, so `magic` is `magicitem`. Nil for anything else. The vendor
+      # reads its catalogue from this row's config, so whatever is typed can't reach a config table
+      # that isn't a catalogue - `buy magic=` once read the witch lessons and raised.
+      def self.shop_category(typed)
+        asked = typed.to_s.downcase.strip
+
+        return nil if asked.empty?
+        return canonical(asked) if row(asked)
+
+        matches = CATEGORIES.select { |r| r['names'].any? { |name| name.start_with?(asked) } }
+
+        matches.size == 1 ? matches.first['names'].first : nil
+      end
+
+      # Every category's canonical name, as a vendor's error message lists them.
+      def self.shop_category_names
+        CATEGORIES.map { |r| r['names'].first }
+      end
+
       def self.model(category)
         name = (row(category) || {})['model']
 

@@ -1305,6 +1305,7 @@ pf2e_feats:
       - druid
     init_magic: true
   Verdant Weapon:
+    staff_request: "which weapon is your verdant weapon, and whether it is a new one or one you already carry"
     assoc_charclass:
       - Druid
     feat_type:
@@ -3640,6 +3641,12 @@ pf2e_feats:
         suboptions: [{"label": "{item|name}", "value": "melodious-spell"}]
         label: "Spellshape"
   Mercy:
+    feat_choice:
+      summary: a mercy
+      options:
+        Mercy of the Body: {}
+        Mercy of Grace: {}
+        Mercy of the Mind: {}
     assoc_charclass:
       - Champion
     feat_type:
@@ -6644,6 +6651,11 @@ pf2e_feats:
         toggleable: true
   Improved Invigorating Elixir:
     repeatable: 2
+    feat_choice:
+      summary: a type of invigoration
+      options:
+        Mental Invigoration: {}
+        Physical Invigoration: {}
     assoc_charclass:
       - Alchemist
     feat_type:
@@ -7113,6 +7125,22 @@ pf2e_feats:
       - cleric
       - divine
   Second Blessing:
+    # A blessing the champion holds already, from Blessing of the Devoted, is not offered again.
+    feat_choice:
+      summary: a second blessing of the devoted
+      options:
+        Blessed Armament:
+          prereq:
+            feature:
+              - "!Blessed Armament"
+        Blessed Shield:
+          prereq:
+            feature:
+              - "!Blessed Shield"
+        Blessed Swiftness:
+          prereq:
+            feature:
+              - "!Blessed Swiftness"
     assoc_charclass:
       - Champion
     feat_type:
@@ -8915,6 +8943,7 @@ pf2e_feats:
     shortdesc: You can suffer so that others might live. You can cast the *champion's sacrifice* devotion spell.
     traits:
       - champion
+    init_magic: true
   Cheat Death:
     assoc_charclass:
       - Swashbuckler
@@ -12797,6 +12826,7 @@ pf2e_feats:
         suboptions: [{"label": "{item|name}", "value": "bloodline-conduit"}]
         label: "Spellshape"
   Bloodline Mutation:
+    staff_request: "which bloodline traits you gain, whether you gain darkvision or low-light vision, and whether you choose flight, amphibious, or resistance (and to which damage type)"
     assoc_charclass:
       - Sorcerer
     feat_type:
