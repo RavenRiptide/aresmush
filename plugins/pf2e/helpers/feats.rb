@@ -651,17 +651,21 @@ module AresMUSH
     end
 
     # The proficiencies a combat_stats prereq factor reads, or nil for a factor it does not know.
-    # Several for Weapon, which any weapon category, group or unarmed attack satisfies.
+    # Several for Weapon, which any weapon category, group or unarmed attack satisfies. A group holds
+    # a rank per category - { 'Sword' => { 'advanced' => 'master' } } - so its ranks are one level
+    # down. Counts the ranks the level in progress raises.
     def self.combat_stat_ranks(char, factor)
-      combat = char.combat
+      combat = DraftSheet.of(char).combat_stats
 
       case factor.to_s.downcase
       when 'perception'
-        [ combat&.perception ]
+        [ combat['perception'] ]
       when 'fortitude', 'reflex', 'will'
-        [ (combat&.saves || {})[factor.to_s.downcase] ]
+        [ combat['saves'][factor.to_s.downcase] ]
       when 'weapon'
-        (combat&.weapon_prof || {}).values + (combat&.weapon_group_prof || {}).values
+        group_ranks = combat['weapon_group_prof'].values.flat_map { |ranks| ranks.is_a?(Hash) ? ranks.values : [ ranks ] }
+
+        combat['weapon_prof'].values + group_ranks
       end
     end
 

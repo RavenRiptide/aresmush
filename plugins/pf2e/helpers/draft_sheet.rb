@@ -105,6 +105,31 @@ module AresMUSH
         progression[[ index + raises, progression.size - 1 ].min]
       end
 
+      # The proficiencies a prerequisite reads off the combat object - perception, saves, weapon
+      # categories and weapon groups - counting the ranks this level raises: the class table's own
+      # `combat_stats` and any a feat grant is holding for advance/done. A rogue's level 7 master
+      # Perception is in the draft when the same level's general feat is picked. Merging keeps the
+      # higher rank, so nothing in the draft lowers one.
+      def combat_stats
+        combat = @char.combat
+
+        held = {
+          'perception' => combat&.perception,
+          'saves' => deep_copy(combat&.saves || {}),
+          'weapon_prof' => deep_copy(combat&.weapon_prof || {}),
+          'weapon_group_prof' => deep_copy(combat&.weapon_group_prof || {})
+        }
+
+        staged = [ draft['combat_stats'] ]
+
+        (draft['grants'] || {}).each_value do |payload|
+          staged << payload['combat_stats'] if payload.is_a?(Hash)
+        end
+
+        staged.select { |stats| stats.is_a?(Hash) }
+              .reduce(held) { |merged, stats| Pf2e.merge_combat_stats(merged, stats.slice(*held.keys)) }
+      end
+
       # rank => [ spells ], for a spontaneous caster's repertoire. Counts the spells this level adds
       # outright - a mystery's or a bloodline's - as well as the ones picked.
       def repertoire(class_key = nil)

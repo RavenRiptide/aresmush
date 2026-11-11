@@ -323,6 +323,52 @@ module AresMUSH
         it "should not count a weapon below the rank asked for" do
           expect(matrix_allows?(matrix_char(:weapon_prof => { 'simple' => 'trained' }), 'Armed')).to be false
         end
+
+        # A group keeps a rank per weapon category, a level below the group's name.
+        it "should count a weapon group's rank" do
+          char = matrix_char
+          allow(char.combat).to receive(:weapon_group_prof).and_return('Sword' => { 'advanced' => 'expert' })
+
+          expect(matrix_allows?(char, 'Armed')).to be true
+        end
+
+        it "should not count a weapon group below the rank asked for" do
+          char = matrix_char
+          allow(char.combat).to receive(:weapon_group_prof).and_return('Sword' => { 'martial' => 'trained' })
+
+          expect(matrix_allows?(char, 'Armed')).to be false
+        end
+
+        # A rogue's level 7 master Perception is staged in the draft when that level's general feat
+        # is picked.
+        it "should count a rank the level-up in progress raises" do
+          char = matrix_char(:advancing => true)
+          allow(char).to receive(:pf2_advancement).and_return('combat_stats' => { 'perception' => 'expert' })
+
+          expect(matrix_allows?(char, 'Watchful')).to be true
+        end
+
+        it "should count a save a feat grant is holding for advance/done" do
+          char = matrix_char(:advancing => true)
+          allow(char).to receive(:pf2_advancement)
+            .and_return('grants' => { 'Some Feat' => { 'combat_stats' => { 'saves' => { 'reflex' => 'expert' } } } })
+
+          expect(matrix_allows?(char, 'Evasive')).to be true
+        end
+
+        it "should not let a lower rank in the draft lower the sheet's" do
+          char = matrix_char(:perception => 'expert', :advancing => true)
+          allow(char).to receive(:pf2_advancement).and_return('combat_stats' => { 'perception' => 'trained' })
+
+          expect(matrix_allows?(char, 'Watchful')).to be true
+        end
+
+        it "should not count a rank the draft raises in another stat" do
+          char = matrix_char(:advancing => true)
+          allow(char).to receive(:pf2_advancement).and_return('combat_stats' => { 'saves' => { 'fortitude' => 'master' } })
+
+          expect(matrix_allows?(char, 'Evasive')).to be false
+        end
       end
 
       # A declared overlap has to be real. Without this the table above could hide a gate that
