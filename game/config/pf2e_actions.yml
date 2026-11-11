@@ -318,6 +318,7 @@ pf2e_actions:
     cost: 1
     category: "class"
     traits: ["swashbuckler"]
+    strikes: {"count": 1, "draws": true, "finisher": true}
   "Bribe Contact":
     from: "action"
     source: "Pathfinder GM Core"
@@ -2849,12 +2850,14 @@ pf2e_actions:
     cost: 1
     category: "class"
     traits: ["alchemist"]
+    strikes: {"count": 1, "attack": "bomb", "draws": true}
   "Quick Draw":
     from: "feat"
     type: "action"
     cost: 1
     category: "class"
     traits: ["gunslinger", "ranger", "rogue"]
+    strikes: {"count": 1, "draws": true}
   "Quick Reversal":
     from: "feat"
     type: "action"

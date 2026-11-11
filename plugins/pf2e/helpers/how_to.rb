@@ -136,9 +136,11 @@ module AresMUSH
 
       def self.action(name)
         entry = Actions.info(name)
-        aimed = (entry['check'] || {})['against'] || entry['strike']
+        aimed = (entry['check'] || {})['against'] || entry['strike'] || entry['strikes']
+        # A weapon is named for a reaction's Strike, and for an action that draws one.
+        weapon = entry['strike'] || (entry['strikes'] || {})['draws']
 
-        { 'name' => name, 'cost' => Actions.cost(name), 'target' => !!aimed, 'strike' => !!entry['strike'] }
+        { 'name' => name, 'cost' => Actions.cost(name), 'target' => !!aimed, 'strike' => !!weapon }
       end
 
       def self.spells_of(magic)

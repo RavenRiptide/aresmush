@@ -528,6 +528,8 @@ en:
 
     # Acting in an encounter: e/act, e/strike, e/cast
     act_announced: "%xh%{actor}%xn uses %{action} (%{cost})%{target}."
+    act_draws: "%xh%{actor}%xn draws %{weapon}."
+    act_finisher_not_strike: "%{finisher} isn't a single Strike, so %{action} can't roll it. Draw your weapon with e/equip, then use e/act %{command}."
     act_at: " at %{target}"
     act_self_effect: "%xh%{actor}%xn uses %{action} (%{cost}): now under %{effect} - %{lasts}."
     act_check_line: "%xh%{actor}%xn uses %{action} on %{target}: %{statistic} %{roll} vs %{defence} %{dc} - %{degree}."

@@ -371,6 +371,68 @@ module AresMUSH
           expect(said).to include('strikes Goblin Warrior #3 with Fist')
         end
 
+        # Quick Draw and Brandishing Draw draw a weapon and Strike with it, for one action. A weapon carried
+        # but not in hand is equipped as `e/equip` would, and nothing but a drawn weapon will do.
+        describe "an action that draws and Strikes" do
+          def rapier
+            state = CombatantStates.of(@encounter, Character[@hero.id])
+            Pf2egear.create_item(state, 'weapons', 'Rapier', 1, Global.read_config('pf2e_weapons', 'Rapier'))
+          end
+
+          def turn
+            TurnState.turn(CombatantStates.of(@encounter, Character[@hero.id]))
+          end
+
+          it "should draw the weapon named and Strike with it" do
+            @hero.update(:pf2_feats => { 'charclass' => [ 'Brandishing Draw' ] })
+            drawn = rapier
+            run(PF2EncounterActCmd, 'e/act brandishing draw=#3/rapier', @hero)
+
+            expect(@client.failures).to eq []
+            expect(said).to include("#{@hero.name}%xn draws Rapier.")
+            expect(said.scan('strikes Goblin Warrior #3 with Rapier').size).to eq 1
+            expect(PF2Weapon[drawn.id].equipped).to be true
+            expect(turn).to include('actions' => 1, 'attacks' => 1)
+          end
+
+          it "should make Brandishing Draw's Strike as the finisher named, for its one action" do
+            @hero.update(:pf2_feats => { 'charclass' => [ 'Brandishing Draw', 'Bleeding Finisher' ] })
+            rapier
+            run(PF2EncounterActCmd, 'e/act brandishing draw=#3/rapier/bleeding finisher', @hero)
+
+            expect(@client.failures).to eq []
+            expect(said).to include('uses Bleeding Finisher')
+            expect(said.scan('strikes Goblin Warrior #3 with Rapier').size).to eq 1
+            expect(turn).to include('actions' => 1, 'attacks' => 1)
+          end
+
+          it "should refuse a finisher the character doesn't have" do
+            @hero.update(:pf2_feats => { 'charclass' => [ 'Brandishing Draw' ] })
+            rapier
+            run(PF2EncounterActCmd, 'e/act brandishing draw=#3/rapier/bleeding finisher', @hero)
+
+            expect(@client.failures.join).to include(t('pf2e.action_not_yours', :action => 'Bleeding Finisher'))
+            expect(said).to_not include('strikes Goblin Warrior #3')
+          end
+
+          it "should refuse a finisher that isn't a single Strike" do
+            @hero.update(:pf2_feats => { 'charclass' => [ 'Brandishing Draw', 'Dual Finisher' ] })
+            rapier
+            run(PF2EncounterActCmd, 'e/act brandishing draw=#3/rapier/dual finisher', @hero)
+
+            expect(@client.failures.join).to include(t('pf2e.act_finisher_not_strike', :finisher => 'Dual Finisher',
+                                                       :action => 'Brandishing Draw', :command => 'dual finisher'))
+          end
+
+          it "should refuse to draw a fist" do
+            @hero.update(:pf2_feats => { 'charclass' => [ 'Quick Draw' ] })
+            run(PF2EncounterActCmd, 'e/act quick draw=#3/fist', @hero)
+
+            expect(@client.failures).to_not be_empty
+            expect(said).to_not include('strikes Goblin Warrior #3')
+          end
+        end
+
         it "should let a character strike a creature with their fist" do
           @dice = 0.75
           run(PF2EncounterStrikeCmd, 'e/strike #3=fist', @hero)

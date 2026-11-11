@@ -952,28 +952,65 @@ module AresMUSH
       STRIKE_KINDS = {
         'unarmed' => ->(attack) { Pf2e.has_trait?(attack['traits'], 'unarmed') },
         'melee' => ->(attack) { !attack['ranged'] },
-        'ranged' => ->(attack) { attack['ranged'] || Array(attack['traits']).any? { |one| one.to_s.start_with?('thrown') } }
+        'ranged' => ->(attack) { attack['ranged'] || Array(attack['traits']).any? { |one| one.to_s.start_with?('thrown') } },
+        'bomb' => ->(attack) { attack['bomb'] },
+        # What can be drawn: anything but a fist or a claw.
+        'drawn' => ->(attack) { !Pf2e.has_trait?(attack['traits'], 'unarmed') }
       }.freeze
+
+      def self.strike_kind?(attack, kinds)
+        kinds.all? do |kind|
+          test = STRIKE_KINDS[kind]
+          Global.logger.warn "Strike kind #{kind} has no test in Acting::STRIKE_KINDS." unless test
+
+          test.nil? || test.call(attack)
+        end
+      end
 
       # An action that is several Strikes - Flurry of Blows' two unarmed ones - or a Strike and something
       # more - Deadly Aim's ranged one - at the one target, each counting toward the multiple attack
       # penalty, for what the action costs, and with the action's own rules switched on. What they hit
       # with is dealt together, so a resistance or weakness applies once to the whole.
+      #
+      # `draws` is an action that draws what it strikes with, as Quick Draw does: a weapon named and
+      # carried but not in hand is equipped first, and the Strike must be made with it. `finisher` is one
+      # that may make its Strike as a one-action finisher the actor has, as Brandishing Draw may: named
+      # after a slash, its own rules and the kind of attack it allows apply too.
       def self.several_strikes(scene, name, entry, words)
         holder = scene.actor.holder
-        kind = entry['strikes']['attack']
-        usable = attacks_of(holder).select { |_, attack| !STRIKE_KINDS[kind] || STRIKE_KINDS[kind].call(attack) }
         named = said(words, scene.permitted)['words']
-        attack = named.map { |word| usable.find { |names, _| names.any? { |one| Domains.slug(one) == Domains.slug(word) } } }.compact.first ||
-                 usable.first
+        finisher = entry['strikes']['finisher'] ? finisher_named(scene, name, named, words) : nil
 
-        return Err.new(:no_attack, 'pf2e.act_no_attack', 'attack' => kind.to_s) unless attack
+        return finisher if finisher.is_a?(Err)
 
-        words = Array(words) + own_toggles(holder, name)
+        drawing = entry['strikes']['draws']
+        kinds = [ entry['strikes']['attack'], drawing ? 'drawn' : nil,
+                  finisher ? Actions.info(finisher)['strikes']['attack'] : nil ].compact.uniq
+
+        return Err.new(:no_target, 'pf2e.act_needs_target') if drawing && !scene.target
+
+        drawn = drawing ? draw!(holder, named) : nil
+        usable = attacks_of(holder).select { |_, attack| strike_kind?(attack, kinds) }
+        attack = if drawn
+                   usable.find { |_, one| one['id'].to_s == drawn.id.to_s }
+                 else
+                   named.map { |word| usable.find { |names, _| names.any? { |one| Domains.slug(one) == Domains.slug(word) } } }.compact.first ||
+                     usable.first
+                 end
+
+        return Err.new(:no_attack, 'pf2e.act_no_attack', 'attack' => (drawn ? drawn.name : kinds.join(' ')).to_s) unless attack
+
+        words = Array(words).reject { |word| finisher && Domains.slug(word) == Domains.slug(finisher) } +
+                own_toggles(holder, name) + (finisher ? own_toggles(holder, finisher) : [])
 
         out = report
         out['lines'] << told('pf2e.act_announced', :actor => scene.actor.label, :action => name,
                                                 :cost => Actions.cost(name), :target => target_phrase(scene))
+        out['lines'] << told('pf2e.act_draws', :actor => scene.actor.label, :weapon => attack.first.first) if drawing
+        if finisher
+          out['lines'] << told('pf2e.act_announced', :actor => scene.actor.label, :action => finisher,
+                                                  :cost => Actions.cost(finisher), :target => target_phrase(scene))
+        end
 
         hits = []
 
@@ -989,6 +1026,42 @@ module AresMUSH
         deal(scene, scene.target, combined(hits), out, :critical => hits.any? { |one| one['critical'] }) if hits.any?
         spend(scene, name, entry, out)
         Ok.new(:state => out)
+      end
+
+      # A weapon named after a slash that the actor carries but has not drawn, equipped as `e/equip`
+      # equips it. One already in hand, or nothing named, draws nothing, and the Strike takes what is in
+      # hand.
+      def self.draw!(holder, named)
+        return nil unless Actors.of(holder).carries_items?
+
+        wanted = named.map { |word| Domains.slug(word) }
+        weapon = Pf2egear::Inventory.held(holder, 'weapons').find do |one|
+          [ one.name, one.nickname ].compact.any? { |called| wanted.include?(Domains.slug(called)) }
+        end
+
+        return nil unless weapon
+
+        weapon.update(:equipped => true) unless weapon.equipped
+        weapon
+      end
+
+      # The finisher named among what was said, if any: one the actor has, that is a single Strike.
+      def self.finisher_named(scene, action, named, words)
+        wanted = named.map { |word| Domains.slug(word) }
+        finisher = Actions.catalogue.find do |one, info|
+          wanted.include?(Domains.slug(one)) && Pf2e.has_trait?(info['traits'], 'finisher')
+        end&.first
+
+        return nil unless finisher
+
+        unless Actions.info(finisher)['strikes'] && Actions.info(finisher)['strikes']['count'].to_i == 1
+          return Err.new(:finisher_not_strike, 'pf2e.act_finisher_not_strike', 'finisher' => finisher, 'action' => action,
+                                                                                'command' => finisher.downcase)
+        end
+
+        allowed = Actors.of(scene.actor.holder).may_use(finisher)
+
+        allowed.err? && !forced?(scene, words) ? allowed : finisher
       end
 
       # The circumstances an action's own rules declare to switch themselves on, which using it does.
