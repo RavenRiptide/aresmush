@@ -1,5 +1,5 @@
 ---
-toc: Pathfinder Second Edition
+toc: Pathfinder Second Edition - Advancement
 summary: Commands related to advancement, skills, and attributes.
 aliases:
 - advanceskills

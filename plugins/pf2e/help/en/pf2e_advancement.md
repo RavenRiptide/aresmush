@@ -1,5 +1,6 @@
 ---
-toc: Pathfinder Second Edition
+toc: Pathfinder Second Edition - Advancement
+tutorial: true
 summary: Commands related to experience and advancement.
 aliases:
 - advance

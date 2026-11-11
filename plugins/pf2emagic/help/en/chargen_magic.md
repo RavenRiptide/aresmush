@@ -1,5 +1,5 @@
 ---
-toc: Magic In Pathfinder Second Edition
+toc: Pathfinder Second Edition - Chargen
 summary: Customizing magic in character generation.
 aliases:
 - addspell

@@ -17,7 +17,7 @@ Some feats and class features have you make a choice during your daily preparati
 `unprepare/<switch>`: Takes back a pick you made since your last rest. If it replaced a pick that was still in force, that pick comes back.
 `prepared`: Shows your daily choices, after any prepared spells.
 
-## The switches
+## Daily choice types
 
 `prepare/longevity <skill>`: **Ancestral Longevity.** Picks the skill you're trained in until your next rest.
 `prepare/studies <skill>`: **Flexible Studies.** Picks the skill you're trained in until your next rest.
@@ -27,7 +27,7 @@ Some feats and class features have you make a choice during your daily preparati
 `prepare/vialmaterial <material>`: **Advanced Vials** (Bomber). Picks the material of the day's versatile vials.
 `prepare/broom <item>`: **Witch's Broom.** Picks the broom, staff, or polearm you anoint for the day.
 `prepare/cauldron <oil or potion>`: **Cauldron.** Picks the oil or potion you brew each day, from the formulas you know. It stays in force until you pick another, and each rest brews a new batch. If you pick in an encounter, the batch is brewed there right away, and changing your pick replaces what's left of the old batch.
-`prepare/charge <who>[, <who>...]`: **Witch's Charge.** Picks your charge for the day. With Witch's Communion, you can name as many charges as your Intelligence modifier. Each charge sees the effect in their own effect list.
+`prepare/charge <who>[, <who>...]`: **Witch's Charge.** Picks your charge for the day. With Witch's Communion, you can specify as many charges as your Intelligence modifier. Each charge sees the effect in their own effect list.
 `prepare/rootmagic <who>`: **Root Magic.** Picks the ally you give your pouch to for the day.
 `prepare/stratagem <who>[, <who>...]`: **Inspired Stratagem.** Picks up to five allies you review stratagems with for the day. Use the reaction with `encounter/act inspired stratagem=<who>`, once on each of them until your next rest.
 `prepare/flexibility <feat>`: **Combat Flexibility.** Picks the fighter feat you have for the day.
@@ -40,8 +40,8 @@ To pick a feat that has its own choice, put the choice after a colon, such as `p
 
 A feat you have for the day is on your sheet, marked `DA`.
 
-To name someone, use the name of an approved character, or the name of a creature in your encounter. Put commas between names. With no names, `prepare/<switch>` lists the people in the room and the creatures in your encounter.
-%t **Note:** A creature you name counts only in the encounter you named it in.
+To specify someone, use the name of an approved character, or the name of a creature in your encounter. Put commas between names. With no names, `prepare/<switch>` lists the people in the room and the creatures in your encounter.
+%t **Note:** A creature you specify counts only in the encounter you specified it in.
 
 ## Choosing again without a rest
 

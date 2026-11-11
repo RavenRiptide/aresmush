@@ -34,15 +34,15 @@ The game puts a prefix, such as `[PF]`, in front of the lines it writes for you,
 
 ## Bonuses for specific actions
 
-Some bonuses only apply to a particular action. For example, a Skeleton Key helps you pick a lock, but doesn't help with other Thievery checks. To claim a bonus like this, name the action after a slash.
+Some bonuses only apply to a particular action. For example, a Skeleton Key helps you pick a lock, but doesn't help with other Thievery checks. To claim a bonus like this, specify the action after a slash.
 %t **Examples**:
 %t `roll thievery/pick-a-lock` rolls Thievery, and counts any bonus that applies to picking a lock.
 %t `roll thievery/pick-a-lock/25` does the same against DC 25.
 %t **Note:** You can put the DC and the action in either order.
 
-You don't need to name the action for a bonus that only depends on your gear. An item you're wearing (and have invested, if it needs investing) applies its bonus on its own.
+You don't need to specify the action for a bonus that only depends on your gear. An item you're wearing (and have invested, if it needs investing) applies its bonus on its own.
 
-`sheet/why <figure>`: Lists your conditional bonuses for `<figure>`, and the circumstance each one needs, so you can see which ones are worth naming.
+`sheet/why <figure>`: Lists your conditional bonuses for `<figure>`, and the circumstance each one needs, so you can see which ones are worth specifying.
 
 ## Other dice commands
 
@@ -52,6 +52,6 @@ You don't need to name the action for a bonus that only depends on your gear. An
 
 `roll/taketen <skill>[/<dc>]`: Forgo the roll and take a flat 10 instead, for characters with the Assurance feat and the Assured Knowledge feat.
 %t **Examples**:
-%t`roll/taketen Nature` with expert Nature at level 4 outputs `Cor'lana foregoes a roll to take 10 on Nature and gets: (10) + 8 = 18`.
+%t`roll/taketen Nature` with expert Nature at level 4 outputs `Sandy foregoes a roll to take 10 on Nature and gets: (10) + 8 = 18`.
 
 `roll/taketen Nature/20` does the same and reports the degree of success against DC 20. As with any take 10 result, there is no natural 20 or natural 1, so the degree is never stepped up or down.

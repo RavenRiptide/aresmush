@@ -21,7 +21,7 @@ Each time you save a creature, you create a new revision of it. An encounter kee
 
 ## Making a custom creature
 
-`creature/save <name>=<description>`: Creates or updates a custom creature from a one-line description, written the same way `encounter/add` reads it (see `help encounter_creatureimport`): `creature/save Barrow Hound=ac 18 hp 40 level 3; strike jaws +11 1d10+5 piercing`.
+`creature/save <name>=<description>`: Creates or updates a custom creature from a one-line description, written the same way `encounter/add` reads it (see `help e/import`): `creature/save Barrow Hound=ac 18 hp 40 level 3; strike jaws +11 1d10+5 piercing`.
 %t **Note:** Saving a creature again under a name you already have creates a new revision of it.
 `creature/save <name>=#<id>`: Saves a combatant from an encounter you're running as a custom creature called `<name>`.
 `creature/clone <creature>=<new name>`: Copies a bestiary creature, or a custom creature you can see, under a new name so you can change it.

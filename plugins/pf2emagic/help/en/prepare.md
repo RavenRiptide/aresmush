@@ -1,5 +1,5 @@
 ---
-toc: Magic In Pathfinder Second Edition
+toc: Pathfinder Second Edition - Magic
 summary: Preparing spells.
 aliases:
 - prepare
@@ -57,11 +57,11 @@ A wizard with one of these feats prepares through its own switch. `prepared` and
 `prepare/spellmastery [<rank> =] <spell>`: Masters `<spell>`, at its own rank or at `<rank>`. A spell already mastered at that rank is replaced.
 `unprepare/spellmastery <spell>`: Stops mastering `<spell>`.
 
-To cast from one of these slots, cast the spell as usual. A combined spell is cast by naming either of its spells.
+To cast from one of these slots, cast the spell as usual. A combined spell is cast by specifying either of its spells.
 
 ## Staves
 
-You can prepare one staff a day, if at least one of its spells is on a spell list you cast from. Only you can cast from it that day. To cast from it, see `help encounter_gear`.
+You can prepare one staff a day, if at least one of its spells is on a spell list you cast from. Only you can cast from it that day. To cast from it, see `help e/gear`.
 
 **Commands**:
 `prepare/staff <staff>`: Prepares a staff you carry for the day. It gets charges equal to the rank of your highest spell slot.

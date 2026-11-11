@@ -14,7 +14,7 @@ Feats in Pathfinder are special abilities that are tied to a character's develop
 These commands can be used to review the feats you have or determine which ones you qualify for.
 
 `feat/info [<character name>]`: Shows details for all feats `<character name>` currently possesses. If `<character name>` is omitted, it will show the details for all of your feats.
-`feat <name>`: Shows details for the named feat.
+`feat <name>`: Shows details for the specified feat.
 `cg/feat <type>[/<restriction>] = <feat name>`: Sets a feat in chargen. `<type>` can be `general`, `skill`, `dedication`, `charclass`, `ancestry`, or `special`. The optional `<restriction>` parameter is only checked if `<type>` is "special", which is used for feats where you're limited in what you can take.
 `cg/info <type> feat`: Shows all feats for which the character qualifies but does not yet have. Use `advance/info <type> feat` instead while advancing. `<type>` can be `general`, `skill`, `dedication`, `charclass`, `ancestry`, or `archetype`. Long lists are paginated, so add a page number to see later pages (for example, `cg/info2 charclass feat`).
 

@@ -13,7 +13,7 @@ Staff can make some modifications to characters' sheets.
 ### RPP
 **Commands**:
 `rpp <name>`: Shows currently available RPP and total RPP for a player. You can specify any alt of a player to see that player's RPP. 
-`rpphist <name>` (alias: `listrpp`) Shows the history of RPP received and spent for the named player in reverse chronological order. You can specify any alt of a player to see information for that player.
+`rpphist <name>` (alias: `listrpp`) Shows the history of RPP received and spent for the specified player in reverse chronological order. You can specify any alt of a player to see information for that player.
 
 `rpp/award <name>=<award>[/<reason>]`: Awards a PC RPP. Note that RPP is tracked per player, not per character.
 `rpp/spend <name>=<spend>[/<reason>]`: Spends RPP for a player.

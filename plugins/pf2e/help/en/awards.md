@@ -1,5 +1,5 @@
 ---
-toc: Pathfinder Second Edition
+toc: Pathfinder Second Edition - Admin
 summary: Admin commands to award players.
 aliases:
 - admin awards

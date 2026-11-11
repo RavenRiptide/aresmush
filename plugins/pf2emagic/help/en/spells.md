@@ -1,5 +1,5 @@
 ---
-toc: Magic In Pathfinder 2e
+toc: Pathfinder Second Edition - Magic
 summary: Other spell-related commands.
 aliases:
 - spell
@@ -39,7 +39,7 @@ You need the full price to try. On a critical success you learn the spell for ha
 
 **Commands**:
 `spell/learn <spell name>`: Learns `<spell name>` into your spellbook or book.
-`spell/learn <book or class>/<spell name>`: Learns it into the one you name, if you keep more than one.
+`spell/learn <book or class>/<spell name>`: Learns it into the one you specify, if you keep more than one.
 
 ## Casting Spells
 Casting spells depends on what type of spell you'd like to cast. For more information about casting spells and a full list of casting commands, see `help casting`.

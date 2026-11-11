@@ -1,5 +1,5 @@
 ---
-toc: Pathfinder Second Edition
+toc: Pathfinder Second Edition - Chargen
 summary: Starting character generation - languages.
 aliases:
 - cg_lang

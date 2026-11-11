@@ -1,16 +1,26 @@
 ---
-toc: Pathfinder Second Edition
+toc: Pathfinder Second Edition - Encounters
 summary: Cover, concealment, and finding hidden creatures in an encounter.
 aliases:
-- encounter_cover
-- encounter cover
+- e_cover
+- e_conceal
+- e_trust
+- e_untrust
 - cover
 - conceal
 - trust
+- pf2e_encounter_cover
+- concealment
+- hidden
+- undetected
+- seek
+- sneak
+- create_a_diversion
+- recall_knowledge
 ---
 # Pathfinder 2E Encounters - Cover and Concealment
 
-The GM, or a player the GM trusts for this encounter, sets cover and concealment on a target. Every attack and check against the target uses them until someone changes them.
+The GM, or a player the GM trusts for this encounter to act as an assistant, sets cover and concealment on a target. Every attack and check against the target uses them until someone changes them.
 
 ## Setting cover and concealment
 
@@ -27,12 +37,12 @@ Concealment applies to everyone, even though the rules sometimes depend on who i
 `encounter/act seek=<targets>`: Rolls your Perception once against the Stealth DC of each target (`<targets>`, separated by commas). A success makes an undetected target hidden, and a hidden target seen. A critical success makes either one seen.
 `encounter/act hide=<targets>` and `encounter/act sneak=<targets>`: Roll your Stealth once against the Perception DC of each target (`<targets>`, separated by commas), and make you hidden or undetected, depending on the result.
 %t **Note:** Against several targets, your worst result decides how well hidden you are, because concealment applies to everyone. The GM can change the result with `encounter/conceal`.
-`encounter/act create a diversion=<targets>/<traits>`: Rolls your Deception once against the Perception DC of each target (`<targets>`, separated by commas), and shows the result against each. You must name the traits your diversion gains from how you do it (`<traits>`): `manipulate` for a gesture or trick, `auditory linguistic` for distracting words, or all three for both.
-%t **Note:** The traits you name count for the action. If you're grabbed, for example, a `manipulate` diversion needs a flat check.
+`encounter/act create a diversion=<targets>/<traits>`: Rolls your Deception once against the Perception DC of each target (`<targets>`, separated by commas), and shows the result against each. You must specify the traits your diversion gains from how you do it (`<traits>`): `manipulate` for a gesture or trick, `auditory linguistic` for distracting words, or all three for both.
+%t **Note:** The traits you specify count for the action. If you're grabbed, for example, a `manipulate` diversion needs a flat check.
 %t **Examples**:
 %t `encounter/act create a diversion=#2,#3/manipulate`
 %t `encounter/act create a diversion=#2,#3/auditory linguistic manipulate`
 %t **Note:** The game doesn't make you hidden when a diversion succeeds, because the rules leave some of how long that lasts to the GM. The GM sets your concealment with `encounter/conceal`.
-`encounter/act recall knowledge=<creature>`: Rolls against a DC based on the creature's level and rarity, using a skill that covers the creature's type unless you name one, such as `/religion`. The GM tells you what you learn; the game doesn't show you the creature's stat block.
+`encounter/act recall knowledge=<creature>`: Rolls against a DC based on the creature's level and rarity, using a skill that covers the creature's type unless you specify one, such as `/religion`. The GM tells you what you learn; the game doesn't show you the creature's stat block.
 
-For other actions, see `help encounter actions` or [read it on the web](/help/pf2e_encounter_actions).
+For more information about other actions, see `help e/act`.

@@ -1,5 +1,5 @@
 ---
-toc: Magic In Pathfinder Second Edition
+toc: Pathfinder Second Edition - Magic
 summary: Searching the spell database. 
 aliases:
 - spellsearch

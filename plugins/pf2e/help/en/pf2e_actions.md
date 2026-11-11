@@ -14,7 +14,7 @@ Everyone has the basic, skill, exploration, and downtime actions. Any other acti
 ### Viewing actions
 `action <name>`: Shows an action's cost, how often it can be used, and what it does. If using the action puts an effect on you, this also shows the effect, how long it lasts, and the command that applies it.
 `action/search <words>`: Lists the actions whose names contain all of `<words>`.
-`action/available [<mode>]`: Lists the actions you can use, grouped by cost. Name a mode to see only the actions for that mode: `combat` (or `encounter`), `exploration`, `downtime`, or `reactions`. `action/available/combat` also works.
+`action/available [<mode>]`: Lists the actions you can use, grouped by cost. Specify a mode to see only the actions for that mode: `combat` (or `encounter`), `exploration`, `downtime`, or `reactions`. `action/available/combat` also works.
 %t **Note:** An action marked `*` puts an effect on you when you use it.
 
 ### Using actions
@@ -24,6 +24,6 @@ Everyone has the basic, skill, exploration, and downtime actions. Any other acti
 %t `action/use mountain stance`
 %t **Note:** Some effects need details that only you know, such as the rank you cast a spell at. Add these details as options after the action's name: `rank <n>`, `value <n>`, or an answer to a question the effect asks. These are the same options `effect/add` takes.
 
-`action/use` is the same command as `encounter/act`. An action that rolls a check against someone needs a target, such as `encounter/act <name>=<target>`. In an encounter, `encounter/act` also rolls the action's check against its target and applies the outcome; see `help encounter actions`.
+`action/use` is the same command as `encounter/act`. An action that rolls a check against someone needs a target, such as `encounter/act <name>=<target>`. In an encounter, `encounter/act` also rolls the action's check against its target and applies the outcome; see `help e/act`.
 
 The encounter also tracks how often you've used each action. If you go over an action's limit, the game shows you, but doesn't stop you. You can tell the GM if you messed up, and they can undo your action for you.

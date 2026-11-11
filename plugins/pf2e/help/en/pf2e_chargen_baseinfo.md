@@ -1,5 +1,5 @@
 ---
-toc: Pathfinder Second Edition
+toc: Pathfinder Second Edition - Chargen
 summary: Starting character generation - basic information.
 aliases:
 - cg_baseinfo

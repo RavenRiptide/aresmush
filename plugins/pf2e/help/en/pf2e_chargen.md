@@ -1,5 +1,6 @@
 ---
-toc: Pathfinder Second Edition
+toc: Pathfinder Second Edition - Chargen
+tutorial: true
 summary: Starting character generation - basic information.
 order: 2
 aliases:
@@ -10,7 +11,7 @@ aliases:
 
 Now it's time to begin assembling your character's Pathfinder 2E character sheet.
 
-Begin by inputting the following command: `cg/review`.
+**Begin by inputting the following command: `cg/review`.**
 
 `cg/review` is your friend and guidebook through the sheet generation process. When you enter cg/review, you begin with the **Basic Information** stage. Afterwards, you'll progress to the **Attributes**, **Skills & Languages**, and **Feats & Magic** stages.
 

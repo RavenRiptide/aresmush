@@ -35,15 +35,15 @@ Each rest makes the items on your alchemy list and gives you your versatile vial
 `encounter/alchemy/vial`: Makes a quick vial, which spends no vial and lasts until the end of your turn. You can throw a quick vial, but you can't spend it on Quick Alchemy.
 %t **Note:** Quick Alchemy needs an Alchemist's Toolkit that you're carrying and haven't put in a bag.
 
-To throw a versatile vial, Strike with it like any other bomb (see `help encounter_actions`). To get vials back by gathering reagents, ask the GM, who uses `encounter/gather` (see `help rest`).
+To throw a versatile vial, Strike with it like any other bomb (see `help e/strike`). To get vials back by gathering reagents, ask the GM, who uses `encounter/gather` (see `help rest`).
 
 Some research fields add commands:
 
 `sheet/option bomber-field-vials=<cold, electricity, or fire>`: **Bomber.** Sets the damage type your vials deal. Use `sheet/option bomber-field-vials=off` to go back to acid.
 `prepare/vialmaterial <adamantine, cold iron, or dawnsilver>`: **Bomber, 11th level.** Sets the material of the day's vials (see `help daily_choices`).
-`encounter/poison <weapon>=versatile vial`: **Toxicologist.** Applies a vial to a weapon as an injury poison (see `help encounter_gear`).
+`encounter/poison <weapon>=versatile vial`: **Toxicologist.** Applies a vial to a weapon as an injury poison (see `help e/gear`).
 `encounter/use consumables=<vial>[/<who>]`: **Chirurgeon.** Drinks a versatile vial to heal, or throws it to heal someone else.
 `encounter/use consumables=<vial>`: **Mutagenist.** Drinks a versatile vial to suppress the drawbacks of your newest mutagen.
 `encounter/mutagenreroll`: **Mutagenist, 5th level.** Ends your mutagen to reroll your last check, if it was a Fortitude save.
 `encounter/persistentmutagen`: **Persistent Mutagen.** Makes the mutagen you drank most recently last until your next rest. You can use it once a day.
-`encounter/spray <who>`: **Toxicologist, 13th level.** When a creature fails its first saving throw against a poison you applied, sprays it onto the creature you name. You have until the end of your turn.
+`encounter/spray <who>`: **Toxicologist, 13th level.** When a creature fails its first saving throw against a poison you applied, sprays it onto the creature you specify. You have until the end of your turn.

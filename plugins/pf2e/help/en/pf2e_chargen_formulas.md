@@ -1,5 +1,5 @@
 ---
-toc: Setting Up Formulas
+toc: Pathfinder Second Edition - Chargen
 summary: How to pick the formulas your class and feats give you.
 aliases:
 - cg_formula

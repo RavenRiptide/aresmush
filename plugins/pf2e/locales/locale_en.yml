@@ -1134,7 +1134,7 @@ en:
     creature_not_open: "%{creature} isn't in Monster Core or Monster Core 2, which anyone can use. A Plotmaster or staff can add any other creature."
     creature_saved_not_open: "%{creature} isn't approved yet. Anyone can add a saved creature once an admin approves it: creature/submit %{creature}."
     creature_custom_not_open: "Only a Plotmaster or staff can add a custom creature. e/bestiary <words> finds creatures in Monster Core or Monster Core 2."
-    described_needs: "A custom creature needs its %{missing}: e/add <name>=ac 16 hp 20 fort 5 ref 7 will 3 perception 2. See help encounter_creatureimport."
+    described_needs: "A custom creature needs its %{missing}: e/add <name>=ac 16 hp 20 fort 5 ref 7 will 3 perception 2. See help e/import."
     described_part: "Couldn't read '%{words}' as part of a creature. After its stats, each part comes after a semicolon: %{parts}."
     described_strike: "Couldn't read '%{words}' as a Strike. Write it as: strike shortsword +9 1d6+4 piercing (agile, finesse)"
     described_shield: "Couldn't read '%{words}' as a shield. Write it as its Hardness and Hit Points: shield 5 20, or shield tower shield 5 20 +3"

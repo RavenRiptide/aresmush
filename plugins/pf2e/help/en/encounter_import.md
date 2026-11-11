@@ -1,13 +1,15 @@
 ---
-toc: Pathfinder Second Edition
+toc: Pathfinder Second Edition - Running Encounters
 summary: Adding temporary custom creatures to encounters.
 aliases:
+- e_import
 - encounter_creatureimport
-- encounter creatureimport
+- pf2e_encounter_creatureimport
+- custom_creatures
 ---
 # Pathfinder 2E Encounters - Adding Temporary Custom Creatures to Encounters
 
-Plotmasters and staff can add a custom creature to an encounter by describing it on one line. This is useful for a custom creature you want to use, but don't expect to run again. To save a permanent copy of a creature to use in other encounters, see `help creatures` or [read it on the web](/help/pf2e_creatures).
+Plotmasters and staff can add a custom creature to an encounter by describing it on one line. This is useful for a custom creature you want to use, but don't expect to run again. For more information about saving a permanent copy of a creature to use in other encounters, see `help creatures` or [read it on the web](/help/pf2e_creatures).
 
 `encounter/add [elite|weak] <name>=<description>`: Adds a custom creature called `<name>`, built from `<description>`, to the encounter.
 %t **Example**:
@@ -27,4 +29,4 @@ A description starts with the creature's statistics. Each other part comes after
   - Damage written with its save, such as `3d6 fire damage (DC 20 basic Reflex save)`, is dealt according to each target's result.
   - Outcomes written the way a stat block writes them, each on its own line after `%r` (such as `Failure The creature is Frightened 2.`), apply the conditions they name.
 
-A custom creature fights just like a creature from the bestiary: it makes Strikes, takes damage, and uses its abilities. You can make it elite or weak with `encounter/add elite` or `encounter/adjust`; see `help encounter_runner` or [read it on the web](/help/pf2e_encounter_runner).
+A custom creature fights just like a creature from the bestiary: it makes Strikes, takes damage, and uses its abilities. You can make it elite or weak with `encounter/add elite` or `encounter/adjust`. See `help e/add` for more information.

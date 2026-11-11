@@ -1,5 +1,5 @@
 ---
-toc: Magic In Pathfinder 2e
+toc: Pathfinder Second Edition - Magic
 summary: Commands used to cast spells.
 aliases:
 - cast
@@ -9,7 +9,7 @@ aliases:
 
 # Casting Spells in Pathfinder 2e
 
-You cast spells in an encounter, using what your last rest there gave you: the day's spell slots, your Focus Points, and your innate spells' uses. You can't cast spells outside an encounter. See "Spells" in `help encounter actions` or [read it on the web](/help/pf2e_encounter_actions) for how the game resolves a spell.
+You cast spells in an encounter, using what your last rest there gave you: the day's spell slots, your Focus Points, and your innate spells' uses. You can't cast spells outside an encounter. See `help e/cast` or [read it on the web](/help/encounter_cast) for how the game resolves a spell.
 
 `encounter/cast <spell>[=<target>,<target>...][/rank <n>][/class <class>][/<how>]`: Casts a spell in the encounter.
 %t **Examples**:

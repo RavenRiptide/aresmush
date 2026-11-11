@@ -12,7 +12,7 @@ Between fights, the party explores: traveling, searching, and recovering. Explor
 
 ## For the GM
 
-`encounter/explore[=<encounter ID>]`: Starts an exploration in the scene, with you as its GM. Name an earlier encounter, such as the fight that just ended, and everyone who was in it continues as they left it.
+`encounter/explore[=<encounter ID>]`: Starts an exploration in the scene, with you as its GM. Specify an earlier encounter, such as the fight that just ended, and everyone who was in it continues as they left it.
 `encounter` or `encounter/start`: While the party is exploring, ends the exploration and starts a fight that continues from it. Everyone exploring joins the fight immediately and rolls initiative based on their exploration activity. Add the creatures with `encounter/add`.
 `encounter/end <encounter ID>`: Ends a fight. To continue exploring from it, use `encounter/explore=<encounter ID>`.
 `encounter/rest`: Declares that a night has passed. It works the same in an exploration as in a fight; see `help rest` or [read it on the web](/help/pf2e_daily).

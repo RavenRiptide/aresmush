@@ -1,5 +1,5 @@
 ---
-toc: Pathfinder Second Edition
+toc: Pathfinder Second Edition - Advancement
 summary: Commands related to advancement and archetypes.
 aliases:
 - advancearchetypes

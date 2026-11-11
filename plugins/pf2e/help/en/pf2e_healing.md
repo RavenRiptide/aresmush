@@ -14,21 +14,21 @@ You can target a combatant by their ID from `encounter/view`, such as `damage #3
 
 ## Anyone in the encounter
 
-`heal <list>=<amount>[ <action>]`: Heals each combatant in `<list>` for `<amount>`, up to their maximum Hit Points. Name the action, such as `treat wounds`, to apply any healing bonus for that action.
+`heal <list>=<amount>[ <action>]`: Heals each combatant in `<list>` for `<amount>`, up to their maximum Hit Points. Specify the action, such as `treat wounds`, to apply any healing bonus for that action.
 
 ## The GM
 
-`damage[/ndc] <list>=<amount>[ <kind>[ <what else>...]]`: Damages each combatant in `<list>` for `<amount>`. Name the damage type (such as `fire`, `cold`, or `persistent-damage`) to apply the target's immunities, weaknesses, and resistances before the damage lands; without a type, nothing resists the damage. After the type, add any other properties of the damage (`silver`, `cold iron`, `magical`, `holy`, `area`, `splash`, `spell`, or `nonlethal`), so that weaknesses and resistances that depend on them apply: `damage #3=12 slashing silver`.
+`damage[/ndc] <list>=<amount>[ <kind>[ <what else>...]]`: Damages each combatant in `<list>` for `<amount>`. Specify the damage type (such as `fire`, `cold`, or `persistent-damage`) to apply the target's immunities, weaknesses, and resistances before the damage lands; without a type, nothing resists the damage. After the type, add any other properties of the damage (`silver`, `cold iron`, `magical`, `holy`, `area`, `splash`, `spell`, or `nonlethal`), so that weaknesses and resistances that depend on them apply: `damage #3=12 slashing silver`.
 %t **Note:** Damage from a Plotmaster or staff can kill a character whose Dying value reaches the death threshold, unless you add `/ndc`. Damage from anyone else never kills a character; it leaves them unconscious instead.
 `condition/set <list>=<condition>[/<value>]`: Sets `<condition>` on each combatant in `<list>`. `<value>` is 1-5, and 0 clears the condition.
 %t **Note:** Only a Plotmaster or staff can give a character Drained or Doomed, but anyone running the encounter can lower or clear them. Only a Plotmaster or staff can mark a character dead with `condition/set <who>=dead`, and `condition/set <who>=dead/0` brings the character back, unconscious at 0 HP.
 
-## At 0 hit points
+## When a character is reduced to 0 hit points
 
 A character reduced to 0 HP is dying: Dying 1, or Dying 2 from a critical hit, plus their Wounded value. From then on, their turn comes right before the turn of whoever was acting when they fell, and they roll a recovery check at the start of each of their turns. While dying, they can't act, except to use a reaction that could have prevented the hit that dropped them.
 
 - **A nonlethal hit** knocks a character out without killing them: they're unconscious at 0 HP, not dying, and wake up once healed.
-- **Damage of at least twice their maximum HP in a single hit** kills a character outright, if the encounter allows death.
+- **Damage of at least twice their maximum HP in a single hit** kills a character outright, if the encounter is in a Death Consent scene.
 
 ## First aid and recovery
 

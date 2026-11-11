@@ -63,7 +63,7 @@ Feats cannot be set directly. To change a character's feats, use `admin/rollback
 
 ### Rolling a character back to an earlier level
 **Command**:
-`admin/rollback <character> = <level>`: Puts a character back to just before the level you name, so they can make that level's choices again with `advance`. Everything they chose at that level and above is set aside, the XP those levels cost is refunded, and they are told in-game (if they are connected).
+`admin/rollback <character> = <level>`: Puts a character back to just before the level you specify, so they can make that level's choices again with `advance`. Everything they chose at that level and above is set aside, the XP those levels cost is refunded, and they are told in-game (if they are connected).
 `admin/unrollback <character>`: Undoes the last rollback on the character and puts the choices back exactly as they were, which is the command to reach for if you rolled back the wrong person or the wrong level.
 
 Two things a rollback deliberately leaves alone:

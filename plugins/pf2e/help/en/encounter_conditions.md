@@ -1,13 +1,27 @@
 ---
-toc: Pathfinder Second Edition
+toc: Pathfinder Second Edition - Encounters
 summary: Being grabbed or held, conditions that limit your actions, and afflictions in an encounter.
 aliases:
-- encounter_conditions
-- encounter conditions
+- e_conditions
+- pf2e_encounter_conditions
+- grabbed
+- restrained
+- swallowed
+- engulfed
+- afflictions
+- prone
+- blinded
+- dazzled
+- deafened
+- stupefied
+- confused
+- fleeing
+- paralyzed
+- sickened
 ---
 # Pathfinder 2E Encounters - Conditions and Afflictions
 
-For setting and clearing conditions, see `help heal` or [read it on the web](/help/pf2e_healing). For how conditions that come with effects work, see `help effects` or [read it on the web](/help/pf2e_effects).
+For more information about setting and clearing conditions, see `help heal` or [read it on the web](/help/pf2e_healing). For more information about conditions that come with effects, see `help effects` or [read it on the web](/help/pf2e_effects).
 
 ## Grabbed and held
 
