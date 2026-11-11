@@ -1183,8 +1183,16 @@ module AresMUSH
           seen = PF2EncounterHandler.new.handle(request(@hero, 'id' => @encounter.id))
 
           expect(seen[:combatants].map { |one| one[:id] }).to eq [ 1, 2 ]
-          expect(seen[:combatants].last[:hp]).to be_nil
+          expect(seen[:combatants].last[:hp]).to eq t('pf2e.wounds_unhurt')
           expect(PF2EncounterHandler.new.handle(request(@gm, 'id' => @encounter.id))[:combatants].last[:hp]).to eq '6 / 6'
+        end
+
+        it "should show a player how hurt a creature looks" do
+          Harm.damage(npc(2), 2)
+          expect(PF2EncounterHandler.new.handle(request(@hero, 'id' => @encounter.id))[:combatants].last[:hp]).to eq t('pf2e.wounds_bloodied')
+
+          Harm.damage(npc(2), 3)
+          expect(PF2EncounterHandler.new.handle(request(@hero, 'id' => @encounter.id))[:combatants].last[:hp]).to eq t('pf2e.wounds_near_death')
         end
 
         it "should show a player the encounter's history, and not its difficulty, which is the GM's" do

@@ -24,6 +24,25 @@ module AresMUSH
       def self.hit_points(holder)
         Actors.of(holder).hit_points
       end
+
+      # How hurt someone looks to whoever may not see their hit points: `Unhurt`, `Bloodied`, `Near Death`
+      # or `Dead`.
+      def self.looks(holder)
+        counts = Actors.of(holder).hit_point_counts
+
+        counts ? t(WOUNDS[wound(*counts)]) : '---'
+      end
+
+      WOUNDS = { :unhurt => 'pf2e.wounds_unhurt', :bloodied => 'pf2e.wounds_bloodied',
+                 :near_death => 'pf2e.wounds_near_death', :dead => 'pf2e.wounds_dead' }.freeze
+
+      # Near death at a quarter of the most there can be, or less.
+      def self.wound(left, most)
+        return :dead if left.to_i <= 0
+        return :unhurt if left.to_i >= most.to_i
+
+        left.to_i * 4 > most.to_i ? :bloodied : :near_death
+      end
     end
   end
 end

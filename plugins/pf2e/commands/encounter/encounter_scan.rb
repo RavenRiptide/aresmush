@@ -25,7 +25,7 @@ module AresMUSH
           return
         end
 
-        template = PF2EncounterScanTemplate.new(encounter)
+        template = PF2EncounterViewTemplate.new(encounter, client, enactor)
 
         client.emit template.render
 

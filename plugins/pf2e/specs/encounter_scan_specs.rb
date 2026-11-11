@@ -3,9 +3,10 @@ require "plugin_test_loader"
 module AresMUSH
   module Pf2e
 
-    # `+e/scan` is the GM's table of everyone in the encounter as they stand: each character, and each
-    # creature with its figures and what it resists. A creature's figures are the GM's alone.
-    describe "an encounter's scan", :dbtest => true do
+    # `encounter/view` and `encounter/scan` show one table of everyone in the encounter as they stand: each character,
+    # and each creature with its figures and what it resists. A creature's figures are the GM's alone, so
+    # anyone else sees them hidden and its hit points as how hurt it looks.
+    describe "an encounter's table", :dbtest => true do
 
       class ScanClient
         attr_reader :failures, :said
@@ -95,6 +96,78 @@ module AresMUSH
         @client.said.clear
         run(PF2EncounterScanCmd, 'e/scan')
         @client.said.join("\n")
+      end
+
+      def view(who = @hero)
+        @client.said.clear
+        run(PF2InitViewCmd, 'e/view', who)
+        @client.said.join("\n")
+      end
+
+      def holder(ref)
+        Combatants.find(encounter, ref).state.holder
+      end
+
+      describe "to the GM" do
+        it "should be the same through +e/view as through +e/scan" do
+          scanned = scan.lines.reject { |line| line.include?(PF2Encounter.page_url(encounter)) }
+
+          expect(view(@gm)).to include(*scanned.map(&:chomp).reject(&:empty?))
+        end
+
+        it "should list everyone in turn order with their initiative" do
+          said = view(@gm)
+          order = Combatants.all(encounter)
+
+          expect(order.map { |one| said.index(/^#{one.ref}\s/) }).to eq order.map { |one| said.index(/^#{one.ref}\s/) }.sort
+          order.each { |one| expect(row(one.ref)[1]).to eq one.init.to_i.to_s }
+        end
+      end
+
+      describe "to a player" do
+        it "should hide a creature's figures, and say how hurt it looks" do
+          view
+
+          expect(row('#2').join(' ')).to match(/Skeleton Guard \? #{t('pf2e.wounds_unhurt')} \? \? \? \? \? \?\z/)
+        end
+
+        it "should say a creature is bloodied, near death, or dead as it is hurt" do
+          Harm.damage(npc(2), 1)
+          view
+          expect(row('#2')).to include(t('pf2e.wounds_bloodied'))
+
+          Harm.damage(npc(2), 2)
+          view
+          expect(row('#2').join(' ')).to include(t('pf2e.wounds_near_death'))
+        end
+
+        it "should not say what a creature is immune to or resists" do
+          said = view
+
+          expect(said).to_not include('Immune death-effects')
+          expect(said).to_not include('Resist cold 5')
+        end
+
+        it "should show a character's figures" do
+          view
+
+          expect(row('#1')).to include(@hero.name, 'Fighter')
+          expect(row('#1').last).to eq 'Y'
+        end
+
+        it "should show what a creature is under and its cover" do
+          Pf2e.set_condition(npc(2), 'Frightened', 1)
+          encounter.update(:cover => { '2' => 'standard' }, :concealment => { '2' => 'concealed' })
+
+          expect(view).to include('Frightened 1; standard cover, concealed')
+        end
+
+        it "should show how long each effect lasts" do
+          ActiveEffects.apply(holder('#1'), 'Spell Effect: Light', :applied_by => @hero.name, :encounter => encounter)
+          effect = ActiveEffects.on(holder('#1')).first
+
+          expect(view).to include("Spell Effect: Light (#{ActiveEffects.remaining(effect)})")
+        end
       end
 
       it "should list each character with the id they are targeted by" do

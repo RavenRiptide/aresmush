@@ -182,6 +182,11 @@ module AresMUSH
         @holder.hp ? "#{Pf2eHP.get_current_hp(@holder)} / #{Pf2eHP.get_max_hp(@holder)}" : '---'
       end
 
+      # `[ left, most ]`, without temporary hit points, or nothing for someone with no hit points kept.
+      def hit_point_counts
+        @holder.hp ? [ Pf2eHP.get_current_hp(@holder), Pf2eHP.get_max_hp(@holder) ] : nil
+      end
+
       # The damage they have taken and the temporary hit points they have left, which is what a hit moves.
       def standing
         hp = Pf2eHP.get_hp_obj(@holder)
@@ -419,6 +424,10 @@ module AresMUSH
 
       def hit_points
         "#{@holder.hp_left} / #{@holder.max_hp}"
+      end
+
+      def hit_point_counts
+        [ @holder.hp_left, @holder.max_hp ]
       end
 
       def standing

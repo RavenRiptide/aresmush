@@ -44,12 +44,13 @@ module AresMUSH
           shapes: gm && one.creature? && holder ? Shapes.shown(holder) : nil }.compact
       end
 
-      # The GM sees everyone's. A creature's are the GM's alone. A character's are on their combat sheet,
-      # and every sheet is open, so anyone logged in sees them.
+      # The GM sees everyone's. Anyone else sees how hurt a creature looks. A character's are on their combat
+      # sheet, and every sheet is open, so anyone logged in sees them.
       def self.hit_points_seen(holder, viewer, gm)
         return nil unless holder
         return Harm.hit_points(holder) if gm
-        return nil if Actors.of(holder).creature? || viewer.nil?
+        return Harm.looks(holder) if Actors.of(holder).creature?
+        return nil if viewer.nil?
 
         Harm.hit_points(holder)
       end

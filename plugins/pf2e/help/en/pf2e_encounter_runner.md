@@ -47,13 +47,13 @@ What an encounter can do depends on who runs it:
 `encounter/prev`: Moves the initiative back one turn. (Alias: `pinit`)
 `encounter/mod [<encounter ID>=]<#id or name>=<new init>`: Sets a combatant's initiative. The current turn stays where it is.
 `encounter/remove [<encounter ID>=]<#id or name>`: Removes a combatant from the initiative order. A removed creature is gone for good. (Alias: `rminit`)
-`encounter/scan`: Shows everyone in the encounter by ID, as they currently are: each combatant's hit points, AC, Perception, saves, and whether they have Reactive Strike; each creature's level and any elite or weak adjustment; and each combatant's immunities, weaknesses, and resistances. (Alias: `tscan`)
+`encounter/scan [<encounter ID>]`: Shows the encounter's table the way `encounter/view` shows it to the GM, with every creature's stats and its immunities, weaknesses, and resistances. Without an encounter ID, it shows the encounter in your scene or, when you're away from that scene, the one you chose with `encounter/focus` or the only one you run. Only the encounter's GM can use it. (Alias: `tscan`)
 `encounter/resync [<encounter ID>=]<#id or name>`: Updates a character's encounter gear from their sheet, for something they forgot to buy or invest before joining. The game adds the items they bought since joining, takes each item's investment and runes from their sheet, and sets their money to match their sheet. Items they already had otherwise stay as they are in the encounter (drawn or stowed, minus anything used), and so does anything the encounter gave them. `encounter/undo` reverses a resync.
 
 ## Party, difficulty, and rewards
 
 `encounter/level <n>`: Sets the party level used for the encounter's difficulty. Without it, the game uses the characters' average level, and `encounter/level 0` goes back to the average.
 %t **Note:** `encounter/view` shows the GM the encounter's difficulty: the threat level, from trivial to extreme, and the XP behind it, using GM Core's encounter budget. Players don't see the difficulty, in the game or on the web.
-`hero/award [<why>]`: Gives every player character in the scene a Hero Point, up to a maximum of three. `encounter/scan` shows how many each character has.
+`hero/award [<why>]`: Gives every player character in the scene a Hero Point, up to a maximum of three. `encounter/view` shows how many each character has.
 
 For running the creatures in an encounter, see `help encounter_creatures` or [read it on the web](/help/pf2e_encounter_creatures). For custom creatures, see `help encounter_creatureimport` or [read it on the web](/help/pf2e_encounter_creatureimport).

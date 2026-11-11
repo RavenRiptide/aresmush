@@ -14,7 +14,7 @@ Hero Points belong to a scene. Every player character starts a scene with one He
 The person running the scene is whoever runs an encounter in it, or the scene's owner if there's no encounter.
 
 `hero`: Shows your Hero Points in the current scene. If you're running the scene, it shows everyone's.
-%t **Note:** Your Hero Points also appear on your combat sheet (`sheet/combat`) and in your row of `encounter/scan`.
+%t **Note:** Your Hero Points also appear on your combat sheet (`csheet`) and under your row of `encounter/view`.
 
 ## Spending a Hero Point
 
