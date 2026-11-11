@@ -24,15 +24,17 @@ module AresMUSH
         },
         {
           'name' => 'divine font',
-          # One extra slot at every rank the character can already cast at. Cantrips get none, and
-          # neither does a rank they have no slots at.
+          # Four extra slots at the cleric's highest slot rank, five from 5th level, six from 15th.
+          # No other rank gets any, and cantrips never do. The 10th rank is not counted as the
+          # highest: Miraculous Spell's single 10th-rank slot is its own thing, so the font stays
+          # at 9th.
           'count' => lambda { |char, charclass, level|
             next 0 unless charclass.to_s.casecmp?('Cleric')
             next 0 if level.to_s.casecmp?(CANTRIP)
             next 0 if char.magic&.divine_font.blank?
-            next 0 unless Restrictions.open_slots(char, charclass, level).positive?
+            next 0 unless level.to_s == Restrictions.highest_font_rank(char, charclass).to_s
 
-            1
+            Restrictions.font_slots(char.pf2_level)
           },
           'eligible' => lambda { |char, _charclass, _level|
             font = char.magic&.divine_font
@@ -91,6 +93,19 @@ module AresMUSH
 
       def self.open_slots(char, charclass, level)
         Entries.slots(char.magic, charclass)[level].to_i
+      end
+
+      # The highest rank from 1 to 9 the class has slots at, or nil when it has none.
+      def self.highest_font_rank(char, charclass)
+        (1..9).reverse_each.find { |rank| open_slots(char, charclass, rank.to_s).positive? }
+      end
+
+      def self.font_slots(char_level)
+        char_level = char_level.to_i
+        return 6 if char_level >= 15
+        return 5 if char_level >= 5
+
+        4
       end
 
       def self.unknown(char, charclass, level)

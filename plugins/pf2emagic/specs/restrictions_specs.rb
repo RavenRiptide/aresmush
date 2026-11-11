@@ -48,25 +48,45 @@ module AresMUSH
         end
       end
 
-      # PF2e: "you can cast one additional spell each day at each spell rank you can cast", and it
-      # must be the font's own spell.
+      # PF2e: "You gain 4 additional spell slots each day at your highest rank of cleric spell
+      # slots", rising to 5 at 5th level and 6 at 15th, and they must hold the font's own spell.
       describe "a divine font" do
-        def cleric(font = 'heal')
+        def cleric(font = 'heal', level: 3, slots: { 'cantrip' => 5, '1' => 3, '2' => 2 })
           magic = magic_stub(:restricted_slots => { 'Cleric' => {} },
                              :tradition => { 'Cleric' => [ 'divine', 'trained' ] },
-                             :spells_per_day => { 'Cleric' => { 'cantrip' => 5, '1' => 2 } },
+                             :spells_per_day => { 'Cleric' => slots },
                              :divine_font => font)
 
-          char_for(magic, nil)
+          double(:magic => magic, :pf2_base_info => {}, :pf2_level => level, :name => 'Someone')
         end
 
-        it "should grant one slot at a rank the cleric has slots at" do
-          expect(Restrictions.at(cleric, 'Cleric', '1')['divine font']['count']).to eq 1
+        it "should grant four slots at the cleric's highest rank" do
+          expect(Restrictions.at(cleric, 'Cleric', '2')['divine font']['count']).to eq 4
+        end
+
+        it "should grant nothing at a lower rank, even one with slots" do
+          expect(Restrictions.at(cleric, 'Cleric', '1')).to eq({})
+        end
+
+        it "should grant five from 5th level and six from 15th" do
+          expect(Restrictions.at(cleric(level: 4), 'Cleric', '2')['divine font']['count']).to eq 4
+          expect(Restrictions.at(cleric(level: 5), 'Cleric', '2')['divine font']['count']).to eq 5
+          expect(Restrictions.at(cleric(level: 14), 'Cleric', '2')['divine font']['count']).to eq 5
+          expect(Restrictions.at(cleric(level: 15), 'Cleric', '2')['divine font']['count']).to eq 6
+        end
+
+        # Miraculous Spell's 10th-rank slot is a rank of its own; the font stays at 9th.
+        it "should not follow the cleric to the 10th rank" do
+          slots = (1..9).each_with_object({ 'cantrip' => 5 }) { |rank, all| all[rank.to_s] = 3 }.merge('10' => 1)
+          capstone = cleric(level: 19, slots: slots)
+
+          expect(Restrictions.at(capstone, 'Cleric', '9')['divine font']['count']).to eq 6
+          expect(Restrictions.at(capstone, 'Cleric', '10')).to eq({})
         end
 
         it "should only take the font's own spell" do
-          expect(Restrictions.at(cleric, 'Cleric', '1')['divine font']['eligible']).to eq [ 'Heal' ]
-          expect(Restrictions.at(cleric('harm'), 'Cleric', '1')['divine font']['eligible']).to eq [ 'Harm' ]
+          expect(Restrictions.at(cleric, 'Cleric', '2')['divine font']['eligible']).to eq [ 'Heal' ]
+          expect(Restrictions.at(cleric('harm'), 'Cleric', '2')['divine font']['eligible']).to eq [ 'Harm' ]
         end
 
         it "should grant no cantrip slot" do
@@ -78,7 +98,7 @@ module AresMUSH
         end
 
         it "should grant nothing with no font chosen" do
-          expect(Restrictions.at(cleric(nil), 'Cleric', '1')).to eq({})
+          expect(Restrictions.at(cleric(nil), 'Cleric', '2')).to eq({})
         end
 
         it "should grant nothing to a class that has no font" do

@@ -41,11 +41,11 @@ module AresMUSH
         expect(Pf2emagic.max_spells_per_day(subject, 'Cleric', '1')).to eq 3
       end
 
-      it "should give one extra slot at each rank once a font is chosen" do
+      it "should give four extra slots at the highest rank once a font is chosen, and none below" do
         @magic.update(:divine_font => 'heal')
 
-        expect(Pf2emagic.max_spells_per_day(subject, 'Cleric', '1')).to eq 4
-        expect(Pf2emagic.max_spells_per_day(subject, 'Cleric', '2')).to eq 4
+        expect(Pf2emagic.max_spells_per_day(subject, 'Cleric', '2')).to eq 7
+        expect(Pf2emagic.max_spells_per_day(subject, 'Cleric', '1')).to eq 3
       end
 
       it "should give no extra cantrip slot" do
@@ -60,21 +60,27 @@ module AresMUSH
         expect(Pf2emagic.max_spells_per_day(subject, 'Cleric', '5')).to eq 0
       end
 
-      # The font slot is not a free slot: it holds the font spell and nothing else.
-      it "should only let the font spell use the extra slot" do
+      # The font slots are not free slots: they hold the font spell and nothing else.
+      it "should only let the font spell use the extra slots" do
         @magic.update(:divine_font => 'heal')
 
-        # Three ordinary slots plus the font's. Four arbitrary spells do not fit; three plus Heal
-        # does.
-        expect(Pf2emagic.prepared_set_fits?(subject, 'Cleric', '1', %w(Bless Shield Sanctuary Command))).to be false
-        expect(Pf2emagic.prepared_set_fits?(subject, 'Cleric', '1', %w(Bless Shield Sanctuary Heal))).to be true
+        # Three ordinary slots plus the font's four. Four arbitrary spells do not fit; three plus
+        # four Heals do.
+        expect(Pf2emagic.prepared_set_fits?(subject, 'Cleric', '2', %w(Bless Shield Sanctuary Command))).to be false
+        expect(Pf2emagic.prepared_set_fits?(subject, 'Cleric', '2', %w(Bless Shield Sanctuary Heal Heal Heal Heal))).to be true
+      end
+
+      it "should give no font slot below the highest rank" do
+        @magic.update(:divine_font => 'heal')
+
+        expect(Pf2emagic.prepared_set_fits?(subject, 'Cleric', '1', %w(Bless Shield Sanctuary Heal))).to be false
       end
 
       it "should take harm instead for a cleric whose font is harm" do
         @magic.update(:divine_font => 'harm')
 
-        expect(Pf2emagic.prepared_set_fits?(subject, 'Cleric', '1', %w(Bless Shield Sanctuary Harm))).to be true
-        expect(Pf2emagic.prepared_set_fits?(subject, 'Cleric', '1', %w(Bless Shield Sanctuary Heal))).to be false
+        expect(Pf2emagic.prepared_set_fits?(subject, 'Cleric', '2', %w(Bless Shield Sanctuary Harm))).to be true
+        expect(Pf2emagic.prepared_set_fits?(subject, 'Cleric', '2', %w(Bless Shield Sanctuary Heal))).to be false
       end
     end
   end
