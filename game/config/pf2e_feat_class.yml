@@ -5700,7 +5700,8 @@ pf2e_feats:
     prereq:
       level: 6
       specialize: storm
-        - tempest surge order spell
+      focus_spell:
+        - Tempest Surge
     shortdesc: "**Trigger** An opponent adjacent to you critically hits you with a melee weapon or melee unarmed attack.%r%r**Requirements** You have at least 1 available Focus Point.%r%rYou lash out, directing a burst of storming fury toward a creature that has harmed you. You cast *tempest surge* on the triggering opponent and push that creature, moving it 5 feet away from you if it fails its Reflex save, or 10 feet if it critically fails. This movement is forced movement."
     traits:
       - druid
@@ -8194,7 +8195,9 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 10
-      specialize: theif
+      specialize: Thief
+      feature:
+        - Debilitating Strike
     shortdesc: You attack with great precision. Add the following debilitations to the list you can choose from when you use Debilitating Strike.
     traits:
       - rogue
