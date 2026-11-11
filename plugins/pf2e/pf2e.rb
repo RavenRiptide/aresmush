@@ -363,8 +363,6 @@ module AresMUSH
           return PF2AdvanceResetCmd
         when "feat"
           return PF2AdvanceFeatCmd
-        when "feats"
-          return PF2AdvanceFeatsCmd
         when "spell"
           return PF2AdvanceSpellCmd
         when "swapspell"

@@ -4,9 +4,9 @@ module AresMUSH
 
   # Every command the PF2e dispatcher answers to, held against the help files.
   #
-  # A command nobody has written down is a command players do not find. Two shipped that way -
-  # advance/feats and spell/eligible existed before anything in game pointed at them - and the
-  # playtest that produced them was full of players guessing at commands that were there all along.
+  # A command nobody has written down is a command players do not find. spell/eligible shipped
+  # that way, existing before anything in game pointed at it, and the playtest that produced it
+  # was full of players guessing at commands that were there all along.
   describe "the PF2e help" do
 
     HELP_ROOT = File.expand_path('..', __dir__)

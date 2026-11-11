@@ -6,7 +6,7 @@ module AresMUSH
   #
   # find_skill reads the whole skills collection out of Redis on every call. Listing the feats a
   # character is eligible for asks it 584 times, and a level 20 character with a dozen Lores has
-  # 255 skill rows - so one `advance/feats charclass` spent 956ms of the single reactor thread
+  # 255 skill rows - so one `advance/info charclass` spent 956ms of the single reactor thread
   # re-reading the same rows. Reading them once takes that to a few milliseconds.
   describe Pf2e::SheetReads do
 

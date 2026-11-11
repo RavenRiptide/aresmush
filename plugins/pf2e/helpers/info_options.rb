@@ -9,11 +9,6 @@ module AresMUSH
     # Entries per page once paging kicks in. Two columns, so this is 20 rows.
     INFO_PAGE_SIZE = 40
 
-    # The feat slot types this level still has something open in.
-    #
-    # `advance/info <type>` lists the feats eligible for one type, but only to a player who already
-    # knows the vocabulary. This is how one command can answer "what can I take now" without the
-    # player being told the words first. Archetype slots nest a level deeper, keyed by archetype.
     # `<element>=<filter>`, with either half allowed to be missing. The element may itself hold
     # spaces, and only the first `=` separates the two.
     def self.split_info_filter(args)
@@ -22,21 +17,6 @@ module AresMUSH
       filter = filter.strip
 
       [ element.empty? ? nil : element, filter.empty? ? nil : filter ]
-    end
-
-    def self.open_feat_slot_types(char)
-      pool = (char.pf2_to_assign || {})['feats']
-
-      return [] unless pool.is_a?(Hash)
-
-      pool.select { |_type, slots| any_open_slot?(slots) }.keys.sort
-    end
-
-    def self.any_open_slot?(slots)
-      return slots.values.any? { |sub| any_open_slot?(sub) } if slots.is_a?(Hash)
-      return slots.any? { |slot| any_open_slot?(slot) } if slots.is_a?(Array)
-
-      slots.to_s.casecmp?('open')
     end
 
     def self.info_options(char, element)

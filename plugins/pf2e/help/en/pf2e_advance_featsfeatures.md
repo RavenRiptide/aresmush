@@ -4,7 +4,6 @@ summary: Commands related to advancement, skills, and attributes.
 aliases:
 - advancefeats
 - advancefeatures
-- advance/feats
 - eligible feats
 ---
 
@@ -27,12 +26,9 @@ Fighter Weapon Mastery: `advance/option Fighter Weapon Mastery=sword` would sati
 
 ## What can I actually take?
 
-`advance/feats`: Lists every feat slot this level still has open, and how many feats you are
-eligible for in each.
-`advance/feats <slot type>`: Lists those feats. The slot types are the ones the summary names -
-general, skill, ancestry, charclass, archetype, dedication.
-`advance/feats <slot type>=<text>`: The same list, narrowed to names containing that text.
+`advance/review` lists the feat slots this level still has open.
 
-The same narrowing works on `advance/info` and `cg/info`, which matters for choices with hundreds
-of options: `advance/info Additional Lore=arch` lists only the Lores containing 'arch' rather than
-paging through every one of them.
+`advance/info <slot type>`: Lists the feats you're eligible for in that slot. `<slot type>` options: `general`, `skill`, `ancestry`, `charclass`, `archetype`, and `dedication`.
+`advance/info <slot type>=<text>`: Lists only the eligible feats whose names contain `<text>`: `advance/info skill=cat`.
+
+`=<text>` narrows any long list on `advance/info`. `advance/info Additional Lore=arch` lists only the Lores containing 'arch' instead of paging through all of them.
