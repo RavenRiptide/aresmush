@@ -1122,9 +1122,10 @@ module AresMUSH
         }
       },
       # The same choice, opened only if the character has neither an open one nor a resolved one:
-      # a feat granted twice does not ask twice.
+      # a feat granted twice does not ask twice. Opened during the level-up, like grant_choice: the
+      # draft is wiped once the level commits, so a choice opened at advance/done is never asked.
       'grant_choice_once' => {
-        'timing' => 'advance',
+        'timing' => 'assign',
         'apply' => lambda { |ctx|
           to_assign = ctx[:char].pf2_to_assign
 
