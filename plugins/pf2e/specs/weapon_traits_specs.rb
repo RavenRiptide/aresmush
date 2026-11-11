@@ -148,7 +148,9 @@ module AresMUSH
       end
 
       def strikes(text)
-        hero_types("e/strike #2=#{text}", 0.5)
+        weapon, _, words = text.partition('/')
+
+        hero_types("e/strike #{weapon}=#2#{words.empty? ? '' : "/#{words}"}", 0.5)
       end
 
       describe "a weapon for one hand or two" do

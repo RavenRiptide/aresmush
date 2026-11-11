@@ -135,13 +135,13 @@ module AresMUSH
           end
 
           it "should be off-guard to them" do
-            hero_types('e/strike #2=fist', 0.5)
+            hero_types('e/strike fist=#2', 0.5)
 
             expect(heard).to include('vs AC 16')
           end
 
           it "should be cut open by slashing damage of its Rupture value or more from inside, which frees them" do
-            hero_types('e/strike #2=claw', 0.75)
+            hero_types('e/strike claw=#2', 0.75)
 
             expect(heard).to include(t('pf2e.hold_cut_free', :target => @hero.name, :actor => 'Snapping Flytrap #2').strip)
             expect(held).to_not have_key('Grabbed')
@@ -149,7 +149,7 @@ module AresMUSH
           end
 
           it "should not be cut open by a blow that is neither slashing nor piercing" do
-            hero_types('e/strike #2=fist', 0.75)
+            hero_types('e/strike fist=#2', 0.75)
 
             expect(Holding.inside(hero)).to_not be_nil
           end
@@ -257,23 +257,23 @@ module AresMUSH
         end
 
         it "should need two hits in a row with the listed Strike on the same creature this turn" do
-          as(2, "strike #{@hero.name}=claw", FightBench::HIGH)
+          as(2, "strike claw=#{@hero.name}", FightBench::HIGH)
           as(2, "act rend=#{@hero.name}")
 
           expect(refused).to eq [ t('pf2e.rend_needs_hits', :actor => 'Forest Troll #2', :strike => 'Claw') ]
         end
 
         it "should not follow a hit with another Strike" do
-          as(2, "strike #{@hero.name}=claw", FightBench::HIGH)
-          as(2, "strike #{@hero.name}=jaws", FightBench::HIGH)
+          as(2, "strike claw=#{@hero.name}", FightBench::HIGH)
+          as(2, "strike jaws=#{@hero.name}", FightBench::HIGH)
           as(2, "act rend=#{@hero.name}")
 
           expect(refused).to eq [ t('pf2e.rend_needs_hits', :actor => 'Forest Troll #2', :strike => 'Claw') ]
         end
 
         it "should deal the Strike's damage again without a roll to hit" do
-          as(2, "strike #{@hero.name}=claw", FightBench::HIGH)
-          as(2, "strike #{@hero.name}=claw", FightBench::HIGH)
+          as(2, "strike claw=#{@hero.name}", FightBench::HIGH)
+          as(2, "strike claw=#{@hero.name}", FightBench::HIGH)
           before = hero_hp
           as(2, "act rend=#{@hero.name}", 0.5)
 
@@ -375,7 +375,7 @@ module AresMUSH
         end
 
         it "should say how far it pushes" do
-          as(2, "strike #{@hero.name}=water jet", FightBench::HIGH)
+          as(2, "strike water jet=#{@hero.name}", FightBench::HIGH)
           as(2, "act push=#{@hero.name}", FightBench::HIGH)
 
           expect(refused).to eq []
@@ -598,7 +598,7 @@ module AresMUSH
         before(:each) do
           add('giant anaconda')
           next_turn
-          as(2, "strike #{@hero.name}=jaws", FightBench::HITS)
+          as(2, "strike jaws=#{@hero.name}", FightBench::HITS)
           as(2, "act grab=#{@hero.name}", 0.5)
         end
 
@@ -1055,7 +1055,7 @@ module AresMUSH
         end
 
         def clawed
-          hero_types('e/strike #2=claw', 0.8)
+          hero_types('e/strike claw=#2', 0.8)
         end
 
         it "should have the shield's bonus to its AC while the shield is raised" do
@@ -1124,7 +1124,7 @@ module AresMUSH
         end
 
         it "should block with it" do
-          hero_types('e/strike #2=claw', 0.8)
+          hero_types('e/strike claw=#2', 0.8)
           as(2, 'act shield block')
 
           expect(refused).to eq []
@@ -1187,7 +1187,7 @@ module AresMUSH
 
         it "should be held no longer" do
           npc.update(:damage => npc.max_hp - 1)
-          hero_types('e/strike #2=claw', FightBench::HIGH)
+          hero_types('e/strike claw=#2', FightBench::HIGH)
 
           expect(heard).to include('is down')
           expect(held.keys & %w{Grabbed Restrained}).to be_empty
@@ -1231,7 +1231,7 @@ module AresMUSH
 
         it "should lose one to a Strike" do
           npc.update(:damage => 29)
-          hero_types('e/strike #2=claw', 0.9)
+          hero_types('e/strike claw=#2', 0.9)
 
           expect(heard).to include('loses a segment. 3 are left')
         end

@@ -8,7 +8,7 @@ module AresMUSH
     # circumstances - so a player learns one grammar:
     #
     #   +e/act trip=#3/flanking
-    #   +e/strike #3=longsword/range 2
+    #   +e/strike longsword=#3/range 2
     #   +e/cast fear=#3,#4
     #
     # and a GM acting for a creature puts the creature first, the way `roll/for` does: `+e/as #3=strike
@@ -148,15 +148,17 @@ module AresMUSH
       end
     end
 
-    # `+e/strike <target>[=<weapon>][/<circumstance>...]`
+    # `+e/strike [<weapon>=]<target>[/<circumstance>...]`
     class PF2EncounterStrikeCmd
       include CommandHandler
       include ActsInEncounter
 
       attr_accessor :target, :weapon, :words, :actor
 
+      # With no `=`, what is named is the target: `e/strike #3` strikes with the first weapon that works.
       def parse_args
-        self.target, self.weapon, self.words = ActsInEncounter.split(cmd.args)
+        head, tail, self.words = ActsInEncounter.split(cmd.args)
+        self.weapon, self.target = tail.empty? ? [ '', head ] : [ head, tail ]
       end
 
       def required_args

@@ -95,7 +95,7 @@ module AresMUSH
       end
 
       def strike
-        run(PF2EncounterStrikeCmd, 'e/strike #2=dagger', @hero)
+        run(PF2EncounterStrikeCmd, 'e/strike dagger=#2', @hero)
       end
 
       describe "applying one" do
@@ -167,7 +167,7 @@ module AresMUSH
           club = Pf2egear.create_item(state, 'weapons', 'Club', 1, Global.read_config('pf2e_weapons', 'Club'))
           club.update(:equipped => true, :poison => { 'name' => 'Giant Centipede Venom', 'dc' => 0 })
           @dice = 0.95
-          run(PF2EncounterStrikeCmd, 'e/strike #2=club', @hero)
+          run(PF2EncounterStrikeCmd, 'e/strike club=#2', @hero)
 
           expect(@exposed).to eq []
           expect(PF2Weapon[club.id].poison).to eq({})

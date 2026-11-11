@@ -23,7 +23,7 @@ module AresMUSH
       end
 
       it "should give a command for each Strike they can make" do
-        expect(how('strike')).to include('+e/strike <target>=Fist', '+e/strike <target>=Claw')
+        expect(how('strike')).to include('+e/strike Fist=<target>', '+e/strike Claw=<target>')
       end
 
       it "should give an action anyone can use, with what it is used at" do

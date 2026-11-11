@@ -262,10 +262,25 @@ module AresMUSH
         # The room is told when a hit drops something: a creature is down, a character dying.
         it "should say a creature is down when a hit takes its last hit point" do
           @dice = 1.0
-          run(PF2EncounterStrikeCmd, 'e/strike #3=fist', @hero)
+          run(PF2EncounterStrikeCmd, 'e/strike fist=#3', @hero)
 
           expect(npc(3).hp_left).to eq 0
           expect(said).to include(t('pf2e.act_down', :target => 'Goblin Warrior #3'))
+        end
+
+        # The weapon comes first and the target after `=`, as an action comes before its target in
+        # `e/act`. The order the command once took finds no combatant called by the weapon's name.
+        it "should Strike with the weapon named before the target" do
+          run(PF2EncounterStrikeCmd, 'e/strike fist=#3', @hero)
+
+          expect(@client.failures).to eq []
+          expect(said).to include('with Fist')
+        end
+
+        it "should refuse the target before the weapon" do
+          run(PF2EncounterStrikeCmd, 'e/strike #3=fist', @hero)
+
+          expect(@client.failures.join).to include(t('pf2e.no_combatant', :target => 'fist'))
         end
 
         it "should say a character is dying when a hit drops them" do
@@ -281,7 +296,7 @@ module AresMUSH
         # The base of a figure says what it is: the attack's proficiency and level. A creature's AC is
         # its stat block's, and says no more than the number.
         it "should explain a Strike against the AC it named" do
-          run(PF2EncounterStrikeCmd, 'e/strike #3=fist', @hero)
+          run(PF2EncounterStrikeCmd, 'e/strike fist=#3', @hero)
           @client.said.clear
           run(PF2EncounterWhyCmd, 'e/why', @hero)
 
@@ -294,7 +309,7 @@ module AresMUSH
         # adds to the multiple attack penalty.
         it "should make Reactive Strike's Strike outside the multiple attack penalty" do
           @hero.update(:pf2_features => { 'charclass_features' => [ 'Reactive Strike' ], 'archetype_features' => [] })
-          run(PF2EncounterStrikeCmd, 'e/strike #3=fist', @hero)
+          run(PF2EncounterStrikeCmd, 'e/strike fist=#3', @hero)
           @client.said.clear
           run(PF2EncounterActCmd, 'e/act reactive strike=#3/fist', @hero)
           turn = TurnState.turn(CombatantStates.of(@encounter, Character[@hero.id]))
@@ -331,7 +346,7 @@ module AresMUSH
 
         it "should refuse a character who is unconscious" do
           Pf2e.set_condition(CombatantStates.of(@encounter, Character[@hero.id]), 'Unconscious')
-          run(PF2EncounterStrikeCmd, 'e/strike #3=fist', @hero)
+          run(PF2EncounterStrikeCmd, 'e/strike fist=#3', @hero)
 
           expect(@client.failures.join).to include(t('pf2e.act_cannot_act', :actor => @hero.name))
         end
@@ -356,7 +371,7 @@ module AresMUSH
         # What a Strike does is the story of the scene: it goes in the scene's log as a line a shared log
         # keeps, where the bookkeeping of turns and joins goes in as OOC.
         it "should log a Strike's result in the scene as a line its shared log keeps" do
-          run(PF2EncounterStrikeCmd, 'e/strike #3=fist', @hero)
+          run(PF2EncounterStrikeCmd, 'e/strike fist=#3', @hero)
 
           expect(Scenes).to have_received(:add_to_scene)
             .with(anything, a_string_including('strikes Goblin Warrior #3'), anything, nil, nil, nil, hash_including(:system_line => 'action'))
@@ -435,7 +450,7 @@ module AresMUSH
 
         it "should let a character strike a creature with their fist" do
           @dice = 0.75
-          run(PF2EncounterStrikeCmd, 'e/strike #3=fist', @hero)
+          run(PF2EncounterStrikeCmd, 'e/strike fist=#3', @hero)
 
           expect(@client.failures).to eq []
           expect(said).to include('with Fist')
@@ -453,7 +468,7 @@ module AresMUSH
 
           it "should apply the group's effect for an attack the character has it with" do
             allow(Pf2e).to receive(:crit_spec_access).and_return('Hammer' => [ 'Fist' ])
-            run(PF2EncounterStrikeCmd, 'e/strike #3=fist', @hero)
+            run(PF2EncounterStrikeCmd, 'e/strike fist=#3', @hero)
 
             expect(said).to include('Critical specialization')
             expect(npc(3).pf2_conditions).to have_key('Prone')
@@ -461,7 +476,7 @@ module AresMUSH
 
           it "should do nothing more for an attack the character does not have it with" do
             allow(Pf2e).to receive(:crit_spec_access).and_return({})
-            run(PF2EncounterStrikeCmd, 'e/strike #3=fist', @hero)
+            run(PF2EncounterStrikeCmd, 'e/strike fist=#3', @hero)
 
             expect(said).to_not include('Critical specialization')
             expect(npc(3).pf2_conditions).to_not have_key('Prone')
@@ -471,7 +486,7 @@ module AresMUSH
             @combat.update(:unarmed_attacks => { 'Fist' => { 'damage' => 'd4', 'damage_type' => 'P', 'group' => 'Knife',
                                                               'traits' => %w{agile unarmed} } })
             allow(Pf2e).to receive(:crit_spec_access).and_return('Knife' => [ 'Fist' ])
-            run(PF2EncounterStrikeCmd, 'e/strike #3=fist', @hero)
+            run(PF2EncounterStrikeCmd, 'e/strike fist=#3', @hero)
 
             expect(PersistentDamage.held(npc(3)).map { |one| [ one['formula'], one['type'] ] }).to eq [ [ '1d6', 'bleed' ] ]
           end
@@ -480,7 +495,7 @@ module AresMUSH
             @combat.update(:unarmed_attacks => { 'Fist' => { 'damage' => 'd4', 'damage_type' => 'B', 'group' => 'Club',
                                                               'traits' => %w{agile unarmed} } })
             allow(Pf2e).to receive(:crit_spec_access).and_return('Club' => [ 'Fist' ])
-            run(PF2EncounterStrikeCmd, 'e/strike #3=fist', @hero)
+            run(PF2EncounterStrikeCmd, 'e/strike fist=#3', @hero)
 
             expect(said).to include('forced movement')
           end
@@ -870,7 +885,7 @@ module AresMUSH
 
         it "should refuse a player's word for cover on their own roll" do
           @dice = 0.75
-          run(PF2EncounterStrikeCmd, 'e/strike #2=fist/greater cover', @hero)
+          run(PF2EncounterStrikeCmd, 'e/strike fist=#2/greater cover', @hero)
 
           expect(said).to include('Only the GM')
         end
@@ -1230,7 +1245,7 @@ module AresMUSH
 
         it "should give the viewer's last roll" do
           @dice = 0.75
-          run(PF2EncounterStrikeCmd, 'e/strike #2=fist', @hero)
+          run(PF2EncounterStrikeCmd, 'e/strike fist=#2', @hero)
 
           expect(PF2LastRollHandler.new.handle(request(@hero))[:lines].first).to include('Fist')
         end

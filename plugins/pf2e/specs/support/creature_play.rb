@@ -158,7 +158,7 @@ module AresMUSH
       # A Strike, and the player's answer to it with what the game offers: Nimble Dodge where it would
       # turn the hit, then Shield Block behind a raised shield.
       def creature_strikes(row, target, with = nil)
-        type(@gm, "e/as ##{row['id']}=strike #{target.name}#{with ? "=#{with}" : ''}")
+        type(@gm, "e/as ##{row['id']}=strike #{with ? "#{with}=" : ''}#{target.name}")
 
         AttackAnswers.offered(state_of(target)).first(1).each { |name| attempt(target, :act, name, "e/act #{name.downcase}") }
         attempt(target, :act, 'Shield Block', 'e/act shield block') if ShieldBlock.offered?(state_of(target))

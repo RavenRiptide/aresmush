@@ -8,7 +8,7 @@ module AresMUSH
     # Its place in the history, from 1.
     attribute :seq, :type => DataType::Integer
 
-    # What was typed, and who typed it: `Aria: +e/strike #3=longsword`.
+    # What was typed, and who typed it: `Aria: +e/strike longsword=#3`.
     attribute :said
 
     # The dice it rolled, in order (`Pf2e::DiceTape`), and the Hero Points spent in it by name: on a check

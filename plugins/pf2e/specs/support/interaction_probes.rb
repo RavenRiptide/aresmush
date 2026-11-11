@@ -74,7 +74,7 @@ module AresMUSH
         probe('standard cover is +2 circumstance to AC') do
           covered, holder = aim
           type(@gm, "e/cover #{covered}=standard")
-          struck = type(striker, "e/strike #{covered}=#{weapon}")
+          struck = type(striker, "e/strike #{weapon}=#{covered}")
           type(@gm, "e/cover #{covered}=none")
           # A Strike refused rolled nothing, and the defence read would be another's.
           next [ false, "the Strike was refused: #{struck.status}" ] unless struck.ok?
@@ -86,7 +86,7 @@ module AresMUSH
 
         probe('flanking leaves the target off-guard, -2 circumstance to AC') do
           ref, holder = aim
-          struck = type(striker, "e/strike #{ref}=#{weapon}/flanking")
+          struck = type(striker, "e/strike #{weapon}=#{ref}/flanking")
           next [ false, "the Strike was refused: #{struck.status}" ] unless struck.ok?
 
           found = defence_rows(holder).find { |row| row['type'] == 'circumstance' && row['value'].to_i == -2 }
@@ -102,7 +102,7 @@ module AresMUSH
         probe('a concealed target makes a Strike roll a DC 5 flat check first') do
           ref, _holder = aim
           type(@gm, "e/conceal #{ref}=concealed")
-          type(striker, "e/strike #{ref}=#{weapon}")
+          type(striker, "e/strike #{weapon}=#{ref}")
           type(@gm, "e/conceal #{ref}=none")
           shown = @lines.last(8).join(' ')
           [ shown.match?(/DC 5|flat/i), "no flat check told: #{shown[0, 300]}" ]
@@ -111,7 +111,7 @@ module AresMUSH
         probe('a hidden target makes a Strike roll a DC 11 flat check first') do
           ref, _holder = aim
           type(@gm, "e/conceal #{ref}=hidden")
-          type(striker, "e/strike #{ref}=#{weapon}")
+          type(striker, "e/strike #{weapon}=#{ref}")
           type(@gm, "e/conceal #{ref}=none")
           shown = @lines.last(8).join(' ')
           [ shown.include?('11'), "no DC 11 flat check told: #{shown[0, 300]}" ]
@@ -133,7 +133,7 @@ module AresMUSH
           next [ false, "degree #{degree} should leave it #{wanted}, holds #{held.keys}" ] unless held.key?(wanted)
           next [ true, nil ] if holder.class[holder.id].hp_left.zero?
 
-          type(striker, "e/strike #{ref}=#{weapon}")
+          type(striker, "e/strike #{weapon}=#{ref}")
           found = defence_rows(holder).find { |row| row['type'] == 'circumstance' && row['value'].to_i == -2 }
           [ found, "a #{wanted.downcase} target is not off-guard: #{defence_rows(holder).inspect[0, 300]}" ]
         end
@@ -143,7 +143,7 @@ module AresMUSH
           probe('the third range increment is -4 to the attack') do
             ref, _holder = aim
             type(archer, 'e/reload') if Loading.held(state_of(archer)).any?
-            shot = type(archer, "e/strike #{ref}=#{ranged_of(archer)}/range 3")
+            shot = type(archer, "e/strike #{ranged_of(archer)}=#{ref}/range 3")
             # A Strike that was refused rolled nothing, and the last roll is someone else's business.
             next [ false, "refused: #{shot.failures.first}" ] if shot.failures.any?
 
@@ -170,7 +170,7 @@ module AresMUSH
           next [ false, "degree #{degree} should leave Frightened #{wanted}, holds #{now}" ] unless now == [ wanted, before ].max
           next [ true, nil ] if holder.class[holder.id].hp_left.zero?
 
-          type(striker, "e/strike #{ref}=#{weapon}")
+          type(striker, "e/strike #{weapon}=#{ref}")
           found = defence_rows(holder).find { |row| row['type'] == 'status' && row['value'].to_i == -now }
           [ found, "Frightened #{now} not on its AC: #{defence_rows(holder).inspect[0, 300]}" ]
         end
@@ -200,7 +200,7 @@ module AresMUSH
           next [ false, "degree #{degree} did not leave it prone" ] unless prone
           next [ true, nil ] if holder.class[holder.id].hp_left.zero?
 
-          type(striker, "e/strike #{ref}=#{weapon}")
+          type(striker, "e/strike #{weapon}=#{ref}")
           found = defence_rows(holder).find { |row| row['type'] == 'circumstance' && row['value'].to_i == -2 }
           [ found, "prone target is not off-guard: #{defence_rows(holder).inspect[0, 300]}" ]
         end
@@ -211,7 +211,7 @@ module AresMUSH
             ref, _holder = aim
             hit = 4.times.find do
               @audit.instance_variable_set(:@last_damage, nil)
-              type(rogue, "e/strike #{ref}=#{weapon_of(rogue) || 'fist'}/flanking")
+              type(rogue, "e/strike #{weapon_of(rogue) || 'fist'}=#{ref}/flanking")
               @audit.last_damage
             end
 
@@ -261,7 +261,7 @@ module AresMUSH
         probe('Bless is +1 status to the attack of whoever it is on') do
           ref, _holder = aim
           type(@gm, "effect/add #{blessed.name}=bless")
-          struck = type(blessed, "e/strike #{ref}=#{weapon_of(blessed) || 'fist'}")
+          struck = type(blessed, "e/strike #{weapon_of(blessed) || 'fist'}=#{ref}")
 
           # Someone restrained, or inside what they would strike at, makes no Strike to read.
           next [ true, nil ] unless struck.ok?

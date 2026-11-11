@@ -533,11 +533,11 @@ module AresMUSH
 
         Array(state.weapons.to_a).each_with_index do |weapon, n|
           name = weapon.name
-          out << [ :strike, name, -> { "e/strike #{foe_ref.call}=#{name}" } ]
+          out << [ :strike, name, -> { "e/strike #{name}=#{foe_ref.call}" } ]
           out << [ :equipment, "unequip #{name}", "e/unequip weapons=#{n}" ] if n.zero?
           out << [ :equipment, "equip #{name}", "e/equip weapons=#{n}" ] if n.zero?
         end
-        out << [ :strike, 'fist', -> { "e/strike #{foe_ref.call}=fist" } ]
+        out << [ :strike, 'fist', -> { "e/strike fist=#{foe_ref.call}" } ]
         out << [ :look, 'why', 'e/why' ]
 
         out << [ :act, 'Raise a Shield', 'e/act raise a shield' ] unless state.shields.to_a.empty? || ShieldBlock.cannot_raise(state)
@@ -566,7 +566,7 @@ module AresMUSH
           name = item.name
 
           if Consumables.bomb?(name)
-            out << [ :strike, name, -> { "e/strike #{foe_ref.call}=#{name}" } ]
+            out << [ :strike, name, -> { "e/strike #{name}=#{foe_ref.call}" } ]
           elsif Consumables.info(name)['heal']
             out << [ :heal, name, -> { "e/use consumables=#{n}/#{hurt_ally.name}" } ]
           else

@@ -123,16 +123,16 @@ module AresMUSH
         end
 
         it "should come off a Strike, which says so" do
-          expect(taken { run(PF2EncounterStrikeCmd, 'e/strike #2=fist', @hero) }).to eq 0
+          expect(taken { run(PF2EncounterStrikeCmd, 'e/strike fist=#2', @hero) }).to eq 0
           expect(heard).to include('0 bludgeoning (1d4+2: 3 +2; resistance -5)')
         end
 
         it "should let through a Strike with a weapon said to be silver" do
-          expect(taken { run(PF2EncounterStrikeCmd, 'e/strike #2=fist/silver', @hero) }).to eq 5
+          expect(taken { run(PF2EncounterStrikeCmd, 'e/strike fist=#2/silver', @hero) }).to eq 5
         end
 
         it "should be hurt more by a Strike with a weapon said to be cold iron" do
-          expect(taken { run(PF2EncounterStrikeCmd, 'e/strike #2=fist/cold iron', @hero) }).to eq 5
+          expect(taken { run(PF2EncounterStrikeCmd, 'e/strike fist=#2/cold iron', @hero) }).to eq 5
           expect(heard).to include('weakness 5', 'resistance -5')
         end
       end
@@ -190,7 +190,7 @@ module AresMUSH
         end
 
         it "should take a critical hit's damage undoubled, and be told why" do
-          expect(taken { run(PF2EncounterStrikeCmd, 'e/strike #2=fist', @hero) }).to eq 5
+          expect(taken { run(PF2EncounterStrikeCmd, 'e/strike fist=#2', @hero) }).to eq 5
           expect(heard).to include('critical hit', t('pf2e.act_crit_immune', :target => 'Ooze #2').strip)
         end
       end
@@ -234,7 +234,7 @@ module AresMUSH
         end
 
         it "should take nothing from a blow that is nonlethal" do
-          expect(taken { run(PF2EncounterStrikeCmd, 'e/strike #2=fist', @hero) }).to eq 0
+          expect(taken { run(PF2EncounterStrikeCmd, 'e/strike fist=#2', @hero) }).to eq 0
         end
 
         it "should not be given a condition its kind is immune to" do

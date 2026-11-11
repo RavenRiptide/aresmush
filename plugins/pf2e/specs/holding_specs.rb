@@ -267,7 +267,7 @@ module AresMUSH
         end
 
         it "should still be able to Strike" do
-          hero_types(PF2EncounterStrikeCmd, 'e/strike #2=fist')
+          hero_types(PF2EncounterStrikeCmd, 'e/strike fist=#2')
 
           expect(@client.failures).to eq []
         end
@@ -292,7 +292,7 @@ module AresMUSH
         end
 
         it "should not be able to Strike" do
-          hero_types(PF2EncounterStrikeCmd, 'e/strike #2=fist')
+          hero_types(PF2EncounterStrikeCmd, 'e/strike fist=#2')
 
           expect(@client.failures).to eq [ t('pf2e.act_restrained', :actor => @hero.name, :action => 'Strike') ]
         end

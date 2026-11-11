@@ -312,7 +312,7 @@ module AresMUSH
           bonus = in_bear(2, false) + 2
           in_bear(2, true)
 
-          hero_types("e/strike ##{goblin_number}=claw")
+          hero_types("e/strike claw=##{goblin_number}")
 
           expect(refused).to eq []
           expect(heard).to include "(12 +#{bonus})"
@@ -325,33 +325,33 @@ module AresMUSH
           casts('bear')
         end
 
-        def strikes(words)
-          hero_types("e/strike ##{goblin_number}#{words}")
+        def strikes(weapon = nil)
+          hero_types("e/strike #{weapon ? "#{weapon}=" : ''}##{goblin_number}")
         end
 
         it "should Strike with the shape's attack, at its modifier" do
-          strikes('=jaws')
+          strikes('jaws')
 
           expect(refused).to eq []
           expect(heard).to include 'with Jaws', '(12 +18)'
         end
 
         it "should use the shape's attack when they name none" do
-          strikes('')
+          strikes
 
           expect(refused).to eq []
           expect(heard).to include 'with Claw', '(12 +18)'
         end
 
         it "should refuse their own attacks" do
-          strikes('=fist')
+          strikes('fist')
 
           expect(refused.join).to include 'fist'
         end
 
         it "should give their own attacks back when the spell ends" do
           ActiveEffects.remove_named(hero, UNTAMED)
-          strikes('=fist')
+          strikes('fist')
 
           expect(refused).to eq []
           expect(heard).to include 'with Fist'

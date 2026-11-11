@@ -103,7 +103,7 @@ module AresMUSH
           next_turn
           next_turn
           expect(ActiveEffects.current_turn(encounter)).to eq @hero.name
-          hero_types('e/strike #2=fist', FightBench::LOW)
+          hero_types('e/strike fist=#2', FightBench::LOW)
         end
 
         def rat_damage
@@ -197,7 +197,7 @@ module AresMUSH
         end
 
         it "should be refused to a roll of 10 or more, and cost nothing" do
-          hero_types('e/strike #2=fist', FightBench::HITS)
+          hero_types('e/strike fist=#2', FightBench::HITS)
 
           hero_types('hero/boost')
 

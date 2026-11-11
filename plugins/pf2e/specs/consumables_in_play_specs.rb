@@ -231,7 +231,7 @@ module AresMUSH
         end
 
         it "should be thrown as a Strike: its fire, its persistent fire and its splash, and one is spent" do
-          run(PF2EncounterStrikeCmd, "e/strike ##{@goblin['id']}=alchemist's fire")
+          run(PF2EncounterStrikeCmd, "e/strike alchemist's fire=##{@goblin['id']}")
 
           expect(@client.failures).to eq []
           expect(said).to include("Alchemist's Fire (Lesser)")
@@ -244,7 +244,7 @@ module AresMUSH
         it "should double all but its splash on a critical hit" do
           @dice = 1.0
 
-          run(PF2EncounterStrikeCmd, "e/strike ##{@goblin['id']}=alchemist's fire")
+          run(PF2EncounterStrikeCmd, "e/strike alchemist's fire=##{@goblin['id']}")
 
           expect(said).to include('17 fire (1d8: 8 = 8, doubled; with 1 splash) + 2 persistent fire')
         end
@@ -256,7 +256,7 @@ module AresMUSH
           Combatants.leave(PF2Encounter[@encounter.id], Combatants.rows(PF2Encounter[@encounter.id]).find { |row| row['char'] }['id'])
           join(@hero)
 
-          run(PF2EncounterStrikeCmd, "e/strike ##{@goblin['id']}=glue bomb")
+          run(PF2EncounterStrikeCmd, "e/strike glue bomb=##{@goblin['id']}")
 
           expect(@client.failures).to eq []
           expect(ActiveEffects.on(goblin).map(&:name)).to include('Effect: Glue Bomb')
@@ -278,7 +278,7 @@ module AresMUSH
           end
 
           it "should tell its note on a hit, and put its effect on once" do
-            run(PF2EncounterStrikeCmd, "e/strike ##{@goblin['id']}=glue bomb")
+            run(PF2EncounterStrikeCmd, "e/strike glue bomb=##{@goblin['id']}")
 
             expect(@client.failures).to eq []
             expect(said).to include('On a hit, -10-foot Speed penalty for 1 minute.')
@@ -290,7 +290,7 @@ module AresMUSH
           it "should tell its critical hit's note on a critical hit" do
             @dice = 1.0
 
-            run(PF2EncounterStrikeCmd, "e/strike ##{@goblin['id']}=glue bomb")
+            run(PF2EncounterStrikeCmd, "e/strike glue bomb=##{@goblin['id']}")
 
             expect(said).to include('Immobilized for 1 round')
             expect(said).not_to include('On a hit,')
@@ -298,7 +298,7 @@ module AresMUSH
           end
 
           it "should not tell its notes with another bomb's Strike" do
-            run(PF2EncounterStrikeCmd, "e/strike ##{@goblin['id']}=alchemist's fire")
+            run(PF2EncounterStrikeCmd, "e/strike alchemist's fire=##{@goblin['id']}")
 
             expect(said).to include("Alchemist's Fire (Lesser)")
             expect(said).not_to include('Speed penalty')
@@ -309,7 +309,7 @@ module AresMUSH
         it "should splash the target when it misses" do
           @dice = 0.4
 
-          run(PF2EncounterStrikeCmd, "e/strike ##{@goblin['id']}=alchemist's fire")
+          run(PF2EncounterStrikeCmd, "e/strike alchemist's fire=##{@goblin['id']}")
 
           expect(said).to include('miss', '1 splash fire')
           expect(goblin.damage).to eq 1
@@ -318,10 +318,10 @@ module AresMUSH
         end
 
         it "should be gone once the last is thrown" do
-          2.times { run(PF2EncounterStrikeCmd, "e/strike ##{@goblin['id']}=alchemist's fire") }
+          2.times { run(PF2EncounterStrikeCmd, "e/strike alchemist's fire=##{@goblin['id']}") }
 
           expect(carried(@hero, "Alchemist's Fire (Lesser)")).to be_nil
-          run(PF2EncounterStrikeCmd, "e/strike ##{@goblin['id']}=alchemist's fire")
+          run(PF2EncounterStrikeCmd, "e/strike alchemist's fire=##{@goblin['id']}")
           expect(@client.failures.last).to eq t('pf2e.act_no_attack', :attack => "alchemist's fire")
         end
       end

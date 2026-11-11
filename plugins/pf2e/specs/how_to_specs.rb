@@ -30,12 +30,12 @@ module AresMUSH
       end
 
       it "should give every Strike for a Strike" do
-        expect(commands('strike')).to eq [ '+e/strike <target>=Longsword', '+e/strike <target>=Fist', '+e/strike <target>=Shortbow' ]
+        expect(commands('strike')).to eq [ '+e/strike Longsword=<target>', '+e/strike Fist=<target>', '+e/strike Shortbow=<target>' ]
       end
 
       it "should give the Strike a weapon makes, and how to draw one not drawn" do
         expect(commands('dagger')).to eq [ '+e/equip weapons=1' ]
-        expect(commands('old faithful')).to eq [ '+e/strike <target>=Longsword' ]
+        expect(commands('old faithful')).to eq [ '+e/strike Longsword=<target>' ]
       end
 
       it "should give an action with what it is used at, and a Strike's weapon" do
@@ -62,8 +62,8 @@ module AresMUSH
 
       it "should give how each item is used" do
         expect(commands('healing potion')).to eq [ '+e/use consumables=0', '+e/use consumables=0/<who>' ]
-        expect(commands("alchemist's fire")).to eq [ "+e/strike <target>=Alchemist's Fire (Lesser)" ]
-        expect(commands('silver arrows')).to eq [ '+e/strike <target>=<weapon>/silver' ]
+        expect(commands("alchemist's fire")).to eq [ "+e/strike Alchemist's Fire (Lesser)=<target>" ]
+        expect(commands('silver arrows')).to eq [ '+e/strike <weapon>=<target>/silver' ]
         expect(commands('wand of heal')).to eq [ '+e/use magicitem=0/heal' ]
       end
 
@@ -79,7 +79,7 @@ module AresMUSH
       end
 
       it "should give everything a name could mean" do
-        expect(commands('longsword')).to eq [ '+e/strike <target>=Longsword' ]
+        expect(commands('longsword')).to eq [ '+e/strike Longsword=<target>' ]
         expect(commands('heal')).to eq [ '+e/use consumables=0', '+e/use consumables=0/<who>', '+e/use magicitem=0/heal' ]
       end
 

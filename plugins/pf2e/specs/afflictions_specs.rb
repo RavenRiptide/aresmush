@@ -190,7 +190,7 @@ module AresMUSH
       it "should leave whoever a stage paralyzes unable to act" do
         as(2, "act giant wasp venom=#{@hero.name}", FightBench::LOW)
         run(PF2EncounterAfflictionCmd, "e/affliction #{@hero.name}=giant wasp venom/3")
-        hero_types('e/strike #2=fist')
+        hero_types('e/strike fist=#2')
 
         expect(refused).to eq [ t('pf2e.act_cannot_act', :actor => @hero.name) ]
       end

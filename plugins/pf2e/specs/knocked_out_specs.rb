@@ -60,7 +60,7 @@ module AresMUSH
         end
 
         it "should not let them Strike, though the hit that dropped them is the last thing that happened" do
-          hero_types('e/strike #2=claw')
+          hero_types('e/strike claw=#2')
 
           expect(refused).to eq [ t('pf2e.act_cannot_act', :actor => @hero.name) ]
         end
@@ -187,14 +187,14 @@ module AresMUSH
         end
 
         it "should take nothing more from a Strike, which says so" do
-          as(4, "strike #{@hero.name}=stinger", FightBench::HIGH)
+          as(4, "strike stinger=#{@hero.name}", FightBench::HIGH)
 
           expect(heard).to include(t('pf2e.act_already_dead', :target => @hero.name).strip)
           expect(heard).to_not include('Damage to')
         end
 
         it "should save against nothing the Strike carries" do
-          as(4, "strike #{@hero.name}=stinger", FightBench::HIGH)
+          as(4, "strike stinger=#{@hero.name}", FightBench::HIGH)
 
           expect(heard).to_not include('Wyvern Venom')
         end
@@ -205,7 +205,7 @@ module AresMUSH
           add('wyvern')
           Pf2eHP.modify_damage(hero, Pf2eHP.get_max_hp(hero), false, true)
           Pf2e.set_condition(hero, 'Dying', 3)
-          as(4, "strike #{@hero.name}=stinger", FightBench::HIGH)
+          as(4, "strike stinger=#{@hero.name}", FightBench::HIGH)
 
           expect(Pf2e.dead?(hero)).to be true
           expect(heard).to_not include('Wyvern Venom')

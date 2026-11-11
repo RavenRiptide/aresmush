@@ -158,7 +158,7 @@ module AresMUSH
         end
 
         it "should refuse a Strike and say why" do
-          hero_types("e/strike ##{goblin_number}=fist")
+          hero_types("e/strike fist=##{goblin_number}")
 
           expect(refused.join).to include "can't make Strikes"
         end

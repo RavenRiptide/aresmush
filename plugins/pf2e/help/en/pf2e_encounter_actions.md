@@ -59,19 +59,19 @@ All rolls are public, meaning that everyone in the scene sees each roll and its 
 
 ## Strikes
 
-`encounter/strike <target>[=<weapon>][/<circumstance>...]`: Strikes the target with your first equipped weapon, or with the weapon you name (by name, by nickname, or an unarmed attack like `fist`). On a hit, the game rolls damage and deals it after the target's resistances.
+`encounter/strike [<weapon>=]<target>[/<circumstance>...]`: Strikes the target with your first equipped weapon, or with the weapon you name (by name, by nickname, or an unarmed attack like `fist`). On a hit, the game rolls damage and deals it after the target's resistances.
 %t **Examples**:
 %t `encounter/strike #3`
-%t `encounter/strike #3=longsword/flanking`
-%t `encounter/strike #4=shortbow/range 2`
-%t **Note:** You throw bombs the same way: `encounter/strike #3=alchemist's fire`. The bomb is used up whether or not it hits. Its persistent damage applies on a hit, and its splash damages the target even on a miss (but not on a critical miss).
-%t **Note:** To splash others standing near the target, name them after `splash`: `encounter/strike #3=alchemist's fire/splash #4, #5`. Each takes the splash damage unless you critically miss. The game can't see where anyone stands, so the GM decides who is close enough.
+%t `encounter/strike longsword=#3/flanking`
+%t `encounter/strike shortbow=#4/range 2`
+%t **Note:** You throw bombs the same way: `encounter/strike alchemist's fire=#3`. The bomb is used up whether or not it hits. Its persistent damage applies on a hit, and its splash damages the target even on a miss (but not on a critical miss).
+%t **Note:** To splash others standing near the target, name them after `splash`: `encounter/strike alchemist's fire=#3/splash #4, #5`. Each takes the splash damage unless you critically miss. The game can't see where anyone stands, so the GM decides who is close enough.
 
 ### Ammunition and reloading
 
 `encounter/reload [<weapon>]`: Reloads a fired weapon that needs it, such as a crossbow or sling. Reloading takes as many actions as the weapon's reload value, and the weapon can't fire again until you reload it.
 
-Bows, crossbows, and slings always have ordinary ammunition, which the game doesn't track or sell. Ammunition made of a precious material is an item you carry, bought by the piece: `buy consumables=cold iron ammunition/10`. To fire one piece, name the material when you attack, such as `encounter/strike #3=longbow/cold iron`. The piece is used up whether or not it hits, and the attack is refused if you have none.
+Bows, crossbows, and slings always have ordinary ammunition, which the game doesn't track or sell. Ammunition made of a precious material is an item you carry, bought by the piece: `buy consumables=cold iron ammunition/10`. To fire one piece, name the material when you attack, such as `encounter/strike longbow=#3/cold iron`. The piece is used up whether or not it hits, and the attack is refused if you have none.
 
 ## Spells
 
@@ -90,12 +90,12 @@ Bows, crossbows, and slings always have ordinary ammunition, which the game does
 `flanking`: The target is off-guard to you (-2 AC).
 `range <n>`: Sets the range increment the target is in: -2 to your attack for each increment past the first. Ranged attacks can't reach past the sixth increment.
 `<number>`: Sets the DC for an action with no target, such as `encounter/act balance/18`.
-`two-handed`: Uses both hands on a weapon that deals more damage that way, such as `encounter/strike #3=bastard sword/two-handed`.
+`two-handed`: Uses both hands on a weapon that deals more damage that way, such as `encounter/strike bastard sword=#3/two-handed`.
 `piercing`, `slashing`, `bludgeoning`: Chooses the damage type a versatile weapon deals this time.
 `nonlethal`, `lethal`: Makes a nonlethal attack with a lethal weapon, or a lethal attack with a nonlethal weapon, at -2 to hit. A nonlethal hit that drops someone to 0 HP knocks them out.
 `volley`: Marks the target as within a volley weapon's short range (-2 to hit).
 `force`: Lets the GM have a creature use an action or cast a spell its stat block doesn't give it, or have someone in a battle form do what the form prevents. See `help encounter_gm`.
-`silver`, `cold iron`, `holy`, `magical`, and so on: Tells the game what your weapon is made of or carries, which it can't see on its own. A creature with a weakness to that material takes more damage, and a resistance that makes an exception for it doesn't apply: `encounter/strike #3=longsword/cold iron`.
+`silver`, `cold iron`, `holy`, `magical`, and so on: Tells the game what your weapon is made of or carries, which it can't see on its own. A creature with a weakness to that material takes more damage, and a resistance that makes an exception for it doesn't apply: `encounter/strike longsword=#3/cold iron`.
 
 Any other circumstance is one the rules can check for, such as `unintelligible`, a skill for Aid, or a variant like `stabilize`.
 

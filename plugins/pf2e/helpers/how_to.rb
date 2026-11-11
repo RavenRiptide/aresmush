@@ -82,7 +82,7 @@ module AresMUSH
         listed = Array(known['strikes'])
         chosen = STRIKE.include?(wanted) ? listed : listed.select { |one| one['names'].any? { |name| called?(name, wanted) } }
 
-        chosen.map { |one| [ "+e/strike <target>=#{one['names'].first}", "Strike with your #{one['names'].first}" ] }
+        chosen.map { |one| [ "+e/strike #{one['names'].first}=<target>", "Strike with your #{one['names'].first}" ] }
       end
 
       def self.actions(wanted, known)
@@ -172,15 +172,15 @@ module AresMUSH
         number = "#{one['category']}=#{one['number']}"
 
         if one['thrown']
-          [ [ "+e/strike <target>=#{one['name']}", "throw your #{one['name']}" ] ]
+          [ [ "+e/strike #{one['name']}=<target>", "throw your #{one['name']}" ] ]
         elsif one['ammunition']
-          [ [ "+e/strike <target>=<weapon>/#{one['ammunition']}", "shoot your #{one['name']} from a weapon that fires it" ] ]
+          [ [ "+e/strike <weapon>=<target>/#{one['ammunition']}", "shoot your #{one['name']} from a weapon that fires it" ] ]
         elsif one['category'] == 'consumables'
           [ [ "+e/use #{number}", "use your #{one['name']}" ], [ "+e/use #{number}/<who>", "give it to someone in the fight" ] ]
         elsif uses.any?
           uses.map { |use| [ "+e/use #{number}/#{use}", "use your #{one['name']}: #{use}" ] }
         elsif %w{weapons armor shields}.include?(one['category'])
-          one['equipped'] ? [ [ "+e/strike <target>=#{one['name']}", "Strike with your #{one['name']}" ] ].select { one['category'] == 'weapons' }
+          one['equipped'] ? [ [ "+e/strike #{one['name']}=<target>", "Strike with your #{one['name']}" ] ].select { one['category'] == 'weapons' }
                           : [ [ "+e/equip #{number}", "draw or put on your #{one['name']}" ] ]
         else
           [ [ "+e/use #{number}", "use your #{one['name']}" ] ]

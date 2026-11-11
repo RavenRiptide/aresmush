@@ -46,7 +46,7 @@ module AresMUSH
         end
 
         it "should roll nothing for an action that is not auditory" do
-          hero_types('e/strike #2=claw')
+          hero_types('e/strike claw=#2')
 
           expect(heard).to_not include('flat check')
         end
@@ -85,21 +85,21 @@ module AresMUSH
       describe "someone who cannot see" do
         it "should miss on an 10 or less on the flat check, blinded" do
           gm_sets(@hero.name, 'blinded')
-          hero_types('e/strike #2=claw', 0.5)
+          hero_types('e/strike claw=#2', 0.5)
 
           expect(heard).to include('blinded, flat check 10 vs DC 11', 'miss')
         end
 
         it "should roll the attack on an 11, blinded" do
           gm_sets(@hero.name, 'blinded')
-          hero_types('e/strike #2=claw', 0.55)
+          hero_types('e/strike claw=#2', 0.55)
 
           expect(heard).to include('vs AC 10')
         end
 
         it "should miss on a 4 or less, dazzled" do
           gm_sets(@hero.name, 'dazzled')
-          hero_types('e/strike #2=claw', 0.2)
+          hero_types('e/strike claw=#2', 0.2)
 
           expect(heard).to include('dazzled, flat check 4 vs DC 5', 'miss')
         end
@@ -107,7 +107,7 @@ module AresMUSH
         it "should roll the harder check where the target is hidden as well" do
           gm_sets(@hero.name, 'dazzled')
           run(PF2EncounterConcealCmd, 'e/conceal #2=hidden')
-          hero_types('e/strike #2=claw', 0.5)
+          hero_types('e/strike claw=#2', 0.5)
 
           expect(heard).to include('hidden, flat check 10 vs DC 11')
         end
@@ -181,7 +181,7 @@ module AresMUSH
         end
 
         it "should Strike" do
-          hero_types('e/strike #2=claw')
+          hero_types('e/strike claw=#2')
 
           expect(refused).to eq []
         end
@@ -255,7 +255,7 @@ module AresMUSH
         before(:each) { gm_sets(@hero.name, 'paralyzed') }
 
         it "should not Strike" do
-          hero_types('e/strike #2=claw')
+          hero_types('e/strike claw=#2')
 
           expect(refused).to eq [ t('pf2e.act_cannot_act', :actor => @hero.name) ]
         end

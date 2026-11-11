@@ -14,7 +14,7 @@ These commands are for the GM of an encounter. For starting and running the enco
 `encounter/as <combatant>=<act|strike|cast|enter|leave> <what>`: Acts for a creature, or for anyone else in the encounter, using the same commands players use. See `help encounter actions` or [read it on the web](/help/pf2e_encounter_actions).
 %t **Examples**:
 %t `encounter/as #3=strike aria`
-%t `encounter/as #3=strike aria=shortbow/range 2`
+%t `encounter/as #3=strike shortbow=aria/range 2`
 %t `encounter/as #5=act demoralize=aria`
 %t `encounter/as #6=cast fear=aria`
 

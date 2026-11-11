@@ -62,7 +62,7 @@ module AresMUSH
       end
 
       it "should let a bow shoot with nothing carried for it" do
-        hero_types('e/strike #2=shortbow')
+        hero_types('e/strike shortbow=#2')
 
         expect(refused).to eq []
         expect(heard).to include('with Shortbow')
@@ -77,18 +77,18 @@ module AresMUSH
 
       describe "of a material" do
         it "should be refused to a bow where none is carried" do
-          hero_types('e/strike #2=shortbow/cold iron')
+          hero_types('e/strike shortbow=#2/cold iron')
 
           expect(refused).to eq [ t('pf2e.ammunition_none', :material => 'cold iron', :weapon => 'Shortbow') ]
         end
 
         it "should hurt what is weak to it, and be used up by the shot" do
           carry('Cold Iron Ammunition (Low-Grade)', 3)
-          plain = taken { hero_types('e/strike #2=shortbow') }
+          plain = taken { hero_types('e/strike shortbow=#2') }
           next_turn
           next_turn
 
-          expect(taken { hero_types('e/strike #2=shortbow/cold iron') }).to eq plain + 5
+          expect(taken { hero_types('e/strike shortbow=#2/cold iron') }).to eq plain + 5
           expect(carried('Cold Iron Ammunition (Low-Grade)')).to eq 2
           expect(heard).to include(t('pf2e.ammunition_shot', :item => 'Cold Iron Ammunition (Low-Grade)', :left => 2).strip)
         end
@@ -96,7 +96,7 @@ module AresMUSH
         it "should be used up by a shot that misses" do
           carry('Silver Ammunition (Low-Grade)', 1)
 
-          hero_types('e/strike #2=shortbow/silver', FightBench::LOW)
+          hero_types('e/strike shortbow=#2/silver', FightBench::LOW)
 
           expect(refused).to eq []
           expect(carried('Silver Ammunition (Low-Grade)')).to eq 0
@@ -105,18 +105,18 @@ module AresMUSH
         it "should not be what a material said of another is" do
           carry('Silver Ammunition (Low-Grade)', 1)
 
-          hero_types('e/strike #2=shortbow/cold iron')
+          hero_types('e/strike shortbow=#2/cold iron')
 
           expect(refused).to eq [ t('pf2e.ammunition_none', :material => 'cold iron', :weapon => 'Shortbow') ]
           expect(carried('Silver Ammunition (Low-Grade)')).to eq 1
         end
 
         it "should still be taken on a fist's say-so, which shoots nothing" do
-          plain = taken { hero_types('e/strike #2=fist') }
+          plain = taken { hero_types('e/strike fist=#2') }
           next_turn
           next_turn
 
-          expect(taken { hero_types('e/strike #2=fist/cold iron') }).to eq plain + 5
+          expect(taken { hero_types('e/strike fist=#2/cold iron') }).to eq plain + 5
           expect(refused).to eq []
         end
 

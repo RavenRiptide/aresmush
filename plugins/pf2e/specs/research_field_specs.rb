@@ -152,7 +152,7 @@ module AresMUSH
         it "should add a field vial's damage to the Strike that hits" do
           WeaponPoison.apply!(state, 'dagger', 'versatile vial')
           @dice = 0.95
-          run(PF2EncounterStrikeCmd, 'e/strike #2=dagger', @hero)
+          run(PF2EncounterStrikeCmd, 'e/strike dagger=#2', @hero)
 
           expect(@client.said.join).to include t('pf2e.poison_exposed', :target => 'Goblin Warrior #2', :poison => 'Versatile Vial (Greater)')
         end
@@ -180,7 +180,7 @@ module AresMUSH
             venom.update(:granted_by => Alchemy::QUICK)
             WeaponPoison.apply!(state, 'dagger', 'giant centipede venom')
             @dice = 0.95
-            run(PF2EncounterStrikeCmd, 'e/strike #2=dagger', @hero)
+            run(PF2EncounterStrikeCmd, 'e/strike dagger=#2', @hero)
           end
 
           it "should offer the spray when the target fails its first save" do
@@ -290,7 +290,7 @@ module AresMUSH
         it "should splash each creature named, on a hit" do
           before = hp('#3')
           @dice = 0.95
-          run(PF2EncounterStrikeCmd, 'e/strike #2=versatile vial/splash #3', @hero)
+          run(PF2EncounterStrikeCmd, 'e/strike versatile vial=#2/splash #3', @hero)
 
           expect(@client.failures).to eq []
           expect(hp('#3')).to eq before - 4
@@ -300,14 +300,14 @@ module AresMUSH
         it "should splash those named on a miss too" do
           before = hp('#3')
           @dice = 0.01
-          run(PF2EncounterStrikeCmd, 'e/strike #2=versatile vial/splash #3', @hero)
+          run(PF2EncounterStrikeCmd, 'e/strike versatile vial=#2/splash #3', @hero)
 
           expect(hp('#3')).to eq before - 4
         end
 
         it "should say so when nobody by that name is there" do
           @dice = 0.95
-          run(PF2EncounterStrikeCmd, 'e/strike #2=versatile vial/splash nobody', @hero)
+          run(PF2EncounterStrikeCmd, 'e/strike versatile vial=#2/splash nobody', @hero)
 
           expect(@client.said.join).to include t('pf2e.splash_not_found', :name => 'nobody')
         end

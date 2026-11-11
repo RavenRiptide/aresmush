@@ -146,8 +146,8 @@ module AresMUSH
         expect(@reminded.map(&:first)).to include(@hero.name)
 
         # Two Strikes: the second is the agile weapon's -4.
-        run(PF2EncounterStrikeCmd, 'e/strike #2=fist', @hero)
-        run(PF2EncounterStrikeCmd, 'e/strike #3=fist', @hero)
+        run(PF2EncounterStrikeCmd, 'e/strike fist=#2', @hero)
+        run(PF2EncounterStrikeCmd, 'e/strike fist=#3', @hero)
         expect(@client.said.join("\n")).to include('2nd attack')
         expect(TurnState.turn(hero)['attacks']).to eq 2
 
@@ -182,7 +182,7 @@ module AresMUSH
 
         @client.said.clear
         run(PF2EncounterHistoryCmd, 'e/history')
-        expect(@client.said.join).to include("e/as #2=strike #{@hero.name}", 'e/strike #3=fist')
+        expect(@client.said.join).to include("e/as #2=strike #{@hero.name}", 'e/strike fist=#3')
 
         run(PF2EncounterTrustCmd, "e/trust #{@hero.name}")
         run(PF2EncounterEndCmd, "encounter/end #{encounter.id}")
