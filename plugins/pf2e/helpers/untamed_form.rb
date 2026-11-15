@@ -22,7 +22,7 @@ module AresMUSH
       TRADITION = 'tradition primal'.freeze
 
       def self.table
-        Global.read_config('pf2e_untamed_shapes') || []
+        Global.read_config('pf2e_untamed_shapes', 'shapes') || []
       end
 
       def self.spell?(spell)
