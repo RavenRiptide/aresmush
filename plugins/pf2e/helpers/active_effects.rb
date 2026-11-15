@@ -34,8 +34,21 @@ module AresMUSH
       # How deep a chain of effects granting effects is followed before it is taken to be a loop.
       DEPTH = 4
 
+      # The imported effects, and the ones kept by hand that Foundry has no entry for
+      # (`pf2e_house_effects.yml`). The two are joined once for each pair of tables read, since the
+      # catalogue is read on almost every roll.
       def self.catalogue
-        Global.read_config('pf2e_effects') || {}
+        imported = Global.read_config('pf2e_effects') || {}
+        house = Global.read_config('pf2e_house_effects') || {}
+
+        return imported if house.empty?
+
+        joined = @joined
+
+        return joined.last if joined && joined.first.equal?(imported) && joined[1].equal?(house)
+
+        @joined = [ imported, house, imported.merge(house) ]
+        @joined.last
       end
 
       # An effect's catalogue entry, with what is kept by hand laid over the imported one

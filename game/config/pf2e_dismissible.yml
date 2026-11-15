@@ -32,4 +32,5 @@ pf2e_dismissible:
   "Effect: Change Shape (Werecreature)": caster
   "Effect: Energizing Lattice": caster
   "Effect: Potion of Living Light": caster
+  "Effect: Winged Rune": holder
   "Effect: Worm Form": caster

@@ -174,6 +174,11 @@ module AresMUSH
 
       NONLETHAL = 'item:trait:nonlethal'.freeze
 
+      # Dead at a stroke, whatever their hit points: a vorpal weapon's decapitation.
+      def slay!
+        Pf2eHP.kill(@holder)
+      end
+
       # What they regained, which is no more than they had lost.
       def heal(amount, options = [])
         before = Pf2eHP.get_hp_obj(@holder).damage.to_i
@@ -429,6 +434,11 @@ module AresMUSH
 
       def heal(amount, _options = [])
         Npcs.heal(@holder, amount)
+      end
+
+      # Dead at a stroke: all its hit points gone.
+      def slay!
+        @holder.update(:damage => @holder.max_hp.to_i, :temp_hp => 0)
       end
 
       def hit_points

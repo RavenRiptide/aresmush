@@ -85,6 +85,12 @@ module AresMUSH
         use = item.use
 
         if use.empty?
+          # A rune's activation is an action of the wearer's.
+          given = Pf2e::RuneActions.given_by(self.category, item)
+
+          return client.emit_failure(t('pf2egear.use_rune_action', :item => item.name, :actions => given.join(', '),
+                                                                   :example => given.first.downcase)) if given.any?
+
           client.emit_failure t('pf2egear.not_usable')
           return
         end

@@ -68,11 +68,14 @@ module AresMUSH
       # everyone's. Anything else - a class's, an archetype's, a heritage's - and any feat that is an
       # action, is theirs if a feat or feature of theirs has its name: the Rage class feature is what gives
       # a barbarian Rage, at the level the class grants it and not before. A class, heritage or background
-      # can also name an action outright, as an investigator's names Devise a Stratagem.
+      # can also name an action outright, as an investigator's names Devise a Stratagem. A property rune
+      # on armor they wear or a weapon they wield gives them its activation.
       def self.usable(char, name)
         entry = info(name)
 
         return Ok.new(:state => name) if entry['for'] == 'everyone' || owned?(char, name) || DragonBreath.grants?(char, name)
+        return Ok.new(:state => name) if RuneActions.grants?(char, name)
+        return RuneActions.refusal(name) if RuneActions.action?(name)
 
         Err.new(:not_yours, 'pf2e.action_not_yours', 'action' => name)
       end

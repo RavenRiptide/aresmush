@@ -115,6 +115,7 @@ en:
     not_found: "I didn't find that item in that category."
     no_access: "%{item} is %{rarity}, so the vendor doesn't sell it to you. To get its formula and have it crafted, put in a request."
     not_usable: "This item has no properties that allow it to be used."
+    use_rune_action: "Your %{item} has a rune you activate as an action: %{actions}. Use e/act <action>, such as e/act %{example}."
     cannot_sell_made: "Your %{item} came from a feat or a class feature, so the vendor won't buy it."
     nothing_to_do: "Nothing to do."
 

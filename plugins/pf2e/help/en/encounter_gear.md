@@ -18,6 +18,8 @@ aliases:
 - elixirs
 - overcharge
 - feather_fan
+- runes
+- rune_activations
 ---
 # Pathfinder 2E Encounters - Using Gear
 
@@ -44,6 +46,18 @@ When you join an encounter, the game copies what you carry into it: your gear, w
 %t **Note:** The spell must be on a spell list you cast from. You cast it with your own spell attack and spell DC.
 %t **Note:** For more information about preparing a staff, see `help prepare`.
 %t **Note:** Outside an encounter, `use consumables=<number>`, `use magicitem=<number>`, or `use weapons=<number>[/<spell>]` tells the room you cast the spell. A scroll is used up, but a wand's daily casting and a staff's charges aren't counted.
+
+## Property runes
+
+Some property runes give you an action while you wear the armor or wield the weapon they're etched on. Use these actions with `encounter/act`, or with `action/use` outside an encounter. `encounter/how` lists the ones you have.
+
+`encounter/act change size/<enlarge or shrink>`: **Size-changing.** Casts *enlarge* or *shrink* on you, once per day.
+`encounter/act go invisible`: **Invisibility.** Makes you invisible for 1 minute, once per day, or three times per day with a greater rune.
+`encounter/act take to the skies`: **Winged.** Gives you a fly Speed of 25 feet, or your land Speed if that's slower, for 5 minutes. A greater rune's wings last until you use `encounter/act dismiss/winged rune`.
+`encounter/act costume change`: **Raiment.** Makes your armor look like ordinary or fine clothes.
+`encounter/act extend=<target>[/<weapon>]`: **Extending.** Strikes with the weapon that carries the rune, at a reach of 60 feet, or 120 feet with a greater rune.
+`encounter/act shine bright/<DC>[/rank <rank>]`: **Brilliant.** Rolls a counteract check against the DC of a magical darkness effect. Add the effect's rank to find out whether the check ends it.
+`encounter/act holy healing`, `encounter/act unholy bloodshed`, and `encounter/act snicker-snack`: **Holy, unholy, and vorpal.** Reacts to a critical hit you just made with the weapon. The game tells you when your Strike qualifies.
 
 A battle form absorbs your gear, so you can't use, equip, or unequip anything until the form ends. The constant abilities of your gear still work.
 

@@ -365,6 +365,66 @@ OWN = {
                        'sickened value by 2.%rSuccess You reduce your sickened value by 1.'},
 }
 
+# The activations of property runes (GM Core), which Foundry keeps on the runes rather than as actions.
+# `Pf2e::RuneActions` says which rune gives each and runs what it does.
+RUNE = {'from': 'action', 'source': 'Pathfinder GM Core', 'for': 'equipment'}
+OWN.update({
+    'Change Size': dict(RUNE, **{
+        'type': 'action', 'cost': 1, 'category': 'interaction', 'traits': ['concentrate'],
+        'frequency': {'max': 1, 'per': 'day'},
+        'description': 'Requirements You are wearing armor etched with a size-changing rune.%rThe armor casts your '
+                       'choice of enlarge or shrink on you.'}),
+    'Costume Change': dict(RUNE, **{
+        'type': 'action', 'cost': 1, 'category': 'interaction', 'traits': ['concentrate'],
+        'description': 'Requirements You are wearing armor etched with a raiment rune.%rYou change the shape and '
+                       "appearance of this armor to appear as ordinary or fine clothes of your imagining. The armor's "
+                       "statistics don't change. Only a creature that's benefiting from truesight or a similar effect "
+                       'can attempt to disbelieve this illusion, with a DC of 25.'}),
+    'Extend': dict(RUNE, **{
+        'type': 'action', 'cost': 2, 'category': 'offensive', 'traits': ['manipulate'],
+        'strikes': {'count': 1, 'attack': 'melee'},
+        'description': 'Requirements You are wielding a melee weapon etched with an extending rune.%rYou extend your '
+                       'weapon, giving you an impossible reach. You Strike with the weapon, and you have reach 60 feet '
+                       'for the Strike, or 120 feet with a greater extending rune.'}),
+    'Go Invisible': dict(RUNE, **{
+        'type': 'action', 'cost': 1, 'category': 'defensive', 'traits': ['concentrate'],
+        'frequency': {'max': 1, 'per': 'day'},
+        'description': 'Requirements You are wearing light armor etched with an invisibility rune.%rWith a thought, you '
+                       'become invisible for 1 minute, gaining the effects of a 2nd-rank invisibility spell. A greater '
+                       'invisibility rune can be activated up to three times per day.'}),
+    'Holy Healing': dict(RUNE, **{
+        'type': 'reaction', 'category': 'defensive', 'traits': ['concentrate', 'healing', 'vitality'],
+        'frequency': {'max': 1, 'per': 'day'},
+        'description': 'Trigger You critically succeed at a Strike against an unholy creature with a weapon etched with '
+                       "a holy rune.%rYou regain HP equal to double the unholy creature's level."}),
+    'Shine Bright': dict(RUNE, **{
+        'type': 'action', 'cost': 1, 'category': 'interaction', 'traits': ['concentrate', 'light'],
+        'description': 'Requirements You are wielding a weapon etched with a brilliant rune.%rYou plunge your weapon into '
+                       'darkness to return the light. Attempt a counteract check with a counteract rank of 5 and a +19 '
+                       'counteract modifier to end a magical darkness effect whose area is within reach of the weapon. '
+                       'A greater brilliant rune has a counteract rank of 9 and a +31 counteract modifier.'}),
+    'Snicker-Snack': dict(RUNE, **{
+        'type': 'reaction', 'category': 'offensive', 'traits': ['concentrate', 'death', 'incapacitation'],
+        'description': 'Trigger You roll a natural 20 on a Strike with a weapon etched with a vorpal rune against a '
+                       'creature that has a head, critically succeed, and deal slashing damage.%rThe target must succeed '
+                       'at a DC 37 Fortitude save or be decapitated. This kills any creature except ones that '
+                       "don't require a head to live."}),
+    'Take to the Skies': dict(RUNE, **{
+        'type': 'action', 'cost': 2, 'category': 'interaction', 'traits': ['concentrate', 'manipulate'],
+        'frequency': {'max': 1, 'per': 'PT1H'},
+        'description': 'Requirements You are wearing armor etched with a winged rune.%rYou trace the rune on the front of '
+                       "the breastplate, and the armor's ephemeral wings grow tangible, granting you a fly Speed of 25 "
+                       'feet or your land Speed, whichever is slower. This effect lasts for 5 minutes or until you '
+                       'Dismiss it. With a greater winged rune, the wings remain tangible until you Dismiss them, and '
+                       "you don't have to wait an hour to activate the rune again."}),
+    'Unholy Bloodshed': dict(RUNE, **{
+        'type': 'reaction', 'category': 'offensive', 'traits': ['concentrate'],
+        'frequency': {'max': 1, 'per': 'day'},
+        'description': 'Trigger You critically succeed at an attack roll against a holy creature with a weapon etched '
+                       'with an unholy rune.%rThe target takes persistent bleed damage equal to 1d8 per weapon damage '
+                       'die of the etched weapon.'}),
+})
+
 
 def rendered(entries):
     lines = ['---', 'pf2e_actions:']

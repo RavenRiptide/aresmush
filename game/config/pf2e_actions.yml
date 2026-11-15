@@ -461,6 +461,16 @@ pf2e_actions:
     category: "ancestry"
     traits: ["duskwalker", "fortune"]
     frequency: {"max": 1, "per": "day"}
+  "Change Size":
+    from: "action"
+    source: "Pathfinder GM Core"
+    for: "equipment"
+    type: "action"
+    cost: 1
+    category: "interaction"
+    traits: ["concentrate"]
+    frequency: {"max": 1, "per": "day"}
+    description: "Requirements You are wearing armor etched with a size-changing rune.%rThe armor casts your choice of enlarge or shrink on you."
   "Change Tradition Focus":
     from: "action"
     source: "Pathfinder GM Core"
@@ -654,6 +664,15 @@ pf2e_actions:
     type: "reaction"
     category: "class"
     traits: ["wizard"]
+  "Costume Change":
+    from: "action"
+    source: "Pathfinder GM Core"
+    for: "equipment"
+    type: "action"
+    cost: 1
+    category: "interaction"
+    traits: ["concentrate"]
+    description: "Requirements You are wearing armor etched with a raiment rune.%rYou change the shape and appearance of this armor to appear as ordinary or fine clothes of your imagining. The armor's statistics don't change. Only a creature that's benefiting from truesight or a similar effect can attempt to disbelieve this illusion, with a DC of 25."
   "Courageous Advance":
     from: "feat"
     type: "action"
@@ -1384,6 +1403,16 @@ pf2e_actions:
     type: "free"
     category: "class"
     traits: ["concentrate", "manipulate", "spellshape", "wizard"]
+  "Extend":
+    from: "action"
+    source: "Pathfinder GM Core"
+    for: "equipment"
+    type: "action"
+    cost: 2
+    category: "offensive"
+    traits: ["manipulate"]
+    strikes: {"count": 1, "attack": "melee"}
+    description: "Requirements You are wielding a melee weapon etched with an extending rune.%rYou extend your weapon, giving you an impossible reach. You Strike with the weapon, and you have reach 60 feet for the Strike, or 120 feet with a greater extending rune."
   "Extravagant Parry":
     from: "feat"
     type: "action"
@@ -1681,6 +1710,16 @@ pf2e_actions:
     category: "defensive"
     traits: ["champion", "divine"]
     description: "Trigger An enemy damages your ally, and both are in your champion's aura%rEffect Your enemy hesitates under the weight of sin as visions of redemption play in their mind's eye. The enemy must choose to repent or refuse, with the following effects. If the enemy is mindless or otherwise unable to repent, use the refuse result.%rRepent The ally is unharmed by the triggering damage.%rRefuse The ally gains resistance to all damage against the triggering damage equal to 2 + your level. After the damaging effect is applied, the enemy becomes Enfeebled 2 until the end of its next turn.%rEffect: Champion's Resistance"
+  "Go Invisible":
+    from: "action"
+    source: "Pathfinder GM Core"
+    for: "equipment"
+    type: "action"
+    cost: 1
+    category: "defensive"
+    traits: ["concentrate"]
+    frequency: {"max": 1, "per": "day"}
+    description: "Requirements You are wearing light armor etched with an invisibility rune.%rWith a thought, you become invisible for 1 minute, gaining the effects of a 2nd-rank invisibility spell. A greater invisibility rune can be activated up to three times per day."
   "Goblin Scuttle":
     from: "feat"
     type: "reaction"
@@ -1813,6 +1852,15 @@ pf2e_actions:
     traits: ["move"]
     check: {"slug": "high-jump", "statistic": "athletics", "options": ["action:high-jump", "action:stride", "action:leap"], "dc": 30, "notes": {"criticalSuccess": "You Leap up to 8 feet vertically and 10 feet horizontally.", "success": "You Leap up to 5 feet vertically and 5 feet horizontally.", "failure": "You Leap normally.", "criticalFailure": "You fall Prone in your space."}}
     description: "You Stride, then attempt a DC 30 Athletics check to jump vertically. If you didn't Stride at least 10 feet, you automatically fail. This DC might be increased or decreased due to the situation, as determined by the GM.%rCritical Success You Leap up to 8 feet vertically and 10 feet horizontally.%rSuccess You Leap up to 5 feet vertically and 5 feet horizontally.%rFailure You Leap normally.%rCritical Failure You fall Prone in your space."
+  "Holy Healing":
+    from: "action"
+    source: "Pathfinder GM Core"
+    for: "equipment"
+    type: "reaction"
+    category: "defensive"
+    traits: ["concentrate", "healing", "vitality"]
+    frequency: {"max": 1, "per": "day"}
+    description: "Trigger You critically succeed at a Strike against an unholy creature with a weapon etched with a holy rune.%rYou regain HP equal to double the unholy creature's level."
   "Hone Claws":
     from: "feat"
     type: "action"
@@ -3516,6 +3564,15 @@ pf2e_actions:
     category: "class"
     traits: ["champion"]
     frequency: {"max": 1, "per": "round"}
+  "Shine Bright":
+    from: "action"
+    source: "Pathfinder GM Core"
+    for: "equipment"
+    type: "action"
+    cost: 1
+    category: "interaction"
+    traits: ["concentrate", "light"]
+    description: "Requirements You are wielding a weapon etched with a brilliant rune.%rYou plunge your weapon into darkness to return the light. Attempt a counteract check with a counteract rank of 5 and a +19 counteract modifier to end a magical darkness effect whose area is within reach of the weapon. A greater brilliant rune has a counteract rank of 9 and a +31 counteract modifier."
   "Shooting Stars Stance":
     from: "feat"
     type: "action"
@@ -3605,6 +3662,14 @@ pf2e_actions:
     traits: ["move", "secret"]
     check: {"slug": "sneak", "statistic": "stealth", "options": ["action:sneak"], "against": "perception", "notes": {"criticalSuccess": "You're undetected by the creature during your movement and remain undetected by the creature at the end of it.", "success": "You're undetected by the creature during your movement and remain undetected by the creature at the end of it.", "failure": "A telltale sound or other sign gives your position away, though you still remain unseen. You're hidden from the creature throughout your movement and remain so.", "criticalFailure": "You're spotted! You're observed by the creature throughout your movement and remain so. If you're invisible and were hidden from the creature, instead of being observed you're hidden throughout your movement and remain so."}}
     description: "You attempt to move to another place while becoming or staying undetected. Stride up to half your Speed. (You can use Sneak while Burrowing, Climbing, Flying, or Swimming instead of Striding if you have the corresponding movement type; you must move at half that Speed.)%rAt the end of your movement, the GM rolls your sneak check in secret and compares the result to the Perception DC of each creature you were Hidden from or Undetected by at the start of your movement. If you have cover or greater cover from the creature throughout your Stride, you gain the +2 circumstance bonus from cover (or +4 from greater cover) to your Stealth check. Because you're moving, the bonus increase from Taking Cover doesn't apply. You don't get to roll against a creature if, at the end of your movement, you neither are Concealed from it nor have cover or greater cover against it. You automatically become observed by such a creature.%rSuccess You're undetected by the creature during your movement and remain undetected by the creature at the end of it.%rYou become observed as soon as you do anything other than Hide, Sneak, or Step. If you attempt to Strike a creature, the creature remains Off-Guard…"
+  "Snicker-Snack":
+    from: "action"
+    source: "Pathfinder GM Core"
+    for: "equipment"
+    type: "reaction"
+    category: "offensive"
+    traits: ["concentrate", "death", "incapacitation"]
+    description: "Trigger You roll a natural 20 on a Strike with a weapon etched with a vorpal rune against a creature that has a head, critically succeed, and deal slashing damage.%rThe target must succeed at a DC 37 Fortitude save or be decapitated. This kills any creature except ones that don't require a head to live."
   "Snowdrift Spell":
     from: "feat"
     type: "action"
@@ -3982,6 +4047,16 @@ pf2e_actions:
     traits: []
     self_effect: "Effect: Cover"
     description: "Requirements You are benefiting from standard cover, are near a feature that allows you to take cover, or are Prone.%rYou press yourself against a wall or duck behind an obstacle to take better advantage of cover. If you would have standard cover, you instead gain greater cover, which provides a +4 circumstance bonus to AC; to Reflex saves against area effects; and to Stealth checks to hide, sneak, or otherwise avoid detection. Otherwise, you gain standard cover (a +2 circumstance bonus instead). If you're prone, you gain greater cover against ranged attacks. Take Cover lasts until you move from your current space, use an attack action, become Unconscious, or end it as a free action."
+  "Take to the Skies":
+    from: "action"
+    source: "Pathfinder GM Core"
+    for: "equipment"
+    type: "action"
+    cost: 2
+    category: "interaction"
+    traits: ["concentrate", "manipulate"]
+    frequency: {"max": 1, "per": "PT1H"}
+    description: "Requirements You are wearing armor etched with a winged rune.%rYou trace the rune on the front of the breastplate, and the armor's ephemeral wings grow tangible, granting you a fly Speed of 25 feet or your land Speed, whichever is slower. This effect lasts for 5 minutes or until you Dismiss it. With a greater winged rune, the wings remain tangible until you Dismiss them, and you don't have to wait an hour to activate the rune again."
   "Tangle of Battle":
     from: "feat"
     type: "reaction"
@@ -4276,6 +4351,15 @@ pf2e_actions:
     category: "class"
     traits: ["rogue"]
     strikes: {"count": 1, "attack": "melee"}
+  "Unholy Bloodshed":
+    from: "action"
+    source: "Pathfinder GM Core"
+    for: "equipment"
+    type: "reaction"
+    category: "offensive"
+    traits: ["concentrate"]
+    frequency: {"max": 1, "per": "day"}
+    description: "Trigger You critically succeed at an attack roll against a holy creature with a weapon etched with an unholy rune.%rThe target takes persistent bleed damage equal to 1d8 per weapon damage die of the etched weapon."
   "Unusual Composition":
     from: "feat"
     type: "action"

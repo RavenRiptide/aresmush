@@ -1,0 +1,39 @@
+---
+# Effects kept by hand that Foundry has no entry for, in the same shape as `pf2e_effects.yml`. That file is
+# replaced whole on each import; these sit beside it (`ActiveEffects.catalogue`) and are never imported
+# over. To correct an imported effect instead, use `pf2e_effect_overrides.yml`.
+pf2e_house_effects:
+  # Invisibility rune: "you become invisible for 1 minute, gaining the effects of a 2nd-rank invisibility spell."
+  "Effect: Invisibility Rune":
+    pack: "house"
+    level: 2
+    duration: {"unit": "minutes", "value": 1, "expiry": "turn-start", "sustained": false}
+    traits: ["illusion"]
+    description: "Granted by an invisibility rune%rYou are invisible for 1 minute, as the 2nd-rank invisibility spell."
+    rules:
+      - key: "GrantItem"
+        uuid: "Compendium.pf2e.conditionitems.Item.Invisible"
+        inMemoryOnly: true
+  # Winged rune: "a fly Speed of 25 feet or your land Speed, whichever is slower. This effect lasts for 5
+  # minutes or until you Dismiss it."
+  "Effect: Winged Rune":
+    pack: "house"
+    level: 13
+    duration: {"unit": "minutes", "value": 5, "expiry": "turn-start", "sustained": false}
+    traits: []
+    description: "Granted by a winged rune%rYou gain a fly Speed of 25 feet or your land Speed, whichever is slower."
+    rules:
+      - key: "BaseSpeed"
+        selector: "fly"
+        value: "min(25,@actor.system.movement.speeds.land.value)"
+  # Greater winged rune: "Once activated, the wings remain tangible indefinitely. You can Dismiss the activation."
+  "Effect: Winged Rune (Greater)":
+    pack: "house"
+    level: 19
+    duration: {"unit": "unlimited", "value": -1, "expiry": null, "sustained": false}
+    traits: []
+    description: "Granted by a greater winged rune%rYou gain a fly Speed of 25 feet or your land Speed, whichever is slower, until you Dismiss it."
+    rules:
+      - key: "BaseSpeed"
+        selector: "fly"
+        value: "min(25,@actor.system.movement.speeds.land.value)"

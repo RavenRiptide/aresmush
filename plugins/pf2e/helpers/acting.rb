@@ -190,7 +190,7 @@ module AresMUSH
 
         return strike(scene, nil, words) if name == 'Strike'
 
-        entry = Actions.info(name)
+        entry = RuneActions.entry(scene.actor.holder, name, Actions.info(name))
         entry = follow_up_entry(entry, follow, term) if follow
         gained = chosen_traits(name, words)
         entry = entry.merge('traits' => Array(entry['traits']) + gained) if gained.any?
@@ -216,7 +216,10 @@ module AresMUSH
         # A creature's own ability: one no catalogue holds, or one the catalogue only lists.
         return announce_ability(scene, name, out, targets, said) if entry.empty? || (own && !run_by_catalogue?(name, entry))
 
-        if entry['check'] && targets.size > 1 && ONE_CHECK_FOR_ALL.include?(name)
+        if RuneActions.runs?(name)
+          ran = RuneActions.act(scene, name, entry, said, out)
+          return ran if ran
+        elsif entry['check'] && targets.size > 1 && ONE_CHECK_FOR_ALL.include?(name)
           check_against_each(scene, name, entry, said, out, targets)
         elsif entry['check']
           check_action(scene, name, entry, said, out)
@@ -990,7 +993,7 @@ module AresMUSH
         return Err.new(:no_target, 'pf2e.act_needs_target') if drawing && !scene.target
 
         drawn = drawing ? draw!(holder, named) : nil
-        usable = attacks_of(holder).select { |_, attack| strike_kind?(attack, kinds) }
+        usable = RuneActions.strike_with(holder, name, attacks_of(holder).select { |_, attack| strike_kind?(attack, kinds) })
         attack = if drawn
                    usable.find { |_, one| one['id'].to_s == drawn.id.to_s }
                  else
@@ -1006,6 +1009,7 @@ module AresMUSH
         out = report
         out['lines'] << told('pf2e.act_announced', :actor => scene.actor.label, :action => name,
                                                 :cost => Actions.cost(name), :target => target_phrase(scene))
+        RuneActions.before_strike(scene, name, out)
         out['lines'] << told('pf2e.act_draws', :actor => scene.actor.label, :weapon => attack.first.first) if drawing
         if finisher
           out['lines'] << told('pf2e.act_announced', :actor => scene.actor.label, :action => finisher,
@@ -1176,8 +1180,13 @@ module AresMUSH
         Ammunition.shoot!(scene.actor.holder, shooting.state, out)
         Loading.shot(scene.actor.holder, attack)
 
-        struck = { 'strike' => attack['name'], 'target' => scene.target.label, 'hit' => rolled['hit'] ? true : false,
-                   'effects' => Array(attack['effects']) }
+        # What a reaction to this Strike asks of it: Holy Healing a critical hit with a holy weapon, Snicker-Snack
+        # a natural 20 that deals slashing damage.
+        struck = { 'strike' => attack['name'], 'target' => scene.target.label, 'number' => scene.target.number,
+                   'hit' => rolled['hit'] ? true : false, 'effects' => Array(attack['effects']),
+                   'degree' => degree, 'die' => rolled.dig('result', 'die'), 'runes' => Array(attack['runes']),
+                   'dice' => (attack['dice'] || 1).to_i + attack['striking'].to_i,
+                   'damage_type' => DamageRoll.kind(attack['damage_type']).to_s }
 
         if reaction
           TurnState.spend(scene.actor.holder, reaction, :type => 'reaction', :struck => struck)
@@ -1185,6 +1194,8 @@ module AresMUSH
           TurnState.spend(scene.actor.holder, 'Strike', :cost => spent ? 1 : 0, :type => 'action', :attack => true,
                                                         :struck => struck)
         end
+
+        RuneActions.offers(scene, out)
 
         Ok.new(:state => out)
       end
