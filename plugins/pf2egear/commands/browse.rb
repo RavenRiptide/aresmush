@@ -18,6 +18,7 @@ module AresMUSH
 
         return browse_spell_items(kind) if kind
         return browse_runes if %w{rune runes}.include?(self.category)
+        return browse_materials if %w{material materials}.include?(self.category)
 
         category = Pf2egear::Inventory.shop_category(self.category)
 
@@ -59,6 +60,31 @@ module AresMUSH
         footer << t('pf2e.spell_item_browse_specialty') unless (row['specialties'] || {}).empty?
 
         client.emit BorderedListTemplate.new(lines + [ '' ] + footer, title).render
+      end
+
+      # Precious materials go into an item rather than being one, so they get a table of their own: each
+      # material's grades by kind of item, with the level and price of each.
+      def browse_materials
+        lines = []
+
+        Materials.materials.each do |name, row|
+          rpp = ((Materials.table['rpp'] || {})[row['rarity'].to_s]).to_i
+          key = rpp.positive? ? 'pf2egear.material_browse_heading' : 'pf2egear.material_browse_heading_common'
+          lines << t(key, :material => name, :rarity => row['rarity'], :rpp => rpp)
+
+          (row['grades'] || {}).each do |kind, grades|
+            shown = grades.map do |grade, at|
+              t('pf2egear.material_browse_grade', :grade => grade, :level => at['level'],
+                :price => Pf2egear.display_money(at['price'].to_i))
+            end
+
+            lines << t('pf2egear.material_browse_kind', :kind => t("pf2egear.material_kind_#{kind}"), :grades => shown.join(', '))
+          end
+        end
+
+        footer = [ '', t('pf2egear.material_browse_price'), t('pf2egear.material_browse_how') ]
+
+        client.emit BorderedListTemplate.new(lines + footer, t('pf2egear.material_browse_title')).render
       end
 
       # Runes go on an item rather than being one, so they get a list of their own: every grade of each

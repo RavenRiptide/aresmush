@@ -53,6 +53,14 @@ pf2e_magicitem:
         toggleable: true
         value: true
         label: "Walking Cauldron \u2014 Animated"
+  Ring of Sigils:
+    traits:
+      - arcane
+      - invested
+    level: 1
+    price: 2000
+    bulk: 0
+    shortdesc: "This silver band is carved with the personal sigils of different individuals, adding one to represent you when you invest it. The ring allows you to cast *sigil* as an arcane innate cantrip.%r%r**Activate--Track Sigil** 1 action (concentrate, detection)%r%r**Frequency** once per 10 minutes%r%r**Effect** You detect the general direction toward the most recent *sigil* you created using the ring. This activation fails if the *sigil* is more than 5 miles away or if there's lead or running water between you and the *sigil*."
   Antler Arrow:
     traits:
       - consumable
@@ -321,6 +329,61 @@ pf2e_magicitem:
     price: 1000
     bulk: 0
     shortdesc: "**Activate** A (concentrate)%r%rLeafy stalks protrude from the shaft of this rustic arrow. When an activated *vine arrow* hits a target, the arrow's shaft splits and grows, wrapping the target in vines.%r%rThe target takes a -10-foot circumstance penalty to its Speeds for 2d4 rounds, or until it Escapes against a DC of 19. On a critical hit, the target is also immobilized until it Escapes."
+  Mage's Hat:
+    traits:
+      - arcane
+      - invested
+    level: 3
+    price: 5000
+    bulk: 0
+    shortdesc: "This hat comes in many forms, such as a colorful turban or a pointy hat with a brim, and is adorned with symbols or runes. It grants you a +1 item bonus to Arcana checks and allows you to cast the *prestidigitation* cantrip as an arcane innate cantrip."
+    rules:
+      - key: "FlatModifier"
+        selector: "arcana"
+        type: "item"
+        value: 1
+  Pendant of the Occult:
+    traits:
+      - invested
+      - occult
+    level: 3
+    price: 6000
+    bulk: 0
+    shortdesc: "This amulet is hollow and shaped in the form of an unblinking eye. Its cavity typically holds some fragment of occult text. While wearing the pendant, you gain a +1 item bonus to Occultism checks, and you can cast the *guidance* cantrip as an occult innate spell."
+    rules:
+      - key: "FlatModifier"
+        selector: "occultism"
+        type: "item"
+        value: 1
+  Shining Symbol:
+    traits:
+      - divine
+      - invested
+      - light
+    level: 3
+    price: 5500
+    bulk: 0
+    shortdesc: "If you worship a deity, this golden amulet transforms into your deity's religious symbol when you invest it. You gain a +1 item bonus to Religion. The symbol casts dim light in a 20-foot emanation.%r%r**Activate--Spiritual Light** 2 actions (concentrate, light, revelation)%r%r**Frequency** once per day%r%r**Effect** The light cast by the symbol becomes bright light for 10 minutes and shines through bodies to reveal hints of the spirits within. Creatures in the light receive a -1 status penalty to Deception and Stealth checks.%r%rYou can Dismiss this activation.%r%r**Craft Requirements** You must be holy or unholy."
+    rules:
+      - key: "FlatModifier"
+        selector: "religion"
+        type: "item"
+        value: 1
+      - key: "ActiveEffectLike"
+        path: "flags.system.shiningSymbolPenalty"
+        mode: "override"
+        value: -1
+      - key: "ActiveEffectLike"
+        path: "flags.system.shiningSymbolWeakness"
+        mode: "override"
+        value: 0
+  Thurible of Revelation (Lesser):
+    traits:
+      - divine
+    level: 3
+    price: 5500
+    bulk: 1
+    shortdesc: "This brass censer dangles on a length of chain. Most *thuribles of revelation* are adorned with swirling Aesyian text, though some are iron and feature Nassian or Abyssal text.%r%r**Activate--Burn Incense** 2 actions (manipulate)%r%r**Cost** incense worth at least 5 gp%r%r**Effect** You light the incense inside the censer, and it burns for 1 hour. During that time, as long you are holding the thurible, you gain a +1 item bonus to Religion checks, and any critical failure you roll when you Decipher Writing of a religious nature is a failure instead."
   # Level 4 Magic Items
   Alchemist Goggles:
     traits:
@@ -422,6 +485,25 @@ pf2e_magicitem:
       - key: "RollOption"
         option: "wand-of-widening"
         toggleable: true
+  Symbol of Conflict:
+    traits:
+      - uncommon
+      - divine
+      - invested
+    level: 4
+    price: 9000
+    bulk: 0
+    shortdesc: "This tarnished necklace can be attuned only by someone who is holy or unholy. When you attune it, it transforms into your deity's religious symbol or a personal symbol if you don't have a deity. You receive a +1 item bonus to Religion and a +1 circumstance bonus to saves against holy and unholy effects.%r%r**Activate--Presence** 2 actions (concentrate, manipulate)%r%r**Frequency** once per day%r%r**Effect** The symbol casts *bane* or *bless*.%r%rThe counteract DC of these effects is 18, and the counteract modifier is +8.%r%r**Craft Requirements** You must be holy or unholy."
+    rules:
+      - key: "FlatModifier"
+        selector: "religion"
+        type: "item"
+        value: 1
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 1
+        predicate: [{"or": ["item:trait:holy", "item:trait:unholy"]}]
   Aeon Stone (Preserving):
     traits:
       - uncommon
@@ -529,6 +611,36 @@ pf2e_magicitem:
     price: 16000
     bulk: 0.1
     shortdesc: "This wand increases a spell's duration. Yellow embers spiral over its surface until the spell ends.%r%r**Activate** Cast a Spell; The activation takes 2 actions if the spell normally takes 1 action to cast, or 3 actions if the spell normally takes 2 actions%r%r**Effect** You Cast the Spell, and its duration is increased by half.%r%r**Craft Requirements** Supply a casting of a spell of the appropriate rank. The spell must have a casting time of 1 action or 2 actions and a duration no less than 10 minutes and no greater than 1 hour."
+  Arboreal Boots:
+    traits:
+      - invested
+      - primal
+    level: 5
+    price: 16000
+    bulk: 0.1
+    shortdesc: "These soft leather boots are embossed with simple woodland scenes. The boots grant a +1 item bonus to Acrobatics and allow you to ignore difficult terrain from plants and fungi."
+    rules:
+      - key: "FlatModifier"
+        selector: "acrobatics"
+        type: "item"
+        value: 1
+  Wand of Shardstorm (1st-Rank Spell):
+    traits:
+      - concentrate
+      - force
+      - magical
+      - manipulate
+      - wand
+    level: 5
+    price: 16000
+    bulk: 0.1
+    spell: Force Barrage
+    spell_rank: 1
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "For 1 minute, more shards fly from the wand at the start of each of your turns, as the 1-action force barrage. Choose targets each time. It ends early if you stop wielding the wand or activate it again."
+      storm: { spell: Force Barrage, rounds: 10 }
+    shortdesc: "This wand features a carved dragon's head at its top and a polished metal sphere set in its midsection.%r%r**Activate** Cast a Spell%r%r**Frequency** Once per day, plus overcharge%r%r**Effect** You cast *force barrage* at 1st rank.%r%rAfter you cast the spell, an additional shard or shards are released from the wand at the start of each of your turns, as though you cast the 1-action version of *force barrage*. Choose targets each time. This lasts for 1 minute, until you're no longer wielding the wand, or until you try to activate the wand again.%r%r**Craft Requirements** Supply a casting of *force barrage* of the appropriate rank."
   # Level 6 Magic Items
   Aeon Stone (Sprouting):
     traits:
@@ -649,6 +761,28 @@ pf2e_magicitem:
       - key: "RollOption"
         option: "wand-of-widening"
         toggleable: true
+  Ring of Sigils (Greater):
+    traits:
+      - arcane
+      - invested
+    level: 6
+    price: 22500
+    bulk: 0
+    shortdesc: "This silver band is carved with the personal sigils of different individuals, adding one to represent you when you invest it. The ring allows you to cast *sigil* as an arcane innate cantrip.%r%r**Activate--Track Sigil** 1 action (concentrate, detection)%r%r**Frequency** once per 10 minutes%r%r**Effect** You detect the general direction toward the most recent *sigil* you created using the ring. This activation fails if the *sigil* is more than 100 miles away or if there's lead or running water between you and the *sigil*. In addition, if the *sigil* was placed on a living creature, you also determine whether the creature is alive, its distance from you, and any conditions affecting it."
+  Wand of Hopeless Night (2nd-Rank Spell):
+    traits:
+      - darkness
+      - magical
+      - wand
+    level: 6
+    price: 25000
+    bulk: 0.1
+    spell: Darkness
+    spell_rank: 2
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "Each creature that ends its turn within the darkness must succeed at a DC 20 Will save or become frightened 1 (frightened 2 on a critical failure)."
+    shortdesc: "This wand is a length of wrought black iron.%r%r**Activate** Cast a Spell%r%r**Frequency** once per day, plus overcharge%r%r**Effect** You cast *darkness* at 2nd-rank. Each creature that ends its turn within the spell's area must succeed at a DC 20 Will save or become frightened 1 (frightened 2 on a critical failure).%r%r**Craft Requirements** Supply a casting of *darkness* at 2nd-rank."
   Aeon Stone (Delaying):
     traits:
       - uncommon
@@ -763,6 +897,63 @@ pf2e_magicitem:
     price: 36000
     bulk: 0.1
     shortdesc: "This wand increases a spell's duration. Yellow embers spiral over its surface until the spell ends.%r%r**Activate** Cast a Spell; The activation takes 2 actions if the spell normally takes 1 action to cast, or 3 actions if the spell normally takes 2 actions%r%r**Effect** You Cast the Spell, and its duration is increased by half.%r%r**Craft Requirements** Supply a casting of a spell of the appropriate rank. The spell must have a casting time of 1 action or 2 actions and a duration no less than 10 minutes and no greater than 1 hour."
+  Alacritous Horseshoes:
+    traits:
+      - companion
+      - invested
+      - primal
+    level: 7
+    price: 34000
+    bulk: 1
+    shortdesc: "When you affix these simple iron horseshoes to the hooves of an ordinary horse or a quadrupedal animal companion and the animal companion invests them, that creature gains a +5-foot item bonus to its land Speed and a +2 circumstance bonus to Athletics checks to High Jump and Long Jump.%r%rIn addition, when it Leaps, it can move 5 feet farther if jumping horizontally or 3 feet higher if jumping vertically."
+    rules:
+      - key: "FlatModifier"
+        selector: ["athletics"]
+        type: "circumstance"
+        value: 2
+        predicate: [{"or": ["action:high-jump", "action:long-jump"]}]
+      - key: "FlatModifier"
+        selector: "land-speed"
+        type: "item"
+        value: 5
+  Clawed Bracers:
+    traits:
+      - invested
+      - primal
+    level: 7
+    price: 32500
+    bulk: 0.1
+    shortdesc: "Animal claws are woven into the thick leather of these bracers.%r%r**Activate--Extend Claws** 1 action (manipulate, morph)%r%r**Frequency** once per hour%r%r**Effect** The bracers fuse temporarily with your forearms, with the claws extending to your fingertips. You gain a climb Speed of 20 feet and a claw unarmed attack with the agile and finesse traits that deals 1d6 slashing damage. This lasts for 10 minutes or until you Dismiss it."
+  Cloak of Illusions:
+    traits:
+      - invested
+      - occult
+    level: 7
+    price: 36000
+    bulk: 0.1
+    shortdesc: "This cloak flows, covering and concealing the wearer's body. The cloak allows you to cast *figment* as an occult innate cantrip. Although naturally a dull gray, while invested the cloak picks up colors and patterns from its surroundings, granting a +1 item bonus to Stealth checks.%r%r**Activate--Draw Hood** 2 actions (manipulate)%r%r**Frequency** once per day%r%r**Effect** You draw the hood up and gain the effects of *invisibility*, with the spell's normal duration or until you pull the hood back down, whichever comes first."
+    rules:
+      - key: "FlatModifier"
+        selector: "stealth"
+        type: "item"
+        value: 1
+  Wand of the Spider (2nd-Rank Spell):
+    traits:
+      - magical
+      - poison
+      - wand
+    level: 7
+    price: 36000
+    bulk: 0.1
+    spell: Web
+    spell_rank: 2
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "The webbing is toxic: a creature that fails its Athletics check or Reflex save against the web takes 1d6 poison damage."
+      outcomes:
+        failure: [{"damage": "1d6", "type": "poison"}]
+        criticalFailure: [{"damage": "1d6", "type": "poison"}]
+    shortdesc: "The length of this wand is a pair of twisted giant spider legs.%r%r**Activate** Cast a Spell%r%r**Frequency** once per day, plus overcharge%r%r**Effect** You cast *web* at 2nd-rank, but the strands of webbing are toxic. Any creature that fails its Athletics check or Reflex save to navigate the web takes 1d6 poison damage.%r%r**Craft Requirements** Supply a casting of *web* at 2nd-rank."
   # Level 8 Magic Items
   Aeon Stone (Envisioning):
     traits:
@@ -835,6 +1026,49 @@ pf2e_magicitem:
       - key: "RollOption"
         option: "wand-of-widening"
         toggleable: true
+  Collar of Inconspicuousness:
+    traits:
+      - companion
+      - invested
+      - primal
+    level: 8
+    price: 47500
+    bulk: 1
+    shortdesc: "This leather collar's worn and almost threadbare look belies its magical nature. When your companion wears and invests the collar, it gains the ability to change its appearance from that of a ferocious animal into a more inconspicuous form.%r%r**Activate--Adorable Guise** 1 action (envision)%r%r**Effect** You touch your animal companion to transform it into a nonthreatening Tiny creature of the same family or a similar creature (for instance, a house cat instead of a tiger, or a puppy instead of a wolf). This has the effects of *pest form* (2nd rank, or 4th rank if your companion can fly). The effect lasts until you Dismiss it."
+  Wand of Crackling Lightning (3rd-Rank Spell):
+    traits:
+      - electricity
+      - magical
+      - wand
+    level: 8
+    price: 50000
+    bulk: 0.1
+    spell: Lightning Bolt
+    spell_rank: 3
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "The line is twice as wide (two adjacent, parallel lines), and each creature that fails its save is off-guard for 1 round."
+      outcomes:
+        failure: [{"condition": "Off-Guard", "until": "next-turn-start"}]
+        criticalFailure: [{"condition": "Off-Guard", "until": "next-turn-start"}]
+    shortdesc: "This wand is made of two copper plates and a ceramic center.%r%r**Activate** Cast a Spell%r%r**Frequency** once per day, plus overcharge%r%r**Effect** You cast *lightning bolt* at 3rd-rank, but the spell's area is twice as wide (two adjacent and parallel 120-foot lines) and creatures that fail their save are off-guard for 1 round.%r%r**Craft Requirements** Supply a casting of *lightning bolt* at 3rd-rank."
+  Wand of Smoldering Fireballs (3rd-Rank Spell):
+    traits:
+      - fire
+      - magical
+      - wand
+    level: 8
+    price: 50000
+    bulk: 0.1
+    spell: Fireball
+    spell_rank: 3
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "Each creature that fails its save also takes 1d6 persistent fire damage."
+      outcomes:
+        failure: [{"persists": "1d6", "type": "fire"}]
+        criticalFailure: [{"persists": "1d6", "type": "fire"}]
+    shortdesc: "This blackened, heavily burned stick smells faintly of saltpeter.%r%r**Activate** Cast a Spell%r%r**Frequency** once per day, plus overcharge%r%r**Effect** You cast *fireball* at 3rd-rank. Each creature that fails its save takes 1d6 persistent fire damage.%r%r**Craft Requirements** Supply a casting of *fireball* at 3rd-rank."
   Armbands of Athleticism:
     traits:
       - invested
@@ -1075,6 +1309,128 @@ pf2e_magicitem:
     price: 70000
     bulk: 0.1
     shortdesc: "This wand increases a spell's duration. Yellow embers spiral over its surface until the spell ends.%r%r**Activate** Cast a Spell; The activation takes 2 actions if the spell normally takes 1 action to cast, or 3 actions if the spell normally takes 2 actions%r%r**Effect** You Cast the Spell, and its duration is increased by half.%r%r**Craft Requirements** Supply a casting of a spell of the appropriate rank. The spell must have a casting time of 1 action or 2 actions and a duration no less than 10 minutes and no greater than 1 hour."
+  Arboreal Boots (Greater):
+    traits:
+      - invested
+      - primal
+    level: 9
+    price: 70000
+    bulk: 0.1
+    shortdesc: "These soft leather boots are embossed with simple woodland scenes. The boots grant a +2 item bonus to Acrobatics and allow you to ignore difficult terrain from plants and fungi.%r%rYou also gain a 10-foot climb Speed while climbing plants or fungi and don't need to use your hands to Climb them."
+    rules:
+      - key: "FlatModifier"
+        selector: "acrobatics"
+        type: "item"
+        value: 2
+  Collar of Empathy:
+    traits:
+      - companion
+      - invested
+      - primal
+    level: 9
+    price: 60000
+    bulk: 1
+    shortdesc: "This ornate collar of intertwined leather strips of contrasting colors is paired with a bracelet of a similar construction. When you wear and invest the bracelet and your companion wears and invests the collar, you gain a stronger connection to each other. You and your companion can always sense each other's emotional states and basic physical wants and needs.%r%r**Activate--Empathic Link** 1 action (concentrate)%r%r**Effect** You perceive through your animal companion's senses instead of your own. You can Sustain the activation. You are unaware of your own surroundings for as long as you are using your animal companion's senses. In addition to the obvious use when you are separated from your companion, this ability might allow you to notice sounds, scents, and other stimuli that your companion's senses register but yours alone don't."
+  Humbug Pocket:
+    traits:
+      - invested
+      - occult
+    level: 9
+    price: 65000
+    bulk: 0
+    shortdesc: "Fine silk lines this fashionable pocket, which is typically cinched to a belt or tailored into a piece of formal clothing. The pocket can hold no more than one item of light Bulk, plus incidental items of negligible Bulk. The pocket grants you a +2 item bonus to Society and to Stealth checks to Conceal an Object in the pocket.%r%rThe pocket can produce stationery and writing implements of high quality. When you Create a Forgery, you can use the pocket to produce ideal materials to make the forgery. Any materials must be able to fit through the opening of the pocket, such as a roll of parchment, an inkwell, or a loupe. Though they're excellent tools, they don't have any value if sold and disappear once their function in making a forgery is fulfilled.%r%r**Activate--Papers Please** 1 action (concentrate, manipulate)%r%r**Frequency** once per hour%r%r**Effect** You create a temporary forgery by imagining the document you need and pulling it from the pocket. Attempt to Create a Forgery of the document you desire, with the GM rolling the secret check as normal. Its quality is based on your check, but the document disintegrates after 1 hour."
+    rules:
+      - key: "FlatModifier"
+        selector: "society"
+        type: "item"
+        value: 2
+      - key: "FlatModifier"
+        selector: "stealth"
+        type: "item"
+        value: 2
+        label: "Humbug Pocket (Conceal an Object in the Pocket)"
+        predicate: ["action:conceal-an-object"]
+  Mage's Hat (Greater):
+    traits:
+      - arcane
+      - invested
+    level: 9
+    price: 65000
+    bulk: 0
+    shortdesc: "This hat comes in many forms, such as a colorful turban or a pointy hat with a brim, and is adorned with symbols or runes. It grants you a +2 item bonus to Arcana checks and allows you to cast the *prestidigitation* cantrip as an arcane innate cantrip.%r%rThis larger, fancier hat can be activated. Each *greater mage's hat* has a specific 4th-rank summon spell from the arcane list woven into its fabric, typically *summon animal* or *summon elemental*. If you prepare arcane spells, you can change the spell to a different 4th-rank arcane summon spell you know when you invest it.%r%r**Activate--Hat Spell** Cast a Spell%r%r**Frequency** once per day%r%r**Effect** You doff the hat, causing magical energy to pour from it. You cast the spell stored in the hat."
+    rules:
+      - key: "FlatModifier"
+        selector: "arcana"
+        type: "item"
+        value: 2
+  Pendant of the Occult (Greater):
+    traits:
+      - invested
+      - occult
+    level: 9
+    price: 65000
+    bulk: 0
+    shortdesc: "This amulet is hollow and shaped in the form of an unblinking eye. Its cavity typically holds some fragment of occult text. While wearing the pendant, you gain a +2 item bonus to Occultism checks, and you can cast the *guidance* cantrip as an occult innate spell.%r%rThe pendant can be activated.%r%r**Activate--Dream Message** 10 minutes (concentrate, manipulate)%r%r**Frequency** once per day%r%r**Effect** You cast a 4th-rank *dream message* spell."
+    rules:
+      - key: "FlatModifier"
+        selector: "occultism"
+        type: "item"
+        value: 2
+  Shining Symbol (Greater):
+    traits:
+      - divine
+      - invested
+      - light
+    level: 9
+    price: 65000
+    bulk: 0
+    shortdesc: "If you worship a deity, this golden amulet transforms into your deity's religious symbol when you invest it. You gain a +2 item bonus to Religion. The symbol casts dim light in a 20-foot emanation.%r%r**Activate--Spiritual Light** 2 actions (concentrate, light, revelation)%r%r**Frequency** once per day%r%r**Effect** The light cast by the symbol becomes bright light for 10 minutes and shines through bodies to reveal hints of the spirits within. Creatures in the light receive a -2 status penalty to Deception and Stealth checks, and while it's active your enemies in the light gain weakness 5 to spirit damage.%r%rYou can Dismiss this activation.%r%r**Craft Requirements** You must be holy or unholy."
+    rules:
+      - key: "FlatModifier"
+        selector: "religion"
+        type: "item"
+        value: 2
+      - key: "ActiveEffectLike"
+        path: "flags.system.shiningSymbolPenalty"
+        mode: "override"
+        value: -2
+      - key: "ActiveEffectLike"
+        path: "flags.system.shiningSymbolWeakness"
+        mode: "override"
+        value: 5
+  Wand of Overflowing Life (3rd-Rank Spell):
+    traits:
+      - healing
+      - magical
+      - vitality
+      - wand
+    level: 9
+    price: 70000
+    bulk: 0.1
+    spell: Heal
+    spell_rank: 3
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "At the start of your next turn, you heal as the 1-action heal at rank 3, once per turn however many such wands you use."
+      next_turn_heal: "3d8"
+    shortdesc: "This alabaster wand has a clear crystal at the tip.%r%r**Activate** Cast a Spell%r%r**Frequency** once per day, plus overcharge%r%r**Effect** You cast *heal* at 3rd-rank.%r%rAfter you cast the spell, at the start of your next turn, excess healing magic wells up from the wand and heals you, as though you cast the 1-action version of *heal* on yourself at 3rd-rank. You gain this benefit only once per turn, even if you cast multiple *heal* spells from *wands of overflowing life* in the same turn.%r%r**Craft Requirements** Supply a casting of *heal* at 3rd-rank."
+  Wand of Shardstorm (3rd-Rank Spell):
+    traits:
+      - concentrate
+      - force
+      - magical
+      - manipulate
+      - wand
+    level: 9
+    price: 70000
+    bulk: 0.1
+    spell: Force Barrage
+    spell_rank: 3
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "For 1 minute, more shards fly from the wand at the start of each of your turns, as the 1-action force barrage. Choose targets each time. It ends early if you stop wielding the wand or activate it again."
+      storm: { spell: Force Barrage, rounds: 10 }
+    shortdesc: "This wand features a carved dragon's head at its top and a polished metal sphere set in its midsection.%r%r**Activate** Cast a Spell%r%r**Frequency** Once per day, plus overcharge%r%r**Effect** You cast *force barrage* at 3rd rank.%r%rAfter you cast the spell, an additional shard or shards are released from the wand at the start of each of your turns, as though you cast the 1-action version of *force barrage*. Choose targets each time. This lasts for 1 minute, until you're no longer wielding the wand, or until you try to activate the wand again.%r%r**Craft Requirements** Supply a casting of *force barrage* of the appropriate rank."
   # Level 10 Magic Items
   Charlatan's Cape:
     traits:
@@ -1316,6 +1672,124 @@ pf2e_magicitem:
     price: 85000
     bulk: 0.1
     shortdesc: "Made from soft leather, with delicate white wings attached near the ankles, these sandals are ensorcelled with powerful air magic.%r%rWhenever you fall while wearing these sandals, they automatically cast *gentle landing* on you. This benefit can't trigger again for 10 minutes.%r%r**Activate--Awaken Wings** 2 actions (air, concentrate); **Frequency** once per day; **Effect** The wings grow in size and propel you through the air, granting you a fly Speed of 30 feet for 10 minutes."
+  Accolade Robe:
+    traits:
+      - arcane
+      - focused
+      - invested
+    level: 10
+    price: 100000
+    bulk: 0.1
+    shortdesc: "Although not all wizards have gone through formal training, it's become tradition to enchant robes representing the arduous training required and festoon them with honors one has earned. Typically, an *accolade robe* is styled after a single wizard school, with appropriate colors and symbols. Wearing these robes grants a +2 item bonus to Arcana checks.%r%rThe pockets of the robe tie to an extradimensional space that can hold 1 Bulk of items, none of which can have greater than light Bulk. The items must be related to spellcasting and academics--spellbooks, scrolls, wands, scholarly journals, and other academic supplies the GM allows. These items do not count against your Bulk limit. You can Interact to retrieve or stow items normally.%r%r**Activate--Review** 1 action (concentrate, manipulate)%r%r**Effect** You retrieve an item of your choice from the robe's storage, then Recall Knowledge.%r%r**Activate--Extra Credit** Free action (concentrate)%r%r**Frequency** once per day%r%r**Effect** You gain 1 Focus Point, which you can spend only to cast a school spell. If you don't spend this Focus Point by the end of this turn, it is lost.%r%r**Craft Requirements** You are a wizard of the associated school."
+    rules:
+      - key: "FlatModifier"
+        selector: "arcana"
+        type: "item"
+        value: 2
+  Entertainer's Cincture:
+    traits:
+      - focused
+      - invested
+      - occult
+    level: 10
+    price: 100000
+    bulk: 0
+    shortdesc: "The designs adorning these lush sashes often imitate the decor of famous opera houses, theaters, and museums. When you invest this item, choose Deception, Diplomacy, Intimidation, or Performance; you gain a +2 item bonus to that skill.%r%r**Activate--Encore!** Free action (concentrate)%r%r**Frequency** once per day%r%r**Effect** Gain 1 Focus Point, which you can spend only to cast a bard composition spell. If you don't spend this point by the end of this turn, it is lost.%r%r**Activate--Transcribe** 1 action (manipulate)%r%r**Frequency** once per day%r%r**Effect** You tuck a small roll of paper into the cincture. For the next 10 minutes or until you Dismiss the activation, any performance you make is recorded on the paper, and the paper expands as necessary to accommodate it. Depending on the type of performance, this might take the form of sheet music, a transcript, or a diagram of dance moves.%r%r**Craft Requirements** You are a bard."
+    rules:
+      - key: "RollOption"
+        option: "entertainers-cincture-skill"
+        toggleable: true
+        alwaysActive: true
+        suboptions: [{"label": "Deception", "value": "deception"}, {"label": "Diplomacy", "value": "diplomacy"}, {"label": "Intimidation", "value": "intimidation"}, {"label": "Performance", "value": "performance"}]
+      - key: "FlatModifier"
+        selector: "{item|flags.system.rulesSelections.entertainersCinctureSkill}"
+        type: "item"
+        value: 2
+  Living Mantle:
+    traits:
+      - focused
+      - invested
+      - plant
+      - primal
+    level: 10
+    price: 100000
+    bulk: 0.1
+    shortdesc: "The base of this cloak is a thick layer of moss, but it slowly picks up native plants from each area it spends time in. You gain a +2 item bonus to Nature checks. You also suffer no effects from severe cold and severe heat.%r%r**Activate--Druidic Secrets** Free action (concentrate)%r%r**Frequency** once per day%r%r**Effect** You gain 1 Focus Point, which you can spend only to cast an order spell. If you don't spend this Focus Point by the end of this turn, it is lost.%r%r**Craft Requirements** You are a druid."
+    rules:
+      - key: "FlatModifier"
+        selector: "nature"
+        type: "item"
+        value: 2
+  Prognostic Veil:
+    traits:
+      - focused
+      - invested
+    level: 10
+    price: 100000
+    bulk: 0
+    shortdesc: "This gauzy purple veil is embroidered with symbols of divinatory significance. As your curse worsens, the veil ripples in an ever-increasing unseen wind. You gain a +2 item bonus to Religion checks.%r%r**Activate--Remember the Future** Free action (concentrate)%r%r**Frequency** once per day%r%r**Effect** You gain 1 Focus Point, which you can spend only to cast a revelation spell. If you don't spend this Focus Point by the end of this turn, it's lost.%r%r**Activate--Twist the Skeins of Fate** Reaction (concentrate)%r%r**Frequency** once per day%r%r**Trigger** An ally within 30 feet is about to attempt a saving throw%r%r**Requirements** You have the cursebound condition%r%r**Effect** The ally gains a status bonus to the saving throw equal to the value of your cursebound condition.%r%r**Craft Requirements** You're an oracle."
+    rules:
+      - key: "FlatModifier"
+        selector: "religion"
+        type: "item"
+        value: 2
+  Symbol of Conflict (Greater):
+    traits:
+      - uncommon
+      - divine
+      - invested
+    level: 10
+    price: 90000
+    bulk: 0
+    shortdesc: "This tarnished necklace can be attuned only by someone who is holy or unholy. When you attune it, it transforms into your deity's religious symbol or a personal symbol if you don't have a deity. You receive a +2 item bonus to Religion and a +1 circumstance bonus to saves against holy and unholy effects.%r%r**Activate--Presence** 2 actions (concentrate, manipulate)%r%r**Frequency** once per day%r%r**Effect** The symbol casts 4th-rank *bane*, *bless*, *divine wrath*, or *cleanse affliction*.%r%rThe counteract DC of these effects is 27, and the counteract modifier is +17.%r%r**Craft Requirements** You must be holy or unholy."
+    rules:
+      - key: "FlatModifier"
+        selector: "religion"
+        type: "item"
+        value: 2
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 1
+        predicate: [{"or": ["item:trait:holy", "item:trait:unholy"]}]
+  Thurible of Revelation (Moderate):
+    traits:
+      - divine
+    level: 10
+    price: 90000
+    bulk: 1
+    shortdesc: "This brass censer dangles on a length of chain. Most *thuribles of revelation* are adorned with swirling Aesyian text, though some are iron and feature Nassian or Abyssal text.%r%r**Activate--Burn Incense** 2 actions (manipulate)%r%r**Cost** incense worth at least 5 gp%r%r**Effect** You light the incense inside the censer, and it burns for 1 hour. During that time, as long you are holding the thurible, you gain a +2 item bonus to Religion checks, and any critical failure you roll when you Decipher Writing of a religious nature is a failure instead.%r%rOnce per day, when you activate the thurible, you can increase its revelations. During that activation, you can hold the thurible up to your eyes with an Interact action to gain the effects of *see the unseen* for 1 round by peering through the smoke."
+  Wand of Crackling Lightning (4th-Rank Spell):
+    traits:
+      - electricity
+      - magical
+      - wand
+    level: 10
+    price: 100000
+    bulk: 0.1
+    spell: Lightning Bolt
+    spell_rank: 4
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "The line is twice as wide (two adjacent, parallel lines), and each creature that fails its save is off-guard for 1 round."
+      outcomes:
+        failure: [{"condition": "Off-Guard", "until": "next-turn-start"}]
+        criticalFailure: [{"condition": "Off-Guard", "until": "next-turn-start"}]
+    shortdesc: "This wand is made of two copper plates and a ceramic center.%r%r**Activate** Cast a Spell%r%r**Frequency** once per day, plus overcharge%r%r**Effect** You cast *lightning bolt* at 4th-rank, but the spell's area is twice as wide (two adjacent and parallel 120-foot lines) and creatures that fail their save are off-guard for 1 round.%r%r**Craft Requirements** Supply a casting of *lightning bolt* at 4th-rank."
+  Wand of Hopeless Night (4th-Rank Spell):
+    traits:
+      - darkness
+      - magical
+      - wand
+    level: 10
+    price: 100000
+    bulk: 0.1
+    spell: Darkness
+    spell_rank: 4
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "Each creature that ends its turn within the darkness must succeed at a DC 27 Will save or become frightened 1 (frightened 2 on a critical failure)."
+    shortdesc: "This wand is a length of wrought black iron.%r%r**Activate** Cast a Spell%r%r**Frequency** once per day, plus overcharge%r%r**Effect** You cast *darkness* at 4th-rank. Each creature that ends its turn within the spell's area must succeed at a DC 27 Will save or become frightened 1 (frightened 2 on a critical failure).%r%r**Craft Requirements** Supply a casting of *darkness* at 4th-rank."
   # Level 11 Magic Items
   Alchemist Goggles (Greater):
     traits:
@@ -1468,6 +1942,74 @@ pf2e_magicitem:
     price: 150000
     bulk: 0.1
     shortdesc: "This wand increases a spell's duration. Yellow embers spiral over its surface until the spell ends.%r%r**Activate** Cast a Spell; The activation takes 2 actions if the spell normally takes 1 action to cast, or 3 actions if the spell normally takes 2 actions%r%r**Effect** You Cast the Spell, and its duration is increased by half.%r%r**Craft Requirements** Supply a casting of a spell of the appropriate rank. The spell must have a casting time of 1 action or 2 actions and a duration no less than 10 minutes and no greater than 1 hour."
+  Devoted Vestments:
+    traits:
+      - divine
+      - focused
+      - invested
+    level: 11
+    price: 125000
+    bulk: 0.1
+    shortdesc: "These vestments are made of panels showing various scenes from the legends of a particular deity. It serves as a religious symbol of that deity, and you gain a +2 item bonus to Religion checks. When you cast *harm* or *heal*, healing granted to followers of that deity is increased by the rank of the spell.%r%r**Activate--Domain Devotion** Free action (concentrate)%r%r**Frequency** once per day%r%r**Effect** Gain 1 Focus Point, which you can spend only to cast a cleric domain spell for a domain belonging to the deity the vestments are dedicated to. If you don't spend this point by the end of this turn, it is lost.%r%r**Craft Requirements** You are a cleric who worships the deity tied to the vestments."
+    rules:
+      - key: "FlatModifier"
+        selector: "religion"
+        type: "item"
+        value: 2
+  Helm of Zeal:
+    traits:
+      - divine
+      - focused
+      - invested
+    level: 11
+    price: 125000
+    bulk: 0.1
+    # Made for one deity, named when it's bought; its skill choice is answered with that deity's Divine
+    # Skill (`Pf2e::ItemChoices`).
+    made_for: deity
+    shortdesc: "This elaborate helmet is emblazoned with the divine symbols of a deity chosen when the helmet was crafted. You gain a +2 item bonus to that deity's Divine Skill.%r%r**Activate--Rally to the Cause** Free action (concentrate)%r%r**Frequency** once per day%r%r**Effect** You gain 1 Focus Point, which you can spend only to cast a devotion spell. If you don't spend this Focus Point by the end of this turn, it's lost.%r%r**Activate--Divine Fervor** Free action (concentrate)%r%r**Frequency** once per day%r%r**Trigger** You've just used your champion's reaction%r%r**Effect** You gain an additional reaction you can use only for your champion's reaction. You lose this reaction if you don't use it by the start of your next turn.%r%r**Craft Requirements** You're a champion of the deity represented by the helmet."
+    rules:
+      - key: "ChoiceSet"
+        flag: "skill"
+        prompt: "Select your deity's divine skill"
+        choices: [{"label": "Acrobatics", "value": "acrobatics"}, {"label": "Arcana", "value": "arcana"}, {"label": "Athletics", "value": "athletics"}, {"label": "Crafting", "value": "crafting"}, {"label": "Deception", "value": "deception"}, {"label": "Diplomacy", "value": "diplomacy"}, {"label": "Intimidation", "value": "intimidation"}, {"label": "Medicine", "value": "medicine"}, {"label": "Nature", "value": "nature"}, {"label": "Occultism", "value": "occultism"}, {"label": "Performance", "value": "performance"}, {"label": "Religion", "value": "religion"}, {"label": "Society", "value": "society"}, {"label": "Stealth", "value": "stealth"}, {"label": "Survival", "value": "survival"}, {"label": "Thievery", "value": "thievery"}]
+      - key: "FlatModifier"
+        selector: "{item|flags.system.rulesSelections.skill}"
+        type: "item"
+        value: 2
+  Wand of Overflowing Life (4th-Rank Spell):
+    traits:
+      - healing
+      - magical
+      - vitality
+      - wand
+    level: 11
+    price: 140000
+    bulk: 0.1
+    spell: Heal
+    spell_rank: 4
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "At the start of your next turn, you heal as the 1-action heal at rank 4, once per turn however many such wands you use."
+      next_turn_heal: "4d8"
+    shortdesc: "This alabaster wand has a clear crystal at the tip.%r%r**Activate** Cast a Spell%r%r**Frequency** once per day, plus overcharge%r%r**Effect** You cast *heal* at 4th-rank.%r%rAfter you cast the spell, at the start of your next turn, excess healing magic wells up from the wand and heals you, as though you cast the 1-action version of *heal* on yourself at 4th-rank. You gain this benefit only once per turn, even if you cast multiple *heal* spells from *wands of overflowing life* in the same turn.%r%r**Craft Requirements** Supply a casting of *heal* at 4th-rank."
+  Wand of the Spider (4th-Rank Spell):
+    traits:
+      - magical
+      - poison
+      - wand
+    level: 11
+    price: 140000
+    bulk: 0.1
+    spell: Web
+    spell_rank: 4
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "The webbing is toxic: a creature that fails its Athletics check or Reflex save against the web takes 2d6 poison damage and 1d6 persistent poison damage."
+      outcomes:
+        failure: [{"damage": "2d6", "type": "poison"}, {"persists": "1d6", "type": "poison"}]
+        criticalFailure: [{"damage": "2d6", "type": "poison"}, {"persists": "1d6", "type": "poison"}]
+    shortdesc: "The length of this wand is a pair of twisted giant spider legs.%r%r**Activate** Cast a Spell%r%r**Frequency** once per day, plus overcharge%r%r**Effect** You cast *web* at 4th-rank, but the strands of webbing are toxic. Any creature that fails its Athletics check or Reflex save to navigate the web takes 2d6 poison damage plus 1d6 persistent poison damage.%r%r**Craft Requirements** Supply a casting of *web* at 4th-rank."
   # Level 12 Magic Items
   Flying Broomstick:
     traits:
@@ -1540,6 +2082,85 @@ pf2e_magicitem:
       - key: "RollOption"
         option: "wand-of-widening"
         toggleable: true
+  Berserker's Cloak:
+    traits:
+      - invested
+      - primal
+    level: 12
+    price: 200000
+    bulk: 1
+    shortdesc: "This bearskin includes the head and bared teeth of the mighty creature from which it was taken. When worn, the cloak drapes over your head and around your shoulders, imbuing you with a bear's ferocity.%r%rIf you have the Rage action, while raging you grow jaws that deal 1d10 piercing damage and claws that deal 1d6 slashing damage and have the agile trait. This transformation is a morph effect, and both the jaws and claws are unarmed attacks in the brawling weapon group. You gain the benefits of a *+1 weapon potency* rune and a *striking* rune with these attacks (gaining a +1 item bonus to attack rolls and increasing the weapon damage dice by one).%r%rIf you have an animal instinct and the bestial rage instinct ability, instead of gaining these unarmed attacks, your unarmed attacks from the bestial rage instinct ability gain the benefits of a *+2 weapon potency* rune and a *greater striking* rune (granting a +2 item bonus to attack rolls and increasing the weapon damage dice by two)."
+    rules:
+      - key: "Strike"
+        category: "unarmed"
+        group: "brawling"
+        baseType: "jaws"
+        damage: {"base": {"damageType": "piercing", "dice": 1, "die": "d10"}}
+        traits: ["unarmed"]
+        slug: "jaws"
+        label: "Jaws"
+        predicate: ["self:effect:rage", {"not": "feature:animal-instinct"}]
+      - key: "Strike"
+        category: "unarmed"
+        group: "brawling"
+        baseType: "claw"
+        damage: {"base": {"damageType": "slashing", "dice": 1, "die": "d6"}}
+        traits: ["unarmed", "agile"]
+        slug: "claw"
+        label: "Claw"
+        predicate: ["self:effect:rage", {"not": "feature:animal-instinct"}]
+      - key: "ItemAlteration"
+        itemId: "{item|id}"
+        property: "runes-potency"
+        mode: "upgrade"
+        value: 1
+      - key: "ItemAlteration"
+        itemId: "{item|id}"
+        property: "runes-striking"
+        mode: "upgrade"
+        value: 1
+      - key: "ItemAlteration"
+        itemType: "weapon"
+        property: "runes-potency"
+        mode: "upgrade"
+        value: 2
+        predicate: ["item:category:unarmed", "item:tag:instinct-unarmed-strike"]
+      - key: "ItemAlteration"
+        itemType: "weapon"
+        property: "runes-striking"
+        mode: "upgrade"
+        value: 2
+        predicate: ["item:category:unarmed", "item:tag:instinct-unarmed-strike"]
+  Cloak of Illusions (Greater):
+    traits:
+      - invested
+      - occult
+    level: 12
+    price: 175000
+    bulk: 0.1
+    shortdesc: "This cloak flows, covering and concealing the wearer's body. The cloak allows you to cast *figment* as an occult innate cantrip. Although naturally a dull gray, while invested the cloak picks up colors and patterns from its surroundings, granting a +2 item bonus to Stealth checks.%r%r**Activate--Draw Hood** 2 actions (manipulate)%r%r**Frequency** once per day%r%r**Effect** You draw the hood up and gain the effects of a 4th-rank *invisibility*, with the spell's normal duration or until you pull the hood back down, whichever comes first."
+    rules:
+      - key: "FlatModifier"
+        selector: "stealth"
+        type: "item"
+        value: 2
+  Wand of Smoldering Fireballs (5th-Rank Spell):
+    traits:
+      - fire
+      - magical
+      - wand
+    level: 12
+    price: 200000
+    bulk: 0.1
+    spell: Fireball
+    spell_rank: 5
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "Each creature that fails its save also takes 2d6 persistent fire damage."
+      outcomes:
+        failure: [{"persists": "2d6", "type": "fire"}]
+        criticalFailure: [{"persists": "2d6", "type": "fire"}]
+    shortdesc: "This blackened, heavily burned stick smells faintly of saltpeter.%r%r**Activate** Cast a Spell%r%r**Frequency** once per day, plus overcharge%r%r**Effect** You cast *fireball* at 5th-rank. Each creature that fails its save takes 2d6 persistent fire damage.%r%r**Craft Requirements** Supply a casting of *fireball* at 5th-rank."
   Eternal Eruption of the Kueu:
     traits:
       - fire
@@ -1606,6 +2227,52 @@ pf2e_magicitem:
     price: 300000
     bulk: 0.1
     shortdesc: "This wand increases a spell's duration. Yellow embers spiral over its surface until the spell ends.%r%r**Activate** Cast a Spell; The activation takes 2 actions if the spell normally takes 1 action to cast, or 3 actions if the spell normally takes 2 actions%r%r**Effect** You Cast the Spell, and its duration is increased by half.%r%r**Craft Requirements** Supply a casting of a spell of the appropriate rank. The spell must have a casting time of 1 action or 2 actions and a duration no less than 10 minutes and no greater than 1 hour."
+  Hellfire Boots:
+    traits:
+      - fire
+      - invested
+      - occult
+    level: 13
+    price: 300000
+    bulk: 1
+    shortdesc: "These heavy boots are made of blackened metal and always feel warm to the touch, with streams of glowing embers cascading off their heels. While wearing *hellfire boots*, you gain resistance 10 to fire damage.%r%r**Activate--Devil's Dance** 2 actions (manipulate)%r%r**Frequency** once per minute%r%r**Effect** You Stride. Each square you move through during your Stride is scorched with hellish flames, becoming hazardous terrain for 1 minute. A creature that moves through one of these spaces takes 3d6 fire damage."
+    rules:
+      - key: "Resistance"
+        type: "fire"
+        value: 10
+  Wand of Overflowing Life (5th-Rank Spell):
+    traits:
+      - healing
+      - magical
+      - vitality
+      - wand
+    level: 13
+    price: 300000
+    bulk: 0.1
+    spell: Heal
+    spell_rank: 5
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "At the start of your next turn, you heal as the 1-action heal at rank 5, once per turn however many such wands you use."
+      next_turn_heal: "5d8"
+    shortdesc: "This alabaster wand has a clear crystal at the tip.%r%r**Activate** Cast a Spell%r%r**Frequency** once per day, plus overcharge%r%r**Effect** You cast *heal* at 5th-rank.%r%rAfter you cast the spell, at the start of your next turn, excess healing magic wells up from the wand and heals you, as though you cast the 1-action version of *heal* on yourself at 5th-rank. You gain this benefit only once per turn, even if you cast multiple *heal* spells from *wands of overflowing life* in the same turn.%r%r**Craft Requirements** Supply a casting of *heal* at 5th-rank."
+  Wand of Shardstorm (5th-Rank Spell):
+    traits:
+      - concentrate
+      - force
+      - magical
+      - manipulate
+      - wand
+    level: 13
+    price: 300000
+    bulk: 0.1
+    spell: Force Barrage
+    spell_rank: 5
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "For 1 minute, more shards fly from the wand at the start of each of your turns, as the 1-action force barrage. Choose targets each time. It ends early if you stop wielding the wand or activate it again."
+      storm: { spell: Force Barrage, rounds: 10 }
+    shortdesc: "This wand features a carved dragon's head at its top and a polished metal sphere set in its midsection.%r%r**Activate** Cast a Spell%r%r**Frequency** Once per day, plus overcharge%r%r**Effect** You cast *force barrage* at 5th rank.%r%rAfter you cast the spell, an additional shard or shards are released from the wand at the start of each of your turns, as though you cast the 1-action version of *force barrage*. Choose targets each time. This lasts for 1 minute, until you're no longer wielding the wand, or until you try to activate the wand again.%r%r**Craft Requirements** Supply a casting of *force barrage* of the appropriate rank."
   # Level 14 Magic Items
   Bands of Force (Greater):
     traits:
@@ -1715,6 +2382,57 @@ pf2e_magicitem:
       - key: "RollOption"
         option: "wand-of-widening"
         toggleable: true
+  Alacritous Horseshoes (Greater):
+    traits:
+      - companion
+      - invested
+      - primal
+    level: 14
+    price: 425000
+    bulk: 1
+    shortdesc: "When you affix these simple iron horseshoes to the hooves of an ordinary horse or a quadrupedal animal companion and the animal companion invests them, that creature gains a +10-foot item bonus to its land Speed and a +3 item bonus to Athletics checks to High Jump and Long Jump.%r%rIn addition, when it Leaps, it can move 5 feet farther if jumping horizontally or 3 feet higher if jumping vertically."
+    rules:
+      - key: "FlatModifier"
+        selector: "athletics"
+        type: "item"
+        value: 3
+        label: "Horseshoes of Speed (long & high jumps)"
+        predicate: [{"or": ["action:high-jump", "action:long-jump"]}]
+      - key: "FlatModifier"
+        selector: "land-speed"
+        type: "item"
+        value: 10
+  Wand of Crackling Lightning (6th-Rank Spell):
+    traits:
+      - electricity
+      - magical
+      - wand
+    level: 14
+    price: 450000
+    bulk: 0.1
+    spell: Lightning Bolt
+    spell_rank: 6
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "The line is twice as wide (two adjacent, parallel lines), and each creature that fails its save is off-guard for 1 round."
+      outcomes:
+        failure: [{"condition": "Off-Guard", "until": "next-turn-start"}]
+        criticalFailure: [{"condition": "Off-Guard", "until": "next-turn-start"}]
+    shortdesc: "This wand is made of two copper plates and a ceramic center.%r%r**Activate** Cast a Spell%r%r**Frequency** once per day, plus overcharge%r%r**Effect** You cast *lightning bolt* at 6th-rank, but the spell's area is twice as wide (two adjacent and parallel 120-foot lines) and creatures that fail their save are off-guard for 1 round.%r%r**Craft Requirements** Supply a casting of *lightning bolt* at 6th-rank."
+  Wand of the Snowfields (5th-Rank Spell):
+    traits:
+      - cold
+      - magical
+      - wand
+    level: 14
+    price: 450000
+    bulk: 0.1
+    spell: Howling Blizzard
+    spell_rank: 5
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "Snow lingers in the spell's area, which is difficult terrain for 1 minute."
+    shortdesc: "This wand is a slender length of ice-blue glass.%r%r**Activate** Cast a Spell%r%r**Frequency** once per day, plus overcharge%r%r**Effect** You cast *howling blizzard* at 5th-rank. Snow lingers in the spell's area, remaining as difficult terrain for 1 minute.%r%r**Craft Requirements** Supply a casting of *howling blizzard* at 5th-rank."
   Countering Charm (Greater):
     traits:
       - uncommon
@@ -1774,6 +2492,31 @@ pf2e_magicitem:
     price: 650000
     bulk: 0.1
     shortdesc: "This wand increases a spell's duration. Yellow embers spiral over its surface until the spell ends.%r%r**Activate** Cast a Spell; The activation takes 2 actions if the spell normally takes 1 action to cast, or 3 actions if the spell normally takes 2 actions%r%r**Effect** You Cast the Spell, and its duration is increased by half.%r%r**Craft Requirements** Supply a casting of a spell of the appropriate rank. The spell must have a casting time of 1 action or 2 actions and a duration no less than 10 minutes and no greater than 1 hour."
+  Earthglide Cloak:
+    traits:
+      - earth
+      - invested
+      - occult
+    level: 15
+    price: 650000
+    bulk: 0
+    shortdesc: "This brown-and-gold robe covers you from head to toe. Its weighty fabric doesn't move with the wind, instead hanging still as if carved of stone.%r%r**Activate--Glide through Earth** 1 action (manipulate)%r%r**Frequency** once per hour%r%r**Effect** You Burrow through dirt and stone up to your land Speed, leaving no tunnels or signs of your passing. If you end your movement inside solid stone, you are forcibly expelled into the nearest open area, taking 1d6 bludgeoning damage for every 5 feet between the end of your movement and the open area."
+  Wand of Overflowing Life (6th-Rank Spell):
+    traits:
+      - healing
+      - magical
+      - vitality
+      - wand
+    level: 15
+    price: 650000
+    bulk: 0.1
+    spell: Heal
+    spell_rank: 6
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "At the start of your next turn, you heal as the 1-action heal at rank 6, once per turn however many such wands you use."
+      next_turn_heal: "6d8"
+    shortdesc: "This alabaster wand has a clear crystal at the tip.%r%r**Activate** Cast a Spell%r%r**Frequency** once per day, plus overcharge%r%r**Effect** You cast *heal* at 6th-rank.%r%rAfter you cast the spell, at the start of your next turn, excess healing magic wells up from the wand and heals you, as though you cast the 1-action version of *heal* on yourself at 6th-rank. You gain this benefit only once per turn, even if you cast multiple *heal* spells from *wands of overflowing life* in the same turn.%r%r**Craft Requirements** Supply a casting of *heal* at 6th-rank."
   # Level 16 Magic Items
   Aeon Stone (Amplifying):
     traits:
@@ -1822,6 +2565,38 @@ pf2e_magicitem:
       - key: "RollOption"
         option: "wand-of-widening"
         toggleable: true
+  Wand of Slaughter (7th-Rank Spell):
+    traits:
+      - magical
+      - void
+      - wand
+    level: 16
+    price: 1000000
+    bulk: 0.1
+    spell: Execute
+    spell_rank: 7
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "If the spell slays a living target, its corpse releases grim energy in a 20-foot emanation, dealing 14 void damage."
+      slain: {"damage": "14", "type": "void", "area": "20-foot emanation"}
+    shortdesc: "This polished black wand has a green gem at the tip, and anyone who looks into it sees a reflection of a grinning skull.%r%r**Activate** Cast a Spell%r%r**Frequency** once per day, plus overcharge%r%r**Effect** You cast *execute* at 7th-rank. If the spell slays a living target, the corpse releases grim energy in a 20-foot emanation, dealing 14 void damage.%r%r**Craft Requirements** Supply a casting of *execute* at 7th-rank."
+  Wand of Smoldering Fireballs (7th-Rank Spell):
+    traits:
+      - fire
+      - magical
+      - wand
+    level: 16
+    price: 1000000
+    bulk: 0.1
+    spell: Fireball
+    spell_rank: 7
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "Each creature that fails its save also takes 3d6 persistent fire damage."
+      outcomes:
+        failure: [{"persists": "3d6", "type": "fire"}]
+        criticalFailure: [{"persists": "3d6", "type": "fire"}]
+    shortdesc: "This blackened, heavily burned stick smells faintly of saltpeter.%r%r**Activate** Cast a Spell%r%r**Frequency** once per day, plus overcharge%r%r**Effect** You cast *fireball* at 7th-rank. Each creature that fails its save takes 3d6 persistent fire damage.%r%r**Craft Requirements** Supply a casting of *fireball* at 7th-rank."
   # Level 17 Magic Items
   Alchemist Goggles (Major):
     traits:
@@ -1874,6 +2649,7 @@ pf2e_magicitem:
     level: 17
     price: 1500000
     bulk: 0.1
+    apex: Constitution
     shortdesc: "This thick leather belt is engraved with imagery of an ancient tree. You gain 15 temporary Hit Points the first time you invest the belt in a day. When you invest the belt, you either increase your Constitution modifier by 1 or increase it to +4, whichever would give you a higher value.%r%r**Activate--Call Upon the Ancient Life** 1 action (manipulate); **Frequency** once per day; **Effect** You draw upon the lifegiving energy of the tree on the belt to gain rapid healing. For 2d4 rounds, at the start of your turn each round, you recover 15 Hit Points."
     rules:
       - key: "TempHP"
@@ -1886,6 +2662,7 @@ pf2e_magicitem:
     level: 17
     price: 1500000
     bulk: 0
+    apex: Strength
     shortdesc: "Etchings of powerful bears decorate these brass bracers. You gain a +3 item bonus to Athletics checks and a +2 circumstance bonus to Athletics checks to lift a heavy object, Escape, and Force Open. When you invest the bracers, you either increase your Strength modifier by 1 or increase it to +4, whichever would give you a higher value.%r%r**Activate--Bear Hug** 1 action (manipulate)%r%rAttempt to Grapple a creature. If you succeed, you crush the creature in your grasp, dealing bludgeoning damage to it equal to your Strength modifier. If you critically succeeded, the damage is equal to double your Strength modifier, and the creature suffocates as long as it remains grabbed or restrained by you."
     rules:
       - key: "FlatModifier"
@@ -1906,6 +2683,7 @@ pf2e_magicitem:
     level: 17
     price: 1500000
     bulk: 0
+    apex: Dexterity
     shortdesc: "This thin cloak is surprisingly light, as if clouds or the very wind were woven together to make the garment. The cloak grants you a +3 item bonus to Acrobatics checks. When you invest the cloak, you either increase your Dexterity modifier by 1 or increase it to +4, whichever would give you a higher value.%r%r**Activate--Ride the Wind** 1 action (manipulate); **Frequency** once per day; **Effect** You tug on the cloak, wrapping yourself in the power of wind. You gain a fly Speed of 30 feet for 1 hour. While wrapped in the cloak, you become translucent, causing you to become concealed for the duration."
     rules:
       - key: "FlatModifier"
@@ -1920,7 +2698,8 @@ pf2e_magicitem:
     level: 17
     price: 1500000
     bulk: 0
-    shortdesc: "A trio of brilliant gems have been set into this elegant golden crown. You gain a +3 item bonus to checks to Recall Knowledge, regardless of the skill. When you invest the cloak, you either increase your Intelligence modifier by 1 or increase it to +4, whichever would give you a higher value. This gives you additional trained skills and languages, as normal for increasing your Intelligence modifier. You must select skills and languages the first time you invest the crown, and whenever you invest the same *crown of intellect*, you get the same skills and languages you chose the first time.%r%r**Activate--Search Your Mind** 1 action (concentrate); **Frequency** once per hour; **Effect** You gain the effects of *hypercognition*."
+    apex: Intelligence
+    shortdesc: "A trio of brilliant gems have been set into this elegant golden crown. You gain a +3 item bonus to checks to Recall Knowledge, regardless of the skill. When you invest the crown, you either increase your Intelligence modifier by 1 or increase it to +4, whichever would give you a higher value. This gives you additional trained skills and languages, as normal for increasing your Intelligence modifier. You must select skills and languages the first time you invest the crown, and whenever you invest the same *crown of intellect*, you get the same skills and languages you chose the first time.%r%r**Activate--Search Your Mind** 1 action (concentrate); **Frequency** once per hour; **Effect** You gain the effects of *hypercognition*."
     rules:
       - key: "FlatModifier"
         selector: "skill-check"
@@ -1990,6 +2769,7 @@ pf2e_magicitem:
     level: 17
     price: 1500000
     bulk: 0
+    apex: Wisdom
     shortdesc: "This simple scarf is designed for wrapping around the head and comes with a gemmed pin for decoration. When you invest the headwrap, you either increase your Wisdom modifier by 1 or increase it to +4, whichever would give you a higher value.%r%r**Activate--Consider the Consequences** 1 action (concentrate); **Frequency** once per day; **Effect** When you are considering a course of action, you get a gut feeling about whether it's a good idea. You gain the effects of an *augury* spell, except that you receive the result from your own instincts rather than an external source.%r%r**Activate--Reclaim Your Mind** Reaction (concentrate, fortune); **Frequency** once per hour; **Trigger** You fail a saving throw against an effect that makes you confused, fascinated, or stupefied; **Effect** The *headwrap of wisdom* clears your mind. You can reroll the saving throw and use the better result."
   Messenger's Ring (Greater):
     traits:
@@ -2012,6 +2792,7 @@ pf2e_magicitem:
     level: 17
     price: 1500000
     bulk: 0.1
+    apex: Charisma
     shortdesc: "Several sapphires are set along the length of this brilliant silver necklace. The necklace features an intricately carved pendant in the shape of a wolf's head. You gain a +2 item bonus to Deception and Diplomacy checks. When you invest the necklace, you either increase your Charisma modifier by 1 or increase it to +4, whichever would give you a higher value.%r%r**Activate--Win Them Over** 2 actions (concentrate); **Frequency** once per hour; **Effect** You cast a 4th-rank *charm* spell with a DC 38 Will save."
     rules:
       - key: "FlatModifier"
@@ -2064,6 +2845,113 @@ pf2e_magicitem:
     price: 1500000
     bulk: 0.1
     shortdesc: "This wand increases a spell's duration. Yellow embers spiral over its surface until the spell ends.%r%r**Activate** Cast a Spell; The activation takes 2 actions if the spell normally takes 1 action to cast, or 3 actions if the spell normally takes 2 actions%r%r**Effect** You Cast the Spell, and its duration is increased by half.%r%r**Craft Requirements** Supply a casting of a spell of the appropriate rank. The spell must have a casting time of 1 action or 2 actions and a duration no less than 10 minutes and no greater than 1 hour."
+  Accolade Robe (Greater):
+    traits:
+      - arcane
+      - focused
+      - invested
+    level: 17
+    price: 1350000
+    bulk: 0.1
+    shortdesc: "Although not all wizards have gone through formal training, it's become tradition to enchant robes representing the arduous training required and festoon them with honors one has earned. Typically, an *accolade robe* is styled after a single wizard school, with appropriate colors and symbols. Wearing these robes grants a +3 item bonus to Arcana checks.%r%rThe pockets of the robe tie to an extradimensional space that can hold 1 Bulk of items, none of which can have greater than light Bulk. The items must be related to spellcasting and academics--spellbooks, scrolls, wands, scholarly journals, and other academic supplies the GM allows. These items do not count against your Bulk limit. You can Interact to retrieve or stow items normally.%r%r**Activate--Review** 1 action (concentrate, manipulate)%r%r**Effect** You retrieve an item of your choice from the robe's storage, then Recall Knowledge.%r%rYou can activate the robe's Review once per minute as a free action.%r%r**Activate--Extra Credit** Free action (concentrate)%r%r**Frequency** once per day%r%r**Effect** You gain 1 Focus Point, which you can spend only to cast a school spell. If you don't spend this Focus Point by the end of this turn, it is lost.%r%r**Craft Requirements** You are a wizard of the associated school."
+    rules:
+      - key: "FlatModifier"
+        selector: "arcana"
+        type: "item"
+        value: 3
+  Entertainer's Cincture (Greater):
+    traits:
+      - focused
+      - invested
+      - occult
+    level: 17
+    price: 1300000
+    bulk: 0
+    shortdesc: "The designs adorning these lush sashes often imitate the decor of famous opera houses, theaters, and museums. When you invest this item, choose Deception, Diplomacy, Intimidation, or Performance; you gain a +3 item bonus to that skill.%r%r**Activate--Encore!** Free action (concentrate)%r%r**Frequency** once per day%r%r**Effect** Gain 1 Focus Point, which you can spend only to cast a bard composition spell. If you don't spend this point by the end of this turn, it is lost.%r%r**Activate--Transcribe** 1 action (manipulate)%r%r**Frequency** once per day%r%r**Effect** You tuck a small roll of paper into the cincture. For the next hour or until you Dismiss the activation, any performance you make is recorded on the paper, and the paper expands as necessary to accommodate it. Depending on the type of performance, this might take the form of sheet music, a transcript, or a diagram of dance moves.%r%r**Craft Requirements** You are a bard."
+    rules:
+      - key: "RollOption"
+        option: "entertainers-cincture-skill"
+        toggleable: true
+        alwaysActive: true
+        suboptions: [{"label": "Deception", "value": "deception"}, {"label": "Diplomacy", "value": "diplomacy"}, {"label": "Intimidation", "value": "intimidation"}, {"label": "Performance", "value": "performance"}]
+      - key: "FlatModifier"
+        selector: "{item|flags.system.rulesSelections.entertainersCinctureSkill}"
+        type: "item"
+        value: 3
+  Humbug Pocket (Greater):
+    traits:
+      - invested
+      - occult
+    level: 17
+    price: 1250000
+    bulk: 0
+    shortdesc: "Fine silk lines this fashionable pocket, which is typically cinched to a belt or tailored into a piece of formal clothing. The pocket can hold no more than one item of light Bulk, plus incidental items of negligible Bulk. The pocket grants you a +3 item bonus to Society and to Stealth checks to Conceal an Object in the pocket.%r%rThe pocket can produce stationery and writing implements of high quality. When you Create a Forgery, you can use the pocket to produce ideal materials to make the forgery. Any materials must be able to fit through the opening of the pocket, such as a roll of parchment, an inkwell, or a loupe. Though they're excellent tools, they don't have any value if sold and disappear once their function in making a forgery is fulfilled.%r%r**Activate--Papers Please** 1 action (concentrate, manipulate)%r%r**Frequency** once per hour%r%r**Effect** You create up to 5 temporary forgeries by imagining the documents you need and pulling them from the pocket. Attempt to Create a Forgery of the documents you desire, with the GM rolling the secret check as normal. Their quality is based on your check, but the documents disintegrate after 1 hour.%r%rAll 5 forgeries must serve a similar purpose--five invitations to the same party for different attendees, for example. Attempt only one check for all the documents."
+    rules:
+      - key: "FlatModifier"
+        selector: "society"
+        type: "item"
+        value: 3
+      - key: "FlatModifier"
+        selector: "stealth"
+        type: "item"
+        value: 3
+        label: "Humbug Pocket (Conceal an Object in the Pocket)"
+        predicate: ["action:conceal-an-object"]
+  Shining Symbol (Major):
+    traits:
+      - divine
+      - invested
+      - light
+    level: 17
+    price: 1350000
+    bulk: 0
+    shortdesc: "If you worship a deity, this golden amulet transforms into your deity's religious symbol when you invest it. You gain a +3 item bonus to Religion. The symbol casts dim light in a 20-foot emanation.%r%r**Activate--Spiritual Light** 2 actions (concentrate, light, revelation)%r%r**Frequency** once per day%r%r**Effect** The light cast by the symbol becomes bright light for 10 minutes and shines through bodies to reveal hints of the spirits within. Creatures in the light receive a -3 status penalty to Deception and Stealth checks, and while it's active your enemies in the light gain weakness 10 to spirit damage.%r%rYou can Dismiss this activation.%r%r**Craft Requirements** You must be holy or unholy."
+    rules:
+      - key: "FlatModifier"
+        selector: "religion"
+        type: "item"
+        value: 3
+      - key: "ActiveEffectLike"
+        path: "flags.system.shiningSymbolPenalty"
+        mode: "override"
+        value: -3
+      - key: "ActiveEffectLike"
+        path: "flags.system.shiningSymbolWeakness"
+        mode: "override"
+        value: 10
+  Wand of Overflowing Life (7th-Rank Spell):
+    traits:
+      - healing
+      - magical
+      - vitality
+      - wand
+    level: 17
+    price: 1500000
+    bulk: 0.1
+    spell: Heal
+    spell_rank: 7
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "At the start of your next turn, you heal as the 1-action heal at rank 7, once per turn however many such wands you use."
+      next_turn_heal: "7d8"
+    shortdesc: "This alabaster wand has a clear crystal at the tip.%r%r**Activate** Cast a Spell%r%r**Frequency** once per day, plus overcharge%r%r**Effect** You cast *heal* at 7th-rank.%r%rAfter you cast the spell, at the start of your next turn, excess healing magic wells up from the wand and heals you, as though you cast the 1-action version of *heal* on yourself at 7th-rank. You gain this benefit only once per turn, even if you cast multiple *heal* spells from *wands of overflowing life* in the same turn.%r%r**Craft Requirements** Supply a casting of *heal* at 7th-rank."
+  Wand of Shardstorm (7th-Rank Spell):
+    traits:
+      - concentrate
+      - force
+      - magical
+      - manipulate
+      - wand
+    level: 17
+    price: 1500000
+    bulk: 0.1
+    spell: Force Barrage
+    spell_rank: 7
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "For 1 minute, more shards fly from the wand at the start of each of your turns, as the 1-action force barrage. Choose targets each time. It ends early if you stop wielding the wand or activate it again."
+      storm: { spell: Force Barrage, rounds: 10 }
+    shortdesc: "This wand features a carved dragon's head at its top and a polished metal sphere set in its midsection.%r%r**Activate** Cast a Spell%r%r**Frequency** Once per day, plus overcharge%r%r**Effect** You cast *force barrage* at 7th rank.%r%rAfter you cast the spell, an additional shard or shards are released from the wand at the start of each of your turns, as though you cast the 1-action version of *force barrage*. Choose targets each time. This lasts for 1 minute, until you're no longer wielding the wand, or until you try to activate the wand again.%r%r**Craft Requirements** Supply a casting of *force barrage* of the appropriate rank."
   # Level 18 Magic Items
   Countering Charm (Major):
     traits:
@@ -2205,6 +3093,142 @@ pf2e_magicitem:
       - key: "RollOption"
         option: "wand-of-widening"
         toggleable: true
+  Genius Diadem:
+    traits:
+      - rare
+      - apex
+      - arcane
+      - intelligent
+    level: 18
+    price: 2400000
+    bulk: 0.1
+    apex: Intelligence
+    shortdesc: "**Perception** +22; precise vision 30 feet, imprecise hearing 30 feet, constant *detect magic*%r%r**Communication** speech (Kamin, Am'sheri Draconic, and eight other common languages)%r%r**Skills** Arcana +34, seven Lore skills +28, Occultism +28, Society +28%r%r**Int** +8, **Wis** +0, **Cha** +4%r%r**Will** +24%r%rThe *genius diadem* is a *Crown of Intellect* that typically acts like an arrogant professor or mentor, often boasting that it is a certified greater intellect and far superior to your own intelligence, even after the benefits the diadem grants you. The *genius diadem* encourages you to learn things for yourself rather than actually attempting to Recall Knowledge for you, though you or your allies might be able to play on its arrogance using Deception to trick it into doing so. In addition to allowing you to activate it, the diadem can use the Search Your Mind activation with its own actions, though if it does so, the diadem gains the benefits instead of you. Only the diadem can use the following activation.%r%r**Activate--Brain Drain** 2 actions (concentrate, manipulate)%r%r**Frequency** once per hour%r%r**Effect** The *genius diadem* casts 7th-rank *never mind*."
+    rules:
+      - key: "FlatModifier"
+        selector: "skill-check"
+        type: "item"
+        value: 3
+        predicate: ["action:recall-knowledge"]
+  Helm of Zeal (Greater):
+    traits:
+      - divine
+      - focused
+      - invested
+    level: 18
+    price: 2100000
+    bulk: 0.1
+    made_for: deity
+    shortdesc: "This elaborate helmet is emblazoned with the divine symbols of a deity chosen when the helmet was crafted. You gain a +3 item bonus to that deity's Divine Skill.%r%r**Activate--Rally to the Cause** Free action (concentrate)%r%r**Frequency** once per day%r%r**Effect** You gain 1 Focus Point, which you can spend only to cast a devotion spell. If you don't spend this Focus Point by the end of this turn, it's lost.%r%r**Activate--Divine Fervor** Free action (concentrate)%r%r**Frequency** once per hour%r%r**Trigger** You've just used your champion's reaction%r%r**Effect** You gain an additional reaction you can use only for your champion's reaction. You lose this reaction if you don't use it by the start of your next turn.%r%r**Craft Requirements** You're a champion of the deity represented by the helmet."
+    rules:
+      - key: "ChoiceSet"
+        flag: "skill"
+        prompt: "Select your deity's divine skill"
+        choices: [{"label": "Acrobatics", "value": "acrobatics"}, {"label": "Arcana", "value": "arcana"}, {"label": "Athletics", "value": "athletics"}, {"label": "Crafting", "value": "crafting"}, {"label": "Deception", "value": "deception"}, {"label": "Diplomacy", "value": "diplomacy"}, {"label": "Intimidation", "value": "intimidation"}, {"label": "Medicine", "value": "medicine"}, {"label": "Nature", "value": "nature"}, {"label": "Occultism", "value": "occultism"}, {"label": "Performance", "value": "performance"}, {"label": "Religion", "value": "religion"}, {"label": "Society", "value": "society"}, {"label": "Stealth", "value": "stealth"}, {"label": "Survival", "value": "survival"}, {"label": "Thievery", "value": "thievery"}]
+      - key: "FlatModifier"
+        selector: "{item|flags.system.rulesSelections.skill}"
+        type: "item"
+        value: 3
+  Living Mantle (Greater):
+    traits:
+      - focused
+      - invested
+      - plant
+      - primal
+    level: 18
+    price: 2100000
+    bulk: 0.1
+    shortdesc: "The base of this cloak is a thick layer of moss, but it slowly picks up native plants from each area it spends time in. You gain a +3 item bonus to Nature checks. You also suffer no effects from extreme cold and severe heat.%r%r**Activate--Druidic Secrets** Free action (concentrate)%r%r**Frequency** once per day%r%r**Effect** You gain 1 Focus Point, which you can spend only to cast an order spell. If you don't spend this Focus Point by the end of this turn, it is lost.%r%r**Craft Requirements** You are a druid."
+    rules:
+      - key: "FlatModifier"
+        selector: "nature"
+        type: "item"
+        value: 3
+  Prognostic Veil (Greater):
+    traits:
+      - focused
+      - invested
+    level: 18
+    price: 2100000
+    bulk: 0
+    shortdesc: "This gauzy purple veil is embroidered with symbols of divinatory significance. As your curse worsens, the veil ripples in an ever-increasing unseen wind. You gain a +3 item bonus to Religion checks.%r%r**Activate--Remember the Future** Free action (concentrate)%r%r**Frequency** once per day%r%r**Effect** You gain 1 Focus Point, which you can spend only to cast a revelation spell. If you don't spend this Focus Point by the end of this turn, it's lost.%r%r**Activate--Twist the Skeins of Fate** Reaction (concentrate)%r%r**Frequency** once per day%r%r**Trigger** An ally within 30 feet is about to attempt a saving throw or an attack roll%r%r**Requirements** You have the cursebound condition%r%r**Effect** The ally gains a status bonus to the saving throw or attack roll equal to the value of your cursebound condition.%r%r**Craft Requirements** You're an oracle."
+    rules:
+      - key: "FlatModifier"
+        selector: "religion"
+        type: "item"
+        value: 3
+  Symbol of Conflict (Major):
+    traits:
+      - uncommon
+      - divine
+      - invested
+    level: 18
+    price: 1900000
+    bulk: 0
+    shortdesc: "This tarnished necklace can be attuned only by someone who is holy or unholy. When you attune it, it transforms into your deity's religious symbol or a personal symbol if you don't have a deity. You receive a +3 item bonus to Religion and a +1 circumstance bonus to saves against holy and unholy effects.%r%r**Activate--Presence** 2 actions (concentrate, manipulate)%r%r**Frequency** once per day%r%r**Effect** The symbol casts 6th-rank *bane*, *bless*, *divine wrath*, or *cleanse affliction*. Add 6th-rank *summon celestial* to this list if you are holy and 6th-rank *summon fiend* if you are unholy.%r%rThe counteract DC of these effects is 38, and the counteract modifier is +28.%r%r**Craft Requirements** You must be holy or unholy."
+    rules:
+      - key: "FlatModifier"
+        selector: "religion"
+        type: "item"
+        value: 2
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 1
+        predicate: [{"or": ["item:trait:holy", "item:trait:unholy"]}]
+  Thurible of Revelation (Greater):
+    traits:
+      - divine
+    level: 18
+    price: 1900000
+    bulk: 1
+    shortdesc: "This brass censer dangles on a length of chain. Most *thuribles of revelation* are adorned with swirling Aesyian text, though some are iron and feature Nassian or Abyssal text.%r%r**Activate--Burn Incense** 2 actions (manipulate)%r%r**Cost** incense worth at least 5 gp%r%r**Effect** You light the incense inside the censer, and it burns for 1 hour. During that time, as long you are holding the thurible, you gain a +3 item bonus to Religion checks, and any critical failure you roll when you Decipher Writing of a religious nature is a failure instead.%r%rOnce per day, when you activate the thurible, you can increase its revelations. During that activation, you can hold the thurible up to your eyes with an Interact action to gain the effects of *see the unseen* and *truesight* for 1 round by peering through the smoke."
+  Wand of Crackling Lightning (8th-Rank Spell):
+    traits:
+      - electricity
+      - magical
+      - wand
+    level: 18
+    price: 2400000
+    bulk: 0.1
+    spell: Lightning Bolt
+    spell_rank: 8
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "The line is twice as wide (two adjacent, parallel lines), and each creature that fails its save is off-guard for 1 round."
+      outcomes:
+        failure: [{"condition": "Off-Guard", "until": "next-turn-start"}]
+        criticalFailure: [{"condition": "Off-Guard", "until": "next-turn-start"}]
+    shortdesc: "This wand is made of two copper plates and a ceramic center.%r%r**Activate** Cast a Spell%r%r**Frequency** once per day, plus overcharge%r%r**Effect** You cast *lightning bolt* at 8th-rank, but the spell's area is twice as wide (two adjacent and parallel 120-foot lines) and creatures that fail their save are off-guard for 1 round.%r%r**Craft Requirements** Supply a casting of *lightning bolt* at 8th-rank."
+  Wand of Slaughter (8th-Rank Spell):
+    traits:
+      - magical
+      - void
+      - wand
+    level: 18
+    price: 2400000
+    bulk: 0.1
+    spell: Execute
+    spell_rank: 8
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "If the spell slays a living target, its corpse releases grim energy in a 20-foot emanation, dealing 16 void damage."
+      slain: {"damage": "16", "type": "void", "area": "20-foot emanation"}
+    shortdesc: "This polished black wand has a green gem at the tip, and anyone who looks into it sees a reflection of a grinning skull.%r%r**Activate** Cast a Spell%r%r**Frequency** once per day, plus overcharge%r%r**Effect** You cast *execute* at 8th-rank. If the spell slays a living target, the corpse releases grim energy in a 20-foot emanation, dealing 16 void damage.%r%r**Craft Requirements** Supply a casting of *execute* at 8th-rank."
+  Wand of the Snowfields (7th-Rank Spell):
+    traits:
+      - cold
+      - magical
+      - wand
+    level: 18
+    price: 2400000
+    bulk: 0.1
+    spell: Howling Blizzard
+    spell_rank: 7
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "Snow lingers in the spell's area, which is difficult terrain for 1 minute."
+    shortdesc: "This wand is a slender length of ice-blue glass.%r%r**Activate** Cast a Spell%r%r**Frequency** once per day, plus overcharge%r%r**Effect** You cast *howling blizzard* at 7th-rank. Snow lingers in the spell's area, remaining as difficult terrain for 1 minute.%r%r**Craft Requirements** Supply a casting of *howling blizzard* at 7th-rank."
   Crystal Ball (Obsidian):
     traits:
       - uncommon
@@ -2266,6 +3290,71 @@ pf2e_magicitem:
     price: 4000000
     bulk: 0.1
     shortdesc: "This wand increases a spell's duration. Yellow embers spiral over its surface until the spell ends.%r%r**Activate** Cast a Spell; The activation takes 2 actions if the spell normally takes 1 action to cast, or 3 actions if the spell normally takes 2 actions%r%r**Effect** You Cast the Spell, and its duration is increased by half.%r%r**Craft Requirements** Supply a casting of a spell of the appropriate rank. The spell must have a casting time of 1 action or 2 actions and a duration no less than 10 minutes and no greater than 1 hour."
+  Berserker's Cloak (Greater):
+    traits:
+      - invested
+      - primal
+    level: 19
+    price: 4000000
+    bulk: 1
+    shortdesc: "This bearskin includes the head and bared teeth of the mighty creature from which it was taken. When worn, the cloak drapes over your head and around your shoulders, imbuing you with a bear's ferocity.%r%rIf you have the Rage action, while raging you grow jaws that deal 1d10 piercing damage and claws that deal 1d6 slashing damage and have the agile trait. This transformation is a morph effect, and both the jaws and claws are unarmed attacks in the brawling weapon group. You gain the benefits of a *+2 weapon potency* rune and a *greater striking* rune with these attacks (gaining a +2 item bonus to attack rolls and increasing the weapon damage dice by two).%r%rIf you have an animal instinct and the bestial rage instinct ability, instead of gaining these unarmed attacks, your unarmed attacks from the bestial rage instinct ability gain the benefits of a *+3 weapon potency* rune and a *major striking* rune (granting a +3 item bonus to attack rolls and increasing the weapon damage dice by three)."
+    rules:
+      - key: "Strike"
+        category: "unarmed"
+        group: "brawling"
+        baseType: "jaws"
+        damage: {"base": {"damageType": "piercing", "dice": 1, "die": "d10"}}
+        traits: ["unarmed"]
+        slug: "jaws"
+        label: "Jaws"
+        predicate: ["self:effect:rage", {"not": "feature:animal-instinct"}]
+      - key: "Strike"
+        category: "unarmed"
+        group: "brawling"
+        baseType: "claw"
+        damage: {"base": {"damageType": "slashing", "dice": 1, "die": "d6"}}
+        traits: ["unarmed", "agile"]
+        slug: "claw"
+        label: "Claw"
+        predicate: ["self:effect:rage", {"not": "feature:animal-instinct"}]
+      - key: "ItemAlteration"
+        itemId: "{item|id}"
+        property: "runes-potency"
+        mode: "upgrade"
+        value: 2
+      - key: "ItemAlteration"
+        itemId: "{item|id}"
+        property: "runes-striking"
+        mode: "upgrade"
+        value: 2
+      - key: "ItemAlteration"
+        itemType: "weapon"
+        property: "runes-potency"
+        mode: "upgrade"
+        value: 3
+        predicate: ["item:category:unarmed", "item:tag:instinct-unarmed-strike"]
+      - key: "ItemAlteration"
+        itemType: "weapon"
+        property: "runes-striking"
+        mode: "upgrade"
+        value: 3
+        predicate: ["item:category:unarmed", "item:tag:instinct-unarmed-strike"]
+  Wand of Overflowing Life (8th-Rank Spell):
+    traits:
+      - healing
+      - magical
+      - vitality
+      - wand
+    level: 19
+    price: 4000000
+    bulk: 0.1
+    spell: Heal
+    spell_rank: 8
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "At the start of your next turn, you heal as the 1-action heal at rank 8, once per turn however many such wands you use."
+      next_turn_heal: "8d8"
+    shortdesc: "This alabaster wand has a clear crystal at the tip.%r%r**Activate** Cast a Spell%r%r**Frequency** once per day, plus overcharge%r%r**Effect** You cast *heal* at 8th-rank.%r%rAfter you cast the spell, at the start of your next turn, excess healing magic wells up from the wand and heals you, as though you cast the 1-action version of *heal* on yourself at 8th-rank. You gain this benefit only once per turn, even if you cast multiple *heal* spells from *wands of overflowing life* in the same turn.%r%r**Craft Requirements** Supply a casting of *heal* at 8th-rank."
   # Level 20 Magic Items
   Bands of Force (Major):
     traits:
@@ -2327,6 +3416,38 @@ pf2e_magicitem:
         selector: "deception"
         type: "item"
         value: 3
+  Wand of Slaughter (9th-Rank Spell):
+    traits:
+      - magical
+      - void
+      - wand
+    level: 20
+    price: 7000000
+    bulk: 0.1
+    spell: Execute
+    spell_rank: 9
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "If the spell slays a living target, its corpse releases grim energy in a 20-foot emanation, dealing 18 void damage."
+      slain: {"damage": "18", "type": "void", "area": "20-foot emanation"}
+    shortdesc: "This polished black wand has a green gem at the tip, and anyone who looks into it sees a reflection of a grinning skull.%r%r**Activate** Cast a Spell%r%r**Frequency** once per day, plus overcharge%r%r**Effect** You cast *execute* at 9th-rank. If the spell slays a living target, the corpse releases grim energy in a 20-foot emanation, dealing 18 void damage.%r%r**Craft Requirements** Supply a casting of *execute* at 9th-rank."
+  Wand of Smoldering Fireballs (9th-Rank Spell):
+    traits:
+      - fire
+      - magical
+      - wand
+    level: 20
+    price: 7000000
+    bulk: 0.1
+    spell: Fireball
+    spell_rank: 9
+    # What the wand adds to its spell (`Pf2e::SpellItems`): told as it is cast, and what the engine applies.
+    wand_effect:
+      told: "Each creature that fails its save also takes 4d6 persistent fire damage."
+      outcomes:
+        failure: [{"persists": "4d6", "type": "fire"}]
+        criticalFailure: [{"persists": "4d6", "type": "fire"}]
+    shortdesc: "This blackened, heavily burned stick smells faintly of saltpeter.%r%r**Activate** Cast a Spell%r%r**Frequency** once per day, plus overcharge%r%r**Effect** You cast *fireball* at 9th-rank. Each creature that fails its save takes 4d6 persistent fire damage.%r%r**Craft Requirements** Supply a casting of *fireball* at 9th-rank."
 
   # Items a feat hands over (bound items): never browsed, bought, sold or learned as a formula, made at the
   # commit boundaries for whoever holds the feat, and usable only while they still hold it. The level is

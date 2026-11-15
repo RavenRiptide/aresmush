@@ -176,6 +176,18 @@ pf2e_gear:
         option: "active-lantern"
         toggleable: true
         label: "{item} is lit"
+  # Light barding for an animal companion (GM Core), sold now and doing nothing until companions are built.
+  # Its armor stats are kept here for them: `companion_armor` is read by nothing yet.
+  Barding of the Zephyr:
+    bulk: 0.1
+    level: 10
+    price: 90000
+    traits:
+      - barding
+      - companion
+      - invested
+      - primal
+    companion_armor: { category: light-barding, ac_bonus: 1, dex_cap: 5, check_penalty: -1, speed_penalty: -5, strength: 3 }
   Light Barding (Large):
     bulk: 4
     level: 0

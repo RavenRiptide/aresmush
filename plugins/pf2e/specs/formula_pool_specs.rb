@@ -179,10 +179,10 @@ module AresMUSH
 
         it "should count by an ability modifier, with a floor" do
           smart = char
-          allow(Pf2eAbilities).to receive(:get_score).with(smart, 'Intelligence').and_return(18)
+          allow(Pf2eAbilities).to receive(:base_score).with(smart, 'Intelligence').and_return(18)
 
           dull = char
-          allow(Pf2eAbilities).to receive(:get_score).with(dull, 'Intelligence').and_return(8)
+          allow(Pf2eAbilities).to receive(:base_score).with(dull, 'Intelligence').and_return(8)
 
           block = { 'count' => { 'ability' => 'Intelligence', 'min' => 1 } }
 

@@ -51,6 +51,10 @@ module AresMUSH
     # The ids of characters whose daily choices named this one (a witch's charge, a Root Magic ally): a hint
     # for joining an encounter, always checked against the giver's own picks (`DailyChoices.given_on_join!`).
     attribute :pf2_designated_by, :type => DataType::Array, :default => []
+    # The apex item that counts for them until the GM next rests them: `{ 'item' => their own item's id,
+    # 'name' => }`. Only the first apex item invested in a day counts (`Pf2e::Apex`). Daily state, never in
+    # the ledger.
+    attribute :pf2_apex, :type => DataType::Hash, :default => {}
 
     # Values an effect wrote that nothing else owns: counters other rules ask about, a lowered recovery
     # DC, extra carrying capacity. Derived rather than chosen, so it is rewritten whenever the effects

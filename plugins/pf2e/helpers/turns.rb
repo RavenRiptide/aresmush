@@ -37,7 +37,7 @@ module AresMUSH
         Equipment.lapse!(holder, 'turn')
         ActiveEffects.on(holder).each { |effect| ActiveEffects.give_temp_hp(holder, effect, 'on_turn_start') }
 
-        events + heal(holder) + recovery(holder)
+        events + heal(holder) + SpellItems.turn_started(holder, round) + recovery(holder)
       end
 
       # The turn starts, and being stunned is paid for out of it: as many actions as its value, which

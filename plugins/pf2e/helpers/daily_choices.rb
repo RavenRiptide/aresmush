@@ -119,8 +119,44 @@ module AresMUSH
         'creature' => {
           'options' => lambda { |char, block| DailyChoices.creature_offer(char, block) },
           'resolve' => lambda { |char, block, typed| DailyChoices.creature_answers(char, block, typed) }
+        },
+        # A character, a worn magical item of theirs without the apex trait, and one of the cleric's deity's
+        # divine attributes: Divine Apex's `<character>: <item>: <attribute>`. The item counts as an apex item
+        # for that attribute in an encounter the cleric is in too (`Apex`).
+        'apex' => {
+          'options' => lambda { |char, _block| DailyChoices.divine_attributes(char) },
+          'resolve' => lambda { |char, block, typed| DailyChoices.apex_answers(char, block, typed) }
         }
       }.freeze
+
+      def self.divine_attributes(char)
+        Array(Pf2e.deity_config(char)&.fetch('divine_ability', nil)).map(&:to_s)
+      end
+
+      def self.apex_answers(char, block, typed)
+        who, item, attribute = typed.to_s.split(':', 3).map(&:strip)
+
+        return Err.new(:apex_form, 'pf2e.daily_apex_form', 'source' => block['source']) if [ who, item, attribute ].any?(&:blank?)
+
+        named = creature_named(char, block, who)
+
+        return named if named.err?
+        return Err.new(:apex_creature, 'pf2e.daily_apex_character', 'source' => block['source']) unless named.state['name']
+
+        wearer = Character.named(named.state['name'])
+        worn = Apex.worn(wearer, item)
+
+        return Err.new(:apex_item, 'pf2e.daily_apex_item', 'name' => wearer.name, 'item' => item, 'source' => block['source']) unless worn
+
+        allowed = divine_attributes(char)
+        found = allowed.find { |one| one.casecmp?(attribute) }
+
+        return Err.new(:apex_attribute, 'pf2e.daily_apex_attribute', 'attribute' => attribute, 'source' => block['source'],
+                       'options' => allowed.empty? ? '---' : allowed.join(', ')) unless found
+
+        Ok.new(:state => { 'pick' => "#{wearer.name}: #{worn.name}: #{found}", 'names' => [ wearer.name ],
+                           'item' => worn.name, 'attribute' => found })
+      end
 
       # A source's blocks: one, or a class's list.
       def self.blocks_of(info)
@@ -532,21 +568,32 @@ module AresMUSH
       end
 
       # Whom a pick names, as they stand now: each named character in every running encounter they're in,
-      # and each named creature in its encounter while that runs.
-      def self.holders_named(pick)
+      # and each named creature in its encounter while that runs. Given a `giver`, only the encounters the
+      # giver is in too, since what a pick gives reaches someone only where its giver is (house rule); given
+      # `only`, that one encounter.
+      def self.holders_named(pick, giver = nil, only: nil)
+        reached = lambda { |encounter| only ? encounter.id == only.id : (giver.nil? || present?(giver, encounter)) }
+
         people = Array(pick['names']).flat_map do |name|
           who = Character.named(name)
 
-          who ? PF2Encounter.running_for(who).to_a.filter_map { |encounter| CombatantStates.of(encounter, who) } : []
+          next [] unless who
+
+          PF2Encounter.running_for(who).to_a.select(&reached).filter_map { |encounter| CombatantStates.of(encounter, who) }
         end
 
         creatures = Array(pick['creatures']).filter_map do |one|
           encounter = PF2Encounter[one['encounter']]
 
-          encounter&.is_active ? Combatants.holder_named(encounter, one['creature']) : nil
+          encounter&.is_active && reached.call(encounter) ? Combatants.holder_named(encounter, one['creature']) : nil
         end
 
         people + creatures
+      end
+
+      # Whether a character is a combatant in this encounter. A GM running it isn't, unless they joined it.
+      def self.present?(char, encounter)
+        PF2Encounter.running_for(char).to_a.any? { |one| one.id == encounter.id }
       end
 
       # What an effect a pick gives says it came from, which is how it is found to take back.
@@ -566,22 +613,34 @@ module AresMUSH
         ActiveEffects.apply(holder, name, :applied_by => char.name, :granted_by => tag, :encounter => encounter, :origin => origin)
       end
 
-      # A pick that gives an effect puts it on everyone it names who is in an encounter now, and remembers on
-      # each named character who named them, for when they join one later.
-      def self.give!(char, switch)
-        block = for_switch(char, switch)
-        pick = (in_force(char)[switch.to_s.downcase] || []).first
+      # A pick that reaches the characters it names: one that gives an effect (Root Magic, a witch's charge), or
+      # Divine Apex. Each named character keeps who named them (`designate!`), so whatever asks about them reads
+      # only those givers.
+      def self.designates?(block)
+        !!block['gives'] || block['pick'].to_s == 'apex'
+      end
 
-        return [] unless block && pick && block['gives']
-
+      # Remembers on each character a pick names who named them.
+      def self.designate!(char, pick)
         Array(pick['names']).each do |name|
           who = Character.named(name)
           next unless who
 
           who.update(:pf2_designated_by => (Array(who.pf2_designated_by) + [ char.id.to_s ]).uniq)
         end
+      end
 
-        holders_named(pick).each { |holder| give_to!(char, block, holder) }
+      # A pick that gives an effect puts it on everyone it names who is in an encounter with the giver now, and
+      # remembers on each named character who named them, for when they join one later.
+      def self.give!(char, switch)
+        block = for_switch(char, switch)
+        pick = (in_force(char)[switch.to_s.downcase] || []).first
+
+        return [] unless block && pick && block['gives']
+
+        designate!(char, pick)
+
+        holders_named(pick, char).each { |holder| give_to!(char, block, holder) }
       end
 
       # What a pick gave, taken back from everyone it named.
@@ -596,9 +655,9 @@ module AresMUSH
         end
       end
 
-      # Someone joins an encounter fresh: whatever a designation of them gives today. Who named them is kept
-      # on them as a hint, checked against the giver's picks, and a giver whose picks no longer name them is
-      # dropped from it.
+      # Someone joins an encounter: whatever a designation of them gives today, from a giver who is in it too.
+      # Who named them is kept on them as a hint, checked against the giver's picks, and a giver whose picks no
+      # longer name them is dropped from it.
       def self.given_on_join!(state, char)
         return unless char.respond_to?(:pf2_designated_by)
 
@@ -607,14 +666,49 @@ module AresMUSH
           next false unless giver
 
           naming = in_force(giver).select do |_switch, (pick, block)|
-            block['pick'].to_s == 'creature' && block['gives'] && Array(pick['names']).any? { |one| one.casecmp?(char.name) }
+            designates?(block) && Array(pick['names']).any? { |one| one.casecmp?(char.name) }
           end
+          giving = naming.select { |_switch, (_pick, block)| block['gives'] }
 
-          naming.each_value { |(_pick, block)| give_to!(giver, block, state) }
+          giving.each_value { |(_pick, block)| give_to!(giver, block, state) } if giving.any? && present?(giver, state.encounter)
           naming.any?
         end
 
         char.update(:pf2_designated_by => kept) if kept.size != Array(char.pf2_designated_by).size
+      end
+
+      # A giver joins an encounter: what their picks give reaches the ones they named who are already in it.
+      def self.giver_joined!(state, char)
+        in_force(char).each_value do |(pick, block)|
+          next unless block['gives']
+
+          holders_named(pick, only: state.encounter).each { |holder| give_to!(char, block, holder) }
+        end
+      end
+
+      # What a pick gave that came along from an earlier encounter stays only if its giver is in this one.
+      def self.drop_absent!(state)
+        ActiveEffects.on(state).each do |effect|
+          giver = giver_of(effect)
+
+          ActiveEffects.remove(state, effect) if giver && !present?(giver, state.encounter)
+        end
+      end
+
+      # The character whose pick gave an effect, read from its tag (`given_by`), or nil for an effect no pick
+      # in force gave.
+      def self.giver_of(effect)
+        tag = effect.granted_by.to_s
+        name = tag[/\A(.+?)'s /, 1]
+        giver = name ? Character.named(name) : nil
+
+        return nil unless giver
+
+        gave = in_force(giver).any? do |_switch, (_pick, block)|
+          block['gives'].to_s == effect.name.to_s && given_by(giver, block) == tag
+        end
+
+        gave ? giver : nil
       end
 
       # An action a creature pick limits (`limits_action:`): Inspired Stratagem reaches only the allies they
@@ -774,6 +868,7 @@ module AresMUSH
 
         brewed = block['pick'].to_s == 'formula' ? brew_where_standing!(char, key) : []
         give!(char, key) if block['gives']
+        designate!(char, outcome.state[key]) if designates?(block) && !block['gives']
 
         Ok.new(:state => outcome.state[key].merge('brewed' => brewed))
       end

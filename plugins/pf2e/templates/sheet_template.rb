@@ -138,11 +138,14 @@ module AresMUSH
 
         return [] if !abil_list
 
+        # An invested apex item's increase shows, marked, on the attribute it raises.
+        raised = Pf2e::Apex.attribute(@char).to_s
+
         list = []
         abil_list.each_with_index do |a,i|
           name = a.name
-          score = a.mod_val ? a.mod_val : a.base_val
-          list << format_ability(name, score, i)
+          score = Pf2eAbilities.get_score(@char, name)
+          list << format_ability(name, score, i, raised.casecmp?(name.to_s))
         end
 
         list
@@ -462,10 +465,12 @@ module AresMUSH
         list
       end
 
-      def format_ability(abil, score, i)
+      def format_ability(abil, score, i, apex = false)
         name = "#{item_color}#{abil.capitalize}%xn"
         linebreak = i % 3 == 0 ? "%r" : ""
-        "#{linebreak}#{left(name, 13)}: #{left(Pf2eAbilities.display_mod(score), 11)}"
+        shown = Pf2eAbilities.display_mod(score)
+        shown = "#{shown} (apex)" if apex
+        "#{linebreak}#{left(name, 13)}: #{left(shown, 11)}"
       end
 
 

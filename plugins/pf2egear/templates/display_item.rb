@@ -87,6 +87,11 @@ module AresMUSH
           # A bound item says what it holds, and which feat it belongs to.
           Pf2e::BoundItems.describe(@char, @item).each { |line| fmt_list << "%b%b#{line}%r" }
 
+          # What it was made for, and what its owner chose when investing it.
+          info = Pf2egear.catalogue_entry(@category, @item) || {}
+          Pf2e::ItemChoices.describe(@item, info).each { |line| fmt_list << "%b%b#{line}%r" }
+          Pf2e::Apex.describe(@char, @item).each { |line| fmt_list << "%b%b#{line}%r" }
+
         when "consumable", "consumables"
 
           # A scroll says the spell it holds.
@@ -114,7 +119,10 @@ module AresMUSH
 
         end
 
-        fmt_list 
+        # A weapon, armor, or shield made of a precious material says which, and what grade.
+        Materials.describe(@item).each { |line| fmt_list << "%b%b#{line}%r" }
+
+        fmt_list
 
       end
 

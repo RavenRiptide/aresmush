@@ -110,9 +110,12 @@ module AresMUSH
         return refused if refused
 
         was = replaces ? Pf2egear.rune_entry(replaces)['price'].to_i : 0
+        price = info['price'].to_i
+        # Quickstrike costs half as much on orichalcum.
+        price /= 2 if Materials.half_price_rune?(item, rune)
 
         Pf2e::Ok.new(:state => { 'kind' => 'property', 'rune' => rune, 'replaces' => replaces,
-                                 'cost' => info['price'].to_i - was })
+                                 'cost' => price - was })
       end
 
       # What the vendor won't sell this character: a rune above their level, or an uncommon or rare one

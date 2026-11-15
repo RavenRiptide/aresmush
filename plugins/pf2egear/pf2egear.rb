@@ -26,6 +26,7 @@ module AresMUSH
         return PF2BrowseGearCmd
       when "buy"
         return PF2BuyRuneCmd if cmd.switch == "rune"
+        return PF2BuyMaterialCmd if cmd.switch == "material"
         return PF2BuyCmd
       when "sell"
         return PF2SellCmd
@@ -41,6 +42,8 @@ module AresMUSH
           return PF2InvestCmd
         when "uninvest"
           return PF2UninvestCmd
+        when "attach", "detach"
+          return PF2GearAttachCmd
         else
           return PF2DisplayGearCmd
         end
@@ -65,6 +68,8 @@ module AresMUSH
         case cmd.switch
         when "view"
           return PF2ItemViewCmd
+        when "give", "give/free", "give/force"
+          return PF2ItemGiveCmd
         end
       when "use"
         return PF2UseItemCmd

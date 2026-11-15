@@ -434,7 +434,7 @@ module AresMUSH
             factor = string[0]
             minimum = string[1]
 
-            char_score = Pf2eAbilities.get_score(char, factor)
+            char_score = Pf2eAbilities.base_score(char, factor)
             msg << "ability#{i}" if char_score < minimum.to_i
           end
         when "skill"
@@ -2245,7 +2245,7 @@ module AresMUSH
       count = block.is_a?(Hash) ? block['count'] : nil
 
       wanted = if count.is_a?(Hash)
-        modifier = Pf2eAbilities.abilmod(Pf2eAbilities.get_score(char, count['ability'].to_s))
+        modifier = Pf2eAbilities.abilmod(Pf2eAbilities.base_score(char, count['ability'].to_s))
 
         [ modifier, (count['min'] || 1).to_i ].max
       else

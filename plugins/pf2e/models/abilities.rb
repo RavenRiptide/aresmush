@@ -36,7 +36,14 @@ module AresMUSH
       score > 18 && score.odd? ? "#{shown} (P)" : shown
     end
 
+    # A score as it stands, with an invested apex item's increase (`Pf2e::Apex`).
     def self.get_score(char, ability)
+      Pf2e::Apex.adjust(char, ability, base_score(char, ability))
+    end
+
+    # The stored score, without what an item lends it: for a feat's prerequisites and anything else the sheet's
+    # history depends on.
+    def self.base_score(char, ability)
       object = Pf2e::SheetReads.rows(char, :abilities).find { |a| a.name_upcase == ability.upcase }
 
       return 10 if !object
@@ -150,7 +157,7 @@ module AresMUSH
 
       open_skills = to_assign['open skills']
       open_languages = to_assign.has_key?('open languages') ? to_assign['open languages'] : []
-      int_mod = Pf2eAbilities.abilmod(Pf2eAbilities.get_score(enactor, 'Intelligence'))
+      int_mod = Pf2eAbilities.abilmod(Pf2eAbilities.base_score(enactor, 'Intelligence'))
 
       int_mod = 0 if int_mod < 1
 

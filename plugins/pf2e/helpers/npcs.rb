@@ -314,7 +314,8 @@ module AresMUSH
       # ------------------------------------------------------------------------------
       # Hardness
 
-      # The Hardness of adamantine, which halves the Hardness of anything no harder than it.
+      # The Hardness of adamantine, which halves the Hardness of anything no harder than it. An adamantine
+      # weapon brings its own (`item:material-hardness:<n>`), 14 at standard grade and 17 at high.
       ADAMANTINE = 10
 
       # A creature's Hardness comes off what a hit deals it, once: `once` holds what the hit's earlier
@@ -324,7 +325,9 @@ module AresMUSH
 
         return held if hardness.zero? || held['amount'] <= 0
 
-        hardness /= 2 if hardness <= ADAMANTINE && IWR.facts(nil, about).include?('damage:material:adamantine')
+        facts = IWR.facts(nil, about)
+        limit = facts.map { |one| one[/\Aitem:material-hardness:(\d+)\z/, 1] }.compact.map(&:to_i).max || ADAMANTINE
+        hardness /= 2 if hardness <= limit && facts.include?('damage:material:adamantine')
         spent = Array(once).sum { |one| one.is_a?(Hash) ? one['hardness'].to_i : 0 }
         absorbed = [ hardness - spent, held['amount'] ].min
 

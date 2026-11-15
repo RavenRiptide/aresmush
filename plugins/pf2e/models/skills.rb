@@ -56,12 +56,12 @@ module AresMUSH
       prof
     end
 
-    # The rank a check or roll uses: their own, or a temporary one a daily choice gives (Ancestral
-    # Longevity), whichever is better. Prerequisites and skill increases read `get_skill_prof` instead,
-    # because a temporary rank can't count towards either.
+    # The rank a check or roll uses: their own, or a temporary one a daily choice (Ancestral Longevity) or an
+    # apex crown's chosen skill gives, whichever is better. Prerequisites and skill increases read
+    # `get_skill_prof` instead, because a temporary rank can't count towards either.
     def self.rolling_prof(char, name)
       held = get_skill_prof(char, name)
-      temporary = Pf2e::DailyChoices.temporary_rank(char, name)
+      temporary = Pf2e::DailyChoices.temporary_rank(char, name) || Pf2e::Apex.temporary_rank(char, name)
 
       return held unless temporary
 

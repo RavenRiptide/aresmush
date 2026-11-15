@@ -68,6 +68,17 @@ module AresMUSH
         shield
       end
 
+      # An orichalcum shield that would be destroyed is left at 1 Hit Point and broken instead, the first
+      # time each day. Answers whether it was.
+      def self.survives!(shield)
+        found = Pf2egear::Materials.of(shield)
+
+        return false unless found && found.last['survives_destruction'] && destroyed?(shield) && !shield.survived_today
+
+        shield.update(:damage => Pf2egear::ShieldRunes.max_hp(shield) - 1, :survived_today => true)
+        true
+      end
+
       def self.physical?(type)
         PHYSICAL.include?(Domains.slug(type))
       end
@@ -111,12 +122,15 @@ module AresMUSH
         Harm.damage(holder, hit['taken'].to_i - blocked, nil, :critical => hit['critical']) if hit['taken'].to_i > blocked
         shield.update(:damage => shield.damage.to_i + rest)
         TurnState.write(holder, 'struck' => nil)
+        survived = survives!(shield)
 
         name = shield.nickname || shield.name
         out['lines'] << Telling.event('pf2e.shield_blocked', :actor => scene.actor.label, :shield => name,
                                                             :blocked => blocked, :taken => hit['taken'].to_i - blocked,
                                                             :rest => rest)
-        if destroyed?(shield)
+        if survived
+          out['lines'] << Telling.event('pf2e.shield_survives', :shield => name)
+        elsif destroyed?(shield)
           out['lines'] << Telling.event('pf2e.shield_destroyed', :shield => name)
         elsif broken?(shield)
           out['lines'] << Telling.event('pf2e.shield_broken', :shield => name)

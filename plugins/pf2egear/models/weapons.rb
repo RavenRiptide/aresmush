@@ -7,6 +7,9 @@ module AresMUSH
     attribute :traits, :type => DataType::Array, :default => []
     attribute :level, :type => DataType::Integer, :default => 0
     attribute :price, :type => DataType::Integer, :default => 0
+    # The precious material it's made of, chosen when it's bought and never changed: `{ 'name' => 'Cold Iron',
+    # 'grade' => 'standard' }`, or empty for an ordinary item (`Pf2egear::Materials`).
+    attribute :material, :type => DataType::Hash, :default => {}
 
     attribute :talisman, :type => DataType::Array, :default => []
     attribute :nickname

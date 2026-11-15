@@ -1164,6 +1164,10 @@ module AresMUSH
         # An injury poison on the weapon: a hit exposes the target, a critical miss wastes it.
         WeaponPoison.after_strike(scene, attack, rolled.dig('result', 'degree'), out)
 
+        # A creature weak to cold iron or silver that critically fails an unarmed attack against someone wearing
+        # it is sickened.
+        MaterialArmor.after_strike(scene, attack, rolled.dig('result', 'degree'), out)
+
         # The others a bomb's splash reaches, as the thrower named them.
         splash_others(scene, attack, check, said['splash'], rolled.dig('result', 'degree'), out) if attack['bomb'] && said['splash']
 
@@ -1669,12 +1673,15 @@ module AresMUSH
       # A spell cast at one or more targets. `cast` is what the caster's magic answered when the slot was
       # spent - the rank and the casting figures - or, for a creature, its spellcasting. `noted` is what
       # was told of the casting before it: the flat checks it was kept through.
-      def self.cast(scene, spell, targets, words, cast: nil, noted: [])
+      # `adds` is outcomes an item lays over the spell's own, by degree: a wand of smoldering fireballs adds
+      # persistent fire to a failed save. `free` spends no actions: a wand of shardstorm's shards.
+      def self.cast(scene, spell, targets, words, cast: nil, noted: [], adds: nil, free: false)
         said = said(words, scene.permitted)
         out = report
         out['lines'].concat(noted)
         refused(out, said)
         spell, base = spell_mechanics(spell)
+        base = with_outcomes(base, adds) if base && adds
         named = base && variant(base, said)
         mechanics = named
         rank = spell_rank(scene.actor.holder, spell, mechanics, said, cast)
@@ -1727,9 +1734,18 @@ module AresMUSH
 
         spell_effect(scene, spell, rank, out, said['words']) if targets.empty? && !named['attack'] && !named['save']
 
-        spend_casting(scene, spell, named['time'], named['attack'], rank, out)
+        spend_casting(scene, spell, free ? '0' : named['time'], named['attack'], rank, out)
 
         Ok.new(:state => out)
+      end
+
+      # A spell's mechanics with more consequences for some degrees, after its own.
+      def self.with_outcomes(mechanics, adds)
+        outcomes = (mechanics['outcomes'] || {}).dup
+
+        adds.each { |degree, list| outcomes[degree.to_s] = Array(outcomes[degree.to_s]) + Array(list) }
+
+        mechanics.merge('outcomes' => outcomes)
       end
 
       # A spell cast another way - Heal with two actions and at range, Needle Darts of silver - as the
@@ -2138,6 +2154,9 @@ module AresMUSH
             thrown = Pf2e.thrown_formula(one['damage'])
             deal(scene, whom, [ { 'amount' => thrown['total'], 'type' => one['type'], 'formula' => one['damage'],
                                   'dice' => thrown['shown'] } ], out)
+          elsif one['persists']
+            # Persistent damage begun, as a hit's is: `{ persists: 1d6, type: fire }`.
+            deal(scene, whom, [ { 'formula' => one['persists'], 'type' => one['type'], 'category' => 'persistent' } ], out)
           elsif one['persistent']
             PersistentDamage.remove(whom.holder, one['persistent'])
             out['lines'] << told('pf2e.act_persistent_ended', :target => whom.label, :type => one['persistent'])

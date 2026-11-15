@@ -3,13 +3,22 @@ module AresMUSH
     class PF2BuyCmd
       include CommandHandler
 
-      attr_accessor :category, :item_name, :quantity
+      attr_accessor :category, :item_name, :quantity, :made_for
 
+      # The last part is how many, or, for an item made for a deity, which deity: `buy magicitem=Helm of
+      # Zeal/Althea`.
       def parse_args
         args = cmd.parse_args(ArgParser.arg1_equals_arg2_slash_optional_arg3)
         self.category = downcase_arg(args.arg1)
         self.item_name = downcase_arg(args.arg2)
-        self.quantity = integer_arg(args.arg3)
+
+        last = trim_arg(args.arg3)
+
+        if last && last !~ /\A-?\d+\z/
+          self.made_for = last
+        else
+          self.quantity = integer_arg(last)
+        end
       end
 
       def required_args
@@ -103,6 +112,20 @@ module AresMUSH
           return
         end
 
+        # A Helm of Zeal is made for one deity, named now. Anything else takes a number there.
+        deity = nil
+
+        if Pf2e::ItemChoices.made_for_deity?(item_info)
+          found = Pf2e::ItemChoices.deity_named(item_name, self.made_for)
+
+          return if Pf2e::CharState.emit_error!(client, found)
+
+          deity = found.state
+        elsif self.made_for
+          client.emit_failure t('pf2egear.bad_quantity')
+          return
+        end
+
         # Only gear and consumables stack; a weapon has its own runes, so each is its own item.
         if q > 1 && !Pf2egear::Inventory.stackable?(self.category)
           client.emit_ooc t('pf2egear.quantity_one_only')
@@ -122,7 +145,8 @@ module AresMUSH
 
         # Create the item.
 
-        Pf2egear.create_item(enactor, self.category, item_name, q, item_info)
+        made = Pf2egear.create_item(enactor, self.category, item_name, q, item_info)
+        made.update(:deity => deity) if deity
 
         Pf2egear.pay_player(enactor, -cost, 'Item Vendor', "Purchase #{item_name}")
 

@@ -78,10 +78,11 @@ module AresMUSH
       end
 
       describe "what can be invested" do
-        it "should name the three kinds PF2e lets a character invest" do
+        # Bags too, for one with the invested trait such as a voyager's pack.
+        it "should name the kinds PF2e lets a character invest" do
           invested = Inventory.categories.select { |c| Inventory.investable?(c) }.map { |c| Inventory.canonical(c) }.uniq
 
-          expect(invested.sort).to eq %w(armor magicitem weapons)
+          expect(invested.sort).to eq %w(armor bags magicitem weapons)
         end
       end
 

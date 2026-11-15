@@ -585,7 +585,9 @@ module AresMUSH
         'die' => damage, 'damage_type' => weapon.wp_damage_type,
         'range' => weapon.range.to_i, 'reload' => weapon.reload.to_i,
         'hands' => twohand ? 2 : weapon.hands.to_i,
-        'materials' => Array(info['materials']),
+        # A catalogue row's own material (Chalice of Justice), and the precious material this one was made of.
+        'materials' => Array(info['materials']) | Pf2egear::Materials.slugs(weapon),
+        'material_hardness' => Pf2egear::Materials.weapon_hardness(weapon),
         'runes' => Pf2egear.property_runes(weapon),
         'striking' => Pf2egear.get_rune_value(weapon, 'fundamental', 'power'),
         'rune' => Pf2egear.get_rune_value(weapon, 'fundamental', 'potency') })

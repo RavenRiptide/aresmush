@@ -17,6 +17,10 @@ module AresMUSH
     # stored field that has no attribute.
     attribute :gear_contents, :type => DataType::Hash, :default => {}
     attribute :nickname
+    # A bag with the invested trait, such as a voyager's pack, is invested as a magic item is: now, and at
+    # each day's preparations while `invest_on_refresh` is set. Its own rules apply only while it's invested.
+    attribute :invested, :type => DataType::Boolean
+    attribute :invest_on_refresh, :type => DataType::Boolean
 
     reference :character, "AresMUSH::Character"
     # An encounter's copy of a character's item, taken as they entered it: the encounter reads and changes

@@ -51,6 +51,18 @@ module AresMUSH
 
           if Pf2e.has_trait?(item_id.traits, 'invested')
 
+            # An item that asks a question when it's invested is answered here, or not invested at all.
+            info = Pf2egear.catalogue_entry(category, item_id) || {}
+            how = "#{cmd.root_plus_switch} #{Pf2egear::Inventory.canonical(category)}/#{num}"
+            held = item_id.respond_to?(:answers) ? item_id.answers : []
+            answered = Pf2e::ItemChoices.for_investing(item_id.name, info, held,
+                                                      Pf2egear::Inventory.invest_answer(item), how: how)
+
+            next if Pf2e::CharState.emit_error!(client, answered)
+
+            # One apex item at a time.
+            next if Pf2e::CharState.emit_error!(client, Pf2e::Apex.refusal(enactor, item_id))
+
             # Invested now as well as at each day's preparations, so the sheet has it at once. One set
             # for the day already is counted in the limit; it only wants investing.
             if item_id.invest_on_refresh
@@ -68,6 +80,8 @@ module AresMUSH
             end
 
             item_id.update(invest_on_refresh: true, invested: true)
+            Pf2e::Apex.invested!(enactor, item_id)
+            item_id.update(answers: answered.state) if item_id.respond_to?(:answers) && answered.state != held
 
           else
             client.emit_ooc t('pf2egear.not_investible_item', :item => Pf2egear.get_item_name(item_id))

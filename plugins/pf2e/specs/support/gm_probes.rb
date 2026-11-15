@@ -29,8 +29,8 @@ module AresMUSH
       def scan_probe
         probe('the scan lists each creature to the GM, and is refused to a player') do
           shown = type(@gm, 'e/scan').said.join("\n")
-          # A row gives the id and then the name without it, as long as the column is.
-          listed = foes.all? { |row| shown.include?(row['name'].sub(/ ##{row['id']}\z/, '')[0, 18].strip) }
+          # A row gives the id and then the name without it, as long as the column is (15 in a fight).
+          listed = foes.all? { |row| shown.include?(row['name'].sub(/ ##{row['id']}\z/, '')[0, 15].strip) }
           player = type(@party.first, 'e/scan')
 
           [ listed && refused?(player, 'pf2e.not_organizer'), "listed #{listed}; a player was told #{player.status}" ]

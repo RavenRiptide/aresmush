@@ -45,8 +45,10 @@ module AresMUSH
           'use_needs' => :invested
         },
         {
+          # A bag with the invested trait (a voyager's pack) is invested like a magic item, and works only then.
           'names' => %w{bags bag}, 'config' => 'pf2e_bags', 'collection' => :bags, 'in_bag' => nil, 'model' => 'PF2Bag',
-          'single' => false, 'stackable' => false, 'investable' => false, 'in_bags' => false
+          'single' => false, 'stackable' => false, 'investable' => true, 'in_bags' => false,
+          'use_needs' => :invested
         },
         {
           'names' => %w{gear}, 'config' => 'pf2e_gear', 'collection' => :gear, 'in_bag' => :gear, 'model' => 'PF2Gear',
@@ -161,13 +163,18 @@ module AresMUSH
       end
 
       # One of those items as its category and number, or nil when it is not an investable category
-      # and a number.
+      # and a number. An answer may follow the number (`magicitem=0=fire`), which `invest_answer` reads.
       def self.investable_ref(item)
-        category, num = item.split('=', 2)
+        category, num = item.split('=', 3)
 
         return nil unless investable?(category) && num&.to_i.to_s == num
 
         [ category, num.to_i ]
+      end
+
+      # The answer typed after an item's number, for an item that asks a question when it's invested.
+      def self.invest_answer(item)
+        item.split('=', 3)[2]
       end
 
       # What has to be true of the item before it can be used: worn for armour and a weapon,

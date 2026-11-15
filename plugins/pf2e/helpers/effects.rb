@@ -537,7 +537,8 @@ module AresMUSH
 
         Pf2egear.carried_items(char).map do |category, item|
           info = Pf2egear.catalogue_entry(category, item) || {}
-          rules = Array(info['rules'])
+          # Its own rules, and those of the precious material it's made of (orichalcum armor's initiative).
+          rules = Array(info['rules']) + Pf2egear::Materials.rules(category, item)
 
           unless worn.include?(item.id.to_s)
             rules = rules.reject { |row| Rules.needs_wearing?(row) && !(info['bomb'] && own_roll?(row)) }
@@ -545,9 +546,12 @@ module AresMUSH
 
           next nil if rules.empty?
 
-          source(Pf2egear.get_item_name(item), rules,
-                 'item' => { 'id' => item.id.to_s, '_id' => item.id.to_s, 'level' => item_level(item) },
-                 'options' => item_options(item))
+          # What the item asked when it was invested, which its other rules read (`ItemChoices`).
+          chosen = ItemChoices.chosen(item, info)
+
+          ItemChoices.answered(char, source(Pf2egear.get_item_name(item), rules,
+                                            'item' => { 'id' => item.id.to_s, '_id' => item.id.to_s, 'level' => item_level(item) },
+                                            'options' => item_options(item), 'chosen' => chosen), chosen)
         end.compact
       end
 

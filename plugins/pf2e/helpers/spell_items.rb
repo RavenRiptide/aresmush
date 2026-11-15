@@ -311,6 +311,17 @@ module AresMUSH
 
         return refused if refused
 
+        # A wand of shardstorm's shards, directed this turn for free; trying to activate it any other time
+        # while the storm lasts ends the storm.
+        ended = nil
+
+        if storm?(item)
+          return shards!(scene, item, targets, words) if shard_ready?(scene, item) && !overcharge
+
+          item.update(:lingering => {})
+          ended = Telling.event('pf2e.wand_storm_ended', :item => item.name)
+        end
+
         if wand?(item)
           return Err.new(:used, 'pf2e.wand_used_today', 'item' => item.name) if item.used_today && !overcharge
           return Err.new(:not_used, 'pf2e.wand_overcharge_unused', 'item' => item.name) if overcharge && !item.used_today
@@ -327,19 +338,148 @@ module AresMUSH
 
         cast = cast_of(holder, item)
         risked = Acting.casting_risked(scene, spell)
+        effect = wand_effect(item)
+        alive = targets.reject { |one| slain?(one.holder) }
 
         done = if risked && !risked['kept']
                  Acting.casting_lost(scene, spell, risked, cast)
                else
-                 Acting.cast(scene, spell, targets, words, :cast => cast, :noted => risked ? risked['lines'] : [])
+                 Acting.cast(scene, spell, targets, words, :cast => cast, :noted => risked ? risked['lines'] : [],
+                                                          :adds => effect && effect['outcomes'])
                end
 
         return done if done.err?
 
-        specialty_cast!(scene, item, targets, done.state) if wand?(item) && !(risked && !risked['kept'])
+        done.state['lines'].unshift(ended) if ended
+
+        unless risked && !risked['kept']
+          specialty_cast!(scene, item, targets, done.state) if wand?(item)
+          wand_effect_cast!(scene, item, effect, alive, done.state) if effect
+        end
         spent!(holder, item, overcharge, done.state)
 
         done
+      end
+
+      # ------------------------------------------------------------------------------
+      # What a wand adds to its spell
+
+      # A stocked wand's `wand_effect`: what is told as it's cast, `outcomes` laid over the spell's by degree
+      # (`Acting.cast`), `slain` for what a kill releases, and `next_turn_heal` for healing at the caster's next
+      # turn. Nil for a wand that adds nothing.
+      def self.wand_effect(item)
+        return nil unless wand?(item)
+
+        found = (Pf2egear.catalogue_entry('magicitem', item) || {})['wand_effect']
+
+        found.is_a?(Hash) ? found : nil
+      end
+
+      # After the spell: the room is told what the wand adds, a target it slew releases what it releases, and
+      # healing at the caster's next turn is noted on the wand. `alive` is who was alive before the casting.
+      def self.wand_effect_cast!(scene, item, effect, alive, out)
+        out['lines'] << Telling.event('pf2e.wand_effect', :item => item.name, :effect => effect['told']) if effect['told']
+
+        if effect['slain']
+          alive.select { |one| slain?(one.holder) && living?(one.holder) }.each do |one|
+            out['lines'] << Telling.event('pf2e.wand_slain', :item => item.name, :target => one.label,
+                                          :damage => effect['slain']['damage'], :type => effect['slain']['type'],
+                                          :area => effect['slain']['area'])
+          end
+        end
+
+        return unless scene.encounter
+
+        round = scene.encounter.round.to_i
+
+        if effect['storm']
+          # The minute counts from this round, so its shards come at the caster's turns in the rounds after.
+          item.update(:lingering => { 'storm' => effect['storm']['spell'], 'round' => round,
+                                      'until' => round + effect['storm']['rounds'].to_i - 1 })
+        elsif effect['next_turn_heal']
+          item.update(:lingering => { 'heal' => effect['next_turn_heal'], 'round' => round })
+        end
+      end
+
+      # Whether a wand of shardstorm's storm is going.
+      def self.storm?(item)
+        wand?(item) && item.lingering.is_a?(Hash) && !item.lingering['storm'].to_s.empty?
+      end
+
+      # Whether this turn's shards are still to be directed: their turn has started since the storm began, and
+      # they haven't directed them yet.
+      def self.shard_ready?(scene, item)
+        round = scene.encounter&.round.to_i
+
+        round.positive? && item.lingering['ready'].to_i == round && item.lingering['shot'].to_i != round
+      end
+
+      # The turn's shards, as the 1-action version of the storm's spell at the wand's rank, spending no actions
+      # and none of the wand's day.
+      def self.shards!(scene, item, targets, words)
+        refused = refusal(scene.actor.holder, item)
+
+        return refused if refused
+
+        done = Acting.cast(scene, item.lingering['storm'], targets, [ 'actions 1' ] + Array(words),
+                           :cast => cast_of(scene.actor.holder, item), :free => true)
+
+        return done if done.err?
+
+        item.update(:lingering => item.lingering.merge('shot' => scene.encounter.round.to_i))
+        done.state['lines'].unshift(Telling.event('pf2e.wand_shards', :actor => scene.actor.label, :item => item.name))
+
+        done
+      end
+
+      # Slain: a creature at 0 Hit Points, or a character dead.
+      def self.slain?(holder)
+        Actors.of(holder).creature? ? holder.hp_left.to_i <= 0 : Pf2e.dead?(holder)
+      end
+
+      # Living: neither undead nor a construct.
+      def self.living?(holder)
+        (Array(holder.pf2_traits).map { |one| one.to_s.downcase } & %w{undead construct}).empty?
+      end
+
+      # A turn starting: a wand of shardstorm's storm gives this turn's shards, or ends; and a wand of overflowing
+      # life used since this turn's last start heals its caster, once however many there are.
+      def self.turn_started(holder, round)
+        return [] unless Actors.of(holder).carries_items?
+
+        storms(holder, round.to_i) + overflowing(holder, round.to_i)
+      end
+
+      def self.storms(holder, round)
+        held = Pf2egear::Inventory.held(holder, 'magicitem')
+
+        held.select { |one| storm?(one) && round > one.lingering['round'].to_i }.map do |one|
+          if round > one.lingering['until'].to_i
+            one.update(:lingering => {})
+            next Turns.event('pf2e.wand_storm_over', 'name' => holder.name, 'item' => one.name)
+          end
+
+          one.update(:lingering => one.lingering.merge('ready' => round))
+          Turns.event('pf2e.wand_storm_shards', 'name' => holder.name, 'item' => one.name,
+                      'number' => held.index { |other| other.id == one.id })
+        end
+      end
+
+      def self.overflowing(holder, round)
+        waiting = Pf2egear::Inventory.held(holder, 'magicitem').select do |one|
+          one.lingering.is_a?(Hash) && one.lingering['heal'] && round > one.lingering['round'].to_i
+        end
+
+        return [] if waiting.empty?
+
+        first = waiting.first
+        thrown = Pf2e.thrown_formula(first.lingering['heal'])
+
+        waiting.each { |one| one.update(:lingering => {}) }
+        Harm.heal(holder, thrown['total'])
+
+        [ Turns.event('pf2e.wand_turn_heal', 'name' => holder.name, 'item' => first.name, 'count' => thrown['total'],
+                      'dice' => thrown['shown'] || first.lingering['heal']) ]
       end
 
       def self.spent!(holder, item, overcharge, out)
@@ -389,8 +529,8 @@ module AresMUSH
       def self.rested!(holder)
         return unless Actors.of(holder).carries_items?
 
-        Pf2egear::Inventory.all(holder, 'magicitem').select { |one| wand?(one) && (one.used_today || one.overcharged) }
-                           .each { |one| one.update(:used_today => false, :overcharged => false) }
+        Pf2egear::Inventory.all(holder, 'magicitem').select { |one| wand?(one) && (one.used_today || one.overcharged || one.lingering.present?) }
+                           .each { |one| one.update(:used_today => false, :overcharged => false, :lingering => {}) }
       end
 
       # What the encounter did to their own wands: broken or mended, and destroyed. Their day isn't carried

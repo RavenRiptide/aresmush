@@ -26,6 +26,8 @@ module AresMUSH
         about << "item:group:#{Domains.slug(attack['group'])}" unless attack['group'].to_s.empty?
         about << 'item:category:unarmed' if attack['unarmed'] || slugs.include?('unarmed')
         about << 'item:magical' if attack['rune'].to_i.positive? || slugs.include?('magical')
+        # An adamantine weapon's own Hardness, which a Hardness it halves can't be above.
+        about << "item:material-hardness:#{attack['material_hardness'].to_i}" if attack['material_hardness'].to_i.positive?
 
         about + said(options)
       end

@@ -281,8 +281,9 @@ module AresMUSH
 
     # How many property runes an item can hold: as many as its potency rune is worth, which is the
     # rule as written.
+    # As many property runes as its potency rune is worth, and one more for orichalcum.
     def self.rune_slots(item)
-      get_rune_value(item, 'fundamental', 'potency').to_i
+      get_rune_value(item, 'fundamental', 'potency').to_i + Materials.rune_slots(item)
     end
 
     def self.catalogue_entry(category, item)

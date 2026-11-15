@@ -40,6 +40,15 @@ module AresMUSH
     # How many of the day's activations a bound item has spent: an egalrin feather fan's Wave Fan. A rest
     # gives them back.
     attribute :activations_used, :type => DataType::Integer, :default => 0
+    # What a wand left to happen at its caster's next turn: a wand of overflowing life's healing,
+    # `{ 'heal' => '3d8', 'round' => the round it was cast }` (`Pf2e::SpellItems.turn_started`).
+    attribute :lingering, :type => DataType::Hash, :default => {}
+    # The answers to what the item asks when it's invested - a Charm of Resistance's kind of damage, an
+    # Entertainer's Cincture's skill - which its rules read (`Pf2e::ItemChoices`).
+    attribute :answers, :type => DataType::Array, :default => []
+    # The deity an item was made for, named when it's bought: a Helm of Zeal's bonus is to that deity's
+    # Divine Skill.
+    attribute :deity
     reference :bag, "AresMUSH::PF2Bag"
 
   end

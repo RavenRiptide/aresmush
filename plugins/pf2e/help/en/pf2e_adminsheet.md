@@ -115,6 +115,16 @@ Players spend RPP through a request to unlock an uncommon or rare spell. Spend t
 
 ### Uncommon and rare items
 Players can buy common items from the vendor. They can also buy an uncommon or rare item there when a feat, class feature, or class names it, such as Khazadi Weapon Familiarity or a cleric's uncommon favored weapon. Players get any other uncommon or rare item through requests: they buy its formula with RPP and money, which you record with `formulas/add`, and then request to have the item crafted for themselves or another character.
+
+### Giving items
+`item/give <character>=<category>/<name>`: Creates an item and gives it to the character, and takes the item's catalog price from their money. Use this to give the item a commission crafting request made, such as `item/give Alice=magicitem/Charm of Resistance`.
+`item/give <character>=magicitem/<name>/<deity>`: Gives an item made for one deity, such as a Helm of Zeal, made for the deity you specify, such as `item/give Alice=magicitem/Helm of Zeal/Althea`.
+`item/give <character>=<category>/<name>/<material>/<grade>`: Gives a weapon, armor, or shield made of a precious material, at the grade you specify (low, standard, or high), and takes its price, such as `item/give Alice=weapons/Longsword/adamantine/standard`. It doesn't spend the RPP an uncommon or rare material costs at the vendor; spend RPP for a request with `rpp/spend`.
+`item/give/force <character>=<category>/<name>`: Gives an item above the character's level, and still takes its price.
+`item/give/free <character>=<category>/<name>`: Gives an item without taking any money and without checking its level, such as loot or a reward.
+%t **Note:** `item/give` refuses an item above the character's level, a character who can't afford the item, a character who isn't approved, and a character in a running encounter. Give the item after the encounter ends.
+%t **Note:** `item/give` doesn't check the crafter's feat or formula, because the crafter is usually another character. Check those against the request before you give the item.
+
 ### Wands
 `wand/repair <character>=<number>`: Repairs a wand that overcharging broke, on the character's own sheet. The number is the wand's number in their `gear` list.
 %t **Note:** If the wand is in an encounter with them, the GM repairs it there with `encounter/repair <who>=<number>`.

@@ -115,3 +115,21 @@ pf2e_bags:
       - extradimensional
       - invested
       - magical
+  # A spacious pouch (type II) that's worn and invested (GM Core). Its +3 to Survival applies only while it's
+  # invested; its climber's kit, tracking a creature that teleported, and its activation are the GM's to apply.
+  Voyager's Pack:
+    price: 1480000
+    level: 17
+    bulk: 0
+    capacity: 50
+    bulk_bonus: 0
+    traits:
+      - uncommon
+      - extradimensional
+      - invested
+      - magical
+    rules:
+      - key: "FlatModifier"
+        selector: "survival"
+        type: "item"
+        value: 3

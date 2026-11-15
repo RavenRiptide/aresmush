@@ -93,6 +93,24 @@ module AresMUSH
         args.map(&:to_s)
       end
 
+      # A worked-out answer kept with the replies until the next write, under the caller's own key. Start the
+      # key with a symbol, which no database command is, and name the record by class and id: Ohm hands back
+      # a new object on every load, so a `SheetReads.memo` (keyed by the object) misses on each fresh copy,
+      # and this doesn't. Outside a command it's worked out every time. Every caller is handed the same
+      # object, so don't change what comes back.
+      def self.kept(key)
+        store = replies
+
+        return yield unless store
+        return store[key] if store.key?(key)
+
+        at = generation
+        found = yield
+        held = replies
+        held[key] = found if held && at == generation
+        found
+      end
+
       # Every command sent: a write moves the generation on.
       module Sent
         def write(args)

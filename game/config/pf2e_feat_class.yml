@@ -12051,6 +12051,12 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 18
+    # The item counts as an apex item for the attribute only in an encounter the cleric is a combatant in
+    # too (house rule; `Pf2e::Apex`).
+    daily_choice:
+      switch: divineapex
+      pick: apex
+      lasts: day
     shortdesc: You can pour divine power into an item, letting the wearer exceed their limits. When you complete your daily preparations, you can touch one worn magical item that doesn't have the apex trait. It gains the apex trait until your next preparations, and you choose one of your deity's divine attributes. The item increases that attribute modifier by 1 or to +4, whichever is higher. A character can benefit from only one apex item at a time, as normal.
     traits:
       - cleric

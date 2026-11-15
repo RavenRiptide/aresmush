@@ -130,10 +130,10 @@ pf2e_foundry_source:
       sha256: 4fd933922db74bcae15373c404d81f8cb9abefbd0f3ce4246baf202f54f1884d
     game/config/pf2e_gear.yml:
       by: import_foundry_rules
-      sha256: 8c4437833cc3aa3b703bc16c9d1de564b03c76815588ba8460b4a801cfed617d
+      sha256: 501ddadcb25fbbaa82679929d87f14b879555b836054dc235a9deaf5befafba0
     game/config/pf2e_magicitem.yml:
       by: import_foundry_rules
-      sha256: bc44442dd94437503a205699eec93fe178f9fe538782061bc1e958c225babaa2
+      sha256: cdbec280e642a1dc9d007f611d00d6715057600cd0be8442ded48a671994704e
     game/config/pf2e_renames.yml:
       by: import_remaster_renames
       sha256: 7818680709bcd65e53eb5ed2cddea55c5a7196f187314d5a32c71cf508ddb56a

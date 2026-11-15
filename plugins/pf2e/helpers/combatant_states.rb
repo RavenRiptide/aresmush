@@ -47,8 +47,10 @@ module AresMUSH
         WeaponPoison.at_rest!(state)
         DailyChoices.brew!(state)
         Paths.apply_all!(state)
-        # What someone's designation of them gives today: a Root Magic pouch, the mark of a witch's charge.
+        # What someone's designation of them gives today: a Root Magic pouch, the mark of a witch's charge. It
+        # reaches them only where its giver is, and what their own picks give reaches those already here.
         DailyChoices.given_on_join!(state, char)
+        DailyChoices.giver_joined!(state, char)
         # The staff they prepared today, charged, and the spells they expended on it spent.
         Staves.on_join!(state, char)
 
@@ -68,6 +70,12 @@ module AresMUSH
         end
 
         Equipment.copy!(state, prior)
+
+        # What a pick gave them in the last encounter stays only if its giver is in this one too, and what a
+        # giver here gives them, or they give those here, is given now.
+        DailyChoices.drop_absent!(state)
+        DailyChoices.given_on_join!(state, char)
+        DailyChoices.giver_joined!(state, char)
 
         state
       end

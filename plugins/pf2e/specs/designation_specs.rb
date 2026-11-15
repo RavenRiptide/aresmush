@@ -157,9 +157,12 @@ module AresMUSH
         end
       end
 
+      # What a pick gives reaches someone only in an encounter its giver is in too (house rule), so a GM who
+      # isn't a combatant can't give it, and it doesn't follow its target into a scene without its giver.
       describe "what a designation gives" do
         it "should put the effect on a charge already in an encounter, from the witch" do
           start
+          join(@giver)
           join(@ally)
           prepare("prepare/charge #{@ally.name}")
 
@@ -172,13 +175,36 @@ module AresMUSH
         it "should put it on them when they join an encounter later" do
           prepare("prepare/charge #{@ally.name}")
           start
+          join(@giver)
           join(@ally)
+
+          expect(effects(@ally, "Effect: Witch's Charge").size).to eq 1
+        end
+
+        it "should give nothing in an encounter the giver isn't in" do
+          prepare("prepare/charge #{@ally.name}")
+          start
+          join(@ally)
+
+          expect(effects(@ally, "Effect: Witch's Charge")).to eq []
+
+          prepare("prepare/rootmagic #{@ally.name}")
+
+          expect(effects(@ally, 'Effect: Root Magic')).to eq []
+        end
+
+        it "should give it when the giver joins the encounter after them" do
+          prepare("prepare/charge #{@ally.name}")
+          start
+          join(@ally)
+          join(@giver)
 
           expect(effects(@ally, "Effect: Witch's Charge").size).to eq 1
         end
 
         it "should take it back with the pick" do
           start
+          join(@giver)
           join(@ally)
           prepare("prepare/charge #{@ally.name}")
           unprepare('unprepare/charge')
@@ -188,6 +214,7 @@ module AresMUSH
 
         it "should give Root Magic's bonus by the giver's Occultism rank, to the first save against a spell" do
           start
+          join(@giver)
           join(@ally)
           prepare("prepare/rootmagic #{@ally.name}")
 

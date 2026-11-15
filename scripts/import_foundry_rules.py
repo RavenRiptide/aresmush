@@ -831,10 +831,13 @@ def main():
             additions = {}
 
             for item, (rules, declared) in theirs.items():
-                found = item and re.search(rf'^  "?{re.escape(item)}"?:$\n((?:    .*\n)*)', text, re.M)
+                # Matched without regard to case, because their names and ours capitalise differently
+                # ("Helm Of Zeal"), and filed under our spelling, which is what `insert` looks for.
+                found = item and re.search(rf'^  "?({re.escape(item)})"?:$\n((?:    .*\n)*)', text, re.M | re.I)
                 if not found:
                     continue
-                rules = [rule for rule in rules if not handled(rule, found.group(1))]
+                item = found.group(1)
+                rules = [rule for rule in rules if not handled(rule, found.group(2))]
                 for rule in rules:
                     if rule.get('key') not in KINDS:
                         unread[rule.get('key')] += 1

@@ -67,6 +67,11 @@ module AresMUSH
       def listed_spell_rank(_spell)
         nil
       end
+
+      # The encounter a character stands in as this holder, or nil for a character on their own sheet.
+      def encounter
+        nil
+      end
     end
 
     class CharacterActor < Actor
@@ -333,6 +338,10 @@ module AresMUSH
 
       def key
         "state-#{@holder.id}"
+      end
+
+      def encounter
+        @holder.encounter
       end
 
       def sheet_iwr

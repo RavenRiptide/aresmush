@@ -22,9 +22,13 @@ module AresMUSH
 
       daily_refresh_reagents(holder)
       do_daily_investiture(holder)
+      # A new day: the apex item invested now is the one that counts.
+      Apex.rested!(holder)
       # A wand's daily casting, and the day's overcharge, come back.
       SpellItems.rested!(holder)
       WaveFan.rested!(holder)
+      # An orichalcum shield can survive being destroyed again.
+      Pf2egear::Materials.rested!(holder)
       # A staff's charges fade, and it is prepared again with the day's other choices.
       Staves.rested!(holder)
 
@@ -103,8 +107,10 @@ module AresMUSH
       char_wp_list = Pf2egear::Inventory.held(char, 'weapons')
       char_a_list = Pf2egear::Inventory.held(char, 'armor')
       char_mi_list = Pf2egear.items_in_inventory(char.magic_items.to_a)
+      # A voyager's pack, or any bag with the invested trait.
+      char_bag_list = Pf2egear::Inventory.held(char, 'bags')
 
-      investable_list = char_wp_list + char_a_list + char_mi_list
+      investable_list = char_wp_list + char_a_list + char_mi_list + char_bag_list
 
       investable_list.each { |item| item.update(invested: false) }
 

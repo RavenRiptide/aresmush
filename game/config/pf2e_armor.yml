@@ -824,6 +824,38 @@ pf2e_armor:
     min_str: 14
     bulk: 2
     group: Composite
+  # Elven chain in GM Core: a dawnsilver chain shirt with no check penalty and without the noisy trait. Its
+  # material is part of the item, so it's never made of another one (`Pf2egear::Materials`).
+  Sildanyari Chain (Standard-Grade):
+    category: light
+    traits:
+      - uncommon
+      - flexible
+    level: 13
+    price: 250000
+    ac_bonus: 2
+    dex_cap: 3
+    check_penalty: 0
+    speed_penalty: 0
+    min_str: 12
+    bulk: 0.1
+    group: Chain
+    material: { name: Dawnsilver, grade: standard }
+  Sildanyari Chain (High-Grade):
+    category: light
+    traits:
+      - uncommon
+      - flexible
+    level: 20
+    price: 5200000
+    ac_bonus: 2
+    dex_cap: 3
+    check_penalty: 0
+    speed_penalty: 0
+    min_str: 12
+    bulk: 0.1
+    group: Chain
+    material: { name: Dawnsilver, grade: high }
   Splint Mail:
     category: heavy
     traits: []

@@ -26,6 +26,9 @@ There are six categories of gear in Emblem of Ea's inventory system.
 `gear [<target>]`: See your gear inventory, or if you're a game admin, someone else's gear inventory by supplying an optional <target>. (Aliases: `i`, `inv`, `inventory`)
 `gear/rename <category>/<item number> = <nickname>`: Give a weapon, armor, magic item, bag, or shield a nickname. This can be helpful to identify which item is which at a glance.
 `item/view <category> = <item number>`: See more details about a weapon, armor, shield, or magic item. (Alias: `gear/view`)
+`gear/attach <shield number> = <weapon number>`: Attaches a shield boss or shield spikes from your weapons to one of your shields, such as `gear/attach 0=3`. Find the numbers with `gear`.
+`gear/detach <shield number>`: Detaches the shield boss or shield spikes from a shield.
+%t **Note:** A shield can have one shield boss or shield spikes attached at a time. A Strike with an attached shield boss or shield spikes counts as a weapon of the shield's precious material, if the shield has one. You can't attach or detach while you're in a running encounter.
 
 For equipping and investing gear, see `help equip`.
 

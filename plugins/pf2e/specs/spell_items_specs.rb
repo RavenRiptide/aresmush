@@ -211,7 +211,7 @@ module AresMUSH
           use("e/use consumables=#{number(state, 'consumables')}/#{@hero.name}")
 
           expect(@client.failures).to eq []
-          expect(Acting).to have_received(:cast) do |_scene, spell, targets, _words, cast:, noted:|
+          expect(Acting).to have_received(:cast) do |_scene, spell, targets, _words, cast:, noted:, adds:|
             expect([ spell, targets.map(&:label), cast['spell level'], cast['tradition'] ]).to eq [ 'Heal', [ @hero.name ], '1', 'primal' ]
           end
           expect(copy('consumables')).to be_nil
@@ -350,6 +350,169 @@ module AresMUSH
             expect(actions).to eq 3
             expect(effect.unit).to eq 'hours'
             expect(effect.started_round.to_i + ActiveEffects.rounds_long(effect) - PF2Encounter[@encounter.id].round.to_i).to eq 900
+          end
+        end
+      end
+
+      # A wand stocked with its own spell - a wand of overflowing life always holds heal - is an ordinary
+      # magic item whose catalogue row names the spell and rank, which buying copies onto the item.
+      describe "wands that hold their own spell" do
+        it "should name a spell the catalogue has, at no lower than its own rank" do
+          stocked = (Global.read_config('pf2e_magicitem') || {}).select { |_name, info| info.is_a?(Hash) && info['spell'] }
+
+          expect(stocked.size).to eq 27
+          stocked.each do |name, info|
+            details = Global.read_config('pf2e_spells', info['spell'])
+
+            expect([ name, details.is_a?(Hash) ]).to eq [ name, true ]
+            expect([ name, info['spell_rank'].to_i >= SpellItems.base_rank(details) ]).to eq [ name, true ]
+            expect([ name, Array(info['traits']).include?('wand') ]).to eq [ name, true ]
+          end
+        end
+
+        it "should sell one carrying its spell, and cast it in an encounter" do
+          @hero.update(:pf2_level => 9)
+          buy('buy magicitem=Wand of Overflowing Life (3rd-Rank Spell)')
+
+          expect(@client.failures).to eq []
+          expect(wands.map { |one| [ one.name, one.spell, one.spell_rank, one.level, one.price ] })
+            .to eq [ [ 'Wand of Overflowing Life (3rd-Rank Spell)', 'Heal', 3, 9, 70000 ] ]
+
+          start
+          allow(Acting).to receive(:cast).and_call_original
+          run(Pf2egear::PF2EncounterUseCmd, "e/use magicitem=#{number(state, 'magicitem')}/#{@hero.name}")
+
+          expect(@client.failures).to eq []
+          expect(Acting).to have_received(:cast) do |_scene, spell, _targets, _words, cast:, noted:, adds:|
+            expect([ spell, cast['spell level'] ]).to eq [ 'Heal', '3' ]
+          end
+        end
+
+        # What a wand adds to its spell: told as it's cast, and applied where the engine can.
+        describe "what the wand adds" do
+          before(:each) { @hero.update(:pf2_level => 9) }
+
+          def dummy
+            found = Combatants.add_npc(PF2Encounter[@encounter.id],
+                                       :described => { 'name' => 'Dummy', 'level' => 1, 'ac' => 10, 'hp' => 300, 'perception' => 0,
+                                                       'traits' => [], 'saves' => { 'fortitude' => 0, 'reflex' => 0, 'will' => 0 } })
+            found.state['npc']
+          end
+
+          def zap(name, target)
+            run(Pf2egear::PF2EncounterUseCmd, "e/use magicitem=#{Pf2egear::Inventory.held(state, 'magicitem').index { |one| one.name == name }}/#{target}")
+          end
+
+          it "should add persistent fire to a failed save, and tell the room what the wand adds" do
+            buy('buy magicitem=Wand of Smoldering Fireballs (3rd-Rank Spell)')
+            start
+            npc = dummy
+            zap('Wand of Smoldering Fireballs (3rd-Rank Spell)', npc.name)
+
+            expect(@client.failures).to eq []
+            expect(Pf2eNpc[npc.id].pf2_persistent).to eq [ { 'formula' => '1d6', 'type' => 'fire', 'dc' => 15 } ]
+            expect(@client.said.join).to include 'Each creature that fails its save also takes 1d6 persistent fire damage.'
+          end
+
+          it "should leave a creature that failed its save off-guard" do
+            buy('buy magicitem=Wand of Crackling Lightning (3rd-Rank Spell)')
+            start
+            npc = dummy
+            zap('Wand of Crackling Lightning (3rd-Rank Spell)', npc.name)
+
+            expect(Pf2eNpc[npc.id].pf2_conditions.keys).to include 'Off-Guard'
+          end
+
+          it "should heal the caster at the start of their next turn, once" do
+            buy('buy magicitem=Wand of Overflowing Life (3rd-Rank Spell)')
+            start
+            zap('Wand of Overflowing Life (3rd-Rank Spell)', @hero.name)
+            Pf2eHP.get_hp_obj(state).update(:damage => 50)
+            hurt = Pf2eHP.get_hp_obj(state).damage.to_i
+
+            encounter = PF2Encounter[@encounter.id]
+            Turns.turn_started(encounter, @hero.name, encounter.round.to_i)
+            expect(Pf2eHP.get_hp_obj(state).damage.to_i).to eq hurt
+
+            events = Turns.turn_started(encounter, @hero.name, encounter.round.to_i + 1)
+            expect(Pf2eHP.get_hp_obj(state).damage.to_i).to be < hurt
+            expect(events.map { |one| one['key'] }).to include 'pf2e.wand_turn_heal'
+
+            healed = Pf2eHP.get_hp_obj(state).damage.to_i
+            Turns.turn_started(encounter, @hero.name, encounter.round.to_i + 2)
+            expect(Pf2eHP.get_hp_obj(state).damage.to_i).to eq healed
+          end
+
+          # A wand of shardstorm: for a minute, at the start of each of the caster's turns, its shards can be
+          # directed once, for free, as the 1-action force barrage. Activating it again ends the storm.
+          describe "a storm of shards" do
+            before(:each) do
+              @magic.update(:tradition => { 'Sorcerer' => [ 'arcane', 'trained' ] })
+              buy('buy magicitem=Wand of Shardstorm (1st-Rank Spell)')
+              start
+              @npc = dummy
+              zap('Wand of Shardstorm (1st-Rank Spell)', @npc.name)
+              @round = PF2Encounter[@encounter.id].round.to_i
+            end
+
+            def wand
+              Pf2egear::Inventory.held(state, 'magicitem').find { |one| one.name.start_with?('Wand of Shardstorm') }
+            end
+
+            def turn(round)
+              Turns.turn_started(PF2Encounter[@encounter.id], @hero.name, round)
+            end
+
+            it "should give shards at the next turn, free, without spending the wand's day again" do
+              expect(@client.failures).to eq []
+
+              events = turn(@round + 1)
+              expect(events.map { |one| one['key'] }).to include 'pf2e.wand_storm_shards'
+
+              PF2Encounter[@encounter.id].update(:round => @round + 1)
+              hurt = Pf2eNpc[@npc.id].damage.to_i
+              spent = TurnState.turn(state)['actions'].to_i
+              zap('Wand of Shardstorm (1st-Rank Spell)', @npc.name)
+
+              expect(@client.failures).to eq []
+              expect(Pf2eNpc[@npc.id].damage.to_i).to be > hurt
+              expect(TurnState.turn(state)['actions'].to_i).to eq spent
+              expect(wand.used_today).to be true
+              expect(wand.overcharged).to be_falsey
+              expect(@client.said.join).to include t('pf2e.wand_shards', :actor => @hero.name, :item => wand.name)
+            end
+
+            it "should end when activated again with no shards ready" do
+              zap('Wand of Shardstorm (1st-Rank Spell)', @npc.name)
+
+              expect(@client.failures).to eq [ t('pf2e.wand_used_today', :item => 'Wand of Shardstorm (1st-Rank Spell)') ]
+              expect(SpellItems.storm?(wand)).to be false
+            end
+
+            it "should end after a minute" do
+              expect(turn(@round + 9).map { |one| one['key'] }).to include 'pf2e.wand_storm_shards'
+              expect(turn(@round + 10).map { |one| one['key'] }).to include 'pf2e.wand_storm_over'
+              expect(SpellItems.storm?(wand)).to be false
+            end
+          end
+
+          it "should tell what a slain living target releases, and nothing for one already dead or undead" do
+            buy('buy magicitem=Wand of Overflowing Life (3rd-Rank Spell)')
+            start
+            npc = dummy
+            wand = Pf2egear::Inventory.held(state, 'magicitem').first
+            effect = { 'slain' => { 'damage' => '14', 'type' => 'void', 'area' => '20-foot emanation' } }
+            Pf2eNpc[npc.id].update(:damage => 300)
+            target = Struct.new(:holder, :label).new(Pf2eNpc[npc.id], npc.name)
+            out = { 'lines' => [] }
+
+            SpellItems.wand_effect_cast!(Struct.new(:encounter).new(nil), wand, effect, [ target ], out)
+
+            expect(out['lines'].map { |one| one['key'] }).to eq [ 'pf2e.wand_slain' ]
+
+            out = { 'lines' => [] }
+            SpellItems.wand_effect_cast!(Struct.new(:encounter).new(nil), wand, effect, [], out)
+            expect(out['lines']).to eq []
           end
         end
       end

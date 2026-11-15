@@ -1,0 +1,184 @@
+---
+# Precious materials for weapons, armor, and shields, from GM Core (pp. 228, 233, and 240), read by
+# `Pf2egear::Materials`. Prices are in copper, as the catalogues' are.
+#
+# A weapon's or armor's price is the grade's `price` plus a tenth of it per Bulk, with Bulk counted as at
+# least 1. That replaces the base item's price. A shield's `price` is its whole price. The item's level is
+# the higher of its own and the grade's.
+#
+#   rarity       the material's rarity, which adds `rpp` to the price at the vendor (house rule)
+#   wood         true for duskwood: only wooden items take it, and wooden items take nothing else
+#   sickens_weak armor of it sickens a creature weak to it that critically fails an unarmed attack
+#                against the wearer
+#   lighter      the item's Bulk is reduced by 1 (1 becomes light, light is unchanged)
+#   armor        changes to armor: `strength` lowers the Strength score needed to ignore its check
+#                penalty, and `speed` raises its Speed penalty toward 0, in feet
+#   weapon_hardness  an adamantine weapon's own Hardness by grade, for halving a creature's Hardness
+#   rune_slots   property-rune slots added to what the potency rune gives
+#   half_price_runes  property runes that cost half as much to etch onto an item of this material
+#   survives_destruction  a shield of it that would be destroyed is left at 1 HP and broken instead, once
+#                a day
+#   rules        rule elements an item of this material carries, by kind of item
+#   grades       by kind of item (weapon, armor, shield, buckler, tower_shield), then grade: level, price,
+#                and for shields hardness and hp
+pf2e_materials:
+  rpp:
+    uncommon: 2
+    rare: 4
+
+  # Which items are wooden, and which can't be made of a precious material at all. GM Core lets metal
+  # weapons and armor be any material except duskwood, and wooden ones only duskwood. Weapons are metal
+  # unless listed here. Armor goes by group.
+  wooden_weapons:
+    - Arbalest
+    - Bassin Sling Staff
+    - Blowgun
+    - Bo Staff
+    - Club
+    - Composite Longbow
+    - Composite Shortbow
+    - Crossbow
+    - Daikyu
+    - Greatclub
+    - Hand Crossbow
+    - Heavy Crossbow
+    - Lance
+    - Longbow
+    - Nunchaku
+    - Shortbow
+    - Staff
+  no_material_weapons:
+    - Bola
+    - Sap
+    - Sling
+    - Thunder Sling
+    - Whip
+  metal_armor_groups: [ Chain, Composite, Plate ]
+  wooden_armor_groups: [ Wood ]
+  # GM Core lets a buckler or shield be any material. House rule: a wooden shield only duskwood, and a steel
+  # shield any metal. A shield in neither list, such as a buckler, takes any material its table lists; only
+  # duskwood comes in a tower shield.
+  wooden_shields: [ Wooden Shield ]
+  metal_shields: [ Steel Shield ]
+
+  materials:
+    Cold Iron:
+      rarity: common
+      sickens_weak: true
+      grades:
+        weapon:
+          low: { level: 2, price: 4000 }
+          standard: { level: 10, price: 88000 }
+          high: { level: 16, price: 900000 }
+        armor:
+          low: { level: 5, price: 14000 }
+          standard: { level: 11, price: 120000 }
+          high: { level: 18, price: 2000000 }
+        shield:
+          low: { level: 2, price: 3400, hardness: 5, hp: 20 }
+          standard: { level: 7, price: 34000, hardness: 7, hp: 28 }
+          high: { level: 15, price: 550000, hardness: 10, hp: 40 }
+        buckler:
+          low: { level: 2, price: 3000, hardness: 3, hp: 12 }
+          standard: { level: 7, price: 30000, hardness: 5, hp: 20 }
+          high: { level: 15, price: 500000, hardness: 8, hp: 32 }
+
+    Silver:
+      rarity: common
+      sickens_weak: true
+      grades:
+        weapon:
+          low: { level: 2, price: 4000 }
+          standard: { level: 10, price: 88000 }
+          high: { level: 16, price: 900000 }
+        armor:
+          low: { level: 5, price: 14000 }
+          standard: { level: 11, price: 120000 }
+          high: { level: 18, price: 2000000 }
+        shield:
+          low: { level: 2, price: 3400, hardness: 3, hp: 12 }
+          standard: { level: 7, price: 34000, hardness: 5, hp: 20 }
+          high: { level: 15, price: 550000, hardness: 8, hp: 32 }
+        buckler:
+          low: { level: 2, price: 3000, hardness: 1, hp: 4 }
+          standard: { level: 7, price: 30000, hardness: 3, hp: 12 }
+          high: { level: 15, price: 500000, hardness: 6, hp: 24 }
+
+    Adamantine:
+      rarity: uncommon
+      # A weapon's own Hardness (GM Core's Items row), which a Hardness it halves can't be above.
+      weapon_hardness: { standard: 14, high: 17 }
+      grades:
+        weapon:
+          standard: { level: 11, price: 140000 }
+          high: { level: 17, price: 1350000 }
+        armor:
+          standard: { level: 12, price: 160000 }
+          high: { level: 19, price: 3200000 }
+        shield:
+          standard: { level: 8, price: 44000, hardness: 10, hp: 40 }
+          high: { level: 16, price: 880000, hardness: 13, hp: 52 }
+        buckler:
+          standard: { level: 8, price: 40000, hardness: 8, hp: 32 }
+          high: { level: 16, price: 800000, hardness: 11, hp: 44 }
+
+    Dawnsilver:
+      rarity: uncommon
+      lighter: true
+      armor: { strength: 2, speed: 5 }
+      grades:
+        weapon:
+          standard: { level: 11, price: 140000 }
+          high: { level: 17, price: 1350000 }
+        armor:
+          standard: { level: 12, price: 160000 }
+          high: { level: 19, price: 3200000 }
+        shield:
+          standard: { level: 8, price: 44000, hardness: 5, hp: 20 }
+          high: { level: 16, price: 880000, hardness: 8, hp: 32 }
+        buckler:
+          standard: { level: 8, price: 40000, hardness: 3, hp: 12 }
+          high: { level: 16, price: 800000, hardness: 6, hp: 24 }
+
+    Duskwood:
+      rarity: uncommon
+      wood: true
+      lighter: true
+      armor: { strength: 2, speed: 5 }
+      grades:
+        weapon:
+          standard: { level: 11, price: 140000 }
+          high: { level: 17, price: 1350000 }
+        armor:
+          standard: { level: 12, price: 160000 }
+          high: { level: 19, price: 3200000 }
+        shield:
+          standard: { level: 8, price: 44000, hardness: 5, hp: 20 }
+          high: { level: 16, price: 880000, hardness: 8, hp: 32 }
+        buckler:
+          standard: { level: 8, price: 40000, hardness: 3, hp: 12 }
+          high: { level: 16, price: 800000, hardness: 5, hp: 20 }
+        tower_shield:
+          standard: { level: 8, price: 56000, hardness: 5, hp: 20 }
+          high: { level: 16, price: 1120000, hardness: 8, hp: 32 }
+
+    Orichalcum:
+      rarity: rare
+      rune_slots: 1
+      half_price_runes: [ Quickstrike ]
+      survives_destruction: true
+      rules:
+        armor:
+          - key: "FlatModifier"
+            selector: "initiative"
+            type: "circumstance"
+            value: 1
+      grades:
+        weapon:
+          high: { level: 18, price: 2250000 }
+        armor:
+          high: { level: 20, price: 5500000 }
+        shield:
+          high: { level: 17, price: 1320000, hardness: 16, hp: 64 }
+        buckler:
+          high: { level: 17, price: 1200000, hardness: 14, hp: 56 }

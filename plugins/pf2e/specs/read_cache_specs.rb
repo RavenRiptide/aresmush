@@ -16,6 +16,61 @@ module AresMUSH
     end
     Redic::Client.prepend(SentToDatabase) unless Redic::Client < SentToDatabase
 
+    # A worked-out answer, kept by a key of the caller's own for the length of a command, until anything
+    # is written.
+    describe "ReadCache.kept" do
+      def worked(counter, key = [ :answer, 'Character', '1' ])
+        ReadCache.kept(key) { counter[:worked] += 1 }
+      end
+
+      it "should work an answer out once in a command" do
+        counter = { :worked => 0 }
+
+        ReadCache.during { 3.times { worked(counter) } }
+
+        expect(counter[:worked]).to eq 1
+      end
+
+      it "should keep each key's answer apart" do
+        counter = { :worked => 0 }
+
+        ReadCache.during { 2.times { [ '1', '2' ].each { |id| worked(counter, [ :answer, 'Character', id ]) } } }
+
+        expect(counter[:worked]).to eq 2
+      end
+
+      it "should work it out again after a write" do
+        counter = { :worked => 0 }
+
+        ReadCache.during do
+          worked(counter)
+          ReadCache.written!
+          worked(counter)
+        end
+
+        expect(counter[:worked]).to eq 2
+      end
+
+      it "should keep nothing written while it was being worked out" do
+        counter = { :worked => 0 }
+
+        ReadCache.during do
+          ReadCache.kept([ :answer ]) { ReadCache.written! }
+          ReadCache.kept([ :answer ]) { counter[:worked] += 1 }
+        end
+
+        expect(counter[:worked]).to eq 1
+      end
+
+      it "should keep nothing outside a command" do
+        counter = { :worked => 0 }
+
+        2.times { worked(counter) }
+
+        expect(counter[:worked]).to eq 2
+      end
+    end
+
     describe ReadCache, :dbtest => true do
 
       before(:each) do

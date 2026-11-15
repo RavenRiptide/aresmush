@@ -66,8 +66,13 @@ module AresMUSH
       # Widths of the figures after the name; a save's heading is as wide as its column allows.
       SAVE_WIDTHS = [ 5, 4, 5 ].freeze
 
+      # Exploring has no turn order, so the initiative column gives its width to the name.
+      def lead(ref, init, name)
+        exploring? ? "#{left(ref, 4)}#{left(name, 20)}" : "#{left(ref, 4)}#{left(init, 5)}#{left(name, 15)}"
+      end
+
       def header_line
-        "#{item_color}#{left("#", 4)}#{left("Init", 5)}#{left("Name", 15)}%b#{left("Kind", 12)}%b#{left("HP", 15)}%b" \
+        "#{item_color}#{lead("#", "Init", "Name")}%b#{left("Kind", 12)}%b#{left("HP", 15)}%b" \
           "#{left("AC", 3)}%b#{left("Per", 4)}#{%w{Fort Ref Will}.zip(SAVE_WIDTHS).map { |name, width| left(name, width) }.join}" \
           "#{left("RS", 2)}%xn"
       end
@@ -85,7 +90,7 @@ module AresMUSH
       def row(one)
         # The id has its own column, so a name that ends with it is shown without.
         name = one.label.sub(/ #{Regexp.escape(one.ref)}\z/, '')
-        start = "#{left(one.ref, 4)}#{left(exploring? ? '-' : one.init.to_i, 5)}#{left(name, 15)}"
+        start = lead(one.ref, one.init.to_i, name)
 
         return start unless one.holder
 
