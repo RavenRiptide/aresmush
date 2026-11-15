@@ -7,7 +7,7 @@ module AresMUSH
       attr_accessor :name, :encounter_id
 
       def parse_args
-        args = trimmed_list_arg(cmd.args, "=")
+        args = trimmed_list_arg(cmd.args, "=") || []
 
         # If only one arg is given, encounter_id is the nil.
         args.unshift(nil) unless args[1]

@@ -10,7 +10,7 @@ module AresMUSH
       attr_accessor :name, :encounter_id
 
       def parse_args
-        args = trimmed_list_arg(cmd.args, "=")
+        args = trimmed_list_arg(cmd.args, "=") || []
         args.unshift(nil) unless args[1]
 
         self.encounter_id = args[0] ? integer_arg(args[0]) : nil

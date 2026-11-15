@@ -7,7 +7,7 @@ module AresMUSH
 
       def parse_args
         # Argument pattern: [character/]notename
-        args = trimmed_list_arg(cmd.args,"/")
+        args = trimmed_list_arg(cmd.args,"/") || []
 
         char_specified = args[1] ? true : false
 
