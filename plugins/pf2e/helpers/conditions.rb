@@ -229,6 +229,23 @@ module AresMUSH
       Ok.new(:state => char.pf2_conditions)
     end
 
+    # Clears every condition set on a character, held in place or not, and any persistent damage. What an
+    # effect, a creature's stat block, or their load brings is not set on them, and stays until that ends.
+    # Death is not a condition, so the dead stay dead.
+    def self.wipe_conditions(char)
+      names = (char.pf2_conditions || {}).keys
+      burning = PersistentDamage.held(char).any?
+
+      return Err.new(:nothing, 'pf2e.conditions_none', 'name' => char.name) if names.empty? && !burning
+
+      char.update(:pf2_persistent => []) if burning
+      names.each { |name| remove_condition(char, name, true) }
+
+      Paths.apply_all!(char)
+
+      Ok.new(:state => char.pf2_conditions)
+    end
+
     # What becomes of the conditions this one granted, now that it has gone.
     def self.release_grants(char, granter)
       granted = (char.pf2_conditions || {}).select { |_name, info|

@@ -22,6 +22,7 @@ The game uses Foundry VTT's Pathfinder 2e effects, about two thousand of them, s
 %t `effect/add Aria Bram=heroism/rank 6`
 %t `effect/add Bram=resist energy/rank 4/fire`
 `effect/remove <names>=<effect>`: Ends an effect on one or more characters early.
+`effect/wipe <names>`: Ends every effect on one or more characters.
 %t **Note:** These commands are for the GM of the encounter here, and work on anyone in that encounter. Effects apply to a character's encounter copy, never to their own sheet.
 
 Options after an effect's name include details that need to be manually added:

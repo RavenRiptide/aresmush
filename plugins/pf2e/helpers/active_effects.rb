@@ -468,6 +468,18 @@ module AresMUSH
         Ok.new(:state => found.state)
       end
 
+      # Ends every effect on a character. Each goes as `remove` ends it, taking along whatever it brought,
+      # so the list is read again after each in case one took others with it.
+      def self.wipe(char)
+        return Err.new(:nothing, 'pf2e.effects_none', 'name' => char.name) if on(char).empty?
+
+        until (left = on(char)).empty?
+          remove(char, left.first)
+        end
+
+        Ok.new(:state => [])
+      end
+
       # Whoever a command names - a character, or a combatant by its id - saying which names found nobody.
       # Whoever a command that changes someone names: combatants in the encounter here, as they stand in
       # it. Nothing changes a character outside an encounter, so without one there is nobody to name.

@@ -182,6 +182,8 @@ module AresMUSH
         case cmd.switch
         when "set"
           return PF2ConditionSetCmd
+        when "wipe"
+          return PF2ConditionWipeCmd
         end
       when "effect"
         case cmd.switch
@@ -189,6 +191,8 @@ module AresMUSH
           return PF2EffectAddCmd
         when "remove"
           return PF2EffectRemoveCmd
+        when "wipe"
+          return PF2EffectWipeCmd
         when "view"
           return PF2EffectViewCmd
         when "search"

@@ -273,6 +273,8 @@ en:
     condition_set_ok: "Condition %{condition} set on %{target}."
     condition_cleared_ok: "Condition %{condition} cleared from %{target}."
     condition_kept: "%{target} is still %{condition}, because it comes from %{from}. It ends when %{from} does."
+    conditions_wiped: "Conditions cleared from %{targets}."
+    conditions_none: "%{name} has no conditions to clear."
     condition_restricted: "%{condition} can't be cleared while %{granter} lasts. It ends when %{granter} does."
     effect_not_found: "There is no effect called %{effect}. Use `effect/search <words>` to find one."
     effect_ambiguous: "%{effect} could be any of: %{options}. Which one?"
@@ -290,6 +292,8 @@ en:
       other: "%{count} rounds left"
     effect_added: "Now under %{effect}: %{targets}."
     effect_removed: "%{effect} ended on %{targets}."
+    effects_wiped: "Every effect ended on %{targets}."
+    effects_none: "%{name} is not under any effects."
     effect_ended: "%{effect} has ended on %{name}."
     fast_healing:
       one: "%{name} regains 1 hit point from %{source}."

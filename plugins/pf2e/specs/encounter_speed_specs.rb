@@ -63,7 +63,8 @@ module AresMUSH
                   [ "e/as ##{priest}=cast fear=#{@hero.name}", @gm ], [ "e/as #5=strike #{@hero.name}", @gm ],
                   [ 'condition/set #6=prone', @gm ], [ "condition/set #{@hero.name}=frightened/1", @gm ],
                   [ "heal #{@hero.name}=3", @gm ], [ 'damage #6=2', @gm ], [ 'e/next', @gm ], [ 'e/undo', @gm ],
-                  [ 'e/redo', @gm ], [ 'e/scan', @gm ], [ 'e/history', @gm ] ]
+                  [ 'e/redo', @gm ], [ 'e/scan', @gm ], [ 'e/history', @gm ], [ 'condition/wipe #6', @gm ],
+                  [ "effect/wipe #{@hero.name}", @gm ] ]
 
         over = typed.map { |text, who| [ text, sent(text, who) ] }.select { |_text, count| count > BUDGET }
 

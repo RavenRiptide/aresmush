@@ -22,6 +22,8 @@ You can target a combatant by their ID from `encounter/view`, such as `damage #3
 %t **Note:** Damage from a Plotmaster or staff can kill a character whose Dying value reaches the death threshold, unless you add `/ndc`. Damage from anyone else never kills a character; it leaves them unconscious instead.
 `condition/set <list>=<condition>[/<value>]`: Sets `<condition>` on each combatant in `<list>`. `<value>` is 1-5, and 0 clears the condition.
 %t **Note:** Only a Plotmaster or staff can give a character Drained or Doomed, but anyone running the encounter can lower or clear them. Only a Plotmaster or staff can mark a character dead with `condition/set <who>=dead`, and `condition/set <who>=dead/0` brings the character back, unconscious at 0 HP.
+`condition/wipe <list>`: Clears every condition and all persistent damage from each combatant in `<list>`.
+%t **Note:** A condition that comes from an effect or from a creature's stat block stays until its source ends. Clearing conditions doesn't bring back a dead character.
 
 ## When a character is reduced to 0 hit points
 
