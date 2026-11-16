@@ -334,6 +334,61 @@ module AresMUSH
           expect(DailyChoices.reopen!(char).state['switches']).to eq [ 'armament' ]
           expect(char.pf2_daily_choices).to eq({})
         end
+
+        # Radiant Armament's holy rune is for a holy champion, and its unholy one for an unholy champion.
+        it "should offer the rune of the champion's own sanctification" do
+          champion([ 'Radiant Armament' ]).update(:pf2_faith => { 'sanctification' => 'Holy' })
+
+          run(PF2PrepareDailyCmd, 'prepare/armament Longsword')
+
+          expect(@client.failures.last).to include 'Holy'
+          expect(@client.failures.last).to_not include 'Unholy'
+
+          char.update(:pf2_faith => { 'sanctification' => 'Unsanctified' })
+          run(PF2PrepareDailyCmd, 'prepare/armament Longsword')
+
+          expect(@client.failures.last).to_not include 'Holy'
+        end
+
+        # The rune is the weapon's for the day as if etched on it, so its damage is the weapon's too.
+        it "should add the rune's damage to the chosen weapon and no other" do
+          champion([ 'Radiant Armament' ])
+
+          run(PF2PrepareDailyCmd, 'prepare/armament Longsword: Brilliant')
+
+          expect(@client.failures).to eq []
+
+          longsword = char.weapons.to_a.find { |one| one.name == 'Longsword' }
+          katana = char.weapons.to_a.find { |one| one.name == 'Katana' }
+
+          expect(Pf2eCombat.damage_breakdown(char, longsword.name, longsword)['formula']).to include '1d4 fire'
+          expect(Pf2eCombat.damage_breakdown(char, katana.name, katana)['formula']).to_not include 'fire'
+        end
+
+        it "should not add the damage twice for a rune already etched on the weapon" do
+          champion([ 'Radiant Armament' ])
+          @longsword.update(:runes => { 'fundamental' => { 'potency' => 1 }, 'property' => { 'list' => [ 'Brilliant' ] } })
+
+          run(PF2PrepareDailyCmd, 'prepare/armament Longsword: Brilliant')
+
+          longsword = char.weapons.to_a.find { |one| one.name == 'Longsword' }
+
+          expect(Pf2eCombat.damage_breakdown(char, longsword.name, longsword)['formula'].scan('1d4 fire').size).to eq 1
+        end
+
+        # Armament Paragon's keen rune turns a natural 19 into a critical hit, as an etched one does.
+        it "should let a granted rune change how the attack goes" do
+          champion([ 'Armament Paragon' ])
+
+          run(PF2PrepareDailyCmd, 'prepare/armament Longsword: Keen')
+
+          expect(@client.failures).to eq []
+
+          longsword = char.weapons.to_a.find { |one| one.name == 'Longsword' }
+          check = Check.of(char, 'attack', Pf2eCombat.attack_descriptor(char, longsword))
+
+          expect(check.outcome(check.total + 1, check.total, 19)).to eq Degree::CRITICAL_SUCCESS
+        end
       end
 
       it "should give void healing to an oracle who nudges the scales towards death" do

@@ -53,7 +53,7 @@ module AresMUSH
         held = Effects.options(char, domains) + Pf2eCombat.attack_options(attack, char) + Array(options)
         named = degree && Degree::NAMES[degree]
 
-        Rules.notes(Effects.sources(char), domains, held).select do |note|
+        Rules.notes(Effects.attack_sources(char, attack), domains, held).select do |note|
           note['outcome'].empty? || note['outcome'].include?(named)
         end
       end
@@ -66,7 +66,7 @@ module AresMUSH
       #     'conditional' => [ … ] }
       def self.of(char, attack, options = [])
         domains = Domains.for('damage', attack, damage_attribute(char, attack))
-        sources = Effects.sources(char)
+        sources = Effects.attack_sources(char, attack)
         context = Effects.context(char)
         # The attack's own facts are part of what a rule about this damage is tested against: a
         # shockwave rune's splash is for a melee weapon dealing bludgeoning damage, and the weapon is

@@ -126,7 +126,13 @@ module AresMUSH
       # Rules that turn one outcome into another: Assurance makes a failure a success, Deafened drops an
       # auditory Perception check to a critical failure.
       def adjustments(rolled = [])
-        Rules.adjustments(Effects.sources(@char), @domains, @options + Array(rolled))
+        Rules.adjustments(sources, @domains, @options + Array(rolled))
+      end
+
+      # What reaches this roll. An attack also has the runes something granted it for the day: a keen
+      # rune from Armament Paragon turns a 19 into a critical hit as an etched one does.
+      def sources
+        @name.is_a?(Hash) ? Effects.attack_sources(@char, @name) : Effects.sources(@char)
       end
 
       # Text to show with the roll, for the outcome it came to where a note names one. With no outcome,
@@ -134,14 +140,14 @@ module AresMUSH
       def notes(outcome = nil)
         named = outcome && Degree::NAMES[outcome]
 
-        Rules.notes(Effects.sources(@char), @domains, @options).select do |note|
+        Rules.notes(sources, @domains, @options).select do |note|
           note['outcome'].empty? || note['outcome'].include?(named)
         end
       end
 
       # Fortune or misfortune on this roll: `keep-higher`, `keep-lower`, or nil.
       def roll_twice
-        @roll_twice ||= Rules.roll_twice(Effects.sources(@char), @domains, @options) || false
+        @roll_twice ||= Rules.roll_twice(sources, @domains, @options) || false
 
         @roll_twice || nil
       end
@@ -150,7 +156,7 @@ module AresMUSH
       # requires is always chosen; any other is chosen by the roller saying `substitute:<slug>`, which is
       # Foundry's own option for it.
       def substitution
-        offered = Rules.gather(Effects.sources(@char), @domains, @options, 'SubstituteRoll') do |row, source|
+        offered = Rules.gather(sources, @domains, @options, 'SubstituteRoll') do |row, source|
           Rules.contribute(row, source, Effects.context(@char).merge('item' => source['item'] || {}))
         end
 

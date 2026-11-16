@@ -144,6 +144,7 @@ module AresMUSH
           named('background', [ info['background'] ]) +
           named('feat', Pf2e.feats_in_play(char)) +
           named('feature', (char.pf2_features || {}).values.flatten) +
+          sanctification_facts(char) +
           skill_facts(char) +
           proficiency_facts(char) +
           attribute_facts(char) +
@@ -162,6 +163,17 @@ module AresMUSH
 
           [ "self:effect:#{slug}", effect.badge ? "self:effect:#{slug}:#{effect.badge}" : nil ].compact
         end
+      end
+
+      # A champion's or cleric's sanctification, as Foundry names it: `sanctification:holy` or
+      # `sanctification:unholy`. Radiant Armament offers the holy rune only to someone holy, and asks it
+      # this way. Unsanctified is no fact at all.
+      SANCTIFICATIONS = %w{holy unholy}.freeze
+
+      def self.sanctification_facts(char)
+        held = char.respond_to?(:pf2_faith) ? (char.pf2_faith || {})['sanctification'].to_s.strip.downcase : ''
+
+        SANCTIFICATIONS.include?(held) ? [ "sanctification:#{held}" ] : []
       end
 
       # Undead, a construct, or living: what a predicate about a mode of being asks, from the traits
@@ -576,26 +588,62 @@ module AresMUSH
       end
 
       def self.rune_source(item, slug)
+        rune_source_on(item.id.to_s, damage_dice_count(item.respond_to?(:wp_damage) ? item.wp_damage : nil), slug)
+      end
+
+      # A rune's rules as a source belonging to whatever `owner` is, by the id its `{item|id}` selectors
+      # name, and worth `dice` where a rule reads the weapon's own dice.
+      def self.rune_source_on(owner, dice, slug)
         info = Pf2egear.rune_entry(slug)
         rules = Array(info && info['rules'])
 
         return nil if rules.empty?
 
         source(Pf2egear.rune_named(slug), rules,
-               'item' => { 'id' => item.id.to_s, '_id' => item.id.to_s,
+               'item' => { 'id' => owner, '_id' => owner,
                            'level' => info['level'].to_i,
                            # `@item.baseDamage.dice` is what a shockwave rune's splash is worth.
-                           'baseDamage' => { 'dice' => damage_dice_count(item) } },
+                           'baseDamage' => { 'dice' => dice } },
                'options' => Array(info['traits']).map { |trait| "item:trait:#{Domains.slug(trait)}" })
       end
 
-      # How many dice the weapon itself rolls: `2d6` is two, and `d8` is one.
-      def self.damage_dice_count(item)
-        found = item.respond_to?(:wp_damage) ? item.wp_damage.to_s.match(/\A(\d*)d/) : nil
+      # How many dice a damage written like a weapon's rolls: `2d6` is two, and `d8` is one.
+      def self.damage_dice_count(written)
+        found = written.to_s.match(/\A(\d*)d/)
 
         return 0 unless found
 
         found[1].empty? ? 1 : found[1].to_i
+      end
+
+      # Everything that reaches one attack: the character's own sources, and the property runes the attack
+      # has the effects of without their being etched on it, such as Blessed Armament's rune for the day.
+      # An etched rune is already a source of the weapon it is on, so it is not added twice.
+      def self.attack_sources(char, attack)
+        sources(char) + granted_runes(char, attack)
+      end
+
+      # The runes an attack carries that nothing etched. Each belongs to the attack's weapon, or for an
+      # unarmed attack to the handwraps lending it runes, or failing both to the attack by name, which is
+      # one of its damage domains too.
+      def self.granted_runes(char, attack)
+        return [] unless attack.is_a?(Hash)
+
+        held = Array(attack['runes']).map { |one| Domains.slug(one) }.uniq
+
+        return [] if held.empty?
+
+        owner = (attack['id'] || attack['rune_item'] || Domains.slug(attack['name'].to_s)).to_s
+
+        return [] if owner.empty?
+
+        items = [ attack['id'], attack['rune_item'] ].compact.map(&:to_s)
+        carried = Actors.of(char).carries_items? ? Pf2egear.carried_items(char).map(&:last) : []
+        etched = carried.select { |item| items.include?(item.id.to_s) }
+                        .flat_map { |item| Pf2egear.property_runes(item) }
+        dice = attack['dice'] ? attack['dice'].to_i : damage_dice_count(attack['die'])
+
+        (held - etched).map { |slug| rune_source_on(owner, dice, slug) }.compact
       end
 
       def self.item_level(item)
