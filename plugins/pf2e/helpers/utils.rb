@@ -294,6 +294,9 @@ module AresMUSH
         aliases.has_key?(word) ? Pf2e.roll_terms(aliases[word]) : word
       }.flatten
 
+      # Dice are read in one spelling, so `2D8` and `1D20` roll as `2d8` and `1d20` do.
+      roll_list = roll_list.map { |word| word =~ /\A[0-9]*d[0-9]+\z/i ? word.downcase : word }
+
       dice_pattern = /([0-9]+)d[0-9]+/i
       find_dice = roll_list.select { |d| d =~ dice_pattern }
 

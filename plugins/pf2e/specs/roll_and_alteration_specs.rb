@@ -81,6 +81,24 @@ module AresMUSH
       end
     end
 
+    # A player may type `2D8` as readily as `2d8`.
+    describe "dice written in capitals" do
+      it "should roll them as it would in lower case" do
+        rolled = Pf2e.parse_roll_string(reread, [ '2D1' ])
+
+        expect(rolled['total']).to eq 2
+        expect(rolled['list']).to eq [ '2d1' ]
+      end
+
+      it "should take an opening 1D20 as a check" do
+        apply('Bless Ally')
+
+        rolled = Pf2e.parse_roll_string(reread, [ '1D20', 'will' ])
+
+        expect(rolled['rolled_twice']['rolls'].size).to eq 2
+      end
+    end
+
     describe "fortune and misfortune" do
       it "should roll a check twice and keep the higher" do
         apply('Bless Ally')
