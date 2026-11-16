@@ -14,7 +14,6 @@ aliases:
 `sheet/<section>`: Views <section> of your sheet. See Valid Sections below.
 `sheet/<section> <name>`: Views <section> of <name>'s sheet.
 `sheet/history`: Lists what you chose or were given at each level, such as feats, attribute boosts, skill increases, languages, spells, and formulas.
-%t **Note:** If your character was created before levels were tracked, the choices made then are listed together under "Before level tracking", because the level of each one wasn't recorded. Anything not tied to a level, such as a formula you bought, is listed last.
 `sheet/history <level>`: Lists what you chose or were given at one level, such as `sheet/history 5`.
 `sheet/history <first>-<last>`: Lists what you chose or were given at a range of levels, such as `sheet/history 3-7`.
 `sheet/history <name>` and `sheet/history <name>=<first>-<last>`: Lists the same for someone else.
