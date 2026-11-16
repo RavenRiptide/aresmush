@@ -123,7 +123,7 @@ module AresMUSH
         'raise skill choice' => [ 'training skills', 'advanceskills' ],
         'raise ability' => [ 'raising attributes', 'advanceattributes' ],
         'feats' => [ 'taking feats', 'advancefeats' ],
-        'feat choice' => [ 'taking feats', 'advancefeats' ],
+        'feat choice' => [ 'choosing options', 'advancefeatures' ],
         'class option' => [ 'choosing class features', 'advancefeatures' ],
         'archetype_specialty' => [ 'archetype choices', 'advancearchetypes' ],
         'archetype specialty choice' => [ 'archetype choices', 'advancearchetypes' ],
@@ -135,12 +135,24 @@ module AresMUSH
         'divine font' => [ 'choosing your divine font', 'advancespells' ]
       }.freeze
 
+      # A formula choice, such as a Formula Book, is held under `feat choice` like any other, but
+      # its commands are explained in the formulas topic rather than the options one.
+      FORMULA_CHOICE_HELP = [ 'picking formulas', 'advanceformulas' ].freeze
+
       # `To review advancement commands for taking feats, see 'help advancefeats'.`
       def self.help_for(key)
         found = RESOLVED_BY[key.to_s]
 
         return nil unless found
 
+        slot_help(found)
+      end
+
+      def self.formula_choice_help
+        slot_help(FORMULA_CHOICE_HELP)
+      end
+
+      def self.slot_help(found)
         t('pf2e.advance_slot_help', :activity => found.first, :topic => found.last)
       end
 
@@ -157,6 +169,11 @@ module AresMUSH
           # its own pointer.
           next if key == "signature"
 
+          if key == "feat choice" && value.is_a?(Hash)
+            list.concat(feat_choice_lines(value))
+            next
+          end
+
           lines = option_lines_for(key, value)
 
           next if lines.empty?
@@ -168,6 +185,31 @@ module AresMUSH
         end
 
         list.reject { |item| item.to_s.strip.empty? }
+      end
+
+      # Open feat choices, each group followed by the pointer to its own help topic: formula choices
+      # are filled the same way but explained in the formulas topic, so a Formula Book listed under
+      # the options pointer would send the player to a page that never mentions it.
+      def feat_choice_lines(choices)
+        formulas, options = choices.partition { |name, _slots| Pf2e.formula_choice?(choice_block(name)) }
+
+        list = []
+
+        [ [ options, self.class.help_for('feat choice') ],
+          [ formulas, self.class.formula_choice_help ] ].each do |group, hint|
+          lines = option_lines_for('feat choice', group.to_h)
+
+          next if lines.empty?
+
+          list.concat(lines)
+          list << "%b%b#{hint}"
+        end
+
+        list
+      end
+
+      def choice_block(name)
+        Pf2e.find_choice_block(@char, name)
       end
 
       # The lines one outstanding key renders as. A `return` here is what a `next` was when this
@@ -189,7 +231,7 @@ module AresMUSH
             value.each_pair do |name, slots|
               next unless Array(slots).include?('open')
 
-              block = Pf2e.find_choice_block(@char, name)
+              block = choice_block(name)
               summary = block ? Pf2e.choice_summary(block) : 'eligible option'
 
               list << "#{item_color}#{name}:%xn #{summary}"

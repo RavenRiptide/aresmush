@@ -16,7 +16,7 @@ module AresMUSH
 
       # Every alias the table points at, as the help files define them.
       TOPICS = %w{advancelanguages advanceskills advanceattributes advancefeats advancefeatures
-                  advancearchetypes advancespells}.freeze
+                  advancearchetypes advancespells advanceformulas}.freeze
 
       describe :help_for do
         it "should point an open language slot at the languages topic" do
@@ -66,6 +66,49 @@ module AresMUSH
           missing = FILLED_BY_THE_PLAYER.reject { |key| PF2AdvanceReviewTemplate.help_for(key) }
 
           expect(missing).to eq []
+        end
+
+        it "should point formula choices at a topic the help files define" do
+          expect(TOPICS).to include PF2AdvanceReviewTemplate::FORMULA_CHOICE_HELP.last
+        end
+      end
+
+      # A choice a feature carries is filled with advance/option, not advance/feat, and a player
+      # told it was about "taking feats" went looking for the wrong command. A formula choice is
+      # filled the same way, but its commands are in the formulas topic.
+      describe :feat_choice_lines do
+        before do
+          @template = PF2AdvanceReviewTemplate.allocate
+          allow(@template).to receive(:item_color).and_return('')
+          allow(@template).to receive(:choice_block) do |name|
+            name == 'Formula Book' ? { 'from_formulas' => {} } : { 'from_feats' => {} }
+          end
+          allow(Pf2e).to receive(:choice_summary).and_return('summary')
+        end
+
+        it "should point an option that grants a feat at the options topic" do
+          lines = @template.feat_choice_lines('Skillful Lessons' => [ 'open' ])
+
+          expect(lines.last).to include 'advancefeatures'
+          expect(lines.join).not_to include 'advanceformulas'
+        end
+
+        it "should point a formula choice at the formulas topic" do
+          lines = @template.feat_choice_lines('Formula Book' => [ 'open' ])
+
+          expect(lines.last).to include 'advanceformulas'
+          expect(lines.join).not_to include 'advancefeatures'
+        end
+
+        it "should list each group under its own pointer when both are open" do
+          lines = @template.feat_choice_lines('Formula Book' => [ 'open' ], 'Skillful Lessons' => [ 'open' ])
+
+          expect(lines.map { |line| line[/Skillful Lessons|Formula Book|advancefeatures|advanceformulas/] })
+            .to eq [ 'Skillful Lessons', 'advancefeatures', 'Formula Book', 'advanceformulas' ]
+        end
+
+        it "should say nothing for choices with no open picks" do
+          expect(@template.feat_choice_lines('Skillful Lessons' => [ 'Recognize Spell' ])).to eq []
         end
       end
 
