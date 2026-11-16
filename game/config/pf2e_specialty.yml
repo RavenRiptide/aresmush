@@ -598,6 +598,11 @@ pf2e_specialty:
         - Quick Tincture
     Empiricism:
       chargen:
+        skill choice:
+        - Arcana
+        - Crafting
+        - Occultism
+        - Society
         feat:
         - That's Odd
         action:
