@@ -167,11 +167,10 @@ module AresMUSH
           list = []
 
           unformatted_talismans = @item.talisman.nil? ? [] : @item.talisman
-          unformatted_fundamental_runes = @item.runes["fundamental"].nil? ? {} : @item.runes["fundamental"]
           unformatted_property_runes = Pf2egear.property_list(@item)
 
           talismans = format_talismans(unformatted_talismans)
-          fund_runes = format_fund_runes(unformatted_fundamental_runes)
+          fund_runes = format_fund_runes
           prop_runes = format_prop_runes(unformatted_property_runes)
 
           list << talismans
@@ -189,12 +188,11 @@ module AresMUSH
         "%b%b#{item_color}Talismans:%xn #{talismans.sort.join(", ")}"
       end
 
-      def format_fund_runes(runes)
+      # Written the way `gear` writes it, `+2 Greater Striking`, from the same helper.
+      def format_fund_runes
+        summary = Pf2egear.fundamental_rune_summary(@item, @category)
 
-        return "%b%b%b%b%xh%xwFundamental:%xn None." if runes.empty?
-
-        striking_rune_names = ["None", "Standard", "Greater", "Major"]
-        "%b%b%b%b%xh%xwFundamental:%xn Potency: +#{runes['potency']}, #{@category.downcase == "armor" ? "Resilient" : "Striking"} (#{striking_rune_names[runes['power'].nil? ? 0 : runes['power']]})"
+        "%b%b%b%b%xh%xwFundamental:%xn #{summary || 'None.'}"
       end
 
       def format_prop_runes(runes)

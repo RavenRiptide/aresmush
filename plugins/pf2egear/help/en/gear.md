@@ -24,6 +24,7 @@ There are six categories of gear in Emblem of Ea's inventory system.
 ## Inventory Commands
 
 `gear [<target>]`: See your gear inventory, or if you're a game admin, someone else's gear inventory by supplying an optional <target>. (Aliases: `i`, `inv`, `inventory`)
+%t **Note:** Under each weapon, armor, or shield with runes, `gear` lists them in short form, such as `Runes: +1 Striking; Flaming`. For more information about an item's runes and talismans, see `item/view`.
 `gear/rename <category>/<item number> = <nickname>`: Give a weapon, armor, magic item, bag, or shield a nickname. This can be helpful to identify which item is which at a glance.
 `item/view <category> = <item number>`: See more details about a weapon, armor, shield, or magic item. (Alias: `gear/view`)
 `gear/attach <shield number> = <weapon number>`: Attaches a shield boss or shield spikes from your weapons to one of your shields, such as `gear/attach 0=3`. Find the numbers with `gear`.

@@ -138,7 +138,15 @@ module AresMUSH
         bulk = w.bulk == 0.1 ? "L" : w.bulk.to_i
         prof = Pf2eCombat.get_weapon_prof(char, w.name)[0].upcase
         equip = w.equipped ? "Yes" : "No"
-        "%b%b#{left(i, 3)}%b#{left(name, 37)}%b#{left(bulk, 6)}%b#{left(prof, 6)}%b#{left(equip, 8)}%b#{left(invested(w), 8)}"
+        "%b%b#{left(i, 3)}%b#{left(name, 37)}%b#{left(bulk, 6)}%b#{left(prof, 6)}%b#{left(equip, 8)}%b#{left(invested(w), 8)}#{rune_line(w, 'weapons')}"
+      end
+
+      # The item's runes on a line of their own under it, or nothing for an item with none. They go
+      # under the name rather than into it, which is the nickname's.
+      def rune_line(item, category)
+        summary = Pf2egear.rune_summary(item, category)
+
+        summary ? "%r%b%b%b%b%b%b%b%b#{item_color}Runes:%xn #{summary}" : ""
       end
 
       def format_armor(char,a,i)
@@ -146,7 +154,7 @@ module AresMUSH
         bulk = a.bulk == 0.1 ? "L" : a.bulk.to_i
         prof = Pf2eCombat.get_armor_prof(char, a.name)[0].upcase
         equip = a.equipped ? "Yes" : "No"
-        "%b%b#{left(i, 3)}%b#{left(name, 37)}%b#{left(bulk, 6)}%b#{left(prof, 6)}%b#{left(equip, 8)}%b#{left(invested(a), 8)}"
+        "%b%b#{left(i, 3)}%b#{left(name, 37)}%b#{left(bulk, 6)}%b#{left(prof, 6)}%b#{left(equip, 8)}%b#{left(invested(a), 8)}#{rune_line(a, 'armor')}"
       end
 
       def header_shields
@@ -159,7 +167,7 @@ module AresMUSH
         disp_hp = Pf2egear.display_shield_hp(s)
         equip = s.equipped ? "Yes" : "No"
 
-        "%b%b#{left(i, 3)}%b#{left(name, 33)}%b#{left(bulk, 6)}%b#{left(disp_hp,10)}%b#{left(equip, 8)}%b#{left(invested(s), 8)}"
+        "%b%b#{left(i, 3)}%b#{left(name, 33)}%b#{left(bulk, 6)}%b#{left(disp_hp,10)}%b#{left(equip, 8)}%b#{left(invested(s), 8)}#{rune_line(s, 'shields')}"
       end
 
       def format_gear(item,i)

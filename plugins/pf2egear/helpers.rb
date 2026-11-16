@@ -199,6 +199,38 @@ module AresMUSH
       Array(held)
     end
 
+    # The runes on a weapon, armor, or shield in the shorthand PF2e writes them in -
+    # `+2 Greater Striking; Flaming, Frost` - or nil for an item with none. `gear` shows it under the
+    # item, so a player can tell their items apart without `item/view` and the name stays the nickname's.
+    def self.rune_summary(item, category)
+      case category.to_s.downcase
+      when 'shield', 'shields'
+        ShieldRunes.name(item)
+      when 'weapon', 'weapons', 'armor'
+        parts = [ fundamental_rune_summary(item, category), property_list(item).sort.join(', ') ]
+                  .reject { |one| one.to_s.empty? }
+
+        parts.empty? ? nil : parts.join('; ')
+      end
+    end
+
+    # A weapon's or armor's potency and striking or resilient rune - `+2 Greater Striking` - or nil for
+    # neither. The item keeps both under `fundamental`, the second as `power`; its name comes from
+    # `pf2e_fundamental_runes.yml`, which calls it striking on a weapon and resilient on armor.
+    def self.fundamental_rune_summary(item, category)
+      runes = (item.respond_to?(:runes) && item.runes) || {}
+      fundamental = runes['fundamental'] || {}
+      potency = fundamental['potency'].to_i
+      power = fundamental['power'].to_i
+
+      kind, table = category.to_s.downcase == 'armor' ? [ 'armor', 'resilient' ] : [ 'weapon', 'striking' ]
+      power_name = power.positive? ? (Global.read_config('pf2e_fundamental_runes', kind, table) || {}).dig(power, 'name') : nil
+
+      parts = [ potency.positive? ? "+#{potency}" : nil, power_name ].compact
+
+      parts.empty? ? nil : parts.join(' ')
+    end
+
     # The catalogue of property runes, keyed by the slug a rule names. Foundry keeps what a rune does in
     # their code rather than their packs, so `scripts/import_foundry_runes.py` reads that table and
     # writes it here as `rules:` like every other catalogue.

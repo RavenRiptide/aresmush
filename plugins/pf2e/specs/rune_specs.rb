@@ -137,17 +137,26 @@ module AresMUSH
       end
 
       # The inventory says whether an item is invested in every category, and `-` for one with nothing to
-      # invest.
+      # invest. The row is read up to its rune line, which follows it.
       it "should say in the inventory whether they are invested" do
         wraps = handwraps(:invested => false)
         listing = Pf2egear::Pf2eDisplayGearTemplate.new(reread, double(:screen_reader => false))
+        row = ->(item, i) { listing.format_wp(reread, item, i).split('%r').first }
 
-        expect(listing.format_wp(reread, wraps, 0)).to match(/No\s*\z/)
+        expect(row.(wraps, 0)).to match(/No\s*\z/)
 
         wraps.update(:invested => true)
 
-        expect(listing.format_wp(reread, PF2Weapon[wraps.id], 0)).to match(/Yes\s*\z/)
-        expect(listing.format_wp(reread, weapon, 1)).to match(/-\s*\z/)
+        expect(row.(PF2Weapon[wraps.id], 0)).to match(/Yes\s*\z/)
+        expect(row.(weapon, 1)).to match(/-\s*\z/)
+      end
+
+      it "should list their runes under them in the inventory" do
+        wraps = handwraps(:runes => [ 'Flaming' ])
+        listing = Pf2egear::Pf2eDisplayGearTemplate.new(reread, double(:screen_reader => false))
+
+        expect(listing.format_wp(reread, wraps, 0)).to end_with "Runes:%xn #{Pf2egear.rune_summary(wraps, 'weapons')}"
+        expect(Pf2egear.rune_summary(wraps, 'weapons')).to end_with 'Flaming'
       end
 
       it "should not offer them as a Strike of their own" do
