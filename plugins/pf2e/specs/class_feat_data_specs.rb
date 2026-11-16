@@ -324,9 +324,8 @@ module AresMUSH
         # A name under `feat` or `orfeat` is matched against the feats a character holds, so one
         # that names anything else can never be met.
         it "should name only feats under feat and orfeat" do
-          # These wait on the familiar and companion systems: a patron's tradition, and holding an
-          # animal companion.
-          waiting = [ 'Spirit Familiar (Witch)', 'Stitched Familiar', 'Side by Side (Ranger)' ]
+          # These wait on the familiar system: a patron's tradition.
+          waiting = [ 'Spirit Familiar (Witch)', 'Stitched Familiar' ]
           known = @feats.keys.map(&:downcase)
 
           class_feats.each_pair do |name, details|
@@ -338,6 +337,36 @@ module AresMUSH
               expect(known).to include(wanted.to_s.downcase), "#{name} asks for #{wanted.inspect}"
             end
           end
+        end
+
+        # Feat names are unique across the feat files, so the Ranger's companion is Animal Companion
+        # (Ranger); plain Animal Companion is the Druid's, behind the animal order, and a Ranger
+        # feat asking for it could never be taken. Asking for the Ranger's own feat also keeps
+        # Druids out, which assoc_charclass does not do once a character is advancing.
+        it "should have Ranger companion feats ask for the Ranger's Animal Companion" do
+          ranger_chain = [ "Companion's Cry", 'Mature Animal Companion (Ranger)', 'Stealthy Companion', 'Masterful Companion' ]
+
+          class_feats.each_pair do |name, details|
+            next unless Array(details['assoc_charclass']).include?('Ranger')
+
+            expect(Array((details['prereq'] || {})['feat'])).not_to include('Animal Companion'), name
+          end
+
+          ranger_chain.each do |name|
+            expect(class_feats[name]['prereq']['feat']).to include('Animal Companion (Ranger)'), name
+          end
+        end
+
+        # A feat that wants any animal companion accepts each feat that grants one.
+        it "should accept every companion-granting feat where any companion will do" do
+          companions = [ 'Animal Companion', 'Animal Companion (Ranger)', 'Faithful Steed' ]
+
+          [ 'Side by Side (Ranger)', 'Fell Rider', 'Ferocious Beasts' ].each do |name|
+            expect(feat(name)['prereq']['orfeat']).to include(*companions), name
+          end
+
+          expect(feat('Ferocious Beasts')['prereq']['orfeat']).to include('Pet', 'Bonded Animal')
+          expect(feat('Ferocious Beasts')['prereq']['feat']).to eq [ 'Oruch Ferocity' ]
         end
 
         # Every name a `feature` prereq asks for is one a class table grants: a feature, or an

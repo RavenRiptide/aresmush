@@ -5318,7 +5318,7 @@ pf2e_feats:
     prereq:
       level: 6
       feat:
-        - Animal Companion
+        - Animal Companion (Ranger)
     shortdesc: "Your animal companion becomes a mature animal companion and gains additional capabilities.%r%rYour animal companion has greater independence.During an encounter, even if you don't use the Command an Animal action, your animal companion can still use 1 action that round on your turn to Strike or Stride (or Burrow, Climb, Fly, or Swim if it has that Speed). It can do this at any point during your turn, as long as you aren't currently taking an action. If it does, that's all the actions it gets that round—you can't Command it later."
     traits:
       - ranger
@@ -9767,8 +9767,10 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 12
-      feat:
-        - an animal companion
+      orfeat:
+        - Animal Companion
+        - Animal Companion (Ranger)
+        - Faithful Steed
     shortdesc: You and your animal companion fight in tandem. Whenever you and your animal companion are adjacent to the same foe, you are both flanking that foe with each other, regardless of your actual positions.
     traits:
       - ranger
@@ -10818,7 +10820,7 @@ pf2e_feats:
     prereq:
       level: 14
       feat:
-        - Animal Companion
+        - Animal Companion (Ranger)
         - Camouflage
     shortdesc: You've trained your animal companion to blend in to its surroundings. Your animal companion gains the benefit of the Camouflage feat. If your companion is a specialized ambusher, its proficiency rank for Stealth increases to master (or legendary if it was already master).
     traits:
@@ -12386,7 +12388,7 @@ pf2e_feats:
     prereq:
       level: 18
       feat:
-        - Animal Companion
+        - Animal Companion (Ranger)
     shortdesc: Your animal companion shares your incredible hunting skills, allowing it to take down your shared prey with ease. When you Hunt Prey, your animal companion gains the Masterful Hunter benefit associated with your hunter's edge, rather than just your original hunter's edge benefit.
     traits:
       - ranger

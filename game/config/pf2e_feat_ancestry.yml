@@ -1903,8 +1903,10 @@ pf2e_feats:
     shortdesc: You have trained with your animal companion to become a terrifying juggernaut on the battlefield. Your animal companion becomes trained in Intimidation. If your animal companion uses Support while serving as your mount, it grants you the effects of the Aid reaction on your first Intimidation check to Demoralize on the same turn, even though it can't take reactions.
     prereq:
       level: 9
-      feat:
-        - animal companion
+      orfeat:
+        - Animal Companion
+        - Animal Companion (Ranger)
+        - Faithful Steed
   Ferocious Beasts:
     feat_type:
       - Ancestry
@@ -1916,8 +1918,13 @@ pf2e_feats:
     prereq:
       level: 13
       feat:
-        - animal companion, Pet, or Bonded Animal
         - Oruch Ferocity
+      orfeat:
+        - Animal Companion
+        - Animal Companion (Ranger)
+        - Faithful Steed
+        - Pet
+        - Bonded Animal
   Fey Fellowship:
     feat_type:
       - Ancestry
