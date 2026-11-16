@@ -345,9 +345,16 @@ module AresMUSH
       # they were - and dead only at the value Doomed leaves for it. `before` and `after` are
       # `{ 'hp' =>, 'temp' =>, 'dying' =>, 'wounded' =>, 'doomed' =>, 'dead' => }`. `dealt` is what the hit
       # landed after resistances: one that landed nothing, or only set damage to burn later, did them no
-      # damage and leaves their dying where it was.
+      # damage and leaves their dying where it was. One that landed twice their maximum hit points or
+      # more is massive damage, which kills outright (or spares, where the GM may not kill), so their
+      # dying before it says nothing about what it should leave.
       def hit_dropped(name, before, after, critical, dealt = nil)
         return if dealt&.zero?
+        if dealt && !before['dead'] && before['max_hp'].to_i.positive? && dealt >= 2 * before['max_hp']
+          what = "#{name}, at #{before['hp']} hit points, maximum #{before['max_hp']}"
+          find('dying', what, "#{dealt} is massive damage and should leave them dead or spared, and left Dying #{after['dying']}") unless after['dead'] || after['dying'].zero?
+          return
+        end
         return if before['dead'] || after['hp'].positive? || (before['hp'].zero? && before['dying'].zero?)
         # Temporary hit points on someone already down may have taken all of it.
         return if before['hp'].zero? && before['temp'].to_i.positive?

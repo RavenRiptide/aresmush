@@ -73,7 +73,7 @@ module AresMUSH
 
         { 'hp' => Pf2eHP.get_current_hp(fresh), 'temp' => fresh.temp_hp.to_i, 'dying' => Pf2e.condition_level(fresh, 'Dying'),
           'wounded' => Pf2e.condition_level(fresh, 'Wounded'), 'doomed' => Pf2e.condition_level(fresh, 'Doomed'),
-          'dead' => Pf2e.dead?(fresh) }
+          'dead' => Pf2e.dead?(fresh), 'max_hp' => Pf2eHP.get_max_hp(fresh) }
       end
 
       # Hit points with temporary ones, which take damage first.

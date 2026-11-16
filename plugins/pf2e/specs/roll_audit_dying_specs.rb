@@ -51,6 +51,19 @@ module AresMUSH
         expect(found_for(left('dying' => 1), left('dying' => 1), false, 0)).to eq []
       end
 
+      # Massive damage: one blow of twice their maximum hit points or more is death, whatever their dying.
+      it "should pass a death from a hit that landed twice their maximum hit points" do
+        expect(found_for(stood('max_hp' => 13, 'hp' => 13), left('dying' => 4, 'dead' => true), true, 26)).to eq []
+      end
+
+      it "should still find a death from a critical hit short of twice their maximum hit points" do
+        expect(found_for(stood('max_hp' => 13, 'hp' => 13), left('dying' => 4, 'dead' => true), true, 25)).to eq [ 'dying' ]
+      end
+
+      it "should still find a massive hit that left them dying instead of dead or spared" do
+        expect(found_for(stood('max_hp' => 13, 'hp' => 13), left('dying' => 2), true, 26)).to eq [ 'dying' ]
+      end
+
       it "should still find a hit on someone dying that landed and left them as they were" do
         expect(found_for(left('dying' => 1), left('dying' => 1), false, 5)).to eq [ 'dying' ]
       end
