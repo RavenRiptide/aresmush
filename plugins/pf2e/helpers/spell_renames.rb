@@ -4,8 +4,8 @@ module AresMUSH
     # Moves a character off a spell name the remaster changed and onto the one the catalogue has: an
     # Enigma bard granted True Strike before the muse data was corrected holds Sure Strike afterwards.
     #
-    # The name is kept in three places, and each is renamed: the ledger's `spell_access` and
-    # `focus_spell` grants, which the next fold writes the known lists from; the magic object's own
+    # The name is kept in three places, and each is renamed: the ledger's `spell_access`, `focus_spell`
+    # and `innate_spell` grants, which the next fold writes the lists from; the magic object's own
     # hashes - signature spells, what is prepared and left today, innate grants; and the spellcasting
     # entry rows. A grant is renamed by reverting it and writing the same grant under the new name, at
     # the level and with the source it had, so a rollback treats it as it treated the old one.
@@ -49,19 +49,25 @@ module AresMUSH
         end
       end
 
+      # The grant kinds that name a spell, and the payload field they name it in.
+      SPELL_FIELDS = { 'spell_access' => 'spell', 'focus_spell' => 'spell', 'innate_spell' => 'name' }.freeze
+
       def self.grants!(char, table)
         stale = Ledger.rows(char).select do |row|
-          row['reverted_by'].to_s.empty? && %w{spell_access focus_spell}.include?(row['kind']) &&
-            table.key?((row['payload'] || {})['spell'].to_s.downcase)
+          field = SPELL_FIELDS[row['kind']]
+
+          row['reverted_by'].to_s.empty? && field && table.key?((row['payload'] || {})[field].to_s.downcase)
         end
 
         stale.each do |row|
+          field = SPELL_FIELDS[row['kind']]
+
           Pf2eGrant[row['id']]&.update(:reverted_by => "spell rename #{Time.now.to_i}")
 
           Ledger.write(char, :source_type => row['source_type'], :source_ref => row['source_ref'],
                              :effective_level => row['effective_level'], :granted_by => 'Spell rename',
                              :materialize => false) do |txn|
-            txn.grant(row['kind'], row['payload'].merge('spell' => table[row['payload']['spell'].to_s.downcase]))
+            txn.grant(row['kind'], row['payload'].merge(field => table[row['payload'][field].to_s.downcase]))
           end
         end
 

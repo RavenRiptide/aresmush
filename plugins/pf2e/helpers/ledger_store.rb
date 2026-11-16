@@ -133,6 +133,8 @@ module AresMUSH
 
       # What the live character currently holds, in the shape `plan` diffs against.
       def self.current_state(char)
+        all = rows(char)
+
         {
           'level' => char.pf2_level,
           'xp' => char.pf2_xp,
@@ -149,9 +151,54 @@ module AresMUSH
           # Every focus spell the ledger has a grant for, reverted or live: the ones materialising
           # may take away. A focus spell outside this list predates the ledger or never went through
           # it, and is left alone.
-          'focus_recorded' => rows(char).select { |row| row['kind'] == 'focus_spell' }.map { |row| Ledger.focus_record(row['payload']) }.uniq,
+          'focus_recorded' => recorded_payloads(all, 'focus_spell').map { |p| Ledger.focus_record(p) }.uniq,
+          # Spellcasting, and - as for focus spells - everything the ledger has a grant for, reverted
+          # or live: what materialising may take away. Anything else predates the ledger and is left.
+          'casting' => held_casting(char.magic),
+          'casting_recorded' => recorded_payloads(all, 'casting').map { |p| p['source'].to_s }.uniq,
+          'innate' => Pf2emagic::Entries.innate_grants(char.magic),
+          'innate_recorded' => recorded_payloads(all, 'innate_spell').map { |p| Ledger.innate_record(p) }.uniq,
+          'slots' => char.magic&.spells_per_day || {},
+          'restricted_slots' => char.magic&.restricted_slots || {},
+          'slots_recorded' => recorded_payloads(all, 'spell_slots').map { |p|
+            [ p['source'].to_s, p['restriction'].to_s, p['rank'].to_s ]
+          }.uniq,
           # What the derived scores are compared against.
           'ability_scores' => char.abilities.each_with_object({}) { |a, h| h[a.name] = a.base_val }
+        }
+      end
+
+      # The payloads of every grant of a kind, reverted or live.
+      def self.recorded_payloads(all_rows, kind)
+        all_rows.select { |row| row['kind'] == kind }.map { |row| row['payload'] || {} }
+      end
+
+      # source => casting record, for every class and archetype the magic object says casts. The
+      # tradition hash's own 'innate' key is not a source.
+      def self.held_casting(magic)
+        return {} unless magic
+
+        tradition = magic.tradition || {}
+        abil = magic.spell_abil || {}
+
+        (tradition.keys + abil.keys).map(&:to_s).uniq.reject { |key| key.casecmp?(Pf2emagic::Entries::INNATE) }
+          .each_with_object({}) do |source, held|
+            trad = tradition[source]
+
+            held[source] = Ledger.casting_record('source' => source, 'tradition' => Array(trad)[0],
+                                                 'proficiency' => Array(trad)[1], 'ability' => abil[source])
+          end
+      end
+
+      # What the level-up commit and the seed diff against: the character's spellcasting, in the
+      # fragment shapes `sync_plan` reads.
+      def self.spellcasting_fragment(char)
+        magic = char.magic
+
+        {
+          'casting' => held_casting(magic),
+          'innate' => Pf2emagic::Entries.innate_grants(magic).map { |g| Ledger.innate_record(g) },
+          'slots' => { 'per_day' => magic&.spells_per_day || {}, 'restricted' => magic&.restricted_slots || {} }
         }
       end
 
@@ -203,6 +250,12 @@ module AresMUSH
             apply_focus(char, op['add'], op['remove'])
           when 'set_ability'
             apply_ability_score(char, op['ability'], op['to'])
+          when 'set_casting'
+            apply_casting(char, op['set'], op['remove'])
+          when 'set_innate'
+            apply_innate(char, op['add'], op['remove'])
+          when 'set_slots'
+            PF2Magic.get_create_magic_obj(char).update(:spells_per_day => op['per_day'], :restricted_slots => op['restricted'])
           end
         end
 
@@ -231,6 +284,61 @@ module AresMUSH
         Array(add).each do |r|
           Pf2emagic::Entries.grant_focus!(char, r['type'], [ r['spell'] ], :kind => r['kind'], :granted_by => r['granted_by'])
         end
+      end
+
+      # What a casting source keeps by its name besides its tradition and attribute. A source taken off
+      # takes these with it, so taking it again starts from nothing rather than from what it left.
+      CASTING_LISTS = %i(spellbook repertoire signature_spells spells_prepared spells_today prepared_lists daily_pick).freeze
+
+      def self.apply_casting(char, set, remove)
+        magic = PF2Magic.get_create_magic_obj(char)
+        tradition = (magic.tradition || {}).dup
+        abil = (magic.spell_abil || {}).dup
+        lists = CASTING_LISTS.to_h { |attr| [ attr, (magic.send(attr) || {}).dup ] }
+
+        Array(remove).each do |source|
+          tradition.delete(source)
+          abil.delete(source)
+          lists.each_value { |by_source| by_source.delete(source) }
+
+          # The class or archetype's own entry row, not its focus or innate ones.
+          char.spellcasting_entries.to_a.each do |row|
+            next unless row.name.to_s.casecmp?(source.to_s)
+            next if [ Pf2emagic::Entries::FOCUS, Pf2emagic::Entries::INNATE ].include?(row.category.to_s)
+
+            row.delete
+          end
+        end
+
+        Array(set).each do |record|
+          source = record['source']
+
+          # Exactly the record, so the next plan finds nothing to do: a field it has no value for is
+          # one the source does not have.
+          record['tradition'] ? tradition[source] = [ record['tradition'], record['proficiency'] ] : tradition.delete(source)
+          record['ability'] ? abil[source] = record['ability'] : abil.delete(source)
+        end
+
+        magic.update({ :tradition => tradition, :spell_abil => abil }.merge(lists))
+
+        Array(set).each do |record|
+          Pf2emagic::Entries.grant_casting!(char, record['source'], :tradition => record['tradition'],
+                                            :proficiency => record['proficiency'], :ability => record['ability'])
+        end
+      end
+
+      # Innate grants come off one at a time, matched on the four fields, so a spell two sources gave
+      # loses only the one whose grant was reverted.
+      def self.apply_innate(char, add, remove)
+        magic = PF2Magic.get_create_magic_obj(char)
+        grants = Array(magic.innate_spells).dup
+
+        Array(remove).each do |record|
+          index = grants.index { |g| g.is_a?(Hash) && Ledger.innate_record(g) == record }
+          grants.delete_at(index) if index
+        end
+
+        magic.update(:innate_spells => grants + Array(add).map { |record| record.compact })
       end
 
       def self.apply_ability_score(char, name, score)
@@ -590,7 +698,9 @@ module AresMUSH
           # there is nothing to record and nothing a rollback could take away.
           'spells' => Pf2emagic::Entries.known_lists(char),
           'focus' => Pf2emagic::Entries.focus_records(char.magic)
-        })
+        # Casting, innate spells and slot counts: a dedication or Qi Tradition taken at this level is a
+        # new casting source, a class level's slots are new counts, and an expert raise a new record.
+        }.merge(spellcasting_fragment(char)))
 
         marker = "level-#{level}-#{Time.now.to_i}"
 
@@ -686,6 +796,16 @@ module AresMUSH
           end
 
           Pf2emagic::Entries.focus_records(char.magic).each { |record| txn.grant('focus_spell', record) }
+
+          # What lets them cast: each source's tradition and attribute, each innate spell, each slot
+          # count. Recorded so a rollback can take back what a later level adds to them.
+          casting = spellcasting_fragment(char)
+
+          casting['casting'].each_value { |record| txn.grant('casting', record) }
+          casting['innate'].each { |record| txn.grant('innate_spell', record) }
+          Ledger.slot_cells(casting['slots']['per_day'], casting['slots']['restricted']).each_pair do |cell, count|
+            txn.grant('spell_slots', Ledger.slot_payload(cell, count))
+          end
 
           char.skills.each do |skill|
             next if skill.prof_level.to_s == 'untrained'

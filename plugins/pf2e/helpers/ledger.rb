@@ -121,6 +121,35 @@ module AresMUSH
         'set_prof' => {
           'key' => 'key', 'sheet' => 'profs',
           'apply' => lambda { |sheet, p| (sheet['profs'][p['group']] ||= {})[p['key']] = p['to'] }
+        },
+        # What a class or archetype casts at: tradition, proficiency and spellcasting attribute. The
+        # latest grant per source wins, so an expert raise at 7th is a new grant and a rollback past
+        # 7th brings back the trained one before it.
+        'casting' => {
+          'key' => 'source', 'sheet' => 'casting', 'sync' => 'casting',
+          'apply' => lambda { |sheet, p| sheet['casting'][p['source'].to_s] = Ledger.casting_record(p) }
+        },
+        # One innate spell grant. One entry per grant row: two sources can give the same spell, and
+        # several give an unchosen 'open' one.
+        'innate_spell' => {
+          'key' => 'name', 'sheet' => 'innate', 'sync' => 'innate',
+          'apply' => lambda { |sheet, p| sheet['innate'] << Ledger.innate_record(p) }
+        },
+        # How many slots a source has at one rank, as a count rather than a change: a slot feat's "+1"
+        # is recorded as the total it produced, so taking it again after a rollback cannot add it twice.
+        # A `restriction` names restricted slots (a curriculum's), which are counted apart.
+        'spell_slots' => {
+          'key' => 'source', 'sheet' => 'slots', 'sync' => 'slots',
+          'apply' => lambda { |sheet, p|
+            source = p['source'].to_s
+            rank = p['rank'].to_s
+
+            if p['restriction'].to_s.empty?
+              (sheet['slots'][source] ||= {})[rank] = p['to'].to_i
+            else
+              ((sheet['restricted_slots'][source] ||= {})[p['restriction'].to_s] ||= {})[rank] = p['to'].to_i
+            end
+          }
         }
       }.freeze
 
@@ -163,6 +192,82 @@ module AresMUSH
         FOCUS_FIELDS.each_with_object({}) { |field, record| record[field] = (payload || {})[field].to_s }
       end
 
+      CASTING_FIELDS = %w(source tradition proficiency ability).freeze
+
+      # A casting source's record in a fixed shape. A field the source has no value for is nil.
+      def self.casting_record(payload)
+        CASTING_FIELDS.each_with_object({}) do |field, record|
+          value = (payload || {})[field]
+          record[field] = value.nil? || value.to_s.empty? ? nil : value.to_s
+        end
+      end
+
+      INNATE_FIELDS = %w(name level tradition cast_stat).freeze
+
+      # An innate spell grant in a fixed shape: the four fields the magic object keeps, with a rank
+      # written as a number ("1" and 1 are the same rank) and 'cantrip' left as a word.
+      def self.innate_record(payload)
+        INNATE_FIELDS.each_with_object({}) do |field, record|
+          value = (payload || {})[field]
+
+          record[field] = if value.nil?
+            nil
+          elsif field == 'level' && value.to_s.match?(/\A\d+\z/)
+            value.to_i
+          else
+            value.to_s
+          end
+        end
+      end
+
+      # Slot counts as one map of [ source, restriction, rank ] => count, restriction '' for the
+      # ordinary ones. Flat, so the fold, the character and a level's diff compare cell by cell.
+      def self.slot_cells(per_day, restricted)
+        cells = {}
+
+        (per_day || {}).each_pair do |source, by_rank|
+          next unless by_rank.is_a?(Hash)
+
+          by_rank.each_pair { |rank, count| cells[ [ source.to_s, '', rank.to_s ] ] = count.to_i }
+        end
+
+        (restricted || {}).each_pair do |source, by_name|
+          next unless by_name.is_a?(Hash)
+
+          by_name.each_pair do |name, by_rank|
+            next unless by_rank.is_a?(Hash)
+
+            by_rank.each_pair { |rank, count| cells[ [ source.to_s, name.to_s, rank.to_s ] ] = count.to_i }
+          end
+        end
+
+        cells
+      end
+
+      # The cells back as [ spells_per_day, restricted_slots ], the magic object's two shapes.
+      def self.slot_hashes(cells)
+        per_day = {}
+        restricted = {}
+
+        cells.each_pair do |(source, restriction, rank), count|
+          if restriction.empty?
+            (per_day[source] ||= {})[rank] = count
+          else
+            ((restricted[source] ||= {})[restriction] ||= {})[rank] = count
+          end
+        end
+
+        [ per_day, restricted ]
+      end
+
+      def self.slot_payload(cell, count)
+        source, restriction, rank = cell
+        payload = { 'source' => source, 'rank' => rank, 'to' => count }
+        payload['restriction'] = restriction unless restriction.empty?
+
+        payload
+      end
+
       def self.empty_sheet(level)
         {
           'level' => level.to_i,
@@ -182,6 +287,10 @@ module AresMUSH
           'profs' => {},
           'formulas' => {},
           'spell_unlocks' => [],
+          'casting' => {},
+          'innate' => [],
+          'slots' => {},
+          'restricted_slots' => {},
           'unsupported' => []
         }
       end
@@ -292,6 +401,12 @@ module AresMUSH
           ops << { 'op' => 'set_focus', 'add' => add, 'remove' => remove } unless add.empty? && remove.empty?
         end
 
+        # Spellcasting: casting sources, innate spells and slot counts. Each puts back what the fold
+        # holds and takes off what a reverted grant recorded, and leaves alone anything the ledger has
+        # never recorded, as focus spells do. The three are planned together because taking a casting
+        # source off without its slots, or the reverse, leaves a caster half there.
+        ops.concat(spellcasting_ops(sheet, current)) if !draft
+
         # Ability scores, derived from nothing. Every ability starts at 10, its ancestry flaw applies
         # and then its boosts, and PF2e's rule for each depends only on the score being changed - so
         # counts per ability are enough and a rollback that drops a boost puts the score back.
@@ -319,6 +434,46 @@ module AresMUSH
           next if draft && !DRAFT_SAFE_ATTRS.include?(attr)
           next unless sheet.key?(key)
           ops << { 'op' => 'set_attr', 'attr' => attr, 'value' => sheet[key] } if changed?(current[key], sheet[key])
+        end
+
+        ops
+      end
+
+      def self.spellcasting_ops(sheet, current)
+        ops = []
+
+        # A source whose record differs is written whole; one the character holds, the ledger recorded,
+        # and the fold no longer has is taken off - tradition, attribute and entry row together, since
+        # the tradition hash is what decides whether a character casts at all.
+        wanted = (sheet['casting'] || {}).transform_values { |r| casting_record(r) }
+        held = (current['casting'] || {}).transform_values { |r| casting_record(r) }
+        recorded = Array(current['casting_recorded']).map(&:to_s)
+
+        set = wanted.values.reject { |record| held[record['source']] == record }
+        remove = held.keys.select { |source| recorded.include?(source) && !wanted.key?(source) }
+
+        ops << { 'op' => 'set_casting', 'set' => set, 'remove' => remove } unless set.empty? && remove.empty?
+
+        # Innate spells are counted, not matched by membership: the same grant twice is two grants.
+        wanted = Array(sheet['innate']).map { |r| innate_record(r) }
+        held = Array(current['innate']).map { |r| innate_record(r) }
+        recorded = Array(current['innate_recorded']).map { |r| innate_record(r) }
+
+        add, gone = multiset_diff(wanted, held)
+        remove = gone.select { |record| recorded.include?(record) }
+
+        ops << { 'op' => 'set_innate', 'add' => add, 'remove' => remove } unless add.empty? && remove.empty?
+
+        # Slots, a cell at a time. The result is written whole, as the two hashes the magic object keeps.
+        wanted = slot_cells(sheet['slots'], sheet['restricted_slots'])
+        held = slot_cells(current['slots'], current['restricted_slots'])
+        recorded = Array(current['slots_recorded']).map { |cell| Array(cell).map(&:to_s) }
+
+        desired = held.reject { |cell, _count| recorded.include?(cell) && !wanted.key?(cell) }.merge(wanted)
+
+        if desired != held
+          per_day, restricted = slot_hashes(desired)
+          ops << { 'op' => 'set_slots', 'per_day' => per_day, 'restricted' => restricted }
         end
 
         ops
@@ -475,6 +630,39 @@ module AresMUSH
           wanted = Array(value).map { |r| Ledger.focus_record(r) }
 
           [ wanted - held, (held - wanted).map { |r| { 'match' => r, 'limit' => 1 } } ]
+        },
+        # A map of casting source to its record. A changed record is a new grant, the latest winning; a
+        # source the character no longer casts from revokes every grant behind it.
+        'casting' => lambda { |sheet, section, value, _spec|
+          held = (sheet[section] || {}).transform_values { |r| Ledger.casting_record(r) }
+          wanted = (value || {}).transform_values { |r| Ledger.casting_record(r) }
+
+          grants = wanted.values.reject { |record| held[record['source']] == record }
+          gone = (held.keys - wanted.keys).map { |source| { 'source' => source } }
+
+          [ grants, gone ]
+        },
+        # Innate spell grants, counted: one revocation per grant gone, matched on every field.
+        'innate' => lambda { |sheet, section, value, _spec|
+          added, removed = Ledger.multiset_diff(Array(value).map { |r| Ledger.innate_record(r) },
+                                                Array(sheet[section]).map { |r| Ledger.innate_record(r) })
+
+          [ added, removed.map { |r| { 'match' => r, 'limit' => 1 } } ]
+        },
+        # Slot counts, a cell at a time. The fragment carries both shapes, as { 'per_day', 'restricted' },
+        # because restricted slots are counted in a section of their own.
+        'slots' => lambda { |sheet, _section, value, _spec|
+          held = Ledger.slot_cells(sheet['slots'], sheet['restricted_slots'])
+          wanted = Ledger.slot_cells((value || {})['per_day'], (value || {})['restricted'])
+
+          grants = wanted.reject { |cell, count| held[cell] == count }.map { |cell, count| Ledger.slot_payload(cell, count) }
+
+          # A nil restriction matches only the ordinary slots, whose grants carry none.
+          gone = (held.keys - wanted.keys).map do |(source, restriction, rank)|
+            { 'source' => source, 'rank' => rank, 'restriction' => restriction.empty? ? nil : restriction }
+          end
+
+          [ grants, gone ]
         },
         # A map of name to rank: skills, lores. A changed rank is a new grant, not a duplicate.
         'ranked' => lambda { |sheet, section, value, spec|

@@ -74,10 +74,13 @@ module AresMUSH
 
       describe "migrating a character who took it before" do
 
-        # The shape the old background left: a "Blessed" special in the ledger, and no Guidance.
+        # The shape the old background left: a "Blessed" special in the ledger, and no Guidance - on the
+        # magic object or, since that character predates innate spells being recorded, in the ledger.
         def old_shape(char)
           magic = char.magic
           magic.update(:innate_spells => Array(magic.innate_spells).reject { |g| g['name'] == 'Guidance' })
+          char.grants.to_a.each { |g| g.delete if g.kind == 'innate_spell' && g.payload['name'] == 'Guidance' }
+          Pf2e::Ledger.invalidate!(char)
 
           Pf2e::Ledger.write(char, :source_type => 'imported', :source_ref => 'old Blessed', :effective_level => 1) do |txn|
             txn.grant('add_special', 'special' => 'Blessed')
