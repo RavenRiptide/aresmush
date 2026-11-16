@@ -11,25 +11,27 @@ aliases:
 See `help advance` for more information about advancement.
 
 ## Selecting Archetypes
-Starting at level 2, you can spend a class feat to select a Dedication feat. Selecting a Dedication feat enters you into the Dedication feat's corresponding archetype. After entering an archetype, you must spend a class feat on two more feats from that archetype before you can select another Dedication feat to enter another archetype. See [Archetypes & Dedications](/wiki/mechanics:archetypes-dedications) for more information.
+
+Starting at level 2, you can spend a class feat on a Dedication feat, which enters you into that feat's archetype. Before you can take another Dedication feat, you must take two more feats from that archetype. For more information about archetypes, see [Archetypes & Dedications](/wiki/mechanics:archetypes-dedications).
 
 **Commands**:
-`advance/feat charclass = <feat name>`: Selects a Dedication or Archetype feat (by its `<feat name>`).
-`advance/archetype specialty = <specialty>`: Selects an archetype specialty, if available.
-`advance/archetype specialtychoice = <specialtychoice>`: Selects an archetype specialty choice, if available. (Only for Barbarian Archetype's Animal and Dragon instincts and the Sorcerer Archetype's Elemental and Draconic bloodlines.)
-`advance/archetype deity = <deity>`: Selects a deity for your archetype. (Only for Cleric and Champion Archetypes.) Deity is automatically assigned for you if you already have a deity set from chargen.
-`advance/archetype key ability = <key ability>`: Selects a key ability for your archetype. (Only for some Archetypes.)
-`advance/archetype sanctification = <sanctification>`: Selects a sanctification for your archetype. (Only for Cleric and Champion Archetypes.)
+`advance/feat charclass=<feat name>`: Selects the Dedication or archetype feat you specify (`<feat name>`).
+`advance/archetype specialty=<specialty>`: Selects a specialty for your archetype, if it offers any.
+`advance/archetype specialtychoice=<choice>`: Selects the choice your archetype's specialty offers. Only the barbarian archetype's animal and dragon instincts and the sorcerer archetype's elemental and draconic bloodlines offer one.
+`advance/archetype deity=<deity>`: Selects a deity for your archetype. Only the cleric and champion archetypes need one.
+%t **Note:** If you set a deity in character generation, the game uses that deity for your archetype, and you don't need this command.
+`advance/archetype key ability=<key ability>`: Selects your archetype's key ability (`<key ability>`), for archetypes that offer a choice.
+`advance/archetype sanctification=<sanctification>`: Selects a sanctification for your archetype. Only the cleric and champion archetypes use one.
 
-Sometimes, archetypes, archetype specialties, and deities chosen for archetypes might give training in skills you're already trained in. Those skills are turned into open slots to train an untrained skill into a trained one. Use the regular `advance/raise skill` command (as outlined in `help advanceskills`) to train those skills.
+When an archetype, its specialty, or its deity gives you training in a skill you're already trained in, you get an open skill slot instead. To fill it, train an untrained skill with `advance/raise skill`. For more information about raising skills, see `help advanceskills`.
 
 ## Archetype Spells
-If your character class is a caster, and you take an archetype that can also learn magic, use the following commands to learn spells for your archetype, depending on caster type. If your main character class doesn't have any casting, you can use the regular spell learning commands.
+
+If your class casts spells and your archetype gives you spellcasting too, learn your archetype's spells by adding the archetype's name to `advance/spell`. If your class doesn't cast spells, use the regular spell commands. For more information about the regular spell commands, see `help advancespells`.
 
 **Commands**:
-`advance/spell repertoire/<archetype name>/<level> = <spell name>`: Selects a spell for your archetype's repertoire.
-`advance/spell spellbook/<archetype name>/<level> = <spell name>`: Selects a spell for your archetype's spellbook. 
-
-### Examples
-Learning a spell for an archetype's repertoire: `advance/spell repertoire/oracle archetype/cantrip=Stabilize` will set the Stabilize cantrip in the Oracle Archetype's repertoire.
-Learning a spell for an archetype's spellbook: `advance/spell spellbook/wizard archetype/cantrip=Light` will set the Light cantrip in the Wizard Archetype's spellbook.
+`advance/spell repertoire/<archetype name>/<level>=<spell name>`: Adds a spell (`<spell name>`) of the rank you specify (`<level>`) to your archetype's repertoire. `<archetype name>` is the archetype's full name, such as `oracle archetype`.
+`advance/spell spellbook/<archetype name>/<level>=<spell name>`: Adds a spell (`<spell name>`) of the rank you specify (`<level>`) to your archetype's spellbook.
+%t **Examples**:
+%t `advance/spell repertoire/oracle archetype/cantrip=Stabilize`: Adds the Stabilize cantrip to your oracle archetype's repertoire.
+%t `advance/spell spellbook/wizard archetype/cantrip=Light`: Adds the Light cantrip to your wizard archetype's spellbook.

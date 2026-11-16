@@ -26,7 +26,7 @@ module AresMUSH
         shared = Pf2e.info_options(enactor, self.element)
 
         if shared
-          show shared[0], shared[1]
+          show shared[0], shared[1], shared[2]
           return
         end
 
@@ -41,8 +41,8 @@ module AresMUSH
         end
       end
 
-      def show(title, options)
-        display = Pf2e.info_option_display(title, options, cmd, self.filter)
+      def show(title, options, formulas = nil)
+        display = Pf2e.info_option_display(title, options, cmd, self.filter, :formulas => formulas, :client => client)
 
         if display[:error]
           client.emit_failure display[:error]

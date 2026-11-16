@@ -7,4 +7,4 @@
 <% sections.each do |section| %>
 <%= section %>
 <% end %>
-<%= footer %>
+<%= paged? ? page_footer : footer %>

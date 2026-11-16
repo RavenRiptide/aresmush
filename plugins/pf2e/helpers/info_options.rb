@@ -30,7 +30,11 @@ module AresMUSH
         block = find_choice_block(char, key)
         return nil unless block
 
-        return [ key, choice_options(char, key, block) ]
+        # A formula choice also hands back its pool filter, so the list can show each formula under
+        # its catalogue and level.
+        formulas = block['from_formulas'].is_a?(Hash) ? block['from_formulas'] : nil
+
+        return [ key, choice_options(char, key, block), formulas ]
       end
 
       # A feat slot type. 'general' and 'general feat' both work.
@@ -45,7 +49,10 @@ module AresMUSH
 
     # `filter` narrows the pool by substring before paging. A pool of two hundred lores is six
     # pages, which is barely more use to a player than the refusal that sent them here.
-    def self.info_option_display(title, options, cmd, filter = nil)
+    #
+    # `formulas` is a formula choice's pool filter. Its options list like the `formulas` screen, by
+    # catalogue and item level, at any length, so no name is cut to fit a column.
+    def self.info_option_display(title, options, cmd, filter = nil, formulas: nil, client: nil)
       options = Array(options).compact
 
       return { :error => t('pf2e.info_no_options', :element => title) } if options.empty?
@@ -57,6 +64,8 @@ module AresMUSH
         return { :error => t('pf2e.info_no_match', :element => title, :filter => filter.to_s.strip) } if options.empty?
       end
 
+      return formula_option_display(title, options, formulas, cmd, client) if formulas
+
       if options.size <= INFO_PAGINATE_LIMIT
         return { :text => t('pf2e.cg_info', :element => title, :options => options.join(", ")) }
       end
@@ -66,6 +75,24 @@ module AresMUSH
       return { :error => paginator.out_of_bounds_msg } if paginator.out_of_bounds?
 
       { :text => PF2OptionListTemplate.new(paginator, title, 2, cmd).render }
+    end
+
+    # Each formula filed under the catalogue a pick of it would go to - the first of the filter's
+    # catalogues that holds it - then paged by whole level groups.
+    def self.formula_option_display(title, names, formulas, cmd, client = nil)
+      fallback = Crafting.pool_categories(formulas).first
+
+      book = names.group_by { |name| (Crafting.pool_category(formulas, name) || [ fallback ]).first }
+      ordered = Crafting.pool_categories(formulas).each_with_object({}) do |category, out|
+        out[category] = book[category] if book[category]
+      end
+      book.each { |category, list| ordered[category] ||= list }
+
+      template = PF2FormulaTemplate.new(ordered, nil, client, :title => title, :cmd => cmd, :page_size => INFO_PAGE_SIZE)
+
+      return { :error => template.paginator.out_of_bounds_msg } if template.paginator.out_of_bounds?
+
+      { :text => template.render }
     end
 
   end

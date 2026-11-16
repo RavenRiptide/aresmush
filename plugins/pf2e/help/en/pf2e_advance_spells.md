@@ -10,27 +10,31 @@ aliases:
 See `help advance` for more information about advancement.
 
 ## Learning Spells
-Repertoire spellcasters learn a handful of spells through advancement and can replace old spells with new ones. Some repertoire spellcasters also gain access to signature spells and can set the spells they know in their repertoire as signature spells.
 
-`advance/spell <type>/<level> = <spell name>`: Selects a new spell (by its `<spell name>`). `<level>` is the level for which you want to learn the spell. `<type>` is either `repertoire` or `spellbook`, depending on what type of caster you are. You must have an open slot to learn a new spell.
-`advance/spell innate/<level> = <spell name>`: Selects an open innate spell (by its `<spell name>`), if you have one from a feat. `<level>` is the level for which you want to learn the spell.
-`advance/swapspell repertoire/<level> = <old spell>/<spell name>`: Swaps a known repertoire spell for a new spell at the same level. You can do this once per advancement. Bloodline or class-granted spells cannot be swapped. Cantrips can be swapped.
-`advance/spell signature/<level>=<spell name>`: Designates a spell (by its `<spell name>`) as a signature spell. `<level>` is the spell's original (base) level.
-`spell/eligible <level>`: Lists every spell you could actually take at that level, for the traditions you cast. Add `=<text>` to narrow it. Use this rather than guessing a name and reading the refusal. See `help spell search`.
+A level-up can give you new spells to learn, and `advance/review` lists the open spell slots. Repertoire spellcasters can also swap a spell they know for a new one, and some choose signature spells from their repertoire.
+
+**Commands**:
+`advance/spell <type>/<level>=<spell name>`: Learns a new spell (`<spell name>`) of the rank you specify (`<level>`). `<type>` is `repertoire` or `spellbook`, depending on how you cast. You need an open slot at that rank.
+`advance/spell innate/<level>=<spell name>`: Learns an innate spell (`<spell name>`) of the rank you specify (`<level>`), when a feat gives you an open innate spell.
+`advance/swapspell repertoire/<level>=<old spell>/<spell name>`: Swaps a repertoire spell you know (`<old spell>`) for a new spell (`<spell name>`) of the same rank (`<level>`). You can swap once per level-up, and cantrips count.
+%t **Note:** You can't swap the spells your bloodline or class gives you.
+`advance/spell signature/<level>=<spell name>`: Makes a repertoire spell (`<spell name>`) a signature spell. `<level>` is the spell's base rank.
+`spell/eligible <level>`: Lists every spell you can take at a rank (`<level>`), for the traditions you cast. Add `=<text>` to narrow the list. For more information about finding spells, see `help spell search`.
 
 ## The Divine Font
 
-A cleric whose deity grants both fonts chooses which one their extra daily slots are cast from. The
-choice is usually made in chargen, but a level can open it too, and `advance/review` lists it under
-Options To Choose when it is outstanding.
+A cleric whose deity grants both fonts chooses which spell their extra daily slots cast. Clerics usually choose in character generation, but a level-up can open the choice too, and `advance/review` lists it under Options To Choose.
 
-`advance/font <heal or harm>`: Chooses your divine font. Your extra daily spell slots at each rank
-are then that spell. In chargen the same command is `cg/font` or `dfont`; staff can set it with
-`admin/set <character>/divine font = <heal or harm>`.
+`advance/font <heal or harm>`: Chooses your divine font. Your extra daily spell slots at each rank then cast that spell.
+%t **Note:** In character generation, use `cg/font` or `dfont`. Staff can set it with `admin/set <character>/divine font=<heal or harm>`.
 
 ## Archetype Spells
-If your character class is a caster, and you take an archetype that can also learn magic, use the following commands to learn spells for your archetype, depending on caster type. If your main character class doesn't have any casting, you can use the regular spell learning commands.
 
-**Commands:**
-`advance/spell repertoire/<archetype name>/<level> = <spell name>`: Selects a spell for your archetype's repertoire. For example, `advance/spell repertoire/oracle archetype/cantrip=Stabilize` will set the Stabilize cantrip in the Oracle Archetype's repertoire.
-`advance/spell spellbook/<archetype name>/<level> = <spell name>`: Selects a spell for your archetype's spellbook. For example, `advance/spell spellbook/wizard archetype/cantrip=Light` will set the Light cantrip in the Wizard Archetype's spellbook. 
+If your class casts spells and your archetype gives you spellcasting too, learn your archetype's spells by adding the archetype's name to `advance/spell`. If your class doesn't cast spells, use the commands in the Learning Spells section.
+
+**Commands**:
+`advance/spell repertoire/<archetype name>/<level>=<spell name>`: Adds a spell (`<spell name>`) of the rank you specify (`<level>`) to your archetype's repertoire. `<archetype name>` is the archetype's full name, such as `oracle archetype`.
+`advance/spell spellbook/<archetype name>/<level>=<spell name>`: Adds a spell (`<spell name>`) of the rank you specify (`<level>`) to your archetype's spellbook.
+%t **Examples**:
+%t `advance/spell repertoire/oracle archetype/cantrip=Stabilize`: Adds the Stabilize cantrip to your oracle archetype's repertoire.
+%t `advance/spell spellbook/wizard archetype/cantrip=Light`: Adds the Light cantrip to your wizard archetype's spellbook.

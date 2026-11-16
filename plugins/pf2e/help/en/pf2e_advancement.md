@@ -11,32 +11,36 @@ aliases:
 
 # Experience and Advancement in Pathfinder Second Edition
 
-As in most games, Pathfinder Second Edition uses a system of Experience Points (XP) to track character growth and power increases over time. Unlike in D&D and Pathfinder First Edition, Pathfinder Second Edition does not operate on a sliding scale of increasingly large experience point totals needed to advance. Instead, to gain a level, you spend a flat 1000 XP, whether you are 1st level or 30th, and XP rewards remain the same per encounter or plot no matter your level. 
+As in most games, Pathfinder Second Edition uses Experience Points (XP) to determine character progression. Unlike D&D and Pathfinder First Edition, Pathfinder Second Edition doesn't need ever-larger XP totals to advance: gaining a level costs a flat 1000 XP, whether you are 1st level or 19th, and XP awards stay the same per encounter or plot no matter your level.
 
-XP rewards per plot are shared publicly on the wiki and may be reviewed there. Your current XP total is listed at the top of your character sheet. 
+The wiki lists the XP awards for each plot. Your current XP total is at the top of your character sheet.
 
-Note that you cannot `advance` if you are in an active encounter. Scenes are fine, but you cannot advance in the middle of combat.
+You can't use `advance` during an active encounter. Scenes are fine.
 
 ## General Advancement Commands
-The following commands are broadly useful for the advancement process.
 
 **Commands**:
-`listxp`: View a history of your XP rewards and spends.
-`advance`: Begins the advancement process. No modification to your sheet is made until you enter `advance/done`.
-`advance/review`: Your guidebook for what you get in advancement and the options you need to select. (Alternative alias: `adv/review`)
-`advance/info <thing>`: Lists the options behind anything the review screen says is still outstanding. For an open feat slot, use its slot type to list the feats you're eligible for: `advance/info skill`. Add `=<text>` to narrow a long list: `advance/info Additional Lore=arch`. See `help advancefeats`.
-`advance/done`: Locks your choices, takes you out of advancement mode, and updates your sheet. 
-`advance/reset`: Backs out of advancement and discards all changes.
-`advance/undo`: Takes back your most recent choice this level, one step at a time, newest first. `advance/redo` puts back the last thing you took back. Neither reaches past `advance/done`; once a level is locked in, only staff can change it, with `admin/rollback`.
+`listxp`: Shows a history of the XP you've been awarded and spent.
+`advance`: Starts a level-up. Your sheet doesn't change until you enter `advance/done`.
+`advance/review`: Lists what this level gives you and the choices you still need to make. `adv/review` also works.
+`advance/info <element>`: Lists the options for anything `advance/review` lists as outstanding. For an open feat slot, specify its slot type to list the feats you're eligible for, such as `advance/info skill`. Add `=<text>` to narrow a long list, such as `advance/info Additional Lore=arch`. For more information about feat slots, see `help advancefeats`.
+`advance/done`: Locks in your choices, ends the level-up, and updates your sheet.
+`advance/reset`: Ends the level-up and discards all your choices.
+`advance/undo`: Takes back your most recent choice this level, one step at a time, newest first.
+`advance/redo`: Puts back the last choice you took back with `advance/undo`.
+%t **Note:** Neither `advance/undo` nor `advance/redo` reaches past `advance/done`. Once you lock in a level, only staff can change it, using `admin/rollback`.
 
 ### Raising Attributes and Skills, and Learning Languages
-See `help advanceskills`, `help advanceattributes`, or `help advancelanguages`.
+For more information about raising attributes and skills and learning languages, see `help advanceskills`.
 
 ### Selecting Feats and Class Features
-See `help advancefeats` or `help advancefeatures`.
+For more information about selecting feats and class feature options, see `help advancefeats`.
 
 ### Learning Spells
-See `help advancespells`.
+For more information about learning spells, see `help advancespells`.
+
+### Picking Formulas
+For more information about picking formulas, see `help advanceformulas`.
 
 ### Archetypes and Dedications
-See `help advancearchetypes` or `help advancededications`.
+For more information about archetypes and Dedication feats, see `help advancearchetypes`.

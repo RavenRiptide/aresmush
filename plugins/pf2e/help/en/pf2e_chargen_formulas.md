@@ -12,13 +12,12 @@ Some classes and feats give you formulas to pick, such as an alchemist's formula
 
 ## Commands
 
-`cg/info <choice>`: Lists the formulas a choice offers. In a level-up, use `advance/info <choice>`.
-`cg/option <choice>=<formula>`: Picks one formula from a choice. Pick again until the choice has no open picks left. In a level-up, use `advance/option <choice>=<formula>`.
+`cg/info <choice>`: Lists the formulas a choice offers, grouped by catalog and item level. Formulas you already know or picked are left out.
+`cg/info<page> <choice>`: Shows another page of a long list, such as `cg/info2 Formula Book`. The bottom of each page shows the command for the next page.
+`cg/info <choice>=<text>`: Lists only the formulas whose names contain `<text>`, such as `cg/info Formula Book=mutagen`.
+`cg/option <choice>=<formula>`: Picks one formula from a choice. Pick again until the choice has no open picks left.
 `formulas`: Lists the formulas you know.
 
-## Selections at later levels
-
-Some choices open again when you level up: an alchemist's Formula Book, an investigator's Alchemical Sciences, Alchemical Scholar, Alchemical Discoveries, and Cauldron. They show up in `advance/review` with your other choices, and you pick them with `advance/option`.
-%t **Note:** Undoing a level-up also takes back the formulas you picked during it.
+Some choices open again when you level up. For more information about picking formulas in a level-up, see `help advanceformulas`.
 
 To get other formulas, buy them with `formula/buy`. See `help formulas` for more information.

@@ -32,6 +32,42 @@ module AresMUSH
         expect(grouped('consumables' => [], 'runes' => [ 'Arsenic' ]).keys).to eq [ 'runes' ]
       end
 
+      it "should give each catalogue a player's label, and capitalize one it doesn't know" do
+        expect(PF2FormulaTemplate.catalogue_label('magicitem')).to eq 'Magic Items'
+        expect(PF2FormulaTemplate.catalogue_label('consumables')).to eq 'Consumables'
+        expect(PF2FormulaTemplate.catalogue_label('trinkets')).to eq 'Trinkets'
+      end
+
+      # A long formula choice pages by whole level groups, so a level's heading isn't left at the
+      # bottom of one page with its formulas on the next.
+      describe :pages do
+        it "should keep everything on one page when it fits" do
+          grouped = { 'consumables' => [ [ 1, %w(A B) ], [ 2, %w(C) ] ] }
+
+          expect(PF2FormulaTemplate.pages(grouped, 3)).to eq [ [ [ 'consumables', 1, %w(A B) ], [ 'consumables', 2, %w(C) ] ] ]
+        end
+
+        it "should start a new page with a level group that would overflow this one" do
+          grouped = { 'consumables' => [ [ 1, %w(A B) ], [ 2, %w(C D) ] ], 'runes' => [ [ 1, %w(E) ] ] }
+
+          expect(PF2FormulaTemplate.pages(grouped, 3)).to eq [
+            [ [ 'consumables', 1, %w(A B) ] ],
+            [ [ 'consumables', 2, %w(C D) ], [ 'runes', 1, %w(E) ] ]
+          ]
+        end
+
+        it "should split a level group longer than a page across pages of its own" do
+          grouped = { 'consumables' => [ [ 1, %w(A) ], [ 2, %w(B C D E F) ] ] }
+
+          expect(PF2FormulaTemplate.pages(grouped, 2)).to eq [
+            [ [ 'consumables', 1, %w(A) ] ],
+            [ [ 'consumables', 2, %w(B C) ] ],
+            [ [ 'consumables', 2, %w(D E) ] ],
+            [ [ 'consumables', 2, %w(F) ] ]
+          ]
+        end
+      end
+
       # The formulas a feat's choice gave are on the formulas screen, so the feat's name carries none.
       describe :feat_display_list do
         before(:each) do

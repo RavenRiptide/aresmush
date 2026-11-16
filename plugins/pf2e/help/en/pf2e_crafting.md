@@ -18,9 +18,9 @@ Formulas are formalized instructions for making items. For full rules on formula
 `formulas [<character>]`: Lists the formulas you know, or the formulas another character knows.
 `formula/buy <category>=<item>`: Buys a formula, and takes its price out of your money. In PF2e, a formula's price depends on the item's level, not on the item's own price.
 %t **Note:** You need to be approved for play to buy formulas.
-%t **Note:** You can buy the formula for an uncommon or rare item with this command only if a feat or class you have names the item. For any other uncommon or rare formula, put in a request to buy it with RPP and money. See `help vendor`.
+%t **Note:** You can buy the formula for an uncommon or rare item with this command only if a feat or class you have names the item. For any other uncommon or rare formula, put in a request to buy it with RPP and money. For more information about buying uncommon and rare items, see `help vendor`.
 
-Your class and some feats also give you formulas to pick. See `help cg_formulas`.
+Your class and some feats also give you formulas to pick. For more information about picking them, see `help cg_formulas` for character generation or `help advanceformulas` for a level-up.
 
 ## Alchemy
 

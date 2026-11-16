@@ -30,7 +30,7 @@ module AresMUSH
           return
         end
 
-        display = Pf2e.info_option_display(found[0], found[1], cmd, self.filter)
+        display = Pf2e.info_option_display(found[0], found[1], cmd, self.filter, :formulas => found[2], :client => client)
 
         if display[:error]
           client.emit_failure display[:error]
