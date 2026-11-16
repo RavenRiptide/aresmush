@@ -291,6 +291,15 @@ module AresMUSH
         rows(char, category).each { |row| row.delete }
       end
 
+      # Every entry, of every category: for starting a character over. The rows are a collection on
+      # the character rather than attributes of the magic object, so blanking the magic object leaves
+      # them, and a focus spell left behind still counts as held.
+      def self.forget_all!(char)
+        return unless char && char.respond_to?(:spellcasting_entries)
+
+        char.spellcasting_entries.to_a.each { |row| row.delete }
+      end
+
       # What the projection reads. Listed so for_magic does not depend on the model having exactly
       # these and nothing else. Focus spells are absent: they are stored as rows, not projected.
       ATTRIBUTES = %w(

@@ -1943,11 +1943,13 @@ pf2e_class:
               magic_stats:
                 tradition:
                   divine: trained
+                spell_abil: Wisdom
           Occult:
             grants:
               magic_stats:
                 tradition:
                   occult: trained
+                spell_abil: Wisdom
     chargen:
       skills:
         - open

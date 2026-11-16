@@ -54,6 +54,39 @@ module AresMUSH
           expect(Pf2emagic::Entries.focus_spells(char.magic, 'qi')).to include('Inner Upheaval')
           expect(Pf2emagic.focus_pool_max(char.magic)).to eq 1
         end
+
+        # A tradition with no spellcasting attribute gives the sheet's spell DC line nothing to look
+        # up, and the whole sheet fails to draw.
+        describe "once the level is done" do
+          before(:each) do
+            @builder.run 'advance/option Qi Spells=Inner Upheaval'
+            @builder.run 'advance/option Qi Tradition=Divine'
+            6.times { break if @builder.resolve_outstanding(:advance).zero? }
+            @builder.run 'advance/done'
+          end
+
+          def plain(text)
+            text.gsub(/%x(?:\d{1,3}|[a-zA-Z])/, '').gsub('%b', ' ')
+          end
+
+          it "should cast qi spells off Wisdom" do
+            expect(char.magic.spell_abil['Monk']).to eq 'Wisdom'
+          end
+
+          it "should draw the sheet with the monk's spell DC" do
+            template = Pf2eSheetTemplate.new(char, 'all', double(:screen_reader => false), char.pf2_base_info, char.pf2_faith)
+            text = plain(SheetReads.holding(char) { template.render })
+
+            expect(text).to match(/Monk\s+Divine\s+T/)
+          end
+
+          it "should list the qi spell under magic" do
+            template = Pf2emagic::PF2MagicDisplayTemplate.new(char, char.magic, double(:screen_reader => false))
+            text = plain(SheetReads.holding(char) { template.render })
+
+            expect(text).to include('Inner Upheaval')
+          end
+        end
       end
     end
   end

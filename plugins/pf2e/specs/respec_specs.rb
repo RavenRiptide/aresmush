@@ -24,6 +24,7 @@ module AresMUSH
         builder.build_level_one('Fighter')
         builder.advance_to(3)
         Pf2egear.pay_player(Character[@char.id], -250, 'Spec Vendor', 'a purchase')
+        Pf2emagic::Entries.grant_focus!(Character[@char.id], 'qi', [ 'Inner Upheaval' ], :kind => 'spell', :granted_by => 'Monk')
         @char = Character[@char.id]
         @money = @char.pf2_money
       end
@@ -44,10 +45,22 @@ module AresMUSH
         expect(reread.pf2_level).to eq 3
         expect(reread.grants.count).to be > 0
         expect(trained_count(reread)).to be > 0
+        expect(Pf2emagic::Entries.stored(reread)).not_to be_empty
+      end
+
+      # A focus spell is a row on the character, not an attribute of the magic object, so one left
+      # behind still counts as held: a feat's spell choice would leave it out of the pool.
+      shared_examples "a character with no spellcasting left" do
+        it "should take their focus spells too" do
+          expect(Pf2emagic::Entries.stored(reread)).to be_empty
+          expect(Pf2emagic::Entries.focus_spells(reread.magic, 'qi')).to be_empty
+        end
       end
 
       describe "a respec" do
         before(:each) { Pf2e.respec_character(reread) }
+
+        it_behaves_like "a character with no spellcasting left"
 
         it "should keep the level and the xp" do
           expect(reread.pf2_level).to eq 3
@@ -89,6 +102,8 @@ module AresMUSH
 
       describe "a reset" do
         before(:each) { Pf2e.reset_character(reread) }
+
+        it_behaves_like "a character with no spellcasting left"
 
         it "should take the level and the xp too" do
           expect(reread.pf2_level).to eq 1

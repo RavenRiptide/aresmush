@@ -545,6 +545,7 @@ module AresMUSH
       Pf2eHP.factory_default(char)
       Pf2eCombat.factory_default(char)
       PF2Magic.factory_default(char)
+      Pf2emagic::Entries.forget_all!(char)
     end
 
     def self.get_character(name, enactor)
