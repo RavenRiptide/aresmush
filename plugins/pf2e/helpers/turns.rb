@@ -113,7 +113,7 @@ module AresMUSH
         WeaponPoison.turn_ended(holder)
 
         events + less_frightened(holder) + PersistentDamage.end_of_turn(holder) + Holding.turn_ended(encounter, participant) +
-          Afflictions.turn_ended(encounter, participant, round)
+          Afflictions.turn_ended(encounter, participant, round) + AnimatedRune.turn_ended(encounter, participant, holder)
       end
 
       # ------------------------------------------------------------------------------

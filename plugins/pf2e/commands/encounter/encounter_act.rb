@@ -257,6 +257,7 @@ module AresMUSH
         return if CharState.emit_error!(client, Acting.casting_refused(scene, self.spell, self.words) || Ok.new(:state => nil))
         return if CharState.emit_error!(client, UntamedForm.refusal(scene, self.spell, self.words, found) || Ok.new(:state => nil))
         return if CharState.emit_error!(client, Acting.item_needed(scene, self.spell, found, self.words) || Ok.new(:state => nil))
+        return if CharState.emit_error!(client, SpellReservoir.refusal(scene, self.spell, found, self.words) || Ok.new(:state => nil))
 
         cast = Actors.of(actor.state.holder).spends_spells? ? spend_the_spell(actor.state.holder) : nil
 
@@ -271,7 +272,12 @@ module AresMUSH
         risked = Acting.casting_risked(scene, spell)
         return tell(encounter, Acting.casting_lost(scene, spell, risked, cast).state, actor.state) if risked && !risked['kept']
 
-        done = Acting.cast(scene, spell, found, self.words, :cast => cast, :noted => risked ? risked['lines'] : [])
+        # Cast into a spell reservoir, the spell waits on the weapon rather than taking effect.
+        done = if SpellReservoir.storing?(self.words)
+                 SpellReservoir.store(scene, spell, cast, found, self.words)
+               else
+                 Acting.cast(scene, spell, found, self.words, :cast => cast, :noted => risked ? risked['lines'] : [])
+               end
 
         return if CharState.emit_error!(client, done)
 

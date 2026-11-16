@@ -58,6 +58,12 @@ Some property runes give you an action while you wear the armor or wield the wea
 `encounter/act extend=<target>[/<weapon>]`: **Extending.** Strikes with the weapon that carries the rune, at a reach of 60 feet, or 120 feet with a greater rune.
 `encounter/act shine bright/<DC>[/rank <rank>]`: **Brilliant.** Rolls a counteract check against the DC of a magical darkness effect. Add the effect's rank to find out whether the check ends it.
 `encounter/act holy healing`, `encounter/act unholy bloodshed`, and `encounter/act snicker-snack`: **Holy, unholy, and vorpal.** Reacts to a critical hit you just made with the weapon. The game tells you when your Strike qualifies.
+`encounter/act antimagic armor[/<DC>]`: **Antimagic.** Reacts to a spell that just landed on you with a counteract check (+26, rank 7) against the spell's DC. If the check ends the spell, what it did to you is undone. The game tells you when you can use it.
+`encounter/act shift weapon/<weapon>`: **Shifting.** Changes the weapon into another melee weapon that needs the same number of hands, until the encounter ends. Runes that can't apply to the new shape are suppressed until it changes again.
+`encounter/act set free[=<target>]`: **Animated.** Releases the weapon to fight the target you specify, or the last enemy you attacked. At the end of each of your turns, it Strikes at +24 plus its potency rune, and then rolls a DC 6 flat check. On a failure, it falls and can't be set free again for 10 minutes. To take it back, use `encounter/equip`.
+`encounter/cast <spell>=<wielder>/reservoir`: **Spell reservoir.** Casts a spell into the weapon of the wielder you specify, while the party explores. The spell must be rank 3 or lower, take 2 actions or fewer, and be able to target a creature other than you. `encounter/gear` shows the spell a weapon contains, and it stays in the weapon after the encounter ends.
+`encounter/act channeled release=<target>`: **Spell reservoir.** Strikes with the weapon and empties it. On a hit, the stored spell targets what you hit: your Strike decides a spell attack, and a save is against DC 30.
+`encounter/act safe release`: **Spell reservoir.** Empties the weapon harmlessly.
 
 A battle form absorbs your gear, so you can't use, equip, or unequip anything until the form ends. The constant abilities of your gear still work.
 

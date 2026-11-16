@@ -369,6 +369,41 @@ OWN = {
 # `Pf2e::RuneActions` says which rune gives each and runs what it does.
 RUNE = {'from': 'action', 'source': 'Pathfinder GM Core', 'for': 'equipment'}
 OWN.update({
+    'Antimagic Armor': dict(RUNE, **{
+        'type': 'reaction', 'category': 'defensive', 'traits': ['concentrate'],
+        'frequency': {'max': 1, 'per': 'day'},
+        'description': 'Trigger A spell targets you or includes you in its area, while you wear armor etched with an '
+                       'antimagic rune.%rThe armor attempts to counteract the triggering spell with the effect of a '
+                       '7th-rank dispel magic spell and a counteract modifier of +26.'}),
+    'Channeled Release': dict(RUNE, **{
+        'type': 'action', 'cost': 2, 'category': 'offensive', 'traits': ['concentrate'],
+        'description': 'Requirements A spell is stored in the spell reservoir weapon you wield.%rMake a Strike with the '
+                       'weapon. You expend the stored spell as part of this Strike; this empties the spell from the '
+                       'weapon and allows a spell to be cast into it again. If the Strike hits, the spell targets the '
+                       'target of the attack. If the spell requires a spell attack roll, the result of your attack roll '
+                       'with the weapon determines the degree of success of the spell, and if the spell requires a '
+                       'saving throw, the DC is 30.'}),
+    'Safe Release': dict(RUNE, **{
+        'type': 'action', 'cost': 1, 'category': 'interaction', 'traits': ['concentrate'],
+        'description': 'Requirements A spell is stored in the spell reservoir weapon you wield.%rHarmlessly expend the '
+                       'stored spell. This frees the weapon to have a new spell cast into it.'}),
+    'Set Free': dict(RUNE, **{
+        'type': 'action', 'cost': 2, 'category': 'offensive', 'traits': ['concentrate', 'manipulate'],
+        'description': 'Requirements You are wielding a melee weapon etched with an animated rune.%rYou Release the '
+                       'weapon and it flutters through the air, fighting on its own against the last enemy you '
+                       'attacked, or the nearest enemy to it if your target has been defeated. At the end of your turn '
+                       'each round, the weapon can Fly up to its fly Speed of 40 feet, and then can either Fly again or '
+                       'Strike one creature within its reach. It makes Strikes with an attack modifier of +24 plus its '
+                       "item bonus to attack rolls, using the weapon's normal damage but a +0 Strength modifier. Each "
+                       'round, when the weapon finishes using its actions, attempt a DC 6 flat check. On a failure, the '
+                       "activation ends. The weapon falls to the ground and can't be Set Free again for 10 minutes."}),
+    'Shift Weapon': dict(RUNE, **{
+        'type': 'action', 'cost': 1, 'category': 'interaction', 'traits': ['manipulate'],
+        'description': 'Requirements You are wielding a melee weapon etched with a shifting rune.%rThe weapon takes the '
+                       'shape of another melee weapon that requires the same number of hands to wield. The weapon\'s '
+                       'runes and any precious material it\'s made of apply to the weapon\'s new shape. Any property '
+                       "runes that can't apply to the new form are suppressed until the item takes a shape to which "
+                       'they can apply.'}),
     'Change Size': dict(RUNE, **{
         'type': 'action', 'cost': 1, 'category': 'interaction', 'traits': ['concentrate'],
         'frequency': {'max': 1, 'per': 'day'},

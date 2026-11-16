@@ -205,6 +205,8 @@ module AresMUSH
 
         # A wand an overcharge broke or destroyed is broken or gone on their own sheet too.
         SpellItems.settle!(state)
+        # what a spell reservoir contains is its weapon's, wherever the spell was stored or released.
+        SpellReservoir.settle!(state)
 
         now = state.consumables.to_a
         held = now.select(&:copied_from).to_h { |one| [ one.copied_from.to_s, one ] }

@@ -133,6 +133,8 @@ module AresMUSH
 
       def format_wp(char,w,i)
         name = Pf2egear.get_item_name(w)
+        held = Pf2e::SpellReservoir.stored(w)
+        name = "#{name} #{t('pf2e.reservoir_contains_mark', :spell => held['spell'], :rank => held['rank'])}" if held
         bulk = w.bulk == 0.1 ? "L" : w.bulk.to_i
         prof = Pf2eCombat.get_weapon_prof(char, w.name)[0].upcase
         equip = w.equipped ? "Yes" : "No"

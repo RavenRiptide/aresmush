@@ -18,7 +18,7 @@ module AresMUSH
       let(:effects) { self.class.config('pf2e_effects').merge(self.class.config('pf2e_house_effects')) }
 
       describe "the table" do
-        it "should name only runes the catalogue holds" do
+        it "should name only runes in the catalogue" do
           known = runes.keys.map { |name| Domains.slug(name) }
           named = RuneActions::ROWS.values.flat_map { |row| row['runes'].keys }
 
@@ -31,13 +31,13 @@ module AresMUSH
           expect(missing).to eq []
         end
 
-        it "should have a row for every rune activation the catalogue holds" do
+        it "should have a row for every rune activation in the catalogue" do
           listed = actions.select { |_name, entry| entry['for'] == 'equipment' && entry['source'] == 'Pathfinder GM Core' }.keys
 
           expect(listed.sort).to eq RuneActions::ROWS.keys.sort
         end
 
-        it "should put on only effects the catalogue holds" do
+        it "should put on only effects in the catalogue" do
           named = RuneActions::ROWS.values.flat_map do |row|
             row['runes'].values.map { |grade| grade['effect'] }.compact + (row['choices'] || {}).values
           end
@@ -284,6 +284,189 @@ module AresMUSH
           hero_types('e/act snicker-snack', FightBench::LOW)
 
           expect(refused.join).to include 'Nothing has triggered'
+        end
+      end
+
+      # The encounter's copy of the hero's weapon, as it is now.
+      def wielded(name = nil)
+        Pf2egear::Inventory.held(hero, 'weapons').find { |one| name.nil? || one.name == name || one.shape_of == name }
+      end
+
+      describe "a shifting weapon" do
+        it "should take another one-handed melee weapon's shape, suppressing the runes that can't apply" do
+          own = carry('weapons', 'Longsword', [ 'Shifting', 'Vorpal' ])
+
+          hero_types('e/act shift weapon/warhammer')
+
+          expect(refused).to eq []
+          weapon = wielded('Longsword')
+          expect(weapon.name).to eq 'Warhammer'
+          expect(weapon.wp_damage_type).to eq 'B'
+          expect(Pf2egear.property_runes(weapon)).to_not include 'vorpal'
+          expect(heard).to include 'suppressed', 'Vorpal'
+          expect(PF2Weapon[own.id].name).to eq 'Longsword'
+        end
+
+        it "should bring a suppressed rune back with a shape it applies to" do
+          carry('weapons', 'Longsword', [ 'Shifting', 'Vorpal' ])
+
+          hero_types('e/act shift weapon/warhammer')
+          hero_types('e/act shift weapon/longsword')
+
+          expect(Pf2egear.property_runes(wielded('Longsword'))).to include 'vorpal'
+        end
+
+        it "should refuse a shape needing other hands, or one that isn't melee" do
+          carry('weapons', 'Longsword', [ 'Shifting' ])
+
+          hero_types('e/act shift weapon/greatsword')
+          expect(refused.join).to include 'same number of hands'
+
+          hero_types('e/act shift weapon/longbow')
+          expect(refused.join).to include 'melee'
+        end
+      end
+
+      describe "a spell reservoir" do
+        before(:each) do
+          allow_any_instance_of(PF2EncounterCastCmd).to receive(:spend_the_spell)
+            .and_return('spell name' => 'Fear', 'spell level' => '1', 'spell_abil' => 'Charisma', 'prof_level' => 'expert')
+        end
+
+        def exploring
+          encounter.update(:mode => Exploration::MODE)
+        end
+
+        it "should store a spell cast into it while the party explores" do
+          carry('weapons', 'Longsword', [ 'Spell Reservoir' ])
+          exploring
+
+          hero_types("e/cast fear=#{@hero.name}/reservoir")
+
+          expect(refused).to eq []
+          expect(wielded.reservoir).to include('spell' => 'Fear', 'rank' => 1)
+          expect(heard).to include 'casts Fear (rank 1) into'
+        end
+
+        it "should refuse to store a spell in a fight, or one too high a rank" do
+          carry('weapons', 'Longsword', [ 'Spell Reservoir' ])
+
+          hero_types("e/cast fear=#{@hero.name}/reservoir")
+          expect(refused.join).to include '1 minute'
+
+          exploring
+          hero_types("e/cast fear=#{@hero.name}/reservoir/rank 4")
+          expect(refused.join).to include 'rank 3 or lower'
+        end
+
+        it "should release the spell through a Strike, emptying the weapon, its save against DC 30" do
+          carry('weapons', 'Longsword', [ 'Spell Reservoir' ])
+          wielded.update(:reservoir => { 'spell' => 'Fear', 'rank' => 1, 'caster' => 'Someone' })
+          used = actions_used
+
+          hero_types("e/act channeled release=##{foe.number}", FightBench::HIGH)
+
+          expect(refused).to eq []
+          expect(heard).to include 'Fear', 'DC 30'
+          expect(wielded.reservoir).to eq({})
+          expect(actions_used).to eq used + 2
+          expect(TurnState.turn(hero)['attacks']).to eq 1
+        end
+
+        it "should spend the spell on a miss" do
+          carry('weapons', 'Longsword', [ 'Spell Reservoir' ])
+          wielded.update(:reservoir => { 'spell' => 'Fear', 'rank' => 1, 'caster' => 'Someone' })
+
+          hero_types("e/act channeled release=##{foe.number}", FightBench::LOW)
+
+          expect(heard).to include 'missed'
+          expect(wielded.reservoir).to eq({})
+        end
+
+        it "should empty harmlessly, and refuse a release with nothing stored" do
+          carry('weapons', 'Longsword', [ 'Spell Reservoir' ])
+          wielded.update(:reservoir => { 'spell' => 'Fear', 'rank' => 1, 'caster' => 'Someone' })
+
+          hero_types('e/act safe release')
+          expect(wielded.reservoir).to eq({})
+
+          hero_types("e/act channeled release=##{foe.number}")
+          expect(refused.join).to include 'contains no spell'
+        end
+
+        it "should keep what the weapon contains on the character's own weapon when the encounter ends" do
+          own = carry('weapons', 'Longsword', [ 'Spell Reservoir' ])
+          wielded.update(:reservoir => { 'spell' => 'Fear', 'rank' => 1, 'caster' => 'Someone' })
+
+          SpellReservoir.settle!(hero)
+
+          expect(PF2Weapon[own.id].reservoir).to include('spell' => 'Fear')
+        end
+      end
+
+      describe "an antimagic rune" do
+        before(:each) do
+          allow_any_instance_of(PF2EncounterCastCmd).to receive(:spend_the_spell)
+            .and_return('spell name' => 'Fear', 'spell level' => '1', 'spell_abil' => 'Charisma', 'prof_level' => 'expert')
+          carry('armor', 'Full Plate', [ 'Antimagic' ])
+        end
+
+        it "should offer to counteract a spell that lands on the wearer, and undo it" do
+          hero_types("e/cast fear=#{@hero.name}", FightBench::LOW)
+
+          expect(Pf2e.held_conditions(hero)).to have_key 'Frightened'
+          expect(heard).to include 'Antimagic Armor may follow'
+
+          hero_types('e/act antimagic armor', FightBench::HIGH)
+
+          expect(refused).to eq []
+          expect(heard).to include 'counteracted'
+          expect(Pf2e.held_conditions(hero)).to_not have_key 'Frightened'
+        end
+
+        it "should be too late once something else has hurt them" do
+          hero_types("e/cast fear=#{@hero.name}", FightBench::LOW)
+          Pf2eHP.get_hp_obj(hero).update(:damage => 7)
+
+          hero_types('e/act antimagic armor', FightBench::HIGH)
+
+          expect(refused.join).to include 'Too much has happened'
+        end
+      end
+
+      describe "an animated weapon" do
+        it "should fly from the hand to fight, and Strike at the end of its owner's turn" do
+          carry('weapons', 'Longsword', [ 'Animated' ])
+          used = actions_used
+
+          hero_types("e/act set free=##{foe.number}")
+
+          expect(refused).to eq []
+          expect(actions_used).to eq used + 2
+          expect(wielded.equipped).to be false
+
+          @dice = FightBench::HIGH
+          @client.said.clear
+          next_turn
+
+          expect(heard).to include 'animated Longsword Strikes', 'keeps fighting'
+        end
+
+        it "should fall on a failed flat check, and rest before it can be set free again" do
+          carry('weapons', 'Longsword', [ 'Animated' ])
+
+          hero_types("e/act set free=##{foe.number}")
+          @dice = FightBench::LOW
+          @client.said.clear
+          next_turn
+
+          expect(heard).to include 'falls to the ground'
+
+          wielded.update(:equipped => true)
+          turn_to(@hero.name)
+          hero_types("e/act set free=##{foe.number}")
+
+          expect(refused.join).to include "can't be set free again"
         end
       end
     end

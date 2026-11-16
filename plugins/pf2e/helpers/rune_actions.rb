@@ -12,6 +12,10 @@ module AresMUSH
     #   announce    tells the room, and `told` says what changes
     #   strike      Strikes with the weapon carrying the rune, as the catalogue's `strikes` says
     #   counteract  rolls a counteract check with the grade's `modifier` and `rank`
+    #   reshape     changes the weapon's shape (`ShiftingRune`)
+    #   release     releases the spell a spell reservoir contains, through a Strike or harmlessly (`SpellReservoir`)
+    #   antimagic   counteracts a spell that just landed on the wearer (`AntimagicRune`)
+    #   animate     sets the weapon fighting on its own (`AnimatedRune`)
     #   answer      a reaction to the wearer's own last Strike, when `trigger` says it qualifies
     module RuneActions
 
@@ -42,6 +46,21 @@ module AresMUSH
           'on' => 'weapons', 'run' => 'counteract',
           'runes' => { 'brilliant' => { 'modifier' => 19, 'rank' => 5 }, 'greater-brilliant' => { 'modifier' => 31, 'rank' => 9 } }
         },
+        'Antimagic Armor' => {
+          'on' => 'armor', 'run' => 'antimagic', 'runes' => { 'antimagic' => {} }
+        },
+        'Set Free' => {
+          'on' => 'weapons', 'run' => 'animate', 'runes' => { 'animated' => {} }
+        },
+        'Shift Weapon' => {
+          'on' => 'weapons', 'run' => 'reshape', 'runes' => { 'shifting' => {} }
+        },
+        'Channeled Release' => {
+          'on' => 'weapons', 'run' => 'release', 'runes' => { 'spell-reservoir' => {} }
+        },
+        'Safe Release' => {
+          'on' => 'weapons', 'run' => 'release_safely', 'runes' => { 'spell-reservoir' => {} }
+        },
         'Holy Healing' => {
           'on' => 'weapons', 'run' => 'answer', 'runes' => { 'holy' => {} }, 'trigger' => 'critical_against_unholy'
         },
@@ -68,6 +87,11 @@ module AresMUSH
         'effect' => ->(scene, name, entry, said, out) { RuneActions.put_on(scene, name, entry, said, out) },
         'announce' => ->(scene, name, _entry, _said, out) { RuneActions.announced(scene, name, out) },
         'counteract' => ->(scene, name, _entry, said, out) { RuneActions.counteracted(scene, name, said, out) },
+        'reshape' => ->(scene, _name, _entry, said, out) { ShiftingRune.act(scene, said, out) },
+        'release' => ->(scene, _name, _entry, _said, out) { SpellReservoir.channel(scene, out) },
+        'release_safely' => ->(scene, _name, _entry, _said, out) { SpellReservoir.release_safely(scene, out) },
+        'antimagic' => ->(scene, _name, _entry, said, out) { AntimagicRune.act(scene, said, out) },
+        'animate' => ->(scene, _name, _entry, _said, out) { AnimatedRune.act(scene, out) },
         'answer' => ->(scene, name, _entry, _said, out) { RuneActions.answered(scene, name, out) }
       }.freeze
 

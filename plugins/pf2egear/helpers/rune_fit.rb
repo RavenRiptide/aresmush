@@ -73,6 +73,15 @@ module AresMUSH
         Pf2e::Ok.new(:state => { 'rune' => stored, 'replaces' => kin })
       end
 
+      # Whether a rune etched on the item can apply to it as it is now, by the rune's usage alone. A shifting
+      # weapon's runes that can't apply to its new shape are suppressed until it takes one they can.
+      def self.applies?(item, name)
+        info = Pf2egear.rune_entry(name)
+        usage = info && USAGES[info['usage'].to_s]
+
+        usage ? usage[0].call(item) : false
+      end
+
       # The rune a name means, as it is stored, and its catalogue entry. A choice rune needs its choice.
       def self.rune(name)
         info = Pf2egear.rune_entry(name)

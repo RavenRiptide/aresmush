@@ -40,6 +40,18 @@ module AresMUSH
     # (`Pf2e::Staves`).
     attribute :staff_charges, :type => DataType::Integer, :default => 0
 
+    # The weapon it was bought as, while a shifting rune has its encounter copy in another shape
+    # (`Pf2e::ShiftingRune`). Empty in its own shape.
+    attribute :shape_of
+
+    # The spell a spell reservoir rune contains: `{ 'spell', 'rank', 'caster' }`, or empty when it contains none
+    # (`Pf2e::SpellReservoir`).
+    attribute :reservoir, :type => DataType::Hash, :default => {}
+
+    # An animated rune's weapon set free on its encounter copy: `{ 'target' => the combatant's number }` while
+    # it fights on its own, `{ 'rested_until' => a round }` after it falls (`Pf2e::AnimatedRune`).
+    attribute :animated, :type => DataType::Hash, :default => {}
+
     reference :character, "AresMUSH::Character"
     # An encounter's copy of a character's item, taken as they entered it: the encounter reads and changes
     # this, never the item itself. `copied_from` is the character's own item.

@@ -1686,7 +1686,10 @@ module AresMUSH
       # was told of the casting before it: the flat checks it was kept through.
       # `adds` is outcomes an item lays over the spell's own, by degree: a wand of smoldering fireballs adds
       # persistent fire to a failed save. `free` spends no actions: a wand of shardstorm's shards.
-      def self.cast(scene, spell, targets, words, cast: nil, noted: [], adds: nil, free: false)
+      # `through` is a spell released through something else that was rolled - a spell reservoir's stored
+      # spell through the Strike that carried it: `{ 'dc' => its save DC, 'degree' => the Strike's degree }`,
+      # which decides a spell attack in its place. It costs nothing more than what released it.
+      def self.cast(scene, spell, targets, words, cast: nil, noted: [], adds: nil, free: false, through: nil)
         said = said(words, scene.permitted)
         out = report
         out['lines'].concat(noted)
@@ -1716,6 +1719,7 @@ module AresMUSH
 
         attack = mechanics['attack']
         dc = casting ? spell_figure(scene.actor.holder, 'spell_dc', casting) : nil
+        dc = through['dc'] if through
         # An area's damage and healing are rolled once, and told once, for everything in it.
         once = named['area'] ? { 'spell' => spell, 'rolled' => {}, 'at' => out['lines'].size } : nil
 
@@ -1729,8 +1733,11 @@ module AresMUSH
 
           next if immune?(mechanics['traits'], out, target, DamageAbout.spell(spell))
           formulas = Adjustments.spell_damage(scene.actor.holder, mechanics, spell_damage(mechanics, rank))
+          guarded = AntimagicRune.before(each.target.holder)
 
-          if attack
+          if attack && through
+            attack_through(each, mechanics, formulas, through['degree'], out)
+          elsif attack
             spell_attack(each, spell, mechanics, casting, formulas, said, out)
           elsif mechanics['save'] && !mends?(mechanics, formulas, target)
             spell_save(each, spell, mechanics, dc, formulas, out, once)
@@ -1741,11 +1748,14 @@ module AresMUSH
           else
             spell_effect(each, spell, rank, out, said['words'])
           end
+
+          # The scene's target, which is the caster's own record where they cast it on themselves.
+          AntimagicRune.after(each.target, spell, rank, dc, guarded, out)
         end
 
         spell_effect(scene, spell, rank, out, said['words']) if targets.empty? && !named['attack'] && !named['save']
 
-        spend_casting(scene, spell, free ? '0' : named['time'], named['attack'], rank, out)
+        spend_casting(scene, spell, free ? '0' : named['time'], named['attack'], rank, out) unless through
 
         Ok.new(:state => out)
       end
@@ -1968,6 +1978,17 @@ module AresMUSH
 
         degree = rolled.dig('result', 'degree')
         outcome(scene, mechanics, degree, formulas, out) if degree
+      end
+
+      # A spell attack decided by another roll's degree: what a spell reservoir's Strike rolled.
+      def self.attack_through(scene, mechanics, formulas, degree, out)
+        if Degree.success?(degree) && formulas.any?
+          critical = degree == Degree::CRITICAL_SUCCESS
+          rows = DamageRoll.of_formulas(formulas.map { |formula, type, category, _| [ formula, type, category ] }, critical)
+          deal(scene, scene.target, rows, out, :critical => critical)
+        end
+
+        outcome(scene, mechanics, degree, formulas, out)
       end
 
       # A save against the caster's DC, rolled by each target: a basic save scales the damage, and any
