@@ -65,6 +65,13 @@ module AresMUSH
         end
       end
 
+      # Master Spellcaster implies Expert Spellcaster; sheet/features still lists both.
+      it "should name only the highest step of a progression" do
+        template = rendered_for('charclass_features' => [ 'Expert Spellcaster', 'Divine Access', 'Master Spellcaster' ])
+
+        expect(template.class_features).to eq 'Divine Access, Master Spellcaster'
+      end
+
       it "should cope with no features hash at all" do
         expect(rendered_for(nil).class_features).to eq 'None.'
       end
@@ -75,7 +82,7 @@ module AresMUSH
 
       # The template's own words, with every value it asks for stubbed.
       class SectionSheet
-        LISTS = %i{abilities skills saves resistances known_for spell_dcs}.freeze
+        LISTS = %i{abilities skills saves resistances known_for spell_dcs feat_levels feature_levels history_lines}.freeze
 
         attr_reader :section
 
@@ -110,8 +117,20 @@ module AresMUSH
         expect(shown('combat')).to include('Stats', 'Conditions')
       end
 
+      # The full sheet lists feats and features by name; their own sections list them by level.
+      it "should show feats, features and history by level in their own sections" do
+        expect(shown('feats')).to eq [ 'Feats by Level' ]
+        expect(shown('features')).to eq [ 'Features by Level' ]
+        expect(shown('history')).to eq [ 'History' ]
+      end
+
       it "should show every section for all" do
         expect(shown('all')).to include('Basic Information', 'Attributes', 'Stats', 'Skills', 'Languages', 'Feats', 'Magic')
+      end
+
+      # A level-20 history runs long, so it is its own view and never part of the full sheet.
+      it "should leave the history and the by-level lists out of all" do
+        expect(shown('all')).not_to include('History', 'Feats by Level', 'Features by Level')
       end
     end
   end

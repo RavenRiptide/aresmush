@@ -261,23 +261,23 @@ module AresMUSH
         labels.empty? ? "None active." : labels.join(", ")
       end
 
+      # Names only, in alphabetical order. Each feat's type and the level it was taken at are on
+      # `sheet/feats`, so the main sheet stays short.
       def feats
         list = []
 
         # Each stored instance becomes its own entry, so a repeatable feat shows once per
         # taking with the choice that instance was taken for.
         %w(charclass ancestry general skill dedication).each do |type|
-          Pf2e.feat_display_list(@char, Pf2e::DraftSheet.of(@char).feats_by_bucket[type] || []).each do |name|
-            list << format_feat(name, type)
-          end
+          list.concat(Pf2e.feat_display_list(@char, Pf2e::DraftSheet.of(@char).feats_by_bucket[type] || []))
         end
 
         # A feat a daily choice lends them for the day (Combat Flexibility), marked as such.
         Pf2e::DailyChoices.feats(@char).each do |lent|
-          list << format_feat(Pf2e::DailyChoices.label('pick' => lent['feat'], 'choice' => lent['choice']), 'day')
+          list << "#{Pf2e::DailyChoices.label('pick' => lent['feat'], 'choice' => lent['choice'])} (today)"
         end
 
-        list.sort.join(", ")
+        list.empty? ? "None." : list.sort.join(", ")
       end
 
       def class_features
@@ -288,11 +288,84 @@ module AresMUSH
         feature_list('archetype_features')
       end
 
-      # The fold only makes a bucket that has something in it, so a bucket may be missing.
+      # The fold only makes a bucket that has something in it, so a bucket may be missing. Only the
+      # highest step of a progression shows; `sheet/features` lists every step.
       def feature_list(bucket)
-        held = Pf2e.feature_display_list(@char, bucket)
+        held = FeatureLadders.collapse(Pf2e.feature_display_list(@char, bucket))
 
         held.empty? ? "None." : held.join(", ")
+      end
+
+      # ------------------------------------------------------------------------------------
+      # By level: sheet/feats, sheet/features and sheet/history
+      # ------------------------------------------------------------------------------------
+
+      # The levels `sheet/history` was limited to, or nil for every level.
+      attr_accessor :history_range
+
+      # The character the ledger belongs to: `e/sheet` hands the template their encounter state.
+      def person
+        @person ||= Actors.of(@char).person
+      end
+
+      def ledger_rows
+        @ledger_rows ||= Ledger.rows(person)
+      end
+
+      def history_heading(group)
+        case group
+        when :before then t('pf2e.sheet_history_before')
+        when :global then t('pf2e.sheet_history_global')
+        else t('pf2e.sheet_history_level', :level => group)
+        end
+      end
+
+      # One line per level: "Level 2: Battle Medicine (skill feat), Champion Dedication (archetype feat)."
+      def level_lines(groups)
+        groups.map { |group, items| "#{item_color}#{history_heading(group)}:%xn #{items.join(', ')}." }
+      end
+
+      def feat_levels
+        by_level(level_lines(LevelHistory.feats_by_level(ledger_rows, person.pf2_level)))
+      end
+
+      def feature_levels
+        by_level(level_lines(LevelHistory.features_by_level(ledger_rows, person.pf2_level)))
+      end
+
+      # A level heading on its own line, then a line per kind of thing taken at that level.
+      def history_lines
+        groups = LevelHistory.groups(ledger_rows, person.pf2_level, :range => @history_range)
+
+        lines = groups.flat_map do |group, rows|
+          [ "#{item_color}#{history_heading(group)}:%xn" ] + rows.map { |label, items| "%b%b#{label}: #{items.join(', ')}." }
+        end
+
+        by_level(lines)
+      end
+
+      # What a by-level view says when it has nothing to list, and the level still being drafted.
+      def by_level(lines)
+        return [ t('pf2e.sheet_history_not_approved', :name => person.name) ] unless Ledger.finalized?(person)
+
+        if lines.empty?
+          lines = [ @history_range ? t('pf2e.sheet_history_none_in_range', :name => person.name, :range => range_words) :
+                                     t('pf2e.sheet_history_empty', :name => person.name) ]
+        end
+
+        drafting = person.pf2_level.to_i + 1
+        lines += [ t('pf2e.sheet_history_in_progress', :level => drafting) ] if person.advancing && in_range?(drafting)
+
+        lines
+      end
+
+      def in_range?(level)
+        @history_range.nil? || @history_range.cover?(level)
+      end
+
+      def range_words
+        r = @history_range
+        r.first == r.last ? "level #{r.first}" : "levels #{r.first} to #{r.last}"
       end
 
       # Through DraftSheet, so a language picked during chargen or an open level-up shows on the
@@ -495,12 +568,6 @@ module AresMUSH
         fmt_prof = prof.to_s[0].to_s.upcase
 
         "#{fmt_name} (#{fmt_prof})"
-      end
-
-      def format_feat(name, type)
-        fmt_type = type.upcase[0..1]
-
-        "#{name} (%xh%xx#{fmt_type}%xn)"
       end
 
       def format_save(char,name)

@@ -201,6 +201,7 @@ module AresMUSH
           # Process according to the data type of the key.
           heading = key.gsub("charclass", "class feat")
                        .gsub(/(?<!raise )skill/, "skill feat(s)")
+                       .gsub("raise ability", "raise attributes")
                        .gsub("key ability", "key attribute")
                        .split(/[_\s]+/)
                        .map {|word| word.capitalize}

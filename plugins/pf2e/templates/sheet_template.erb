@@ -82,16 +82,28 @@
 <% end %>
 <% if section == "all" %>
 <%= section_line("Class & Archetype Features") %>
-<% end %>
-<% if [ "features", "all" ].include?(section) %>
 <%= "#{item_color}Class Feature(s)%xn: #{class_features}" %>
 <%= "#{item_color}Archetype Feature(s)%xn: #{archetype_features}" %>
-<% end %>
-<% if section == "all" %>
 <%= section_line("Feats") %>
-<% end %>
-<% if [ "feats", "all" ].include?(section) %>
 <%= feats %>
+<% end %>
+<% if section == "features" %>
+<%= section_line("Features by Level") %>
+<% feature_levels.each do |line| %>
+<%= line %>
+<% end %>
+<% end %>
+<% if section == "feats" %>
+<%= section_line("Feats by Level") %>
+<% feat_levels.each do |line| %>
+<%= line %>
+<% end %>
+<% end %>
+<% if section == "history" %>
+<%= section_line("History") %>
+<% history_lines.each do |line| %>
+<%= line %>
+<% end %>
 <% end %>
 <% if section == "all" %>
 <%= section_line("Known For...") -%>

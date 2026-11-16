@@ -3,6 +3,8 @@ toc: Pathfinder Second Edition
 summary: Pathfinder 2E sheets and sheet sections.
 aliases:
 - sheet
+- sheet_history
+- level_history
 ---
 
 # Pathfinder 2E Sheets
@@ -11,6 +13,11 @@ aliases:
 `sheet <name>`: Views someone else's sheet.
 `sheet/<section>`: Views <section> of your sheet. See Valid Sections below.
 `sheet/<section> <name>`: Views <section> of <name>'s sheet.
+`sheet/history`: Lists what you chose or were given at each level, such as feats, attribute boosts, skill increases, languages, spells, and formulas.
+%t **Note:** If your character was created before levels were tracked, the choices made then are listed together under "Before level tracking", because the level of each one wasn't recorded. Anything not tied to a level, such as a formula you bought, is listed last.
+`sheet/history <level>`: Lists what you chose or were given at one level, such as `sheet/history 5`.
+`sheet/history <first>-<last>`: Lists what you chose or were given at a range of levels, such as `sheet/history 3-7`.
+`sheet/history <name>` and `sheet/history <name>=<first>-<last>`: Lists the same for someone else.
 `csheet` and `csheet <name>`: Alias for `sheet/combat`.
 %t **Note:** The combat sheet is available once a character is approved. During chargen, use `sheet` instead.
 `sheet/why <figure>`: Shows the math behind one number on your sheet: its base value, and every bonus and penalty applied to it. `<figure>` can be `hp`, `ac`, `speed`, `perception`, a save (`fortitude`, `reflex`, or `will`), `class dc`, or a skill or lore by name.
@@ -30,8 +37,9 @@ The following sections are valid switches for this command.
 * **info** or **top**: Shows basic character information.
 * **attributes**: Shows attribute modifiers. (P) marks a partial boost, which is halfway to the next modifier.
 * **combat**: Shows derived stats, AC, to-hit, attacks and their bonuses, and lists feats that may apply in combat.
-* **features**: Shows class-specific features gained from your class and dedication archetypes.
-* **feats**: Shows general and skill feats.
+* **features**: Shows the features your class and archetypes gave you, by the level you gained each one. The full sheet shows only the highest step of a feature that improves as you level, such as Master Spellcaster in place of Expert Spellcaster.
+* **feats**: Shows your feats by the level you took each one, and what type of feat each one is.
+* **history**: Shows what you chose or were given at each level, such as feats, attribute boosts, and skill increases. Add a level or a range of levels to show only those, such as `sheet/history 3-7`.
 * **languages**: Shows known languages.
 * **magic**: Shows focus spells and spells per-day / remaining for spellcasting classes.
 * **skills**: Shows skills and their modifiers.

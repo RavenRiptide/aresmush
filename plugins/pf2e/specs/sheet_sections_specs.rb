@@ -19,7 +19,7 @@ module AresMUSH
 
       describe :sections do
         it "should include every section a player can be shown" do
-          expect(Sheet.sections).to include('all', 'info', 'attributes', 'skills', 'feats', 'features', 'languages', 'magic', 'combat')
+          expect(Sheet.sections).to include('all', 'info', 'attributes', 'skills', 'feats', 'features', 'languages', 'magic', 'combat', 'history')
         end
 
         # PF2e's Remaster renamed ability scores to attributes; there is no alias for the old word.

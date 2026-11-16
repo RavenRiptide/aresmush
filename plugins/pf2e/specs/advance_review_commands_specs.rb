@@ -68,6 +68,20 @@ module AresMUSH
           expect(missing).to eq []
         end
       end
+
+      # PF2e's Remaster calls them attributes. The draft's key is still `raise ability`, but a player
+      # never sees that word.
+      describe "an attribute boost slot" do
+        it "should be headed Raise Attributes" do
+          template = PF2AdvanceReviewTemplate.allocate
+          allow(template).to receive(:item_color).and_return('')
+
+          line = template.option_lines_for('raise ability', %w(open open open open)).first
+
+          expect(line).to start_with('Raise Attributes:')
+          expect(line).not_to include('Ability')
+        end
+      end
     end
   end
 end

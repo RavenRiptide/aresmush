@@ -391,6 +391,14 @@ en:
     formula_level_unknown: "Unknown level"
 
     has_code: "This character has edicts and anathema."
+    sheet_history_not_approved: "%{name}'s history starts when they're approved. Until then, everything on their sheet is still a draft."
+    sheet_history_empty: "Nothing is recorded for %{name} yet."
+    sheet_history_none_in_range: "Nothing is recorded for %{name} at %{range}."
+    sheet_history_in_progress: "Level %{level} is in progress. It appears here when the level-up is finished."
+    sheet_history_bad_range: "'%{range}' isn't a level or a range of levels. Specify a level, such as 5, or a range, such as 3-7."
+    sheet_history_before: "Before level tracking (levels not recorded)"
+    sheet_history_global: "Not tied to a level"
+    sheet_history_level: "Level %{level}"
     healing_applied_ok: "You heal %{amount} points of damage to %{list}."
 
     exploration_view_title: "Exploring (encounter %{id})"

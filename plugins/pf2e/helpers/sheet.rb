@@ -21,6 +21,7 @@ module AresMUSH
         { 'name' => 'features' },
         { 'name' => 'languages' },
         { 'name' => 'combat' },
+        { 'name' => 'history' },
         {
           'name' => 'magic',
           'requires' => lambda { |char| !!char.magic },
