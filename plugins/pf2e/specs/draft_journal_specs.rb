@@ -93,6 +93,59 @@ module AresMUSH
           expect(Pf2eSkills.find_skill('Arcana', reread).prof_level).to eq 'untrained'
         end
 
+        # Focus spells live on spellcasting entries, a collection on the character, so the snapshot
+        # reads them as a slice of their own.
+        describe "a focus spell" do
+          def warden_spells
+            Pf2emagic::Entries.stored(reread)
+              .select { |entry| entry['category'] == Pf2emagic::Entries::FOCUS }
+              .flat_map { |entry| Array((entry['known'] || {})['spell']) }
+          end
+
+          def grant(spell)
+            Pf2emagic::Entries.grant_focus!(reread, 'warden', [ spell ], :kind => 'spell', :granted_by => 'Initiate Warden')
+          end
+
+          it "should take back a focus spell the step granted" do
+            DraftJournal.step!(@char, 'cg/option') { grant('Heal Companion') }
+
+            expect(warden_spells).to eq [ 'Heal Companion' ]
+
+            DraftJournal.undo!(reread)
+
+            expect(warden_spells).to be_empty
+            expect(reread.spellcasting_entries.to_a).to be_empty
+          end
+
+          it "should put the spell back on a redo" do
+            DraftJournal.step!(@char, 'cg/option') { grant('Heal Companion') }
+            DraftJournal.undo!(reread)
+            DraftJournal.redo!(reread)
+
+            expect(warden_spells).to eq [ 'Heal Companion' ]
+          end
+
+          it "should put back a focus spell the step took away" do
+            grant('Heal Companion')
+            DraftJournal.step!(@char, 'feat/unset') { reread.spellcasting_entries.to_a.each { |row| row.delete } }
+
+            expect(warden_spells).to be_empty
+
+            DraftJournal.undo!(reread)
+
+            expect(warden_spells).to eq [ 'Heal Companion' ]
+          end
+
+          # A shape saved before the snapshot held spellcasting entries cannot say what they were,
+          # so the diff leaves them out rather than reading the missing slice as "none".
+          it "should leave out a slice the before side does not hold" do
+            before = DraftSnapshot.of(@char).reject { |slice, _v| slice == 'spellcasting' }
+            grant('Heal Companion')
+
+            expect(DraftSnapshot.diff(before, DraftSnapshot.of(reread))).to_not have_key 'spellcasting'
+          end
+        end
+
         it "should write a delta back" do
           before = DraftSnapshot.of(@char)
           @char.update(:pf2_lang => [ 'Kamin' ])

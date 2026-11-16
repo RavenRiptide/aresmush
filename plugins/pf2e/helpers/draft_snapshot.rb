@@ -3,10 +3,11 @@ module AresMUSH
 
     # What a character's draft looks like, and how to move it back to an earlier shape.
     #
-    # A draft lives in attributes on the character, the skill and ability rows, and the three rows
-    # the character references: their magic, their combat proficiencies and their hit points. A
-    # snapshot reads all of them; a diff of two snapshots holds only what changed, with the value
-    # from the `before` side; restoring writes those values back.
+    # A draft lives in attributes on the character, the skill and ability rows, the three rows the
+    # character references (their magic, their combat proficiencies and their hit points), and their
+    # spellcasting entries, which hold every focus spell. A snapshot reads all of them; a diff of two
+    # snapshots holds only what changed, with the value from the `before` side; restoring writes
+    # those values back.
     #
     # Attributes are taken by rule rather than by list - everything the chargen and advancement
     # code can write, minus the few things a draft does not own. A list would have to be extended
@@ -110,8 +111,55 @@ module AresMUSH
         },
         'magic' => side_slice('magic'),
         'combat' => side_slice('combat'),
-        'hp' => side_slice('hp')
+        'hp' => side_slice('hp'),
+        # A collection on the character, not an attribute of the magic row, so the magic slice does
+        # not see it. Without this a rewound feat left the focus spell it granted behind, and taking
+        # the feat again granted a second one.
+        'spellcasting' => {
+          'read' => lambda { |char| DraftSnapshot.entries(char) },
+          'write' => lambda { |char, values| DraftSnapshot.write_entries(char, values) }
+        }
       }.freeze
+
+      # What a spellcasting entry holds that belongs to play rather than to the build: the spells
+      # prepared today and the uses spent, kept out for the reason SIDE_MODELS keeps its transients.
+      ENTRY_TRANSIENT = %w{prepared uses}.freeze
+
+      # An entry is identified by name, category and source together, as Entries.store! finds one.
+      def self.entry_key(held)
+        [ held['name'], held['category'], held['granted_by'] ].map(&:to_s).join('|')
+      end
+
+      def self.entries(char)
+        return {} unless char.respond_to?(:spellcasting_entries)
+
+        char.spellcasting_entries.to_a.each_with_object({}) do |row, held|
+          values = row.to_h.reject { |field, _v| ENTRY_TRANSIENT.include?(field) }
+
+          held[entry_key(values)] = values
+        end
+      end
+
+      # No entry on the before side means the step created it, so it goes. An entry the step took
+      # away is made again.
+      def self.write_entries(char, values)
+        return unless char.respond_to?(:spellcasting_entries)
+
+        rows = char.spellcasting_entries.to_a.group_by { |row| entry_key(row.to_h) }
+
+        values.each_pair do |key, held|
+          found = Array(rows[key])
+
+          if held.nil?
+            found.each { |row| row.delete }
+            next
+          end
+
+          row = found.first || Pf2eSpellcastingEntry.create(:character => char, :name => held['name'])
+
+          row.update(held.reject { |field, _v| field == 'name' }.transform_keys(&:to_sym))
+        end
+      end
 
       # Every skill row's rank, in two round trips rather than one per row.
       #
@@ -158,8 +206,14 @@ module AresMUSH
 
       # What to write to turn `after` back into `before`: the before value of every key the two
       # disagree on, and nothing for a slice they agree on entirely.
+      #
+      # A slice the before side does not hold at all is skipped. A checkpoint or journal step saved
+      # before that slice existed would otherwise read as "nothing there", and restoring it would
+      # delete every row the slice covers.
       def self.diff(before, after)
         SLICES.keys.each_with_object({}) do |name, delta|
+          next unless before.key?(name)
+
           was = before[name] || {}
           now = after[name] || {}
           changed = (was.keys | now.keys).reject { |key| was[key] == now[key] }

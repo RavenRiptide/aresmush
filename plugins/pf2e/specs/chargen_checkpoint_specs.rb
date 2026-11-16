@@ -128,6 +128,60 @@ module AresMUSH
         expect(DraftSnapshot.ability_scores(Character[@char.id]).values.uniq).to eq [ 10 ]
       end
 
+      # A focus spell is held on a spellcasting entry, a collection beside the character rather
+      # than one of its attributes. A restore that missed it left Initiate Warden's spell behind
+      # when the feat went, and taking the feat again granted another, so a ranger could collect
+      # all three initial warden spells.
+      describe "a focus spell a feat granted" do
+        def warden_spells(char)
+          Pf2emagic::Entries.stored(char)
+            .select { |entry| entry['category'] == Pf2emagic::Entries::FOCUS && entry['name'].to_s.casecmp?('warden') }
+            .flat_map { |entry| Array((entry['known'] || {})['spell']) }
+        end
+
+        # The builder takes no feat with a choice, so the ranger takes Initiate Warden by hand in
+        # the slot a rewound skills stage opens again.
+        def take_warden(spell)
+          @builder.clear
+          @builder.run "commit skills"
+          @builder.run "cg/feat charclass=Initiate Warden"
+          @builder.run "cg/option Initiate Warden=#{spell}"
+
+          expect(@builder.failures).to be_empty
+
+          Character[@char.id]
+        end
+
+        before(:each) do
+          @builder = AutoBuilder.new(@char)
+          @builder.build_level_one('Ranger')
+          restore('skills')
+        end
+
+        it "should take the spell back when the skills stage is rewound" do
+          expect(warden_spells(take_warden('Heal Companion'))).to eq [ 'Heal Companion' ]
+
+          expect(warden_spells(restore('skills'))).to be_empty
+        end
+
+        it "should leave only the spell picked the second time" do
+          take_warden('Heal Companion')
+          restore('skills')
+
+          expect(warden_spells(take_warden('Gravity Weapon'))).to eq [ 'Gravity Weapon' ]
+        end
+
+        # A checkpoint saved before the snapshot held spellcasting entries has no record of them. It
+        # must leave them alone rather than read as "none", which would delete every entry.
+        it "should leave the entries alone when the checkpoint predates them" do
+          char = take_warden('Heal Companion')
+          row = Pf2e::Checkpoints.find(char, 'skills')
+          row.update(:shape => row.shape.reject { |slice, _v| slice == 'spellcasting' })
+
+          expect(warden_spells(restore('skills'))).to eq [ 'Heal Companion' ]
+        end
+      end
+
       # The picks the stage needed were restored with it, so there is nothing left open and the
       # stage commits straight away.
       it "should let the rewound stage be committed again" do
