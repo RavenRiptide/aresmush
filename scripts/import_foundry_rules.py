@@ -49,6 +49,18 @@ SOURCES = [
     ('actions', ['pf2e_actions.yml']),
 ]
 
+# Ancestry feats the setting renames, as their pack names them and as ours do. Feats are matched on
+# name, so without this an orc's Tusks (Orc) never finds our Tusks (Oruch) and takes no rules. Listed
+# one by one rather than by swapping ancestry names, because a swap would also reach the Lore feats,
+# whose skills our own `grants` already train.
+FEATS_RENAMED = {
+    'Tusks (Orc)': 'Tusks (Oruch)',
+    'Orc Superstition': 'Oruch Superstition',
+    'Irrepressible (Halfling)': 'Irrepressible (Bassin)',
+    'Unfettered Halfling': 'Unfettered Bassin',
+    'Watchful Halfling': 'Watchful Bassin',
+}
+
 # A subclass as their pack names it: a barbarian's Fury is their Fury Instinct, a sorcerer's Draconic
 # their Bloodline: Draconic. Any class not named here calls it what we do.
 SUBCLASS_NAMES = {'Barbarian': '{} Instinct', 'Druid': '{} Order', 'Sorcerer': 'Bloodline: {}',
@@ -816,6 +828,9 @@ def main():
         if pack == 'actions':
             from import_foundry_actions import RENAMED
             theirs = {RENAMED.get(item, item): found for item, found in theirs.items() if item not in RENAMED.values()}
+        if pack == 'feats':
+            theirs = {FEATS_RENAMED.get(item, item): found for item, found in theirs.items()
+                      if item not in FEATS_RENAMED.values()}
 
         # The class features' catalogue is made from the class tables, then filled like any other.
         made = class_feature_catalogue(theirs) if pack == 'class-features' else None

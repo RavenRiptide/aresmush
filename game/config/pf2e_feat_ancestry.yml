@@ -2838,6 +2838,15 @@ pf2e_feats:
     shortdesc: You are easily able to ward off attempts to play on your fears and emotions. When you roll a success on a saving throw against an emotion effect, you get a critical success instead. If your heritage is gutsy bassin, when you roll a critical failure on a saving throw against an emotion effect, you get a failure instead.
     prereq:
       level: 9
+    rules:
+      - key: "AdjustDegreeOfSuccess"
+        selector: "saving-throw"
+        adjustment: {"success": "one-degree-better"}
+        predicate: ["item:trait:emotion"]
+      - key: "AdjustDegreeOfSuccess"
+        selector: "saving-throw"
+        adjustment: {"criticalFailure": "one-degree-better"}
+        predicate: ["item:trait:emotion", "heritage:gutsy"]
   Jinx Glutton:
     feat_type:
       - Ancestry
@@ -3674,6 +3683,16 @@ pf2e_feats:
     prereq:
       level: 1
     actions: reaction
+    rules:
+      - key: "RollOption"
+        option: "orc-superstition"
+        toggleable: true
+        predicate: [{"not": "feat:pervasive-superstition"}]
+      - key: "FlatModifier"
+        selector: "saving-throw"
+        type: "circumstance"
+        value: 1
+        predicate: ["orc-superstition", {"or": ["arcane", "divine", "primal", "occult", "magical"]}]
   Oruch Weapon Familiarity:
     feat_type:
       - Ancestry
@@ -5339,6 +5358,19 @@ pf2e_feats:
     shortdesc: You were either pressed into indentured servitude or shackled in a prison, but you've since escaped and have trained to ensure you'll never be caught again. Whenever you roll a success on a check to Escape or a saving throw against an effect that would impose the grabbed, immobilized, or restrained condition on you, you get a critical success instead. Whenever a creature rolls a failure on a check to Grapple you, it gets a critical failure instead.
     prereq:
       level: 1
+    rules:
+      - key: "AdjustDegreeOfSuccess"
+        selector: "saving-throw"
+        adjustment: {"success": "one-degree-better"}
+        predicate: [{"or": ["inflicts:grabbed", "inflicts:immobilized", "inflicts:restrained"]}]
+      - key: "AdjustDegreeOfSuccess"
+        selector: "skill-check"
+        adjustment: {"success": "one-degree-better"}
+        predicate: ["action:escape"]
+      - key: "AdjustDegreeOfSuccess"
+        selector: "attack-roll"
+        adjustment: {"success": "one-degree-better"}
+        predicate: ["action:escape"]
   Unhampered Passage:
     feat_type:
       - Ancestry
@@ -5641,6 +5673,12 @@ pf2e_feats:
     shortdesc: "You pay close attention to the people around you, allowing you to more easily notice when they act out of character. You gain a +2 circumstance bonus to Perception checks when using the Sense Motive basic action to notice enchanted or possessed characters. If you aren't actively using Sense Motive on an enchanted or possessed character, the GM rolls a secret check, without your usual circumstance bonus, for you to potentially notice the enchantment or possession anyway.%r%rIn addition to using it for skill checks, you can use the Aid basic action to grant a bonus to another creature's saving throw or other check to overcome enchantment or possession. As usual for Aid, you need to prepare by using an action on your turn to encourage the creature to fight against the effect."
     prereq:
       level: 1
+    rules:
+      - key: "FlatModifier"
+        selector: "perception"
+        type: "circumstance"
+        value: 2
+        predicate: ["action:sense-motive", {"or": ["target:trait:possessed", "target:trait:enchanted"]}]
   Wind God's Fan:
     feat_type:
       - Ancestry
