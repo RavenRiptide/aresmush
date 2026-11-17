@@ -39,7 +39,7 @@ module AresMUSH
 
         named = found.state.first
 
-        return client.emit_failure(t('pf2e.nothing_to_do')) unless Pf2e::Crafting.known?(char, self.category, named)
+        return client.emit_failure(t('pf2e.nothing_to_do')) unless Pf2e::Crafting.in_book?(char, self.category, named)
 
         Pf2e::Crafting.forget!(char, self.category, named, :by => enactor.name)
 

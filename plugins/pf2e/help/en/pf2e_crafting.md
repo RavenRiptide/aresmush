@@ -19,6 +19,8 @@ Formulas are formalized instructions for making items. For full rules on formula
 `formula/buy <category>=<item>`: Buys a formula, and takes its price out of your money. In PF2e, a formula's price depends on the item's level, not on the item's own price.
 %t **Note:** You need to be approved for play to buy formulas.
 %t **Note:** You can buy the formula for an uncommon or rare item with this command only if a feat or class you have names the item. For any other uncommon or rare formula, put in a request to buy it with RPP and money. For more information about buying uncommon and rare items, see `help vendor`.
+%t **Note:** One formula lets you make every version of its item, so you can't buy a formula for a version you can already make. For example, the formula for Elixir of Life (Minor) also lets you make Elixir of Life (Lesser) once you reach level 5, the item's level.
+%t **Note:** Some versions need their own formula. Each aeon stone is really a different item, so each stone needs its own formula. An uncommon version of an item also needs its own formula if you only know the formula for a common version.
 
 Your class and some feats also give you formulas to pick. For more information about picking them, see `help cg_formulas` for character generation or `help advanceformulas` for a level-up.
 

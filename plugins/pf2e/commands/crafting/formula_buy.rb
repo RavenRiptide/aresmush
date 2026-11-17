@@ -14,9 +14,7 @@ module AresMUSH
       end
 
       def check_known
-        return nil unless Crafting.known?(enactor, self.category, entry.state.first)
-
-        t('pf2e.formula_known', :formula => entry.state.first)
+        Crafting.known_message(enactor, self.category, entry.state.first)
       end
     end
 

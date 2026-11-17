@@ -88,6 +88,12 @@ module AresMUSH
           expect(prepare('acid flask (lesser)', 1).code).to eq :no_formula
         end
 
+        # The player report: the lesser formula is all an alchemist needs for the moderate type at 3rd level.
+        it "should take a higher type of a formula they know, once their level reaches it" do
+          expect(prepare("alchemist's fire (moderate)", 1).ok?).to be true
+          expect(Alchemy.quick!(standing, "alchemist's fire (moderate)").state).to eq [ "Alchemist's Fire (Moderate)" ]
+        end
+
         it "should never offer a versatile vial, which is made, not prepared" do
           expect(prepare('versatile vial (lesser)', 1).err?).to be true
         end

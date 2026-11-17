@@ -396,13 +396,14 @@ module AresMUSH
       # ------------------------------------------------------------------------------
       # Brewing a batch
 
-      # The formulas they know in a category that carry one of the traits, no higher than their level.
+      # The items their formulas make in a category that carry one of the traits, no higher than their
+      # level - every type of a formula they know, not only the type written in the book.
       def self.known_formulas(char, filter)
         category = (filter['category'] || 'consumables').to_s
         traits = Crafting.words(filter['traits'])
 
-        Array((char.pf2_formula_book || {})[category]).map(&:to_s).uniq.select { |name|
-          info = Global.read_config("pf2e_#{category}", name)
+        Crafting.makeable_names(char, category).uniq.select { |name|
+          info = Crafting.info_for(category, name)
 
           info.is_a?(Hash) && info['level'].to_i <= char.pf2_level.to_i &&
             (traits.empty? || (Crafting.words(info['traits']) & traits).any?)

@@ -42,7 +42,9 @@ module AresMUSH
 
         named = found.state.first
 
-        return client.emit_failure(t('pf2e.formula_known', :formula => named)) if Pf2e::Crafting.known?(char, self.category, named)
+        refused = Pf2e::Crafting.known_message(char, self.category, named)
+
+        return client.emit_failure(refused) if refused
 
         Pf2e::Crafting.learn!(char, self.category, named, :source_type => 'staff', :source_ref => "formula: #{named}",
                                                           :granted_by => enactor.name)

@@ -940,6 +940,7 @@ en:
     alchemy_left_off: "%{name}'s preparations make up to %{cap} items, so %{items} from their list were left off."
     alchemy_quick: "%xh%{name}%xn makes %{item} on the spot; it lasts until their next turn."
     formula_known: "You already know the formula for %{formula}."
+    formula_covered: "The formula for %{known} already makes every type of the item, including %{formula}."
     formula_not_common: "%{formula} isn't a common item. To get its formula, put in a request."
     formula_not_approved: "%{char} isn't approved yet. Add formulas once they are."
     access_kinds: "You can give access to: spell."

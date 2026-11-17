@@ -93,9 +93,36 @@ module AresMUSH
         expect(@client.failures.last).to eq t('pf2e.formula_known', :formula => 'Healing Potion (Minor)')
 
         char.update(:pf2_money => 1)
-        run(PF2FormulaBuyCmd, 'formula/buy consumables=healing potion (lesser)')
+        run(PF2FormulaBuyCmd, "formula/buy consumables=alchemist's fire (lesser)")
 
         expect(@client.failures.last).to eq t('pf2egear.not_enough_you', :item => 'money for that formula')
+      end
+
+      # One formula makes every type of its item, so a higher type is no new formula to buy or give.
+      it "should refuse another type of a formula they know, saying which formula makes it" do
+        run(PF2FormulaBuyCmd, 'formula/buy consumables=healing potion (minor)')
+        purse = char.pf2_money
+
+        run(PF2FormulaBuyCmd, 'formula/buy consumables=healing potion (lesser)')
+
+        expect(@client.failures.last).to eq t('pf2e.formula_covered', :known => 'Healing Potion (Minor)', :formula => 'Healing Potion (Lesser)')
+        expect(known).to eq [ 'Healing Potion (Minor)' ]
+        expect(char.pf2_money).to eq purse
+
+        allow_any_instance_of(Character).to receive(:has_permission?).and_return(true)
+        run(PF2FormulaAddCmd, "formula/add #{char.name}=consumables/healing potion (lesser)")
+
+        expect(@client.failures.last).to eq t('pf2e.formula_covered', :known => 'Healing Potion (Minor)', :formula => 'Healing Potion (Lesser)')
+      end
+
+      it "should remove only a formula written in the book, not a type it makes" do
+        allow_any_instance_of(Character).to receive(:has_permission?).and_return(true)
+        run(PF2FormulaBuyCmd, 'formula/buy consumables=healing potion (minor)')
+
+        run(PF2FormulaRemoveCmd, "formula/remove #{char.name}=consumables/healing potion (lesser)")
+
+        expect(@client.failures.last).to eq t('pf2e.nothing_to_do')
+        expect(known).to eq [ 'Healing Potion (Minor)' ]
       end
 
       it "should record how it was come by, so it can be explained and taken back" do
