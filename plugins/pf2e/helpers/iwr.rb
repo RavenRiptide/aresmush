@@ -269,6 +269,16 @@ module AresMUSH
                       .map { |one| one['category'] == 'immunity' ? 'immune' : "#{one['category']} #{one['adjustment']}" }
       end
 
+      # The same, worded for the player whose damage it changed, with the kind it was against: `immune to
+      # poison`, `cold weakness 5`, `fire resistance 5`. A label's exceptions and doublings are left out.
+      def self.told(applied)
+        Array(applied).reject { |one| one['category'] != 'immunity' && one['adjustment'].to_i.zero? }.map do |one|
+          type = one['type'].to_s.sub(/ \(.*\)\z/, '').tr('-', ' ')
+
+          one['category'] == 'immunity' ? "immune to #{type}" : "#{type} #{one['category']} #{one['adjustment'].to_i.abs}"
+        end
+      end
+
       # ------------------------------------------------------------------------------
       # Damage
 

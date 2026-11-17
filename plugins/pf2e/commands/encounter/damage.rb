@@ -71,14 +71,14 @@ module AresMUSH
           why = Pf2e::IWR.words(held['applied'])
           changed << t('pf2e.damage_taken', :name => holder.name, :taken => held['amount'], :why => why.join(', ')) if why.any?
 
-          Pf2e::Actors.of(holder).notify_damage(self.damage, enactor.name)
+          Pf2e::Actors.of(holder).notify_damage(held['amount'], enactor.name, Pf2e::IWR.told(held['applied']))
           Pf2e::Acting.dropped(Pf2e::Combatants::Combatant.new(holder, holder.name, nil), standing, dropped, held.merge('encounter' => encounter))
 
           holder.name
         end
 
         client.emit_success t('pf2e.damage_applied_ok', :list => ok_char_list.sort.join(", "), :amount => self.damage)
-        # What someone resists or is weak to is the GM's to know of the damage they named.
+        # The GM sees what changed the damage they named for each target; a player's notification says it too.
         changed.each { |line| client.emit_ooc line }
 
         # The room is told who it dropped, as a Strike tells it.

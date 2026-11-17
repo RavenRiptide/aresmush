@@ -225,8 +225,13 @@ module AresMUSH
         true
       end
 
-      def notify_damage(amount, source)
-        Login.notify person, :pf2_damage, t('pf2e.you_took_damage', :amount => amount, :source => source), 0
+      # `why` is what changed the amount: their immunities, weaknesses, and resistances, as IWR.told gives them.
+      def notify_damage(amount, source, why = [])
+        message = why.any? ?
+          t('pf2e.you_took_damage_why', :amount => amount, :source => source, :why => why.join(', ')) :
+          t('pf2e.you_took_damage', :amount => amount, :source => source)
+
+        Login.notify person, :pf2_damage, message, 0
       end
 
       # The player behind it, who is told things.
@@ -481,7 +486,7 @@ module AresMUSH
         false
       end
 
-      def notify_damage(_amount, _source)
+      def notify_damage(_amount, _source, _why = [])
       end
 
       # A creature carries nothing of its own; what it has is its stat block's.

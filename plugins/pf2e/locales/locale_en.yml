@@ -537,7 +537,8 @@ en:
     xp_awarded: "You award %{award} XP to %{awardee}."
     xp_history_title: "Experience Awards for %{char}"
 
-    you_took_damage: "You take %{amount} damage from ${source}."
+    you_took_damage: "You take %{amount} damage from %{source}."
+    you_took_damage_why: "You take %{amount} damage from %{source} (%{why})."
     your_init: "It is your turn in encounter %{id}. The organizer may skip you if you do not respond."
 
     whirldice: "%b%b%b%xh%xx*** WHIRLDICE ALERT ***%xn"

@@ -422,6 +422,34 @@ module AresMUSH
           expect(IWR.apply(held(:immunity => [ entry('critical-hits') ]), 10, 'slashing')['amount']).to eq 10
         end
       end
+
+      describe "telling the player" do
+        def told(held, amount, kind, about = [])
+          IWR.told(IWR.apply(held, amount, kind, about)['applied'])
+        end
+
+        it "should name the kind of a resistance and give its size" do
+          expect(told(held(:resistance => [ entry('fire', 5) ]), 16, 'fire')).to eq [ 'fire resistance 5' ]
+        end
+
+        it "should name the kind of a weakness" do
+          expect(told(held(:weakness => [ entry('cold', 5) ]), 16, 'cold')).to eq [ 'cold weakness 5' ]
+        end
+
+        it "should say what they are immune to" do
+          expect(told(held(:immunity => [ entry('poison') ]), 16, 'poison')).to eq [ 'immune to poison' ]
+        end
+
+        it "should leave out a label's exceptions and write its kind as words" do
+          ghost = held(:resistance => [ entry('all-damage', 5).merge('exceptions' => [ 'force' ]) ])
+
+          expect(told(ghost, 12, 'slashing')).to eq [ 'all damage resistance 5' ]
+        end
+
+        it "should say nothing when nothing changed it" do
+          expect(told(held, 16, 'fire')).to eq []
+        end
+      end
     end
   end
 end
