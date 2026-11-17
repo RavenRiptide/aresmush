@@ -589,14 +589,12 @@ module AresMUSH
         Pf2eAbilities.update_base_score(enactor, key_ability.first)
       end
 
-      # Collate and record unarmed attacks. Everyone starts with a fist.
-      # A monk's fist does 1d6, everyone else's does 1d4.
-
-      fist_damage = Pf2e.treat_as_charclass?(enactor, "Monk") ? '1d6' : '1d4'
+      # Collate and record unarmed attacks. Everyone starts with a 1d4 fist. A monk's d6 is Powerful
+      # Fist's rule, read when the fist is attacked with, so a Monk Dedication taken later gets it too.
 
       unarmed_attacks = {
         'Fist' => {
-            'damage' => fist_damage,
+            'damage' => '1d4',
             'damage_type' => 'B',
             'group' => 'Brawling',
             'traits' => %w(agile finesse nonlethal unarmed)

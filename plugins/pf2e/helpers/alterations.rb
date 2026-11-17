@@ -143,10 +143,11 @@ module AresMUSH
       # The things that are altered
 
       # A weapon's attack descriptor, as an alteration leaves it. `striking` and `rune` are what the
-      # descriptor calls the runes an alteration calls `runes-striking` and `runes-potency`.
+      # descriptor calls the runes an alteration calls `runes-striking` and `runes-potency`. The character's
+      # own fist is not an item and has no `id`, so it answers to the id Foundry gives it.
       def self.attack(char, descriptor)
         held = descriptor.merge('potency' => descriptor['rune'], 'material' => Array(descriptor['materials']).first)
-        altered = apply(char, 'weapon', held, :id => descriptor['id'],
+        altered = apply(char, 'weapon', held, :id => descriptor['id'] || descriptor['foundry_id'],
                                               :options => Pf2eCombat.attack_options(descriptor, char))
 
         altered.merge('rune' => altered['potency'].to_i,

@@ -487,7 +487,8 @@ module AresMUSH
         Array(descriptor['traits']).map { |trait| "item:trait:#{Pf2e::Domains.slug(trait)}" } +
         Array(descriptor['materials']).map { |one| "item:material:#{Pf2e::Domains.slug(one)}" } +
         Array(descriptor['runes']).map { |one| "item:rune:property:#{Pf2e::Domains.slug(one)}" } +
-        Array(descriptor['tags']).map { |one| "item:tag:#{Pf2e::Domains.slug(one)}" }
+        Array(descriptor['tags']).map { |one| "item:tag:#{Pf2e::Domains.slug(one)}" } +
+        (descriptor['foundry_id'] ? [ "item:id:#{descriptor['foundry_id']}", "item:slug:#{descriptor['foundry_id']}" ] : [])
     end
 
     # Magical because it says so, or because someone etched it: a potency or striking rune makes a
@@ -619,8 +620,17 @@ module AresMUSH
       adjusted_strike(char, Pf2e::ResearchField.bomb(char, info, thrown))
     end
 
+    # The id Foundry gives every character's own fist. Their rules name the fist by it - Iron Fists takes
+    # away its nonlethal trait, Wooden Fists makes its die larger - and never by name, so that an attack
+    # an effect grants that happens to be called "Fist" (Divine Vessel's) is not the one they change.
+    FIST_ID = 'xxxxxxFISTxxxxxx'.freeze
+
     # An unarmed attack's damage is written with its count, `1d4`, where a weapon's is its die alone; both
     # are read here, so a fist rolls one d4 and not a d14.
+    #
+    # The character's own fist carries Foundry's id as `foundry_id`, which alterations are matched on. It is
+    # kept apart from `id`, because a nil `id` is what tells the rest of the engine that an attack is not
+    # an inventory item: what lends it handwraps' runes, and keeps weapon poison and selectors off it.
     def self.unarmed_descriptor(name, info, prof, char = nil)
       written = info['damage'].to_s.match(/\A(\d*)(d\d+)\z/)
       descriptor = { 'id' => nil, 'name' => name, 'prof' => prof, 'group' => info['group'],
@@ -629,6 +639,7 @@ module AresMUSH
                      'dice' => written && !written[1].empty? ? written[1].to_i : nil, 'range' => 0,
                      'materials' => [], 'runes' => [],
                      'damage_type' => info['damage_type'] || 'B', 'striking' => 0, 'rune' => 0 }
+      descriptor['foundry_id'] = FIST_ID if name.to_s == 'Fist'
 
       char ? adjusted_strike(char, descriptor) : descriptor
     end
