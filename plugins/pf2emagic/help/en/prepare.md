@@ -18,70 +18,13 @@ Some classes record spells and cantrips in a spellbook, or otherwise 'prepare' s
 `unprepare <caster class>/<level> = <spell name>`: Removes `<spell name>` at the defined `<level>` from your prepared list.
 `prepare <caster class>/<cantrip> = <spell name>`: Prepares the cantrip `<spell name>`.
 `unprepare <caster class>/<cantrip> = <spell name>`: Removes the cantrip `<spell name>` from your prepared list.
-`prepared [<caster class>]`: Shows your currently prepared spell list. If `<caster class>` is omitted, it will show you all spell lists and your daily choices. 
+`prepared [<caster class>]`: Shows how many spell slots you have at each rank and the spells you've prepared in them, including ranks with nothing prepared yet. If `<caster class>` is omitted, it shows all your classes and your daily choices.
 
 Some feats have you make other choices during your daily preparations, such as the skill Ancestral Longevity trains you in. See `help daily_choices`.
 
-## A cleric's deity spells
+## Other ways to prepare
 
-A cleric can prepare their deity's cleric spells as if they were on the divine list, even ones from another tradition or uncommon ones. `magic` lists them under your Divine Font.
-
-## Preparing from a book: Esoteric Polymath and Arcane Evolution
-
-A bard with **Esoteric Polymath** keeps a Book of Occult Spells, and a sorcerer with **Arcane Evolution** keeps a list of arcane spells. Each includes every spell in your repertoire, plus any spell you learn into it with `spell/learn` (see `help spells`). Each day, before you `rest`, you pick one spell from it:
-
-- A spell already in your repertoire becomes a **signature spell** until your next rest.
-- A spell that isn't joins your **repertoire** until your next rest, at its own rank or a higher one you have slots for.
-
-You make one pick between rests. If you took Esoteric Polymath, every spell that has been in your repertoire since stays in your book, even one you later swap out.
-
-**Commands**:
-`prepare/esotericpolymath <spell name>`: Picks `<spell name>` from your Book of Occult Spells.
-`prepare/esotericpolymath <rank> = <spell name>`: Picks a spell that isn't in your repertoire, adding it at `<rank>`.
-`prepare/arcaneevolution <spell name>`: Picks `<spell name>` from your Arcane Evolution list.
-`prepare/arcaneevolution <rank> = <spell name>`: Picks a spell that isn't in your repertoire, adding it at `<rank>`.
-
-## Two spells in one slot, and mastered spells: Split Slot, Spell Combination and Spell Mastery
-
-A wizard with one of these feats prepares through its own switch. `prepared` and `magic` show what you have, and each takes effect when you next `rest`.
-
-- **Split Slot**: two spells in one slot, at least one rank below your highest. Cast either one and the other is lost.
-- **Spell Combination**: two spells in one slot of rank 3 or higher, one such slot per rank. Both are cast together, at two ranks below the slot. Both spells must target only one creature (or be able to), and both must work the same way: both by spell attack, both by the same save, or both automatically. The code doesn't check this yet, so keep to it yourself.
-- **Spell Mastery**: up to four spells from your spellbook, each at a different rank of 9 or lower, prepared at every rest in slots of their own. Change them whenever you like; the change takes effect at your next rest.
-
-**Commands**:
-`prepare/splitslot <rank> = <spell>, <spell>`: Prepares two spells in one slot of `<rank>`.
-`unprepare/splitslot`: Empties that slot.
-`prepare/spellcombination <rank> = <spell> + <spell>`: Prepares a combined spell in a slot of `<rank>`.
-`unprepare/spellcombination <rank>`: Empties the combination slot of `<rank>`.
-`prepare/spellmastery [<rank> =] <spell>`: Masters `<spell>`, at its own rank or at `<rank>`. A spell already mastered at that rank is replaced.
-`unprepare/spellmastery <spell>`: Stops mastering `<spell>`.
-
-To cast from one of these slots, cast the spell as usual. A combined spell is cast by specifying either of its spells.
-
-## Staves
-
-You can prepare one staff a day, if at least one of its spells is on a spell list you cast from. Only you can cast from it that day. To cast from it, see `help e/gear`.
-
-**Commands**:
-`prepare/staff <staff>`: Prepares a staff you carry for the day. It gets charges equal to the rank of your highest spell slot.
-`prepare/staff <staff>/<rank> = <spell>`: Expends a spell you prepared at `<rank>` and haven't cast, adding `<rank>` charges to the staff. A prepared caster can expend one spell a day on a staff. If you've already prepared the staff today, this adds to it.
-`prepare/staff`: Shows the staff you prepared today, its charges, and the spells you expended on it.
-`unprepare/staff`: Takes back today's staff and returns the spells you expended on it. You can't take it back once you've cast from it.
-%t **Note:** A wizard with the Staff Nexus thesis can expend two spells from 8th level and three from 16th. Expend each with its own `prepare/staff` command, such as `prepare/staff Staff of Fire/3 = fireball`, then `prepare/staff Staff of Fire/2 = mist`.
-%t **Note:** Your staff's charges fade when the GM rests you, and you prepare a staff again.
-
-**Staff Nexus**:
-`prepare/staff makeshift staff`: Prepares your makeshift staff on its own.
-%t **Note:** You choose your makeshift staff's two spells in chargen; see `help addspell`. Prepared on its own, it has no charges until you expend a spell on it. Any other staff you prepare contains your makeshift staff's two spells as well as its own, and gets its usual charges.
-
-## Preparing sets of spells
-
-Prepared casters may also choose to prepare standard sets, or many spells at once.
-
-**Commands**:
-`spellset/add <set name> = <spell name>/<level>`: Adds a spell to a set with name `<set name>`. `<set name>` may contain spaces or special characters except for = or /. If `<set name>` does not exist, this command will create it, otherwise it will add that spell to the list.
-`spellset/list [<set name>]`: If `<set name>` is provided, shows the prepared spells in set `<set name>`. If not, shows a list of available sets. 
-`spellset/clear <set name>`: Deletes the set `<set name>`.
-`spellset/rem <set name> = <spell name>/<level>`: Removes `<spell name>` from set `<set name>`.
-`spellset/ready <set name>`: Clears all existing prepared spells and replaces it with the contents of `<set name>`.
+- `help prepare/cleric`: Filling a cleric's divine font slots, and preparing their deity's spells.
+- `help prepare/book`: Picking a spell each day from a Book of Occult Spells (Esoteric Polymath) or an Arcane Evolution list.
+- `help prepare/wizard`: Split Slot, Spell Combination, and Spell Mastery.
+- `help prepare/staff`: Preparing a staff, expending spells on it, and Staff Nexus.

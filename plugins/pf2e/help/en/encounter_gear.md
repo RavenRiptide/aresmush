@@ -44,7 +44,7 @@ When you join an encounter, the game copies what you carry into it: your gear, w
 `encounter/use weapons=<number>[/<who>[, <who>]][/<spell>][/<word>]`: **Staff.** Casts a spell from the staff you prepared today, which you must have equipped. Specify the spell after the targets, as for the feather fan. It costs charges equal to the spell's rank, and a cantrip costs none.
 `encounter/use weapons=<number>[/<who>[, <who>]]/<spell>/rank <number>`: **Staff, spontaneous caster.** Casts a spell from the staff for 1 charge and one of your spell slots, of the spell's rank or higher.
 %t **Note:** The spell must be on a spell list you cast from. You cast it with your own spell attack and spell DC.
-%t **Note:** For more information about preparing a staff, see `help prepare`.
+%t **Note:** For more information about preparing a staff, see `help prepare/staff`.
 %t **Note:** Outside an encounter, `use consumables=<number>`, `use magicitem=<number>`, or `use weapons=<number>[/<spell>]` tells the room you cast the spell. A scroll is used up, but a wand's daily casting and a staff's charges aren't counted.
 
 ## Property runes

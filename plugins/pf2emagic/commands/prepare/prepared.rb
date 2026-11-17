@@ -30,9 +30,13 @@ module AresMUSH
 
         return t('pf2emagic.you_cast_no_spells') unless magic && Pf2emagic.is_caster?(enactor)
 
+        # Every class they prepare through is listed, with its slots, even with nothing prepared yet:
+        # a Cleric or Druid keeps no spellbook, so this is where they see how many slots they have.
         # A class whose only preparations are through a feat (Split Slot, Spell Mastery) is listed too.
-        prepared_spells = magic.spells_prepared.dup
-        ((magic.slot_pairs || {}).keys + (magic.mastered_spells || {}).keys).each { |cc| prepared_spells[cc] ||= {} }
+        prepared_spells = (magic.spells_prepared || {}).dup
+        listed = Entries.slots_by_source(magic, 'prepared').keys +
+                 (magic.slot_pairs || {}).keys + (magic.mastered_spells || {}).keys
+        listed.each { |cc| prepared_spells[cc] ||= {} }
 
         if prepared_spells.empty?
           prepares = (magic.tradition || {}).keys.any? { |cc| Pf2emagic.get_caster_type(cc) == 'prepared' }

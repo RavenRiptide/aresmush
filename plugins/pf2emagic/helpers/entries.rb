@@ -390,9 +390,11 @@ module AresMUSH
         end
       end
 
-      # Every source's slots, keyed by source name.
-      def self.slots_by_source(magic)
+      # Every source's slots, keyed by source name. A category narrows it to the spontaneous or
+      # prepared ones, as for known_by_source.
+      def self.slots_by_source(magic, category = nil)
         for_magic(magic).each_with_object({}) do |entry, all|
+          next if category && entry['category'].to_s != category.to_s
           next if (entry['slots'] || {}).empty?
 
           all[entry['name']] = entry['slots']

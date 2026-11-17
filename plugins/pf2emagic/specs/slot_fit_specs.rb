@@ -96,13 +96,40 @@ module AresMUSH
           pools = SlotFit.from_slots(3, 'Curriculum' => { 'count' => 1, 'eligible' => [ 'Fireball' ] })
 
           expect(pools).to eq [
-            { 'capacity' => 3, 'eligible' => nil },
-            { 'capacity' => 1, 'eligible' => [ 'Fireball' ] }
+            { 'name' => nil, 'capacity' => 3, 'eligible' => nil },
+            { 'name' => 'Curriculum', 'capacity' => 1, 'eligible' => [ 'Fireball' ] }
           ]
         end
 
         it "should leave out an empty open pool" do
           expect(SlotFit.from_slots(0, {})).to eq []
+        end
+      end
+
+      # Where each spell went, for a display that shows the restricted slots apart from the rest.
+      describe :assign do
+        it "should put a spell a restricted pool accepts there before an open slot" do
+          pools = [ open(2), restricted(4, %w(Heal)) ]
+
+          expect(SlotFit.assign(pools, %w(Heal Bless Heal))).to eq [ [ 'Bless' ], %w(Heal Heal) ]
+        end
+
+        it "should overflow into the open slots once the restricted pool is full" do
+          pools = [ open(2), restricted(1, %w(Heal)) ]
+
+          expect(SlotFit.assign(pools, %w(Heal Heal))).to eq [ [ 'Heal' ], [ 'Heal' ] ]
+        end
+
+        it "should give an empty list for each pool when nothing is prepared" do
+          expect(SlotFit.assign([ open(2), restricted(4, %w(Heal)) ], [])).to eq [ [], [] ]
+        end
+
+        it "should give nil when the spells don't fit" do
+          expect(SlotFit.assign([ open(1), restricted(1, %w(Heal)) ], %w(Bless Fear))).to be_nil
+        end
+
+        it "should keep the spells' own capitalisation" do
+          expect(SlotFit.assign([ restricted(1, %w(heal)) ], [ 'Heal' ])).to eq [ [ 'Heal' ] ]
         end
       end
     end

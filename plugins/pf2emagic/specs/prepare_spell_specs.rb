@@ -32,6 +32,39 @@ module AresMUSH
         expect(PF2Magic[@magic.id].spells_prepared['Cleric']['1']).to eq [ 'Fear' ]
       end
 
+      # A Cleric keeps no spellbook, so `prepared` is where they see their slots before filling any.
+      it "should show a Cleric with nothing prepared their slots with prepared" do
+        @magic.update(:spells_per_day => { 'Cleric' => { 'cantrip' => 5, '1' => 2 } })
+        @char.update(:is_approved => true)
+
+        shown = []
+        client = double('client', :screen_reader => false)
+        allow(client).to receive(:emit) { |message| shown << message }
+        allow(client).to receive(:emit_failure) { |message| shown << "FAILURE: #{message}" }
+
+        PF2DisplayPreparedCmd.new(client, Command.new('prepared'), Character[@char.id]).handle
+
+        expect(shown.join).not_to include 'FAILURE'
+        expect(shown.join).to include('Cantrip (5 slots)', '1st-rank (2 slots)', t('pf2emagic.prepared_rank_empty'))
+      end
+
+      it "should show a Cleric how many of their divine font slots they've filled" do
+        @magic.update(:divine_font => 'heal', :spells_per_day => { 'Cleric' => { 'cantrip' => 5, '1' => 2 } })
+        @char.update(:is_approved => true)
+        2.times { expect(Pf2emagic.prepare_spell('Heal', Character[@char.id], 'Cleric', '1')).to be_a Hash }
+        expect(Pf2emagic.prepare_spell('Bless', Character[@char.id], 'Cleric', '1')).to be_a Hash
+
+        shown = []
+        client = double('client', :screen_reader => false)
+        allow(client).to receive(:emit) { |message| shown << message }
+        allow(client).to receive(:emit_failure) { |message| shown << "FAILURE: #{message}" }
+
+        PF2DisplayPreparedCmd.new(client, Command.new('prepared'), Character[@char.id]).handle
+
+        expect(shown.join).to include('1st-rank (2 slots + 4 divine font slots)', 'Any spell (1 of 2): Bless',
+                                      'Divine font (2 of 4): Heal, Heal')
+      end
+
       it "should refuse a spell off the class's tradition" do
         result = Pf2emagic.prepare_spell('Force Barrage', Character[@char.id], 'Cleric', '1')
 
