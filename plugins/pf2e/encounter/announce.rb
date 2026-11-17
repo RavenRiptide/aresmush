@@ -10,7 +10,7 @@ module AresMUSH
       # bookkeeping - who joins, whose turn, cover set, the encounter starting and ending - goes in as an
       # OOC line, which the shared log leaves out. That is how the game's own combat logs.
       module Announce
-        # An encounter notice - `start`, `end`, `round` or `turn` - and its details go with the line in the
+        # An encounter notice - `start`, `explore`, `end`, `round` or `turn` - and its details go with the line in the
         # encounter's own log and its scene's, for their pages to lay out as their own rather than show the
         # text. Any other line is marked with the game's prefix for whoever hears or reads it: a story line
         # as an `action`, the bookkeeping as `system` (see `SystemPrefix`).

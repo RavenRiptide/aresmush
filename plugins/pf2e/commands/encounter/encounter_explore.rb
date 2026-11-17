@@ -42,11 +42,10 @@ module AresMUSH
         encounter = PF2Encounter.create(owner: enactor, organizer: enactor.name, scene: scene,
                                         mode: Exploration::MODE, carries_on_from: self.from)
 
-        message = t('pf2e.explore_started', :id => encounter.id, :gm => enactor.name)
+        banner = PF2ExploreStart.new(encounter)
 
-        enactor_room.emit message
-        PF2Encounter.send_to_encounter(encounter, message)
-        Scenes.add_to_scene(scene, message, Game.master.system_character, false, true)
+        Pf2e::Encounters::Announce.tell(encounter, banner.render, :room => enactor_room, :notice => 'explore',
+                                                                  :notice_details => banner.notice_details)
       end
     end
   end

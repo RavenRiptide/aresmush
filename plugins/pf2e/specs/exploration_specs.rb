@@ -119,7 +119,29 @@ module AresMUSH
 
         expect(@client.failures).to eq []
         expect(active.mode).to eq 'exploration'
-        expect(@logged.join).to include('EXPLORING')
+        expect(@logged.join).to include(t('pf2e.explore_start_title'))
+      end
+
+      it "should mark an exploration's start in its log with what it says" do
+        run('e/explore')
+        exploring = active
+
+        start = EncounterWeb.log(PF2Encounter[exploring.id]).find { |one| one[:notice] == 'explore' }
+
+        expect(start[:notice_details]).to eq('organizer' => @gm.name, 'id' => exploring.id,
+                                             'instruction' => EncounterWeb.plain(t('pf2e.explore_start_join')))
+        expect(@logged.join).to include(PF2Encounter.page_url(exploring))
+      end
+
+      it "should say who carries on when an exploration continues from an earlier encounter" do
+        run('e/start')
+        fought = active
+        run("e/end #{fought.id}")
+        run("e/explore=#{fought.id}")
+
+        start = EncounterWeb.log(PF2Encounter[active.id]).find { |one| one[:notice] == 'explore' }
+
+        expect(start[:notice_details]['instruction']).to eq EncounterWeb.plain(t('pf2e.explore_start_carried_on', :from => fought.id))
       end
 
       it "should take a character into it without rolling initiative" do
