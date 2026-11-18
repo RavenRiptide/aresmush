@@ -57,6 +57,8 @@ module AresMUSH
 
         client.emit_success t('pf2egear.item_equip_ok', :name => iname)
 
+        sheet_only_note(item)
+
         # Untrained is allowed, and costs them their proficiency bonus; the player hears so now.
         return unless Pf2egear::Inventory.proficiency(holder, self.category, item.name) == 'untrained'
 
@@ -66,6 +68,16 @@ module AresMUSH
         else
           client.emit_ooc t('pf2egear.equip_untrained_weapon', :name => iname)
         end
+      end
+
+      # In an encounter, plain `equip` changed their sheet; they hear how to equip it there too.
+      # `encounter/equip` works on the encounter's copy already, so it has nothing to say.
+      def sheet_only_note(item)
+        return unless holder == enactor
+
+        note = Pf2egear::EncounterGear.sheet_only_note(enactor, self.category, item)
+
+        client.emit_ooc note if note
       end
 
     end

@@ -20,6 +20,34 @@ module AresMUSH
       def check_in_form
         holder && Pf2e::BattleForms.active?(holder) ? t('pf2e.form_gear_absorbed', :actor => enactor.name) : nil
       end
+
+      # Plain `equip` or `unequip` in an encounter changes the character's sheet, not the encounter's copy
+      # of their gear, which is what their Strikes and AC there read. When the copy of this item is now
+      # the other way round, the note saying so, with the encounter command and the copy's own number.
+      # An item just equipped that the copy lacks (bought since they joined, or in a bag there) needs a
+      # resync first, and the note says that instead. Nil outside an encounter.
+      def self.sheet_only_note(char, category, item)
+        encounter = Pf2e::Combatants.encounter_here(char)
+        state = encounter ? Pf2e::CombatantStates.of(encounter, char) : nil
+
+        return nil unless state
+
+        collection = Pf2egear::Inventory.canonical(category)
+        copies = Pf2egear::Inventory.held(state, collection)
+        number = copies.index { |copy| copy.copied_from.to_s == item.id.to_s }
+
+        name = item.nickname || item.name
+
+        if number.nil?
+          # Nothing there to unequip.
+          return item.equipped ? t('pf2egear.equip_sheet_not_here', :name => name) : nil
+        end
+
+        return nil if !!copies[number].equipped == !!item.equipped
+
+        t(item.equipped ? 'pf2egear.equip_sheet_only' : 'pf2egear.unequip_sheet_only',
+          :name => name, :category => collection, :number => number)
+      end
     end
 
     # `+e/use <category>=<number>[/<use>]`, and for a consumable `+e/use consumables=<number>[/<who>]`:

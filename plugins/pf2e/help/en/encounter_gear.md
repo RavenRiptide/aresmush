@@ -28,7 +28,7 @@ When you join an encounter, the game copies what you carry into it: your gear, w
 `encounter/gear [<who>]`: Lists what you, or another combatant, are carrying in the encounter here.
 `encounter/use <category>=<number>[/<use>]`: Uses an item you're carrying in the encounter, such as drinking a potion or spending a charge.
 `encounter/use consumables=<number>[/<who>]`: Drinks a potion, elixir, or mutagen, or gives it to someone else in the fight. A healing potion heals by its dice (vitality healing works on the living and does nothing for the undead), and an elixir or mutagen applies its effect to whoever takes it.
-`encounter/equip <category>=<number>`: Draws a weapon, puts on armor, or straps on a shield.
+`encounter/equip <category>=<number>`: Equips a weapon, armor, or a shield.
 `encounter/unequip <category>=<number>`: Puts away a weapon, armor, or shield.
 `encounter/poison <weapon>=<poison>`: Applies an injury poison you're carrying to a weapon you're wielding. The poison stays on the weapon until your next Strike with it that hits or critically misses.
 `encounter/loot <who>=<consumable>[/<quantity>]`: Gives someone a consumable from the catalog for this encounter.

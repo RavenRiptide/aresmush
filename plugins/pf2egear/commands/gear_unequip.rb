@@ -47,6 +47,14 @@ module AresMUSH
         iname = item.nickname ? item.nickname : item.name
 
         client.emit_success t('pf2egear.item_unequip_ok', :name => iname)
+
+        # In an encounter, plain `unequip` changed their sheet; they hear how to unequip it there too.
+        # `encounter/unequip` works on the encounter's copy already, so it has nothing to say.
+        return unless holder == enactor
+
+        note = Pf2egear::EncounterGear.sheet_only_note(enactor, self.category, item)
+
+        client.emit_ooc note if note
       end
 
     end

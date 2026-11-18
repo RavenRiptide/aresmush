@@ -24,3 +24,4 @@ aliases:
 `encounter/remove [<encounter ID>=]<#id or name>`: Removes a combatant from the encounter. A removed creature is gone for good. (Alias: `rminit`)
 `encounter/scan [<encounter ID>]`: Shows the encounter the way `encounter/view` shows it to you, with each creature's immunities, weaknesses, and resistances. Only the GM can use this. (Alias: `tscan`)
 `encounter/resync [<encounter ID>=]<#id or name>`: Updates a character's encounter gear from their sheet, for something they forgot to buy or invest before joining. Items they already had in the encounter stay as they are. `encounter/undo` reverses a resync.
+%t **Note:** Resync doesn't acknowledge when players have equipped weapons or armor. Tell the player to use `encounter/equip` instead to change gear equipment.

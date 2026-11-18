@@ -33,6 +33,60 @@ module AresMUSH
         expect(carried).to eq []
       end
 
+      # Plain `equip` mid-encounter changes the sheet, which a resync leaves the encounter's copy alone
+      # on; the player hears how to equip it there instead.
+      describe "equipping on the sheet mid-encounter" do
+        before(:each) do
+          PF2Weapon.create(:name => 'Falchion', :character => @hero)
+          run(PF2EncounterResyncCmd, "e/resync #{@hero.name}")
+          @client.said.clear
+        end
+
+        def equipped_here
+          Pf2egear::Inventory.held(hero, 'weapons').first.equipped
+        end
+
+        def note(key)
+          t("pf2egear.#{key}", :name => 'Falchion', :category => 'weapons', :number => 0)
+        end
+
+        it "should tell them the encounter still has it unequipped, and leave a resync equipping nothing" do
+          run(Pf2egear::PF2GearEquipCmd, 'equip weapons=0', @hero)
+
+          expect(heard).to include(note('equip_sheet_only'))
+
+          run(PF2EncounterResyncCmd, "e/resync #{@hero.name}")
+
+          expect(equipped_here).to be_falsey
+        end
+
+        it "should say nothing when encounter/equip equipped it there already" do
+          run(Pf2egear::PF2EncounterEquipCmd, 'e/equip weapons=0', @hero)
+          @client.said.clear
+          run(Pf2egear::PF2GearEquipCmd, 'equip weapons=0', @hero)
+
+          expect(equipped_here).to be true
+          expect(heard).to_not include('encounter/equip')
+        end
+
+        it "should tell them the encounter still has it equipped after unequipping on the sheet" do
+          run(Pf2egear::PF2EncounterEquipCmd, 'e/equip weapons=0', @hero)
+          run(Pf2egear::PF2GearEquipCmd, 'equip weapons=0', @hero)
+          @client.said.clear
+          run(Pf2egear::PF2GearUnequipCmd, 'unequip weapons=0', @hero)
+
+          expect(heard).to include(note('unequip_sheet_only'))
+        end
+      end
+
+      it "should tell them to ask for a resync when they equip something bought since joining" do
+        PF2Weapon.create(:name => 'Falchion', :character => @hero)
+
+        run(Pf2egear::PF2GearEquipCmd, 'equip weapons=0', @hero)
+
+        expect(heard).to include(t('pf2egear.equip_sheet_not_here', :name => 'Falchion'))
+      end
+
       it "should be the GM's alone" do
         run(PF2EncounterResyncCmd, "e/resync #{@hero.name}", @hero)
 
