@@ -1,0 +1,29 @@
+%lh
+<%= event.title %>
+
+<%= t('events.starts_at_title')%> <%= start_datetime_local %> (<%= t('eaevents.sr_server_time', :time => start_time_standard) %>)
+<%= t('events.who_title')%> <%= event.who %>
+<%= t('events.tags_title') %> <%= event.content_tags.join(" ") %>
+<%= t('eaevents.players_title') %> <%= AresMUSH::EaEvents.screen_reader_players(event) %>.
+<% if event.death_consent %>
+<%= t('eaevents.death_consent_title') %> <%= t('eaevents.sr_death_consent_yes') %>
+<% end %>
+
+<%= event.description %>
+<% if !event.content_warning.blank? %>
+
+<%= t('events.content_warning') %> <%= event.content_warning %>
+<% end %>
+
+<%= t('eaevents.roster_title')%>
+<% roster.each_with_index do |s, i| %>
+<%= signup_sentence(s, "#{i+1}.") %>
+<% end %>
+<% if waitlist.any? %>
+
+<%= t('eaevents.waitlist_title')%>
+<% waitlist.each_with_index do |s, i| %>
+<%= signup_sentence(s, t('eaevents.sr_waitlist_place', :position => i + 1)) %>
+<% end %>
+<% end %>
+%lf

@@ -126,7 +126,7 @@ module AresMUSH
           f.puts "DTSTART:#{Events.format_timestamp(event.starts)}\r\n"
           f.puts "DTSTAMP:#{Events.format_timestamp(event.updated_at)}\r\n"
           f.puts "SUMMARY:#{event.title}\r\n"
-          f.puts "DESCRIPTION:#{event.description&.gsub("%r", "\r\n  ") || ""}\r\n" # Riptide: Custom Ares change: resolving error if an event description is left blank
+          f.puts "DESCRIPTION:#{event.description&.gsub("%r", "\r\n  ") || ""}\r\n" # Emblem of Ea: Custom Ares change: resolving error if an event description is left blank
           f.puts "END:VEVENT\r\n"
         end
         
@@ -143,8 +143,10 @@ module AresMUSH
       if (!signup)
         return t('events.not_signed_up', :name => char.name)
       end
+      roster_before = EaEvents.roster_ids(event) # Emblem of Ea: Custom Ares change: waitlist (eaevents)
       signup.delete
-      
+      EaEvents.notify_promotions(event, roster_before) # Emblem of Ea: Custom Ares change: waitlist (eaevents)
+
       return nil
     end
     
@@ -171,7 +173,7 @@ module AresMUSH
       scene.update(title: event.title)
       
       Scenes.add_participant(scene, enactor, enactor)
-      event.signups.each do |signup|
+      EaEvents.roster(event).each do |signup| # Emblem of Ea: Custom Ares change: invite the roster, not the waitlist (eaevents)
         invitee = signup.character
         if (invitee)
           Scenes.invite_to_scene(scene, invitee, enactor)

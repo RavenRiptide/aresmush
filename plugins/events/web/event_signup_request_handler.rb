@@ -23,8 +23,8 @@ module AresMUSH
 
         Global.logger.info "#{enactor.name} signing up #{signup_as.name} for event #{event.id}."
         Events.signup_for_event(event, signup_as, comment)
-        
-        {}
+
+        { waitlisted: EaEvents.is_waitlisted?(event, signup_as) } # Emblem of Ea: Custom Ares change: waitlist (eaevents)
       end
     end
   end

@@ -24,7 +24,11 @@ module AresMUSH
         if (title.blank? || desc.blank?)
           return { error: t('webportal.missing_required_fields', :fields => "title, description") }
         end
-      
+
+        # Emblem of Ea: Custom Ares change: player limit and death consent (eaevents)
+        ea_error = EaEvents.check_web_fields(request.args)
+        return { error: ea_error } if ea_error
+
         begin
           datetime, notused, error = Events.parse_date_time_desc("#{date} #{time}/notused".strip.downcase)
           if (error)
@@ -41,7 +45,8 @@ module AresMUSH
         if (!event)
           return { error: t('webportal.unexpected_error') }
         end
-        
+        EaEvents.save_web_fields(event, request.args) # Emblem of Ea: Custom Ares change (eaevents)
+
         {
           id: event.id
         }

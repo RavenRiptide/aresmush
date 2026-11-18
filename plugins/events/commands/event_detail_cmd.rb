@@ -16,7 +16,7 @@ module AresMUSH
       
       def handle
         Events.with_an_event(self.num, client, enactor) do |event| 
-          template = EventDetailTemplate.new(event, enactor)
+          template = EaEvents::EventDetailTemplate.new(event, enactor) # Emblem of Ea: Custom Ares change: roster and waitlist (eaevents)
           Login.mark_notices_read(enactor, :event, event.id)          
           client.emit template.render
         end

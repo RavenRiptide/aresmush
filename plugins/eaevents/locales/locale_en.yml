@@ -1,0 +1,57 @@
+---
+en:
+  eaevents:
+    class_label: "Lvl %{level} %{charclass}"
+    class_label_long: "Level %{level} %{charclass}"
+
+    col_title: "Title"
+    col_organizer: "Organizer"
+    col_when: "Date/Time"
+    col_players: "Players"
+    full: "Full"
+    waitlisted_count: "%{waiting} waitlisted"
+    no_events: "There are no events scheduled."
+    list_legend: "[*] = Signed up.  [W] = On the waitlist.  [DC] = Death consent."
+
+    sr_death_consent: "Death consent."
+    sr_organizer: "Organizer: %{name}."
+    sr_when: "%{local} (%{server} server time)."
+    sr_server_time: "%{time} server time"
+    sr_players: "Players: %{players}."
+    sr_you_are_signed_up: "You're signed up."
+    sr_you_are_waitlisted: "You're on the waitlist."
+    sr_tags: "Tags: %{tags}."
+    sr_players_no_limit: "%{count} signed up, no limit"
+    sr_players_open: "%{count} of %{limit}"
+    sr_players_full: "%{count} of %{limit}, full"
+    sr_players_waitlist: "%{count} of %{limit}, full, %{waiting} on the waitlist"
+    sr_death_consent_yes: "Yes. Characters in this event can die."
+    sr_waitlist_place: "Waitlist %{position}."
+
+    players_no_limit: "%{count} signed up"
+    players_open: "%{count}/%{limit}"
+    players_full: "%{count}/%{limit} (Full)"
+    players_waitlist: "%{count}/%{limit} (Full) - %{waiting} on the waitlist"
+    no_limit: "No limit"
+    waiting_count: "%{waiting} on the waitlist"
+
+    players_title: "Players:"
+    death_consent_title: "Death Consent:"
+    death_consent_yes: "Yes - characters in this event can die."
+    roster_title: "Roster"
+    waitlist_title: "Waitlist"
+
+    signed_up_waitlisted: "%{title} is full. You are #%{position} on the waitlist, and you'll move up automatically if a spot opens."
+    promoted_notice: "A spot opened in %{title}. %{name} is now on the roster."
+    moved_to_waitlist_notice: "%{title} now allows %{limit} players. You are on the waitlist (#%{position})."
+    death_consent_added_notice: "%{title} is now a death-consent event. Characters in it can die. To withdraw, type event/cancel %{num}."
+
+    limit_set: "%{title} now allows %{limit} players."
+    limit_removed: "%{title} no longer has a player limit."
+    limit_moved_to_waitlist: "Moved to the waitlist: %{names}."
+    limit_moved_to_roster: "Moved onto the roster: %{names}."
+    invalid_limit: "The player limit has to be a whole number greater than 0, or none."
+
+    consent_on: "%{title} is now a death-consent event."
+    consent_off: "%{title} is no longer a death-consent event."
+    invalid_consent_setting: "Specify on or off."

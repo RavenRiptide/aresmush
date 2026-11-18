@@ -19,7 +19,7 @@ module AresMUSH
           content_warning: e.content_warning,
           is_signed_up: e.is_signed_up?(enactor),
           tags: e.content_tags
-        }}
+        }.merge(EaEvents.event_list_web_fields(e, enactor)) } # Emblem of Ea: Custom Ares change: limit, waitlist, death consent (eaevents)
         
         
         {

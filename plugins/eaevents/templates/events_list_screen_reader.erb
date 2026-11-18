@@ -1,0 +1,10 @@
+%lh
+<%= title %>
+
+<% if events.empty? %>
+<%= t('eaevents.no_events') %>
+<% end %>
+<% events.each_with_index do |ev, i| %>
+<%= sentence(ev, i + 1) %>
+<% end %>
+%lf

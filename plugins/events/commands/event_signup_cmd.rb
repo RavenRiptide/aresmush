@@ -24,7 +24,7 @@ module AresMUSH
       def handle
         Events.with_an_event(self.num, client, enactor) do |event| 
           Events.signup_for_event(event, enactor, self.comment)
-          client.emit_success t('events.signed_up')
+          client.emit_success EaEvents.signup_message(event, enactor) # Emblem of Ea: Custom Ares change: waitlist (eaevents)
         end
       end
     end

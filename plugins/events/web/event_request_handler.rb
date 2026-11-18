@@ -14,8 +14,6 @@ module AresMUSH
         error = Website.check_login(request, true)
         return error if error
         
-        datetime = OOCTime.format_date_time_for_entry(event.starts)
-        
         if (edit_mode)
           description = Website.format_input_for_html(event.description)
           content_warning = Website.format_input_for_html(event.content_warning)
@@ -37,7 +35,7 @@ module AresMUSH
             comment: s.comment,
             author: enactor && s.character == enactor,
             can_edit: Events.can_manage_signup?(event, s.character, enactor)
-            }}
+            }.merge(EaEvents.signup_web_fields(s)) } # Emblem of Ea: Custom Ares change: level and class (eaevents)
         if (enactor)
           signupChars = AresCentral.alts(enactor).map { |p| { id: p.id, name: p.name, avatar: Website.avatar_info(p) }}   
         else
@@ -51,8 +49,9 @@ module AresMUSH
             name: event.character.name, 
             avatar: Website.avatar_info(event.character) },
           description: description,
-          date: datetime.before(' '),
-          time: datetime.after( ' '),
+          # Emblem of Ea: Custom Ares change: split date and time by format, not at the first space (short_date_format has spaces)
+          date: OOCTime.format_date_for_entry(event.starts),
+          time: event.starts.strftime(Global.read_config("datetime", "time_format")).strip,
           tags: edit_mode ? event.content_tags.join(" ") : event.content_tags,
           signups: signups,
           can_manage: enactor && Events.can_manage_event?(enactor, event),
@@ -62,7 +61,7 @@ module AresMUSH
           content_warning: content_warning,
           server_time: OOCTime.server_timestr,
           available_alts: signupChars
-        }
+        }.merge(EaEvents.event_web_fields(event, signups)) # Emblem of Ea: Custom Ares change: limit, waitlist, death consent (eaevents)
         
       end
     end

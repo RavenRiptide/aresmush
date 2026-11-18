@@ -1,0 +1,21 @@
+%lh
+%xh<%= title %>%xn
+<% if events.empty? %>
+
+<%= t('eaevents.no_events') %>
+<% else %>
+%ld
+%xh<%= header %>%xn
+%ld
+<% events.each_with_index do |ev, i| %>
+<% if i > 0 %>
+
+<% end %>
+<% rows(ev, i + 1).each do |line| %>
+<%= line %>
+<% end %>
+<% end %>
+%ld
+<%= t('eaevents.list_legend') %>
+<% end %>
+%lf

@@ -132,7 +132,7 @@ module AresMUSH
     end
     
     def self.set_birthday(model, date_str)
-      bday = OOCTime.parse_date(date_str)
+      bday = Demographics.parse_birthdate_input(date_str) || OOCTime.parse_date(date_str) # Emblem of Ea: Custom Ares change: Ea/RL months and RL years
       if (!bday)
         return { error: t('demographics.invalid_birthdate', 
            :format_str => Global.read_config("datetime", "date_entry_format_help")) }
