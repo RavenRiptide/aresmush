@@ -161,67 +161,159 @@ module AresMUSH
       # Bonuses that hold only while doing something in particular. Naming the circumstance is the point:
       # it is how a player learns that their Skeleton Key does nothing until they say they are picking a
       # lock.
+      #   Conditional   Slick +1 item, when you Escape or Squeeze.
+      #                 To count it: roll acrobatics/escape
+      #   Not applied   Leather's armor check penalty (-1), because you meet its
+      #                 Strength requirement.
+      #
+      # A penalty that is not counted is kept apart from the bonuses a player can claim, and says why, so
+      # it does not read as something they have to do.
       def conditional
-        Array(@breakdown['conditional']).map do |row|
-          case conditional_kind(row)
-          when :waived
-            "  #{item_color}Waived:%xn #{row['source']} #{amount(row['value'])} armor penalty"
-          when :vague
-            "  #{item_color}In some circumstances:%xn #{conditional_what(row) { |v| amount(v) }}"
+        shown_conditional.map do |row|
+          if waived?(row)
+            column('Not applied', "#{possessive(row['source'])} #{penalty_name(row)} (#{amount(row['value'])})#{waiver(row)}.")
           else
-            hint = roll_hint(row) ? "   (#{roll_hint(row)})" : ''
+            hint = roll_hint(row) ? [ "To count it: #{roll_hint(row)}" ] : []
 
-            "  #{item_color}Also, when you #{action_names(row)}:%xn  #{conditional_what(row) { |v| amount(v) }}#{hint}"
+            column('Conditional', "#{row['source']} #{amount(row['value'])} #{type_word(type(row))}, #{circumstance(row)}.", *hint)
           end
         end
       end
 
       def spoken_conditional
-        Array(@breakdown['conditional']).map do |row|
-          case conditional_kind(row)
-          when :waived
-            "Waived: #{row['source']} armor penalty, #{spoken(row['value'])}."
-          when :vague
-            "In some circumstances: #{conditional_what(row, ', ') { |v| spoken(v) }}."
+        shown_conditional.map do |row|
+          if waived?(row)
+            "Not applied: #{possessive(row['source'])} #{penalty_name(row)}, #{spoken(row['value'])}#{waiver(row)}."
           else
-            hint = roll_hint(row) ? " To use it, #{roll_hint(row)}." : ''
+            hint = roll_hint(row) ? " To count it, #{roll_hint(row)}." : ''
 
-            "Also, when you #{action_names(row)}: #{conditional_what(row, ', ') { |v| spoken(v) }}.#{hint}"
+            "Conditional: #{row['source']}, #{spoken(row['value'])} #{type_word(type(row))}, #{circumstance(row)}.#{hint}"
           end
         end
       end
 
-      def conditional_kind(row)
-        return :waived if row['slug'].to_s.start_with?('armor-') && row['value'].to_i.negative?
-
-        actions_in(row['when']).empty? ? :vague : :action
+      # The conditional rows that can apply to this figure. A rule written against every skill check that
+      # needs Recall Knowledge reaches Stealth too, but Stealth cannot be used to Recall Knowledge, so it
+      # is left off Stealth's page. Where the actions config does not say which skill an action uses, the
+      # row stays: better to show a bonus that might apply than hide one that does.
+      def shown_conditional
+        Array(@breakdown['conditional']).select { |row| waived?(row) || possible?(row) }
       end
 
-      # `Slick +1 item`, or `Slick, plus 1 item` aloud.
-      def conditional_what(row, joiner = ' ')
-        "#{row['source']}#{joiner}#{yield(row['value'])} #{type_word(type(row))}"
+      def possible?(row)
+        known = parts(row['when'])['actions'].map { |slug| [ slug, action_statistics[slug] ] }
+                                              .reject { |_slug, stats| stats.nil? }
+
+        return true if known.empty?
+
+        known.any? { |slug, stats| stats.include?(statistic) || (@kind == 'lore' && slug == 'recall-knowledge') }
       end
 
+      # The figure as the actions config names a check's statistic: `stealth`, `reflex`, `perception`.
+      def statistic
+        Domains.slug(@label.to_s)
+      end
+
+      # action slug => the statistics its check may use, for every action in config that says.
+      def action_statistics
+        @action_statistics ||= (Global.read_config('pf2e_actions') || {}).each_with_object({}) do |(name, info), out|
+          check = info.is_a?(Hash) ? info['check'] : nil
+          stats = check.is_a?(Hash) ? Array(check['statistic']) : []
+
+          out[Domains.slug(name)] = stats.map { |one| Domains.slug(one) } unless stats.empty?
+        end
+      end
+
+      def waived?(row)
+        row['slug'].to_s.start_with?('armor-') && row['value'].to_i.negative?
+      end
+
+      # `when you Recall Knowledge or Investigate (taste)`, `when the check is visual`, or for a
+      # requirement nothing here can put into words, `in some circumstances`.
+      def circumstance(row)
+        found = parts(row['when'])
+
+        return 'in some circumstances' if found['unreadable'] || (found['actions'].empty? && found['words'].empty?)
+
+        words = found['words'].join(', ')
+
+        if found['actions'].empty?
+          "when the check is #{words}"
+        else
+          "when you #{found['actions'].map { |slug| action_name(slug) }.join(' or ')}#{words.empty? ? '' : " (#{words})"}"
+        end
+      end
+
+      # What a player types to count the bonus: the first action, and any word it also needs.
       def roll_hint(row)
-        return nil unless %w{skill lore}.include?(@kind)
+        found = parts(row['when'])
 
-        "roll #{@label.downcase}/#{actions_in(row['when']).first}"
+        return nil unless %w{skill lore perception}.include?(@kind)
+        return nil if found['unreadable'] || (found['actions'].empty? && found['words'].empty?)
+
+        "roll #{@label.downcase}/#{([ found['actions'].first ].compact + found['words']).join('/')}"
       end
 
-      def action_names(row)
-        actions_in(row['when']).map { |slug| action_name(slug) }.join(' or ')
-      end
+      # A predicate taken apart into what a player can say: `actions` (`action:escape`, or an `or` of
+      # actions), `words` a roll can name (`taste`, `visual`), and whether anything else is required that
+      # a player cannot say - a fact about the target, say - in which case it is `unreadable`.
+      def parts(statement)
+        found = { 'actions' => [], 'words' => [], 'unreadable' => false }
 
-      # The actions a circumstance names, as their slugs: `action:pick-a-lock` is `pick-a-lock`, and an
-      # `or` of actions is each of them. Anything else is not an action, and is described more vaguely.
-      def actions_in(statement)
-        Array(statement).flat_map do |one|
-          case one
-          when String then one.start_with?('action:') ? [ one.delete_prefix('action:') ] : []
-          when Hash then one.keys.map(&:to_s) == [ 'or' ] ? actions_in(one['or'] || one[:or]) : []
-          else []
+        Array(statement).each do |one|
+          if one.is_a?(String) && one.start_with?('action:')
+            found['actions'] << one.delete_prefix('action:')
+          elsif one.is_a?(String) && !one.include?(':')
+            found['words'] << one
+          elsif one.is_a?(Hash) && one.keys.map(&:to_s) == [ 'or' ] &&
+                Array(one['or'] || one[:or]).all? { |each| each.is_a?(String) && each.start_with?('action:') }
+            found['actions'] += Array(one['or'] || one[:or]).map { |each| each.delete_prefix('action:') }
+          else
+            found['unreadable'] = true
           end
-        end.uniq
+        end
+
+        found.merge('actions' => found['actions'].uniq)
+      end
+
+      WAIVED_BECAUSE = { 'strength' => ', because you meet its Strength requirement',
+                         'flexible' => ', because the armor is flexible',
+                         'ignored' => ', because a feat or ability ignores it' }.freeze
+
+      def waiver(row)
+        WAIVED_BECAUSE[row['waived_by']].to_s
+      end
+
+      def penalty_name(row)
+        row['slug'].to_s == 'armor-speed-penalty' ? 'Speed penalty' : 'armor check penalty'
+      end
+
+      def possessive(name)
+        name.to_s.end_with?('s') ? "#{name}'" : "#{name}'s"
+      end
+
+      # A labelled row whose text wraps under itself rather than back to the margin. Each of `more` starts
+      # a line of its own, so a roll to type is never split across two.
+      def column(label, text, *more)
+        width = WIDTH - 2 - LABEL_WIDTH
+        lines = ([ text ] + more).flat_map { |one| wrap(one, width) }
+        indent = ' ' * (2 + LABEL_WIDTH)
+
+        ([ "  #{item_color}#{left(label, LABEL_WIDTH)}%xn#{lines.first}" ] +
+          lines.drop(1).map { |line| "#{indent}#{line}" }).join('%r')
+      end
+
+      # Words into lines no longer than `width`, measured without colour codes.
+      def wrap(text, width)
+        text.split(' ').each_with_object([ '' ]) do |word, lines|
+          if lines.last.empty?
+            lines[-1] = word
+          elsif strip(lines.last).length + 1 + strip(word).length > width
+            lines << word
+          else
+            lines[-1] = "#{lines.last} #{word}"
+          end
+        end
       end
 
       # `pick-a-lock` as a player reads it: Pick a Lock.
@@ -285,9 +377,9 @@ module AresMUSH
         text.empty? ? text : text[0].upcase + text[1..]
       end
 
-      # The text without its colour codes, for measuring it.
+      # The text without its colour codes, for measuring it: `%xh` and `%xn`, and the 256-colour `%x229`.
       def strip(text)
-        text.gsub(/%x./i, '')
+        text.gsub(/%x(\d{1,3}|[a-z])/i, '')
       end
     end
   end

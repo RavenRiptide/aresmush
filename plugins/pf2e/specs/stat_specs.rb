@@ -429,6 +429,75 @@ module AresMUSH
         expect(sum).to_not include('-  1 status')
       end
 
+      # Built by hand, so each case is exactly the row under test.
+      describe "what applies only sometimes" do
+        def rendered(label, kind, row, client = nil)
+          breakdown = { 'base' => 10, 'total' => 10, 'modifiers' => [], 'conditional' => [ row ] }
+
+          Pf2e::PF2StatBreakdownTemplate.new(label, breakdown, kind, client).render
+        end
+
+        # The words as read, with a wrapped row joined back up.
+        def page(*args)
+          rendered(*args).gsub(/%r\s+/, ' ')
+        end
+
+        let(:waived) do
+          { 'source' => 'Leather', 'slug' => 'armor-check-penalty', 'type' => 'untyped', 'value' => -1,
+            'waived_by' => 'strength' }
+        end
+
+        let(:supertaster) do
+          { 'source' => 'Supertaster', 'slug' => 'supertaster', 'type' => 'circumstance', 'value' => 2,
+            'when' => [ 'taste', { 'or' => [ 'action:recall-knowledge', 'action:investigate' ] } ] }
+        end
+
+        it "should say an armor penalty is not applied, and why" do
+          expect(page('Stealth', 'skill', waived)).to include 'Not applied'
+          expect(page('Stealth', 'skill', waived)).to include "Leather's armor check penalty"
+          expect(page('Stealth', 'skill', waived)).to include 'because you meet its Strength requirement'
+          expect(page('Stealth', 'skill', waived)).to_not include 'Waived'
+        end
+
+        it "should say it aloud the same way" do
+          spoken = page('Stealth', 'skill', waived, double('client', :screen_reader => true))
+
+          expect(spoken).to include "Not applied: Leather's armor check penalty, minus 1, because you meet its Strength requirement."
+        end
+
+        # Stealth cannot be used to Recall Knowledge, so a bonus to Recall Knowledge has no place on it.
+        it "should leave off a bonus for an action the skill cannot be used for" do
+          expect(page('Stealth', 'skill', supertaster)).to_not include 'Supertaster'
+        end
+
+        it "should name every requirement, and the roll that meets them, where it can apply" do
+          shown = page('Arcana', 'skill', supertaster)
+
+          expect(shown).to include 'when you Recall Knowledge or Investigate (taste)'
+          expect(shown).to include 'roll arcana/recall-knowledge/taste'
+        end
+
+        it "should count Recall Knowledge as a lore's" do
+          expect(page('Sailing Lore', 'lore', supertaster)).to include 'Supertaster'
+        end
+
+        it "should keep a row whose action the config does not place" do
+          row = supertaster.merge('when' => [ 'action:made-up-action' ])
+
+          expect(page('Stealth', 'skill', row)).to include 'Supertaster'
+        end
+
+        it "should keep the roll to type on one line" do
+          expect(rendered('Arcana', 'skill', supertaster)).to match(/%r\s+To count it: roll arcana\/recall-knowledge\/taste\n/)
+        end
+
+        it "should wrap a long row under itself rather than past the edge" do
+          rendered('Arcana', 'skill', supertaster).split(/%r|\n/).map { |line| line.gsub(/%x(\d{1,3}|[a-z])/i, '') }.each do |line|
+            expect(line.length).to be <= 78
+          end
+        end
+      end
+
       it "should say what the page is" do
         rendered = Pf2e::PF2StatBreakdownTemplate.new('Will', Pf2e::Stat.of(reread, 'save', 'will'), 'save').render
 

@@ -111,6 +111,16 @@ module AresMUSH
 
         expect(waived.map { |row| row['slug'] }).to include 'armor-check-penalty'
       end
+
+      # So a breakdown can say why the penalty is missing, rather than only that it is.
+      it "should say why it did not apply" do
+        strength(16)
+        wear('Breastplate')
+
+        waived = Pf2eSkills.skill_breakdown(reread, 'Acrobatics')['conditional'].find { |row| row['slug'] == 'armor-check-penalty' }
+
+        expect(waived['waived_by']).to eq 'strength'
+      end
     end
 
     describe "the speed penalty" do

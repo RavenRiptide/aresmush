@@ -167,11 +167,27 @@ module AresMUSH
         # An unmet row is kept out of the stacking, so it cannot override one that applies, but it is
         # still reported: "+2, but only while picking a lock" is what a player wants to know.
         figure = Modifiers.breakdown(row['base'].call(char, name).to_i, adjusted)
-                          .merge('conditional' => unmet + waived, 'basis' => basis(row, char, name))
+                          .merge('conditional' => unmet + waived.map { |one| with_waiver(one, held) },
+                                 'basis' => basis(row, char, name))
 
         # A character in a battle form has the form's AC, skills, attacks and speeds where those are
         # better or the form insists.
         BattleForms.override(char, kind, name, figure, options, extra)
+      end
+
+      # Why an armour penalty is not counted, in the order a player would want to hear it: something
+      # they have ignores it outright, they are strong enough for the armour, or it is flexible. Kept on
+      # the row as `waived_by`, so a breakdown can say why rather than only that it was waived.
+      WAIVERS = [ [ %w{armor:ignore-check-penalty armor:ignore-speed-penalty}, 'ignored' ],
+                  [ %w{armor:strength-requirement-met}, 'strength' ],
+                  [ %w{armor:trait:flexible}, 'flexible' ] ].freeze
+
+      def self.with_waiver(row, held)
+        return row unless row['slug'].to_s.start_with?('armor-')
+
+        found = WAIVERS.find { |facts, _| (facts & Array(held)).any? }
+
+        found ? row.merge('waived_by' => found.last) : row
       end
 
       # What the base is made of, for whoever asks why: `expert, level 11`; for AC the armour as well.
