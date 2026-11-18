@@ -3,8 +3,8 @@ require "plugin_test_loader"
 module AresMUSH
   module Pf2e
 
-    # What a player means when they ask why a figure is what it is. `sheet/why reflex` has to reach the
-    # save and `sheet/why athletics` the skill, and a name the catalogue does not hold is a lore -
+    # What a player means when they ask why a figure is what it is. `sheet/breakdown reflex` has to reach
+    # the save and `sheet/breakdown athletics` the skill, and a name the catalogue does not hold is a lore -
     # which is what a lore is.
     describe "naming a figure", :dbtest => true do
 

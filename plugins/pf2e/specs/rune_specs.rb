@@ -64,10 +64,13 @@ module AresMUSH
         expect(rules.first['damageType']).to eq 'fire'
       end
 
-      # A rune belongs to the weapon it is etched on, so its selector names that weapon rather than
-      # every attack the character has.
-      it "should name the item it is etched on rather than a statistic" do
+      # A weapon rune belongs to the weapon it is etched on, so its selector names that weapon rather than
+      # every attack the character has. An armour rune's bonus is to its wearer's skill, and it is counted
+      # only from the suit they wear, so naming the skill is right for it.
+      it "should name the weapon it is etched on rather than a statistic" do
         Global.read_config('pf2e_runes').each_pair do |name, info|
+          next if info['kind'] == 'armor'
+
           Array(info['rules']).each do |row|
             expect(row['selector']).to match(/\A\{item\|id\}-/), "#{name}: #{row['selector']}"
           end
@@ -92,6 +95,64 @@ module AresMUSH
         }
 
         expect(strays).to eq []
+      end
+    end
+
+    # Foundry automates no armour rune, so these are written by hand in the importer from the runes' text.
+    describe "armour runes" do
+      before(:each) do
+        @skills = %w{Stealth Acrobatics}.map { |name| Pf2eSkills.create_skill_for_char(name, @char) }
+      end
+
+      after(:each) { @skills.each(&:delete) }
+
+      def armor(runes, equipped: true)
+        info = Global.read_config('pf2e_armor', 'Leather') || raise('no Leather armour')
+        item = Pf2egear.create_item(@char, 'armor', 'Leather', 1, info)
+        item.update(:equipped => equipped,
+                    :runes => { 'fundamental' => { 'potency' => 1 }, 'property' => { 'list' => runes } })
+        @items << item
+
+        item
+      end
+
+      def bonus(skill, options = [])
+        Pf2eSkills.get_skill_bonus(reread, skill, options)
+      end
+
+      it "should give a greater shadow rune's +2 to Stealth while the armour is worn" do
+        plain = bonus('Stealth')
+
+        armor([ 'Greater Shadow' ])
+
+        expect(bonus('Stealth')).to eq plain + 2
+      end
+
+      it "should name the rune in the breakdown, as an item bonus" do
+        armor([ 'Greater Shadow' ])
+
+        row = Pf2eSkills.skill_breakdown(reread, 'Stealth')['modifiers'].find { |one| one['source'] == 'Greater Shadow' }
+
+        expect(row).to include('type' => 'item', 'value' => 2, 'enabled' => true)
+      end
+
+      it "should give nothing from a suit that is carried but not worn" do
+        plain = bonus('Stealth')
+
+        armor([ 'Greater Shadow' ], :equipped => false)
+
+        expect(bonus('Stealth')).to eq plain
+      end
+
+      it "should give a slick rune's bonus to Escape and Squeeze, and to no other Acrobatics check" do
+        plain = bonus('Acrobatics')
+
+        armor([ 'Slick' ])
+
+        expect(bonus('Acrobatics')).to eq plain
+        expect(bonus('Acrobatics', [ 'action:escape' ])).to eq plain + 1
+        expect(bonus('Acrobatics', [ 'action:squeeze' ])).to eq plain + 1
+        expect(bonus('Acrobatics', [ 'action:balance' ])).to eq plain
       end
     end
 

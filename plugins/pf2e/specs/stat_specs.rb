@@ -385,7 +385,7 @@ module AresMUSH
       end
     end
 
-    # `sheet/why` is the whole reason an overridden modifier stays on the list, so it is worth proving
+    # `sheet/breakdown` is the whole reason an overridden modifier stays on the list, so it is worth proving
     # the page renders rather than finding out in game.
     describe "what a player is shown" do
       it "should render the breakdown" do
@@ -402,17 +402,79 @@ module AresMUSH
         condition('Frightened', 1)
         condition('Sickened', 3)
 
-        rendered = Pf2e::PF2StatBreakdownTemplate.new('Will', Pf2e::Stat.of(reread, 'save', 'will')).render
+        rendered = Pf2e::PF2StatBreakdownTemplate.new('Will', Pf2e::Stat.of(reread, 'save', 'will'), 'save').render
 
-        expect(rendered).to match(/overridden/)
+        expect(rendered).to match(/Frightened %xr-1%xn.*\(not counted: Sickened is worse\)/)
       end
 
       it "should sign a bonus and a penalty so the arithmetic reads" do
         condition('Frightened', 2)
 
-        rendered = Pf2e::PF2StatBreakdownTemplate.new('Will', Pf2e::Stat.of(reread, 'save', 'will')).render
+        rendered = Pf2e::PF2StatBreakdownTemplate.new('Will', Pf2e::Stat.of(reread, 'save', 'will'), 'save').render
 
         expect(rendered).to match(/-2/)
+      end
+
+      # The sum is the first thing shown, so a player can see how much of the figure is theirs.
+      it "should open with the sum, counting only what applies" do
+        condition('Frightened', 1)
+        condition('Sickened', 3)
+
+        breakdown = Pf2e::Stat.of(reread, 'save', 'will')
+        rendered = Pf2e::PF2StatBreakdownTemplate.new('Will', breakdown, 'save').render
+        sum = rendered.lines.find { |line| line.include?('=') && line.include?('proficiency') }
+
+        expect(sum).to include("#{breakdown['total']}")
+        expect(sum).to include('-  3 status')
+        expect(sum).to_not include('-  1 status')
+      end
+
+      it "should say what the page is" do
+        rendered = Pf2e::PF2StatBreakdownTemplate.new('Will', Pf2e::Stat.of(reread, 'save', 'will'), 'save').render
+
+        expect(rendered).to include('Will Breakdown')
+      end
+
+      # Whether "+" and "-" are spoken depends on the reader's punctuation level, so signs are words, and
+      # each row names its type rather than relying on a column the eye groups.
+      describe "with the screen reader setting" do
+        def spoken
+          client = double('client', :screen_reader => true)
+
+          Pf2e::PF2StatBreakdownTemplate.new('Will', Pf2e::Stat.of(reread, 'save', 'will'), 'save', client).render
+        end
+
+        it "should say signs as words" do
+          condition('Frightened', 2)
+
+          expect(spoken).to include('minus 2 status')
+          expect(spoken).to include('Status: Frightened, minus 2.')
+        end
+
+        it "should name each switched-off row's type and what beat it" do
+          condition('Frightened', 1)
+          condition('Sickened', 3)
+
+          expect(spoken).to include('Status: Frightened, minus 1, not counted: Sickened is worse.')
+        end
+
+        it "should say a sign inside a row's text as a word too" do
+          template = Pf2e::PF2StatBreakdownTemplate.new('AC', Pf2e::Stat.of(reread, 'ac'), 'ac', double('client', :screen_reader => true))
+
+          expect(template.spoken_text('10, Leather +1, untrained')).to eq '10, Leather plus 1, untrained'
+          expect(template.spoken_text('Cold-Iron Sword')).to eq 'Cold-Iron Sword'
+        end
+
+        it "should draw no lines and use no colour" do
+          expect(spoken).to_not match(/%l[hdf]|%x/)
+          expect(spoken).to start_with('Will Breakdown.')
+        end
+      end
+
+      it "should print an amount such as AC without a sign" do
+        rendered = Pf2e::PF2StatBreakdownTemplate.new('AC', Pf2e::Stat.of(reread, 'ac'), 'ac').render
+
+        expect(rendered).to_not match(/\+\d+%xn  =/)
       end
     end
 

@@ -579,12 +579,26 @@ module AresMUSH
       # A rune is not an item: it is something done to one, and what it does belongs to the thing it is
       # etched on. So the source carries the *weapon's* id, which is what its rules name - a flaming
       # rune's fire is written against `{item|id}-damage` and reaches that weapon's damage and no other.
+      #
+      # An armour rune is the exception: a shadow rune's Stealth bonus names the skill, not the armour, so
+      # it would reach the character from a spare suit in their pack. Armour runes count only from the
+      # suit they are wearing, which is what "while wearing the armor" says.
       def self.runes(char)
+        worn = Pf2eCombat.get_equipped_armor(char)
+
         Pf2egear.carried_items(char).flat_map do |_category, item|
           next [] unless item.respond_to?(:runes)
 
-          Pf2egear.property_runes(item).map { |slug| rune_source(item, slug) }.compact
+          Pf2egear.property_runes(item).map { |slug|
+            next nil if armor_rune?(slug) && !(worn && worn.id == item.id)
+
+            rune_source(item, slug)
+          }.compact
         end
+      end
+
+      def self.armor_rune?(slug)
+        Pf2egear.rune_entry(slug)&.dig('kind') == 'armor'
       end
 
       def self.rune_source(item, slug)

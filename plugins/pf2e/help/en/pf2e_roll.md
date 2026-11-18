@@ -42,7 +42,7 @@ Some bonuses only apply to a particular action. For example, a Skeleton Key help
 
 You don't need to specify the action for a bonus that only depends on your gear. An item you're wearing (and have invested, if it needs investing) applies its bonus on its own.
 
-`sheet/why <figure>`: Lists your conditional bonuses for `<figure>`, and the circumstance each one needs, so you can see which ones are worth specifying.
+`sheet/breakdown <stat>`: Lists your conditional bonuses for `<stat>`, and the circumstance each one needs, so you can see which ones are worth specifying.
 
 ## Other dice commands
 

@@ -13,7 +13,9 @@ handful of function-valued fields are taken out. Nothing is translated on the wa
 `DamageDice` row with the same fields. What we cannot read is refused and counted, never flattened.
 
 Selectors are `{item|id}-…`, because a rune belongs to the weapon it is etched on: `Pf2e::Effects`
-builds one source per rune per weapon and the weapon's own damage domain is the one it reaches.
+builds one source per rune per weapon and the weapon's own damage domain is the one it reaches. The
+exception is the few armour runes in ARMOR_RULES, which Foundry does not automate: their bonuses are to
+the wearer's skills, so they name the skill.
 
 Only runes from GM Core, Player Core, and Player Core 2 come in. The table has no book, and no word on
 what a rune may be etched onto; the rune's item in their equipment pack has both, along with the book's
@@ -94,6 +96,26 @@ REFUSALS = {
     'ignoredResistances': 'ignores a resistance, which is the target\'s and not reachable from here',
     'adjustments': 'adjusts a modifier by way of a function rather than a value',
     'strikeAdjustments': 'changes the weapon itself by way of a function',
+}
+
+# What an armour rune does, written here because Foundry's table carries nothing for armour runes and
+# their pack items have empty rules: Foundry leaves these to the player. Each row is read from the rune's
+# own text in GM Core. The selector is a skill rather than `{item|id}-…`, because the bonus is to the
+# wearer's check; `Pf2e::Effects.runes` counts an armour rune only from the suit being worn.
+ESCAPE_OR_SQUEEZE = [{'or': ['action:escape', 'action:squeeze']}]
+
+ARMOR_RULES = {
+    # "You gain a +1 item bonus to Stealth checks while wearing the armor."
+    'shadow': [{'key': 'FlatModifier', 'selector': 'stealth', 'slug': 'shadow', 'type': 'item', 'value': 1}],
+    'greaterShadow': [{'key': 'FlatModifier', 'selector': 'stealth', 'slug': 'shadow', 'type': 'item', 'value': 2}],
+    'majorShadow': [{'key': 'FlatModifier', 'selector': 'stealth', 'slug': 'shadow', 'type': 'item', 'value': 3}],
+    # "You gain a +1 item bonus to Acrobatics checks to Escape and Squeeze."
+    'slick': [{'key': 'FlatModifier', 'selector': 'acrobatics', 'slug': 'slick', 'type': 'item', 'value': 1,
+               'predicate': ESCAPE_OR_SQUEEZE}],
+    'greaterSlick': [{'key': 'FlatModifier', 'selector': 'acrobatics', 'slug': 'slick', 'type': 'item', 'value': 2,
+                      'predicate': ESCAPE_OR_SQUEEZE}],
+    'majorSlick': [{'key': 'FlatModifier', 'selector': 'acrobatics', 'slug': 'slick', 'type': 'item', 'value': 3,
+                    'predicate': ESCAPE_OR_SQUEEZE}],
 }
 
 # Foundry's own spelling of an outcome, onto the spelling their packs use - which is the one
@@ -442,7 +464,7 @@ def kind_of(usage):
 def entry_of(slug, rune, kind, refused, found=None, item=None):
     """A property rune: what it does from the table, and from its pack item, when it has one, the book's
     level, price, and rarity and what it is etched onto."""
-    rules = rules_of(rune, slug, refused, found) if kind == 'weapon' else []
+    rules = rules_of(rune, slug, refused, found) if kind == 'weapon' else ARMOR_RULES.get(slug, [])
     entry = {'slug': slug, 'kind': kind, 'level': rune.get('level', 1),
              'price': int(rune.get('price', 0) * GOLD), 'rarity': rune.get('rarity', 'common'),
              'traits': rune.get('traits') or [], 'rules': rules}

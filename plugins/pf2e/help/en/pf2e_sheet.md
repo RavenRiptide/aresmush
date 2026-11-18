@@ -19,9 +19,9 @@ aliases:
 `sheet/history <name>` and `sheet/history <name>=<first>-<last>`: Lists the same for someone else.
 `csheet` and `csheet <name>`: Alias for `sheet/combat`.
 %t **Note:** The combat sheet is available once a character is approved. During chargen, use `sheet` instead.
-`sheet/why <figure>`: Shows the math behind one number on your sheet: its base value, and every bonus and penalty applied to it. `<figure>` can be `hp`, `ac`, `speed`, `perception`, a save (`fortitude`, `reflex`, or `will`), `class dc`, or a skill or lore by name.
+`sheet/breakdown <stat>`: Shows the math behind a stat on your sheet: its base value, and every bonus and penalty applied to it. `<stat>` can be `hp`, `ac`, `speed`, `perception`, a save (`fortitude`, `reflex`, or `will`), `class dc`, or a skill or lore by name.
 %t **Note:** A modifier that the stacking rules don't count is listed and marked, so you can see when a new item changes nothing because you already have a better bonus of the same type. Bonuses that only apply while you're doing something specific are listed separately, with the circumstance each one needs; see "Bonuses for specific actions" in `help roll` for how to claim them.
-`sheet/why <figure>=<name>`: Shows the same for someone else's sheet.
+`sheet/breakdown <stat>=<player>`: Shows the same for someone else's sheet.
 `sheet/option` (or `sheet/options`): Lists the circumstances your gear and feats offer, and which ones are on.
 %t **Note:** Some items only work while one of their features is active. For example, a Clandestine Cloak hides you while its magic is running, but makes you harder to talk to. These circumstances are on by default, so an item you're wearing does what it says.
 `sheet/option <name>`: Turns a circumstance off, or back on.

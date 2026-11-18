@@ -1,7 +1,7 @@
 module AresMUSH
   module Pf2e
 
-    # `sheet/why <figure>` - the arithmetic behind one number on the sheet.
+    # `sheet/breakdown <figure>` - the arithmetic behind one number on the sheet.
     class PF2StatBreakdownCmd
       include CommandHandler
 
@@ -37,7 +37,7 @@ module AresMUSH
 
         kind, name = found
 
-        client.emit PF2StatBreakdownTemplate.new(label(kind, name), Pf2e::Stat.of(char, kind, name)).render
+        client.emit PF2StatBreakdownTemplate.new(label(kind, name), Pf2e::Stat.of(char, kind, name), kind, client).render
       end
 
       def label(kind, name)

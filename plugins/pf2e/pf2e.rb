@@ -85,7 +85,7 @@ module AresMUSH
         case cmd.switch
         when "combat"
           return PF2DisplayCombatSheetCmd
-        when "why"
+        when "breakdown"
           return PF2StatBreakdownCmd
         when "option", "options"
           return PF2RollOptionCmd

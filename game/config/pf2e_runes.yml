@@ -475,6 +475,12 @@ pf2e_runes:
     rarity: "common"
     traits:
       - "magical"
+    rules:
+      - key: "FlatModifier"
+        selector: "stealth"
+        slug: "shadow"
+        type: "item"
+        value: 2
   Greater Shock:
     slug: "greaterShock"
     kind: "weapon"
@@ -513,6 +519,13 @@ pf2e_runes:
     rarity: "common"
     traits:
       - "magical"
+    rules:
+      - key: "FlatModifier"
+        selector: "acrobatics"
+        slug: "slick"
+        type: "item"
+        value: 2
+        predicate: [{"or": ["action:escape", "action:squeeze"]}]
   Greater Thundering:
     slug: "greaterThundering"
     kind: "weapon"
@@ -730,6 +743,12 @@ pf2e_runes:
     rarity: "common"
     traits:
       - "magical"
+    rules:
+      - key: "FlatModifier"
+        selector: "stealth"
+        slug: "shadow"
+        type: "item"
+        value: 3
   Major Slick:
     slug: "majorSlick"
     kind: "armor"
@@ -739,6 +758,13 @@ pf2e_runes:
     rarity: "common"
     traits:
       - "magical"
+    rules:
+      - key: "FlatModifier"
+        selector: "acrobatics"
+        slug: "slick"
+        type: "item"
+        value: 3
+        predicate: [{"or": ["action:escape", "action:squeeze"]}]
   Quickstrike:
     slug: "quickstrike"
     kind: "weapon"
@@ -791,6 +817,12 @@ pf2e_runes:
     rarity: "common"
     traits:
       - "magical"
+    rules:
+      - key: "FlatModifier"
+        selector: "stealth"
+        slug: "shadow"
+        type: "item"
+        value: 1
   Shifting:
     slug: "shifting"
     kind: "weapon"
@@ -866,6 +898,13 @@ pf2e_runes:
     rarity: "common"
     traits:
       - "magical"
+    rules:
+      - key: "FlatModifier"
+        selector: "acrobatics"
+        slug: "slick"
+        type: "item"
+        value: 1
+        predicate: [{"or": ["action:escape", "action:squeeze"]}]
   Spell Reservoir:
     slug: "spellReservoir"
     kind: "weapon"

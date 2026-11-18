@@ -139,7 +139,7 @@ pf2e_foundry_source:
       sha256: 7818680709bcd65e53eb5ed2cddea55c5a7196f187314d5a32c71cf508ddb56a
     game/config/pf2e_runes.yml:
       by: import_foundry_runes
-      sha256: f6cc6a88201fe2de44b9a1765395c1ee454efcefd957982c3ba9519ca0cbf6ee
+      sha256: d5f0e97d8e1f9c4d9607830d765cca374beaeebc1dbc808387da64cb3db90d9a
     game/config/pf2e_shields.yml:
       by: import_foundry_rules
       sha256: 44439476b06fa653c2383577d661f88eb7371b6c6fb1affead666618a254b718
