@@ -78,7 +78,15 @@ module AresMUSH
         scoped = slug ? said['words'].map { |word| "action:#{slug}:#{Domains.slug(word)}" } : []
         flanked = said['flanking'] ? [ 'target:condition:off-guard' ] : []
 
-        said['options'] + scoped + flanked + (scene.target ? Resolve.seen_as(scene.target.holder, 'target') : [])
+        seen = scene.target ? Resolve.seen_as(scene.target.holder, 'target') + Marks.seen(scene.actor.holder, scene.target, 'target') : []
+
+        said['options'] + scoped + flanked + seen
+      end
+
+      # What is true of the one acting, as the target's rules read it for a defence against them: what
+      # they are, and whether the target has marked them.
+      def self.attacker_seen(scene)
+        Resolve.seen_as(scene.actor.holder, 'origin') + Marks.seen(scene.target.holder, scene.actor, 'origin')
       end
 
       # The target's cover and concealment: set on it in the encounter, or said for this one roll by
@@ -201,6 +209,7 @@ module AresMUSH
         return bonded_item(scene, name, entry, words) if name == BondedItem::NAME
         return sustain_effect(scene, name, entry, words) if name == Sustaining::NAME
         return dismiss_effect(scene, name, entry, words) if name == Dismissing::NAME
+        return Stratagem.act(scene, name, entry, said(words, scene.permitted), risked) if name == Stratagem::NAME
         return attack_answer(scene, name, entry) if entry['type'] == 'reaction' && AttackAnswers.answer(scene.actor.holder, name)
 
         # An action a daily choice limits reaches only whom it named: Inspired Stratagem's allies.
@@ -737,7 +746,7 @@ module AresMUSH
 
         if dc.nil? && against && scene.target
           defence = Resolve.defence(scene.target.holder, against,
-                                    :options => Resolve.seen_as(scene.actor.holder, 'origin'),
+                                    :options => attacker_seen(scene),
                                     :extra => defender_extra(scene, said, against))
           dc = defence && defence['dc']
         end
@@ -1101,7 +1110,7 @@ module AresMUSH
 
         return Err.new(:no_attack, 'pf2e.act_no_attack', 'attack' => weapon_term.to_s) unless attack
 
-        stopped = Restraints.refusal(scene.actor, 'Strike', [ 'attack' ])
+        stopped = Restraints.refusal(scene.actor, 'Strike', [ 'attack' ]) || Stratagem.strike_refusal(scene)
         return stopped if stopped
 
         attack = as_wielded(scene.actor.holder, attack, said['words'])
@@ -1132,7 +1141,7 @@ module AresMUSH
 
         penalty = said['no_map'] ? [] : TurnState.map_options(scene.actor.holder)
         options = penalty + options_for(scene, said, 'strike') + [ 'action:strike' ]
-        check = Check.of(scene.actor.holder, 'attack', attack, options)
+        check = Stratagem.attack_check(scene, attack, Check.of(scene.actor.holder, 'attack', attack, options), options)
         extra = increments > 1 ? [ { 'source' => "range increment #{increments}", 'slug' => 'range-penalty',
                                      'type' => 'untyped', 'value' => -2 * (increments - 1) } ] : []
 
@@ -1147,6 +1156,7 @@ module AresMUSH
         out['lines'] << rolled['line']
         # Whoever struck from hiding is seen for it.
         conceal(scene, scene.actor, nil, out) if unseen
+        Stratagem.after_strike(scene, check, attack, out)
 
         # The attack's notes for its outcome, and the effects they link: Sympathetic Strike's on a hit. A
         # bomb's own effect is left to the hit, which puts it on.
@@ -1259,7 +1269,7 @@ module AresMUSH
                                                           :die => flat['die'], :dc => flat['dc']) }
         end
 
-        defence = Resolve.defence(scene.target.holder, 'ac', :options => Resolve.seen_as(scene.actor.holder, 'origin'),
+        defence = Resolve.defence(scene.target.holder, 'ac', :options => attacker_seen(scene),
                                                              :extra => defender_extra(scene, said, 'ac'))
         result = Resolve.roll(check, :dc => defence['dc'], :extra => extra)
 

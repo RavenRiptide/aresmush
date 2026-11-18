@@ -292,10 +292,14 @@ module AresMUSH
         (named.is_a?(Hash) ? named['prof'] : nil) || char.combat&.class_dc
       end
 
+      # An investigator's Strike on a stratagem's roll may use Intelligence too (`Pf2e::Stratagem`).
       def self.attack_abilities(attack)
-        return [ 'Dexterity' ] if attack['ranged']
+        own = if attack['ranged'] then [ 'Dexterity' ]
+              elsif Pf2e.has_trait?(attack['traits'], 'finesse') then [ 'Strength', 'Dexterity' ]
+              else [ 'Strength' ]
+              end
 
-        Pf2e.has_trait?(attack['traits'], 'finesse') ? [ 'Strength', 'Dexterity' ] : [ 'Strength' ]
+        attack['stratagem'] ? own + [ 'Intelligence' ] : own
       end
 
       def self.item(value, source, slug = nil)

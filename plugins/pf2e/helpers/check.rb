@@ -164,8 +164,14 @@ module AresMUSH
           offered.find { |one| @options.include?("substitute:#{one['slug']}") }
       end
 
-      # Which substitution the roll used, set by the roll path once it has decided.
-      attr_accessor :substituted
+      # Which substitution the roll used, set by the roll path once it has decided. What follows the roll
+      # reads it as `check:substitution:<slug>`: Strategic Strike's precision dice need the stratagem's roll.
+      attr_reader :substituted
+
+      def substituted=(slug)
+        @substituted = slug
+        @options += [ "check:substitution:#{slug}" ] if slug
+      end
 
       # The roll has been made. What was spent on it is spent: Guidance's bonus, a fortune effect.
       def rolled!(total, dc = nil, die = nil)

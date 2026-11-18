@@ -51,18 +51,22 @@ module AresMUSH
 
         held.merge('on' => on,
                    'locked' => !!locked,
-                   'selected' => selected(held, said),
+                   'selected' => selected(held, said, source['chosen']),
                    'chosen' => chosen.key?(held['option']),
                    'reachable' => reachable)
       end
 
-      # Which of an option's choices holds. What the player said, if it is one of them; otherwise what
-      # the rule selected, or the first - because an option that is on has to be on as *something*.
-      def self.selected(held, said)
+      # Which of an option's choices holds. What the player said, if it is one of them; then an answer the
+      # effect declaring it was applied with (a stratagem's `skill`); otherwise what the rule selected, or
+      # the first - because an option that is on has to be on as *something*.
+      def self.selected(held, said, answers = [])
         values = Array(held['choices']).map { |one| one['value'] }
 
         return nil if values.empty?
         return said if said.is_a?(String) && values.include?(said)
+
+        answered = Array(answers).map(&:to_s).find { |one| values.include?(one) }
+        return answered if answered
 
         values.include?(held['selection'].to_s) ? held['selection'].to_s : values.first
       end

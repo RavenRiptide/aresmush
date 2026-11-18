@@ -61,6 +61,11 @@ module AresMUSH
     # effect with different numbers. Empty when nothing said - an effect a GM added by hand.
     attribute :origin, :type => DataType::Hash, :default => {}
 
+    # The creature the effect marks, by its label in the encounter, and the mark's slug: Devise a
+    # Stratagem marks the creature it was devised against. Rules read it as `target:mark:<slug>` from the
+    # holder's side and `origin:mark:<slug>` from the marked creature's (`Pf2e::Marks`).
+    attribute :mark, :type => DataType::Hash, :default => {}
+
     # A mutagen's halves, which the polymorph rule and a Mutagenist's field vial part (`Pf2e::Mutagens`):
     # whether a later polymorph has ended its benefits, keeping its drawbacks, and the encounter round until
     # which a field vial suppresses its drawbacks.

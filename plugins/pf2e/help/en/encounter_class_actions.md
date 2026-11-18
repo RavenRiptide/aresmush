@@ -18,6 +18,9 @@ aliases:
 - "dragon's_rage_breath"
 - dragons_rage_breath
 - inspired_stratagem
+- devise_a_stratagem
+- stratagem
+- strategic_strike
 ---
 # Pathfinder 2E Encounters - Class and Ancestry Feat Actions
 
@@ -43,6 +46,16 @@ These feat actions take more syntax than `encounter/act <action>=<target>`. For 
 %t **Example**:
 %t `encounter/act nimble dodge`
 `encounter/act inspired stratagem=<ally>`: Only works on an ally you reviewed stratagems with at your daily preparations.
+
+## Devise a Stratagem
+
+`encounter/act devise a stratagem=<target>`: **Investigator.** Rolls your d20 ahead of time against the target and starts you on an attack stratagem. Your next Strike against that target this round uses the roll in place of the d20, adds your Intelligence modifier if it's higher than your Strength or Dexterity modifier, and deals your Strategic Strike damage if it hits.
+%t **Note:** The roll replaces the d20 only for an agile, finesse, or ranged weapon. A Strike with any other weapon rolls as usual and uses up the stratagem.
+%t **Example**:
+%t `encounter/act devise a stratagem=#3`, then `encounter/strike rapier=#3`
+`encounter/act devise a stratagem/<stratagem>`: Changes your stratagem after you see the roll, at no cost in actions. Choose `skill`, or `defensive` if you have the Defensive Stratagem feat. With either one, you can't Strike the target until the start of your next turn.
+%t **Example**:
+%t `encounter/act devise a stratagem/skill`
 
 ## Other class actions
 

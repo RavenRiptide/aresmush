@@ -342,7 +342,8 @@ module AresMUSH
         def check(target, skill, against)
           attacks = Array(own['traits']).include?('attack')
           rolled = Check.of(actor.holder, 'skill', skill, attacks ? TurnState.map_options(actor.holder) : [])
-          defence = Resolve.defence(target.holder, against, :options => Resolve.seen_as(actor.holder, 'origin'))
+          defence = Resolve.defence(target.holder, against, :options => Resolve.seen_as(actor.holder, 'origin') +
+                                                                         Marks.seen(target.holder, actor, 'origin'))
           result = Resolve.roll(rolled, :dc => defence['dc'], :extra => attacks ? Acting.attack_penalty(actor.holder) : [])
 
           out['lines'] << Acting.check_line(at(target), name, skill, result, { 'against' => against }, defence, defence['dc'])
