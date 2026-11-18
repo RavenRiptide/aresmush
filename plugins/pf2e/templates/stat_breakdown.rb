@@ -164,17 +164,16 @@ module AresMUSH
       #
       #   Conditional bonuses/penalties
       #      Wary Disarmament: +2 circumstance bonus against traps or devices
-      #      Supertaster: +2 circumstance bonus when you Recall Knowledge or Investigate
-      #        (taste)
-      #          (Roll command: roll cooking lore/recall knowledge/taste)
+      #      Supertaster: +2 circumstance bonus when you Recall Knowledge or Investigate (taste)
+      #        (Roll command: roll cooking lore/recall knowledge/taste)
       #   Not applied
       #      Leather's armor check penalty (-1), because you meet its Strength requirement
       #
+      # Each entry is one line however long, so a bonus is never split; the client wraps it if it must.
       # A penalty that is not counted is kept apart from the bonuses a player can claim, and says why, so
       # it does not read as something they have to do.
       ITEM_INDENT = 5
-      WRAP_INDENT = 7
-      HINT_INDENT = 9
+      HINT_INDENT = 7
 
       def conditional
         claimable, waived = shown_conditional.partition { |row| !waived?(row) }
@@ -220,13 +219,8 @@ module AresMUSH
         "  #{item_color}#{text}%xn"
       end
 
-      # A list entry, wrapping under itself a little further in than it starts.
       def item(text)
-        first = wrap(text, WIDTH - ITEM_INDENT).first
-        rest = text.split(' ').drop(first.split(' ').size).join(' ')
-        more = rest.empty? ? [] : wrap(rest, WIDTH - WRAP_INDENT)
-
-        ([ "#{' ' * ITEM_INDENT}#{first}" ] + more.map { |line| "#{' ' * WRAP_INDENT}#{line}" }).join('%r')
+        "#{' ' * ITEM_INDENT}#{text}"
       end
 
       # `circumstance bonus`, `status penalty`.
@@ -364,19 +358,6 @@ module AresMUSH
 
       def possessive(name)
         name.to_s.end_with?('s') ? "#{name}'" : "#{name}'s"
-      end
-
-      # Words into lines no longer than `width`, measured without colour codes.
-      def wrap(text, width)
-        text.split(' ').each_with_object([ '' ]) do |word, lines|
-          if lines.last.empty?
-            lines[-1] = word
-          elsif strip(lines.last).length + 1 + strip(word).length > width
-            lines << word
-          else
-            lines[-1] = "#{lines.last} #{word}"
-          end
-        end
       end
 
       # `pick-a-lock` as a player reads it: Pick a Lock.

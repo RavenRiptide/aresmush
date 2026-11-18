@@ -524,13 +524,13 @@ module AresMUSH
         end
 
         it "should keep the roll to type on one line" do
-          expect(rendered('Arcana', 'skill', supertaster)).to match(/\n {9}\(Roll command: roll arcana\/recall knowledge\/taste\)\n/)
+          expect(rendered('Arcana', 'skill', supertaster)).to match(/\n {7}\(Roll command: roll arcana\/recall knowledge\/taste\)\n/)
         end
 
-        it "should wrap a long row under itself rather than past the edge" do
-          rendered('Arcana', 'skill', supertaster).split(/%r|\n/).map { |line| line.gsub(/%x(\d{1,3}|[a-z])/i, '') }.each do |line|
-            expect(line.length).to be <= 78
-          end
+        # A bonus split across lines reads as two things, so an entry stays whole however long it is.
+        it "should keep each bonus on one line" do
+          expect(rendered('Arcana', 'skill', supertaster))
+            .to match(/\n {5}Supertaster: \+2 circumstance bonus when you Recall Knowledge or Investigate \(taste\)\n/)
         end
       end
 
