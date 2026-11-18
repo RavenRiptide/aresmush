@@ -161,35 +161,77 @@ module AresMUSH
       # Bonuses that hold only while doing something in particular. Naming the circumstance is the point:
       # it is how a player learns that their Skeleton Key does nothing until they say they are picking a
       # lock.
-      #   Conditional   Slick +1 item, when you Escape or Squeeze.
-      #                 To count it: roll acrobatics/escape
-      #   Not applied   Leather's armor check penalty (-1), because you meet its
-      #                 Strength requirement.
+      #
+      #   Conditional bonuses/penalties
+      #      Wary Disarmament: +2 circumstance bonus against traps or devices
+      #      Supertaster: +2 circumstance bonus when you Recall Knowledge or Investigate
+      #        (taste)
+      #          (Roll command: roll cooking lore/recall knowledge/taste)
+      #   Not applied
+      #      Leather's armor check penalty (-1), because you meet its Strength requirement
       #
       # A penalty that is not counted is kept apart from the bonuses a player can claim, and says why, so
       # it does not read as something they have to do.
-      def conditional
-        shown_conditional.map do |row|
-          if waived?(row)
-            column('Not applied', "#{possessive(row['source'])} #{penalty_name(row)} (#{amount(row['value'])})#{waiver(row)}.")
-          else
-            hint = roll_hint(row) ? [ "To count it: #{roll_hint(row)}" ] : []
+      ITEM_INDENT = 5
+      WRAP_INDENT = 7
+      HINT_INDENT = 9
 
-            column('Conditional', "#{row['source']} #{amount(row['value'])} #{type_word(type(row))}, #{circumstance(row)}.", *hint)
+      def conditional
+        claimable, waived = shown_conditional.partition { |row| !waived?(row) }
+        lines = []
+
+        if claimable.any?
+          lines << heading('Conditional bonuses/penalties')
+          claimable.each do |row|
+            lines << item("#{row['source']}: #{amount(row['value'])} #{bonus_words(row)}#{condition(row)}")
+            lines << "#{' ' * HINT_INDENT}(Roll command: #{roll_hint(row)})" if roll_hint(row)
           end
         end
+
+        if waived.any?
+          lines << heading('Not applied')
+          waived.each { |row| lines << item("#{possessive(row['source'])} #{penalty_name(row)} (#{amount(row['value'])})#{waiver(row)}") }
+        end
+
+        lines
       end
 
       def spoken_conditional
-        shown_conditional.map do |row|
-          if waived?(row)
-            "Not applied: #{possessive(row['source'])} #{penalty_name(row)}, #{spoken(row['value'])}#{waiver(row)}."
-          else
-            hint = roll_hint(row) ? " To count it, #{roll_hint(row)}." : ''
+        claimable, waived = shown_conditional.partition { |row| !waived?(row) }
+        lines = []
 
-            "Conditional: #{row['source']}, #{spoken(row['value'])} #{type_word(type(row))}, #{circumstance(row)}.#{hint}"
+        if claimable.any?
+          lines << 'Conditional bonuses and penalties:'
+          claimable.each do |row|
+            hint = roll_hint(row) ? " Roll command: #{roll_hint(row)}." : ''
+
+            lines << "#{row['source']}: #{spoken(row['value'])} #{bonus_words(row)}#{condition(row)}.#{hint}"
           end
         end
+
+        waived.each do |row|
+          lines << "Not applied: #{possessive(row['source'])} #{penalty_name(row)}, #{spoken(row['value'])}#{waiver(row)}."
+        end
+
+        lines
+      end
+
+      def heading(text)
+        "  #{item_color}#{text}%xn"
+      end
+
+      # A list entry, wrapping under itself a little further in than it starts.
+      def item(text)
+        first = wrap(text, WIDTH - ITEM_INDENT).first
+        rest = text.split(' ').drop(first.split(' ').size).join(' ')
+        more = rest.empty? ? [] : wrap(rest, WIDTH - WRAP_INDENT)
+
+        ([ "#{' ' * ITEM_INDENT}#{first}" ] + more.map { |line| "#{' ' * WRAP_INDENT}#{line}" }).join('%r')
+      end
+
+      # `circumstance bonus`, `status penalty`.
+      def bonus_words(row)
+        "#{type_word(type(row))} #{row['value'].to_i.negative? ? 'penalty' : 'bonus'}"
       end
 
       # The conditional rows that can apply to this figure. A rule written against every skill check that
@@ -228,30 +270,62 @@ module AresMUSH
         row['slug'].to_s.start_with?('armor-') && row['value'].to_i.negative?
       end
 
-      # `when you Recall Knowledge or Investigate (taste)`, `when the check is visual`, or for a
-      # requirement nothing here can put into words, `in some circumstances`.
-      def circumstance(row)
+      # Words a predicate uses that read better as a phrase of their own.
+      PHRASES = { 'trap' => 'against traps or devices',
+                  'attack' => 'against attacks',
+                  'unarmed' => 'with unarmed attacks',
+                  'area-effect' => 'against area effects',
+                  'damaging-effect' => 'against damaging effects',
+                  'scent' => 'using scent' }.freeze
+
+      # Traits of what the check is against, or of the check itself: `fear` is a fear effect.
+      TRAITS = %w{fear mental emotion visual auditory sonic magical spell illusion inhaled poison disease
+                  curse affliction vitality void death linguistic olfactory}.freeze
+
+      # Figures a player defends with, where a trait is the effect's rather than the check's.
+      DEFENSES = %w{ac save}.freeze
+
+      # ` when you Recall Knowledge or Investigate (taste)`, ` against fear effects`, or nothing at all
+      # where the only requirement is the feat's own switch - Nimble Dodge's bonus is for when you use
+      # Nimble Dodge, and its name says so.
+      def condition(row)
         found = parts(row['when'])
 
-        return 'in some circumstances' if found['unreadable'] || (found['actions'].empty? && found['words'].empty?)
+        return ' in some circumstances' if found['unreadable']
 
-        words = found['words'].join(', ')
+        words = found['words'].reject { |word| own?(word, row) }
+        phrased, plain = words.partition { |word| PHRASES[word] || TRAITS.include?(word) }
+        said = phrased.map { |word| PHRASES[word] || trait_phrase(word) }
 
-        if found['actions'].empty?
-          "when the check is #{words}"
-        else
-          "when you #{found['actions'].map { |slug| action_name(slug) }.join(' or ')}#{words.empty? ? '' : " (#{words})"}"
-        end
+        said << "when you #{found['actions'].map { |slug| action_name(slug) }.join(' or ')}" if found['actions'].any?
+        said << "(#{plain.map { |word| word.tr('-', ' ') }.join(', ')})" if plain.any?
+
+        said.empty? ? '' : " #{said.join(' ')}"
       end
 
-      # What a player types to count the bonus: the first action, and any word it also needs.
+      def trait_phrase(word)
+        DEFENSES.include?(@kind) ? "against #{word} effects" : "on #{word} checks"
+      end
+
+      # Whether a word is the source's own switch: `nimble-dodge` on Nimble Dodge.
+      def own?(word, row)
+        [ Domains.slug(row['source'].to_s), row['slug'].to_s ].include?(word)
+      end
+
+      # What a player types to count the bonus, as they would say it: the first action and any word it
+      # also needs, with spaces for hyphens - `roll cooking lore/recall knowledge/taste`. The roll reads
+      # each part after a slash as a circumstance, hyphenated or not.
       def roll_hint(row)
         found = parts(row['when'])
 
         return nil unless %w{skill lore perception}.include?(@kind)
-        return nil if found['unreadable'] || (found['actions'].empty? && found['words'].empty?)
+        return nil if found['unreadable']
 
-        "roll #{@label.downcase}/#{([ found['actions'].first ].compact + found['words']).join('/')}"
+        typed = [ found['actions'].first ].compact + found['words'].reject { |word| own?(word, row) }
+
+        return nil if typed.empty?
+
+        "roll #{@label.downcase}/#{typed.map { |word| word.tr('-', ' ') }.join('/')}"
       end
 
       # A predicate taken apart into what a player can say: `actions` (`action:escape`, or an `or` of
@@ -290,17 +364,6 @@ module AresMUSH
 
       def possessive(name)
         name.to_s.end_with?('s') ? "#{name}'" : "#{name}'s"
-      end
-
-      # A labelled row whose text wraps under itself rather than back to the margin. Each of `more` starts
-      # a line of its own, so a roll to type is never split across two.
-      def column(label, text, *more)
-        width = WIDTH - 2 - LABEL_WIDTH
-        lines = ([ text ] + more).flat_map { |one| wrap(one, width) }
-        indent = ' ' * (2 + LABEL_WIDTH)
-
-        ([ "  #{item_color}#{left(label, LABEL_WIDTH)}%xn#{lines.first}" ] +
-          lines.drop(1).map { |line| "#{indent}#{line}" }).join('%r')
       end
 
       # Words into lines no longer than `width`, measured without colour codes.

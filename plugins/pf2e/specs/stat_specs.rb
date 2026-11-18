@@ -473,8 +473,44 @@ module AresMUSH
         it "should name every requirement, and the roll that meets them, where it can apply" do
           shown = page('Arcana', 'skill', supertaster)
 
-          expect(shown).to include 'when you Recall Knowledge or Investigate (taste)'
-          expect(shown).to include 'roll arcana/recall-knowledge/taste'
+          expect(shown).to include 'Conditional bonuses/penalties'
+          expect(shown).to include 'Supertaster: +2 circumstance bonus when you Recall Knowledge or Investigate (taste)'
+          expect(shown).to include '(Roll command: roll arcana/recall knowledge/taste)'
+        end
+
+        it "should say it aloud as a sentence, with the roll command" do
+          spoken = page('Arcana', 'skill', supertaster, double('client', :screen_reader => true))
+
+          expect(spoken).to include 'Conditional bonuses and penalties:'
+          expect(spoken).to include 'Supertaster: plus 2 circumstance bonus when you Recall Knowledge or Investigate (taste). ' \
+                                    'Roll command: roll arcana/recall knowledge/taste.'
+        end
+
+        # Nimble Dodge's bonus is for when you use Nimble Dodge, which its name already says.
+        it "should add nothing to a bonus whose only requirement is its own switch" do
+          row = { 'source' => 'Nimble Dodge', 'type' => 'circumstance', 'value' => 2, 'when' => [ 'nimble-dodge' ] }
+
+          expect(page('AC', 'ac', row)).to match(/Nimble Dodge: \+2 circumstance bonus\n/)
+        end
+
+        it "should put a word about what the bonus is against into words" do
+          row = { 'source' => 'Wary Disarmament', 'type' => 'circumstance', 'value' => 2, 'when' => [ 'trap' ] }
+
+          expect(page('AC', 'ac', row)).to include 'Wary Disarmament: +2 circumstance bonus against traps or devices'
+        end
+
+        it "should read a trait as the effect's on a defense, and the check's elsewhere" do
+          fear = { 'source' => 'Bravery', 'type' => 'status', 'value' => 1, 'when' => [ 'fear' ] }
+          visual = { 'source' => 'Obsidian Goggles', 'type' => 'item', 'value' => 1, 'when' => [ 'visual' ] }
+
+          expect(page('Will', 'save', fear)).to include 'Bravery: +1 status bonus against fear effects'
+          expect(page('Perception', 'perception', visual)).to include 'Obsidian Goggles: +1 item bonus on visual checks'
+        end
+
+        it "should offer no roll command for a figure nobody rolls" do
+          row = { 'source' => 'Wary Disarmament', 'type' => 'circumstance', 'value' => 2, 'when' => [ 'trap' ] }
+
+          expect(page('AC', 'ac', row)).to_not include 'Roll command'
         end
 
         it "should count Recall Knowledge as a lore's" do
@@ -488,7 +524,7 @@ module AresMUSH
         end
 
         it "should keep the roll to type on one line" do
-          expect(rendered('Arcana', 'skill', supertaster)).to match(/%r\s+To count it: roll arcana\/recall-knowledge\/taste\n/)
+          expect(rendered('Arcana', 'skill', supertaster)).to match(/\n {9}\(Roll command: roll arcana\/recall knowledge\/taste\)\n/)
         end
 
         it "should wrap a long row under itself rather than past the edge" do

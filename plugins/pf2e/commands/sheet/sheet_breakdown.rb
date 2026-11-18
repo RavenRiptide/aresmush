@@ -40,8 +40,13 @@ module AresMUSH
         client.emit PF2StatBreakdownTemplate.new(label(kind, name), Pf2e::Stat.of(char, kind, name), kind, client).render
       end
 
+      # `AC`, `HP` and `Class DC` are abbreviations, and read wrong capitalised as words.
+      ABBREVIATIONS = %w{ac hp dc}.freeze
+
       def label(kind, name)
-        (name || kind.to_s.tr('_', ' ')).to_s.split.map(&:capitalize).join(' ')
+        (name || kind.to_s.tr('_', ' ')).to_s.split.map { |word|
+          ABBREVIATIONS.include?(word.downcase) ? word.upcase : word.capitalize
+        }.join(' ')
       end
     end
   end
