@@ -6,8 +6,11 @@ en:
 
     col_title: "Title"
     col_organizer: "Organizer"
-    col_when: "Date/Time"
+    list_title: "All Upcoming Events"
+    col_time: "Time"
     col_players: "Players"
+    tags_label: "Tags:"
+    sr_times_in_zone: "Times are in %{zone}."
     full: "Full"
     waitlisted_count: "%{waiting} waitlisted"
     no_events: "There are no events scheduled."
@@ -36,6 +39,7 @@ en:
     waiting_count: "%{waiting} on the waitlist"
 
     players_title: "Players:"
+    average_level_title: "Average Level:"
     death_consent_title: "Death Consent (DC):"
     death_consent_yes: "Yes - characters in this event can die, and what happens in it can have consequences that last after the event ends, such as broken gear that has to be repaired. For more information, see %{wiki_title}: %{wiki_url}"
     roster_title: "Roster"

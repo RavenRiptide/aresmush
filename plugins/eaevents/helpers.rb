@@ -181,6 +181,16 @@ module AresMUSH
       end
     end
 
+    # The roster's average level to at most two decimal places, without trailing zeros ("4.67",
+    # "5.2", "5"), for the organizer's encounter math; nil with nobody on the roster. The waitlist
+    # isn't the party, so it doesn't count. Only approved characters can sign up, so everyone on
+    # the roster has a real level.
+    def self.average_level(event)
+      levels = EaEvents.roster(event).map { |s| s.character }.compact.map { |c| c.pf2_level.to_i }
+      return nil if levels.empty?
+      format("%.2f", levels.sum.to_f / levels.count).sub(/0+\z/, "").sub(/\.\z/, "")
+    end
+
     # "5/5 (Full) - 2 on the waitlist", "3/6", or "4 signed up" with no limit.
     def self.players_summary(event)
       count = event.signups.count
@@ -234,6 +244,9 @@ module AresMUSH
         death_consent_wiki_title: EaEvents.death_consent_wiki_title,
         is_full: EaEvents.is_full?(event),
         players_summary: EaEvents.players_summary(event),
+        # The portal shows this only to someone who can manage the event. It isn't hidden from
+        # the API, since each sign-up's level is already public on the roster.
+        average_level: EaEvents.average_level(event),
         roster_count: roster.count,
         roster: roster.each_with_index.map { |s, i| s.merge(position: "#{i + 1}.") },
         waitlist: waitlist.each_with_index.map { |s, i| s.merge(position: "W#{i + 1}") }

@@ -150,6 +150,39 @@ module AresMUSH
         expect(EaEvents.class_label(@gm)).to eq ""
       end
 
+      # The roster is levels 2, 3, 4, and 5.
+      it "should average the roster's levels to two decimal places, leaving out the waitlist" do
+        event.update(max_players: 3)
+        @chars[0].update(pf2_level: 1)
+        expect(EaEvents.average_level(event)).to eq "2.67"
+      end
+
+      it "should drop trailing zeros from the average" do
+        expect(EaEvents.average_level(event)).to eq "3.5"
+        event.update(max_players: 3)
+        expect(EaEvents.average_level(event)).to eq "3"
+        event.update(max_players: 1)
+        @chars[0].update(pf2_level: 10)
+        expect(EaEvents.average_level(event)).to eq "10"
+      end
+
+      it "should give no average for an empty roster" do
+        event.signups.to_a.each { |s| s.delete }
+        expect(EaEvents.average_level(event)).to be_nil
+      end
+
+      it "should show the average level below the roster, only to someone who can manage the event" do
+        event.update(max_players: 3)
+
+        output = EaEvents::EventDetailTemplate.new(event, @gm).render
+        expect(output).to match(/#{@chars[2].name}.*Average Level:\S* 3\s.*#{t('eaevents.waitlist_title')}/m)
+        expect(EaEvents::EventDetailTemplate.new(event, @chars[0]).render).not_to include("Average Level:")
+
+        @gm.update(screen_reader: true)
+        output = EaEvents::EventDetailTemplate.new(event, Character[@gm.id]).render
+        expect(output).to match(/#{@chars[2].name}.*Average Level: 3\..*#{t('eaevents.waitlist_title')}/m)
+      end
+
       it "should split the portal's sign-ups into a numbered roster and waitlist" do
         event.update(max_players: 3)
         # The stock handler's list, deliberately out of order.
@@ -161,6 +194,7 @@ module AresMUSH
         expect(fields[:roster].map { |s| s[:position] }).to eq [ "1.", "2.", "3." ]
         expect(fields[:waitlist].map { |s| s[:position] }).to eq [ "W1" ]
         expect(fields[:is_full]).to eq true
+        expect(fields[:average_level]).to eq "3"
       end
 
       # Rendered for real: ERB runs inside Erubis's namespace, so a template that calls this
@@ -170,7 +204,7 @@ module AresMUSH
 
         output = EaEvents::EventsListTemplate.new([ event ], "Events", @chars[3]).render
 
-        expect(output).to match(/#\s+Title\s+Organizer\s+Date\/Time\s+Players/)
+        expect(output).to match(/#\s+Title\s+Organizer\s+Time\s+Players/)
         expect(output).to match(/1\.\s+.*#{@event.title[0, 10]}.*#{@gm.name[0, 10]}.*3 \/ 3 Full/)
         expect(output).to match(/\[W\].*\[DC\].*server|\[W\].*\[DC\]/m)
         expect(output).to include("1 waitlisted")
@@ -183,6 +217,58 @@ module AresMUSH
         expect(output).to include("4 signed up")
         expect(output).to include("No limit")
         expect(output).to include("[*]")
+      end
+
+      it "should name the viewer's time zone and put each day under its own divider" do
+        @chars[3].update(ooctime_timezone: "America/Chicago")
+        later = Event.create(:title => "Second Dive", :starts => @event.starts + 2 * 86400, :character => @gm)
+        viewer = Character[@chars[3].id]
+
+        begin
+          template = EaEvents::EventsListTemplate.new([ event, later ], "All Upcoming Events", viewer)
+          output = template.render
+
+          expect(output).to match(/All Upcoming Events.*America\/Chicago \(C[SD]T\)/)
+          expect(template.days.map { |divider, group| group.map { |ev, num| num } }).to eq [ [1], [2] ]
+          expect(output.scan(/-< %xh\w{3} \w{3} \d{1,2} \d{4} C[SD]T%xn >-/).count).to eq 2
+          expect(output).to match(/^2\.\s+.*Second Dive/)
+        ensure
+          later.delete
+        end
+      end
+
+      it "should keep events on the same day under one divider" do
+        # Noon UTC is morning in New York, so the hour between them never crosses midnight there.
+        tomorrow = Date.today + 1
+        noon = Time.utc(tomorrow.year, tomorrow.month, tomorrow.day, 12)
+        event.update(starts: noon)
+        later = Event.create(:title => "Same Day", :starts => noon + 3600, :character => @gm)
+
+        begin
+          template = EaEvents::EventsListTemplate.new([ event, later ], "Events", @gm)
+
+          expect(template.days.map { |divider, group| group.map { |ev, num| num } }).to eq [ [1, 2] ]
+        ensure
+          later.delete
+        end
+      end
+
+      it "should put tags on their own line and wrap them rather than cut them off" do
+        tags = (1..12).map { |i| "longish-tag-#{i}" }
+        ev = event
+        allow(ev).to receive(:content_tags) { tags }
+
+        lines = EaEvents::EventsListTemplate.new([ ev ], "Events", @gm).rows(ev, 1)
+
+        expect(lines[1]).not_to include("longish")
+        expect(lines[2]).to start_with("    Tags: longish-tag-1 ")
+        expect(lines.drop(2).join(" ").split.drop(1)).to eq tags
+        lines.drop(2).each { |line| expect(line.length).to be <= 78 }
+        expect(lines.drop(3)).to all(start_with(" " * 10))
+      end
+
+      it "should leave the tags line off an event without tags" do
+        expect(EaEvents::EventsListTemplate.new([ event ], "Events", @gm).rows(event, 1).count).to eq 2
       end
 
       it "should say so when there are no events" do
@@ -200,6 +286,7 @@ module AresMUSH
         expect(output).to include("1. #{@event.title}. Death Consent. Organizer: #{@gm.name}.")
         expect(output).to include("Players: 3 of 3, full, 1 on the waitlist. You're on the waitlist.")
         expect(output).to include("server time).")
+        expect(output).to include("Times are in America/New_York.")
         expect(output).not_to include("[W]")
         expect(output).not_to include("[DC]")
         expect(output).not_to include(t('eaevents.list_legend'))

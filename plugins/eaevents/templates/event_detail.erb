@@ -23,6 +23,10 @@
 <% roster.each_with_index do |s, i| %>
 <%= signup_line(s, "#{i+1}.") %>
 <% end %>
+<% if !average_level.blank? %>
+
+%xh<%= t('eaevents.average_level_title') %>%xn <%= average_level %>
+<% end %>
 <% if waitlist.any? %>
 %ld
 %xh<%= t('eaevents.waitlist_title')%>%xn

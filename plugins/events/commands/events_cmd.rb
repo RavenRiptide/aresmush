@@ -6,7 +6,7 @@ module AresMUSH
 
       def handle
         events = Event.sorted_events
-        title = t('events.all_events_title')
+        title = t('eaevents.list_title') # Emblem of Ea: Custom Ares change: list title (eaevents)
         template = EaEvents::EventsListTemplate.new(events, title, enactor) # Emblem of Ea: Custom Ares change: portal-style list (eaevents)
         client.emit template.render
       end

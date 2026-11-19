@@ -1,18 +1,17 @@
 %lh
-%xh<%= title %>%xn
+<%= title_line %>
 <% if events.empty? %>
 
 <%= t('eaevents.no_events') %>
 <% else %>
 %ld
 %xh<%= header %>%xn
-%ld
-<% events.each_with_index do |ev, i| %>
-<% if i > 0 %>
-
-<% end %>
-<% rows(ev, i + 1).each do |line| %>
+<% days.each do |divider, group| %>
+<%= divider %>
+<% group.each do |ev, num| %>
+<% rows(ev, num).each do |line| %>
 <%= line %>
+<% end %>
 <% end %>
 <% end %>
 %ld

@@ -37,6 +37,13 @@ module AresMUSH
         EaEvents.roster(@event)
       end
 
+      # The roster's average level, for the organizer's encounter math. Blank for anyone who
+      # can't manage the event, and with nobody on the roster.
+      def average_level
+        return "" if !@enactor || !Events.can_manage_event?(@enactor, @event)
+        EaEvents.average_level(@event) || ""
+      end
+
       def waitlist
         EaEvents.waitlist(@event)
       end
