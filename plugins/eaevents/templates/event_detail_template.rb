@@ -29,6 +29,10 @@ module AresMUSH
         @event.start_time_standard
       end
 
+      def death_consent_line
+        EaEvents.death_consent_line(screen_reader?)
+      end
+
       def roster
         EaEvents.roster(@event)
       end
@@ -37,21 +41,32 @@ module AresMUSH
         EaEvents.waitlist(@event)
       end
 
-      # "1.  Kaveh        Lvl 5 Wizard    - comment". Padded but never cut (ljust, not left), so a
-      # long name or class only pushes the rest of its own line over.
+      # "T2 (Levels 5-8)", or words for a screen reader; blank with no range.
+      def level_range
+        EaEvents.event_level_label(@event, screen_reader? ? :sr : :full)
+      end
+
+      # "1.  Kaveh        Lvl 5 Wizard    - comment", with "(below range)" or "(above range)"
+      # after the class for a character outside the level range. Padded but never cut (ljust,
+      # not left), so a long name or class only pushes the rest of its own line over.
       def signup_line(signup, label)
         char = signup.character
         name = char ? char.name : ""
+        fit = EaEvents.level_fit(@event, char)
+        fit_text = fit ? t("eaevents.#{fit}_range") : ""
         comment = signup.comment.blank? ? "" : " - #{signup.comment}"
-        "#{label.ljust(4)}#{name.ljust(12)} #{EaEvents.class_label(char).ljust(16)}#{comment}".rstrip
+        "#{label.ljust(4)}#{name.ljust(12)} #{EaEvents.class_label(char).ljust(16)}#{fit_text}#{comment}".rstrip
       end
 
-      # "1. Kaveh, Level 5 Wizard: comment", or "1. Kaveh." with no class and no comment.
+      # "1. Kaveh, Level 5 Wizard: comment", or "1. Kaveh." with no class and no comment. A
+      # character outside the level range gets ", below the level range" after the class.
       def signup_sentence(signup, label)
         char = signup.character
         text = "#{label} #{char ? char.name : ''}"
         class_label = EaEvents.class_label(char, :long)
         text = "#{text}, #{class_label}" if !class_label.blank?
+        fit = EaEvents.level_fit(@event, char)
+        text = "#{text}, #{t("eaevents.sr_#{fit}_range")}" if fit
         signup.comment.blank? ? "#{text}." : "#{text}: #{signup.comment}"
       end
     end

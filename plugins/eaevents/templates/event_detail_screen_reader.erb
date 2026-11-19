@@ -5,8 +5,11 @@
 <%= t('events.who_title')%> <%= event.who %>
 <%= t('events.tags_title') %> <%= event.content_tags.join(" ") %>
 <%= t('eaevents.players_title') %> <%= AresMUSH::EaEvents.screen_reader_players(event) %>.
+<% if !level_range.blank? %>
+<%= t('eaevents.level_range_title') %> <%= level_range %>.
+<% end %>
 <% if event.death_consent %>
-<%= t('eaevents.death_consent_title') %> <%= t('eaevents.sr_death_consent_yes') %>
+<%= t('eaevents.death_consent_title') %> <%= death_consent_line %>
 <% end %>
 
 <%= event.description %>

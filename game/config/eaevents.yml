@@ -1,0 +1,30 @@
+---
+eaevents:
+  # Tiers of play, used to label an event's level range. A range that starts and ends on tier
+  # boundaries is shown as tiers ("T2-T3 (Levels 5-12)"); any other range is shown as levels. The
+  # highest max here is the level cap event ranges are checked against.
+  level_tiers:
+  - name: T1
+    min: 1
+    max: 4
+  - name: T2
+    min: 5
+    max: 8
+  - name: T3
+    min: 9
+    max: 12
+  - name: T4
+    min: 13
+    max: 16
+  - name: T5
+    min: 17
+    max: 20
+
+  # The wiki page that explains the tiers. The portal links to it from the event pages.
+  tiers_wiki_page: plots
+  tiers_wiki_title: Plots & Events Overview
+
+  # The wiki page that explains death-consent events. The game and the portal link to it
+  # wherever an event is marked death consent.
+  death_consent_wiki_page: plots:dc-prps
+  death_consent_wiki_title: Death Consent Player-Run Plots

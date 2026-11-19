@@ -197,7 +197,7 @@ module AresMUSH
 
         output = EaEvents::EventsListTemplate.new([ event ], "Events", Character[@chars[3].id]).render
 
-        expect(output).to include("1. #{@event.title}. Death consent. Organizer: #{@gm.name}.")
+        expect(output).to include("1. #{@event.title}. Death Consent. Organizer: #{@gm.name}.")
         expect(output).to include("Players: 3 of 3, full, 1 on the waitlist. You're on the waitlist.")
         expect(output).to include("server time).")
         expect(output).not_to include("[W]")
@@ -211,7 +211,8 @@ module AresMUSH
         output = EaEvents::EventDetailTemplate.new(event, @gm).render
 
         expect(output).to include("3/3 (Full) - 1 on the waitlist")
-        expect(output).to include(t('eaevents.death_consent_yes'))
+        expect(output).to include(EaEvents.death_consent_line(false))
+        expect(output).to include("/wiki/plots:dc-prps")
         expect(output).to include(t('eaevents.waitlist_title'))
         expect(output).to match(/1\.\s+#{@chars[0].name}\s+Lvl 2 Wizard/)
         expect(output).to match(/W1\s+#{@chars[3].name}\s+Lvl 5 Wizard/)
@@ -225,7 +226,8 @@ module AresMUSH
         output = EaEvents::EventDetailTemplate.new(event, Character[@gm.id]).render
 
         expect(output).to include("Players: 3 of 3, full, 1 on the waitlist.")
-        expect(output).to include("Death Consent: Yes. Characters in this event can die.")
+        expect(output).to include("Death Consent (DC): Yes. Characters in this event can die, and what happens in it")
+        expect(output).to include("see Death Consent Player-Run Plots: #{Game.web_portal_url}/wiki/plots:dc-prps")
         expect(output).to include("1. #{@chars[0].name}, Level 2 Wizard: Bringing a lantern")
         expect(output).to include("2. #{@chars[1].name}, Level 3 Wizard.")
         expect(output).to include("Waitlist 1. #{@chars[3].name}, Level 5 Wizard.")
@@ -244,6 +246,114 @@ module AresMUSH
         EaEvents.save_web_fields(event, 'max_players' => nil, 'death_consent' => false)
         expect(EaEvents.max_players(event)).to be_nil
         expect(event.death_consent).to eq false
+      end
+
+      # ---- The level range. The four players are levels 2 to 5. ----
+
+      it "should notify only the sign-ups a range change puts outside it" do
+        told = EaEvents.set_level_range(event, [3, 4])
+
+        expect(told).to eq [ @chars[0], @chars[3] ]
+        expect(Login).to have_received(:notify).with(@chars[0], :event,
+          t('eaevents.level_range_changed_notice', :title => @event.title, :range => "Levels 3-4",
+            :name => @chars[0].name, :level => 2, :organizer => @gm.name, :num => EaEvents.event_number(event)),
+          @event.id)
+
+        # Player 1 was already outside and isn't told again; player 4 is back inside.
+        told = EaEvents.set_level_range(event, [4, 5])
+        expect(told).to eq [ @chars[1] ]
+        expect(Login).to have_received(:notify).exactly(3).times
+      end
+
+      it "should notify no one when the range is cleared or widened" do
+        event.update(min_level: 3, max_level: 4)
+
+        expect(EaEvents.set_level_range(event, [1, 20])).to eq []
+        expect(EaEvents.set_level_range(event, nil)).to eq []
+        expect(EaEvents.level_range(event)).to be_nil
+        expect(Login).not_to have_received(:notify)
+      end
+
+      it "should add a note to the sign-up message for a character outside the range" do
+        event.update(min_level: 3, max_level: 4)
+
+        expect(EaEvents.signup_message(event, @chars[1])).to eq t('events.signed_up')
+        expect(EaEvents.signup_message(event, @chars[0])).to eq "You've signed up. " +
+          "Note: #{@event.title} is for Levels 3-4, and #{@chars[0].name} is level 2. " +
+          "Talk to #{@gm.name} to find out if you can still participate."
+      end
+
+      it "should put the level note after the waitlist message" do
+        event.update(max_players: 3, min_level: 2, max_level: 4)
+
+        message = EaEvents.signup_message(event, @chars[3])
+        expect(message).to include("#1 on the waitlist")
+        expect(message).to include("%rNote: #{@event.title} is for Levels 2-4")
+      end
+
+      it "should leave out characters without a level" do
+        event.update(min_level: 3, max_level: 4)
+
+        expect(EaEvents.level_fit(event, @gm)).to be_nil
+        expect(EaEvents.level_note(event, @gm)).to be_nil
+      end
+
+      it "should show the level range and mark sign-ups outside it on the event page" do
+        event.update(min_level: 3, max_level: 4)
+
+        output = EaEvents::EventDetailTemplate.new(event, @gm).render
+
+        expect(output).to include("Level Range:%xn Levels 3-4")
+        expect(output).to match(/1\.\s+#{@chars[0].name}\s+Lvl 2 Wizard\s+\(below range\)/)
+        expect(output).to match(/2\.\s+#{@chars[1].name}\s+Lvl 3 Wizard$/)
+        expect(output).to match(/4\.\s+#{@chars[3].name}\s+Lvl 5 Wizard\s+\(above range\)/)
+      end
+
+      it "should leave the level range off the event page when there is none" do
+        output = EaEvents::EventDetailTemplate.new(event, @gm).render
+
+        expect(output).not_to include("Level Range:")
+        expect(output).not_to include("range)")
+      end
+
+      it "should give a screen reader the level range and range marks in words" do
+        event.update(min_level: 5, max_level: 8)
+        @gm.update(screen_reader: true)
+
+        output = EaEvents::EventDetailTemplate.new(event, Character[@gm.id]).render
+
+        expect(output).to include("Level Range: T2, levels 5 to 8.")
+        expect(output).to include("1. #{@chars[0].name}, Level 2 Wizard, below the level range.")
+        expect(output).to include("4. #{@chars[3].name}, Level 5 Wizard.")
+      end
+
+      it "should show the level range in the events list" do
+        event.update(min_level: 5, max_level: 12, death_consent: true)
+
+        output = EaEvents::EventsListTemplate.new([ event ], "Events", @gm).render
+        expect(output).to include("T2-T3 %xh%xr[DC]%xn")
+
+        @gm.update(screen_reader: true)
+        output = EaEvents::EventsListTemplate.new([ event ], "Events", Character[@gm.id]).render
+        expect(output).to include("Death Consent. For T2 to T3, levels 5 to 12. Organizer:")
+      end
+
+      it "should save the portal form's level range and send it to the event page" do
+        expect(EaEvents.check_web_fields('min_level' => '3', 'max_level' => '30')).not_to be_nil
+
+        EaEvents.save_web_fields(event, 'min_level' => '4', 'max_level' => '3')
+        expect(EaEvents.level_range(event)).to eq [3, 4]
+        expect(Login).to have_received(:notify).twice
+
+        signup = EaEvents.ordered_signups(event).first
+        expect(EaEvents.signup_web_fields(signup)[:level_fit]).to eq "below range"
+        fields = EaEvents.event_web_fields(event, [])
+        expect(fields[:level_range]).to eq "Levels 3-4"
+        expect(fields[:min_level]).to eq 3
+        expect(EaEvents.event_list_web_fields(event, @gm)[:level_range]).to eq "Lv 3-4"
+
+        EaEvents.save_web_fields(event, 'min_level' => '', 'max_level' => '')
+        expect(EaEvents.level_range(event)).to be_nil
       end
     end
   end

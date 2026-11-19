@@ -10,5 +10,10 @@ module AresMUSH
     attribute :max_players, :type => DataType::Integer
 
     attribute :death_consent, :type => DataType::Boolean
+
+    # The level range the organizer is looking for. 0 in either (the value unset reads as) means
+    # no range. Informational: anyone can still sign up.
+    attribute :min_level, :type => DataType::Integer
+    attribute :max_level, :type => DataType::Integer
   end
 end

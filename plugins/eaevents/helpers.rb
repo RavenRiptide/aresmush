@@ -90,8 +90,29 @@ module AresMUSH
       event.signups.each do |s|
         next if !s.character
         EaEvents.notify(s.character, event, t('eaevents.death_consent_added_notice',
-          :title => event.title, :num => EaEvents.event_number(event)))
+          :title => event.title, :num => EaEvents.event_number(event),
+          :wiki_title => EaEvents.death_consent_wiki_title, :wiki_url => EaEvents.death_consent_wiki_url))
       end
+    end
+
+    # The wiki page that explains death-consent events. The game gets the full URL, since a
+    # MUSH client can't follow a relative link; the portal links by page name.
+    def self.death_consent_wiki_page
+      Global.read_config("eaevents", "death_consent_wiki_page")
+    end
+
+    def self.death_consent_wiki_title
+      Global.read_config("eaevents", "death_consent_wiki_title")
+    end
+
+    def self.death_consent_wiki_url
+      "#{Game.web_portal_url}/wiki/#{EaEvents.death_consent_wiki_page}"
+    end
+
+    # The "Death Consent:" line on `event <#>`, in the screen-reader form if `screen_reader`.
+    def self.death_consent_line(screen_reader)
+      key = screen_reader ? 'eaevents.sr_death_consent_yes' : 'eaevents.death_consent_yes'
+      t(key, :wiki_title => EaEvents.death_consent_wiki_title, :wiki_url => EaEvents.death_consent_wiki_url)
     end
 
     # Notifies whoever moved onto the roster since `roster_before` (from roster_ids) was taken.
@@ -121,11 +142,16 @@ module AresMUSH
 
     # ---- What players see -----------------------------------------------------------------------
 
-    # What the game says to someone who just signed up (or changed their comment).
+    # What the game says to someone who just signed up (or changed their comment), with a note
+    # when the character is outside the event's level range.
     def self.signup_message(event, char)
       position = EaEvents.waitlist_position(event, char)
-      return t('events.signed_up') if !position
-      t('eaevents.signed_up_waitlisted', :title => event.title, :position => position)
+      note = EaEvents.level_note(event, char)
+      if (position)
+        message = t('eaevents.signed_up_waitlisted', :title => event.title, :position => position)
+        return note ? "#{message}%r#{note}" : message
+      end
+      note ? t('eaevents.signed_up_with_note', :note => note) : t('events.signed_up')
     end
 
     # "Lvl 5 Wizard" (or "Level 5 Wizard" in the :long form screen readers get), or blank for a
@@ -176,10 +202,12 @@ module AresMUSH
     # Added to each sign-up the event page shows.
     def self.signup_web_fields(signup)
       char = signup.character
+      fit = signup.event ? EaEvents.level_fit(signup.event, char) : nil
       {
         level: char ? char.pf2_level : nil,
         charclass: char ? ((char.pf2_base_info || {})['charclass'] || "") : "",
-        class_label: EaEvents.class_label(char)
+        class_label: EaEvents.class_label(char),
+        level_fit: fit ? t("eaevents.web_#{fit}_range") : nil
       }
     end
 
@@ -193,9 +221,17 @@ module AresMUSH
       signups = signups.sort_by { |h| order.index(h[:char][:name]) || order.count }
       roster = limit ? signups.first(limit) : signups
       waitlist = limit ? signups.drop(limit) : []
+      range = EaEvents.level_range(event)
       {
         max_players: limit,
         death_consent: !!event.death_consent,
+        min_level: range ? range[0] : nil,
+        max_level: range ? range[1] : nil,
+        level_range: EaEvents.level_range_label(range),
+        tiers_wiki_page: Global.read_config("eaevents", "tiers_wiki_page"),
+        tiers_wiki_title: Global.read_config("eaevents", "tiers_wiki_title"),
+        death_consent_wiki_page: EaEvents.death_consent_wiki_page,
+        death_consent_wiki_title: EaEvents.death_consent_wiki_title,
         is_full: EaEvents.is_full?(event),
         players_summary: EaEvents.players_summary(event),
         roster_count: roster.count,
@@ -210,6 +246,7 @@ module AresMUSH
       waiting = EaEvents.waitlist(event).count
       {
         death_consent: !!event.death_consent,
+        level_range: EaEvents.event_level_label(event, :short),
         is_waitlisted: EaEvents.any_alt_waitlisted?(event, enactor),
         players: limit ? "#{[event.signups.count, limit].min} / #{limit}#{EaEvents.is_full?(event) ? ' · Full' : ''}" : t('eaevents.players_no_limit', :count => event.signups.count),
         players_note: !limit ? t('eaevents.no_limit') : (waiting > 0 ? t('eaevents.waiting_count', :waiting => waiting) : "")
@@ -218,16 +255,28 @@ module AresMUSH
 
     # Checks the portal's create and edit forms. Returns an error message, or nil.
     def self.check_web_fields(args)
-      EaEvents.parse_limit(args['max_players'])[1]
+      EaEvents.parse_limit(args['max_players'])[1] || EaEvents.parse_web_level_range(args)[1]
     end
 
-    # Saves the portal form's limit and flag. Run after check_web_fields passes.
+    # Saves the portal form's limit, flag, and level range. Run after check_web_fields passes.
     def self.save_web_fields(event, args)
       limit, error = EaEvents.parse_limit(args['max_players'])
+      return if error
+      range, error = EaEvents.parse_web_level_range(args)
       return if error
 
       EaEvents.set_max_players(event, limit) if limit != EaEvents.max_players(event)
       EaEvents.set_death_consent(event, "#{args['death_consent']}".downcase == "true")
+      EaEvents.set_level_range(event, range) if range != EaEvents.level_range(event)
+    end
+
+    # The form's From and To levels as a range. Both blank is no range; one blank is that level
+    # alone. Returns [[min, max] or nil, error or nil].
+    def self.parse_web_level_range(args)
+      ends = [ args['min_level'], args['max_level'] ].map { |v| "#{v}".strip }.reject { |v| v.blank? }
+      return [ nil, nil ] if ends.empty?
+      return [ nil, t('eaevents.invalid_level_range', :cap => EaEvents.level_cap) ] if ends.any? { |v| v !~ /\A\d+\z/ }
+      EaEvents.parse_level_range(ends.join("-"))
     end
 
     # Blank or "none" is no limit. Returns [limit or nil, error or nil].

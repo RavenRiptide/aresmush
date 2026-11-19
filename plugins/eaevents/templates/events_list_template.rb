@@ -5,7 +5,8 @@ module AresMUSH
     #
     # Laid out like the web portal's events table: Title, Organizer, Date/Time, and Players, with a
     # second line per event for what the portal stacks underneath (server time, the waitlist or
-    # "No limit") and for the sign-up marker, the death-consent mark, and tags. A character with
+    # "No limit") and for the sign-up marker, the level range, the death-consent mark, and tags.
+    # The level range comes before the tags because long tags get cut off. A character with
     # screen reader mode on gets one sentence per event instead, with words in place of columns
     # and symbols.
     class EventsListTemplate < ErbTemplateRenderer
@@ -38,8 +39,8 @@ module AresMUSH
       # The event's two lines for the visual list.
       def rows(event, num)
         marker = { waitlisted: "[W]", signed_up: "[*]" }[signup_status(event)] || ""
-        tags = event.content_tags.join(" ")
-        under_title = event.death_consent ? "[DC] #{tags}" : tags
+        under_title = [ EaEvents.event_level_label(event, :short), event.death_consent ? "[DC]" : "",
+          event.content_tags.join(" ") ].reject { |part| part.blank? }.join(" ")
         under_title = left(under_title, TITLE - 1).rstrip.sub("[DC]", "%xh%xr[DC]%xn")
         when_color = event.color
 
@@ -56,6 +57,8 @@ module AresMUSH
       def sentence(event, num)
         parts = [ "#{num}. #{event.title}." ]
         parts << t('eaevents.sr_death_consent') if event.death_consent
+        range = EaEvents.event_level_label(event, :sr)
+        parts << t('eaevents.sr_level_range', :range => range) if !range.blank?
         parts << t('eaevents.sr_organizer', :name => event.organizer_name)
         parts << t('eaevents.sr_when', :local => local_when(event), :server => event.start_time_standard)
         parts << t('eaevents.sr_players', :players => EaEvents.screen_reader_players(event))

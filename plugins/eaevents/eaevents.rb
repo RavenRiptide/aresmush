@@ -3,9 +3,9 @@ $:.unshift File.dirname(__FILE__)
 module AresMUSH
 
   # Emblem of Ea's additions to the stock events plugin: a player limit with a waitlist, a
-  # death-consent flag, and each sign-up's level and class.
+  # death-consent flag, a level range, and each sign-up's level and class.
   #
-  # The stock plugin still owns events and sign-ups. This plugin adds two attributes to Event and
+  # The stock plugin still owns events and sign-ups. This plugin adds attributes to Event and
   # works out the roster and waitlist from the order people signed up, so nothing is stored twice.
   # The stock commands, web handlers, and templates call in here at the few points where they
   # need to know about the limit (each such call is marked "Emblem of Ea: Custom Ares change").
@@ -23,7 +23,7 @@ module AresMUSH
     end
 
     # The stock plugin answers `event` with every switch it knows and nil for the rest, so these
-    # two reach this plugin whichever is asked first.
+    # switches reach this plugin whichever is asked first.
     def self.get_cmd_handler(client, cmd, enactor)
       return nil if cmd.root != "event"
 
@@ -32,6 +32,8 @@ module AresMUSH
         return EventLimitCmd
       when "consent"
         return EventConsentCmd
+      when "levels"
+        return EventLevelsCmd
       end
 
       nil
@@ -42,6 +44,10 @@ module AresMUSH
     end
 
     def self.get_web_request_handler(request)
+      case request.cmd
+      when "eventLevelTiers"
+        return EventLevelTiersRequestHandler
+      end
       nil
     end
   end

@@ -5,8 +5,11 @@
 %xh<%= t('events.who_title')%>%xn <%= event.who %>
 %xh<%= t('events.tags_title') %>%xn <%= event.content_tags.join(" ") %>
 %xh<%= t('eaevents.players_title') %>%xn <%= AresMUSH::EaEvents.players_summary(event) %>
+<% if !level_range.blank? %>
+%xh<%= t('eaevents.level_range_title') %>%xn <%= level_range %>
+<% end %>
 <% if event.death_consent %>
-%xh%xr<%= t('eaevents.death_consent_title') %>%xn <%= t('eaevents.death_consent_yes') %>
+%xh%xr<%= t('eaevents.death_consent_title') %>%xn <%= death_consent_line %>
 <% end %>
 
 <%= event.description %>
