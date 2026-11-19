@@ -6,12 +6,6 @@ pf2noms:
   dmnom_amount: 3
   nom_money: 123
   dmnom_money: 369
-  rpp_alt_tiers:
-    - 0
-    - 100
-    - 250
-    - 450
-    - 700
   nom_refresh_cron:
     day_of_week:
       - Sun

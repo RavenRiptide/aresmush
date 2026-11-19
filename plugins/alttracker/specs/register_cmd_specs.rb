@@ -11,8 +11,6 @@ module AresMUSH
         stub_translate_for_testing
         allow(@player).to receive(:banned) { nil }
         allow(@player).to receive(:codeword) { "Secret" }
-        allow(Pf2noms).to receive(:calculate_max_alts) { 5 }
-        allow(Pf2noms).to receive(:calculate_current_alts) { 1 }
       end
 
       def run(command_text)
@@ -47,6 +45,14 @@ module AresMUSH
         end
 
         it "registers the character when the code word matches" do
+          expect(@enactor).to receive(:update).with(player: @player)
+          expect(@player).to receive(:update).with(mark_idle: nil)
+          expect(@client).to receive(:emit_success).with("alttracker.register_ok")
+          run("register taken@example.com=Secret")
+        end
+
+        it "registers the character no matter how many alts the player already has" do
+          allow(@player).to receive(:characters) { Array.new(50) { double(is_admin?: false) } }
           expect(@enactor).to receive(:update).with(player: @player)
           expect(@player).to receive(:update).with(mark_idle: nil)
           expect(@client).to receive(:emit_success).with("alttracker.register_ok")

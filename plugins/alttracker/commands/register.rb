@@ -40,14 +40,8 @@ module AresMUSH
           end
         end
 
-        max_alts = Pf2noms.calculate_max_alts(player)
-        current_alts = Pf2noms.calculate_current_alts(player)
-
         if player.banned
           client.emit_failure t('alttracker.player_banned')
-          return
-        elsif current_alts >= max_alts
-          client.emit_failure t('alttracker.max_alts_exceeded', :max_alts => max_alts)
           return
         elsif !(self.codeword == player.codeword)
           # A player registering for the first time can pick an email that is already on

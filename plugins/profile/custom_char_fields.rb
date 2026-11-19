@@ -14,13 +14,20 @@ module AresMUSH
       #    return { goals: Website.format_markdown_for_html(char.goals) }
       def self.get_fields_for_viewing(char, viewer)
 
-        if viewer == char || viewer&.has_permission?("manage_alts")
+        # Registration is private: only the character's own player (on any of their alts) and
+        # alt-tracker staff see it. show_registration tells the portal whether to draw the tab.
+        same_player = viewer == char || (viewer&.player && viewer.player == char.player)
+        if same_player || viewer&.has_permission?("manage_alts")
           if !(char.player)
-            return { registration: Website.format_markdown_for_html("Not yet registered.") }
+            return {
+              show_registration: true,
+              alttracker_register: Website.format_markdown_for_html("Not yet registered."),
+              alttracker_alts: Website.format_markdown_for_html("None.")
+            }
           else
             altlist = AltTracker.get_altlist_by_object(char.player).join(", ")
             player_email = char.player.name ? char.player.name : "No email set."
-            return { alttracker_register: Website.format_markdown_for_html(player_email), alttracker_alts: Website.format_markdown_for_html(altlist) }
+            return { show_registration: true, alttracker_register: Website.format_markdown_for_html(player_email), alttracker_alts: Website.format_markdown_for_html(altlist) }
           end
         else
           return {}
