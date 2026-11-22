@@ -13,9 +13,17 @@ module AresMUSH
       # @example
       #    return { goals: Website.format_markdown_for_html(char.goals) }
       def self.get_fields_for_viewing(char, viewer)
+        fields = registration_fields(char, viewer)
 
-        # Registration is private: only the character's own player (on any of their alts) and
-        # alt-tracker staff see it. show_registration tells the portal whether to draw the tab.
+        # Emblem of Ea: Custom Ares change: which tabs of the Pathfinder 2e section the profile draws (pf2e)
+        pf2 = Pf2e::ProfileSheet.flags(char, viewer)
+
+        pf2 ? fields.merge(pf2: pf2) : fields
+      end
+
+      # Registration is private: only the character's own player (on any of their alts) and
+      # alt-tracker staff see it. show_registration tells the portal whether to draw the tab.
+      def self.registration_fields(char, viewer)
         same_player = viewer == char || (viewer&.player && viewer.player == char.player)
         if same_player || viewer&.has_permission?("manage_alts")
           if !(char.player)
@@ -45,9 +53,14 @@ module AresMUSH
       # @example
       #    return { goals: Website.format_input_for_html(char.goals) }
       def self.get_fields_for_editing(char, viewer)
-        return {
+        fields = {
           looking_for_rp_announce: char.looking_for_rp_announce == "on" ? true : false ,
         }
+
+        # Emblem of Ea: Custom Ares change: the Familiar tab, for choosing the familiar's picture (pf2e)
+        familiar = Pf2e::FamiliarPicture.edit_fields(char)
+
+        familiar ? fields.merge(pf2_familiar: familiar) : fields
       end
 
       # Gets custom fields for character creation (chargen).
@@ -93,9 +106,14 @@ module AresMUSH
       #        char.update(goals: Website.format_input_for_mush(char_data['custom']['goals']))
       #        return []
       def self.save_fields_from_profile_edit2(char, enactor, char_data)
-        # By default, this calls the old method for backwards compatibility. The old one didn't
-        # use enactor. Replace this with your own code.
-        char.update(looking_for_rp_announce: Website.format_input_for_mush(char_data["custom"]["looking_for_rp_announce"] == true ? "on" : "off"))
+        custom = char_data["custom"] || {}
+        char.update(looking_for_rp_announce: Website.format_input_for_mush(custom["looking_for_rp_announce"] == true ? "on" : "off"))
+
+        # Emblem of Ea: Custom Ares change: the familiar's picture, sent only by an Edit page that drew the Familiar tab (pf2e)
+        return [] unless custom.key?("pf2_familiar_image")
+
+        chosen = Pf2e::FamiliarPicture.choose!(char, custom["pf2_familiar_image"])
+        chosen.ok? ? [] : [ t(chosen.key, **chosen.args.transform_keys(&:to_sym)) ]
       end
 
       

@@ -97,6 +97,10 @@ module AresMUSH
     # grants.
     attribute :pf2_familiar, :type => DataType::Hash, :default => {}
 
+    # The picture of their familiar or pet that the profile shows, as a path under the uploads folder
+    # (`hexa/smudge.jpg`), chosen from their own files on the portal's Edit page (`Pf2e::FamiliarPicture`).
+    attribute :pf2_familiar_image
+
     collection :abilities, "AresMUSH::Pf2eAbilities"
     collection :skills, "AresMUSH::Pf2eSkills"
     reference :hp, "AresMUSH::Pf2eHP"

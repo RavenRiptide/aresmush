@@ -100,7 +100,13 @@ module AresMUSH
       nil
     end
 
+    # A page reads each sheet once between its writes, as a command does.
     def self.get_web_request_handler(request)
+      case request.cmd
+      when "pf2ProfileInventory"
+        return Pf2e::ReadsOnce.wrapped(PF2ProfileInventoryHandler)
+      end
+
       nil
     end
 

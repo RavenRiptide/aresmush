@@ -60,7 +60,8 @@ module AresMUSH
             'attribute' => attribute,
             'hp' => HP_PER_LEVEL * level + flat(sources, [ 'hp' ], options, context),
             'ac' => special['ac'] ? Formula.value(special['ac'], context).to_i : shared(master, 'ac'),
-            'saves' => SAVES.each_with_object({}) { |save, out| out[save] = shared(master, 'save', save) },
+            # Read by the lower-case name the master's own sheet uses, which is how the class tables key a rank.
+            'saves' => SAVES.each_with_object({}) { |save, out| out[save] = shared(master, 'save', save.downcase) },
             'perception' => kept,
             'attack' => level,
             'skills' => skills(sources, level, kept, options, context),

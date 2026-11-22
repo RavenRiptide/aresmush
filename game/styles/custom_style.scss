@@ -225,6 +225,13 @@ button.navbar-toggler {
     margin-top: -2px;
 }
 
+@media (min-width: 992px) {
+  .navbar-expand-lg .navbar-collapse {
+        background-color: transparent;
+        color: #dbd3c6 !important;
+    }
+}
+
 /* Right sidebar styling */
 
 div.col-md-3.right-sidebar {
@@ -1035,6 +1042,10 @@ td {
     border-right: 1px solid #302727; /* Dark Pine */
 }
 
+tr.table-info {
+    --bs-table-striped-bg: #E1B07E5E;
+}
+
 ul.list-table {
     margin-top: .5rem;
     margin-bottom: .5rem;
@@ -1679,4 +1690,161 @@ div.footer-tos a {
   padding-bottom: .22em;
   margin-right: 3px;
   border-radius: .3em;
+}
+
+/* Pathfinder 2e section of the character profile */
+
+.pf2-profile h3 {
+    font-variant: small-caps;
+    letter-spacing: .03em;
+}
+
+.pf2-label {
+    color: #CBC0AD; /* Dark Vanilla */
+}
+
+.pf2-hint {
+    color: #CBC0AD; /* Dark Vanilla */
+}
+
+.pf2-banner {
+    background-image: linear-gradient(to right, #466671, transparent); /* Deep Space Sparkle */
+    border: 3px solid #CBC0AD;
+    border-left-style: double;
+    border-left-width: 8px;
+    border-right-style: none;
+    border-image: linear-gradient(to right, #CBC0AD, transparent) 1; /* Dark Vanilla */
+}
+
+.pf2-banner-title {
+    font-family: 'Philosopher', sans-serif;
+    font-variant: small-caps;
+    font-weight: bold;
+    color: #dbd3c6; /* Bone */
+}
+
+.pf2-banner-sub {
+    color: #dbd3c6; /* Bone */
+}
+
+.pf2-stat,
+.pf2-strike {
+    background-color: #201a1a; /* Eerie Black */
+    border: 1px solid #E1B07E;
+    border-image: linear-gradient(to bottom right, #E1B07E, #E1B07E61, #E1B07E) 1; /* Tumbleweed */
+}
+
+.pf2-stat-key {
+    background-image: linear-gradient(to bottom, #46667199, #201a1a); /* Deep Space Sparkle */
+}
+
+.pf2-stat-tag {
+    color: #E1B07E; /* Tumbleweed */
+}
+
+.pf2-stat-value,
+.pf2-skill-value,
+.pf2-strike-value,
+.pf2-sum-value,
+.pf2-sum-op,
+.pf2-source-value {
+    font-family: 'Teko', sans-serif;
+    font-weight: 500;
+    color: #dbd3c6; /* Bone */
+}
+
+.pf2-sum-op {
+    color: #b37066; /* Copper Penny */
+}
+
+.pf2-sum-total .pf2-sum-value {
+    color: #E1B07E; /* Tumbleweed */
+}
+
+.pf2-strike-name {
+    font-family: 'Philosopher', serif;
+    font-weight: bold;
+    color: #df8f84; /* New York Pink */
+}
+
+.pf2-strike-name small {
+    font-family: 'Mulish', sans-serif;
+    font-weight: normal;
+    color: #CBC0AD; /* Dark Vanilla */
+}
+
+.pf2-rank {
+    color: #74a7bb; /* Moonstone Blue */
+}
+
+.pf2-rank-expert {
+    background-color: #466671; /* Deep Space Sparkle */
+    border-color: #466671;
+    color: #dbd3c6;
+}
+
+.pf2-rank-master {
+    background-color: #b37066; /* Copper Penny */
+    border-color: #b37066;
+    color: #171510;
+}
+
+.pf2-rank-legendary,
+.pf2-rank-signature {
+    background-color: #E1B07E; /* Tumbleweed */
+    border-color: #E1B07E;
+    color: #171510;
+}
+
+.pf2-chip {
+    background-color: #302727; /* Dark Pine */
+    border: 1px solid #4b2b31; /* Brown Coffee */
+    color: #E1B07E;
+}
+
+.pf2-chip-dim {
+    background-color: transparent;
+    border-style: dashed;
+    border-color: #594f4f; /* Dark Liver */
+    color: #CBC0AD;
+}
+
+.pf2-skill {
+    border-bottom: 1px solid #302727; /* Dark Pine */
+}
+
+.pf2-table th.pf2-table-head {
+    color: #CBC0AD; /* Dark Vanilla */
+    font-variant: small-caps;
+    letter-spacing: .04em;
+}
+
+.pf2-source-head {
+    background: linear-gradient(to right, #466671, transparent); /* Deep Space Sparkle */
+}
+
+.pf2-source-title {
+    font-family: 'Philosopher', sans-serif;
+    font-variant: small-caps;
+    font-weight: bold;
+    color: #dbd3c6; /* Bone */
+}
+
+.pf2-source-title small {
+    font-family: 'Mulish', sans-serif;
+    font-variant: normal;
+    font-weight: normal;
+}
+
+.pf2-note {
+    color: #CBC0AD; /* Dark Vanilla */
+    background-color: #201a1a; /* Eerie Black */
+    border: 2px solid #CBC0AD;
+    border-image: linear-gradient(to bottom right, #CBC0AD, #CBC0AD1A, #CBC0AD) 1;
+}
+
+.pf2-familiar-picture {
+    background-color: #201a1a; /* Eerie Black */
+    border: 1px solid #E1B07E;
+    border-image: linear-gradient(to bottom right, #E1B07E, #E1B07E61, #E1B07E) 1; /* Tumbleweed */
 }

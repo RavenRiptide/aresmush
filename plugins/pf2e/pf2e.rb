@@ -558,6 +558,12 @@ module AresMUSH
         return PF2ActionsHandler
       when "pf2LastRoll"
         return PF2LastRollHandler
+      when "pf2ProfileSheet"
+        return PF2ProfileSheetHandler
+      when "pf2ProfileCombat"
+        return PF2ProfileCombatHandler
+      when "pf2ProfileFamiliar"
+        return PF2ProfileFamiliarHandler
       end
 
       nil

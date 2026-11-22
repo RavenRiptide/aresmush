@@ -92,8 +92,7 @@ module AresMUSH
           familiar = context['familiar']
           # In an encounter, its master as they stand there.
           master = familiar&.master || char
-          stats = Stats.of(master, Daily.abilities_today(master), :form => approved['form'].presence || 'land',
-                           :specific => approved['specific'], :options => Daily.options(master))
+          stats = stats(master, approved)
           stats = in_fight(stats, familiar) if familiar
           context = context.merge('stats' => stats)
 
@@ -101,6 +100,13 @@ module AresMUSH
             basic_section(context), stats_section(context), saves_section(context), skills_section(context),
             context['pet'] ? pet_section(context) : nil, specific_section(context),
             context['pet'] ? nil : today_section(context), spells_section(context), notes_section(context) ]
+        end
+
+        # An approved familiar's stats today, from its master's: `sheet/familiar` and the profile's Familiar
+        # tab both read them here.
+        def self.stats(master, approved)
+          Stats.of(master, Daily.abilities_today(master), :form => approved['form'].presence || 'land',
+                   :specific => approved['specific'], :options => Daily.options(master))
         end
 
         # ------------------------------------------------------------------------------------------------
@@ -285,7 +291,7 @@ module AresMUSH
           return nil unless main['kind'] == 'spellbook'
 
           char = context['char']
-          source = main['feature'] ? 'Witch' : Array(Choices.feat(main['name'])['assoc_archetype']).first.to_s
+          source = FamiliarView.spell_source(char)
           known = char.magic ? Pf2emagic::Entries.known(char.magic, source) : {}
           counted = known.each_with_object(Hash.new(0)) do |(rank, spells), out|
             out[rank.to_s.casecmp?('cantrip') ? 'cantrips' : 'spells'] += Array(spells).count { |one| !one.to_s.casecmp?(Pf2emagic::Entries::OPEN) }

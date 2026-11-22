@@ -67,28 +67,9 @@ module AresMUSH
       end
 
       def archetype
-        archetype_info = @char.pf2_archetypeinfo || {}
-        archetypes_list = []
+        labels = SheetView.archetype_labels(@char)
 
-        (1..4).each do |index|
-          archetype_name = archetype_info["archetype#{index}"].to_s.strip
-          next if archetype_name.empty?
-
-          specialty = archetype_info["archetype_specialty#{index}"].to_s.strip
-          choice = archetype_info["archetype_specialty_choice#{index}"].to_s.strip
-          name = archetype_name.sub(/ Archetype$/, '')
-
-          if specialty.empty?
-            archetypes_list << name
-          else
-            specialty_label = choice.empty? ? specialty : "#{specialty} - #{choice}"
-            archetypes_list << "#{name} (#{specialty_label})"
-          end
-        end
-
-        return "None" if archetypes_list.empty?
-
-        archetypes_list.join(", ")
+        labels.empty? ? "None" : labels.join(", ")
       end
 
       def archetype_line
@@ -452,16 +433,7 @@ module AresMUSH
       end
 
       def deity_fav_weapon
-        return nil if !combat_stats.weapon_prof['deity']
-
-        deity_name = @faith_info['deity']
-        return nil if deity_name.blank?
-
-        fav_weapon = Global.read_config('pf2e_deities', deity_name, 'fav_weapon')
-        return nil if fav_weapon.blank?
-
-        weapons = Global.read_config('pf2e_weapons') || {}
-        weapons.keys.find { |w| w.to_s.casecmp?(fav_weapon.to_s) }
+        SheetView.deity_weapon(@char, @faith_info || {})
       end
 
       def weapon_group_prof

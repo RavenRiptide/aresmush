@@ -9,6 +9,23 @@ module AresMUSH
         @char = double("char", player: @player)
         allow(AltTracker).to receive(:get_altlist_by_object).with(@player) { [ "Alpha", "Beta" ] }
         allow(Website).to receive(:format_markdown_for_html) { |text| text }
+        # The Pathfinder 2e flags have their own spec (profile_sheet_specs.rb); these characters have no sheet.
+        allow(Pf2e::ProfileSheet).to receive(:flags).and_return(nil)
+      end
+
+      it "gives the Edit page the familiar's picture fields only for a character with a familiar" do
+        char = double("char", looking_for_rp_announce: "on")
+        allow(Pf2e::FamiliarPicture).to receive(:edit_fields).with(char).and_return(nil)
+        expect(CustomCharFields.get_fields_for_editing(char, char)).to eq({ looking_for_rp_announce: true })
+
+        allow(Pf2e::FamiliarPicture).to receive(:edit_fields).with(char).and_return({ name: 'Smudge', pet: false, image: nil })
+        expect(CustomCharFields.get_fields_for_editing(char, char)[:pf2_familiar]).to eq({ name: 'Smudge', pet: false, image: nil })
+      end
+
+      it "adds the Pathfinder 2e flags when the character has a sheet to show" do
+        allow(Pf2e::ProfileSheet).to receive(:flags).and_return({ sheet: true })
+
+        expect(CustomCharFields.get_fields_for_viewing(@char, nil)).to eq({ pf2: { sheet: true } })
       end
 
       def viewer(player: nil, staff: false)

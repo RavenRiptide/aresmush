@@ -15,7 +15,7 @@ module AresMUSH
         @char = Character.create(:name => "Morwen#{rand(1000000)}")
         @combat = Pf2eCombat.create(:character => @char, :key_abil => 'Intelligence', :perception => 'trained',
                                     :armor_prof => { 'unarmored' => 'trained' },
-                                    :saves => { 'Fortitude' => 'trained', 'Reflex' => 'trained', 'Will' => 'expert' })
+                                    :saves => { 'fortitude' => 'trained', 'reflex' => 'trained', 'will' => 'expert' })
         @hp = Pf2eHP.create(:character => @char, :ancestry_hp => 6, :charclass_hp => 6)
         @char.update(:combat => @combat, :hp => @hp, :pf2_level => 6, :pf2_conditions => {}, :pf2_traits => [],
                      :pf2_derived => {}, :pf2_feats => {},
@@ -63,7 +63,15 @@ module AresMUSH
       describe "AC and saves" do
         it "should be the master's" do
           expect(stats['ac']).to eq Stat.total(master, 'ac')
-          expect(stats['saves']['Will']).to eq Stat.total(master, 'save', 'Will')
+          expect(stats['saves']['Will']).to eq Stat.total(master, 'save', 'will')
+        end
+
+        # The class tables key a save's rank in lower case, as the master's own sheet reads it.
+        it "should carry the master's proficiency in each save" do
+          expect(stats['saves']).to eq('Fortitude' => Pf2eCombat.get_save_bonus(master, 'fortitude'),
+                                       'Reflex' => Pf2eCombat.get_save_bonus(master, 'reflex'),
+                                       'Will' => Pf2eCombat.get_save_bonus(master, 'will'))
+          expect(stats['saves']['Will']).to be > Pf2eAbilities.abilmod(12)
         end
 
         it "should not share the master's status penalties" do
