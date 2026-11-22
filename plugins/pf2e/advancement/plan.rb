@@ -17,6 +17,8 @@ module AresMUSH
           { 'when' => lambda { |state, _args| state['advancing'] }, 'key' => 'pf2e.already_advancing' },
           { 'when' => lambda { |state, _args| state['xp'].to_i < Pf2e::ADVANCEMENT_XP_COST }, 'key' => 'pf2e.not_enough_xp' },
           { 'when' => lambda { |_state, args| args['in_encounter'] }, 'key' => 'pf2e.already_in_encounter' },
+          # A familiar staff haven't approved, which the shell asks Familiar about.
+          { 'when' => lambda { |_state, args| args['familiar_waiting'] }, 'key' => 'pf2e.familiar_blocks_advance' },
           { 'when' => lambda { |state, _args| state['level'].to_i == state['config'].read('pf2e', 'max_level').to_i }, 'key' => 'pf2e.already_max_level' }
         ].freeze
 

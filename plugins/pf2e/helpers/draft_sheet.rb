@@ -65,6 +65,14 @@ module AresMUSH
       def feats_by_bucket
         buckets = (@char.pf2_feats || {}).each_with_object({}) { |(b, list), h| h[b.to_s] = Array(list).dup }
 
+        # A feat this level retrains away is gone from its bucket, which is how the level's commit revokes it.
+        retrained_away.each do |gone|
+          bucket = buckets.keys.find { |b| buckets[b].any? { |name| name.to_s.upcase == gone } }
+          next unless bucket
+
+          buckets[bucket].delete_at(buckets[bucket].index { |name| name.to_s.upcase == gone })
+        end
+
         (draft['feats'] || {}).each_pair do |bucket, list|
           taken = Array(list).reject { |f| f.to_s.blank? || f.to_s.casecmp?('open') }
 
@@ -194,7 +202,27 @@ module AresMUSH
       end
 
       def held_feats
-        (@char.pf2_feats || {}).values.flatten.map { |f| f.to_s.upcase }
+        without_retrained((@char.pf2_feats || {}).values.flatten.map { |f| f.to_s.upcase })
+      end
+
+      # Feats this level retrains away (`advance/retrain`), upcased: each retrained feat and the feats it
+      # gave. Only once the replacement is chosen.
+      def retrained_away
+        Array(draft['retrains']).reject { |one| one['to'].blank? }
+                                .flat_map { |one| [ one['from'] ] + Array(one['also']) }
+                                .map { |name| name.to_s.upcase }
+      end
+
+      # Upcased names, without one taking of each feat this level retrains away.
+      def without_retrained(names)
+        list = names.dup
+
+        retrained_away.each do |gone|
+          index = list.index(gone)
+          list.delete_at(index) if index
+        end
+
+        list
       end
 
       def staged_feats

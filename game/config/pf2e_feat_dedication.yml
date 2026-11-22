@@ -637,7 +637,12 @@ pf2e_feats:
         mode: "upgrade"
         value: 1
   Witch Dedication:
+    familiar_kind: spellbook
     familiar: true
+    daily_choice:
+      switch: familiar
+      pick: familiar
+      lasts: until_changed
     assoc_archetype:
       - Witch Archetype
     assoc_class:
@@ -673,6 +678,16 @@ pf2e_feats:
         flag: "patron"
         prompt: "Select a patron."
         choices: {"filter": ["item:tag:witch-patron", {"not": "item:tag:class-archetype"}]}
+      - key: "ActiveEffectLike"
+        path: "system.attributes.familiarAbilities.value"
+        mode: "add"
+        value: "2 + min(3,floor(@actor.level / 6))"
+        predicate: ["class:witch"]
+      - key: "ActiveEffectLike"
+        path: "system.attributes.familiarAbilities.value"
+        mode: "upgrade"
+        value: 2
+        priority: 19
   Wizard Dedication:
     assoc_archetype:
       - Wizard Archetype
@@ -1408,6 +1423,7 @@ pf2e_feats:
         path: "system.attributes.familiarAbilities.value"
         mode: "upgrade"
         value: 3
+        priority: 9
       - key: "ChoiceSet"
         flag: "basicWitchcraft"
         prompt: "Select a 1st or 2nd-level class feat."

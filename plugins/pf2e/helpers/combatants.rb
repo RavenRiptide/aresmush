@@ -14,11 +14,21 @@ module AresMUSH
     # names the same goblin all fight long whatever the order does - which is what a player types to
     # target it, since three goblins share a name. A row with neither holder is a name the GM put in the
     # order and nothing more.
+    #
+    # A familiar is a row too, so it is targeted like anyone else, but it names its master's row and takes
+    # no turn of its own: it acts on its master's turn. The turn order is the rows without them (`order`).
+    #
+    #   { 'id' => 7, 'init' => 15.0, 'name' => 'Smudge', 'npc' => '88', 'master' => 1 }
     module Combatants
 
-      Combatant = Struct.new(:holder, :label, :number, :init) do
+      Combatant = Struct.new(:holder, :label, :number, :init, :master) do
         def creature?
           Actors.of(holder).creature?
+        end
+
+        # It acts on its master's turn, and has none in the order.
+        def minion?
+          !master.nil?
         end
 
         def ref
@@ -79,16 +89,43 @@ module AresMUSH
       end
 
       def self.combatant(row)
-        Combatant.new(holder_of(row), row['name'], row['id'].to_i, row['init'].to_f)
+        Combatant.new(holder_of(row), row['name'], row['id'].to_i, row['init'].to_f, row['master'])
       end
 
       def self.all(encounter)
         rows(encounter).map { |row| combatant(row) }
       end
 
-      # The one at this place in the order.
+      # The turn order: everyone with a turn of their own. `next_init` counts places in this.
+      def self.order(encounter)
+        in_turn_order(rows(encounter))
+      end
+
+      def self.in_turn_order(rows)
+        rows.reject { |row| row['master'] }
+      end
+
+      def self.in_order(encounter)
+        order(encounter).map { |row| combatant(row) }
+      end
+
+      # Whose turn a combatant acts in, by label: a familiar's is its master's.
+      def self.turn_name(encounter, label)
+        held = rows(encounter)
+        row = held.find { |one| one['name'] == label }
+        master = row && row['master'] ? held.find { |one| one['id'].to_i == row['master'].to_i } : nil
+
+        master ? master['name'] : label
+      end
+
+      # The familiars that act in this combatant's turn.
+      def self.minions_of(encounter, id)
+        rows(encounter).select { |row| row['master'] && row['master'].to_i == id.to_i }
+      end
+
+      # The one at this place in the turn order.
       def self.at(encounter, index)
-        row = rows(encounter)[index]
+        row = order(encounter)[index]
 
         row ? combatant(row) : nil
       end
@@ -107,8 +144,8 @@ module AresMUSH
       # The order
 
       # Someone takes a place in the order: a character, a creature, or with no holder a name the GM put
-      # there.
-      def self.join(encounter, name, init, holder: nil)
+      # there. `master` is the row id of a familiar's master.
+      def self.join(encounter, name, init, holder: nil, master: nil)
         id = encounter.last_number.to_i + 1
         row = { 'id' => id, 'name' => name }
 
@@ -118,16 +155,36 @@ module AresMUSH
           row.merge!('char' => holder.id, 'state' => CombatantStates.for_join(encounter, holder).id)
         end
 
+        row['master'] = master if master
         row['init'] = placed(row, init)
 
+        held = rows(encounter)
+        held = renumber_familiar(held, name) if row['char']
+
         encounter.update(:last_number => id)
-        write(encounter, rows(encounter) + [ row ])
+        write(encounter, held + [ row ])
 
         row
       end
 
+      # A character can't change their name, so a familiar already here under the same one takes its id
+      # after it, as a creature does: `Smudge #7`.
+      def self.renumber_familiar(held, name)
+        held.map do |row|
+          next row unless row['master'] && row['name'].casecmp?(name.to_s)
+
+          label = "#{row['name']} ##{row['id']}"
+          Pf2eNpc[row['npc']]&.update(:name => label)
+          row.merge('name' => label)
+        end
+      end
+
+      # A familiar leaves with its master, and is gone with what it was under.
       def self.leave(encounter, id)
-        write(encounter, rows(encounter).reject { |row| row['id'].to_i == id.to_i })
+        familiars = minions_of(encounter, id)
+
+        write(encounter, rows(encounter).reject { |row| row['id'].to_i == id.to_i || familiars.include?(row) })
+        familiars.each { |row| Pf2eNpc[row['npc']]&.delete }
       end
 
       def self.reroll(encounter, id, init)
@@ -144,15 +201,17 @@ module AresMUSH
       def self.write(encounter, rows)
         # Those on the same count stay in the order they were given.
         sorted = rows.each_with_index.sort_by { |row, at| [ -row['init'].to_f, at ] }.map(&:first)
+        turns = pointer(encounter, order(encounter), in_turn_order(sorted))
 
-        encounter.update(:next_init => pointer(encounter, rows(encounter), sorted), :participants => sorted)
+        encounter.update(:next_init => turns, :participants => sorted)
       end
 
       # Someone moved to act directly before whoever's turn it is, from here on: who was reduced to no hit
       # points in that turn, or returns from a Delay. Answers whose turn that is where they were moved, and
       # nothing where it is their own or they already act directly before it.
       def self.before_current(encounter, label)
-        order = rows(encounter)
+        order = order(encounter)
+        familiars = rows(encounter).select { |row| row['master'] }
         current = ActiveEffects.current_turn(encounter)
         at = order.index { |row| row['name'] == current }
 
@@ -165,7 +224,8 @@ module AresMUSH
         rest = order.reject { |row| row['name'] == label }
 
         # Placed, and not only counted: between two on the same count, the count alone does not say where.
-        write(encounter, rest.take_while { |row| row['name'] != current } + [ moved ] + rest.drop_while { |row| row['name'] != current })
+        write(encounter, rest.take_while { |row| row['name'] != current } + [ moved ] + rest.drop_while { |row| row['name'] != current } +
+                         familiars)
 
         current
       end

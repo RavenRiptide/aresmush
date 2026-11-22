@@ -69,6 +69,12 @@ module AresMUSH
           'Tiger Poise' => { 'feat_type' => [ 'General' ], 'traits' => [ 'monk', 'stance' ] },
           'Pact' => { 'feat_type' => [ 'General' ], 'familiar' => true },
 
+          # One pet or familiar: a second basic or special source is refused, a spellbook one takes over.
+          'SecondPact' => { 'feat_type' => [ 'General' ], 'familiar' => true },
+          'Shaped' => { 'feat_type' => [ 'General' ], 'familiar' => true, 'familiar_kind' => 'special' },
+          'Petted' => { 'feat_type' => [ 'General' ], 'pet' => true },
+          'Patroned' => { 'feat_type' => [ 'General' ], 'familiar' => true, 'familiar_kind' => 'spellbook' },
+
           # Gates that are not prereq entries: the feat's own type decides who may take it.
           'FighterOnly' => { 'feat_type' => [ 'Charclass' ], 'assoc_charclass' => [ 'Fighter' ] },
           'ElfOnly' => { 'feat_type' => [ 'Ancestry' ], 'assoc_ancestry' => [ 'Elf' ] },
@@ -136,7 +142,10 @@ module AresMUSH
         'NotSpecialised' => { :specialize => 'Warpriest' },
         'NotArmament' => { :features => [ 'Blessing of the Devoted (Blessed Armament)' ] },
         'LineageBound' => { :level => 2 },
-        'FighterOnly' => { :charclass => 'Wizard' }
+        'FighterOnly' => { :charclass => 'Wizard' },
+        'SecondPact' => { :features => [ 'Familiar' ] },
+        'Shaped' => { :feats => { 'charclass' => [ 'Pact' ] } },
+        'Petted' => { :feats => { 'charclass' => [ 'Pact' ] } }
       }.freeze
 
       # Where one row's mutation legitimately satisfies another row's prerequisite. Declared, so
@@ -306,6 +315,35 @@ module AresMUSH
 
         it "should not count a feature that only mentions one" do
           expect(matrix_allows?(matrix_char(:features => [ 'Familiar Master' ]), 'Bonded')).to be false
+        end
+      end
+
+      # Emblem of Ea's house rule: one pet or familiar.
+      describe "a second familiar" do
+        it "should refuse a familiar to someone holding a pet" do
+          expect(matrix_allows?(matrix_char(:feats => matrix_holding('Petted')), 'SecondPact')).to be false
+        end
+
+        it "should refuse a special familiar to a witch" do
+          expect(matrix_allows?(matrix_char(:features => [ 'Familiar' ]), 'Shaped')).to be false
+        end
+
+        it "should let a spellbook familiar take over one they have" do
+          expect(matrix_allows?(matrix_char(:feats => matrix_holding('Pact')), 'Patroned')).to be true
+          expect(matrix_allows?(matrix_char(:feats => matrix_holding('Shaped')), 'Patroned')).to be true
+        end
+
+        it "should say where the familiar they have comes from" do
+          char = matrix_char(:features => [ 'Familiar' ])
+
+          expect(Pf2e.explain_feat_block(char, feat_config['SecondPact'])).to include 'Familiar'
+        end
+
+        it "should count a familiar taken earlier in the level-up in progress" do
+          char = matrix_char(:advancing => true)
+          allow(char).to receive(:pf2_advancement).and_return('feats' => { 'general' => [ 'Pact' ] })
+
+          expect(matrix_allows?(char, 'Petted')).to be false
         end
       end
 

@@ -70,8 +70,20 @@ module AresMUSH
         allowances(holder)['vials']
       end
 
+      # Extra Alchemy: their familiar helps them make one more item at their preparations.
+      EXTRA_ALCHEMY = 'Extra Alchemy'.freeze
+
+      # Extra Vial: their familiar gives them one more vial a day. It is a gift, not a bigger pool, so
+      # gathering reagents still fills only to `max_vials`.
+      EXTRA_VIAL = 'Extra Vial'.freeze
+
       def self.prepared_limit(holder)
-        allowances(holder)['prepared']
+        allowances(holder)['prepared'] + (Familiar::Daily.master_ability?(holder, EXTRA_ALCHEMY) ? 1 : 0)
+      end
+
+      # The vials a rest gives them.
+      def self.rest_vials(holder)
+        max_vials(holder) + (Familiar::Daily.master_ability?(holder, EXTRA_VIAL) ? 1 : 0)
       end
 
       # ------------------------------------------------------------------------------
@@ -98,7 +110,7 @@ module AresMUSH
       def self.day(holder)
         standing = !Gm.encounter_of(holder).nil?
 
-        { 'vials' => max_vials(holder), 'left' => standing ? left(holder) : max_vials(holder),
+        { 'vials' => rest_vials(holder), 'left' => standing ? left(holder) : rest_vials(holder),
           'prepared' => prepared_limit(holder) }
       end
 
@@ -216,7 +228,7 @@ module AresMUSH
         vial = vial_name(holder.pf2_level)
 
         if max_vials(holder).positive?
-          Equipment.grant!(holder, 'consumables', vial, max_vials(holder),
+          Equipment.grant!(holder, 'consumables', vial, rest_vials(holder),
                            Global.read_config('pf2e_consumables', vial), :granted_by => VIALS, :expires => 'rest')
         end
 

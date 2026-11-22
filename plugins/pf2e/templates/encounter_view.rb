@@ -33,6 +33,15 @@ module AresMUSH
         'iwr' => ->(npc) { Npcs.iwr(npc) }
       }.freeze
 
+      # A familiar is read as a creature is, and is the kind it is to everyone.
+      FAMILIAR = CREATURE.merge(
+        'kind' => ->(npc) { t(npc.stat_block['pet'] ? 'pf2e.view_kind_pet' : 'pf2e.view_kind_familiar', :level => npc.stat_block['level']) },
+        'reactive' => ->(_npc) { false }
+      ).freeze
+
+      # A familiar has no initiative: it acts on its master's turn.
+      NO_TURN = '--'.freeze
+
       SAVES = %w{fortitude reflex will}.freeze
 
       IWR_WORDS = { 'immunity' => 'Immune', 'weakness' => 'Weak', 'resistance' => 'Resist' }.freeze
@@ -77,9 +86,10 @@ module AresMUSH
           "#{left("RS", 2)}%xn"
       end
 
-      # Everyone in the order: a row each, and a line beneath it where there is anything to say.
+      # Everyone in the order: a row each, and a line beneath it where there is anything to say. A familiar
+      # comes straight after its master.
       def combatant_list
-        Combatants.all(@encounter).flat_map do |one|
+        listed.flat_map do |one|
           next [ row(one) ] unless one.holder
 
           # One read block per combatant, because the figures all ask the same questions about the same one.
@@ -87,10 +97,18 @@ module AresMUSH
         end
       end
 
+      def listed
+        everyone = Combatants.all(@encounter)
+        familiars, others = everyone.partition(&:minion?)
+        placed = others.flat_map { |one| [ one ] + familiars.select { |familiar| familiar.master.to_i == one.number } }
+
+        placed + (familiars - placed)
+      end
+
       def row(one)
         # The id has its own column, so a name that ends with it is shown without.
         name = one.label.sub(/ #{Regexp.escape(one.ref)}\z/, '')
-        start = lead(one.ref, one.init.to_i, name)
+        start = lead(one.ref, one.minion? ? NO_TURN : one.init.to_i, name)
 
         return start unless one.holder
 
@@ -118,20 +136,30 @@ module AresMUSH
           'reactive' => reads['reactive'].call(holder) ? 'Y' : 'N' }
       end
 
-      # A creature's figures are the GM's alone.
+      # A creature's figures are the GM's alone; a familiar's are anyone's, as a character's are.
       def hidden?(one)
-        one.creature? && !gm?
+        one.creature? && !one.minion? && !gm?
       end
 
       def reads_for(one)
+        return FAMILIAR if one.minion?
+
         one.creature? ? CREATURE : CHARACTER
       end
 
       # `Hero Points 2; Frightened 1; Bless (2 rounds); standard cover, concealed; Immune poison`, or nothing.
       def beneath(one)
-        parts = [ hero_points(one), conditions(one), effects(one), cover(one), activity(one), iwr(one) ].compact
+        parts = [ master(one), hero_points(one), conditions(one), effects(one), cover(one), activity(one), iwr(one) ].compact
 
         parts.empty? ? nil : "#{' ' * 4}#{parts.join('; ')}"
+      end
+
+      # `Morwen's familiar`.
+      def master(one)
+        return nil unless one.minion?
+
+        owner = one.holder.master&.name
+        owner ? t(one.holder.stat_block['pet'] ? 'pf2e.view_pet_of' : 'pf2e.view_familiar_of', :char => owner) : nil
       end
 
       # Hero Points are a player character's, in an encounter that is part of a scene.

@@ -248,6 +248,9 @@ module AresMUSH
       # No double-dipping on base class / dedication, per Paizo RAW.
       msg << 'dedication' unless dedication_allowed?(char, details, ignore_dedication_lock)
 
+      # One pet or familiar.
+      msg << 'familiar' if Familiar.blocks?(char, details)
+
       # Prereq check, prerequisites includes level
 
       prereqs = details["prereq"]
@@ -411,6 +414,8 @@ module AresMUSH
     # A more useful reason than "you do not meet the prerequisites", where one exists.
     # Returns nil when there is nothing better to say and the generic message should stand.
     def self.explain_feat_block(char, details)
+      return Familiar.block_message(char) if Familiar.blocks?(char, details)
+
       prereqs = details.is_a?(Hash) ? details['prereq'] : nil
       return nil unless prereqs.is_a?(Hash)
 
@@ -1375,6 +1380,11 @@ module AresMUSH
         end
 
         checked = waived ? found[1].merge('prereq' => nil) : found[1]
+
+        # The one-familiar rule is about what a player picks. A familiar or pet a feat hands over is part
+        # of the familiar that came with it (Animal Accomplice's Pet); sources that collide are settled
+        # when the familiar is resolved.
+        checked = checked.reject { |key, _| %w{familiar pet}.include?(key) }
 
         unless can_take_feat_details?(char, found[0], checked)
           Global.logger.warn "#{char.name} was granted '#{found[0]}' but does not qualify for it."
@@ -3329,6 +3339,9 @@ module AresMUSH
 
           msgs << t('pf2e.choice_opened', :choice => fname, :summary => choice_summary(nested), :cmd => choice_info_cmd(char))
         end
+
+        # A familiar or pet to set up, as a feat taken directly says.
+        msgs << Advancement::FeatGain.familiar_gained(:details => fdetails, :chargen => true) if Familiar.source?(fdetails)
 
         value = fname
       else

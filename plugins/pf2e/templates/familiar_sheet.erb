@@ -1,0 +1,15 @@
+<%= header %>
+<%= center("#{title_color}#{title}", 78) %>%xn
+<% sections.each do |section| %>
+<%= section_line(section['title']) %>
+<% section['rows'].each do |row| %>
+<%= row_text(row) %>
+<% end %>
+<% unless Array(section['notes']).empty? %>
+<%= divider %>
+<% section['notes'].each do |note| %>
+<%= note %>
+<% end %>
+<% end %>
+<% end %>
+<%= footer %>

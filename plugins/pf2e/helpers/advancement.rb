@@ -182,7 +182,8 @@ module AresMUSH
 
       msg = []
       msg << t('pf2e.adv_item_magic', :options => rest.sort.join(" and ")) unless rest.empty?
-      msg << t('pf2e.adv_item_innate_spells') unless innate.empty?
+      # advance/start's notice, which can name the command; the review screen's message can't.
+      msg << t('pf2e.adv_start_innate_spells') unless innate.empty?
 
       msg
     end
@@ -529,8 +530,13 @@ module AresMUSH
     # drawn from - so that lookup happens here rather than in the pure table.
     def self.advancement_messages(char)
       # Only the draft and the config, not a folded sheet: this runs on every review screen and at
-      # every advance/done, and Outstanding reads nothing else.
+      # every advance/done, and Outstanding reads nothing else but the familiar's missing details.
       state = CharState.build({ 'to_assign' => char.pf2_to_assign, 'advancement' => char.pf2_advancement })
+
+      # A familiar's details live on the character, not in the draft, so they are read here for
+      # Outstanding to judge.
+      missing = Familiar.unfinished(char)
+      state = state.merge('familiar_missing' => missing, 'familiar_pet' => !missing.empty? && Familiar::Choices.plain_pet?(char))
 
       msg = Advancement::Outstanding.messages(state).map do |(key, args)|
         args = args.merge('summary' => choice_pending_summary(char, args['choice'])) if args.key?('choice')

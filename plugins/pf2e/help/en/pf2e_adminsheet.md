@@ -58,8 +58,33 @@ Players can spend RPP to learn a common, uncommon, or rare language. Spend the R
 `[add|delete]`: Choose `add` to teach the character a language; `delete` to remove one they know.
 `<language>`: The language's name. Use `lang/info <type>` to see each type's languages, where `<type>` is `common`, `uncommon`, `rare`, or `secret`.
 
+### Retraining a feat
+**Command**:
+`admin/retrain <character> = <old feat>/<new feat>`: Swaps a feat the character has for another in the same slot.
+%t **Note:** The new feat must be the same type as the old one, no higher than the level of the slot, and the character must meet its prerequisites at that level. You can't retrain a feat other feats need, so retrain those first.
+%t **Note:** Some feats say they can't be retrained into or out of, such as Hag Claws, and `admin/retrain` refuses them.
+%t **Note:** `admin/retrain` can't open a new feat's own grants or choices, or take back an old feat's grants other than the feats it gave. For those, use `admin/rollback` to send the character back to the level where they chose the feat.
+
+A retrain in a slot from 2nd level or higher belongs to that level, so rolling the character back past that level puts the old feat back. A retrain in a 1st-level slot stays through any rollback.
+
+**Key**:
+`<character>`: The character's name.
+`<old feat>`: The feat to retrain out of.
+`<new feat>`: The feat to retrain into.
+
+### Approving familiars
+**Command**:
+`familiar/approve <character>`: Approves the character's familiar's name, species, and form, and closes its approval request.
+`familiar/reject <character> = <reason>`: Sends the details back with your reason, in the approval request, which stays open.
+%t **Note:** Approving a character's application approves their familiar's details with it. If the details are incomplete, an approval request opens for the character to finish them.
+%t **Note:** A character whose familiar is awaiting approval can't advance, and only the familiar's spells work.
+`familiar/cantrip <character> = <old cantrip>/<new cantrip>`: Changes a cantrip that the character's Cantrip Connection adds to their repertoire, as retraining it, such as `familiar/cantrip Morwen = Shield/Light`.
+%t **Note:** A repertoire caster chooses the cantrip the first time they choose Cantrip Connection, and the game keeps it on later days. Only this command changes it.
+
+For more information about familiars, see `help familiars`.
+
 ### Changing feats
-Feats cannot be set directly. To change a character's feats, use `admin/rollback` to send them back to the level where the choice was made and let them redo it, or `admin/respec` to let them rebuild the character from scratch while keeping their XP.
+To change a feat in a way `admin/retrain` can't, use `admin/rollback` to send the character back to the level where they made the choice and let them redo it, or `admin/respec` to let them rebuild the character from scratch while keeping their XP.
 
 ### Rolling a character back to an earlier level
 **Command**:

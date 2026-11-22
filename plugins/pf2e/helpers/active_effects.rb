@@ -558,7 +558,7 @@ module AresMUSH
 
       # Whose turn it is in an encounter, by name, or nil before the first turn.
       def self.current_turn(encounter)
-        order = Combatants.rows(encounter)
+        order = Combatants.order(encounter)
 
         return nil if order.empty? || encounter.round.to_i.zero?
 
@@ -629,8 +629,9 @@ module AresMUSH
       end
 
       def self.turn_to_come?(name, encounter)
-        order = Combatants.rows(encounter)
-        at = order.index { |row| row['name'] == name }
+        order = Combatants.order(encounter)
+        turn = Combatants.turn_name(encounter, name)
+        at = order.index { |row| row['name'] == turn }
 
         !at.nil? && encounter.round.to_i.positive? && at > (encounter.next_init.to_i - 1) % order.size
       end

@@ -14,6 +14,33 @@ module AresMUSH
         stub_translate_for_testing
         allow(Pf2e).to receive(:find_choice_block).and_return(nil)
         allow(Pf2e).to receive(:choice_summary).and_return('an option')
+        # A familiar's details are on the character, which these doubles don't carry.
+        allow(Familiar).to receive(:unfinished).and_return([])
+      end
+
+      describe "a familiar to set up" do
+        it "should owe its details while any are missing" do
+          found = Advancement::Outstanding.messages(state({}).merge('familiar_missing' => [ 'name' ]))
+
+          expect(found).to eq [ [ 'pf2e.familiar_review_setup', {} ] ]
+        end
+
+        it "should call a plain pet a pet" do
+          found = Advancement::Outstanding.messages(state({}).merge('familiar_missing' => [ 'pet_abilities' ], 'familiar_pet' => true))
+
+          expect(found).to eq [ [ 'pf2e.familiar_review_setup_pet', {} ] ]
+        end
+
+        it "should owe nothing once its details are set" do
+          expect(Advancement::Outstanding.messages(state({}).merge('familiar_missing' => []))).to be_empty
+        end
+
+        it "should hold advance/done through the review messages" do
+          allow(Familiar).to receive(:unfinished).and_return([ 'name' ])
+          allow(Familiar::Choices).to receive(:plain_pet?).and_return(false)
+
+          expect(messages({})).to eq [ 'pf2e.familiar_review_setup' ]
+        end
       end
 
       def char_with(to_assign)

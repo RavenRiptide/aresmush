@@ -3386,6 +3386,11 @@ pf2e_class:
   Witch:
     key_abil:
       - Intelligence
+    daily_choice:
+      - switch: familiar
+        pick: familiar
+        feature: Familiar
+        lasts: until_changed
     HP: 6
     chargen:
       charclass_feature:

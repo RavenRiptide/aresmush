@@ -25,6 +25,8 @@ module AresMUSH
 
         out['lines'] << Telling.event(longer ? 'pf2e.act_sustained' : 'pf2e.act_sustained_again',
                                       :actor => scene.actor.label, :effect => ActiveEffects.bare_name(rows.first))
+        # What was sustained, for what a Sustain of it also does (a hex's patron rider).
+        out['sustained'] = ActiveEffects.bare_name(rows.first)
 
         Ok.new(:state => out)
       end

@@ -80,6 +80,10 @@
 <%= choices %>
 <% end %>
 <% end %>
+<% if show_familiar %>
+<%= section_line(familiar_title) %>
+<%= familiar %>
+<% end %>
 <% if show_magic %>
 <%= section_line("Magic") %>
 <% if divine_font %>

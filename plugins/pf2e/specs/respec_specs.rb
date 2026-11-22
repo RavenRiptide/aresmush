@@ -25,6 +25,7 @@ module AresMUSH
         builder.advance_to(3)
         Pf2egear.pay_player(Character[@char.id], -250, 'Spec Vendor', 'a purchase')
         Pf2emagic::Entries.grant_focus!(Character[@char.id], 'qi', [ 'Inner Upheaval' ], :kind => 'spell', :granted_by => 'Monk')
+        Character[@char.id].update(:pf2_familiar => { 'pending' => { 'name' => 'Smudge', 'species' => 'black cat', 'form' => 'land' } })
         @char = Character[@char.id]
         @money = @char.pf2_money
       end
@@ -57,10 +58,18 @@ module AresMUSH
         end
       end
 
+      # A familiar's details left behind would come back the next time a feat gives them a familiar.
+      shared_examples "a character with no familiar left" do
+        it "should take their familiar's details too" do
+          expect(reread.pf2_familiar).to eq({})
+        end
+      end
+
       describe "a respec" do
         before(:each) { Pf2e.respec_character(reread) }
 
         it_behaves_like "a character with no spellcasting left"
+        it_behaves_like "a character with no familiar left"
 
         it "should keep the level and the xp" do
           expect(reread.pf2_level).to eq 3
@@ -104,6 +113,7 @@ module AresMUSH
         before(:each) { Pf2e.reset_character(reread) }
 
         it_behaves_like "a character with no spellcasting left"
+        it_behaves_like "a character with no familiar left"
 
         it "should take the level and the xp too" do
           expect(reread.pf2_level).to eq 1

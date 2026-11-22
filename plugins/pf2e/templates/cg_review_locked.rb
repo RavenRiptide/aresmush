@@ -58,8 +58,8 @@ module AresMUSH
 
       def feats_stage_done?
       # Feats are the last thing to assign and have no commit of their own, so the sheet is
-      # finished once nothing is outstanding.
-        @char.pf2_skills_locked && feat_messages.empty? && magic_messages.empty?
+      # finished once nothing is outstanding, a familiar's details included.
+        @char.pf2_skills_locked && feat_messages.empty? && magic_messages.empty? && !familiar_pending?
       end
 
       def skills_reopened?
@@ -139,6 +139,38 @@ module AresMUSH
 
           "#{line}%r%t#{t('pf2e.cg_choice_pointer', :choice => row[:choice])}"
         end.join("%r")
+      end
+
+      # A familiar or pet, from a feat or the Witch's class feature, whose details staff approve with
+      # the application. Missing details keep cg/review at the feats stage, but don't stop staff
+      # approving the application: the familiar is then finished in a request.
+      def show_familiar
+        (stage == 'feats' || stage == 'final') && !Pf2e::Familiar.main_source(@char).nil?
+      end
+
+      def familiar_title
+        Pf2e::Familiar.review_title(@char)
+      end
+
+      def familiar
+        Pf2e::Familiar.review_lines(@char).map do |line|
+          line.is_a?(Array) ? "#{item_color}#{line[0]}%xn: #{line[1]}" : line
+        end.join("%r")
+      end
+
+      # A familiar with details still to set. It doesn't ask which stage they're at, because the stage
+      # asks it.
+      def familiar_pending?
+        return @familiar_pending if defined?(@familiar_pending)
+
+        @familiar_pending = !Pf2e::Familiar.unfinished(@char).empty?
+      end
+
+      # The Messages line while the familiar still has details to set.
+      def familiar_messages
+        return [] unless show_familiar && familiar_pending?
+
+        [ t(Pf2e::Familiar::Choices.plain_pet?(@char) ? 'pf2e.familiar_review_setup_pet' : 'pf2e.familiar_review_setup') ]
       end
 
       def magic_plugin?
@@ -652,8 +684,8 @@ module AresMUSH
         when 'attributes' then boost_messages
         when 'skills'     then skill_messages + language_messages
         # skill_messages is normally empty here, and isn't when a feat has reopened skills.
-        when 'feats'      then skill_messages + feat_messages + magic_messages
-        else                   boost_messages + skill_messages + language_messages + feat_messages + magic_messages
+        when 'feats'      then skill_messages + feat_messages + magic_messages + familiar_messages
+        else                   boost_messages + skill_messages + language_messages + feat_messages + magic_messages + familiar_messages
         end
       end
 

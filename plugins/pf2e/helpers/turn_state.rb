@@ -91,6 +91,15 @@ module AresMUSH
           Array(last['effects']).any? { |effect| Domains.slug(effect).delete_prefix('improved-').start_with?(wanted) }
       end
 
+      # A use of something limited to a period, counted on its own without spending an action: a familiar's
+      # Familiar Focus, counted on its master.
+      def self.count_use(holder, name, per)
+        uses = of(holder)['uses'] || {}
+        held = uses[name] || { 'count' => 0, 'period' => period(per) }
+
+        write(holder, 'uses' => uses.merge(name => held.merge('count' => held['count'].to_i + 1)))
+      end
+
       # How many times an action has been used in its period.
       def self.used(holder, name)
         ((of(holder)['uses'] || {})[name] || {})['count'].to_i
@@ -110,11 +119,12 @@ module AresMUSH
       end
 
       # How many actions the turn holds: three, one more if quickened, fewer by what being stunned took
-      # as it started or by slowed, whichever is more - what stunned takes counts toward slowed.
+      # as it started or by slowed, whichever is more - what stunned takes counts toward slowed. A familiar's
+      # are what its master gave it.
       def self.actions(holder)
         taken = [ Pf2e.condition_level(holder, 'Slowed'), turn(holder)['stunned'].to_i ].max
 
-        [ regained(holder) - taken, 0 ].max
+        [ Actors.of(holder).turn_actions - taken, 0 ].max
       end
 
       # `2 of 3 actions used, reaction ready, next attack at -5`.

@@ -35,8 +35,10 @@ module AresMUSH
                  Paralyzed Petrified Prone Restrained Unconscious}.freeze
       CONDITION = /\b(?:(#{VALUED.join('|')}) (\d+)|(#{PLAIN.join('|')}))\b/
 
-      # How long, where the words say it in a way this reads; a minute is ten rounds.
+      # How long, where the words say it in a way this reads; a minute is ten rounds. Rounds in dice are
+      # rolled as the condition is applied, for each creature it is applied to.
       LASTS = [ [ /\bfor (\d+) rounds?\b/i, ->(found) { "rounds:#{found[1]}" } ],
+                [ /\bfor (\d+d\d+) rounds?\b/i, ->(found) { "rounds:#{found[1].downcase}" } ],
                 [ /\bfor (\d+) minutes?\b/i, ->(found) { "rounds:#{found[1].to_i * 10}" } ],
                 [ /\buntil the end of (?:its|their|the creature's|the target's) next turn\b/i, ->(_) { 'its-next-turn-end' } ],
                 [ /\buntil the (?:start|beginning) of (?:its|their|the creature's|the target's) next turn\b/i, ->(_) { 'its-next-turn-start' } ] ].freeze

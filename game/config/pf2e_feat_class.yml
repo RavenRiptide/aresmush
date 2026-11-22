@@ -61,7 +61,15 @@ pf2e_feats:
         text: "If have the formula for the item you're identifying, and you roll a critical failure, you get a failure instead."
         predicate: ["action:identify-alchemy"]
   Alchemical Familiar:
+    familiar_kind: special
     familiar: true
+    familiar_no_specific: true
+    familiar_innate:
+      abilities: [ Construct ]
+    daily_choice:
+      switch: familiar
+      pick: familiar
+      lasts: until_changed
     assoc_charclass:
       - Alchemist
     feat_type:
@@ -76,6 +84,7 @@ pf2e_feats:
         path: "system.attributes.familiarAbilities.value"
         mode: "upgrade"
         value: 2
+        priority: 9
   Animal Companion:
     assoc_charclass:
       - Druid
@@ -517,6 +526,10 @@ pf2e_feats:
       - champion
   Familiar:
     familiar: true
+    daily_choice:
+      switch: familiar
+      pick: familiar
+      lasts: until_changed
     assoc_charclass:
       - Sorcerer
       - Wizard
@@ -528,6 +541,12 @@ pf2e_feats:
     traits:
       - sorcerer
       - wizard
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.attributes.familiarAbilities.value"
+        mode: "upgrade"
+        value: 2
+        priority: 19
   Far Lobber:
     assoc_charclass:
       - Alchemist
@@ -722,7 +741,15 @@ pf2e_feats:
     traits:
       - investigator
   Leshy Familiar:
+    familiar_kind: special
     familiar: true
+    familiar_no_specific: true
+    familiar_innate:
+      choose: [ Plant, Fungus ]
+    daily_choice:
+      switch: familiar
+      pick: familiar
+      lasts: until_changed
     assoc_charclass:
       - Druid
     feat_type:
@@ -733,6 +760,12 @@ pf2e_feats:
     shortdesc: You call a minor spirit of nature into a plant body, creating a leshy companion to aid you in your spellcasting. You gain a familiar, which has your choice of either the plant or fungus familiar ability; this doesn't count against your usual limit of familiar abilities (typically 2). The spirit you call has a more tenuous connection to its plant body than fully independent leshies, so it is Tiny in size like other familiars.
     traits:
       - druid
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.attributes.familiarAbilities.value"
+        mode: "upgrade"
+        value: 2
+        priority: 19
   Lingering Composition:
     assoc_charclass:
       - Bard
@@ -2147,6 +2180,7 @@ pf2e_feats:
         path: "system.attributes.familiarAbilities.value"
         mode: "upgrade"
         value: 4
+        priority: 9
   Enjoy the Show:
     assoc_charclass:
       - Swashbuckler
@@ -3552,6 +3586,7 @@ pf2e_feats:
       - move
       - swashbuckler
   Leshy Familiar Secrets:
+    familiar_pool: leshy
     assoc_charclass:
       - Druid
     feat_type:
@@ -4546,10 +4581,12 @@ pf2e_feats:
         path: "flags.system.animalSkinBonus"
         mode: "upgrade"
         value: 2
+        priority: 19
       - key: "ActiveEffectLike"
         path: "flags.system.animalSkinBonus"
         mode: "upgrade"
         value: 3
+        priority: 19
         predicate: ["feature:greater-juggernaut"]
       - key: "AdjustModifier"
         mode: "add"
@@ -5018,6 +5055,7 @@ pf2e_feats:
         path: "flags.system.champion.aura"
         mode: "upgrade"
         value: 30
+        priority: 51
         predicate: ["expand-aura"]
   Explosive Arrival:
     assoc_charclass:
@@ -6738,6 +6776,7 @@ pf2e_feats:
         path: "system.attributes.familiarAbilities.value"
         mode: "upgrade"
         value: 6
+        priority: 9
   Inspired Stratagem:
     assoc_charclass:
       - Rogue
@@ -6788,6 +6827,7 @@ pf2e_feats:
         path: "system.proficiencies.defenses.heavy.rank"
         mode: "upgrade"
         value: "ternary(gte(@actor.level,19),3,ternary(gte(@actor.level,13),2,1))"
+        priority: 41
         predicate: ["class:barbarian"]
   Ironblood Stance:
     assoc_charclass:

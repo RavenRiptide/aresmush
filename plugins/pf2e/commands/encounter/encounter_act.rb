@@ -88,7 +88,7 @@ module AresMUSH
       # Said, and not refused, when what was just done takes someone past the actions their turn holds:
       # the game does not know everything a turn may be owed.
       def over_turn(encounter, actor, out)
-        return unless encounter && ActiveEffects.current_turn(encounter) == actor.label
+        return unless encounter && ActiveEffects.current_turn(encounter) == Combatants.turn_name(encounter, actor.label)
 
         used = TurnState.turn(actor.holder)['actions'].to_i
         total = TurnState.actions(actor.holder)
@@ -337,7 +337,7 @@ module AresMUSH
     end
 
     # `+e/as <combatant>=<act|strike|cast> <what>` - a GM acting for a creature, or for anyone in the
-    # encounter.
+    # encounter, and a player acting for their own familiar, as the rules let it act (`Familiar::Minion`).
     class PF2EncounterAsCmd
       include CommandHandler
 
@@ -371,10 +371,11 @@ module AresMUSH
         encounter = Combatants.encounter_here(enactor)
 
         return client.emit_failure(t('pf2e.not_in_active_encounter')) unless encounter
-        return client.emit_failure(t('pf2e.not_organizer')) unless Combatants.gm?(enactor, encounter)
 
+        gm = Combatants.gm?(enactor, encounter)
         actor = Combatants.find(encounter, self.who)
 
+        return client.emit_failure(t('pf2e.not_organizer')) if !gm && !(actor.ok? && own_familiar?(encounter, actor.state))
         return if CharState.emit_error!(client, actor)
 
         handler = self.class.verbs[self.verb].new(client, Command.new("e/#{self.verb} #{self.rest}"), enactor)
@@ -384,8 +385,26 @@ module AresMUSH
         missing = handler.required_args.any? { |one| one.to_s.empty? }
 
         return client.emit_failure(t('dispatcher.invalid_syntax', :cmd => "e/#{self.verb}")) if missing
+        return if !gm && CharState.emit_error!(client, familiar_refusal(encounter, actor.state, handler))
 
         handler.handle
+      end
+
+      # The enactor's own familiar, in this encounter.
+      def own_familiar?(encounter, combatant)
+        return false unless combatant.minion?
+
+        master = Combatants.rows(encounter).find { |row| row['id'].to_i == combatant.master.to_i }
+        !master.nil? && master['char'].to_s == enactor.id.to_s
+      end
+
+      # A player's familiar only takes actions, and only as the rules let it.
+      def familiar_refusal(encounter, combatant, handler)
+        case self.verb
+        when 'act' then Familiar::Minion.player_refusal(encounter, combatant, handler.action) || Ok.new(:state => nil)
+        when 'cast' then Familiar::Minion.cast_refusal(encounter, combatant, handler.spell) || Ok.new(:state => nil)
+        else Err.new(:familiar_act_only, 'pf2e.familiar_act_only', 'name' => combatant.label, 'ref' => combatant.ref)
+        end
       end
     end
 

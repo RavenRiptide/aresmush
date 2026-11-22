@@ -178,5 +178,17 @@ module AresMUSH
 
       expect(handed.map { |one| one.ancestors.include?(Pf2e::ReadsOnce) }).to eq [ true ] * 4
     end
+
+    # pf2emagic hands out pf2e's daily-choice and staff commands as well as its own spell commands.
+    it "should be how pf2emagic's commands read" do
+      allow(Pf2e::DailyChoices).to receive(:switch?).and_return(false)
+      allow(Pf2e::DailyChoices).to receive(:switch?).with('familiar').and_return(true)
+
+      handed = [ 'prepare', 'prepare/familiar', 'prepare/staff', 'magic', 'spell' ].map do |typed|
+        Pf2emagic.get_cmd_handler(nil, Command.new(typed), nil)
+      end
+
+      expect(handed).to all(be < Pf2e::ReadsOnce)
+    end
   end
 end

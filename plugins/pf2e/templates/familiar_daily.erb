@@ -1,0 +1,19 @@
+<%= header %>
+<%= center("#{title_color}#{title}", 78) %>%xn
+<%= section_line('pf2e.familiar_daily_selected') %>
+<% selected_rows.each do |row| %>
+<%= row %>
+<% end %>
+<%= section_line('pf2e.familiar_daily_available') %>
+<% available.each_with_index do |(heading, lines), index| %>
+<% if index > 0 %>
+
+<% end %>
+<%= heading %>
+<% lines.each do |line| %>
+<%= line %>
+<% end %>
+<% end %>
+<%= divider %>
+<%= budget_line %>
+<%= footer %>

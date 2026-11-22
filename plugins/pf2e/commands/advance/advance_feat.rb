@@ -96,16 +96,25 @@ module AresMUSH
         # No double-dipping on the base class or an archetype already held, per Paizo RAW.
         return t('pf2e.does_not_qualify') unless Pf2e.dedication_allowed?(enactor, fdetails)
 
+        # One pet or familiar.
+        return Pf2e::Familiar.block_message(enactor) if Pf2e::Familiar.blocks?(enactor, fdetails)
+
         # Already held, and if so may it be taken again at the level being gained?
         repeat = Pf2e.feat_repeat_block(enactor, fname, fdetails, nil, enactor.pf2_level + 1)
         return repeat if repeat
 
         prereqs = fdetails['prereq']
 
-        return nil unless prereqs
-        return nil if Pf2e.meets_prereqs?(enactor, prereqs, enactor.pf2_level + 1)
+        if prereqs && !Pf2e.meets_prereqs?(enactor, prereqs, enactor.pf2_level + 1)
+          return Pf2e.explain_feat_block(enactor, fdetails) || t('pf2e.feat_fails_prereq')
+        end
 
-        Pf2e.explain_feat_block(enactor, fdetails) || t('pf2e.feat_fails_prereq')
+        # Another class's or ancestry's feat (or a lineage feat past level 1). `prereq` doesn't say whose a
+        # feat is - `assoc_charclass` and `assoc_ancestry` do - so this asks the same question as the
+        # eligible-feat lists, at the level being gained, and a feat advance/info doesn't list is refused.
+        return t('pf2e.does_not_qualify') unless Pf2e.can_take_feat_details?(enactor, fname, fdetails, enactor.pf2_level + 1)
+
+        nil
       end
 
     end

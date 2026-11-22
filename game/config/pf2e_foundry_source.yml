@@ -6,6 +6,10 @@ pf2e_foundry_source:
   repository: https://github.com/foundryvtt/pf2e
   pin: fda67da2ad6be91aa331d35ba903e7e4eee97148
   imports:
+    import_foundry_familiars:
+      commit: d507983d7611aad7bee01b473ba918436c6ea380
+      version: 8.7.1
+      committed: '2026-11-18T21:46:00-08:00'
     import_foundry_npcs:
       commit: fda67da2ad6be91aa331d35ba903e7e4eee97148
       version: 8.6.1
@@ -125,6 +129,9 @@ pf2e_foundry_source:
     game/config/pf2e_consumables.yml:
       by: import_foundry_rules
       sha256: 2166de86fc3e5c9ede9e0561ae3a69e1b3473e99b5d3371f01289b1ebb64faac
+    game/config/pf2e_familiar_abilities.yml:
+      by: import_foundry_familiars
+      sha256: bdf23db2602a068c95b398281c95acbd9b53685978b1acca39df3aba39ccb877
     game/config/pf2e_fundamental_runes.yml:
       by: import_foundry_runes
       sha256: 4fd933922db74bcae15373c404d81f8cb9abefbd0f3ce4246baf202f54f1884d

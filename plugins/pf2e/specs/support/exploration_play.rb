@@ -148,7 +148,7 @@ module AresMUSH
       end
 
       # The encounter's bookkeeping, and the lines that tell what happened.
-      BOOKKEEPING = /\*\*\* EXPLORING|ENCOUNTER STARTED|END OF ENCOUNTER|joins the exploration|joins encounter|rolls \w+ for initiative|NEW ROUND|Initiative advances|exploration \(encounter \d+\) ends/
+      BOOKKEEPING = /\*\*\* EXPLORATION STARTED|ENCOUNTER STARTED|END OF ENCOUNTER|joins the exploration|joins encounter|rolls \w+ for initiative|NEW ROUND|Initiative advances|exploration \(encounter \d+\) ends/
       STORY = /strikes|\buses\b|\bcasts\b|Damage to|is exploring:|regains|is now|is no longer/
 
       # The log the scene keeps once it is shared, which leaves its OOC lines out.
@@ -215,7 +215,7 @@ module AresMUSH
           @audit.find('scene', char.name, 'none of their poses is in the scene log')
         end
 
-        order = [ 'EXPLORING', 'ENCOUNTER STARTED', 'END OF ENCOUNTER', 'EXPLORING', 'ENCOUNTER STARTED' ]
+        order = [ 'EXPLORATION STARTED', 'ENCOUNTER STARTED', 'END OF ENCOUNTER', 'EXPLORATION STARTED', 'ENCOUNTER STARTED' ]
         positions = []
         order.each do |marker|
           found = text.each_index.find { |i| text[i].include?(marker) && (positions.empty? || i > positions.last) }

@@ -307,7 +307,7 @@ module AresMUSH
       # class and subclass it is.
       def self.features(char)
         named = (char.pf2_features || {}).values.flatten.map { |one| feature_named(one.to_s) }
-        names = (named + [ subclass_named(char) ]).compact.uniq
+        names = (named + [ subclass_named(char), subclass_option_named(char) ]).compact.uniq
 
         names.map do |name|
           info = Global.read_config('pf2e_class_features', name)
@@ -347,6 +347,19 @@ module AresMUSH
 
         (Global.read_config('pf2e_class_features') || {}).find do |_name, entry|
           entry.is_a?(Hash) && entry['charclass'] == info['charclass'] && entry['subclass'] == info['specialize']
+        end&.first
+      end
+
+      # The entry for the option their subclass's question was answered with, where their pack holds it as a
+      # feature of its own: a wizard's Improved Familiar Attunement thesis.
+      def self.subclass_option_named(char)
+        info = char.pf2_base_info || {}
+        option = info['specialize_info'].to_s
+
+        return nil if option.empty?
+
+        (Global.read_config('pf2e_class_features') || {}).find do |_name, entry|
+          entry.is_a?(Hash) && entry['charclass'] == info['charclass'] && entry['option'] == option
         end&.first
       end
 

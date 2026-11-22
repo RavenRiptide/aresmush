@@ -19,6 +19,7 @@ aliases:
 %t `encounter/as #6=cast fear=aria`
 %t `encounter/as #6=act magma breath=#1,#2,aria`
 %t **Note:** For more information on command syntax, see `help e/strike`, `help e/act`, and `help e/cast`. For more information about what the game does with a creature's abilities, see `help e/abilities`.
+%t **Note:** A player can use `encounter/as` for their own familiar, with `act` only. As GM, you can have a familiar do anything. For more information about familiars in encounters, see `help encounter_familiar`.
 
 ## Going beyond the stat block
 

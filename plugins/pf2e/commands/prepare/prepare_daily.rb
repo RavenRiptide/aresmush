@@ -40,11 +40,22 @@ module AresMUSH
       end
 
       def list(block)
+        return list_familiar(block) if block['pick'].to_s == 'familiar'
+
         options = DailyChoices.options(enactor, block)
 
         return client.emit_failure(t('pf2e.daily_no_options', :source => block['source'])) if options.empty?
 
         client.emit BorderedListTemplate.new(options, t('pf2e.daily_options_title', :source => block['source'])).render
+      end
+
+      # One listing serves both the empty check and the screen: building it is most of what the command costs.
+      def list_familiar(block)
+        shown = Familiar::Daily.listing(enactor)
+
+        return client.emit_failure(t('pf2e.daily_no_options', :source => block['source'])) if Familiar::Daily.offered(shown).empty?
+
+        client.emit PF2FamiliarDailyTemplate.new(shown, client).render
       end
     end
 

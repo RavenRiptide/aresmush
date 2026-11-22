@@ -37,7 +37,9 @@ module AresMUSH
 
         already_invested = investable_list.select { |item| item.invest_on_refresh }
 
-        counter = already_invested.size
+        # What counts toward the limit; an aeon wyrd's master leaves one aeon stone out (Aeon Stone Reservoir).
+        counted = already_invested.dup
+        counter = Pf2e::Familiar.invest_count(enactor, counted)
 
         self.to_invest.each do |item|
 
@@ -71,7 +73,8 @@ module AresMUSH
                 return
               end
             else
-              counter = counter + 1
+              counted << item_id
+              counter = Pf2e::Familiar.invest_count(enactor, counted)
 
               if counter > max_investable
                 client.emit_failure t('pf2egear.too_many_invested', :max => max_investable)

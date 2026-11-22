@@ -23,6 +23,7 @@
 #   seen       someone hidden found, by so many steps: undetected, then hidden, then seen
 #   unseen     how well hidden they now are: hidden, undetected, or observed; `unless` they already
 #              stand as it says, which leaves them as they are
+#   command    a familiar Commanded, which gives it 2 actions this turn (Familiar::Minion)
 pf2e_action_consequences:
   "trip":
     criticalSuccess: [{"on": "target", "condition": "Prone"}, {"on": "target", "damage": "1d6", "type": "bludgeoning"}]
@@ -92,3 +93,5 @@ pf2e_action_consequences:
     criticalFailure: [{"on": "target", "damage": "1d8", "type": "untyped"}]
   "inspired-stratagem":
     always: [{"on": "target", "effect": "Effect: Inspired Stratagem"}]
+  "command-a-minion":
+    always: [{"on": "target", "command": true}]

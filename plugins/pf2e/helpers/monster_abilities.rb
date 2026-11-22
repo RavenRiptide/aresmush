@@ -251,7 +251,16 @@ module AresMUSH
         end
       }.freeze
 
+      # Familiar Focus and Restorative Familiar: a familiar gives its master a Focus Point or Hit Points,
+      # once a day (`Familiar::MasterActions`).
+      MASTER_ACTION = {
+        'refusal' => ->(use) { Familiar::MasterActions.refusal(use) },
+        'run' => ->(use) { Familiar::MasterActions.run(use) }
+      }.freeze
+
       ROWS = {
+        'familiar-focus' => MASTER_ACTION,
+        'restorative-familiar' => MASTER_ACTION,
         'constrict' => CONSTRICT,
         'greater-constrict' => CONSTRICT,
         'swallow-whole' => SWALLOW,

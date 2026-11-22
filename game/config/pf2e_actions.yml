@@ -615,6 +615,17 @@ pf2e_actions:
     category: "class"
     traits: ["barbarian", "concentrate", "rage"]
     self_effect: "Effect: Come and Get Me"
+  # Hand-written: Foundry's actions pack doesn't carry it. Familiar::Minion refuses it unless its target is
+  # the actor's own familiar.
+  "Command a Minion":
+    from: "action"
+    source: "Pathfinder Player Core"
+    for: "everyone"
+    type: "action"
+    cost: 1
+    category: "interaction"
+    traits: ["auditory", "concentrate"]
+    description: "You issue a command to a minion of yours, such as your familiar. It gains 2 actions it can use this turn. A minion you don't Command uses no actions, unless an ability says otherwise."
   "Command an Animal":
     from: "action"
     source: "Pathfinder Player Core"
@@ -1444,6 +1455,46 @@ pf2e_actions:
     cost: 1
     category: "skill"
     traits: ["general", "skill"]
+  "Familiar of Balanced Luck":
+    from: "action"
+    source: "Pathfinder Player Core"
+    for: "everyone"
+    type: "free"
+    category: "interaction"
+    traits: []
+    description: "Requirements You Cast or Sustained a hex this turn, your familiar is in the encounter, and this is your patron's familiar ability.%rOne creature within 15 feet of your familiar gets your choice of either a +1 status bonus to its AC or a -1 status penalty to its AC until the start of your next turn."
+  "Familiar of Keen Senses":
+    from: "action"
+    source: "Pathfinder Player Core"
+    for: "everyone"
+    type: "free"
+    category: "interaction"
+    traits: []
+    description: "Requirements You Cast or Sustained a hex this turn, your familiar is in the encounter, and this is your patron's familiar ability.%rYour familiar gains your choice of an imprecise scent, tremorsense, or wavesense, with a range of 60 feet until the start of your next turn, and it can immediately Point Out as a free action."
+  "Familiar of Ongoing Misery":
+    from: "action"
+    source: "Pathfinder Player Core"
+    for: "everyone"
+    type: "free"
+    category: "interaction"
+    traits: ["curse"]
+    description: "Requirements You Cast or Sustained a hex this turn, your familiar is in the encounter, and this is your patron's familiar ability.%rYour familiar curses a creature within 15 feet of it, prolonging one negative condition of your choice affecting the creature by 1 round. This extension can be applied only once to a given case of a condition, and prolongs only conditions with a timed duration."
+  "Familiar of Restored Spirit":
+    from: "action"
+    source: "Pathfinder Player Core"
+    for: "everyone"
+    type: "free"
+    category: "interaction"
+    traits: []
+    description: "Requirements You Cast or Sustained a hex this turn, your familiar is in the encounter, and this is your patron's familiar ability.%rOne willing creature within 15 feet of your familiar gains temporary Hit Points equal to 2 + half your level, which last until the start of your next turn."
+  "Familiar of Stalking Night":
+    from: "action"
+    source: "Pathfinder Player Core"
+    for: "everyone"
+    type: "free"
+    category: "interaction"
+    traits: []
+    description: "Requirements You Cast or Sustained a hex this turn, your familiar is in the encounter, and this is your patron's familiar ability.%rAn enemy adjacent to your familiar, to which your familiar is Concealed, Hidden, or Undetected, becomes Frightened 1."
   "Fantastic Leap":
     from: "feat"
     type: "action"
@@ -2281,6 +2332,14 @@ pf2e_actions:
     cost: 1
     category: "ancestry"
     traits: ["gnome", "move", "teleportation"]
+  "Lifelink":
+    from: "action"
+    source: "Pathfinder Player Core"
+    for: "everyone"
+    type: "reaction"
+    category: "interaction"
+    traits: ["concentrate"]
+    description: "Trigger Your familiar would be reduced to 0 Hit Points by damage.%rRequirements You have the Lifelink master ability today.%rYou take all the damage, and your familiar takes none. Special effects that would occur due to that damage, such as snake venom, still apply."
   "Lightning Qi":
     from: "feat"
     type: "free"

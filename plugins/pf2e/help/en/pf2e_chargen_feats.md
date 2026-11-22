@@ -22,4 +22,6 @@ A choice with hundreds of options - `Additional Lore` has over two hundred - pag
 `cg/feat <input>=<feat>`: Sets an open feat. Input can be `ancestry`, `archetype`, `charclass`, `dedication`, `general`, `skill`.
 `cg/option <feature> = <option>`: Some class features and feats require that an option selected with this command in `advance/review`. `<feature>` is the name of the class feature or feat, and `<option>` is the option you'd like to choose. 
 
+If a feat gives you a familiar or pet, set it up before you submit your application. For more information about setting up a familiar, see `help chargen_familiar`.
+
 To take a feat back, enter `cg/undo` - it takes back your most recent choice, so run it until the feat you want to change is gone. `cg/restore skills` still returns you to the point just before you started setting feats.

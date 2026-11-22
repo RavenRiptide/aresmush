@@ -49,7 +49,12 @@ module AresMUSH
     reference :encounter, "AresMUSH::PF2Encounter"
     collection :pf2_effects, "AresMUSH::Pf2eEffect", :npc
 
+    # A familiar: its master as they stand in this encounter. Its figures are worked out from them
+    # (`Pf2e::Familiar::Block`), so it has no stat block of its own.
+    reference :master, "AresMUSH::Pf2eCombatantState"
+
     index :number
+    index :master_id
 
     before_delete :delete_effects
 
@@ -64,6 +69,8 @@ module AresMUSH
     end
 
     def written_stat_block
+      return Pf2e::Familiar::Block.of(self) if self.master_id
+
       (self.revision_id ? Pf2eCreatureRevision[self.revision_id]&.block : nil) ||
         (self.creature ? Pf2e::Bestiary.entry(self.creature) : nil) || self.described || {}
     end

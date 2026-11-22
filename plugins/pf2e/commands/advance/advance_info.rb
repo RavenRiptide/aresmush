@@ -22,6 +22,9 @@ module AresMUSH
           return
         end
 
+        # A retrain the level owes lists the feats advance/retrain would accept.
+        return show_retrain if self.element.to_s.strip.casecmp?(RETRAIN)
+
         # Advancement-specific elements first, then the shared vocabulary.
         found = class_option_element || Pf2e.info_options(enactor, self.element)
 
@@ -54,6 +57,22 @@ module AresMUSH
       # Everything the character could usefully ask about right now.
       def pending_elements
         Pf2e::Advancement::Outstanding.labels(outstanding)
+      end
+
+      RETRAIN = 'retrain'.freeze
+
+      def show_retrain
+        owed = Retrain.owed(enactor)
+        return client.emit_failure(t('pf2e.retrain_none_owed')) unless owed
+
+        blocked = Retrain.dependents_block(enactor, owed)
+        return client.emit_failure(blocked) if blocked
+
+        title = t('pf2e.info_retrain_title', :feat => owed['from'], :level => owed['level'],
+                  :type => owed['bucket'].to_s.gsub('charclass', 'class'))
+        display = Pf2e.info_option_display(title, Retrain.options(enactor, owed), cmd, self.filter, :client => client)
+
+        display[:error] ? client.emit_failure(display[:error]) : client.emit(display[:text])
       end
 
       def show_pending

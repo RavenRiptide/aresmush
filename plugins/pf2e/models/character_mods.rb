@@ -91,6 +91,12 @@ module AresMUSH
     attribute :pf2_alchemy_plan, :type => DataType::Hash, :default => {}
     attribute :pf2_cnotes, :type => DataType::Hash, :default => {}
 
+    # Their familiar's details and whether staff have approved them (`Pf2e::Familiar`): the details the
+    # player is setting under `pending`, the ones staff approved under `approved`, and the request open for
+    # them. Details are the player's choice and staff's approval, not sheet history, so they are not ledger
+    # grants.
+    attribute :pf2_familiar, :type => DataType::Hash, :default => {}
+
     collection :abilities, "AresMUSH::Pf2eAbilities"
     collection :skills, "AresMUSH::Pf2eSkills"
     reference :hp, "AresMUSH::Pf2eHP"

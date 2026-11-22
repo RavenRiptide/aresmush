@@ -205,7 +205,10 @@ module AresMUSH
       # to tell which side of the move each field came from.
       #
       # A category migrated in full simply has nothing left to fill in.
-      def self.for_magic(magic)
+      #
+      # `familiar: false` leaves out what their familiar's day adds, for a reader that must see only what
+      # they have learned: the ledger's diff of known spells.
+      def self.for_magic(magic, familiar: true)
         return [] unless magic
 
         rows = stored(magic.character)
@@ -219,7 +222,10 @@ module AresMUSH
 
         # Sources that exist only as rows - a focus type, an item, a ritual - have nothing to
         # project from.
-        merged + rows.reject { |row| projected.any? { |entry| same_source?(row, entry) } }
+        all = merged + rows.reject { |row| projected.any? { |entry| same_source?(row, entry) } }
+
+        # What their familiar's day adds: Cantrip Connection, Spell Battery. Never stored.
+        familiar && AresMUSH.const_defined?('Pf2e') ? Pf2e::Familiar::MasterSpells.adjust(magic, all) : all
       end
 
       # Two descriptions of the same source. Name and category together, because a name alone is
@@ -363,6 +369,12 @@ module AresMUSH
         (find(magic, source) || {})['known'] || {}
       end
 
+      # What a source knows, less what their familiar's day adds (Cantrip Connection): what a writer
+      # puts back into the repertoire or spellbook must hold only what they learned.
+      def self.learned(magic, source)
+        (for_magic(magic, familiar: false).find { |e| e['name'].to_s.casecmp?(source.to_s) } || {})['known'] || {}
+      end
+
       # How many slots a source casts from, by rank.
       def self.slots(magic, source)
         (find(magic, source) || {})['slots'] || {}
@@ -488,7 +500,7 @@ module AresMUSH
 
         return {} unless magic
 
-        lists = for_magic(magic).each_with_object({}) do |entry, out|
+        lists = for_magic(magic, familiar: false).each_with_object({}) do |entry, out|
           next unless [ 'class', 'archetype' ].include?(entry['source_type'])
           next unless enumerated?(entry['name'])
 

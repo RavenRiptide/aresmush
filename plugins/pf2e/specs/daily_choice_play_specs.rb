@@ -101,7 +101,8 @@ module AresMUSH
           run(PF2PrepareDailyCmd, 'prepare/longevity Athletics')
           run(PF2PrepareDailyCmd, 'prepare/longevity Stealth')
 
-          expect(@client.failures).to eq [ t('pf2e.daily_already_picked', :source => 'Ancestral Longevity', :pick => 'Athletics') ]
+          expect(@client.failures).to eq [ t('pf2e.daily_already_picked', :source => 'Ancestral Longevity', :pick => 'Athletics',
+                                                         :switch => 'longevity') ]
 
           DailyChoices.rested!(char)
 
@@ -203,14 +204,14 @@ module AresMUSH
           expect(DraftSheet.of(char).feat_names).to_not include 'SUDDEN CHARGE'
         end
 
-        it "should take a feat that asks its own choice with the answer after a colon" do
+        it "should take a feat that requires its own choice, with that choice after a colon" do
           fighter(9, [ 'Combat Flexibility' ])
           details = Global.read_config('pf2e_feats', 'Advanced Weapon Training')
           group = Pf2e.choice_options(char, 'Advanced Weapon Training', Pf2e.feat_choice_def(details)).first
 
           run(PF2PrepareDailyCmd, 'prepare/flexibility Advanced Weapon Training')
 
-          expect(@client.failures.last).to start_with 'Advanced Weapon Training asks for'
+          expect(@client.failures.last).to include "'%xwprepare/flexibility Advanced Weapon Training: <choice>%xn%xr'"
 
           run(PF2PrepareDailyCmd, "prepare/flexibility Advanced Weapon Training: #{group}")
 
@@ -477,16 +478,21 @@ module AresMUSH
           expect(strays.map(&:first)).to eq []
         end
 
-        # A switch on `prepare` reaches one feat's preparations, whichever kind declares it.
-        it "should give no two feats the same prepare switch" do
-          switches = Global.read_config('pf2e_feats').values.select { |info| info.is_a?(Hash) }.flat_map do |info|
-            info.values.select { |value| value.is_a?(Hash) && value['switch'] }.map { |value| value['switch'].to_s.downcase }
+        # A switch on `prepare` reaches one feat's preparations, whichever kind declares it. Several sources
+        # may share one only by declaring the same choice: every source of a familiar declares
+        # prepare/familiar, since a character has one familiar whichever feat gave it.
+        it "should give no two feats the same prepare switch, unless they declare the same choice" do
+          declared = Global.read_config('pf2e_feats').values.select { |info| info.is_a?(Hash) }.flat_map do |info|
+            info.values.select { |value| value.is_a?(Hash) && value['switch'] }
           end
           # A class's blocks are a list, which the sweep above does not reach.
-          switches += Global.read_config('pf2e_class').values.flat_map { |info| DailyChoices.blocks_of(info) }
-                                                     .map { |block| block['switch'].to_s.downcase }
+          declared += Global.read_config('pf2e_class').values.flat_map { |info| DailyChoices.blocks_of(info) }
 
-          expect(switches.group_by(&:itself).select { |_switch, all| all.size > 1 }.keys).to eq []
+          clashing = declared.group_by { |block| block['switch'].to_s.downcase }.select do |_switch, all|
+            all.map { |block| block.except('feature') }.uniq.size > 1
+          end
+
+          expect(clashing.keys).to eq []
         end
       end
     end

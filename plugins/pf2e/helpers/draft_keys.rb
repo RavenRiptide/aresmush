@@ -46,6 +46,7 @@ module AresMUSH
         # What a level-up has settled, in advancement.
         'feats' => [ BOTH, 'the feat slot pool in to_assign, keyed by slot type, and what was taken in them in advancement' ],
         'grants' => [ ADVANCEMENT, 'what those feats handed over, pending advance/done' ],
+        'retrains' => [ ADVANCEMENT, 'feats a witch familiar taking over leaves to retrain, and what each became' ],
         'magic_stats' => [ ADVANCEMENT, 'spellcasting this level grants, by source' ],
         'combat_stats' => [ ADVANCEMENT, 'proficiencies this level grants, including an archetype class DC' ],
         'raise skill' => [ ADVANCEMENT, 'skill increases taken, which breaks the spacing convention' ],

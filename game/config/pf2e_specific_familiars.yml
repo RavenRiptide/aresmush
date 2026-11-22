@@ -1,0 +1,84 @@
+---
+# Specific familiars (Player Core 2 pp. 170-171), written by hand: Foundry doesn't carry them. The imp is left
+# out on purpose; it isn't available to player characters.
+#
+#   traits      replace the familiar's animal trait
+#   uses        how many of the familiar's abilities it takes; the familiar must have at least this many
+#   abilities   what it gives, from pf2e_familiar_abilities.yml, without their prerequisites
+#   choices     picks made once, when staff approve the familiar: an ability's own choice (Pipefox's
+#               Skilled), or `porter`, one ability from a list
+#   prereq      what the master needs: slot_rank (they cast spells of this rank from slots)
+#   no_land_speed, ac, senses, rules   what its special abilities change
+#   aquatic     true if its rules let it be aquatic; without it, familiar/form aquatic is refused (none can)
+#   reinforce   one of its daily abilities may be spent to suppress a special ability for the day
+#   specials    its own abilities, shown on its sheet: %{name} is the familiar's name, and %{skill},
+#               %{language} and %{ability} the choices made for it (familiar/choose)
+#   actions     what it can use in an encounter, written as a bestiary stat block writes an action, so the
+#               creature-ability code runs it; %{name} is its name and %{dc} the higher of its master's
+#               class DC and spell DC (Familiar::Block)
+#   blood_link  if it is destroyed, its master takes this much mental damage, and while its master is
+#               unconscious and dying it acts as if Commanded (Familiar::Minion)
+pf2e_specific_familiars:
+  Aeon Wyrd:
+    traits: [ construct ]
+    uses: 3
+    abilities: [ Construct, Flier ]
+    no_land_speed: true
+    rules:
+      - { key: Weakness, type: sonic, value: "@actor.level" }
+    specials:
+      Aeon Stone Reservoir: "%{name} can house any aeon stone as its nucleus. You gain the stone's benefits and its resonant power without investing it."
+      Can't Walk: "%{name} has no land Speed."
+      Crystalline: "%{name} has weakness to sonic damage equal to your level."
+  Fey Dragonet:
+    traits: [ dragon ]
+    uses: 5
+    abilities: [ Darkvision, Flier, Manual Dexterity, Speech, Touch Telepathy ]
+    choices: [ Speech ]
+    actions:
+      - name: Euphoric Breath
+        type: action
+        cost: 2
+        traits: [ arcane, poison ]
+        text: "Frequency once per hour%r%{name} breathes euphoric gas in a 10-foot cone. Each creature in the area attempts a DC %{dc} Fortitude save.%rFailure The creature is Stupefied 2 for 1d4 rounds and Slowed 1 for 1d4 rounds.%rCritical Failure The creature is Stupefied 2 for 1 minute and Slowed 1 for 1 minute."
+    specials:
+      Euphoric Breath: "2 actions, once per hour (arcane, poison). %{name} breathes euphoric gas in a 10-foot cone. Each creature in the area attempts a Fortitude save against the higher of your class DC or spell DC. On a failure, it is stupefied 2 and slowed 1 for 1d4 rounds; on a critical failure, for 1 minute."
+  Homunculus:
+    traits: [ construct ]
+    uses: 6
+    abilities: [ Construct, Darkvision, Manual Dexterity, Poison Reservoir ]
+    choices: [ porter ]
+    porter: [ Item Delivery, Valet ]
+    blood_link: 2d10
+    specials:
+      Blood Link: "%{name} shares a telepathic link with you out to 1,500 feet, and the two of you can share what you know and what it hears. If you are unconscious and dying, %{name} acts on its next turn as if you had Commanded it. If %{name} is destroyed, you take 2d10 mental damage."
+      Porter: "%{name} has the %{ability} ability, chosen from item delivery and valet when it was approved."
+  Pipefox:
+    traits: [ beast ]
+    uses: 5
+    abilities: [ Climber, Darkvision, Second Opinion, Skilled, Speech ]
+    choices: [ Skilled, linguist ]
+    specials:
+      Scholarly Linguist: "%{name} speaks and understands every language you know, plus one common language you don't: %{language}."
+  Poppet:
+    traits: [ construct ]
+    uses: 1
+    abilities: [ Construct ]
+    reinforce: Flammable
+    rules:
+      - { key: Weakness, type: fire, value: "@actor.level", predicate: [ { not: "self:reinforced" } ] }
+    specials:
+      Flammable: "%{name} has weakness to fire damage equal to your level. You can spend one of its abilities for the day to reinforce it, which removes the weakness for the day."
+  Spellslime:
+    traits: [ ooze ]
+    uses: 4
+    abilities: [ Climber, Darkvision, Tough, Focused Rejuvenation ]
+    prereq: { slot_rank: 1 }
+    ac: "10 + @actor.level"
+    senses: [ "magic scent (imprecise) 30 feet" ]
+    rules:
+      - { key: Immunity, type: [ critical-hits, precision ] }
+    specials:
+      Magic Scent: "%{name} can smell magic of your tradition as an imprecise sense out to 30 feet."
+      Ooze Defense: "%{name} is immune to critical hits and precision damage, and its AC is 10 + your level instead of your AC."
+      Slime Rejuvenation: "%{name} has the focused rejuvenation ability, and recovers 2 Hit Points per level when you Refocus instead of 1."

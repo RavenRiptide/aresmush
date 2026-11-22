@@ -31,7 +31,7 @@ module AresMUSH
           return
         end
 
-        initlist = Pf2e::Combatants.all(encounter)
+        initlist = Pf2e::Combatants.in_order(encounter)
 
         # Whose turn is ending, before the order moves: an effect that lasts until the end of someone's
         # turn ends now.

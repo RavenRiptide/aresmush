@@ -58,6 +58,13 @@ pf2e:
     # answers to `advance` as well.
     advance/font: dfont
   max_level: 20
+  # The forms a familiar or pet can take, for familiar/form. Player Core gives a pet a land Speed, or a swim
+  # Speed if it's aquatic.
+  familiar_forms:
+    - land
+    - aquatic
+  # The job category a familiar's approval request opens in. Blank uses the jobs plugin's request category.
+  familiar_job_category:
   # Turns on the playtest's self-service commands: selfaward/xp, selfaward/gold and selfapprove. Set
   # false on a live game, where staff award XP and approve characters.
   playtest: true

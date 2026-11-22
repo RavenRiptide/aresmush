@@ -490,7 +490,21 @@ module AresMUSH
       def self.rollback_to_level!(char, level, enactor = nil)
         marker = "rollback-#{Time.now.to_i}-#{rand(1000)}-to-#{level.to_i}"
 
-        Ledger.rollback_targets(rows(char), level).each { |id| revert_txn!(char, id, :by => marker, :materialize => false) }
+        all = rows(char)
+        rolled_back = Ledger.rollback_targets(all, level)
+
+        rolled_back.each { |id| revert_txn!(char, id, :by => marker, :materialize => false) }
+
+        # A grant whose own level is rolled back too stays out, under this rollback's marker, so a redo
+        # treats it like the rest of its level.
+        Ledger.level_revoked_ids(all, level).each do |id|
+          grant = Pf2eGrant[id]
+          next unless grant
+
+          gone = rolled_back.include?(grant.txn) ? marker : nil
+
+          grant.update(:restored_by => marker, :restored_from => grant.reverted_by, :reverted_by => gone)
+        end
 
         invalidate!(char)
         char.update(:pf2_level => (level.to_i - 1))
@@ -519,6 +533,9 @@ module AresMUSH
 
         abandoned.each { |grant| grant.delete }
 
+        # What the abandoned levels had revoked stays live: the levels that took it away are gone.
+        char.grants.find(:restored_by => marker).each { |grant| grant.update(:restored_by => nil, :restored_from => nil) }
+
         char.update(:pf2_rollback_marker => nil)
         invalidate!(char)
 
@@ -533,6 +550,11 @@ module AresMUSH
 
         level = restored.map { |g| g.effective_level.to_i }.max
         restored.each { |g| g.update(:reverted_by => nil) }
+
+        # The levels coming back revoke again what they had revoked.
+        char.grants.find(:restored_by => marker).each do |grant|
+          grant.update(:reverted_by => grant.restored_from, :restored_by => nil, :restored_from => nil)
+        end
 
         invalidate!(char)
         char.update(:pf2_level => level)
@@ -565,7 +587,7 @@ module AresMUSH
         'grant_formula' => lambda { |char, p| Pf2e::Crafting.write_formula(char, p['category'], p['formula']) },
         'set_ability_score' => lambda { |char, p| Ledger.apply_ability_score(char, p['ability'], p['to'].to_i) },
         'spell_access' => lambda { |char, p|
-          known = Pf2emagic::Entries.known(char.magic, p['source'])
+          known = Pf2emagic::Entries.learned(char.magic, p['source'])
           at_rank = Array(known[p['rank'].to_s])
 
           next if at_rank.any? { |spell| spell.to_s.casecmp?(p['spell'].to_s) }
@@ -593,7 +615,7 @@ module AresMUSH
         'grant_formula' => lambda { |char, match| Pf2e::Crafting.write_formula(char, match['category'], match['formula'], :remove => true) },
         'add_special' => lambda { |char, match| char.update(:pf2_special => Array(char.pf2_special).reject { |s| s.to_s.casecmp?(match['special'].to_s) }) },
         'spell_access' => lambda { |char, match|
-          known = Pf2emagic::Entries.known(char.magic, match['source'])
+          known = Pf2emagic::Entries.learned(char.magic, match['source'])
           without = known.each_with_object({}) do |(rank, spells), kept|
             kept[rank] = Array(spells).reject { |spell| spell.to_s.casecmp?(match['spell'].to_s) }
           end
@@ -702,7 +724,7 @@ module AresMUSH
         # new casting source, a class level's slots are new counts, and an expert raise a new record.
         }.merge(spellcasting_fragment(char)))
 
-        marker = "level-#{level}-#{Time.now.to_i}"
+        marker = Ledger.level_revocation_marker(level)
 
         plan['revocations'].each { |r| revert_matching!(char, r['kind'], r['match'], :by => marker, :materialize => false, :limit => r['limit']) }
 

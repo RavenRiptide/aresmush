@@ -77,6 +77,21 @@ module AresMUSH
               [ [ nil, Pf2emagic::SpellBooks.instructions(book) ] ]
             }
           },
+          # A familiar or pet to set up: its details, and when staff approve them. A witch familiar taking
+          # over the one they have keeps that one's details instead, and says so.
+          {
+            'name' => 'familiar',
+            'when' => lambda { |ctx| Familiar.source?(ctx[:details]) },
+            'apply' => lambda { |ctx| [ [ nil, FeatGain.taken_over(ctx) || FeatGain.familiar_gained(ctx) ] ] }
+          },
+          # A witch familiar taking over the one they have: the basic feat that gave it is retrained this
+          # level (Familiar.stage_retrains), which only an open level can hold. After the familiar row, so
+          # the player reads that the familiar was replaced before they read what that costs.
+          {
+            'name' => 'familiar takeover',
+            'when' => lambda { |ctx| FeatGain.takeover?(ctx) },
+            'apply' => lambda { |ctx| Familiar.stage_retrains(ctx[:char], ctx[:advancement]) }
+          },
           # A feat staff set up by hand - Bloodline Mutation's traits and benefits, Verdant Weapon's
           # ikon - tells the player what to put in a request for.
           {
@@ -330,6 +345,47 @@ module AresMUSH
           end
 
           []
+        end
+
+        # What to set up for a new familiar or pet, and when staff approve it. A pet also chooses its two
+        # abilities.
+        def self.familiar_gained(ctx)
+          # Witch Dedication's familiar comes from a patron, whom staff approve in the same request.
+          if takeover?(ctx)
+            return [ t('pf2e.familiar_gained_witch'), patron_request, t('pf2e.familiar_gained_help_advance') ].join(' ')
+          end
+
+          pet = ctx[:details]['pet'] == true && ctx[:details]['familiar'] != true
+          parts = [ t(pet ? 'pf2e.familiar_gained_pet' : 'pf2e.familiar_gained') ]
+          parts << t('pf2e.familiar_gained_pet_abilities') if pet
+          parts << t(ctx[:chargen] ? 'pf2e.familiar_gained_chargen' : 'pf2e.familiar_gained_advance')
+          parts << t(ctx[:chargen] ? 'pf2e.familiar_gained_help_chargen' : 'pf2e.familiar_gained_help_advance')
+
+          parts.join(' ')
+        end
+
+        # A spellbook familiar (Witch Dedication) taken in a level, which takes over any they have.
+        def self.takeover?(ctx)
+          !ctx[:chargen] && Familiar.source?(ctx[:details]) && Familiar.kind_of(ctx[:details]) == 'spellbook'
+        end
+
+        # What to say when a witch familiar takes over the one they have, or nil when they had none. Its
+        # details carry over, so there is nothing to set unless they want a change.
+        def self.taken_over(ctx)
+          return nil unless takeover?(ctx)
+
+          old = Familiar.replaced(ctx[:char], ctx[:feat])
+          return nil unless old
+
+          said = old['name'].blank? ? t('pf2e.familiar_taken_over_unnamed') : t('pf2e.familiar_taken_over', :name => old['name'])
+
+          [ said, t('pf2e.familiar_change_details'), patron_request, t('pf2e.familiar_gained_help_advance') ].join(' ')
+        end
+
+        # That the approval request at the end of the level approves the patron too, and where the template
+        # for describing one is.
+        def self.patron_request
+          t('pf2e.familiar_patron_request', :url => Familiar.patron_wiki_url)
         end
 
         def self.level_choices(ctx)

@@ -87,7 +87,7 @@ module AresMUSH
         },
         'feat' => {
           'options' => lambda { |char, block| DailyChoices.feat_pool(char, block) },
-          'detail' => lambda { |char, _block, feat, said| DailyChoices.feat_choice(char, feat, said) }
+          'detail' => lambda { |char, block, feat, said| DailyChoices.feat_choice(char, feat, said, block['switch']) }
         },
         # One of a fixed list, which may make something true of them: Nudge the Scales' death side gives
         # void healing (`facts: { death: [ self:void-healing ] }`).
@@ -126,6 +126,16 @@ module AresMUSH
         'apex' => {
           'options' => lambda { |char, _block| DailyChoices.divine_attributes(char) },
           'resolve' => lambda { |char, block, typed| DailyChoices.apex_answers(char, block, typed) }
+        },
+        # A familiar's abilities for the day, named with commas: `Darkvision, Skilled (Arcana)`
+        # (`Familiar::Daily`). `kept` is what a rest asks of a pick that lasts until changed, where the
+        # pick is a whole list and no one option matches it. `picked` runs once the pick is written:
+        # Cantrip Connection's cantrips are remembered.
+        'familiar' => {
+          'options' => lambda { |char, _block| Familiar::Daily.offer(char) },
+          'resolve' => lambda { |char, block, typed| Familiar::Daily.answers(char, block, typed) },
+          'kept' => lambda { |char, block, pick| Familiar::Daily.kept?(char, block, pick) },
+          'picked' => lambda { |char, pick| Familiar::MasterSpells.remember!(char, pick) }
         }
       }.freeze
 
@@ -266,8 +276,9 @@ module AresMUSH
       end
 
       # What a picked feat's own choice was answered with, for a feat that asks one: Advanced Weapon
-      # Training's weapon group, typed after a colon.
-      def self.feat_choice(char, feat, said)
+      # Training's weapon group, typed after a colon. `switch` is the daily choice's, for the command the
+      # refusal shows.
+      def self.feat_choice(char, feat, said, switch)
         details = Global.read_config('pf2e_feats', feat)
         block = Pf2e.feat_choice_def(details)
 
@@ -279,7 +290,7 @@ module AresMUSH
         return Ok.new(:state => { 'choice' => found }) if found
 
         Err.new(:needs_choice, 'pf2e.daily_needs_choice', 'feat' => feat, 'summary' => Pf2e.choice_summary(block),
-                'options' => offered.empty? ? '---' : offered.join(', '))
+                'options' => offered.empty? ? '---' : offered.join(', '), 'switch' => switch.to_s.downcase)
       end
 
       # The feats their picks lend them today: [ { 'feat', 'choice', 'source' } ].
@@ -354,6 +365,7 @@ module AresMUSH
             names = effect_names(set, char, offered)
 
             return Err.new(:needs_answer, 'pf2e.daily_effect_answer', 'source' => block['source'], 'form' => form,
+                           'switch' => block['switch'].to_s.downcase,
                            'question' => set['flag'].to_s, 'options' => names.empty? ? '---' : names.join(', '))
           end
 
@@ -766,7 +778,8 @@ module AresMUSH
         current = picks[switch]
 
         if current.is_a?(Hash) && current['locked']
-          return Err.new(:already_picked, 'pf2e.daily_already_picked', 'source' => block['source'], 'pick' => current['pick'])
+          return Err.new(:already_picked, 'pf2e.daily_already_picked', 'source' => block['source'], 'pick' => current['pick'],
+                         'switch' => switch)
         end
 
         found = Array(options).find { |one| one.to_s.casecmp?(typed.to_s.strip) }
@@ -777,7 +790,10 @@ module AresMUSH
         end
 
         made = { 'pick' => found, 'source' => block['source'], 'locked' => true }.merge(detail)
-        made['previous'] = current['pick'] if current.is_a?(Hash) && current['pick'] && current['pick'] != found
+        if current.is_a?(Hash) && current['pick'] && current['pick'] != found
+          made['previous'] = current['pick']
+          made['previous_abilities'] = current['abilities'] if current['abilities']
+        end
 
         Ok.new(:state => picks.merge(switch => made))
       end
@@ -800,8 +816,10 @@ module AresMUSH
 
         return Ok.new(:state => rest) unless current['previous']
 
-        Ok.new(:state => rest.merge(switch => { 'pick' => current['previous'], 'source' => current['source'],
-                                                'locked' => false }))
+        restored = { 'pick' => current['previous'], 'source' => current['source'], 'locked' => false }
+        restored['abilities'] = current['previous_abilities'] if current['previous_abilities']
+
+        Ok.new(:state => rest.merge(switch => restored))
       end
 
       # A rest unlocks every pick. A pick that lasts a day is cleared; one that holds until changed is kept
@@ -822,7 +840,8 @@ module AresMUSH
             next
           end
 
-          out[switch] = { 'pick' => pick['pick'], 'source' => block['source'], 'locked' => false }
+          # A familiar's pick is its list of abilities, which stays with it.
+          out[switch] = { 'pick' => pick['pick'], 'source' => block['source'], 'locked' => false }.merge(pick.slice('abilities'))
         end
 
         [ kept, dropped ]
@@ -866,6 +885,7 @@ module AresMUSH
         return outcome unless outcome.ok?
 
         char.update(:pf2_daily_choices => outcome.state)
+        kind['picked']&.call(char, outcome.state[key])
 
         brewed = block['pick'].to_s == 'formula' ? brew_where_standing!(char, key) : []
         give!(char, key) if block['gives']
@@ -913,6 +933,9 @@ module AresMUSH
 
         blocks = held(holder)
         kept, dropped = rest(current, blocks, lambda { |switch, pick|
+          kept = (KINDS[blocks[switch]['pick'].to_s] || {})['kept']
+          next kept.call(holder, blocks[switch], current[switch]) if kept
+
           options(holder, blocks[switch]).any? { |one| one.casecmp?(pick.to_s) }
         })
 

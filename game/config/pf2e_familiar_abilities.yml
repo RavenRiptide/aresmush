@@ -1,0 +1,592 @@
+---
+# Familiar and master abilities, written by scripts/import_foundry_familiars.py. Don't edit by hand:
+# the descriptions and rules are Foundry's, and the kind, prerequisites and choices are the HAND table in
+# that script. Specific familiars are hand-written in pf2e_specific_familiars.yml.
+pf2e_familiar_abilities:
+  Absorb Familiar:
+    kind: master
+    source: Player Core
+    shortdesc: Your familiar can transform into a mark you carry on your flesh, typically seeming like a birthmark, tattoo, or gem that vaguely resembles its normal form. When transformed, the familiar can't act except to turn back into a familiar. It isn't affected by area effects and must be targeted separately to affect it, which requires knowledge that it's a creature.%rThis means you and your allies can heal or assist the familiar while most enemies stay unaware of its true nature. Creatures must attempt a DC 20 Perception check to Seek to realize a it is actually a familiar. Your familiar can still communicate its feelings empathically. Transforming the familiar between forms is a 1-minute activity that has the concentrate trait.
+  Accompanist:
+    kind: familiar
+    source: Player Core
+    shortdesc: Your familiar helps you perform. Whenever you attempt a Performance check, if your familiar is nearby and can act, it accompanies you with chirps, claps, or its own miniature instrument. This grants you a +1 circumstance bonus, or +2 if you're a master in Performance.
+  Amphibious:
+    kind: familiar
+    pet: true
+    source: Player Core
+    shortdesc: It gains the amphibious trait, allowing it to breathe in both air and water, and has both a land Speed and a swim Speed, each equal to its highest land Speed or swim Speed.
+    rules:
+    - key: BaseSpeed
+      selector: land
+      value: 25
+    - key: BaseSpeed
+      selector: swim
+      value: 25
+    - key: ActorTraits
+      add:
+      - amphibious
+  Burrower:
+    kind: familiar
+    pet: true
+    source: Player Core
+    shortdesc: It gains a burrow Speed of 5 feet, allowing it to dig Tiny holes.
+    rules:
+    - key: BaseSpeed
+      selector: burrow
+      value: 5
+  Cantrip Connection:
+    kind: master
+    repeatable: true
+    prereq:
+      cantrips: true
+    choice:
+      from: cantrips
+    source: Player Core
+    shortdesc: You can prepare an additional cantrip, or if you have a repertoire, designate a cantrip to add to your repertoire every time you select this ability; you can retrain it but can't otherwise change it. You must be able to prepare cantrips or add them to your repertoire to select this.
+  Climber:
+    kind: familiar
+    pet: true
+    source: Player Core
+    shortdesc: It gains a climb Speed of 25 feet.
+    rules:
+    - key: BaseSpeed
+      selector: climb
+      value: 25
+  Construct:
+    kind: familiar
+    changes_trait: true
+    prereq:
+      abilities:
+      - Tough
+    source: Player Core
+    shortdesc: Your familiar has the construct trait instead of the animal trait. The familiar is immune to death effects, disease, doomed, drained, fatigued, healing, nonlethal attacks, paralyzed, poison, sickened, spirit, unconscious, vitality, and void. Your familiar must have the Tough pet ability to select this.
+    rules:
+    - key: Immunity
+      type:
+      - death-effects
+      - disease
+      - doomed
+      - drained
+      - fatigued
+      - healing
+      - nonlethal-attacks
+      - paralyzed
+      - poison
+      - sickened
+      - spirit
+      - unconscious
+      - vitality
+      - void
+    - key: ActorTraits
+      add:
+      - construct
+  Damage Avoidance:
+    kind: familiar
+    choice:
+      from: list
+      label: save
+      options:
+      - Fortitude
+      - Reflex
+      - Will
+    source: Player Core
+    shortdesc: Choose one type of save. Your familiar takes no damage when it rolls a success on that type of save; this doesn't prevent effects other than damage.
+    rules:
+    - key: ChoiceSet
+      flag: save
+      choices:
+      - label: Fortitude
+        value: fortitude
+      - label: Reflex
+        value: reflex
+      - label: Will
+        value: will
+    - key: Note
+      selector: '{item|flags.system.rulesSelections.save}'
+      outcome:
+      - success
+      - criticalSuccess
+      title: '{item|name}'
+      text: '{item|description}'
+  Darkvision:
+    kind: familiar
+    pet: true
+    source: Player Core
+    shortdesc: It gains darkvision.
+    rules:
+    - key: Sense
+      selector: darkvision
+  Dragon:
+    kind: familiar
+    changes_trait: true
+    source: Player Core
+    shortdesc: Your familiar has the dragon trait instead of the animal trait.
+    rules:
+    - key: ActorTraits
+      add:
+      - dragon
+  Echolocation:
+    kind: familiar
+    pet: true
+    source: Player Core
+    shortdesc: It can use hearing as a precise sense within 20 feet.
+    rules:
+    - key: Sense
+      acuity: precise
+      range: 20
+      selector: echolocation
+  Elemental:
+    kind: familiar
+    changes_trait: true
+    prereq:
+      abilities:
+      - Resistance
+    choice:
+      from: list
+      label: element
+      options:
+      - air
+      - earth
+      - fire
+      - metal
+      - water
+      - wood
+    source: Player Core
+    shortdesc: Your familiar has the elemental trait instead of the animal trait. Choose air, earth, fire, metal, water, or wood. Your familiar gains that trait. The familiar is immune to bleed, Paralyzed, poison, sleep, and the element matching its trait. Your familiar must have the resistance familiar ability to select this.
+    rules:
+    - key: ChoiceSet
+      flag: element
+      prompt: Select an element.
+      choices:
+      - label: Air
+        value: air
+      - label: Earth
+        value: earth
+      - label: Fire
+        value: fire
+      - label: Metal
+        value: metal
+      - label: Water
+        value: water
+      - label: Wood
+        value: wood
+    - key: ActorTraits
+      add:
+      - elemental
+      - '{item|flags.system.rulesSelections.element}'
+      remove:
+      - animal
+    - key: Immunity
+      type:
+      - bleed
+      - paralyzed
+      - poison
+      - sleep
+      - '{item|flags.system.rulesSelections.element}'
+  Extra Alchemy:
+    kind: master
+    prereq:
+      feature: Advanced Alchemy
+    source: Player Core 2
+    shortdesc: 'Your familiar helps you brew items at the start of the day. You can create one additional item with Advanced Alchemy during your daily preparations. You must have the Advanced Alchemy ability to select this ability.%rEffect: Extra Alchemy'
+  Extra Vial:
+    kind: master
+    prereq:
+      feature: Versatile Vials
+    source: Player Core 2
+    shortdesc: Your familiar accretes alchemical liquids in its body. Once per day, you can Interact when your familiar is adjacent to you to gain a versatile vial. You must have the Versatile Vials ability to select this ability.
+  Familiar Focus:
+    kind: master
+    prereq:
+      has_focus_pool: true
+    actions: 2
+    frequency: 1/day
+    source: Player Core
+    shortdesc: Once per day, your familiar can use 2 actions with the concentrate trait to restore 1 Focus Point to your focus pool, up to your usual maximum. You must have a focus pool to select this.
+  Familiar of Balanced Luck:
+    kind: patron
+    patron: Fate
+    source: Player Core
+    shortdesc: 'Your familiar has a spot on its body that looks like a good luck charm or a bad omen, depending on the angle. When you Cast or Sustain a hex, one creature within 15 feet of your familiar gets your choice of either a +1 status bonus to its AC or a –1 status penalty to its AC until the start of your next turn.%rEffect: Familiar of Balanced Luck'
+  Familiar of Flowing Script:
+    kind: patron
+    patron: Rune
+    source: Player Core
+    shortdesc: Your familiar is covered in a pattern that looks similar to letters in an unknown language, one that seems to draw attention even as it eludes understanding. When you Cast or Sustain a hex, the letters begin to rapidly change, causing a distraction. Until the start of your next turn, your familiar can provide flanking for you and your allies as though it were able to attack and had a reach of 5 feet; this is a visual effect.
+  Familiar of Freezing Rime:
+    kind: patron
+    patron: Winter
+    source: Player Core
+    shortdesc: Your familiar is cold to the touch, its breath always visible. When you Cast or Sustain a hex, you can cause ice to form in a 5-foot burst centered on a square of your familiar's space. Those squares are difficult terrain until the start of your next turn.
+  Familiar of Keen Senses:
+    kind: patron
+    patron: Wild
+    source: Player Core
+    shortdesc: 'Your familiar has glinting eyes, twitching ears, or some other sign of a beast''s powerful senses. When you Cast or Sustain a hex, your familiar gains your choice of an imprecise scent, tremorsense, or wavesense, with a range of 60 feet until the start of your next turn, and it can immediately Point Out as a free action.%rEffect: Familiar of Keen Senses'
+  Familiar of Ongoing Misery:
+    kind: patron
+    patron: Curse
+    source: Player Core
+    shortdesc: Your familiar seems hostile to all creatures other than you, hissing at them if they get too near. When you Cast or Sustain a hex, your familiar can curse a creature within 15 feet of it, prolonging one negative condition of your choice affecting the creature by 1 round. This extension can be applied only once to a given case of a condition. This is a curse effect. This prolongs only conditions with a timed duration (such as "1 round" or "until the end of your next turn") and doesn't prevent conditions from being removed by other means.
+  Familiar of Restored Spirit:
+    kind: patron
+    patron: Fervor
+    source: Player Core
+    shortdesc: 'Your familiar is pleasantly warm and soft, seeming to wash away worries with its mere presence. When you Cast or Sustain a hex, one willing creature within 15 feet of your familiar gains temporary Hit Points equal to 2 + half your level, which last until the start of your next turn.%rEffect: Familiar of Restored Spirit'
+  Familiar of Stalking Night:
+    kind: patron
+    patron: Night
+    source: Player Core
+    shortdesc: Your familiar is dark of fur or feather, and light seems to disappear into it. When you Cast or Sustain a hex, and your familiar is adjacent to an enemy to which it's Concealed, Hidden, or undetected, the enemy becomes Frightened 1.
+  Fast Movement:
+    kind: familiar
+    pet: true
+    choice:
+      from: speeds
+    source: Player Core
+    shortdesc: Increase one of your familiar's Speeds from 25 to 40 feet.
+    rules:
+    - key: ChoiceSet
+      flag: speed
+      prompt: Select a movement type.
+      choices:
+      - label: Climb
+        predicate:
+        - speed:climb
+        value: climb
+      - label: Fly
+        predicate:
+        - speed:fly
+        value: fly
+      - label: Land
+        predicate:
+        - speed:land
+        value: land
+      - label: Swim
+        predicate:
+        - speed:swim
+        value: swim
+  Flier:
+    kind: familiar
+    pet: true
+    source: Player Core
+    shortdesc: It gains a fly Speed of 25 feet.
+    rules:
+    - key: BaseSpeed
+      selector: fly
+      value: 25
+  Focused Rejuvenation:
+    kind: familiar
+    source: Player Core
+    shortdesc: When you Refocus, you generate magical energy that heals your familiar. Your familiar regains 1 Hit Point per level whenever you Refocus.
+  Fungus:
+    kind: familiar
+    changes_trait: true
+    source: Player Core
+    shortdesc: Your familiar has the fungus trait instead of the animal trait.
+    rules:
+    - key: ActorTraits
+      add:
+      - fungus
+  Grasping Tendrils:
+    kind: familiar
+    pool: leshy
+    source: Player Core
+    shortdesc: Prerequisites Leshy Familiar Secrets%rYour familiar can extend vines or similar tendrils, increasing its reach to 15 feet.
+  Independent:
+    kind: familiar
+    source: Player Core
+    shortdesc: In an encounter, if you don't Command your familiar, it still gains 1 action each round. Typically, you still decide how it spends that action, but, the GM might determine that your familiar chooses its own tactics rather than performing your preferred action. This doesn't work with Valet or similar abilities that require a command, if you're capable of riding your familiar, or similar situations.
+  Innate Surge:
+    kind: master
+    prereq:
+      innate_ancestry_spell: true
+    source: Player Core
+    shortdesc: Once per day, you can draw upon your familiar's innate magic to replenish your own. You can cast one innate spell gained from an ancestry feat that you have already cast today. You must still Cast the Spell and meet the spell's other requirements.
+  Item Delivery:
+    kind: familiar
+    prereq:
+      abilities:
+      - Manual Dexterity
+    source: Player Core 2
+    shortdesc: If your familiar is adjacent to you, you can Command it to deliver an item. Instead of its normal 2 actions, your familiar Interacts to take an item you're holding of light Bulk or less, then takes one move action, then finally Interacts to pass off the item to another willing creature.%rIt can instead administer the item to the creature if it can do so with 1 action and has an appropriate type of item (such as alchemical elixir). If your familiar doesn't reach the target this turn, it holds the item until commanded otherwise. Your familiar must have the manual dexterity ability to select this.
+  Kinspeech:
+    kind: familiar
+    prereq:
+      abilities:
+      - Speech
+      level: 6
+      trait: animal
+    source: Player Core
+    shortdesc: It can understand and speak with animals of the same species. To select this, your familiar must be an animal, it must have the speech ability, and you must be at least 6th level.
+  Lifelink:
+    kind: master
+    source: Player Core
+    shortdesc: If your familiar would be reduced to 0 HP by damage, as a reaction with the concentrate trait, you can take all the damage, and your familiar takes none. However, special effects that would occur due to that damage (such as snake venom) still apply.
+  Major Resistance:
+    kind: familiar
+    prereq:
+      abilities:
+      - Resistance
+      level: 8
+    source: Player Core
+    shortdesc: Your familiar increases the resistance it gains from its Resistance familiar ability to a value equal to your level. To select this you must be at least 8th level.
+    rules:
+    - key: Resistance
+      type: '{actor|flags.system.resistance.resistanceOne}'
+      value: '@actor.level'
+    - key: Resistance
+      type: '{actor|flags.system.resistance.resistanceTwo}'
+      value: '@actor.level'
+  Manual Dexterity:
+    kind: familiar
+    pet: true
+    source: Player Core
+    shortdesc: It can use up to two of its limbs as if they were hands to perform manipulate actions.
+  Master's Form:
+    kind: familiar
+    prereq:
+      abilities:
+      - Manual Dexterity
+      - Speech
+    source: Player Core
+    shortdesc: Your familiar can change shape as a single action, transforming into a humanoid of your ancestry with the same age, gender, and build of its true form, though it always maintains a clearly unnatural remnant of its nature, such as a cat's eyes or a serpent's tongue. This form is always the same each time it uses this ability. This otherwise uses the effects of Humanoid Form, except the change is purely cosmetic. It only appears humanoid and gains no new capabilities. Your familiar must have the manual dexterity and speech abilities to select this.
+  Partner in Crime:
+    kind: familiar
+    source: Player Core
+    shortdesc: Your familiar is your criminal associate. Despite being a minion, your familiar gains 1 reaction at the start of its turns, which it can use only to Aid you on a Deception or Thievery skill check (it still has to prepare to help you as normal for the Aid reaction). It automatically succeeds at its check to Aid you with those skills or automatically critically succeeds if you're a master of the skill in question.
+  Plant:
+    kind: familiar
+    changes_trait: true
+    source: Player Core
+    shortdesc: Your familiar has the plant trait instead of the animal trait.
+    rules:
+    - key: ActorTraits
+      add:
+      - plant
+  Plant Form:
+    kind: familiar
+    prereq:
+      trait: plant
+    source: Player Core
+    shortdesc: Your plant familiar can change shape as a single action, transforming into a Tiny plant of a type roughly similar to the familiar's nature. This otherwise uses the effects of One with Plants. You must have a familiar with the plant trait to select this ability.
+  Poison Reservoir:
+    kind: familiar
+    prereq:
+      specific: Homunculus
+    source: Player Core 2
+    shortdesc: Your familiar has a reservoir for poison, allowing it to apply an injury poison to an adjacent ally's exposed weapon with a single Interact action. You must supply the poison and instill it into this reservoir using two consecutive Interact actions. You must have a homunculus familiar to select this ability
+  Purify Air:
+    kind: familiar
+    pool: leshy
+    source: Player Core
+    shortdesc: Prerequisites Leshy Familiar Secrets%rYour familiar recycles air, providing enough oxygen for a Medium creature in areas with stale air, such as a sealed chamber or extradimensional space. If the leshy is within the area of an inhaled poison effect or an effect that relies on smell, creatures within a 15-foot emanation from the leshy gain a +2 circumstance bonus to their saving throws against the effect.
+  Recall Familiar:
+    kind: master
+    source: Player Core
+    shortdesc: Once per day, you can use a 3-action activity, which has the concentrate trait, to teleport your familiar to your space. Your familiar must be within 1 mile or the attempt to summon it fails. This is a teleportation effect.
+  Resistance:
+    kind: familiar
+    choice:
+      from: list
+      label: two damage types
+      options:
+      - acid
+      - cold
+      - electricity
+      - fire
+      - poison
+      - sonic
+      count: 2
+    source: Player Core
+    shortdesc: 'Choose two of the following: acid, cold, electricity, fire, poison, or sonic. Your familiar gains resistance equal to half your level (minimum resistance 1) against the chosen damage types.'
+    rules:
+    - key: ChoiceSet
+      flag: resistanceOne
+      rollOption: resistance
+      prompt: Select a resistance.
+      choices:
+      - label: Acid
+        value: acid
+      - label: Cold
+        value: cold
+      - label: Electricity
+        value: electricity
+      - label: Fire
+        value: fire
+      - label: Poison
+        value: poison
+      - label: Sonic
+        value: sonic
+    - key: ChoiceSet
+      flag: resistanceTwo
+      rollOption: resistance
+      prompt: Select a resistance.
+      choices:
+      - label: Acid
+        predicate:
+        - not: resistance:acid
+        value: acid
+      - label: Cold
+        predicate:
+        - not: resistance:cold
+        value: cold
+      - label: Electricity
+        predicate:
+        - not: resistance:electricity
+        value: electricity
+      - label: Fire
+        predicate:
+        - not: resistance:fire
+        value: fire
+      - label: Poison
+        predicate:
+        - not: resistance:poison
+        value: poison
+      - label: Sonic
+        predicate:
+        - not: resistance:sonic
+        value: sonic
+    - key: Resistance
+      type: '{item|flags.system.rulesSelections.resistanceOne}'
+      value: max(1,floor(@actor.level/2))
+    - key: Resistance
+      type: '{item|flags.system.rulesSelections.resistanceTwo}'
+      value: max(1,floor(@actor.level/2))
+    - key: ActiveEffectLike
+      path: flags.system.resistance.resistanceOne
+      mode: override
+      value: '{item|flags.system.rulesSelections.resistanceOne}'
+    - key: ActiveEffectLike
+      path: flags.system.resistance.resistanceTwo
+      mode: override
+      value: '{item|flags.system.rulesSelections.resistanceTwo}'
+  Restorative Familiar:
+    kind: master
+    source: Player Core
+    shortdesc: Once per day, your familiar can use 2 actions with the concentrate trait to give up some of its energy and heal you. It must be in your space to do so. You restore a number of Hit Points equal to 1d8 times half your level (minimum 1d8).
+  Scent:
+    kind: familiar
+    pet: true
+    source: Player Core
+    shortdesc: It can use scent as an imprecise sense within 30 feet.
+    rules:
+    - key: Sense
+      acuity: imprecise
+      range: 30
+      selector: scent
+  Second Opinion:
+    kind: familiar
+    prereq:
+      abilities:
+      - Skilled
+    source: Player Core 2
+    shortdesc: Your familiar is your academic confidant. Despite being a minion, your familiar gains 1 reaction at the start of its turns, which it can use only to Aid you on a Recall Knowledge skill check for a skill in which it has the Skilled familiar ability (it still has to prepare to help you as normal for the Aid reaction).%rIt automatically succeeds at its check to Aid you with those skills or automatically critically succeeds if you're a master of the skill in question. Your familiar must have the skilled ability to select this.
+  Share Senses:
+    kind: master
+    frequency: 1/PT10M
+    source: Player Core
+    shortdesc: Once every 10 minutes, you can use a single action with the concentrate trait to project your senses into your familiar. When you do, you lose all sensory information from your own body, but can sense through your familiar's body for up to 1 minute. You can Dismiss this effect.
+  Skilled:
+    kind: familiar
+    repeatable: true
+    choice:
+      from: skills
+      except:
+      - Acrobatics
+      - Stealth
+    source: Player Core
+    shortdesc: Choose a skill other than Acrobatics or Stealth. Your familiar's modifier for that skill is equal to your level plus your spellcasting attribute modifier, rather than just your level. You can select this ability repeatedly, choosing a different skill each time.
+    rules:
+    - key: ChoiceSet
+      flag: skill
+      choices:
+      - label: Arcana
+        value: arcana
+      - label: Athletics
+        value: athletics
+      - label: Crafting
+        value: crafting
+      - label: Deception
+        value: deception
+      - label: Diplomacy
+        value: diplomacy
+      - label: Intimidation
+        value: intimidation
+      - label: Medicine
+        value: medicine
+      - label: Nature
+        value: nature
+      - label: Occultism
+        value: occultism
+      - label: Performance
+        value: performance
+      - label: Religion
+        value: religion
+      - label: Society
+        value: society
+      - label: Survival
+        value: survival
+      - label: Thievery
+        value: thievery
+    - key: FlatModifier
+      selector: '{item|flags.system.rulesSelections.skill}'
+      value: '@actor.masterAttributeModifier'
+  Speech:
+    kind: familiar
+    choice:
+      from: languages
+    source: Player Core
+    shortdesc: It understands and speaks a language you know.
+  Spell Battery:
+    kind: master
+    prereq:
+      slot_rank: 4
+    source: Player Core
+    shortdesc: You gain one additional spell slot at least 3 ranks lower than your highest-rank spell slot; you must be able to cast 4th-rank spells using spell slots to select this master ability.
+  Spell Delivery:
+    kind: master
+    source: Player Core
+    shortdesc: If your familiar is in your space, you can cast a spell with a range of touch, transfer its power to your familiar, and command the familiar to deliver the spell. If you do, the familiar uses its 2 actions for the round to move to a target of your choice and touch that target. If it doesn't reach the target to touch it this turn, the spell has no effect.
+  Spellcasting:
+    kind: familiar
+    prereq:
+      slot_rank: 6
+    choice:
+      from: spells
+      ranks_below: 5
+    source: Player Core
+    shortdesc: Choose a spell in your repertoire or that you prepared today at least 5 ranks lower than your highest-rank spell slot. Your familiar can Cast that Spell once per day using your magical tradition, spell attack modifier, and spell DC. If the spell has a drawback that affects the caster, both you and your familiar are affected. You must be able to cast 6th-rank spells using spell slots to select this.
+  Toolbearer:
+    kind: familiar
+    prereq:
+      abilities:
+      - Manual Dexterity
+    source: Player Core
+    shortdesc: Your familiar can carry a toolkit of up to light Bulk. So long as your familiar is adjacent to you, you can draw and replace the tools as part of the action that uses them as if you were wearing them. Your familiar must have the manual dexterity ability to select this.
+  Touch Telepathy:
+    kind: familiar
+    source: Player Core
+    shortdesc: Your familiar can telepathically communicate with you via touch. If it also has the speech ability, it can telepathically communicate via touch with any creature if they share a language.
+  Tough:
+    kind: familiar
+    pet: true
+    source: Player Core
+    shortdesc: Your familiar's max HP increase by 2 per level.
+    rules:
+    - key: FlatModifier
+      selector: hp
+      type: untyped
+      value: 2 * @actor.level
+  Valet:
+    kind: familiar
+    source: Player Core
+    shortdesc: You can command your familiar to deliver you items more efficiently. Your familiar doesn't use its 2 actions immediately upon your command. Instead, up to twice before the end of your turn, you can have your familiar Interact to retrieve an item of light or negligible Bulk you are wearing and place it into one of your free hands. The familiar can't use this ability to retrieve stowed items. If the familiar has a different number of actions, it can retrieve one item for each action it has when commanded this way.
+  Verdant Burst:
+    kind: familiar
+    pool: leshy
+    prereq:
+      slot_rank: 2
+    source: Player Core
+    shortdesc: Prerequisites Leshy Familiar Secrets%rWhen your familiar dies, it releases its primal energy to cast the 3-action version of Heal, heightened to a rank 1 lower than your highest-rank spell slot. The heal spell gains a status bonus equal to twice the spell's rank to the Hit Points it restores to plants. You must be able to cast 2nd-rank spells using spell slots to select this familiar ability.

@@ -250,6 +250,10 @@ pf2e_feats:
         value: 1
   Animal Accomplice:
     familiar: true
+    daily_choice:
+      switch: familiar
+      pick: familiar
+      lasts: until_changed
     feat_type:
       - Ancestry
     assoc_ancestry:
@@ -262,6 +266,12 @@ pf2e_feats:
     shortdesc: You build a rapport with an animal, which becomes magically bonded to you. You gain a familiar. The type of animal is up to you, but most gnomes choose animals with a burrow Speed.
     prereq:
       level: 1
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.attributes.familiarAbilities.value"
+        mode: "upgrade"
+        value: 2
+        priority: 19
   Animal Elocutionist:
     feat_type:
       - Ancestry
@@ -531,6 +541,7 @@ pf2e_feats:
         prompt: "Select a feat."
         choices: [{"value": "Compendium.pf2e.feats-srd.Item.Pet"}, {"value": "Compendium.pf2e.feats-srd.Item.Train Animal"}]
   Bestial Manifestation:
+    no_retrain: both
     feat_type:
       - Ancestry
     assoc_ancestry: 
@@ -1387,6 +1398,7 @@ pf2e_feats:
       special:
         - Darkvision
   Chance Death:
+    no_retrain: both
     feat_type:
       - Ancestry
     assoc_ancestry:
@@ -1409,6 +1421,7 @@ pf2e_feats:
       level: 1
       heritage: Ashen One
   Deliberate Death:
+    no_retrain: both
     feat_type:
       - Ancestry
     assoc_ancestry: 
@@ -1803,6 +1816,7 @@ pf2e_feats:
         path: "system.skills.{item|flags.system.rulesSelections.expertLongevity}.rank"
         mode: "upgrade"
         value: 2
+        priority: 60
   Extraplanar Supplication:
     feat_type:
       - Ancestry
@@ -1839,6 +1853,7 @@ pf2e_feats:
             magic_stats:
               innate_spell: { level: 1, name: [ Bane ], tradition: divine, cast_stat: Charisma }
   Eyes of Night:
+    no_retrain: both
     feat_type:
       - Ancestry
     assoc_ancestry: 
@@ -2300,6 +2315,7 @@ pf2e_feats:
       - key: "CriticalSpecialization"
         predicate: [{"gte": ["self:level", 5]}, "item:trait:goblin"]
   Gravesight:
+    no_retrain: both
     feat_type:
       - Ancestry
     assoc_ancestry: 
@@ -2430,6 +2446,7 @@ pf2e_feats:
       feat:
         - Bassin Luck
   Hag Claws:
+    no_retrain: out
     feat_type:
       - Ancestry
     assoc_ancestry: 
@@ -3649,6 +3666,7 @@ pf2e_feats:
     prereq:
       level: 1
   Oruch Sight:
+    no_retrain: both
     feat_type:
       - Ancestry
     assoc_ancestry: 
@@ -4029,6 +4047,11 @@ pf2e_feats:
     actions: free
   Rat Familiar:
     familiar: true
+    familiar_no_specific: true
+    daily_choice:
+      switch: familiar
+      pick: familiar
+      lasts: until_changed
     feat_type:
       - Ancestry
     assoc_ancestry:
@@ -4043,6 +4066,7 @@ pf2e_feats:
         path: "system.attributes.familiarAbilities.value"
         mode: "upgrade"
         value: 2
+        priority: 9
   Rat Form:
     feat_type:
       - Ancestry
@@ -4387,6 +4411,7 @@ pf2e_feats:
       feat:
         - Overcrowd
   Sil Atavism:
+    no_retrain: both
     feat_type:
       - Ancestry
     assoc_ancestry: 
@@ -5207,6 +5232,7 @@ pf2e_feats:
             magic_stats:
               innate_spell: { level: 7, name: [ Cursed Metamorphosis ], tradition: primal, cast_stat: Charisma }
   Tusks (Oruch):
+    no_retrain: into
     feat_type:
       - Ancestry
     assoc_ancestry:

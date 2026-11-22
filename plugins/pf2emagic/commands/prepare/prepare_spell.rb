@@ -11,7 +11,7 @@ module AresMUSH
         if cmd.args
           args = cmd.parse_args(ArgParser.arg1_equals_arg2)
 
-          parse_arg_1 = args.arg1.split("/")
+          parse_arg_1 = args.arg1.to_s.split("/")
 
           self.caster_class = trim_arg(parse_arg_1[0])
           self.spell_level = integer_arg(parse_arg_1[1])

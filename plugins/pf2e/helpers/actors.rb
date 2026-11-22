@@ -14,6 +14,7 @@ module AresMUSH
     module Actors
 
       def self.of(holder)
+        return FamiliarActor.new(holder) if holder.is_a?(Pf2eNpc) && holder.master_id
         return CreatureActor.new(holder) if holder.is_a?(Pf2eNpc)
         return EncounterCharacterActor.new(holder) if holder.is_a?(Pf2eCombatantState)
 
@@ -46,6 +47,15 @@ module AresMUSH
 
       def reactions?
         true
+      end
+
+      # The actions a turn of theirs holds before anything takes from it.
+      def turn_actions
+        TurnState.regained(@holder)
+      end
+
+      # It has just gone down: what that brings beyond going down, into the report.
+      def fallen(_out)
       end
 
       def own_ability(_term)
@@ -354,6 +364,15 @@ module AresMUSH
         @holder.encounter
       end
 
+      # How to have their familiar act, where it is here with them.
+      def reminder_lines
+        found = @holder.encounter
+        row = found && Combatants.rows(found).find { |one| one['state'].to_s == @holder.id.to_s }
+        familiars = row ? Combatants.minions_of(found, row['id']) : []
+
+        familiars.map { |one| t('pf2e.familiar_turn_reminder', :name => one['name'], :ref => "##{one['id']}") }
+      end
+
       def sheet_iwr
         IWR.of(@holder)
       end
@@ -595,6 +614,41 @@ module AresMUSH
 
       def effect_owner_field
         :npc
+      end
+    end
+
+    # A familiar in an encounter: a creature record whose figures come from its master
+    # (`Familiar::Block`), fighting on its master's side. It acts in its master's turn, as a minion
+    # (`Familiar::Minion`).
+    class FamiliarActor < CreatureActor
+      def side
+        'characters'
+      end
+
+      def reactions?
+        false
+      end
+
+      def turn_actions
+        Familiar::Minion.turn_actions(@holder)
+      end
+
+      # Destroyed: a homunculus's Blood Link hurts its master.
+      def fallen(out)
+        Familiar::Minion.destroyed!(@holder, out)
+      end
+
+      # Its master hears what it took, as a player hears their own damage. It isn't their `person`: that
+      # would let it spend their Hero Points and stand in for them in their picks.
+      def notify_damage(amount, source, why = [])
+        master = @holder.master&.character
+        return unless master
+
+        message = why.any? ?
+          t('pf2e.familiar_took_damage_why', :name => @holder.name, :amount => amount, :source => source, :why => why.join(', ')) :
+          t('pf2e.familiar_took_damage', :name => @holder.name, :amount => amount, :source => source)
+
+        Login.notify master, :pf2_damage, message, 0
       end
     end
   end

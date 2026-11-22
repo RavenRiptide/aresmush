@@ -176,6 +176,13 @@ module AresMUSH
 
         targets ||= [ scene.target ].compact
 
+        if name == Familiar::Minion::COMMAND
+          refused = Familiar::Minion.command_refusal(scene.encounter, scene.actor, targets)
+          return refused if refused
+        end
+
+        return hex_rider(scene, name, words) if Familiar::HexRiders.rider?(name)
+
         if DragonBreath.action?(name)
           risked = Restraints.risked(scene.actor, name, traits_of(scene, name), :type => type_of(scene, name))
           return lost(scene, name, risked) if risked && !risked['kept']
@@ -206,6 +213,7 @@ module AresMUSH
         return reaction_strike(scene, name, entry, words) if entry['strike']
         return several_strikes(scene, name, entry, words) if entry['strikes']
         return shield_block(scene, name, entry) if name == ShieldBlock::NAME
+        return lifelink(scene, name, entry) if name == Familiar::Lifelink::NAME
         return bonded_item(scene, name, entry, words) if name == BondedItem::NAME
         return sustain_effect(scene, name, entry, words) if name == Sustaining::NAME
         return dismiss_effect(scene, name, entry, words) if name == Dismissing::NAME
@@ -929,7 +937,10 @@ module AresMUSH
       def self.sustain_effect(scene, name, entry, words)
         kept = Sustaining.act(scene, said(words, scene.permitted)['words'].first, report)
 
-        spend(scene, name, entry, kept.state) if kept.ok?
+        if kept.ok?
+          spend(scene, name, entry, kept.state)
+          Familiar::HexRiders.hexed!(scene, kept.state['sustained'], kept.state)
+        end
         kept
       end
 
@@ -945,6 +956,27 @@ module AresMUSH
 
         spend(scene, name, entry, blocked.state) if blocked.ok?
         blocked
+      end
+
+      # A witch's patron rider, readied by a hex this turn: a free action.
+      def self.hex_rider(scene, name, words)
+        out = report
+        used = Familiar::HexRiders.use(scene, name, said(words, scene.permitted)['words'], out)
+
+        spend(scene, name, Actions.info(name), out) if used.ok?
+        used
+      end
+
+      # Lifelink: the master takes the hit that dropped their familiar. A reaction already spent is told.
+      def self.lifelink(scene, name, entry)
+        out = report
+        taken = Familiar::Lifelink.take(scene, out)
+
+        if taken.ok?
+          reaction_spent(scene, out)
+          spend(scene, name, entry, out)
+        end
+        taken
       end
 
       # ------------------------------------------------------------------------------
@@ -1486,6 +1518,7 @@ module AresMUSH
         shown = []
         standing = still_up(whom.holder)
         blockable = ShieldBlock.before(whom.holder)
+        lifelinked = Familiar::Lifelink.before(whom.holder)
         taken = 0
         physical = 0
         fate = nil
@@ -1544,6 +1577,7 @@ module AresMUSH
         freed = scene.actor ? Holding.cut_free(scene.actor, whom, sharp) : nil
         out['lines'] << freed if freed
         offer_block(whom, blockable, taken, physical, critical, out) if blockable && physical.positive?
+        Familiar::Lifelink.offer(whom, lifelinked, taken, out) if lifelinked && taken.positive?
       end
 
       # A hit a raised shield could have taken is kept for Shield Block, and its bearer told they may.
@@ -1611,6 +1645,7 @@ module AresMUSH
           offered_when_down(whom.holder).each do |name|
             out['lines'] << told('pf2e.act_follow_up', :effect => name, :command => "e/as ##{whom.holder.number}=act #{name.downcase}")
           end
+          Actors.of(whom.holder).fallen(out)
         elsif standing.is_a?(Integer) && now.is_a?(Integer) && now > standing
           out['lines'] << told('pf2e.act_dying', :target => whom.label, :value => now)
         else
@@ -1714,6 +1749,10 @@ module AresMUSH
 
         out['lines'] << told('pf2e.act_cast', :actor => scene.actor.label, :spell => spell, :rank => rank,
                                            :targets => targets.map(&:label).join(', ').then { |one| one.empty? ? '' : " at #{one}" })
+        # A hex readies a witch's patron rider (Familiar::HexRiders); a familiar's Spellcasting spell is spent
+        # for its master's day.
+        Familiar::HexRiders.hexed!(scene, spell, out)
+        Familiar::MasterSpells.cast!(scene, spell, out)
 
         unless mechanics
           out['lines'] << told('pf2e.act_spell_gm')
@@ -2183,6 +2222,7 @@ module AresMUSH
           elsif one['unseen'] then unseen_consequence(scene, whom, one, out)
           elsif one['dying'] then dying_consequence(whom, one, out)
           elsif one['recover'] then recovered(whom, one['recover'], one['dc'], out)
+          elsif one['command'] then command_consequence(whom, out)
           elsif one['suffer'] then suffer_consequence(scene, whom, one, out)
           elsif one['effect'] then effect_consequence(scene, whom, one, rank, out, origin)
           elsif one['heal']
@@ -2245,6 +2285,14 @@ module AresMUSH
         out['lines'] << (FATES[fate] ? told(FATES[fate], :target => whom.label) : told('pf2e.act_dying', :target => whom.label, :value => value))
       end
 
+      # A familiar Commanded: the 2 actions it has this turn.
+      def self.command_consequence(whom, out)
+        Familiar::Minion.command!(whom.holder)
+
+        out['lines'] << told('pf2e.familiar_commanded', :name => whom.label, :actions => Familiar::Minion::COMMANDED,
+                                                        :ref => whom.ref)
+      end
+
       # Their persistent damage of a kind, dealt them now.
       def self.suffer_consequence(scene, whom, one, out)
         held = PersistentDamage.held(whom.holder).find { |each| each['type'] == Domains.slug(one['suffer']) }
@@ -2285,22 +2333,38 @@ module AresMUSH
         set = Pf2e.set_condition(whom.holder, name, value || Pf2e.default_condition_value(name))
         return out['lines'] << told(set.key, set.args) if set.err?
 
-        ends = scene.encounter && one['until'] ? Turns.expiry_for(one['until'], scene.encounter, scene.actor.label, whom.label) : nil
+        lasting, thrown = rolled_lasting(one['until'], out, whom.label)
+        ends = scene.encounter && lasting ? Turns.expiry_for(lasting, scene.encounter, scene.actor.label, whom.label) : nil
         expire_at(whom.holder, name, ends) if ends
         # The DC of the save that left it, which recovering from it is rolled against.
         note_on(whom.holder, name, 'dc' => out['dc']) if out['dc']
         Holding.mark(whom.holder, name, scene.actor.label) unless whom.label == scene.actor.label
 
         shown = value ? "#{name} #{value}" : name
-        timed_by = one['until'].to_s.start_with?('its-') ? whom.label : scene.actor.label
+        timed_by = lasting.to_s.start_with?('its-') ? whom.label : scene.actor.label
         out['lines'] << told('pf2e.act_now', :target => whom.label, :condition => shown,
-                                          :until => ends ? until_phrase(one['until'].to_s.delete_prefix('its-'), timed_by) : '')
+                                          :until => ends ? until_phrase(lasting.to_s.delete_prefix('its-'), timed_by, thrown) : '')
       end
 
-      # ` until the end of Aria's next turn`, ` for 10 rounds`.
-      def self.until_phrase(until_when, actor)
+      # `rounds:1d4` as so many rounds rolled, and the roll: `[ 'rounds:3', '1d4: 3' ]`. Anything else as it is.
+      # One roll for each creature it reaches, which every condition it leaves on them shares: Euphoric
+      # Breath's "stupefied 2 and slowed 1 for 1d4 rounds" ends together.
+      def self.rolled_lasting(until_when, out, label)
+        dice = until_when.to_s[/\Arounds:(\d+d\d+)\z/, 1]
+        return [ until_when, nil ] unless dice
+
+        rolls = (out['rolled_lasting'] ||= {})
+        thrown = rolls["#{label}|#{dice}"] ||= Pf2e.thrown_formula(dice)
+        [ "rounds:#{[ thrown['total'], 1 ].max}", thrown['shown'] ]
+      end
+
+      # ` until the end of Aria's next turn`, ` for 10 rounds`, ` for 3 rounds (1d4: 3)`.
+      def self.until_phrase(until_when, actor, thrown = nil)
         rounds = until_when.to_s[/\Arounds:(\d+)\z/, 1]
 
+        if rounds && thrown
+          return told(rounds == '1' ? 'pf2e.until_one_round_rolled' : 'pf2e.until_rounds_rolled', :rounds => rounds, :dice => thrown)
+        end
         return told(rounds == '1' ? 'pf2e.until_one_round' : 'pf2e.until_rounds', :rounds => rounds) if rounds
 
         told("pf2e.until_#{until_when.to_s.tr('-', '_')}", :actor => actor)

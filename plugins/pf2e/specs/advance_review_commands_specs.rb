@@ -16,7 +16,7 @@ module AresMUSH
 
       # Every alias the table points at, as the help files define them.
       TOPICS = %w{advancelanguages advanceskills advanceattributes advancefeats advancefeatures
-                  advancearchetypes advancespells advanceformulas}.freeze
+                  advancearchetypes advancespells advanceformulas advanceretrain}.freeze
 
       describe :help_for do
         it "should point an open language slot at the languages topic" do
@@ -59,7 +59,7 @@ module AresMUSH
           'raise ability', 'raise skill', 'raise skill choice', 'open languages', 'open skills',
           'feats', 'feat choice', 'repertoire', 'spellbook', 'innate', 'class option',
           'divine font', 'archetype_specialty', 'archetype specialty choice', 'archetype deity',
-          'archetype key ability'
+          'archetype key ability', 'archetype_sanctification', 'retrains'
         ].freeze
 
         it "should have a topic for every slot the player has to fill" do
@@ -109,6 +109,45 @@ module AresMUSH
 
         it "should say nothing for choices with no open picks" do
           expect(@template.feat_choice_lines('Skillful Lessons' => [ 'Recognize Spell' ])).to eq []
+        end
+      end
+
+      # A retrain the level owes (a witch familiar taking over) is a hash in the advancement draft. It
+      # rendered as the raw hash under "Options So Far", and only the Messages section, which can't carry
+      # commands, said it was owed.
+      describe "a retrain" do
+        OWED_RETRAIN = { 'feat' => 'Familiar', 'bucket' => 'charclass', 'level' => 1, 'from' => 'Familiar', 'also' => [], 'to' => nil }.freeze
+
+        def template_with(retrains)
+          template = PF2AdvanceReviewTemplate.allocate
+          allow(template).to receive(:item_color).and_return('')
+          char = double('char', :pf2_advancement => { 'retrains' => retrains })
+          template.instance_variable_set(:@char, char)
+          template
+        end
+
+        it "should list an open retrain to choose, as the feat and its slot" do
+          lines = template_with([ OWED_RETRAIN ]).retrain_option_lines
+
+          expect(lines).to eq [ 'Retrain:%xn Familiar (a level 1 class feat)' ]
+        end
+
+        it "should leave an open retrain out of the options so far" do
+          adv = template_with([ OWED_RETRAIN ]).annotate_retrains('retrains' => [ OWED_RETRAIN ], 'feats' => { 'charclass' => [ 'Witch Dedication' ] })
+
+          expect(adv).to eq('feats' => { 'charclass' => [ 'Witch Dedication' ] })
+        end
+
+        it "should show a retrain made as the old feat and its replacement, with what goes with it" do
+          made = OWED_RETRAIN.merge('from' => 'Animal Accomplice', 'also' => [ 'Pet' ], 'to' => 'Reach Spell')
+          template = template_with([ made ])
+
+          expect(template.annotate_retrains('retrains' => [ made ])).to eq('retrains' => [ 'Animal Accomplice (with Pet) to Reach Spell' ])
+          expect(template.retrain_option_lines).to eq []
+        end
+
+        it "should point an open retrain at the retraining topic" do
+          expect(PF2AdvanceReviewTemplate.help_for('retrains')).to include 'advanceretrain'
         end
       end
 

@@ -492,6 +492,7 @@ module AresMUSH
       :pf2_is_dead => nil,
       :pf2_known_for => [],
       :pf2_alloc_reagents => 0,
+      :pf2_familiar => {},
       :groups => {},
       :demographics => {}
     }.freeze

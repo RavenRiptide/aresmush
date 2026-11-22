@@ -518,6 +518,24 @@ module AresMUSH
           .uniq
       end
 
+      # What a level revokes is marked `level-<level>-...`: a level-up's diff taking something away, or
+      # a feat retrained into another in that level's slot.
+      LEVEL_REVOCATION = /\Alevel-(\d+)-/.freeze
+
+      def self.level_revocation_marker(level, what = nil)
+        [ "level-#{level.to_i}", what, Time.now.to_i, rand(1000) ].compact.join('-')
+      end
+
+      # The grants a rollback to `level` should bring back: those a level at or above it revoked.
+      # Rolling a level back undoes everything it did, and taking something away is one of them.
+      def self.level_revoked_ids(grants, level)
+        grants.select do |g|
+          found = g['reverted_by'].to_s.match(LEVEL_REVOCATION)
+
+          found && found[1].to_i >= level.to_i
+        end.map { |g| g['id'] }
+      end
+
       # ------------------------------------------------------------------------------
       # Syncing whole lists (the migration bridge)
       # ------------------------------------------------------------------------------

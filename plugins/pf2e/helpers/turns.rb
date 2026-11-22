@@ -32,7 +32,27 @@ module AresMUSH
 
         return events unless holder
 
-        events += Delay.lost(holder)
+        # A familiar's turn is its master's.
+        ([ holder ] + familiars(encounter, participant).map(&:last)).each do |one|
+          events += holder_started(one, round)
+        end
+
+        events
+      end
+
+      # The familiars acting in this combatant's turn, as `[ label, holder ]`.
+      def self.familiars(encounter, participant)
+        row = Combatants.rows(encounter).find { |one| one['name'] == participant }
+        return [] unless row
+
+        Combatants.minions_of(encounter, row['id']).filter_map do |one|
+          holder = Combatants.holder_of(one)
+          holder ? [ one['name'], holder ] : nil
+        end
+      end
+
+      def self.holder_started(holder, round)
+        events = Delay.lost(holder)
         events += stunned(holder, round)
         Equipment.lapse!(holder, 'turn')
         ActiveEffects.on(holder).each { |effect| ActiveEffects.give_temp_hp(holder, effect, 'on_turn_start') }
@@ -107,12 +127,20 @@ module AresMUSH
 
         return events unless holder
 
+        ([ [ participant, holder ] ] + familiars(encounter, participant)).each do |label, one|
+          events += holder_ending(encounter, label, one, round)
+        end
+
+        events
+      end
+
+      def self.holder_ending(encounter, participant, holder, round)
         # What was made to last only until the end of this turn: a Quick Vial, a field vial on a weapon, and
         # a Toxicologist's spray not used.
         Equipment.lapse!(holder, 'turn_end')
         WeaponPoison.turn_ended(holder)
 
-        events + less_frightened(holder) + PersistentDamage.end_of_turn(holder) + Holding.turn_ended(encounter, participant) +
+        less_frightened(holder) + PersistentDamage.end_of_turn(holder) + Holding.turn_ended(encounter, participant) +
           Afflictions.turn_ended(encounter, participant, round) + AnimatedRune.turn_ended(encounter, participant, holder)
       end
 
@@ -165,9 +193,11 @@ module AresMUSH
 
       # The same, for a condition an outcome leaves: one timed by `its-` is counted from the turn of
       # whoever holds it - Blanket of Stars' "dazzled until the end of its next turn" - and anything else
-      # from the caster's.
+      # from the caster's. A familiar's turn is its master's.
       def self.expiry_for(until_when, encounter, actor, target)
         kind = until_when.to_s
+        actor = Combatants.turn_name(encounter, actor)
+        target = Combatants.turn_name(encounter, target)
 
         return expiry(kind, actor, encounter.round) unless kind.start_with?('its-')
 
@@ -177,9 +207,9 @@ module AresMUSH
 
       # The round of someone's next turn: this one, if their place in the order is still to come.
       def self.upcoming_round(encounter, label)
-        order = Combatants.rows(encounter).map { |row| row['name'] }
+        order = Combatants.order(encounter).map { |row| row['name'] }
         now = (encounter.next_init.to_i - 1) % [ order.size, 1 ].max
-        at = order.index(label)
+        at = order.index(Combatants.turn_name(encounter, label))
 
         at && at > now ? encounter.round.to_i : encounter.round.to_i + 1
       end

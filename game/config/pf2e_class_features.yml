@@ -1,7 +1,7 @@
 ---
 # A class feature's or subclass's rule elements, from Foundry's class-features pack, written
-# by scripts/import_foundry_rules.py. An entry is a feature some class or specialty grants, or a
-# subclass, which says whose it is.
+# by scripts/import_foundry_rules.py. An entry is a feature some class or specialty grants, a
+# subclass, which says whose it is, or a subclass's option, which says whose option it is.
 pf2e_class_features:
   "Abundant Vials":
     pack: "class-features"
@@ -1173,6 +1173,19 @@ pf2e_class_features:
       - key: "AdjustDegreeOfSuccess"
         selector: "reflex"
         adjustment: {"success": "one-degree-better"}
+  "Familiar":
+    pack: "class-features"
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.attributes.familiarAbilities.value"
+        mode: "add"
+        value: "2 + min(3,floor(@actor.level / 6))"
+        predicate: ["class:witch"]
+      - key: "ActiveEffectLike"
+        path: "system.attributes.familiarAbilities.value"
+        mode: "upgrade"
+        value: 2
+        priority: 19
   "Fencer":
     pack: "class-features"
     charclass: "Swashbuckler"
@@ -1428,6 +1441,20 @@ pf2e_class_features:
         predicate: [{"or": ["action:grapple", "action:reposition", "action:shove", "action:trip"]}]
   "Hunt Prey":
     pack: "class-features"
+  "Improved Familiar Attunement":
+    pack: "class-features"
+    charclass: "Wizard"
+    option: "Improved Familiar Attunement"
+    rules:
+      - key: "ActiveEffectLike"
+        path: "system.attributes.familiarAbilities.value"
+        mode: "add"
+        value: "match(when(lte(@actor.level, 5), 1), when(btwn(@actor.level, 6, 11), 2), when(btwn(@actor.level, 12, 17), 3), when(gte(@actor.level, 18), 4))"
+      - key: "ActiveEffectLike"
+        path: "system.attributes.familiarAbilities.value"
+        mode: "upgrade"
+        value: 2
+        priority: 19
   "Incredible Movement":
     pack: "class-features"
     rules:
@@ -1491,6 +1518,11 @@ pf2e_class_features:
         mode: "upgrade"
         value: 1
         predicate: [{"not": "feat:order-explorer:leaf-order"}]
+      - key: "ActiveEffectLike"
+        path: "system.attributes.familiarAbilities.value"
+        mode: "upgrade"
+        value: 2
+        priority: 19
   "Legendary Spellcaster":
     pack: "class-features"
     rules:

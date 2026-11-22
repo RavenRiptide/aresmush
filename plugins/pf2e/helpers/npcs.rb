@@ -70,6 +70,9 @@ module AresMUSH
         held = options(npc, domains) + Array(options)
 
         met = Effects.modifiers(sources, domains, context, held).select { |one| one['met'] }
+        # A familiar never gains item bonuses of its own; what its master's items give its AC and saves is in
+        # its stat block already.
+        met = met.reject { |one| one['type'].to_s.downcase == 'item' && Modifiers.value_of(one).positive? } if npc.master_id
         own = [ Stat.multiple_attack(kind, name, sources, domains, held, context),
                 kind.to_s == 'ac' ? Pf2eCombat.raised_shield(npc) : nil ].compact
         adjusted = Modifiers.adjust(own + met, Rules.modifier_adjustments(sources, domains, held, context))

@@ -61,6 +61,23 @@ FEATS_RENAMED = {
     'Watchful Halfling': 'Watchful Bassin',
 }
 
+# Class features their pack names apart from ours: the witch's familiar is our Witch's Familiar feature.
+FEATURES_RENAMED = {
+    'Familiar (Witch)': 'Familiar',
+}
+
+# A subclass's option their pack holds as a class feature of its own, with the class it belongs to. Named
+# one by one: a word like "Time" is an option of ours and an unrelated feature of theirs.
+OPTION_FEATURES = {
+    'Improved Familiar Attunement': 'Wizard',
+}
+
+# Paths a feat or feature granted by another writes for the one that granted it. The ledger records the
+# grant itself, so the granted item's rules never reach the grantor - which loses nothing, except where we
+# don't grant the item at all: Familiar, Leshy Familiar and the witch's familiar get their base ability
+# count from the Pet feat, which they grant in Foundry and we leave out so a character has one familiar.
+GRANTED_PATHS = {'system.attributes.familiarAbilities.value'}
+
 # A subclass as their pack names it: a barbarian's Fury is their Fury Instinct, a sorcerer's Draconic
 # their Bloodline: Draconic. Any class not named here calls it what we do.
 SUBCLASS_NAMES = {'Barbarian': '{} Instinct', 'Druid': '{} Order', 'Sorcerer': 'Bloodline: {}',
@@ -119,18 +136,20 @@ def class_feature_catalogue(theirs):
     the rules to be written under. A subclass's entry names the class and subclass it is."""
     lines = ['---',
              '# A class feature\'s or subclass\'s rule elements, from Foundry\'s class-features pack, written',
-             '# by scripts/import_foundry_rules.py. An entry is a feature some class or specialty grants, or a',
-             '# subclass, which says whose it is.',
+             '# by scripts/import_foundry_rules.py. An entry is a feature some class or specialty grants, a',
+             '# subclass, which says whose it is, or a subclass\'s option, which says whose option it is.',
              'pf2e_class_features:']
     named = subclasses(theirs)
 
-    for name in sorted(granted_features() | set(named)):
+    for name in sorted(granted_features() | set(named) | set(OPTION_FEATURES)):
         rules = [rule for rule in theirs.get(name, ([], []))[0] if rule.get('key') in KINDS]
         if not rules:
             continue
         lines += [f'  {json.dumps(name)}:', '    pack: "class-features"']
         if name in named:
             lines += [f'    charclass: {json.dumps(named[name][0])}', f'    subclass: {json.dumps(named[name][1])}']
+        elif name in OPTION_FEATURES:
+            lines += [f'    charclass: {json.dumps(OPTION_FEATURES[name])}', f'    option: {json.dumps(name)}']
 
     return '\n'.join(lines) + '\n'
 
@@ -191,8 +210,9 @@ KINDS = {
     'RollOption': {'key', 'option', 'domain', 'toggleable', 'value', 'predicate', 'slug', 'label',
                    'suboptions', 'selection', 'alwaysActive', 'disabledIf', 'disabledValue',
                    'placement', 'mergeable', 'phase', 'priority', 'requiresEquipped'},
-    # phase and priority order writes against Foundry's data preparation, which has no counterpart here;
-    # the modes are ordered instead, which is what the ordering is for.
+    # phase orders writes against Foundry's data preparation, which has no counterpart here. priority
+    # orders the writes themselves, which `Pf2e::Rules.writes` does too: Pet sets a familiar's ability
+    # count before Leshy Familiar Secrets adds one.
     'ActiveEffectLike': {'key', 'path', 'mode', 'value', 'predicate', 'slug', 'label', 'phase',
                          'priority', 'merge'},
     # priority orders adjustments against Foundry's data preparation; ours are ordered by mode.
@@ -252,7 +272,7 @@ GRANT_ALTERATIONS = {'badge-value'}
 # neither describes a mechanic. This mirrors `Pf2e::Rules::PRESENTATION`.
 PRESENTATION = {
     'RollOption': {'placement', 'mergeable', 'phase', 'priority'},
-    'ActiveEffectLike': {'phase', 'priority'},
+    'ActiveEffectLike': {'phase'},
     'AdjustModifier': {'priority'},
     'AdjustStrike': {'priority', 'phase'},
     'DamageAlteration': {'priority', 'phase'},
@@ -288,7 +308,7 @@ ORDER = ['key', 'add', 'remove', 'recoverable', 'reevaluateOnUpdate', 'required'
          'baseType', 'damage', 'traits', 'otherTags', 'fist', 'replaceAll', 'exceptions', 'doubleVs',
          'selector', 'selectors', 'adjustment', 'suppress', 'relabel',
          'maxApplications', 'type', 'ability',
-         'value', 'min', 'max', 'diceNumber', 'dieSize', 'damageType', 'damageCategory',
+         'value', 'priority', 'min', 'max', 'diceNumber', 'dieSize', 'damageType', 'damageCategory',
          'critical', 'override', 'tags', 'hideIfDisabled', 'slug', 'requiresEquipped',
          'events', 'deactivatedBy', 'details', 'keep', 'outcome', 'removeAfterRoll', 'title', 'text', 'label', 'predicate']
 
@@ -627,6 +647,39 @@ def documents(node):
             yield from documents(value)
 
 
+# The packs a granted feat or feature is found in, by the compendium name a GrantItem's uuid uses.
+GRANTED_PACKS = {'feats-srd': 'feats', 'classfeatures': 'class-features'}
+GRANTED_ITEMS = {}
+
+
+def granted_rules(checkout, uuid):
+    """The rules of the feat or feature a GrantItem names, or none."""
+    found = GRANT_UUID.match(str(uuid or ''))
+    pack = found and GRANTED_PACKS.get(found.group(1))
+    if not pack:
+        return []
+    if pack not in GRANTED_ITEMS:
+        GRANTED_ITEMS[pack] = foundry(checkout, pack)
+
+    return GRANTED_ITEMS[pack].get(found.group(2), ([], []))[0]
+
+
+def with_granted_paths(checkout, rules, depth=0):
+    """The rules, and the writes to `GRANTED_PATHS` of any feat or feature they grant, however deep: Witch
+    Dedication grants the witch's familiar, which grants Pet."""
+    out = list(rules)
+    if depth > 3:
+        return out
+
+    for rule in rules:
+        if rule.get('key') != 'GrantItem':
+            continue
+        granted = with_granted_paths(checkout, granted_rules(checkout, rule.get('uuid')), depth + 1)
+        out += [one for one in granted if one.get('key') == 'ActiveEffectLike' and one.get('path') in GRANTED_PATHS]
+
+    return out
+
+
 def foundry(checkout, pack):
     """name -> (rules, options the item declares for itself)."""
     found = collections.defaultdict(lambda: ([], []))
@@ -831,6 +884,9 @@ def main():
         if pack == 'feats':
             theirs = {FEATS_RENAMED.get(item, item): found for item, found in theirs.items()
                       if item not in FEATS_RENAMED.values()}
+        if pack == 'class-features':
+            theirs = {FEATURES_RENAMED.get(item, item): found for item, found in theirs.items()
+                      if item not in FEATURES_RENAMED.values()}
 
         # The class features' catalogue is made from the class tables, then filled like any other.
         made = class_feature_catalogue(theirs) if pack == 'class-features' else None
@@ -852,7 +908,7 @@ def main():
                 if not found:
                     continue
                 item = found.group(1)
-                rules = [rule for rule in rules if not handled(rule, found.group(2))]
+                rules = [rule for rule in with_granted_paths(args.checkout, rules) if not handled(rule, found.group(2))]
                 for rule in rules:
                     if rule.get('key') not in KINDS:
                         unread[rule.get('key')] += 1

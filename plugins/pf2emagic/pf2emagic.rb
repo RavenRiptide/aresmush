@@ -11,7 +11,13 @@ module AresMUSH
       Global.read_config("pf2emagic", "shortcuts")
     end
 
+    # Each command reads a sheet once between its writes (`Pf2e::SheetReads.during`), as pf2e's and pf2egear's do.
+    # Without it, prepare/familiar read the same records from Redis over and over and took over half a second.
     def self.get_cmd_handler(client, cmd, enactor)
+      Pf2e::ReadsOnce.wrapped(cmd_handler(client, cmd, enactor))
+    end
+
+    def self.cmd_handler(client, cmd, enactor)
       case cmd.root
       when "addspell"
         return PF2ChargenSpellsCmd

@@ -96,7 +96,8 @@ module AresMUSH
 
       # An encounter as it stands.
       def self.of_encounter(encounter)
-        listed = Combatants.all(encounter).select(&:holder)
+        # A familiar is neither a foe nor one of the party.
+        listed = Combatants.all(encounter).select(&:holder).reject(&:minion?)
         creatures, characters = listed.partition(&:creature?)
 
         of(creatures.map { |one| one.holder.pf2_level }, characters.map { |one| one.holder.pf2_level },

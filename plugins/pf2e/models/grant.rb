@@ -42,6 +42,12 @@ module AresMUSH
     attribute :reverted_by
     index :reverted_by
 
+    # A rollback past the level that revoked this grant brings it back: `restored_by` is that
+    # rollback's marker and `restored_from` the level's, so a redo of the rollback can revoke it again.
+    attribute :restored_by
+    index :restored_by
+    attribute :restored_from
+
     reference :character, "AresMUSH::Character"
 
     def live?

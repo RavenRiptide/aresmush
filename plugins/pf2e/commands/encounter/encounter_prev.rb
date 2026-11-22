@@ -30,7 +30,7 @@ module AresMUSH
           return
         end
 
-        initlist = Pf2e::Combatants.all(encounter)
+        initlist = Pf2e::Combatants.in_order(encounter)
         moved = Pf2e::Encounters::Turn.move('prev', :size => initlist.size,
                                             :at => encounter.next_init, :round => encounter.round)
 

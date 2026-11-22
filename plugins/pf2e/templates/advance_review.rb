@@ -36,7 +36,7 @@ module AresMUSH
       end
 
       def build_advancement
-        adv = annotate_feat_choices(prune_open_advancement(@char.pf2_advancement).merge(chosen_assignments))
+        adv = annotate_retrains(annotate_feat_choices(prune_open_advancement(@char.pf2_advancement).merge(chosen_assignments)))
 
         list = []
 
@@ -129,6 +129,8 @@ module AresMUSH
         'archetype specialty choice' => [ 'archetype choices', 'advancearchetypes' ],
         'archetype deity' => [ 'archetype choices', 'advancearchetypes' ],
         'archetype key ability' => [ 'archetype choices', 'advancearchetypes' ],
+        'archetype_sanctification' => [ 'archetype choices', 'advancearchetypes' ],
+        'retrains' => [ 'retraining feats', 'advanceretrain' ],
         'repertoire' => [ 'selecting spells', 'advancespells' ],
         'spellbook' => [ 'selecting spells', 'advancespells' ],
         'innate' => [ 'selecting spells', 'advancespells' ],
@@ -162,6 +164,14 @@ module AresMUSH
       # through another - a feat slot, a spell slot, a skill raise - cannot be missed.
       def build_options
         list = []
+
+        # A retrain the level owes is held in the advancement draft rather than in to_assign, so it is
+        # listed first, beside the feat that made it owed.
+        retrains = retrain_option_lines
+        unless retrains.empty?
+          list.concat(retrains)
+          list << "%b%b#{self.class.help_for('retrains')}"
+        end
 
         pending_options.each_pair do |key, value|
           # Signature spells are owed per rank of a repertoire rather than as a slot of their own, so
@@ -413,6 +423,31 @@ module AresMUSH
         adv.merge('feats' => annotated)
       end
 
+      # Retrains the level owes (`advance/retrain`), each still waiting for its replacement.
+      def retrain_option_lines
+        Array((@char.pf2_advancement || {})['retrains']).select { |one| one['to'].blank? }.map do |one|
+          "#{item_color}Retrain:%xn #{retrained_feat(one)} (a level #{one['level']} #{one['bucket'].to_s.gsub('charclass', 'class')} feat)"
+        end
+      end
+
+      # The draft holds retrains as hashes. "Options So Far" shows each one made as "Familiar to Reach
+      # Spell", and leaves the open ones to "Options To Choose".
+      def annotate_retrains(adv)
+        return adv unless adv.key?('retrains')
+
+        made = Array(adv['retrains']).reject { |one| one['to'].blank? }.map { |one| "#{retrained_feat(one)} to #{one['to']}" }
+        pruned = adv.reject { |key, _value| key == 'retrains' }
+
+        made.empty? ? pruned : pruned.merge('retrains' => made)
+      end
+
+      # The feat retrained, with the feats it gave that go with it: "Animal Accomplice (with Pet)".
+      def retrained_feat(one)
+        also = Array(one['also'])
+
+        also.empty? ? one['from'].to_s : "#{one['from']} (with #{also.join(', ')})"
+      end
+
       def feat_choice_label(name, chosen)
         key = chosen.keys.find { |k| k.to_s.casecmp?(name.to_s) }
         labels = key ? Array(chosen[key]) : []
@@ -420,6 +455,22 @@ module AresMUSH
         return name if labels.empty?
 
         "#{name} (#{labels.join(', ')})"
+      end
+
+      # A familiar or pet this level gave them, or a witch familiar taking over one: its details, which
+      # must be set before the level is done. One staff already approved needs nothing here.
+      def show_familiar
+        Familiar.awaiting_approval?(@char)
+      end
+
+      def familiar_title
+        Familiar.review_title(@char)
+      end
+
+      def familiar
+        Familiar.review_lines(@char).map do |line|
+          line.is_a?(Array) ? "#{item_color}#{line[0]}%xn: #{line[1]}" : line
+        end
       end
 
       def messages

@@ -14,7 +14,8 @@ module AresMUSH
 
         # Whether they are in an encounter is the one part only the live game can answer.
         blocked = Pf2e::Advancement::Plan.can_advance(state,
-          'in_encounter' => PF2Encounter.in_active_encounter?(enactor))
+          'in_encounter' => PF2Encounter.in_active_encounter?(enactor),
+          'familiar_waiting' => Pf2e::Familiar.awaiting_approval?(enactor))
 
         return if Pf2e::CharState.emit_error!(client, blocked)
 

@@ -458,6 +458,7 @@ pf2e_feats:
         path: "flags.system.multilingualTaken"
         mode: "override"
         value: 0
+        priority: 19
       - key: "ActiveEffectLike"
         path: "flags.system.multilingualTaken"
         mode: "add"

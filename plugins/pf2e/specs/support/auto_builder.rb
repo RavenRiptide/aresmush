@@ -81,8 +81,17 @@ module AresMUSH
 
       # Picks a feat that keeps the build simple: no follow-up choice, no grants that spawn new
       # requirements, and never a dedication (which drags in a whole archetype).
+      # Picks a spec wants made: a feat slot's type, or a feat choice's name, => what to pick there, used when
+      # it's on offer. `{ 'ancestry' => 'Natural Ambition', 'Natural Ambition' => 'Familiar' }`.
+      def prefer
+        @prefer ||= {}
+      end
+
       def feat_pick(type)
         options = (Pf2e.get_feat_options(@char, type) rescue [])
+
+        wanted = options.find { |f| f.to_s.casecmp?(prefer[type.to_s].to_s) }
+        return wanted if wanted
 
         ranked = options.reject do |f|
           d = Global.read_config('pf2e_feats', f) || {}
@@ -392,7 +401,7 @@ module AresMUSH
                 note "!! choice_options raised for #{name.inspect}: #{e.class}: #{e.message}"
                 []
               end
-              pick = options.first
+              pick = options.find { |o| o.to_s.casecmp?(prefer[name.to_s].to_s) } || options.first
               pick ||= Array(block && block['options']).first
               pick ||= lore_pick if name.to_s.downcase.include?('lore')
 
@@ -607,6 +616,7 @@ module AresMUSH
         @char = Character[@char.id]
 
         ((@char.pf2_level + 1)..target).each do |level|
+          settle_familiar
           clear
           run "advance"
 
@@ -617,6 +627,8 @@ module AresMUSH
 
           6.times { break if resolve_outstanding(:advance).zero? }
 
+          # A familiar this level gave is approved before the level finishes, so no request opens.
+          settle_familiar
           clear
           run "advance/done"
 
@@ -628,6 +640,19 @@ module AresMUSH
         end
 
         @char
+      end
+
+      # Gives a familiar waiting for approval its details and approves it, as the player and staff would.
+      # A climb would otherwise stop at the next `advance`, which refuses while a familiar waits.
+      def settle_familiar
+        return unless Pf2e::Familiar.awaiting_approval?(@char)
+
+        held = Pf2e::Familiar.record(@char)
+        held['pending'] = { 'name' => 'Spot', 'species' => 'cat', 'form' => 'land' }
+        @char.update(:pf2_familiar => held)
+
+        Pf2e::Familiar.approve!(@char, :by => nil, :close => false)
+        @char = Character[@char.id]
       end
 
       def build(charclass, target, **origin)

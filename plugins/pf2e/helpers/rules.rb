@@ -141,15 +141,17 @@ module AresMUSH
         },
         {
           'key' => 'ActiveEffectLike',
-          'fields' => %w{key path mode value predicate slug label merge},
+          'fields' => %w{key path mode value priority predicate slug label merge},
           # Writes a value rather than adding a modifier: a feat that makes you trained in a skill, a
           # counter another rule's predicate asks about. `Pf2e::Paths` says which paths may be written
-          # and what each mode does; a path it does not know is refused there.
+          # and what each mode does; a path it does not know is refused there. `priority` says when it
+          # is written (`writes`).
           'contribute' => lambda { |row, source, context|
             { 'source' => source['name'],
               'slug' => row['slug'] || Domains.slug(source['name']),
               'path' => row['path'],
               'mode' => row['mode'].to_s,
+              'priority' => row['priority'],
               'value' => writable_value(row['value'], context) }
           }
         },
@@ -461,11 +463,12 @@ module AresMUSH
       # that describes where a control sits in an interface we do not have is neither.
       # `placement` and `mergeable` position a toggle in Foundry's character sheet. `phase` and `priority`
       # order a rule against their data-preparation passes, which have no counterpart here: ours are
-      # ordered by mode where order matters and by when they are asked for otherwise. `hideIfDisabled`
+      # ordered by when they are asked for. An ActiveEffectLike's `priority` is the exception, read by
+      # `writes`, because the order of writes to one path changes what is written. `hideIfDisabled`
       # keeps a modifier that is not applying off their sheet; a breakdown here lists it as conditional
       # instead, so a player can see what they would need to claim it.
       PRESENTATION = { 'RollOption' => %w{placement mergeable phase priority},
-                       'ActiveEffectLike' => %w{phase priority},
+                       'ActiveEffectLike' => %w{phase},
                        'AdjustModifier' => %w{priority},
                        'FlatModifier' => %w{hideIfDisabled phase priority},
                        'DamageDice' => %w{hideIfDisabled phase priority},
@@ -588,9 +591,20 @@ module AresMUSH
         end
       end
 
-      # Everything an effect writes, in the order the modes are meant to run: a multiply before an add,
-      # and an override last, so an override wins whatever else said (`ae-like.ts`).
-      MODE_ORDER = %w{multiply add subtract remove downgrade upgrade override}.freeze
+      # Everything an effect writes, lowest priority first. A row without a `priority` takes its mode's,
+      # as Foundry's do (`ae-like.ts`): a multiply before an add, and an override last, so an override
+      # wins whatever else said. A row names its own where the order matters to one path: a familiar's
+      # ability count sets its base (Pet, Enhanced Familiar) before anything adds to it.
+      MODE_PRIORITY = { 'multiply' => 10, 'add' => 20, 'subtract' => 20, 'remove' => 20, 'downgrade' => 30,
+                        'upgrade' => 40, 'override' => 50 }.freeze
+
+      def self.write_priority(write)
+        held = write['priority']
+
+        return held if held.is_a?(Numeric)
+
+        MODE_PRIORITY.fetch(write['mode'], MODE_PRIORITY.values.max + 1)
+      end
 
       def self.writes(sources, options, context = {})
         gathered = Array(sources).flat_map do |source|
@@ -602,8 +616,9 @@ module AresMUSH
             .compact
         end
 
+        # Ties keep the order the rows were gathered in.
         gathered.select { |write| Paths.writable?(write['path']) }
-                .sort_by { |write| MODE_ORDER.index(write['mode']) || MODE_ORDER.size }
+                .each_with_index.sort_by { |write, index| [ write_priority(write), index ] }.map(&:first)
       end
 
       # Rules that change how a check turned out. A row may restrict itself to a kind of check - a save

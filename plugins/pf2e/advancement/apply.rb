@@ -90,6 +90,12 @@ module AresMUSH
           'feats' => {
             'apply' => lambda { |ctx| Apply.add_feats(ctx) }
           },
+          # A retrained feat is gone from DraftSheet's feats and its replacement is among this level's, so the
+          # level's commit revokes the one and grants the other. A feat another feat's choice gave moves the
+          # choice too (Apply.retrained_choices).
+          'retrains' => {
+            'apply' => lambda { |ctx| Apply.retrained_choices(ctx) }
+          },
           'charclass_feature option' => {
             'apply' => lambda { |ctx| Apply.feature_options(ctx) }
           },
@@ -209,6 +215,25 @@ module AresMUSH
 
               Pf2e.apply_init_magic_feat(ctx[:char], found[0], found[1], ctx[:client])
             end
+          end
+
+          []
+        end
+
+        # A retrained feat that came from another feat's choice: the old choice is revoked under the level's
+        # marker, so a rollback of the level brings it back, and the choice is recorded at the level being
+        # gained with the replacement, which the level's commit writes.
+        def self.retrained_choices(ctx)
+          char = ctx[:char]
+          level = char.pf2_level.to_i + 1
+
+          Array(ctx[:value]).each do |one|
+            next if one['to'].blank? || one['choice'].blank?
+
+            Pf2e::Ledger.revert_matching!(char, 'make_choice', { 'choice' => one['choice'], 'label' => one['from'] },
+                                          :by => Pf2e::Ledger.level_revocation_marker(level, 'retrain'),
+                                          :materialize => false, :limit => 1)
+            Pf2e.record_choice(char, one['choice'], one['to'], level)
           end
 
           []

@@ -85,12 +85,31 @@ module AresMUSH
         case cmd.switch
         when "combat"
           return PF2DisplayCombatSheetCmd
+        when "familiar"
+          return PF2FamiliarSheetCmd
         when "breakdown"
           return PF2StatBreakdownCmd
         when "option", "options"
           return PF2RollOptionCmd
         else
           return PF2DisplaySheetCmd
+        end
+      when "familiar"
+        case cmd.switch
+        when "name", "species", "form"
+          return PF2FamiliarSetCmd
+        when "specific"
+          return PF2FamiliarSpecificCmd
+        when "pet"
+          return PF2FamiliarPetCmd
+        when "choose"
+          return PF2FamiliarChooseCmd
+        when "approve"
+          return PF2FamiliarApproveCmd
+        when "reject"
+          return PF2FamiliarRejectCmd
+        when "cantrip"
+          return PF2FamiliarCantripCmd
         end
       when "award"
         case cmd.switch
@@ -253,8 +272,12 @@ module AresMUSH
           return PF2EncounterAuraCmd
         when "option"
           return PF2EncounterOptionCmd
+        when "sheet/familiar"
+          return PF2EncounterFamiliarSheetCmd
         when "sheet"
           return PF2EncounterSheetCmd
+        when "familiar", "familiar/leave"
+          return PF2EncounterFamiliarCmd
         when "csheet"
           return PF2EncounterCombatSheetCmd
         when "undo", "redo"
@@ -350,6 +373,8 @@ module AresMUSH
           return PF2AdminAccessCmd
         when "unaccess"
           return PF2AdminUnaccessCmd
+        when "retrain"
+          return PF2AdminRetrainCmd
         end
       when "advance"
         if cmd.switch&.start_with?("language=")
@@ -367,6 +392,8 @@ module AresMUSH
           return PF2AdvanceResetCmd
         when "feat"
           return PF2AdvanceFeatCmd
+        when "retrain"
+          return PF2AdvanceRetrainCmd
         when "spell"
           return PF2AdvanceSpellCmd
         when "swapspell"

@@ -116,6 +116,21 @@ module AresMUSH
               end
             }
           },
+          # A feat a witch familiar taking over the one they had leaves to retrain (Familiar.stage_retrains).
+          # Asked about as `advance/info retrain`, which lists the feats advance/retrain would accept.
+          {
+            'kind' => 'retrain', 'askable' => true,
+            'elements' => lambda { |state|
+              open = Array((state['advancement'] || {})['retrains']).select { |one| one['to'].blank? }
+              open.empty? ? [] : [ { 'label' => 'retrain', 'options' => nil } ]
+            },
+            'messages' => lambda { |state|
+              Array((state['advancement'] || {})['retrains']).select { |one| one['to'].blank? }.map do |one|
+                [ 'pf2e.adv_item_retrain', { 'feat' => one['from'], 'type' => one['bucket'].to_s.gsub('charclass', 'class'),
+                                             'level' => one['level'] } ]
+              end
+            }
+          },
           # Feat slots the level handed out, by type.
           {
             'kind' => 'feat', 'askable' => true,
@@ -183,6 +198,20 @@ module AresMUSH
             },
             'messages' => lambda { |state|
               Outstanding.elements_of('raise_skill_choice', state).map { |_e| [ 'pf2e.adv_item_skill_choice', {} ] }
+            }
+          },
+          # A familiar or pet this level gave them, whose details must be set before the level is done, so
+          # the approval request opens complete. The shell reads what's missing off the character
+          # (Familiar.unfinished) into state['familiar_missing'].
+          {
+            'kind' => 'familiar', 'askable' => false,
+            'elements' => lambda { |state|
+              Array(state['familiar_missing']).empty? ? [] : [ { 'label' => 'familiar', 'options' => nil } ]
+            },
+            'messages' => lambda { |state|
+              next [] if Array(state['familiar_missing']).empty?
+
+              [ [ state['familiar_pet'] ? 'pf2e.familiar_review_setup_pet' : 'pf2e.familiar_review_setup', {} ] ]
             }
           },
           {
