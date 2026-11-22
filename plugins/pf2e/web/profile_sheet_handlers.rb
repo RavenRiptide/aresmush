@@ -15,6 +15,13 @@ module AresMUSH
       end
     end
 
+    # `pf2ProfileFormulas` - the Formulas tab: `{ id }`.
+    class PF2ProfileFormulasHandler
+      def handle(request)
+        ProfileSheet.answer(request, 'formulas') { |char| FormulasView.of(char) }
+      end
+    end
+
     # `pf2ProfileFamiliar` - the Familiar tab: `{ id }`.
     class PF2ProfileFamiliarHandler
       def handle(request)

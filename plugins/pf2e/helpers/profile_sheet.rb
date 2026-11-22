@@ -19,6 +19,12 @@ module AresMUSH
         },
         { 'name' => 'inventory' },
         {
+          'name' => 'formulas',
+          'requires' => lambda { |char| FormulasView.any?(char) },
+          'code' => :no_formulas,
+          'key' => 'pf2e.profile_sheet_no_formulas'
+        },
+        {
           'name' => 'familiar',
           'requires' => lambda { |char| Familiar.approved?(char) },
           'code' => :no_familiar,

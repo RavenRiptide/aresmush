@@ -31,6 +31,11 @@ module AresMUSH
           Ledger.commit_chargen!(Character[char.id])
         end
         Familiar.approve_with_app!(Character[@witch.id])
+
+        [ [ 'consumables', 'Acid Flask (Moderate)' ], [ 'consumables', 'Elixir of Life (Minor)' ],
+          [ 'consumables', 'Antidote (Lesser)' ], [ 'runes', 'Astral' ] ].each do |category, name|
+          Crafting.learn!(Character[@witch.id], category, name, :source_type => 'staff', :source_ref => 'given')
+        end
       end
 
       after(:all) do
@@ -97,9 +102,14 @@ module AresMUSH
           expect(ProfileSheet.refusal(@fighter, @viewer, 'familiar').code).to eq :no_familiar
         end
 
+        it "should refuse the Formulas tab of a character who knows no formulas" do
+          expect(ProfileSheet.refusal(@fighter, @viewer, 'formulas').code).to eq :no_formulas
+          expect(asked(PF2ProfileFormulasHandler, @fighter)[:error]).to eq t('pf2e.profile_sheet_no_formulas', :name => @fighter.name)
+        end
+
         it "should tell the profile which tabs to draw" do
-          expect(ProfileSheet.flags(@witch, @viewer)).to eq(sheet: true, combat: true, spells: true, inventory: true, familiar: true)
-          expect(ProfileSheet.flags(@fighter, @viewer)).to eq(sheet: true, combat: true, spells: false, inventory: true, familiar: false)
+          expect(ProfileSheet.flags(@witch, @viewer)).to eq(sheet: true, combat: true, spells: true, inventory: true, formulas: true, familiar: true)
+          expect(ProfileSheet.flags(@fighter, @viewer)).to eq(sheet: true, combat: true, spells: false, inventory: true, formulas: false, familiar: false)
         end
 
         it "should send the flags with the profile's custom fields" do
@@ -183,6 +193,22 @@ module AresMUSH
         end
       end
 
+      describe "the Formulas tab" do
+        before(:each) { @view = asked(PF2ProfileFormulasHandler, @witch) }
+
+        it "should give a block per catalogue, named as the formulas screen names it" do
+          expect(@view[:catalogues].map { |one| one[:label] }).to contain_exactly('Consumables', 'Runes')
+        end
+
+        it "should group formulas by item level, lowest first and alphabetical within a level" do
+          consumables = @view[:catalogues].find { |one| one[:label] == 'Consumables' }
+
+          expect(consumables[:levels].map { |row| row[:level] }).to eq [ 1, 3 ]
+          expect(consumables[:levels].first[:formulas].map { |item| item[:name] }).to eq [ 'Antidote (Lesser)', 'Elixir of Life (Minor)' ]
+          expect(consumables[:levels].first[:formulas].first[:kind]).to eq 'item'
+        end
+      end
+
       describe "the Familiar tab" do
         before(:each) { @view = asked(PF2ProfileFamiliarHandler, @witch) }
 
@@ -202,7 +228,8 @@ module AresMUSH
 
       it "should send no colour codes in any tab" do
         [ [ PF2ProfileSheetHandler, @witch ], [ PF2ProfileCombatHandler, @witch ], [ Pf2emagic::PF2ProfileSpellsHandler, @witch ],
-          [ Pf2egear::PF2ProfileInventoryHandler, @witch ], [ PF2ProfileFamiliarHandler, @witch ] ].each do |handler, char|
+          [ Pf2egear::PF2ProfileInventoryHandler, @witch ], [ PF2ProfileFormulasHandler, @witch ],
+          [ PF2ProfileFamiliarHandler, @witch ] ].each do |handler, char|
           expect(asked(handler, char).to_json).not_to match(/%x|%r|%b/)
         end
       end

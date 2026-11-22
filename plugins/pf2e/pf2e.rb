@@ -562,6 +562,8 @@ module AresMUSH
         return PF2ProfileSheetHandler
       when "pf2ProfileCombat"
         return PF2ProfileCombatHandler
+      when "pf2ProfileFormulas"
+        return PF2ProfileFormulasHandler
       when "pf2ProfileFamiliar"
         return PF2ProfileFamiliarHandler
       end

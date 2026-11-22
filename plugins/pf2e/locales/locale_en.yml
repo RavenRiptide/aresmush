@@ -1139,6 +1139,7 @@ en:
     profile_sheet_login: "Log in to see Pathfinder 2e sheets."
     profile_sheet_no_spells: "%{name} doesn't cast spells."
     profile_sheet_no_familiar: "%{name} doesn't have an approved familiar."
+    profile_sheet_no_formulas: "%{name} doesn't know any formulas."
     profile_sheet_no_strikes: "While in %{source}, %{name} can't make Strikes."
     profile_sheet_strikes_replaced: "While in %{source}, %{name} can Strike only with %{attacks}."
     profile_familiar_spells: "%{name} contains %{char}'s witch spells: %{cantrips} cantrips and %{spells} spells. They're listed on the Spells tab."
