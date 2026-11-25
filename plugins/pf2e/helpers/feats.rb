@@ -187,8 +187,10 @@ module AresMUSH
     end
 
     # Eligibility check for a feat whose details the caller already has.
+    # `choice_gate: false` skips the check that a skill choice has something left to pick, for a feat a
+    # grant hands over: the grant settles or narrows the pick itself.
     def self.can_take_feat_details?(char, feat, details, effective_level = nil, ignore_charclass = false,
-                                    ignore_dedication_lock = false)
+                                    ignore_dedication_lock = false, choice_gate: true)
       return false if !details
 
       msg = []
@@ -251,6 +253,9 @@ module AresMUSH
       # One pet or familiar.
       msg << 'familiar' if Familiar.blocks?(char, details)
 
+      # One animal companion, and no bonded animal beside it.
+      msg << 'companion' if Companion.blocks?(char, details)
+
       # Prereq check, prerequisites includes level
 
       prereqs = details["prereq"]
@@ -264,6 +269,9 @@ module AresMUSH
       end
 
       msg << "prerequisites" if !meets_prereqs
+
+      # A feat that picks its skill when taken needs a skill it can pick.
+      msg << "choice" if choice_gate && !skill_choice_open?(char, feat, details)
 
       return true if msg.empty?
       return false
@@ -413,10 +421,20 @@ module AresMUSH
 
     # A more useful reason than "you do not meet the prerequisites", where one exists.
     # Returns nil when there is nothing better to say and the generic message should stand.
-    def self.explain_feat_block(char, details)
+    #
+    # `feat` is the feat's name, which a skill choice files its earlier picks under. Its empty choice is
+    # the reason only once the prerequisites pass, so a feat missing those still says so.
+    def self.explain_feat_block(char, details, feat = nil)
       return Familiar.block_message(char) if Familiar.blocks?(char, details)
+      return Companion.block_message(char, details) if Companion.blocks?(char, details)
 
       prereqs = details.is_a?(Hash) ? details['prereq'] : nil
+
+      if feat && !skill_choice_open?(char, feat, details) &&
+         (!prereqs.is_a?(Hash) || meets_prereqs?(char, prereqs, effective_char_level(char)))
+        return t('pf2e.feat_choice_nothing_left', :choice => choice_summary(feat_choice_def(details)))
+      end
+
       return nil unless prereqs.is_a?(Hash)
 
       return t('pf2e.needs_divine_font') if prereqs['divine_font'] && char.magic&.divine_font.blank?
@@ -580,6 +598,16 @@ module AresMUSH
 
             msg << "combat_stats" unless held.any? { |prof| prof_rank(prof).to_i >= min_rank }
           end
+        when "recall_skill"
+          # A rank in at least one skill with the Recall Knowledge action - Dubious Knowledge's
+          # "trained in a skill with the Recall Knowledge action".
+          msg << "recall_skill" if choice_skill_pool(char, 'min_prof' => required.to_s, 'recall_knowledge' => true).empty?
+        when "speed"
+          # A movement type the character has for good - "swim", "climb", "fly" or "burrow" - as
+          # Marsh Runner asks for a swim Speed. A list means all of them.
+          held = Movement.permanent_types(char, cl)
+
+          msg << "speed" unless Array(required).all? { |type| held.include?(type.to_s.strip.downcase) }
         when "max_class_hp"
           # Resiliency's "a class granting no more Hit Points per level than 8 + your Constitution
           # modifier": the base class's Hit Points per level, before Constitution.
@@ -988,6 +1016,12 @@ module AresMUSH
             key_display = 'Innate spell tradition'
           elsif k == 'caster'
             key_display = 'Ability to cast'
+          elsif k == 'recall_skill'
+            key_display = 'Skill requirement'
+            v = "#{v} in a skill with the Recall Knowledge action"
+          elsif k == 'speed'
+            v = Array(v).map { |type| "a #{type} Speed" }
+            v = v.first if v.length == 1
           elsif k == 'max_class_hp'
             key_display = 'Class Hit Points'
             v = "no more than #{v} + your Constitution modifier per level"
@@ -1383,10 +1417,11 @@ module AresMUSH
 
         # The one-familiar rule is about what a player picks. A familiar or pet a feat hands over is part
         # of the familiar that came with it (Animal Accomplice's Pet); sources that collide are settled
-        # when the familiar is resolved.
-        checked = checked.reject { |key, _| %w{familiar pet}.include?(key) }
+        # when the familiar is resolved. So is the one-companion rule: the animal order's Animal Companion
+        # is the companion that came with the order.
+        checked = checked.reject { |key, _| %w{familiar pet companion}.include?(key) }
 
-        unless can_take_feat_details?(char, found[0], checked)
+        unless can_take_feat_details?(char, found[0], checked, choice_gate: false)
           Global.logger.warn "#{char.name} was granted '#{found[0]}' but does not qualify for it."
           next []
         end
@@ -2618,17 +2653,36 @@ module AresMUSH
         rank && rank >= min_rank && (max_rank.nil? || rank <= max_rank)
       end
 
+      skills = Global.read_config('pf2e_skills') || {}
+      skill_info = ->(name) { skills[skills.keys.find { |s| s.to_s.casecmp?(name.to_s) }] || {} }
+
       if filter['key_abil']
         wanted = Array(filter['key_abil']).compact.map { |a| a.to_s.downcase }
-        skills = Global.read_config('pf2e_skills') || {}
 
-        list = list.select do |name|
-          key = skills.keys.find { |s| s.to_s.casecmp?(name.to_s) }
-          key && wanted.include?(skills[key]['key_abil'].to_s.downcase)
-        end
+        list = list.select { |name| wanted.include?(skill_info.call(name)['key_abil'].to_s.downcase) }
+      end
+
+      # Skills with the Recall Knowledge action, as pf2e_skills marks them: the knowledge skills and
+      # every lore.
+      list = list.select { |name| skill_info.call(name)['recall_knowledge'] } if filter['recall_knowledge']
+
+      # Skills the character picked for another feat's choice: Automatic Knowledge wants a skill they
+      # have Assurance in.
+      if filter['with_feat']
+        chosen = Array(filter['with_feat']).flat_map { |feat| choice_labels_for(char, feat) }
+
+        list = list.select { |name| chosen.any? { |c| c.to_s.casecmp?(name.to_s) } }
       end
 
       list.sort
+    end
+
+    # Whether a feat that picks a skill when taken has a skill left to pick - Assurance with no
+    # trained skill it does not already cover, say. True for a feat with no such choice.
+    def self.skill_choice_open?(char, feat, details)
+      return true unless skill_choice_feat?(details)
+
+      choice_options(char, feat, feat_choice_def(details)).any?
     end
 
     def self.choice_spell_pool(char, filter, choice_name = nil)
@@ -3071,6 +3125,12 @@ module AresMUSH
         options << 'Touch of the Void' if fonts.any? { |f| f.to_s.casecmp?('harm') }
 
         options.sort
+      when 'companion_types'
+        # A companion feat's type: Faithful Steed's only mounts, an uncommon type only with its access.
+        Companion.type_options(char, choice_name)
+      when 'companion_specializations'
+        # A specialized feat's specialization: one the companion doesn't have yet.
+        Companion.specialization_options(char, choice_name)
       when 'lineage planes'
         # Nephilim Lore.
         case char.pf2_base_info['heritage'].to_s

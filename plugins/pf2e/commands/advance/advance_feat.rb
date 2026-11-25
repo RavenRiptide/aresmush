@@ -99,6 +99,9 @@ module AresMUSH
         # One pet or familiar.
         return Pf2e::Familiar.block_message(enactor) if Pf2e::Familiar.blocks?(enactor, fdetails)
 
+        # One animal companion, and no bonded animal beside it.
+        return Pf2e::Companion.block_message(enactor, fdetails) if Pf2e::Companion.blocks?(enactor, fdetails)
+
         # Already held, and if so may it be taken again at the level being gained?
         repeat = Pf2e.feat_repeat_block(enactor, fname, fdetails, nil, enactor.pf2_level + 1)
         return repeat if repeat
@@ -112,9 +115,10 @@ module AresMUSH
         # Another class's or ancestry's feat (or a lineage feat past level 1). `prereq` doesn't say whose a
         # feat is - `assoc_charclass` and `assoc_ancestry` do - so this asks the same question as the
         # eligible-feat lists, at the level being gained, and a feat advance/info doesn't list is refused.
-        return t('pf2e.does_not_qualify') unless Pf2e.can_take_feat_details?(enactor, fname, fdetails, enactor.pf2_level + 1)
+        # It also refuses a feat whose skill choice has nothing left to pick, which explain_feat_block names.
+        return nil if Pf2e.can_take_feat_details?(enactor, fname, fdetails, enactor.pf2_level + 1)
 
-        nil
+        Pf2e.explain_feat_block(enactor, fdetails, fname) || t('pf2e.does_not_qualify')
       end
 
     end

@@ -77,7 +77,8 @@ module AresMUSH
         return Ok.new(:state => name) if RuneActions.grants?(char, name)
         return RuneActions.refusal(name) if RuneActions.action?(name)
 
-        Err.new(:not_yours, 'pf2e.action_not_yours', 'action' => name)
+        # Shed Spirit and the like are the familiar's, which their feat gives it.
+        Familiar::Activities.master_refusal(char, name) || Err.new(:not_yours, 'pf2e.action_not_yours', 'action' => name)
       end
 
       def self.owned?(char, name)

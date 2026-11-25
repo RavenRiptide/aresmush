@@ -77,16 +77,31 @@ module AresMUSH
         list
       end
 
+      # Two to a line, except an item their animal companion wears, which takes a line of its own to say so.
       def gear
-        list = []
-
         gear_list = @char.gear ? Pf2egear.items_in_inventory(@char.gear.to_a) : []
+        column = 0
 
-        gear_list.each_with_index do |g,i|
-          list << format_gear(g,i)
+        gear_list.each_with_index.map do |g, i|
+          mark = worn_mark(g)
+
+          if mark
+            column = 0
+            qty = g.quantity > 99 ? "99+" : g.quantity
+            "%r (#{i}) #{g.name} #{mark}: #{qty}"
+          else
+            row = format_gear(g, i, column)
+            column = 1 - column
+            row
+          end
         end
+      end
 
-        list
+      # "(worn by Ash)" for an item their animal companion wears, or nil.
+      def worn_mark(item)
+        return nil unless Pf2e::Companion::Gear.worn?(item)
+
+        t('pf2e.companion_gear_worn_mark', :name => Pf2e::Companion::Gear.wearer_name(@char, item))
       end
 
       def use_encumbrance
@@ -120,9 +135,10 @@ module AresMUSH
       end
 
       # Whether an item is invested, for every kind of item listed in columns. One without the invested
-      # trait has nothing to invest: `-`.
+      # trait has nothing to invest: `-`. One their animal companion has invested says so.
       def invested(item)
         return "-" unless item.respond_to?(:invested) && Pf2e.has_trait?(item.traits, 'invested')
+        return t('pf2e.companion_gear_invested_column') if item.respond_to?(:companion_invested) && item.companion_invested
 
         item.invested ? "Yes" : "No"
       end
@@ -170,10 +186,11 @@ module AresMUSH
         "%b%b#{left(i, 3)}%b#{left(name, 33)}%b#{left(bulk, 6)}%b#{left(disp_hp,10)}%b#{left(equip, 8)}%b#{left(invested(s), 8)}#{rune_line(s, 'shields')}"
       end
 
-      def format_gear(item,i)
+      # `column` is where on the line it goes: an even number starts a new line.
+      def format_gear(item, i, column = i)
         qty = item.quantity > 99 ?  "99+" : item.quantity
         name = item.name
-        linebreak = i % 2 == 1 ? "" : "%r"
+        linebreak = column % 2 == 1 ? "" : "%r"
         index = "(#{i}) #{name}"
         "#{linebreak} #{left(index, 30)}: #{left(qty,3)} "
       end
@@ -185,6 +202,7 @@ module AresMUSH
       def format_mi(mi, i)
         name = Pf2egear.get_item_name(mi)
         name = "#{name} #{t('pf2e.bound_item_inert_mark')}" if Pf2e::BoundItems.inert_for(@char, mi)
+        name = "#{name} #{worn_mark(mi)}" if worn_mark(mi)
         bulk = mi.bulk == 0.1 ? "L" : mi.bulk.to_i
         "%b%b#{left(i, 3)}%b#{left(name, 52)}%b#{left(bulk, 8)}%b#{left(invested(mi), 10)}"
       end

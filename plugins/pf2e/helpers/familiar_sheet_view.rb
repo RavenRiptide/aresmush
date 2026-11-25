@@ -98,8 +98,17 @@ module AresMUSH
 
           [ familiar ? encounter_section(context) : nil,
             basic_section(context), stats_section(context), saves_section(context), skills_section(context),
-            context['pet'] ? pet_section(context) : nil, specific_section(context),
+            context['pet'] ? pet_section(context) : nil, specific_section(context), activities_section(context, master),
             context['pet'] ? nil : today_section(context), spells_section(context), notes_section(context) ]
+        end
+
+        # What its master's feats let it do - Shed Spirit and the like - with its master's figures, as they
+        # stand in the encounter where it is in one.
+        def self.activities_section(context, master)
+          rows = Activities.sheet_lines(master, context['name'])
+          return nil if rows.empty?
+
+          section(t('pf2e.familiar_sheet_section_activities'), rows, [ t('pf2e.familiar_sheet_activities_how', :name => context['name']) ])
         end
 
         # An approved familiar's stats today, from its master's: `sheet/familiar` and the profile's Familiar

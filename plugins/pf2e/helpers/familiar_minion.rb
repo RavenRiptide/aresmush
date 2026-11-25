@@ -78,6 +78,11 @@ module AresMUSH
           return Err.new(:command_whom, 'pf2e.familiar_command_whom') if targets.size != 1
 
           target = targets.first
+          # One's own companion is Commanded before this is asked (`Companion::Minion.commanded_one`).
+          if target.holder && Actors.of(target.holder).minion_kind == 'companion'
+            return Err.new(:not_your_companion, 'pf2e.companion_command_not_yours', 'target' => target.label)
+          end
+
           return nil if encounter && target.minion? && target.master.to_i == actor.number.to_i
 
           Err.new(:not_your_familiar, 'pf2e.familiar_command_not_yours', 'target' => target.label)
@@ -99,18 +104,7 @@ module AresMUSH
 
         # Outside its master's turn, or without the actions a command gave it. Exploration has no turns.
         def self.turn_refusal(encounter, combatant)
-          return nil if Exploration.exploring?(encounter)
-
-          npc = combatant.holder
-          master = Combatants.turn_name(encounter, combatant.label)
-
-          if ActiveEffects.current_turn(encounter) != master
-            return Err.new(:not_master_turn, 'pf2e.familiar_not_master_turn', 'name' => combatant.label, 'master' => master)
-          end
-
-          return nil if TurnState.turn(npc)['actions'].to_i < TurnState.actions(npc)
-
-          Err.new(:not_commanded, 'pf2e.familiar_not_commanded', 'name' => combatant.label, 'ref' => combatant.ref)
+          Minions.turn_refusal(encounter, combatant, 'pf2e.familiar_not_commanded')
         end
 
         def self.action_refusal(npc, label, term)

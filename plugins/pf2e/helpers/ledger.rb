@@ -112,6 +112,12 @@ module AresMUSH
           'key' => 'spell', 'sheet' => 'spell_unlocks',
           'apply' => lambda { |sheet, p| Ledger.add_to_list(sheet['spell_unlocks'], p['spell']) }
         },
+        # Staff approved a new animal companion in place of the old one: `old_name`, `old_type`,
+        # `new_name`, `new_type`. A record for sheet/history; the companion itself is the feats' choices.
+        'companion_replaced' => {
+          'key' => 'new_name', 'sheet' => 'companion_replacements',
+          'apply' => lambda { |sheet, p| sheet['companion_replacements'] << p.slice('old_name', 'old_type', 'new_name', 'new_type') }
+        },
         # A focus spell or cantrip, with the focus type it is cast as and what granted it. The record
         # is the whole payload, since one spell can come from two sources.
         'focus_spell' => {
@@ -287,6 +293,7 @@ module AresMUSH
           'profs' => {},
           'formulas' => {},
           'spell_unlocks' => [],
+          'companion_replacements' => [],
           'casting' => {},
           'innate' => [],
           'slots' => {},

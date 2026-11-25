@@ -292,7 +292,7 @@ module AresMUSH
         # is reminded that a drawback falls on both.
         def self.cast!(scene, spell, out)
           holder = scene.actor.holder
-          state = holder.respond_to?(:master_id) && holder.master_id ? holder.master : nil
+          state = Actors.of(holder).minion_kind == 'familiar' ? holder.master : nil
           chosen = state ? spellcasting_spell(state) : nil
           return unless chosen && chosen.casecmp?(spell.to_s)
 

@@ -40,8 +40,10 @@ module AresMUSH
         holder.respond_to?(:encounter) ? holder.encounter : nil
       end
 
+      # Whether they die as a character does, which is what Death Consent is about: a character, or an
+      # animal companion (`Actor#dies_as_character?`).
       def self.character?(holder)
-        !Actors.of(holder).creature?
+        Actors.of(holder).dies_as_character?
       end
 
       # Whether what happens to a character where they stand may kill them.

@@ -17,7 +17,7 @@ module AresMUSH
 
         # What a hit can put back: nil unless the holder is a familiar standing whose master has Lifelink.
         def self.before(holder)
-          return nil unless holder.respond_to?(:master_id) && holder.master_id && holder.hp_left.to_i.positive?
+          return nil unless Actors.of(holder).minion_kind == 'familiar' && holder.hp_left.to_i.positive?
 
           state = holder.master
           return nil unless state && Daily.master_ability?(state, NAME)

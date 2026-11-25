@@ -32,7 +32,24 @@ module AresMUSH
       end
 
       def advancement
-        @advancement_lines ||= build_advancement
+        @advancement_lines ||= build_advancement + companion_advancement
+      end
+
+      # What the level does to their animal companion, as one more entry in "Options So Far", laid out
+      # as build_advancement lays out a nested hash: the heading, then each row indented under it.
+      def companion_advancement
+        return [] unless companion_level && !companion_level['rows'].empty?
+
+        rows = companion_level['rows'].map do |(label, value)|
+          if value.is_a?(Array)
+            inner = value.map { |(sublabel, subvalue)| "%r%b%b%b%b%xh#{sublabel}:%xn #{subvalue}" }.join
+            "%r%b%b#{item_color}#{label}:%xn#{inner}"
+          else
+            "%r%b%b#{item_color}#{label}:%xn #{value}"
+          end
+        end
+
+        [ "#{item_color}#{companion_level['heading']}:%xn#{rows.join}" ]
       end
 
       def build_advancement
@@ -457,6 +474,14 @@ module AresMUSH
         "#{name} (#{labels.join(', ')})"
       end
 
+      # What this level does to their animal companion (Companion::Preview.for), or nil when it only
+      # raises its level. The choices it waits on are listed with the other options, as any feat choice is.
+      def companion_level
+        return @companion_level if defined?(@companion_level)
+
+        @companion_level = Pf2e::Companion::Preview.for(@char)
+      end
+
       # A familiar or pet this level gave them, or a witch familiar taking over one: its details, which
       # must be set before the level is done. One staff already approved needs nothing here.
       def show_familiar
@@ -473,11 +498,13 @@ module AresMUSH
         end
       end
 
+      # What's still to do, or that everything is, then any companion notes. The notes come after,
+      # because they don't hold up the level.
       def messages
-        msg = Pf2e.advancement_messages(@char)
+        msg = Pf2e.advancement_messages(@char) || [ t('pf2e.advance_no_messages') ]
+        notes = companion_level ? companion_level['notes'] : []
 
-        return msg.join("%r") if msg
-        return t('pf2e.advance_no_messages')
+        (msg + notes).join("%r")
       end
 
       def help_instructions

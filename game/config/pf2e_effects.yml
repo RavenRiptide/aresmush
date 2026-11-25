@@ -83,6 +83,17 @@ pf2e_effects:
         radius: 10
         effects: [{"affects": "allies", "predicate": ["parent:origin:item:tag:multifaceted-will"], "uuid": "Compendium.pf2e.feat-effects.Item.Effect: Multifaceted Will"}]
         slug: "manifest-will"
+  "Aura: Patron's Presence":
+    pack: "feat-effects"
+    level: 1
+    duration: {"unit": "minutes", "value": 1, "expiry": "turn-end", "sustained": true}
+    traits: ["aura"]
+    description: "Hand-written. Granted by Patron's Presence%rA palpable weight extends from the familiar in a 15-foot emanation. Enemies who enter or start their turn within the aura attempt a Will save against its master's spell DC, or are stupefied while they remain within it."
+    rules:
+      - key: "Aura"
+        radius: 15
+        effects: [{"affects": "enemies", "uuid": "Compendium.pf2e.feat-effects.Item.Effect: Patron's Presence (Inside)"}]
+        slug: "patron-s-presence"
   "Aura: Protective Wards":
     pack: "spell-effects"
     level: 1
@@ -2429,6 +2440,16 @@ pf2e_effects:
         selector: ["attack-roll", "saving-throw", "skill-check"]
         keep: "lower"
         removeAfterRoll: true
+  "Effect: Badger Rage":
+    pack: "other-effects"
+    level: 1
+    duration: {"unit": "minutes", "value": 1, "expiry": "turn-start", "sustained": false}
+    traits: []
+    description: "Your badger is raging. It deals 4 additional damage with its jaws and 2 additional damage with its claws, takes a -1 penalty to AC, and can't use actions with the concentrate trait except Seek. The rage ends after 1 minute, when there are no enemies it can perceive, or when it falls unconscious, and it can't rage again for 1 minute."
+    rules:
+      - key: "FlatModifier"
+        selector: "ac"
+        value: -1
   "Effect: Balisse Feather":
     pack: "equipment-effects"
     level: 12
@@ -6792,6 +6813,13 @@ pf2e_effects:
         type: "circumstance"
         value: "{item|flags.system.rulesSelections.lastingProtection}"
         predicate: ["origin:mark:commmitment-to-protection-lasting"]
+  "Effect: Companion Support":
+    pack: "other-effects"
+    level: 1
+    duration: {"unit": "rounds", "value": 1, "expiry": "turn-start", "sustained": false}
+    traits: []
+    description: "Your animal companion is Supporting you. Until the start of your next turn, your Strikes against a creature in its reach gain its support benefit: add the word support to the Strike."
+    rules: []
   "Effect: Compel Courage":
     pack: "bestiary-effects"
     level: 1
@@ -22481,6 +22509,12 @@ pf2e_effects:
         selector: "all-speeds"
         type: "status"
         value: 10
+  "Effect: Patron's Presence (Inside)":
+    pack: "feat-effects"
+    level: 1
+    duration: {"unit": "unlimited", "value": -1, "expiry": null, "sustained": false}
+    traits: []
+    description: "Hand-written. You are inside a familiar's Patron's Presence, which you entered or started your turn in. Each time you start your turn here, you attempt the Will save again unless the aura has already made you stupefied."
   "Effect: Peace in Dreams Tea":
     pack: "equipment-effects"
     level: 9
@@ -33800,6 +33834,28 @@ pf2e_effects:
         selector: "jaws-attack"
         title: "1 Knockdown ({item|name})"
         text: "Requirements The monster's last action was a successful Strike that lists Knockdown in its damage entry%rEffect The monster attempts to trip the creature. This attempt neither applies nor counts toward the monster's multiple attack penalty."
+  "Effect: Wolf Support":
+    pack: "other-effects"
+    level: 1
+    duration: {"unit": "minutes", "value": 1, "expiry": "turn-start", "sustained": false}
+    traits: []
+    description: "A wolf's Support tore your tendons. You take a -5-foot status penalty to your Speeds."
+    rules:
+      - key: "FlatModifier"
+        selector: "all-speeds"
+        type: "status"
+        value: -5
+  "Effect: Wolf Support (Critical)":
+    pack: "other-effects"
+    level: 1
+    duration: {"unit": "minutes", "value": 1, "expiry": "turn-start", "sustained": false}
+    traits: []
+    description: "A wolf's Support tore your tendons on a critical hit. You take a -10-foot status penalty to your Speeds."
+    rules:
+      - key: "FlatModifier"
+        selector: "all-speeds"
+        type: "status"
+        value: -10
   "Effect: Wolfjaw Armor":
     pack: "equipment-effects"
     level: 7

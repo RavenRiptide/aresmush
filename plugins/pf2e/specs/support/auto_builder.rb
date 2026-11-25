@@ -527,7 +527,8 @@ module AresMUSH
 
       # Chargen: base info, the four commits, boosts, skills, languages and feats.
       # `option` names the specialty's option to take, such as a wizard's thesis; the first one otherwise.
-      def build_level_one(charclass, ancestry: 'Khazad', heritage: 'Forge', background: 'Acolyte', option: nil)
+      # `specialty` picks the subclass (a druid's order); otherwise the first whose alignment fits.
+      def build_level_one(charclass, ancestry: 'Khazad', heritage: 'Forge', background: 'Acolyte', option: nil, specialty: nil)
         @char.update(:chargen_stage => 4)
         Pf2eAbilities.factory_default(@char)
         Pf2eSkills.factory_default(@char)
@@ -541,7 +542,7 @@ module AresMUSH
         # A specialty can constrain alignment (champion causes do), so pick the pair together.
         specialties = Global.read_config('pf2e_specialty', charclass) || {}
         alignment = 'BL'
-        specialty = specialties.keys.find do |name|
+        specialty ||= specialties.keys.find do |name|
           allowed = Array((specialties[name] || {})['allowed_alignments'])
           allowed.empty? || allowed.include?(alignment)
         end
@@ -629,6 +630,7 @@ module AresMUSH
 
           # A familiar this level gave is approved before the level finishes, so no request opens.
           settle_familiar
+          settle_companion
           clear
           run "advance/done"
 
@@ -652,6 +654,23 @@ module AresMUSH
         @char.update(:pf2_familiar => held)
 
         Pf2e::Familiar.approve!(@char, :by => nil, :close => false)
+        @char = Character[@char.id]
+      end
+
+      # Names an animal companion waiting for approval and approves it, as the player and staff would, so
+      # advance/done doesn't open a request in the middle of a climb.
+      def settle_companion
+        return unless Pf2e::Companion.awaiting_approval?(@char)
+        return unless Pf2e::Companion.main(@char)['type']
+
+        companion = Pf2e::Companion.main(@char)
+        unless Pf2e::Companion.name_of(@char, companion)
+          held = Pf2e::Companion.entry(@char, companion)
+          held['pending'] = { 'name' => 'Rex' }
+          Pf2e::Companion.save_entry!(@char, companion, held)
+        end
+        @char = Character[@char.id]
+        Pf2e::Companion.approve!(@char, :by => nil, :close => false)
         @char = Character[@char.id]
       end
 

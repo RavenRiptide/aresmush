@@ -83,6 +83,21 @@ A retrain in a slot from 2nd level or higher belongs to that level, so rolling t
 
 For more information about familiars, see `help familiars`.
 
+### Approving animal companions
+
+`companion/approve <character>`: Approves the character's animal companion's name, and closes its approval request.
+`companion/reject <character> = <reason>`: Sends the name back with your reason, in the approval request, which stays open.
+%t **Note:** Approving a character's application approves their companion's name with it. If the companion has no name or type yet, an approval request opens for the character to finish it.
+%t **Note:** A companion awaiting approval doesn't stop its character from advancing.
+`companion/dead <character>`: Marks the character's animal companion as dead. It can't join encounters until you revive it or approve a replacement.
+`companion/revive <character>`: Marks a dead companion alive again, exactly as it was, such as after it's raised or reincarnated.
+%t **Note:** Approving a replacement of a new type rewrites the character's old companion choices at the levels they made them, so a later rollback treats each new choice as that level's.
+%t **Note:** If a replacement can't wear something the old companion wore, such as barding of the wrong size, it comes off and goes back to the character's inventory. The request's closing comment tells the player.
+`companion/wear <character>=<category>=<item number>`: Puts an item from the character's inventory on their animal companion, including an item without the companion trait, such as `companion/wear Rowan=gear=5`. The barding and investiture limits still apply.
+`companion/remove <character>=<category>=<item number>`: Takes an item off the character's animal companion and puts it back in their inventory.
+
+For more information about animal companions, see `help companions`.
+
 ### Changing feats
 To change a feat in a way `admin/retrain` can't, use `admin/rollback` to send the character back to the level where they made the choice and let them redo it, or `admin/respec` to let them rebuild the character from scratch while keeping their XP.
 

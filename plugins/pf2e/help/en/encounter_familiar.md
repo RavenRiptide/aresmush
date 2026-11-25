@@ -8,10 +8,15 @@ aliases:
 - minions
 - command_a_minion
 - lifelink
+- phase_familiar
 - patron_familiar
 - patron_familiar_abilities
 - euphoric_breath
 - blood_link
+- shed_spirit
+- stitching_strike
+- patrons_claim
+- patrons_presence
 ---
 
 # Familiars in Encounters
@@ -43,6 +48,8 @@ For more information about familiars and pets, see `help familiars`.
 %t **Note:** Your familiar never gains item bonuses on its own checks. You're told when your familiar takes damage.
 `encounter/act lifelink`: Takes the damage that just reduced your familiar to 0 Hit Points, if you have the Lifelink master ability today. Your familiar's Hit Points go back to what they were, and you take the damage instead. This uses your reaction.
 %t **Note:** The game tells you when you can use Lifelink. Use it before anything else changes your Hit Points or your familiar's. If your homunculus's Blood Link hurt you when it fell, Lifelink undoes that damage.
+`encounter/cast phase familiar`: Casts the Phase Familiar hex against the damage your familiar just took, if you know it. Your familiar takes the damage again with resistance 5 to all damage, 2 more for each rank above 1, and immunity to precision damage. This uses your reaction and a Focus Point.
+%t **Note:** The game tells you when you can cast Phase Familiar. Cast it before anything else changes your Hit Points or your familiar's. Like any hex, it readies your patron's familiar ability.
 %t **Note:** With Familiar Focus or Restorative Familiar, your familiar can spend 2 actions once a day to restore 1 of your Focus Points or heal you, such as `encounter/as Smudge=act familiar focus` or `encounter/as Smudge=act restorative familiar`. It can use each again after your next rest. While your group is exploring, your familiar can use them without your turn or a command, so a GM can start `encounter/explore` to let you use them after a fight.
 
 ## Specific Familiars
@@ -50,6 +57,20 @@ For more information about familiars and pets, see `help familiars`.
 `encounter/as <fey dragonet>=act euphoric breath=<targets>`: Has your Commanded fey dragonet use Euphoric Breath, such as `encounter/as Feyfly=act euphoric breath=#3,#4`. Each target attempts a Fortitude save against the higher of your class DC and spell DC, and the game applies the outcome. Your fey dragonet can use it once in each encounter.
 
 A homunculus's Blood Link works in encounters: while you are unconscious and dying, your homunculus acts on your turn as if you had Commanded it, and if it is destroyed, you take 2d10 mental damage.
+
+## Witch Feat Activities
+
+Some witch feats give your familiar an activity of its own. Your Commanded familiar uses it with its 2 actions, and each target attempts a basic save against your spell DC. `sheet/familiar` lists the activities your familiar has, with their damage at your level.
+
+`encounter/as <familiar>=act shed spirit=<enemy>,<ally>`: Has your familiar use Shed Spirit (Spirit Familiar) on the enemy, such as `encounter/as Smudge=act shed spirit=#4,#2`. If the enemy takes damage, the ally regains Hit Points equal to half of it.
+%t **Note:** Specify the enemy first and the ally second. If you don't specify an ally, nobody regains Hit Points.
+`encounter/as <familiar>=act stitching strike=<enemy>`: Has your familiar use Stitching Strike (Stitched Familiar). An enemy that fails its Reflex save is immobilized for 1 round, and `encounter/act escape` ends it early against your spell DC.
+`encounter/as <familiar>=act patron's claim=<target>`: Has your familiar use Patron's Claim. A target that fails its Fortitude save and takes damage is drained 2, or drained 4 on a critical failure, and you regain 1 Focus Point.
+`encounter/as <familiar>=act patron's presence`: Has your familiar extend Patron's Presence, a 15-foot emanation that lasts until the end of your next turn.
+`encounter/as <familiar>=enter patron's presence=<enemy>,<enemy>`: Marks enemies inside Patron's Presence, as the map shows. Each attempts a Will save against your spell DC, and on a failure is stupefied 2, or stupefied 3 on a critical failure, while it remains inside.
+`encounter/as <familiar>=leave patron's presence=<enemy>`: Marks that an enemy has left Patron's Presence, which ends the stupefied condition the aura gave it.
+%t **Note:** An enemy still inside attempts the save again when its turn starts, unless the aura has already made it stupefied. To keep the aura up for up to 1 minute, have your Commanded familiar Sustain it with `encounter/as <familiar>=act sustain`.
+%t **Note:** Your familiar can use each activity once in each encounter. To see the command for one, use `encounter/how <activity>`.
 
 ## Patron Familiar Abilities
 

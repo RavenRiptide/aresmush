@@ -19,6 +19,8 @@ aliases:
 %t **Note:** You fight with what you carried in. Joining copies your gear, the items you have equipped and invested, and your money into the encounter. See `help e/gear` for more information.
 `encounter/familiar`: Brings your familiar into the encounter after you join. For more information about familiars in encounters, see `help encounter_familiar`.
 `encounter/sheet/familiar[ <character or familiar>]`: Shows your familiar's sheet, or another one's, as it stands in the encounter.
+`encounter/companion`: Brings your animal companion into the encounter after you join. For more information about animal companions in encounters, see `help encounter_companion`.
+`encounter/sheet/companion[ <character or companion>]`: Shows your animal companion's sheet, or another one's, as it stands in the encounter.
 `encounter/view [<encounter ID>]`: Shows the encounter in turn order: each combatant's ID, initiative, hit points, defenses, conditions, and effects, and a link to the encounter's web page. (Alias: `tinit <encounter ID>`)
 %t **Note:** Only the GM sees a creature's stats. Everyone else sees how hurt the creature looks: Unhurt, Bloodied, Near Death, or Dead.
 `encounter/sheet[ <#id or name>][/<section>]`: Shows your sheet, or another combatant's, as it stands in the encounter, with hit points, conditions, and effects. Add `/<section>` to show one section; the sections are the same as `sheet`'s.

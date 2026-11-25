@@ -84,6 +84,10 @@
 <%= section_line(familiar_title) %>
 <%= familiar %>
 <% end %>
+<% if show_companion %>
+<%= section_line(t('pf2e.companion_review_title')) %>
+<%= companion %>
+<% end %>
 <% if show_magic %>
 <%= section_line("Magic") %>
 <% if divine_font %>

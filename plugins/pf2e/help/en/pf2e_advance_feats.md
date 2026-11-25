@@ -21,6 +21,8 @@ Most levels give you at least one feat to select.
 
 A class feature or feat that gives you a feat to choose, such as Skillful Lessons, doesn't use a feat slot. Choose that feat with `advance/option`. For more information about choosing options, see `help advancefeatures`.
 
+When you take Incredible Companion, you choose whether your animal companion becomes nimble or savage, and when you take Specialized Companion, you choose a specialization. Make the choice with `advance/option`, such as `advance/option Incredible Companion (Druid)=Savage`. For more information about animal companions, see `help companions`.
+
 ## Retraining a Feat
 
 When you take Witch Dedication and already have a familiar from Pet, Familiar, Animal Accomplice, or Rat Familiar, the familiar your patron sends you replaces it, and you retrain that feat in the same level. `advance/review` lists the retrain until you make it.

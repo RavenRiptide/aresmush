@@ -60,6 +60,8 @@ module AresMUSH
           # Who else a bomb's splash reaches, which the game can't see without positions: `splash orc, ogre`.
           elsif (found = lower.match(/\Asplash\s+(.+)\z/)) then out['splash'] = found[1].split(',').map(&:strip).reject(&:empty?)
           elsif %w{flanking flanked flank}.include?(lower) then out['flanking'] = true
+          # The target is in reach of the striker's Supporting animal companion (`Companion::Support`).
+          elsif lower == Companion::Support::WORD then out['support'] = true
           elsif lower == 'force' then out['force'] = true
           elsif COVER_WORDS.key?(lower)
             permitted ? out['cover'] = COVER_WORDS[lower] : out['refused'] << word
@@ -142,8 +144,9 @@ module AresMUSH
         scene = escaping(scene) if name == ESCAPE
         return scene if scene.is_a?(Err)
 
-        # Out of something that swallowed or engulfed them, at the DC it lists.
-        listed = name == ESCAPE ? (Holding.inside(scene.actor.holder) || {})['escape_dc'] : nil
+        # Out of something that swallowed or engulfed them, or immobilized them with a DC to escape -
+        # Stitching Strike's - at the DC it lists.
+        listed = name == ESCAPE ? escape_dc(scene.actor.holder) : nil
         words = Array(words) + [ listed.to_s ] if listed && Array(words).none? { |word| word.to_s.match?(/\A\d+\z/) }
 
         unnamed = traits_unnamed(name, words)
@@ -176,6 +179,15 @@ module AresMUSH
 
         targets ||= [ scene.target ].compact
 
+        # Onto an animal companion, or off one (`Companion::Riding`); Mount at anything else is announced.
+        if name == Companion::Riding::MOUNT
+          ridden = Companion::Riding.act(scene, name, targets)
+          return ridden if ridden
+        end
+
+        companion = Companion::Minion.commanded_one(scene.actor, name, targets)
+        return companion_command(scene, name, companion, words) if companion
+
         if name == Familiar::Minion::COMMAND
           refused = Familiar::Minion.command_refusal(scene.encounter, scene.actor, targets)
           return refused if refused
@@ -201,7 +213,7 @@ module AresMUSH
         risked = Restraints.risked(scene.actor, name, traits_of(scene, name, words), :type => type_of(scene, name))
         return lost(scene, name, risked) if risked && !risked['kept']
 
-        return MonsterAbilities.use(scene, name, own, targets) if ability
+        return MonsterAbilities.use(scene, name, own, targets, said(words, scene.permitted)['words']) if ability
 
         return strike(scene, nil, words) if name == 'Strike'
 
@@ -218,6 +230,11 @@ module AresMUSH
         return sustain_effect(scene, name, entry, words) if name == Sustaining::NAME
         return dismiss_effect(scene, name, entry, words) if name == Dismissing::NAME
         return Stratagem.act(scene, name, entry, said(words, scene.permitted), risked) if name == Stratagem::NAME
+        return Companion::Spells.instinctive(scene, name) if name == Companion::Spells::INSTINCTIVE
+        if name == HuntPrey::NAME
+          hunted = HuntPrey.act(scene, name, entry, risked)
+          return hunted if hunted
+        end
         return attack_answer(scene, name, entry) if entry['type'] == 'reaction' && AttackAnswers.answer(scene.actor.holder, name)
 
         # An action a daily choice limits reaches only whom it named: Inspired Stratagem's allies.
@@ -410,6 +427,13 @@ module AresMUSH
 
       # Escape is from whoever holds them, where nobody is named; with nothing holding them there is
       # nothing to escape.
+      def self.escape_dc(holder)
+        inside = (Holding.inside(holder) || {})['escape_dc']
+        immobilized = (holder.pf2_conditions || {})['Immobilized']
+
+        inside || (immobilized.is_a?(Hash) ? immobilized['escape_dc'] : nil)
+      end
+
       def self.escaping(scene)
         return Err.new(:escape_nothing, 'pf2e.escape_nothing') unless Holding.held?(scene.actor.holder)
         return scene if scene.target
@@ -744,6 +768,8 @@ module AresMUSH
         rolled_check = Check.of(scene.actor.holder, kind, stat_name, options)
         extra = action_modifiers(check, rolled_check.options) + weapon_bonus(scene.actor.holder, check) +
                 (attack ? attack_penalty(scene.actor.holder) : [])
+        # Fell Rider's Aid, on the first Demoralize after a ridden companion Supports.
+        extra += Companion::Riding.fell_rider_aid(scene.actor.holder) if slug == 'demoralize'
 
         defence = nil
         way = WAYS["#{slug}:#{check['variant']}"]
@@ -857,7 +883,7 @@ module AresMUSH
       # An action with the attack trait that is not a Strike takes the multiple attack penalty as well,
       # at -5 and -10: nothing about it is agile.
       def self.attack_penalty(holder)
-        attacks = TurnState.turn(holder)['attacks'].to_i
+        attacks = TurnState.attacks(holder)
 
         return [] unless attacks.positive?
 
@@ -956,6 +982,22 @@ module AresMUSH
 
         spend(scene, name, entry, blocked.state) if blocked.ok?
         blocked
+      end
+
+      # Their own animal companion Commanded: no Nature check, and 2 actions for it this turn, or 3 for 2 of
+      # theirs with Companion's Cry (`actions 2`).
+      def self.companion_command(scene, name, whom, words)
+        actions = (said(words, scene.permitted)['actions'] || 1).to_i
+        refused = Companion::Minion.command_refusal(whom.holder, whom.label, name, actions)
+        return refused if refused
+
+        out = report
+        gained = actions == 2 ? Companion::Minion::CRIED : Companion::Minion::COMMANDED
+        Companion::Minion.command!(whom.holder, gained)
+        out['lines'] << told('pf2e.companion_commanded', :name => whom.label, :actions => gained, :ref => whom.ref)
+        spend(scene, name, Actions.info(name).merge('cost' => actions), out)
+
+        Ok.new(:state => out)
       end
 
       # A witch's patron rider, readied by a hex this turn: a free action.
@@ -1126,7 +1168,8 @@ module AresMUSH
 
       # `hold` keeps a hit's damage in the report's `held` for the caller to deal, with what else it hit.
       # `quiet` is a reaction's Strike made as part of something already announced.
-      def self.strike(scene, weapon_term, words, reaction: nil, melee: false, spent: true, hold: false, quiet: false)
+      # `bonus` is a circumstance bonus an ability gives this one Strike: `{ 'source' =>, 'value' => }`.
+      def self.strike(scene, weapon_term, words, reaction: nil, melee: false, spent: true, hold: false, quiet: false, bonus: nil)
         said = said(words, scene.permitted)
         out = report
         out['held'] = [] if hold
@@ -1144,6 +1187,13 @@ module AresMUSH
 
         stopped = Restraints.refusal(scene.actor, 'Strike', [ 'attack' ]) || Stratagem.strike_refusal(scene)
         return stopped if stopped
+
+        if said['support']
+          unsupported = Companion::Support.word_refusal(scene)
+          return unsupported if unsupported
+
+          attack = attack.merge('companion_support' => true)
+        end
 
         attack = as_wielded(scene.actor.holder, attack, said['words'])
         return attack if attack.is_a?(Err)
@@ -1173,6 +1223,9 @@ module AresMUSH
 
         penalty = said['no_map'] ? [] : TurnState.map_options(scene.actor.holder)
         options = penalty + options_for(scene, said, 'strike') + [ 'action:strike' ]
+        # Precision's extra damage, on the first hit on a hunted prey this round (`HuntPrey`).
+        options += HuntPrey.precision_options(scene.actor.holder, scene.target,
+                                              reaction ? [] : TurnState.turn(scene.actor.holder)['strikes'])
         check = Stratagem.attack_check(scene, attack, Check.of(scene.actor.holder, 'attack', attack, options), options)
         extra = increments > 1 ? [ { 'source' => "range increment #{increments}", 'slug' => 'range-penalty',
                                      'type' => 'untyped', 'value' => -2 * (increments - 1) } ] : []
@@ -1181,7 +1234,9 @@ module AresMUSH
         # Strike is no part of the turn's run of them.
         earlier = reaction ? [] : Array(TurnState.turn(scene.actor.holder)['strikes'])
         extra += WeaponTraits.attack_modifiers(attack, earlier, scene.target.label, said['words'])
+        extra << { 'source' => bonus['source'], 'slug' => Domains.slug(bonus['source']), 'type' => 'circumstance', 'value' => bonus['value'] } if bonus
         attack = attack.merge('bonus_damage' => WeaponTraits.damage_modifiers(attack, earlier, off_guard?(scene, said)))
+        attack = Companion::Riding.horse_charge(scene, attack, said)
 
         unseen = unseen_attacker?(scene)
         rolled = attack_roll(scene, attack, check, said, extra, out)
@@ -1350,7 +1405,9 @@ module AresMUSH
         if out['held']
           out['held'] << { 'rows' => rows, 'critical' => critical }
         else
+          before = attack['companion_support'] ? Actors.of(scene.target.holder).standing : nil
           deal(scene, scene.target, rows, out, :critical => critical)
+          Companion::Support.after_hit(scene, rows, before, critical, out, attack) if attack['companion_support']
         end
 
         Recharge.critical_hit(scene, out) if critical
@@ -1519,6 +1576,7 @@ module AresMUSH
         standing = still_up(whom.holder)
         blockable = ShieldBlock.before(whom.holder)
         lifelinked = Familiar::Lifelink.before(whom.holder)
+        phasing = Familiar::Phase.before(whom.holder)
         taken = 0
         physical = 0
         fate = nil
@@ -1568,6 +1626,10 @@ module AresMUSH
 
         return if shown.empty?
 
+        # What landed on each, for an ability whose next step depends on it: Shed Spirit heals half of it.
+        landed = (out['taken'] ||= {})
+        landed[whom.label] = landed[whom.label].to_i + taken
+
         out['lines'] << told('pf2e.act_damage', :damage => shown.join(' + '), :target => whom.label)
         out['detail'] << told('pf2e.why_damage', :damage => shown.join(' + '), :target => whom.label) if out['detail']
         shaken_out(whom, taken, out)
@@ -1578,6 +1640,7 @@ module AresMUSH
         out['lines'] << freed if freed
         offer_block(whom, blockable, taken, physical, critical, out) if blockable && physical.positive?
         Familiar::Lifelink.offer(whom, lifelinked, taken, out) if lifelinked && taken.positive?
+        Familiar::Phase.remember(whom, phasing, immediate + precise, critical, out) if phasing && taken.positive?
       end
 
       # A hit a raised shield could have taken is kept for Shield Block, and its bearer told they may.
@@ -1620,7 +1683,7 @@ module AresMUSH
       def self.still_up(holder)
         fresh = holder.class[holder.id] || holder
 
-        Actors.of(fresh).creature? ? fresh.hp_left.to_i.positive? : Pf2e.condition_level(fresh, 'Dying')
+        Actors.of(fresh).dies_as_character? ? Pf2e.condition_level(fresh, 'Dying') : fresh.hp_left.to_i.positive?
       end
 
       # What a hit that settled a character's fate is told as.
@@ -1640,6 +1703,8 @@ module AresMUSH
 
         if FATES[fate]
           out['lines'] << told(FATES[fate], :target => whom.label)
+          note = fate == :dead ? Actors.of(whom.holder).death_note : nil
+          out['lines'] << note if note
         elsif standing == true && now == false
           out['lines'] << told('pf2e.act_down', :target => whom.label)
           offered_when_down(whom.holder).each do |name|
@@ -1663,6 +1728,8 @@ module AresMUSH
         # and is read again so that what they do next is written over their release, not under it.
         released = Holding.let_go(encounter, whom.label)
         out['lines'].concat(released)
+        # A companion knocked out or killed throws its rider.
+        out['lines'].concat(Companion::Riding.dropped(whom.holder))
         held['actor'].holder.load! if released.any? && held['actor']
 
         # A character who lost their last hit points acts from now on just before the turn they fell in.
@@ -1754,6 +1821,12 @@ module AresMUSH
         Familiar::HexRiders.hexed!(scene, spell, out)
         Familiar::MasterSpells.cast!(scene, spell, out)
 
+        # Phase Familiar answers the hit its familiar just took, and puts nothing lasting on it.
+        if Familiar::Phase.spell?(spell) && Familiar::Phase.cast!(scene, rank, out)
+          spend_casting(scene, spell, named ? named['time'] : 'reaction', false, rank, out)
+          return Ok.new(:state => out)
+        end
+
         unless mechanics
           out['lines'] << told('pf2e.act_spell_gm')
           return Ok.new(:state => out)
@@ -1777,6 +1850,7 @@ module AresMUSH
           mechanics = (named.equal?(base) ? way_for(base, target) : way_for(base, target, named['time']) || named)
                         .merge('cast_rank' => rank)
           mechanics = DragonBreath.typed(scene.actor.holder, spell, mechanics)
+          mechanics = Companion::Riding.heal_mount(scene, spell, mechanics, target)
           attack = mechanics['attack']
           out['about'] = DamageAbout.of_spell(mechanics, spell)
 
@@ -1805,6 +1879,8 @@ module AresMUSH
         spell_effect(scene, spell, rank, out, said['words']) if targets.empty? && !named['attack'] && !named['save']
 
         spend_casting(scene, spell, free ? '0' : named['time'], named['attack'], rank, out) unless through
+        # A spell cast only at one's own animal companion readies Instinctive Support.
+        Companion::Spells.cast!(scene, spell, targets)
 
         Ok.new(:state => out)
       end

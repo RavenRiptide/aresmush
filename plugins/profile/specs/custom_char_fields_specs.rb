@@ -15,11 +15,22 @@ module AresMUSH
 
       it "gives the Edit page the familiar's picture fields only for a character with a familiar" do
         char = double("char", looking_for_rp_announce: "on")
+        allow(Pf2e::Companion::Picture).to receive(:edit_fields).with(char).and_return(nil)
         allow(Pf2e::FamiliarPicture).to receive(:edit_fields).with(char).and_return(nil)
         expect(CustomCharFields.get_fields_for_editing(char, char)).to eq({ looking_for_rp_announce: true })
 
         allow(Pf2e::FamiliarPicture).to receive(:edit_fields).with(char).and_return({ name: 'Smudge', pet: false, image: nil })
         expect(CustomCharFields.get_fields_for_editing(char, char)[:pf2_familiar]).to eq({ name: 'Smudge', pet: false, image: nil })
+      end
+
+      it "gives the Edit page the companion's picture fields only for a character with a companion" do
+        char = double("char", looking_for_rp_announce: "on")
+        allow(Pf2e::FamiliarPicture).to receive(:edit_fields).with(char).and_return(nil)
+        allow(Pf2e::Companion::Picture).to receive(:edit_fields).with(char).and_return(nil)
+        expect(CustomCharFields.get_fields_for_editing(char, char)).to eq({ looking_for_rp_announce: true })
+
+        allow(Pf2e::Companion::Picture).to receive(:edit_fields).with(char).and_return({ name: 'Ash', image: nil })
+        expect(CustomCharFields.get_fields_for_editing(char, char)[:pf2_companion]).to eq({ name: 'Ash', image: nil })
       end
 
       it "adds the Pathfinder 2e flags when the character has a sheet to show" do

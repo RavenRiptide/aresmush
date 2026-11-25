@@ -131,6 +131,12 @@ module AresMUSH
 
         return if CharState.emit_error!(client, actor)
 
+        # A rider's only move action is Mount, to dismount. The GM may have them do anything.
+        unless Combatants.gm?(enactor, encounter)
+          ridden = Companion::Riding.rider_refusal(actor.state, self.action)
+          return if ridden && CharState.emit_error!(client, ridden)
+        end
+
         named = self.target.to_s.split(',').map(&:strip).reject(&:empty?)
         targets, missing = Combatants.resolve_all(enactor, named, encounter)
 
@@ -255,9 +261,11 @@ module AresMUSH
         scene = scene_for(encounter, actor.state, nil)
         return if CharState.emit_error!(client, Acting.unlisted_spell(scene, self.spell, self.words) || Ok.new(:state => nil))
         return if CharState.emit_error!(client, Acting.casting_refused(scene, self.spell, self.words) || Ok.new(:state => nil))
+        return if CharState.emit_error!(client, Companion::Spells.refusal(scene, self.spell, found, self.words) || Ok.new(:state => nil))
         return if CharState.emit_error!(client, UntamedForm.refusal(scene, self.spell, self.words, found) || Ok.new(:state => nil))
         return if CharState.emit_error!(client, Acting.item_needed(scene, self.spell, found, self.words) || Ok.new(:state => nil))
         return if CharState.emit_error!(client, SpellReservoir.refusal(scene, self.spell, found, self.words) || Ok.new(:state => nil))
+        return if CharState.emit_error!(client, Familiar::Phase.refusal(scene, self.spell) || Ok.new(:state => nil))
 
         cast = Actors.of(actor.state.holder).spends_spells? ? spend_the_spell(actor.state.holder) : nil
 
@@ -337,7 +345,8 @@ module AresMUSH
     end
 
     # `+e/as <combatant>=<act|strike|cast> <what>` - a GM acting for a creature, or for anyone in the
-    # encounter, and a player acting for their own familiar, as the rules let it act (`Familiar::Minion`).
+    # encounter, and a player acting for their own familiar or animal companion, as the rules let it act
+    # (`Familiar::Minion`, `Companion::Minion`).
     class PF2EncounterAsCmd
       include CommandHandler
 
@@ -375,7 +384,7 @@ module AresMUSH
         gm = Combatants.gm?(enactor, encounter)
         actor = Combatants.find(encounter, self.who)
 
-        return client.emit_failure(t('pf2e.not_organizer')) if !gm && !(actor.ok? && own_familiar?(encounter, actor.state))
+        return client.emit_failure(t('pf2e.not_organizer')) if !gm && !(actor.ok? && own_minion?(encounter, actor.state))
         return if CharState.emit_error!(client, actor)
 
         handler = self.class.verbs[self.verb].new(client, Command.new("e/#{self.verb} #{self.rest}"), enactor)
@@ -385,24 +394,32 @@ module AresMUSH
         missing = handler.required_args.any? { |one| one.to_s.empty? }
 
         return client.emit_failure(t('dispatcher.invalid_syntax', :cmd => "e/#{self.verb}")) if missing
-        return if !gm && CharState.emit_error!(client, familiar_refusal(encounter, actor.state, handler))
+        return if !gm && CharState.emit_error!(client, minion_refusal(encounter, actor.state, handler))
 
         handler.handle
       end
 
-      # The enactor's own familiar, in this encounter.
-      def own_familiar?(encounter, combatant)
+      # The enactor's own familiar or animal companion, in this encounter.
+      def own_minion?(encounter, combatant)
         return false unless combatant.minion?
 
         master = Combatants.rows(encounter).find { |row| row['id'].to_i == combatant.master.to_i }
         !master.nil? && master['char'].to_s == enactor.id.to_s
       end
 
-      # A player's familiar only takes actions, and only as the rules let it.
-      def familiar_refusal(encounter, combatant, handler)
+      # A player's familiar only takes actions, and their animal companion only takes actions and makes
+      # Strikes, each only as the rules let it.
+      def minion_refusal(encounter, combatant, handler)
+        if Actors.of(combatant.holder).minion_kind == 'companion'
+          term = self.verb == 'act' ? handler.action : nil
+          return Companion::Minion.player_refusal(encounter, combatant, self.verb, term) || Ok.new(:state => nil)
+        end
+
         case self.verb
         when 'act' then Familiar::Minion.player_refusal(encounter, combatant, handler.action) || Ok.new(:state => nil)
         when 'cast' then Familiar::Minion.cast_refusal(encounter, combatant, handler.spell) || Ok.new(:state => nil)
+        # Marking who is inside its aura, such as Patron's Presence, which is no action of its own.
+        when 'enter', 'leave' then Ok.new(:state => nil)
         else Err.new(:familiar_act_only, 'pf2e.familiar_act_only', 'name' => combatant.label, 'ref' => combatant.ref)
         end
       end

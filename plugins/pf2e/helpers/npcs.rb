@@ -72,7 +72,7 @@ module AresMUSH
         met = Effects.modifiers(sources, domains, context, held).select { |one| one['met'] }
         # A familiar never gains item bonuses of its own; what its master's items give its AC and saves is in
         # its stat block already.
-        met = met.reject { |one| one['type'].to_s.downcase == 'item' && Modifiers.value_of(one).positive? } if npc.master_id
+        met = met.reject { |one| one['type'].to_s.downcase == 'item' && Modifiers.value_of(one).positive? } if npc.familiar?
         own = [ Stat.multiple_attack(kind, name, sources, domains, held, context),
                 kind.to_s == 'ac' ? Pf2eCombat.raised_shield(npc) : nil ].compact
         adjusted = Modifiers.adjust(own + met, Rules.modifier_adjustments(sources, domains, held, context))
@@ -483,7 +483,9 @@ module AresMUSH
         base = Array(strike['damage']).first
         kind = base ? base[1] : nil
 
+        recounted = dice_counts(sources, domains, held, context)
         dice = Effects.damage_dice(sources, domains, context, held).select { |row| row['met'] && !row['override'] }
+                      .map { |row| recounted.key?(row['slug']) ? row.merge('dice' => recounted[row['slug']]) : row }
                       .map do |row|
           { 'formula' => "#{row['dice']}#{row['die']}", 'type' => row['damage_type'] || kind,
             'category' => row['category'], 'bucket' => Damage::BUCKETS.fetch(row['critical'], 'doubling') }
@@ -496,6 +498,17 @@ module AresMUSH
         end
 
         dice + flat
+      end
+
+      # How many dice a `DamageAlteration` sets for the damage dice of its slug: a Masterful Share Hunter's Edge
+      # makes its Precision dice fewer on a second or third hit. Slug => count.
+      def self.dice_counts(sources, domains, held, context)
+        Rules.damage_alterations(sources, domains, held, context).each_with_object({}) do |row, out|
+          next unless row['property'] == 'dice-number' && row['mode'] == 'override'
+
+          value = row['value'].is_a?(String) ? Formula.value(row['value'], context) : row['value']
+          out[row['slug']] = value.to_i if value.to_i.positive?
+        end
       end
 
       def self.heal(npc, amount)

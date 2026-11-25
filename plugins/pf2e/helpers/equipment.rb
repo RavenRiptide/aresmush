@@ -37,7 +37,8 @@ module AresMUSH
           Pf2egear::Inventory.stackable?(category)
 
         held = Pf2egear::Inventory.all(holder, category).find do |item|
-          item.name == name && !item.copied_from && item.granted_by == granted_by && item.expires == expires
+          item.name == name && !item.copied_from && item.granted_by == granted_by && item.expires == expires &&
+            !Companion::Gear.worn?(item)
         end
 
         return held.update(:quantity => held.quantity.to_i + quantity.to_i) if held
@@ -107,8 +108,8 @@ module AresMUSH
 
       # What a character carries in an encounter made what their sheet holds now, for a GM who lets them
       # have what they bought since joining, or invest what they forgot to. What they had already is kept
-      # as they have it here - drawn, stowed, its charges spent - except whether it is invested and what
-      # runes it has, which are the sheet's; and a consumable less what they used of it here. What their sheet no
+      # as they have it here - drawn, stowed, its charges spent - except whether it is invested, what runes
+      # it has, and whether their companion wears it, which are the sheet's; and a consumable less what they used of it here. What their sheet no
       # longer holds goes, and what the encounter gave them stays. Their money is their sheet's.
       def self.resync!(state, char)
         copied = {}
@@ -133,7 +134,7 @@ module AresMUSH
               left = copy.quantity.to_i + item.quantity.to_i - (started.dig(item.id.to_s, 'quantity') || copy.quantity).to_i
               left.positive? ? copy.update(:quantity => left) : copy.delete
             elsif Pf2egear::Inventory.stackable?(collection)
-              copy.update(:quantity => item.quantity)
+              copy.update({ :quantity => item.quantity }.merge(facts_of(model, item)))
             else
               facts = facts_of(model, item)
               copy.update(facts) unless facts.empty?
@@ -150,9 +151,10 @@ module AresMUSH
         state.update(:pf2_money => char.pf2_money.to_i, :consumables_at_start => baseline)
       end
 
-      # What an item is, which the sheet decides even mid-encounter: whether it is invested and what runes
-      # it has. Whether it is drawn, and what is spent of it, happened in the encounter and stays.
-      FACTS = %i{invested invest_on_refresh runes}.freeze
+      # What an item is, which the sheet decides even mid-encounter: whether it is invested, what runes it
+      # has, and whether their animal companion wears it. Whether it is drawn, and what is spent of it,
+      # happened in the encounter and stays.
+      FACTS = %i{invested invest_on_refresh runes companion companion_invested}.freeze
 
       def self.facts_of(model, item)
         held = model.attributes.map(&:to_sym)

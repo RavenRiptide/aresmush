@@ -21,6 +21,8 @@ aliases:
 - devise_a_stratagem
 - stratagem
 - strategic_strike
+- hunt_prey
+- hunters_edge
 ---
 # Pathfinder 2E Encounters - Class and Ancestry Feat Actions
 
@@ -56,6 +58,14 @@ These feat actions take more syntax than `encounter/act <action>=<target>`. For 
 `encounter/act devise a stratagem/<stratagem>`: Changes your stratagem after you see the roll, at no cost in actions. Choose `skill`, or `defensive` if you have the Defensive Stratagem feat. With either one, you can't Strike the target until the start of your next turn.
 %t **Example**:
 %t `encounter/act devise a stratagem/skill`
+
+## Hunt Prey
+
+`encounter/act hunt prey=<target>`: **Ranger.** Makes the target your prey. Your hunter's edge then applies to it: Flurry's lower multiple attack penalty, Outwit's bonuses, or Precision's extra damage on your first hit against it each round.
+%t **Note:** You can have only one prey at a time. Hunting another creature moves your prey to it.
+%t **Note:** With Animal Companion, your companion shares your prey and your hunter's edge, including if it joins the encounter later. With Masterful Companion, it gains your edge's Masterful Hunter benefit instead.
+%t **Example**:
+%t `encounter/act hunt prey=#3`, then `encounter/strike longbow=#3`
 
 ## Other class actions
 

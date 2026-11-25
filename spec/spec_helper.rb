@@ -122,6 +122,17 @@ module AresMUSH
       abort "Setting up the spec database failed, and the run is stopped: #{e.class}: #{e.message}"
     end
 
+    # A parallel worker's database is emptied as its run ends, so Redis's save file doesn't carry a copy
+    # of every worker's data. Only a database this run set up, and only after the same check as above.
+    def self.empty_after!
+      return unless @seeded && ENV['SPEC_EMPTY_AFTER'] == '1'
+
+      held = Ohm.redis.call!('CLIENT', 'INFO').to_s
+      Ohm.redis.call!('FLUSHDB') if held.match?(/\bdb=#{DB}\b/)
+    rescue StandardError, SecurityError => e
+      warn "Emptying spec database #{DB} failed: #{e.class}: #{e.message}"
+    end
+
     # Install.init_db narrates as it goes, for someone installing a game; a spec run has no use for it.
     def self.quietly
       require 'stringio'
@@ -141,6 +152,18 @@ RSpec.configure do |c|
   # The spec database, set up once the specs have loaded the engine (see AresMUSH::SpecDatabase).
   c.before(:suite) do
     AresMUSH::SpecDatabase.install! if defined?(AresMUSH::Database) && defined?(Redic)
+  end
+
+  c.after(:suite) { AresMUSH::SpecDatabase.empty_after! }
+
+  # CUSTOM CODE ADD FOR EMBLEM OF EA: a parallel worker (spec/parallel_run.rb) runs only the examples whose
+  # IDs are listed in SPEC_IDS_FILE, one per line, so one file's examples can be shared between workers.
+  if ENV['SPEC_IDS_FILE']
+    kept = File.readlines(ENV['SPEC_IDS_FILE'], :chomp => true).reject(&:empty?).to_h { |id| [ id, true ] }
+
+    c.define_derived_metadata { |meta| meta[:parallel_share] = true }
+    # An example's ID as rspec prints it (`./plugins/x_specs.rb[1:2]`), which its metadata doesn't hold.
+    c.filter_run_excluding :parallel_share => lambda { |_value, meta| !kept.key?("#{meta[:rerun_file_path]}[#{meta[:scoped_id]}]") }
   end
 
   # List each example for easier test debugging

@@ -59,8 +59,11 @@ module AresMUSH
 
         # Emblem of Ea: Custom Ares change: the Familiar tab, for choosing the familiar's picture (pf2e)
         familiar = Pf2e::FamiliarPicture.edit_fields(char)
+        fields = fields.merge(pf2_familiar: familiar) if familiar
 
-        familiar ? fields.merge(pf2_familiar: familiar) : fields
+        # Emblem of Ea: Custom Ares change: the Animal Companion tab, for choosing the companion's picture (pf2e)
+        companion = Pf2e::Companion::Picture.edit_fields(char)
+        companion ? fields.merge(pf2_companion: companion) : fields
       end
 
       # Gets custom fields for character creation (chargen).
@@ -109,11 +112,12 @@ module AresMUSH
         custom = char_data["custom"] || {}
         char.update(looking_for_rp_announce: Website.format_input_for_mush(custom["looking_for_rp_announce"] == true ? "on" : "off"))
 
-        # Emblem of Ea: Custom Ares change: the familiar's picture, sent only by an Edit page that drew the Familiar tab (pf2e)
-        return [] unless custom.key?("pf2_familiar_image")
-
-        chosen = Pf2e::FamiliarPicture.choose!(char, custom["pf2_familiar_image"])
-        chosen.ok? ? [] : [ t(chosen.key, **chosen.args.transform_keys(&:to_sym)) ]
+        # Emblem of Ea: Custom Ares change: the familiar's and the companion's pictures, each sent only by an Edit page
+        # that drew its tab (pf2e)
+        chosen = []
+        chosen << Pf2e::FamiliarPicture.choose!(char, custom["pf2_familiar_image"]) if custom.key?("pf2_familiar_image")
+        chosen << Pf2e::Companion::Picture.choose!(char, custom["pf2_companion_image"]) if custom.key?("pf2_companion_image")
+        chosen.select(&:err?).map { |err| t(err.key, **err.args.transform_keys(&:to_sym)) }
       end
 
       

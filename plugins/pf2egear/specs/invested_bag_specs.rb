@@ -86,5 +86,19 @@ module AresMUSH
       expect(info['traits']).to include 'companion'
       expect(info['companion_armor']['ac_bonus']).to eq 1
     end
+
+    # Player Core: light barding is AC +1, Dex cap +5; heavy barding is AC +3, Dex cap +3.
+    it "should keep armor stats on every barding" do
+      bardings = Global.read_config('pf2e_gear').select { |_name, info| Array((info || {})['traits']).include?('barding') }
+
+      expect(bardings.keys).to include('Light Barding (Small or Medium)', 'Light Barding (Large)',
+                                       'Heavy Barding (Small or Medium)', 'Heavy Barding (Large)')
+      bardings.each do |name, info|
+        armor = info['companion_armor']
+        expected = armor && armor['category'] == 'heavy-barding' ? [ 3, 3 ] : [ 1, 5 ]
+
+        expect(armor && armor.values_at('ac_bonus', 'dex_cap')).to eq(expected), name
+      end
+    end
   end
 end

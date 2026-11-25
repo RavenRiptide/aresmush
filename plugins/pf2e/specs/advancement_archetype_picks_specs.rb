@@ -442,19 +442,20 @@ module AresMUSH
           expect(Array(out[:to_assign]['raise skill'])).to include 'Athletics'
         end
 
-        # The Druid Archetype's Animal order grants the Animal Companion feat through its `feat`
-        # key, the same key an archetype's own block uses.
-        it "should grant the feats a specialty hands over" do
+        # Druid Dedication: "You don't gain any other abilities from your choice of order." The animal
+        # order's companion comes from Basic Wilding, and its spell from Order Spell.
+        it "should give a Druid Dedication's animal order no companion or order spell" do
           out = pick('Druid Archetype', 'specialty', 'Animal', :to_assign => { 'archetype_specialty' => 'open' })
 
-          expect(Array(out[:advancement]['feats']['general'])).to include 'Animal Companion'
-          expect(Array(out[:to_assign]['feats']['general'])).to include 'Animal Companion'
+          expect(Array(((out[:advancement] || {})['feats'] || {})['general'])).not_to include 'Animal Companion'
+          expect(Array(((out[:to_assign] || {})['feats'] || {})['general'])).not_to include 'Animal Companion'
+          expect((((out[:advancement] || {})['magic_stats'] || {})['Druid Archetype'] || {})['focus_spell']).to be_nil
         end
 
         it "should stage the spellcasting a specialty brings under the archetype's own key" do
-          out = pick('Druid Archetype', 'specialty', 'Animal', :to_assign => { 'archetype_specialty' => 'open' })
+          out = pick('Witch Archetype', 'specialty', 'Curse', :to_assign => { 'archetype_specialty' => 'open' })
 
-          expect(out[:advancement]['magic_stats']['Druid Archetype']['focus_spell']).to eq('order' => [ 'Heal Animal' ])
+          expect(out[:advancement]['magic_stats']['Witch Archetype']['tradition']).to eq('occult' => 'trained')
         end
 
         # Merged rather than replaced: the dedication's own magic stats are already under this

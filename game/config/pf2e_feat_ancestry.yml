@@ -1909,6 +1909,9 @@ pf2e_feats:
         traits: ["grapple", "unarmed"]
         label: "Fangs"
   Fell Rider:
+    companion_grants:
+      skills:
+        Intimidation: trained
     feat_type:
       - Ancestry
     assoc_ancestry:
@@ -3169,8 +3172,7 @@ pf2e_feats:
     shortdesc: When you use the Step action, you can ignore difficult terrain caused by flooding, swamps, or quicksand. In addition, when you use the Acrobatics skill to Balance on narrow surfaces or uneven marshy ground, you aren't off-guard, and if you roll a success on the Acrobatics check, you get a critical success instead.
     prereq:
       level: 1
-      feat:
-        - You have a swim Speed
+      speed: swim
   Mist Child:
     feat_type:
       - Ancestry
@@ -4228,6 +4230,8 @@ pf2e_feats:
         text: "When you use the Acrobatics skill to Balance on narrow surfaces or uneven ground made of stone or earth, you aren't off-guard, and when you roll a success at one of these Acrobatics checks, you get a critical success instead."
         predicate: ["action:balance"]
   Rough Rider:
+    companion_grants:
+      mount: [ Wolf ]
     feat_type:
       - Ancestry
     assoc_ancestry:
@@ -4396,7 +4400,8 @@ pf2e_feats:
     prereq:
       level: 5
       feat:
-        - Ciith Armaments (Tail)
+        - Ciith Armaments
+      feature: Tail
     actions: reaction
   Shinstabber:
     feat_type:
@@ -4638,7 +4643,7 @@ pf2e_feats:
     shortdesc: "**Frequency** once per round%r%rYou Fly. If you don't normally have a fly Speed, you gain a fly Speed of 20 feet for this movement. If you aren't on solid ground at the end of this movement, you fall."
     prereq:
       level: 5
-      heritage: Skyborn Egalrin
+      heritage: Skyborn
     actions: 1
     frequency: once per round
     rules:

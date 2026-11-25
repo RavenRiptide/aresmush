@@ -19,6 +19,7 @@ aliases:
 `sheet/history <name>` and `sheet/history <name>=<first>-<last>`: Lists the same for someone else.
 `csheet` and `csheet <name>`: Alias for `sheet/combat`.
 `sheet/familiar` and `sheet/familiar <name>`: Shows a familiar's or pet's sheet. For more information about familiars, see `help familiars`.
+`sheet/companion` and `sheet/companion <name>`: Shows an animal companion's sheet. For more information about animal companions, see `help companions`.
 %t **Note:** The combat sheet is available once a character is approved. During chargen, use `sheet` instead.
 `sheet/breakdown <stat>`: Shows the math behind a stat on your sheet: its base value, and every bonus and penalty applied to it. `<stat>` can be `hp`, `ac`, `speed`, `perception`, a save (`fortitude`, `reflex`, or `will`), `class dc`, or a skill or lore by name.
 %t **Note:** A modifier that the stacking rules don't count is listed and marked, so you can see when a new item changes nothing because you already have a better bonus of the same type. Bonuses that only apply while you're doing something specific are listed separately, with the circumstance each one needs; see "Bonuses for specific actions" in `help roll` for how to claim them.

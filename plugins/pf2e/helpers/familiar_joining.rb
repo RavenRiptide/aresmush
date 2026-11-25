@@ -18,7 +18,7 @@ module AresMUSH
           name = Familiar.approved_record(char)['name'].to_s
           held = Combatants.rows(encounter)
 
-          if (here = held.find { |one| one['master'].to_s == row['id'].to_s })
+          if (here = Combatants.minions_of(encounter, row['id'], 'familiar').first)
             return Err.new(:already_here, 'pf2e.familiar_encounter_here', 'name' => here['name'])
           end
 
@@ -43,7 +43,7 @@ module AresMUSH
 
         # It leaves, letting go of anyone it held, and is gone with whatever it was under.
         def self.leave!(encounter, char, row)
-          here = row ? Combatants.minions_of(encounter, row['id']).first : nil
+          here = row ? Combatants.minions_of(encounter, row['id'], 'familiar').first : nil
           return Err.new(:not_here, 'pf2e.familiar_encounter_absent', 'char' => char.name) unless here
 
           freed = Holding.let_go(encounter, here['name'])

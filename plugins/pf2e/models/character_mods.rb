@@ -97,6 +97,11 @@ module AresMUSH
     # grants.
     attribute :pf2_familiar, :type => DataType::Hash, :default => {}
 
+    # Their animal companions' names and whether staff have approved them (`Pf2e::Companion`), by companion:
+    # `{ 'companions' => { id => { 'pending', 'approved', 'job' } } }`. What a companion is (its type, nimble
+    # or savage, specializations) is their feats' choices on the ledger; only what staff approve is here.
+    attribute :pf2_companions, :type => DataType::Hash, :default => {}
+
     # The picture of their familiar or pet that the profile shows, as a path under the uploads folder
     # (`hexa/smudge.jpg`), chosen from their own files on the portal's Edit page (`Pf2e::FamiliarPicture`).
     attribute :pf2_familiar_image

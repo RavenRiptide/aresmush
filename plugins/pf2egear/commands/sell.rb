@@ -63,6 +63,8 @@ module AresMUSH
 
         return client.emit_failure(t('pf2egear.item_in_encounter', :item => item_id.name, :id => held.id)) if held
 
+        return if Pf2e::CharState.emit_error!(client, Pf2e::Companion::Gear.worn_refusal(item_id))
+
         # What a feat or a class feature made isn't the vendor's to buy: a feather fan, a versatile vial.
         info = list[item_id.name]
         made_only = info.is_a?(Hash) && info['made_only']
@@ -85,7 +87,7 @@ module AresMUSH
           return
         end
 
-        to_be_paid = price * item_qty
+        to_be_paid = price * q
 
         # If they're selling all of them, blow the item out of the list, else subtract quantity
 

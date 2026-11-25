@@ -92,6 +92,17 @@ module AresMUSH
           'order' => lambda { |_p| 19 },
           'category' => lambda { |_p| 'Formula' },
           'item' => lambda { |p| p['formula'].to_s }
+        },
+        # "Fang, wolf companion, replaced by Ash", naming the new type only when it differs.
+        'companion_replaced' => {
+          'order' => lambda { |_p| 20 },
+          'category' => lambda { |_p| 'Companion' },
+          'item' => lambda { |p|
+            old_type = p['old_type'].to_s.downcase
+            new_type = p['new_type'].to_s.downcase
+            shown = "#{p['old_name']}, #{old_type} companion, replaced by #{p['new_name']}"
+            new_type == old_type ? shown : "#{shown}, #{new_type} companion"
+          }
         }
       }.freeze
 

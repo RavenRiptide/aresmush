@@ -116,6 +116,13 @@ rescue LoadError
   # no rspec available
 end
 
+# CUSTOM CODE ADD FOR EMBLEM OF EA: the db specs shared between workers, each on its own Redis database.
+desc "Run the db specs in parallel: rake spec:db:parallel[8] (1 to 14 workers, 8 if not given)."
+task 'spec:db:parallel', [ :workers ] do |_t, args|
+  require_relative 'spec/parallel_run'
+  exit(AresMUSH::SpecParallel::Runner.new(Integer(args[:workers] || 8)).run ? 0 : 1)
+end
+
 desc "Run all specs except the db ones."
 begin
   require 'rspec/core/rake_task'

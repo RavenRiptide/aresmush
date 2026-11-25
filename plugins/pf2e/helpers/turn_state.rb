@@ -61,6 +61,8 @@ module AresMUSH
         now = turn(holder)
         now = now.merge('actions' => now['actions'].to_i + cost.to_i) if type == 'action'
         now = now.merge('reaction' => true) if type == 'reaction'
+        # Instinctive Support follows its spell at once; anything else done first passes it by.
+        now = now.merge('instinctive' => nil) unless type == 'free'
         now = now.merge('attacks' => now['attacks'].to_i + 1) if attack
         # A reaction is no part of the turn's own run of actions - but a Strike made as one is the last
         # thing done, which is what a Grab then follows.
@@ -113,9 +115,15 @@ module AresMUSH
 
       # Foundry's option for which attack of the turn this is: the second is `map:increases:1`.
       def self.map_options(holder)
-        attacks = turn(holder)['attacks'].to_i
+        attacks = attacks(holder)
 
         attacks.positive? ? [ "map:increases:#{[ attacks, 2 ].min}" ] : []
+      end
+
+      # The attacks counting toward the multiple attack penalty: their own this turn, and a rider's or a
+      # mount's in the same turn, since the two fight as a unit (`Companion::Riding`).
+      def self.attacks(holder)
+        turn(holder)['attacks'].to_i + Companion::Riding.shared_attacks(holder)
       end
 
       # How many actions the turn holds: three, one more if quickened, fewer by what being stunned took
@@ -130,7 +138,7 @@ module AresMUSH
       # `2 of 3 actions used, reaction ready, next attack at -5`.
       def self.summary(holder)
         now = turn(holder)
-        penalty = map_penalty(now['attacks'].to_i)
+        penalty = map_penalty(attacks(holder))
 
         t('pf2e.turn_summary', :used => now['actions'].to_i, :total => [ actions(holder), 0 ].max,
                                :reaction => reaction_words(holder, now),

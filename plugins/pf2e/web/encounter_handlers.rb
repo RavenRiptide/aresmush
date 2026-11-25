@@ -31,25 +31,81 @@ module AresMUSH
         end
       end
 
+      # Everyone in the order, each familiar and animal companion straight after its master, as `+e/view` lists them.
+      def self.listed(encounter)
+        everyone = Combatants.all(encounter)
+        minions, others = everyone.partition(&:minion?)
+        placed = others.flat_map { |one| [ one ] + minions.select { |minion| minion.master.to_i == one.number } }
+
+        placed + (minions - placed)
+      end
+
       def self.combatant(encounter, one, viewer, gm)
         holder = one.holder
         number = one.number.to_s
 
-        { id: one.number, name: one.label, initiative: one.init.to_i, creature: one.creature?,
+        # A familiar or companion has no initiative: it acts on its master's turn.
+        { id: one.number, name: one.label, initiative: one.minion? ? nil : one.init.to_i, minion: one.minion?, creature: one.creature?,
+          lines: lines(encounter, one),
           conditions: holder ? Pf2e.condition_labels(holder, false) : [],
           effects: holder ? ActiveEffects.on(holder).map { |effect| "#{effect.name} (#{plain(ActiveEffects.remaining(effect))})" } : [],
           cover: (encounter.cover || {})[number], concealment: (encounter.concealment || {})[number],
           hp: hit_points_seen(holder, viewer, gm), hero_points: hero_points_seen(encounter, holder, viewer, gm),
-          turn: holder ? plain(TurnState.summary(holder)) : nil,
+          turn: holder ? turn(encounter, holder) : nil,
           shapes: gm && one.creature? && holder ? Shapes.shown(holder) : nil }.compact
       end
 
+      # What is said beneath a combatant's name: whose familiar or companion it is, who rides whom, and the prey a
+      # ranger hunts or their companion shares.
+      def self.lines(encounter, one)
+        holder = one.holder
+        return [] unless holder
+
+        kind = Actors.of(holder).minion_kind
+        owner = kind ? holder.master&.name : nil
+        lines = []
+
+        if owner
+          key = if kind == 'companion' then 'pf2e.view_companion_of'
+                elsif holder.stat_block['pet'] then 'pf2e.view_pet_of'
+                else 'pf2e.view_familiar_of'
+                end
+          lines << t(key, :char => owner)
+        end
+
+        riding = Companion::Riding.view_line(holder)
+        lines << riding if riding
+
+        prey = HuntPrey.prey(holder)
+        if prey
+          row = Combatants.rows(encounter).find { |found| found['name'] == prey }
+          lines << t('pf2e.view_hunting', :target => row ? "#{prey} (##{row['id']})" : prey)
+        end
+
+        if owner && ActiveEffects.on(holder).any? { |effect| (effect.mark || {})['slug'] == HuntPrey::SHARE_SLUG }
+          lines << t('pf2e.view_sharing_hunt', :char => owner)
+        end
+
+        lines
+      end
+
+      # What they have done this turn, and who they share the multiple attack penalty with, where the penalty
+      # counts a rider's or a mount's attacks too.
+      def self.turn(encounter, holder)
+        summary = plain(TurnState.summary(holder))
+        return summary unless Companion::Riding.shared_attacks(holder).positive?
+
+        partner = Companion::Riding.partner_of(holder)
+        row = partner ? Companion::Riding.row_of(encounter, partner) : nil
+        row ? t('pf2e.turn_shared', :summary => summary.chomp('.'), :name => row['name']) : summary
+      end
+
       # The GM sees everyone's. Anyone else sees how hurt a creature looks. A character's are on their combat
-      # sheet, and every sheet is open, so anyone logged in sees them.
+      # sheet, and every sheet is open, so anyone logged in sees them, and so are a familiar's and a companion's.
       def self.hit_points_seen(holder, viewer, gm)
         return nil unless holder
         return Harm.hit_points(holder) if gm
-        return Harm.looks(holder) if Actors.of(holder).creature?
+        return Harm.looks(holder) if Actors.of(holder).creature? && Actors.of(holder).minion_kind.nil?
         return nil if viewer.nil?
 
         Harm.hit_points(holder)
@@ -78,7 +134,7 @@ module AresMUSH
 
         enactor = request.enactor
         gm = enactor ? Combatants.gm?(enactor, encounter) : false
-        listed = Combatants.all(encounter)
+        listed = EncounterWeb.listed(encounter)
 
         page = { id: encounter.id, round: encounter.round.to_i, active: encounter.is_active,
                  current: ActiveEffects.current_turn(encounter), organizer: PF2Encounter.gm_of(encounter)&.name || encounter.organizer, gm: gm,

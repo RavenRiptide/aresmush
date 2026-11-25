@@ -65,6 +65,9 @@ pf2e:
     - aquatic
   # The job category a familiar's approval request opens in. Blank uses the jobs plugin's request category.
   familiar_job_category:
+  # The job category an animal companion's approval request opens in. Blank uses the jobs plugin's request
+  # category.
+  companion_job_category:
   # Whether visitors who aren't logged in can see the Pathfinder 2e section of a character's profile on the
   # web portal. False shows it only to logged-in players.
   profile_sheet_anonymous: false

@@ -87,6 +87,8 @@ module AresMUSH
           return PF2DisplayCombatSheetCmd
         when "familiar"
           return PF2FamiliarSheetCmd
+        when "companion"
+          return PF2CompanionSheetCmd
         when "breakdown"
           return PF2StatBreakdownCmd
         when "option", "options"
@@ -110,6 +112,27 @@ module AresMUSH
           return PF2FamiliarRejectCmd
         when "cantrip"
           return PF2FamiliarCantripCmd
+        end
+      when "companion"
+        case cmd.switch
+        when "name"
+          return PF2CompanionNameCmd
+        when "approve"
+          return PF2CompanionApproveCmd
+        when "reject"
+          return PF2CompanionRejectCmd
+        when "replace"
+          return PF2CompanionReplaceCmd
+        when "replace/option"
+          return PF2CompanionReplaceOptionCmd
+        when "replace/cancel"
+          return PF2CompanionReplaceCancelCmd
+        when "dead", "revive"
+          return PF2CompanionDeadCmd
+        when "wear"
+          return PF2CompanionWearCmd
+        when "remove"
+          return PF2CompanionRemoveCmd
         end
       when "award"
         case cmd.switch
@@ -274,10 +297,14 @@ module AresMUSH
           return PF2EncounterOptionCmd
         when "sheet/familiar"
           return PF2EncounterFamiliarSheetCmd
+        when "sheet/companion"
+          return PF2EncounterCompanionSheetCmd
         when "sheet"
           return PF2EncounterSheetCmd
         when "familiar", "familiar/leave"
           return PF2EncounterFamiliarCmd
+        when "companion", "companion/leave"
+          return PF2EncounterCompanionCmd
         when "csheet"
           return PF2EncounterCombatSheetCmd
         when "undo", "redo"
@@ -566,6 +593,8 @@ module AresMUSH
         return PF2ProfileFormulasHandler
       when "pf2ProfileFamiliar"
         return PF2ProfileFamiliarHandler
+      when "pf2ProfileCompanion"
+        return PF2ProfileCompanionHandler
       end
 
       nil

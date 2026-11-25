@@ -200,6 +200,7 @@ module AresMUSH
           expect(lines).to include [ 'Name', 'Not set' ]
           expect(lines).to include [ 'Specific familiar (optional)', 'No' ]
           expect(lines.join).not_to include 'Still needed'
+          expect(lines.last).to eq t('pf2e.familiar_review_note')
         end
 
         it "should say in cg/review's messages that there is a familiar to set up, until its details are set" do

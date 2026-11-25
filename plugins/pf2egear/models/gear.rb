@@ -23,5 +23,10 @@ module AresMUSH
     attribute :expires
     reference :bag, "AresMUSH::PF2Bag"
 
+    # The animal companion wearing it, by the companion's id, and whether the companion has invested it
+    # (`Pf2e::Companion::Gear`). A worn item stays in the character's inventory, but its Bulk isn't theirs.
+    attribute :companion
+    attribute :companion_invested, :type => DataType::Boolean
+
   end
 end

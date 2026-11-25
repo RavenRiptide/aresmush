@@ -11,14 +11,40 @@ module AresMUSH
           weapons: Inventory.held(char, 'weapons').map { |item| worn(char, item, 'weapons', Pf2eCombat.get_weapon_prof(char, item.name)) },
           armor: Inventory.held(char, 'armor').map { |item| worn(char, item, 'armor', Pf2eCombat.get_armor_prof(char, item.name)) },
           shields: listed(char.shields).map { |item| worn(char, item, 'shields', nil).merge(hp: Pf2egear.display_shield_hp(item)) },
-          worn: listed(char.magic_items).map { |item| magic_item(char, item) },
-          gear: listed(char.gear).map { |item| counted(item) },
+          worn: own(listed(char.magic_items)).map { |item| magic_item(char, item) },
+          gear: own(listed(char.gear)).map { |item| counted(item) },
+          companion_worn: companion_worn(char),
           consumables: listed(char.consumables).map { |item| counted(item) },
           bags: Array(char.bags.to_a).map { |bag| bag_of(bag) } }
       end
 
       def self.listed(collection)
         collection ? Pf2egear.items_in_inventory(collection.to_a) : []
+      end
+
+      # What the character keeps for themselves: an item their animal companion wears has a section of its own.
+      def self.own(items)
+        items.reject { |item| Pf2e::Companion::Gear.worn?(item) }
+      end
+
+      # What their animal companion wears, which they still own: `{ name, items }`, or nil when it wears nothing.
+      def self.companion_worn(char)
+        items = Pf2e::Companion::Gear.worn_items(char)
+        return nil if items.empty?
+
+        # Anyone may open a profile, so an unnamed companion is "Rowan's animal companion".
+        { name: Pf2e::Companion::Gear.wearer_name(char, nil, :staff => true),
+          items: items.map do |item|
+            facts = Pf2e::Companion::Gear.facts(item)
+            { item: named(item), kind: worn_kind(item, facts), bulk: bulk_word(item),
+              invested: facts['investable'] ? facts['invested'] : nil }
+          end }
+      end
+
+      def self.worn_kind(item, facts)
+        return 'Barding' if facts['armor']
+
+        item.is_a?(PF2MagicItem) ? 'Magic item' : 'Adventuring gear'
       end
 
       def self.bulk_word(item)

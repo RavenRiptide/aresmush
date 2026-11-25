@@ -1,6 +1,7 @@
 ---
 pf2e_deities:
   Althea:
+    servitors: celestial
     allowed_sanctifications:
       - Holy
     allowed_alignments:
@@ -36,6 +37,7 @@ pf2e_deities:
       - Use negative energy spells.
       - Betray the trust of a community.
   Angoron:
+    servitors: celestial
     allowed_sanctifications:
       - Holy
     allowed_alignments:
@@ -71,6 +73,7 @@ pf2e_deities:
       - Bully those weaker than yourself.
       - Fail to acknowledge when you've been bested.
   Animus:
+    servitors: monitor
     allowed_sanctifications:
       - Holy
       - Unholy
@@ -136,6 +139,7 @@ pf2e_deities:
       - Talk when actions serve better.
       - Refuse power when it is offered.
   Ceinara:
+    servitors: monitor
     allowed_sanctifications:
       - Holy
       - Unholy
@@ -170,6 +174,7 @@ pf2e_deities:
       - Destroy an artistic expression.
       - Discourage an artist from pursuing their dreams.
   Daeus:
+    servitors: celestial
     allowed_sanctifications:
       - Holy
     allowed_alignments:
@@ -203,6 +208,7 @@ pf2e_deities:
       - Mistake vengeance for justice.
       - Cheat, deceive, or undermine those who have placed trust in you.
   Dana:
+    servitors: monitor
     allowed_sanctifications:
       - Holy
       - Unholy
@@ -268,6 +274,7 @@ pf2e_deities:
       - Remain silent where you can speak.
       - Believe in innocence.
   Eluna:
+    servitors: celestial
     allowed_sanctifications:
       - Holy
     allowed_alignments:
@@ -303,6 +310,7 @@ pf2e_deities:
       - Sacrifice the future for short-term benefit.
       - Ignore the guidance found in dreams, divination, and prophecy.
   Gilead:
+    servitors: celestial
     allowed_sanctifications:
       - Holy
     allowed_alignments:
@@ -395,6 +403,7 @@ pf2e_deities:
       - Fail to punish someone that's done wrong.
       - Ignoring someone's quest for vengeance.
   Kor:
+    servitors: monitor
     allowed_sanctifications:
       - Holy
       - Unholy
@@ -457,6 +466,7 @@ pf2e_deities:
       - Shirk your duties and responsibilities.
       - Take more than you're owed.
   Navos:
+    servitors: celestial
     allowed_sanctifications:
       - Holy
     allowed_alignments:
@@ -489,6 +499,7 @@ pf2e_deities:
       - Fail to perceive the weight of your own actions.
       - Try to change past events.
   Rada:
+    servitors: monitor
     allowed_sanctifications:
       - Holy
       - Unholy
@@ -522,6 +533,7 @@ pf2e_deities:
       - Be a false guide to another.
       - Pollute the ocean.
   Reos:
+    servitors: monitor
     allowed_sanctifications:
       - Holy
       - Unholy
@@ -556,6 +568,7 @@ pf2e_deities:
       - Strive for impossible perfection.
       - Disparage the act of creation.
   Serriel:
+    servitors: monitor
     allowed_sanctifications:
       - Holy
       - Unholy
@@ -620,6 +633,7 @@ pf2e_deities:
       - Allow the truth to ruin a good story.
       - Give your secrets away for free.
   Tarien:
+    servitors: celestial
     allowed_sanctifications:
       - Holy
     allowed_alignments:
@@ -683,6 +697,7 @@ pf2e_deities:
       - Ignore the needs of the dead.
       - Live in fear of death.
   Vardama:
+    servitors: monitor
     allowed_sanctifications:
       - Holy
       - Unholy

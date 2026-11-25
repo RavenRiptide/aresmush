@@ -176,8 +176,9 @@ pf2e_gear:
         option: "active-lantern"
         toggleable: true
         label: "{item} is lit"
-  # Light barding for an animal companion (GM Core), sold now and doing nothing until companions are built.
-  # Its armor stats are kept here for them: `companion_armor` is read by nothing yet.
+  # Barding is armor for an animal companion. Its armor stats are kept in `companion_armor` (Player Core
+  # and GM Core values), read by Pf2e::Companion::Stats while the companion wears it. `sizes` are the
+  # companion sizes it fits; barding without `sizes` adjusts to fit any companion.
   Barding of the Zephyr:
     bulk: 0.1
     level: 10
@@ -195,6 +196,7 @@ pf2e_gear:
     traits:
       - barding
       - companion
+    companion_armor: { category: light-barding, ac_bonus: 1, dex_cap: 5, check_penalty: -1, speed_penalty: -5, strength: 3, sizes: [ Large ] }
   Light Barding (Small or Medium):
     bulk: 2
     level: 0
@@ -202,6 +204,7 @@ pf2e_gear:
     traits:
       - barding
       - companion
+    companion_armor: { category: light-barding, ac_bonus: 1, dex_cap: 5, check_penalty: -1, speed_penalty: -5, strength: 3, sizes: [ Small, Medium ] }
   Lock (Poor):
     bulk: 0
     level: 0
@@ -422,6 +425,7 @@ pf2e_gear:
     traits:
       - barding
       - companion
+    companion_armor: { category: heavy-barding, ac_bonus: 3, dex_cap: 3, check_penalty: -3, speed_penalty: -10, strength: 5, sizes: [ Small, Medium ] }
   Periscope:
     bulk: 0.1
     level: 2
@@ -575,6 +579,7 @@ pf2e_gear:
     traits:
       - barding
       - companion
+    companion_armor: { category: heavy-barding, ac_bonus: 3, dex_cap: 3, check_penalty: -3, speed_penalty: -10, strength: 5, sizes: [ Large ] }
   Lock (Average):
     bulk: 0
     level: 3

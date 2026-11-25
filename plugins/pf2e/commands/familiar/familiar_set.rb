@@ -35,7 +35,7 @@ module AresMUSH
 
       def checked
         @checked ||= case self.field
-                     when 'name' then Familiar::Details.name(self.value)
+                     when 'name' then Familiar::Details.name(self.value).and_then { |name| Companion::Names.not_companion(enactor, name) }
                      when 'species' then Familiar::Details.species(self.value)
                      else Familiar::Details.form(self.value).and_then { |form| Familiar::Choices.form_allowed(enactor, form) }
                      end

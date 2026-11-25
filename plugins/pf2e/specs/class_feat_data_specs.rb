@@ -324,13 +324,9 @@ module AresMUSH
         # A name under `feat` or `orfeat` is matched against the feats a character holds, so one
         # that names anything else can never be met.
         it "should name only feats under feat and orfeat" do
-          # These wait on the familiar system: a patron's tradition.
-          waiting = [ 'Spirit Familiar (Witch)', 'Stitched Familiar' ]
           known = @feats.keys.map(&:downcase)
 
           class_feats.each_pair do |name, details|
-            next if waiting.include?(name)
-
             prereq = details['prereq'] || {}
 
             Array(prereq['feat']).concat(Array(prereq['orfeat'])).each do |wanted|
@@ -370,8 +366,9 @@ module AresMUSH
         end
 
         # Every name a `feature` prereq asks for is one a class table grants: a feature, or an
-        # option of a class choice.
-        it "should name only features a class grants" do
+        # option of a class choice. Or an option of a feat's choice, which holds_feature? also
+        # matches: Shed Tail asks for the tail Ciith Armaments gave.
+        it "should name only features a class or feat choice grants" do
           granted = []
 
           collect = lambda do |node|
@@ -388,6 +385,11 @@ module AresMUSH
           end
 
           %w(class specialty).each { |file| collect.call(YAML.load_file("game/config/pf2e_#{file}.yml")) }
+
+          @feats.each_value do |details|
+            options = (details['feat_choice'] || {})['options'] if details.is_a?(Hash)
+            granted.concat(options.keys) if options.is_a?(Hash)
+          end
 
           @feats.each_pair do |name, details|
             Array((details['prereq'] || {})['feature']).each do |wanted|

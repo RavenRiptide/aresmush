@@ -230,7 +230,8 @@ module AresMUSH
       end
 
       # What cg/review and advance/review show of a familiar waiting to be set up: [ label, value ] for
-      # each detail, then the picks as a plain line. What's still missing is said in their messages.
+      # each detail, then the picks and a pointer to sheet/familiar as plain lines. What's still missing is
+      # said in their messages.
       def self.review_lines(char)
         shown = details(char)
         unset = t('pf2e.familiar_detail_unset')
@@ -243,6 +244,7 @@ module AresMUSH
 
         picks = picks_text(shown)
         lines << t('pf2e.familiar_sheet_choices', :picks => picks) unless picks.empty?
+        lines << t(Choices.plain_pet?(char) ? 'pf2e.familiar_review_note_pet' : 'pf2e.familiar_review_note')
 
         lines
       end

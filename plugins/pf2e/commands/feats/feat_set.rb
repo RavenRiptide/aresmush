@@ -60,7 +60,7 @@ module AresMUSH
         end
 
         unless Pf2e.can_take_feat?(enactor, fname)
-          client.emit_failure Pf2e.explain_feat_block(enactor, fdetails) || t('pf2e.does_not_qualify')
+          client.emit_failure Pf2e.explain_feat_block(enactor, fdetails, fname) || t('pf2e.does_not_qualify')
           return
         end
 

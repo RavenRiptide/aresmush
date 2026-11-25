@@ -158,6 +158,19 @@ module AresMUSH
         end
       end
 
+      # The movement types a character has for good, which a `speed` prereq reads: the heritage's, the
+      # feats' and their chosen options', and the class's at `level`. Counts the feats a level in
+      # progress has picked and drops the ones it retrains away. Leaves out today's daily choices and
+      # anything an effect gives, since neither lasts. An entry's own prereq is still checked, so one
+      # must never ask for a `speed`, or this would call itself.
+      def self.permanent_types(char, level)
+        entries = heritage_entries(char) + feat_entries(char, DraftSheet.of(char).feat_names) + class_entries(char, level)
+
+        entries.select { |entry| entry['prereq'].nil? || Pf2e.meets_prereqs?(char, entry['prereq'], level) }
+               .flat_map { |entry| TYPES.select { |type| entry.key?(type) } }
+               .uniq
+      end
+
       # What chargen wrote beside the ancestry's Speed.
       def self.heritage_entries(char)
         heritage = char.pf2_base_info['heritage']
@@ -170,11 +183,11 @@ module AresMUSH
         end
       end
 
-      # From the feats on the sheet, and from the option chosen for a feat's choice.
-      def self.feat_entries(char)
+      # From the feats on the sheet, or the `names` given, and from the option chosen for a feat's choice.
+      def self.feat_entries(char, names = Pf2e.feats_in_play(char))
         config = Global.read_config('pf2e_feats') || {}
 
-        Pf2e.feats_in_play(char).uniq.flat_map do |name|
+        names.uniq.flat_map do |name|
           key = config.keys.find { |k| k.to_s.casecmp?(name.to_s) }
           details = key && config[key]
           next [] unless details.is_a?(Hash)

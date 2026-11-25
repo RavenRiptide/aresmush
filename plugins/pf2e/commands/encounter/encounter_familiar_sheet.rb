@@ -33,7 +33,7 @@ module AresMUSH
         return nil unless char
 
         master = rows.find { |row| row['char'].to_s == char.id.to_s }
-        [ char, master ? Combatants.minions_of(encounter, master['id']).first : nil ]
+        [ char, master ? Combatants.minions_of(encounter, master['id'], 'familiar').first : nil ]
       end
 
       # A familiar here by its id or name, a character here, or any character by name.
@@ -43,7 +43,7 @@ module AresMUSH
         if found.ok?
           combatant = found.state
 
-          if combatant.minion?
+          if combatant.minion? && Actors.of(combatant.holder).minion_kind == 'familiar'
             master = rows.find { |row| row['id'].to_i == combatant.master.to_i }
             return master ? Character[master['char']] : nil
           end

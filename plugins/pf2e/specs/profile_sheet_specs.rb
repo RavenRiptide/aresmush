@@ -108,8 +108,8 @@ module AresMUSH
         end
 
         it "should tell the profile which tabs to draw" do
-          expect(ProfileSheet.flags(@witch, @viewer)).to eq(sheet: true, combat: true, spells: true, inventory: true, formulas: true, familiar: true)
-          expect(ProfileSheet.flags(@fighter, @viewer)).to eq(sheet: true, combat: true, spells: false, inventory: true, formulas: false, familiar: false)
+          expect(ProfileSheet.flags(@witch, @viewer)).to eq(sheet: true, combat: true, spells: true, inventory: true, formulas: true, familiar: true, companion: false)
+          expect(ProfileSheet.flags(@fighter, @viewer)).to eq(sheet: true, combat: true, spells: false, inventory: true, formulas: false, familiar: false, companion: false)
         end
 
         it "should send the flags with the profile's custom fields" do

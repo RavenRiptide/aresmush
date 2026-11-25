@@ -37,6 +37,7 @@ module AresMUSH
       PF2InitJoinCmd, PF2EncounterAddCmd, PF2EncounterAdjustCmd, PF2EncounterAfflictionCmd, PF2EncounterNextCmd, PF2EncounterPrevCmd, PF2InitModCmd,
       PF2EncounterRemoveCmd, PF2EncounterResyncCmd, PF2DamagePlayerCmd, PF2HealPlayerCmd, PF2ConditionSetCmd, PF2ConditionWipeCmd, PF2EffectAddCmd,
       PF2EffectRemoveCmd, PF2EffectWipeCmd,PF2EncounterRestCmd, PF2EncounterRefocusCmd, PF2EncounterGatherCmd,
-      PF2EncounterPoisonCmd, PF2EncounterSprayCmd, PF2PersistentMutagenCmd, PF2EncounterFamiliarCmd ].each { |command| command.prepend(Recorded) }
+      PF2EncounterPoisonCmd, PF2EncounterSprayCmd, PF2PersistentMutagenCmd, PF2EncounterFamiliarCmd,
+      PF2EncounterCompanionCmd ].each { |command| command.prepend(Recorded) }
   end
 end

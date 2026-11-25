@@ -105,8 +105,18 @@ module AresMUSH
         }
 
         ended.each { |effect| ActiveEffects.remove(target, effect) }
+        dropped = drop_conditions(target, aura ? origin(emitter, aura) : "#{Pf2e.holder_key(emitter)}:#{slug}")
 
-        Ok.new(:state => ended.map(&:name))
+        Ok.new(:state => ended.map(&:name) + dropped)
+      end
+
+      # The conditions an aura's save left that last only while they remain in it - Patron's Presence's
+      # Stupefied - marked with the aura's origin. Answers their names.
+      def self.drop_conditions(holder, origin)
+        names = (holder.pf2_conditions || {}).select { |_name, held| held.is_a?(Hash) && held['aura_of'] == origin }.keys
+
+        names.each { |name| Pf2e.remove_condition(holder, name) }
+        names
       end
 
       def self.inside?(target, name, origin)
@@ -116,7 +126,10 @@ module AresMUSH
       # The effect projecting an aura has ended: everything the aura put on anyone ends with it.
       def self.dispelled(emitter, effect)
         origins(emitter, effect.name).flat_map { |origin| Pf2eEffect.find(:aura_of => origin).to_a }.each do |one|
-          ActiveEffects.remove(one.holder, one) if one.holder
+          next unless one.holder
+
+          drop_conditions(one.holder, one.aura_of)
+          ActiveEffects.remove(one.holder, one)
         end
       end
 

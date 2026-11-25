@@ -39,7 +39,9 @@ module AresMUSH
       end
 
       # Everything together. An item whose bag has gone counts as loose, as `items_in_inventory` lists it.
+      # What their animal companion wears is the companion's to carry (`Pf2e::Companion::Gear`).
       def self.tally(items, bags)
+        items = items.reject { |item| item.respond_to?(:companion) && !item.companion.to_s.empty? }
         by_bag = items.group_by { |item| item.bag_id.to_s }
         ours = bags.map { |bag| bag.id.to_s }
         loose = items.reject { |item| ours.include?(item.bag_id.to_s) }

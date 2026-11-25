@@ -29,6 +29,13 @@ module AresMUSH
           'requires' => lambda { |char| Familiar.approved?(char) },
           'code' => :no_familiar,
           'key' => 'pf2e.profile_sheet_no_familiar'
+        },
+        {
+          # Approved, as the familiar's tab is. A dead companion stays approved until a replacement is.
+          'name' => 'companion',
+          'requires' => lambda { |char| Companion.approved?(char) },
+          'code' => :no_companion,
+          'key' => 'pf2e.profile_sheet_no_companion'
         }
       ].freeze
 

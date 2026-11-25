@@ -214,8 +214,10 @@ module AresMUSH
       (amount + Pf2e::Stat.total(char, 'healing', nil, options)).clamp(0, nil)
     end
 
+    # A character's hit points record, or an animal companion's own creature record, which dies as a
+    # character does (`Actor#hit_point_record`).
     def self.get_hp_obj(char)
-      char.hp
+      char.hp || Pf2e::Actors.of(char).hit_point_record
     end
 
     # The DC to recover from dying: 10 plus the dying value, less whatever an effect took off it.
@@ -241,7 +243,8 @@ module AresMUSH
     end
 
     def self.get_max_hp(char)
-      Pf2e::Stat.total(char, 'hp')
+      own = char.hp ? nil : Pf2e::Actors.of(char).hit_point_record
+      own ? own.max_hp : Pf2e::Stat.total(char, 'hp')
     end
 
     # The arithmetic as well as the answer, for a sheet that shows a player why Drained cost them 40.

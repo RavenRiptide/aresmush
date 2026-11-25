@@ -14,7 +14,8 @@ module AresMUSH
     module Actors
 
       def self.of(holder)
-        return FamiliarActor.new(holder) if holder.is_a?(Pf2eNpc) && holder.master_id
+        return CompanionActor.new(holder) if holder.is_a?(Pf2eNpc) && holder.companion?
+        return FamiliarActor.new(holder) if holder.is_a?(Pf2eNpc) && holder.familiar?
         return CreatureActor.new(holder) if holder.is_a?(Pf2eNpc)
         return EncounterCharacterActor.new(holder) if holder.is_a?(Pf2eCombatantState)
 
@@ -82,9 +83,70 @@ module AresMUSH
       def encounter
         nil
       end
+
+      # Which kind of creature acting on a master's turn it is: 'familiar', 'companion', or nil for anyone
+      # with a turn of their own.
+      def minion_kind
+        nil
+      end
+
+      # Whether they die as a character does: dying at 0 Hit Points, recovery checks, and Death Consent
+      # deciding whether they may die. Characters, and animal companions ("Knocked Out and Dying", Player
+      # Core); a creature is dead at 0 Hit Points.
+      def dies_as_character?
+        false
+      end
+
+      # The record `Pf2eHP` keeps their damage on where it isn't a character's hit points record: an animal
+      # companion's own creature record.
+      def hit_point_record
+        nil
+      end
+
+      # What else is said when they die: for an animal companion, that staff record it on its master's sheet.
+      def death_note
+        nil
+      end
+    end
+
+    # Hit points as a character's go: damage that leaves them dying, healing that brings them back, and
+    # death as `Pf2eHP` has it. A character's, and an animal companion's.
+    module DiesAsCharacter
+      def dies_as_character?
+        true
+      end
+
+      # What they took after what they resist, and under `fate` what became of them if it settled that:
+      # `:dead`, or `:spared` where it would have killed and may not.
+      def damage(amount, kind = nil, is_dm: nil, critical: false, continuing: false, about: [], once: nil)
+        held = IWR.apply(IWR.of(@holder), amount.to_i, kind, about, :once => once)
+        had = Pf2eHP.get_current_hp(@holder).positive?
+        fate = Pf2eHP.modify_damage(@holder, held['amount'], false, is_dm, kind, [], :critical => critical,
+                                                                                   :continuing => continuing, :resisted => true,
+                                                                                   :nonlethal => IWR.facts(nil, about).include?(CharacterActor::NONLETHAL))
+
+        # `fell` is that this is what took their last hit points.
+        held.merge('fate' => fate, 'fell' => had && !Pf2eHP.get_current_hp(@holder).positive?)
+      end
+
+      # Dead at a stroke, whatever their hit points: a vorpal weapon's decapitation.
+      def slay!
+        Pf2eHP.kill(@holder)
+      end
+
+      # What they regained, which is no more than they had lost.
+      def heal(amount, options = [])
+        before = Pf2eHP.get_hp_obj(@holder).damage.to_i
+
+        Pf2eHP.modify_damage(@holder, amount.to_i, true, false, nil, options)
+
+        before - Pf2eHP.get_hp_obj(@holder).damage.to_i
+      end
     end
 
     class CharacterActor < Actor
+      include DiesAsCharacter
+
       def creature?
         false
       end
@@ -169,34 +231,7 @@ module AresMUSH
       # ------------------------------------------------------------------------------
       # Hit points
 
-      # What they took after what they resist, and under `fate` what became of them if it settled that:
-      # `:dead`, or `:spared` where it would have killed and may not.
-      def damage(amount, kind = nil, is_dm: nil, critical: false, continuing: false, about: [], once: nil)
-        held = IWR.apply(IWR.of(@holder), amount.to_i, kind, about, :once => once)
-        had = Pf2eHP.get_current_hp(@holder).positive?
-        fate = Pf2eHP.modify_damage(@holder, held['amount'], false, is_dm, kind, [], :critical => critical,
-                                                                                   :continuing => continuing, :resisted => true,
-                                                                                   :nonlethal => IWR.facts(nil, about).include?(NONLETHAL))
-
-        # `fell` is that this is what took their last hit points.
-        held.merge('fate' => fate, 'fell' => had && !Pf2eHP.get_current_hp(@holder).positive?)
-      end
-
       NONLETHAL = 'item:trait:nonlethal'.freeze
-
-      # Dead at a stroke, whatever their hit points: a vorpal weapon's decapitation.
-      def slay!
-        Pf2eHP.kill(@holder)
-      end
-
-      # What they regained, which is no more than they had lost.
-      def heal(amount, options = [])
-        before = Pf2eHP.get_hp_obj(@holder).damage.to_i
-
-        Pf2eHP.modify_damage(@holder, amount.to_i, true, false, nil, options)
-
-        before - Pf2eHP.get_hp_obj(@holder).damage.to_i
-      end
 
       def hit_points
         @holder.hp ? "#{Pf2eHP.get_current_hp(@holder)} / #{Pf2eHP.get_max_hp(@holder)}" : '---'
@@ -364,13 +399,22 @@ module AresMUSH
         @holder.encounter
       end
 
-      # How to have their familiar act, where it is here with them.
+      # How to have their familiar and animal companion act, where they are here with them.
       def reminder_lines
         found = @holder.encounter
         row = found && Combatants.rows(found).find { |one| one['state'].to_s == @holder.id.to_s }
-        familiars = row ? Combatants.minions_of(found, row['id']) : []
+        return [] unless row
 
-        familiars.map { |one| t('pf2e.familiar_turn_reminder', :name => one['name'], :ref => "##{one['id']}") }
+        familiars = Combatants.minions_of(found, row['id'], 'familiar').map do |one|
+          t('pf2e.familiar_turn_reminder', :name => one['name'], :ref => "##{one['id']}")
+        end
+
+        companions = Combatants.minions_of(found, row['id'], 'companion').map do |one|
+          alone = Companion::Minion.independent?(Combatants.holder_of(one))
+          t(alone ? 'pf2e.companion_turn_reminder_independent' : 'pf2e.companion_turn_reminder', :name => one['name'], :ref => "##{one['id']}")
+        end
+
+        familiars + companions
       end
 
       def sheet_iwr
@@ -617,16 +661,38 @@ module AresMUSH
       end
     end
 
-    # A familiar in an encounter: a creature record whose figures come from its master
-    # (`Familiar::Block`), fighting on its master's side. It acts in its master's turn, as a minion
-    # (`Familiar::Minion`).
-    class FamiliarActor < CreatureActor
+    # What a familiar and an animal companion share: a creature record whose figures come from its master,
+    # fighting on its master's side, with no reactions, acting in its master's turn.
+    module MasterSide
       def side
         'characters'
       end
 
       def reactions?
         false
+      end
+
+      # Its master hears what it took, as a player hears their own damage. It isn't their `person`: that
+      # would let it spend their Hero Points and stand in for them in their picks.
+      def notify_damage(amount, source, why = [])
+        master = @holder.master&.character
+        return unless master
+
+        key = "pf2e.#{minion_kind}_took_damage"
+        message = why.any? ?
+          t("#{key}_why", :name => @holder.name, :amount => amount, :source => source, :why => why.join(', ')) :
+          t(key, :name => @holder.name, :amount => amount, :source => source)
+
+        Login.notify master, :pf2_damage, message, 0
+      end
+    end
+
+    # A familiar in an encounter (`Familiar::Block`), acting as a minion (`Familiar::Minion`).
+    class FamiliarActor < CreatureActor
+      include MasterSide
+
+      def minion_kind
+        'familiar'
       end
 
       def turn_actions
@@ -637,18 +703,31 @@ module AresMUSH
       def fallen(out)
         Familiar::Minion.destroyed!(@holder, out)
       end
+    end
 
-      # Its master hears what it took, as a player hears their own damage. It isn't their `person`: that
-      # would let it spend their Hero Points and stand in for them in their picks.
-      def notify_damage(amount, source, why = [])
+    # An animal companion in an encounter (`Companion::Block`), acting as a minion (`Companion::Minion`).
+    class CompanionActor < CreatureActor
+      include MasterSide
+      # At 0 Hit Points it is knocked out and dying, as a character is, on its own record.
+      include DiesAsCharacter
+
+      def minion_kind
+        'companion'
+      end
+
+      def hit_point_record
+        @holder
+      end
+
+      # An encounter never writes its master's sheet, so staff record the death there (`companion/dead`),
+      # which opens its replacement.
+      def death_note
         master = @holder.master&.character
-        return unless master
+        master ? Telling.event('pf2e.companion_died', :name => @holder.name, :char => master.name) : nil
+      end
 
-        message = why.any? ?
-          t('pf2e.familiar_took_damage_why', :name => @holder.name, :amount => amount, :source => source, :why => why.join(', ')) :
-          t('pf2e.familiar_took_damage', :name => @holder.name, :amount => amount, :source => source)
-
-        Login.notify master, :pf2_damage, message, 0
+      def turn_actions
+        Companion::Minion.turn_actions(@holder)
       end
     end
   end

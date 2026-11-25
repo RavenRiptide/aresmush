@@ -273,6 +273,9 @@ module AresMUSH
         # would otherwise take it straight back off again.
         Pf2e::Paths.apply_all!(char)
 
+        # Barding their companion has outgrown, and what a companion they no longer have wore, comes off.
+        Pf2e::Companion::Gear.settle!(char)
+
         ops.size
       end
 

@@ -46,6 +46,8 @@ module AresMUSH
 
         char.update(:pf2_persistent => list)
         Pf2e.remove_condition(char, CONDITION) if list.empty?
+        # A bird's Support left them Dazzled until the bleed ends.
+        Companion::Support.bleed_ended(char) if Domains.slug(type) == 'bleed'
 
         Ok.new(:state => list)
       end

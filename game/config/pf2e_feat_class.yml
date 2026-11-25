@@ -86,6 +86,10 @@ pf2e_feats:
         value: 2
         priority: 9
   Animal Companion:
+    companion: true
+    feat_choice:
+      from: companion_types
+      summary: a type of animal companion
     assoc_charclass:
       - Druid
     feat_type:
@@ -97,6 +101,10 @@ pf2e_feats:
     traits:
       - druid
   Animal Companion (Ranger):
+    companion: true
+    feat_choice:
+      from: companion_types
+      summary: a type of animal companion
     assoc_charclass:
       - Ranger
     feat_type:
@@ -515,6 +523,11 @@ pf2e_feats:
     traits:
       - swashbuckler
   Faithful Steed:
+    companion: true
+    feat_choice:
+      from: companion_types
+      summary: a type of animal companion
+    companion_mount: true
     assoc_charclass:
       - Champion
     feat_type:
@@ -3645,6 +3658,8 @@ pf2e_feats:
     traits:
       - wizard
   Mature Animal Companion (Druid):
+    companion_stage: mature
+    companion_independent: 1
     assoc_charclass:
       - Druid
     feat_type:
@@ -5292,6 +5307,7 @@ pf2e_feats:
     traits:
       - rogue
   Loyal Warhorse:
+    companion_stage: mature
     assoc_charclass:
       - Champion
     feat_type:
@@ -5349,6 +5365,8 @@ pf2e_feats:
         base_level: 3
         focus_type: warden
   Mature Animal Companion (Ranger):
+    companion_stage: mature
+    companion_independent: 1
     assoc_charclass:
       - Ranger
     feat_type:
@@ -6083,7 +6101,7 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 8
-      skill: Perception/master
+      combat_stats: Perception/master
     shortdesc: "**Fighter, Rogue, Investigator** Your battle instincts make you more aware of concealed and invisible opponents.%r%r**Ranger** Your heightened senses allow you to instinctively detect unseen opponents.%r%rYou don't need to succeed at a flat check to target concealed creatures. You're not off-guard to creatures that are hidden from you (unless you're off-guard to them for reasons other than the hidden condition), and you need only a successful DC 5 flat check to target a hidden creature.%r%rWhile you're adjacent to an undetected creature of your level or lower, it is instead only hidden from you."
     traits:
       - fighter
@@ -6748,6 +6766,12 @@ pf2e_feats:
         text: "You ignore the target's Concealed condition."
         predicate: ["incredible-aim"]
   Incredible Companion (Druid):
+    companion_stage: incredible
+    feat_choice:
+      options:
+        Nimble: {}
+        Savage: {}
+      summary: nimble or savage for your animal companion
     assoc_charclass:
       - Druid
     feat_type:
@@ -7269,12 +7293,23 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 8
-      orfeat:
-        - divine
-        - occult patron
+      specialize:
+        - Curse
+        - Fate
+        - Fervor
+        - Night
     shortdesc: Your familiar can subsume its body to become pure spirit. Your familiar gains the Shed Spirit activity.
     traits:
       - witch
+    # An activity on the familiar's stat block in an encounter (Familiar::Activities). `%{dc}` is the
+    # master's spell DC and `%{damage}` the dice at the master's level.
+    familiar_action:
+      name: Shed Spirit
+      summary: "2 actions, once per 10 minutes. %{damage} spirit damage to an enemy (DC %{dc} basic Will save); the ally you specify regains half the damage dealt."
+      type: action
+      cost: 2
+      damage: { base: 6d6, from: 9, every: 2, add: 2 }
+      text: "(%{damage}) spirit, DC %{dc} basic Will%rFrequency once per 10 minutes%r%{name}'s spirit leaves its body and flies at an enemy within 20 feet, dealing %{damage} spirit damage (DC %{dc} basic Will save). If it dealt damage, it then flies to an ally within 30 feet of the enemy, who regains Hit Points equal to half the damage dealt. %{name} then re-forms in its original square."
   Stitched Familiar:
     assoc_charclass:
       - Witch
@@ -7282,12 +7317,20 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 8
-      orfeat:
-        - arcane
-        - primal patron
+      specialize:
+        - Rune
+        - Wild
+        - Winter
     shortdesc: Your familiar can shed its material form, becoming a mass of animated magic. Your familiar gains the Stitching Strike activity.
     traits:
       - witch
+    familiar_action:
+      name: Stitching Strike
+      summary: "2 actions, once per 10 minutes. %{damage} slashing damage to an enemy (DC %{dc} basic Reflex save); on a failure, it is immobilized for 1 round or until it Escapes (DC %{dc})."
+      type: action
+      cost: 2
+      damage: { base: 6d6, from: 9, every: 2, add: 2 }
+      text: "(%{damage}) slashing, DC %{dc} basic Reflex%rFrequency once per 10 minutes%r%{name} unravels into magical fibers that wrap an enemy within 30 feet, dealing %{damage} slashing damage (DC %{dc} basic Reflex save). A target that fails is also immobilized for 1 round, or until it Escapes against DC %{dc}. %{name} then re-forms in its original square."
   Stunning Finisher:
     assoc_charclass:
       - Swashbuckler
@@ -8001,6 +8044,13 @@ pf2e_feats:
     traits:
       - bard
   Imposing Destrier:
+    companion_stage: incredible
+    companion_independent: 1
+    feat_choice:
+      options:
+        Nimble: {}
+        Savage: {}
+      summary: nimble or savage for your animal companion
     assoc_charclass:
       - Champion
     feat_type:
@@ -8023,6 +8073,12 @@ pf2e_feats:
     traits:
       - barbarian
   Incredible Companion (Ranger):
+    companion_stage: incredible
+    feat_choice:
+      options:
+        Nimble: {}
+        Savage: {}
+      summary: nimble or savage for your animal companion
     assoc_charclass:
       - Ranger
     feat_type:
@@ -10566,6 +10622,15 @@ pf2e_feats:
     shortdesc: Your patron can direct its attention through your familiar, and its mere presence becomes an ominous weight on the minds of other beings to distract them and blot out their magic. Your familiar gains the Patron's Presence activity.
     traits:
       - witch
+    # Using it puts `Aura: Patron's Presence` on the familiar; entering the aura rolls the save below
+    # (Familiar::Presence).
+    familiar_action:
+      name: Patron's Presence
+      type: action
+      cost: 2
+      traits: [ aura ]
+      summary: "2 actions, once per hour. A 15-foot emanation until the end of your next turn, which %{name} can Sustain up to 1 minute; an enemy that enters or starts its turn in it attempts a DC %{dc} Will save, or is stupefied 2 (stupefied 3 on a critical failure) while it remains in it."
+      text: "DC %{dc} Will%rFrequency once per hour%rA palpable weight extends from %{name} in a 15-foot emanation until the end of your next turn, and %{name} can Sustain it up to 1 minute. An enemy that enters or starts its turn in the aura attempts a DC %{dc} Will save.%rCritical Success The creature is unaffected.%rSuccess The creature is unaffected.%rFailure The creature is Stupefied 2 while it remains in the aura.%rCritical Failure The creature is Stupefied 3 while it remains in the aura."
   Peerless Form:
     assoc_charclass:
       - Monk
@@ -10811,6 +10876,10 @@ pf2e_feats:
         suboptions: [{"label": "{item|name}", "value": "sow-spell"}]
         label: "Spellshape"
   Specialized Companion (Druid):
+    companion_stage: specialized
+    feat_choice:
+      from: companion_specializations
+      summary: a specialization for your animal companion
     repeatable: 3
     assoc_charclass:
       - Druid
@@ -10853,6 +10922,9 @@ pf2e_feats:
     traits:
       - rogue
   Stealthy Companion:
+    companion_grants:
+      raise_with:
+        Ambusher: [ Stealth ]
     assoc_charclass:
       - Ranger
     feat_type:
@@ -11102,6 +11174,10 @@ pf2e_feats:
       - monk
 # Level 16 Class Feats
   Auspicious Mount:
+    companion_stage: specialized
+    feat_choice:
+      from: companion_specializations
+      summary: a specialization for your animal companion
     assoc_charclass:
       - Champion
     feat_type:
@@ -11913,6 +11989,10 @@ pf2e_feats:
         mode: "add"
         value: "{actor|system.proficiencies.aliases.witch}"
   Specialized Companion (Ranger):
+    companion_stage: specialized
+    feat_choice:
+      from: companion_specializations
+      summary: a specialization for your animal companion
     repeatable: 3
     assoc_charclass:
       - Ranger
@@ -12474,6 +12554,13 @@ pf2e_feats:
     shortdesc: Your patron partially manifests itself through your familiar to claim a foe's power for its own. Your familiar gains the Patron's Claim activity.
     traits:
       - witch
+    familiar_action:
+      name: Patron's Claim
+      summary: "2 actions, once per hour. %{damage} spirit damage to a creature (DC %{dc} basic Fortitude save); on a failure that deals damage, it is drained 2 (drained 4 on a critical failure) and you regain 1 Focus Point."
+      type: action
+      cost: 2
+      damage: 10d10
+      text: "(%{damage}) spirit, DC %{dc} basic Fortitude%rFrequency once per hour%r%{name}'s mouth opens impossibly wide and your patron's grasping limb stretches from it at a creature within 30 feet, dealing %{damage} spirit damage (DC %{dc} basic Fortitude save). A creature that fails and takes damage is also drained 2, or drained 4 on a critical failure, and you regain 1 Focus Point, up to your usual maximum."
   Perfect Clarity:
     assoc_charclass:
       - Barbarian
@@ -12571,7 +12658,7 @@ pf2e_feats:
       level: 18
       feat:
         - Qi Spells
-      skill: Of Many Styles/master
+        - Master of Many Styles
     shortdesc: "**Frequency** once per minute%r%rYou center yourself with the universe and draw upon its vast power. You cast a single action qi spell with the stance trait, without spending a Focus Point."
     traits:
       - monk
@@ -13169,7 +13256,7 @@ pf2e_feats:
       level: 20
       feat:
         - Far Shot
-      skill: Perception/legendary
+      combat_stats: Perception/legendary
     shortdesc: You focus on your hunted prey, perceiving angles, air resistance, and every variable that would affect your ranged attack. If you have master proficiency with your ranged weapon, you can ignore the penalty for attacking up to five range increments away when attacking your hunted prey.
     traits:
       - ranger

@@ -51,5 +51,11 @@ module AresMUSH
     attribute :deity
     reference :bag, "AresMUSH::PF2Bag"
 
+    # The animal companion wearing it, by the companion's id, and whether the companion has invested it
+    # (`Pf2e::Companion::Gear`). A worn item stays in the character's inventory, and the character's own
+    # `invested` and `invest_on_refresh` stay off while the companion wears it.
+    attribute :companion
+    attribute :companion_invested, :type => DataType::Boolean
+
   end
 end

@@ -51,6 +51,9 @@ module AresMUSH
 
           item_id = found.state
 
+          # What their animal companion wears, the companion invests.
+          next if Pf2e::CharState.emit_error!(client, Pf2e::Companion::Gear.worn_refusal(item_id))
+
           if Pf2e.has_trait?(item_id.traits, 'invested')
 
             # An item that asks a question when it's invested is answered here, or not invested at all.

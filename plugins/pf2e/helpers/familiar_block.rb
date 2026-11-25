@@ -42,8 +42,9 @@ module AresMUSH
             'spellcasting' => [ MasterSpells.block_entry(state) ].compact }
         end
 
-        # A specific familiar's own actions, with its name and its master's DC written in, and the actions
-        # its master's abilities today give it (Familiar Focus, Restorative Familiar).
+        # A specific familiar's own actions, with its name and its master's DC written in, the actions its
+        # master's abilities today give it (Familiar Focus, Restorative Familiar), and the activities its
+        # master's feats give it (Shed Spirit, Stitching Strike, Patron's Claim).
         def self.actions(npc, state, specific)
           listed = Array(Stats.specific_config(specific)['actions'])
           own = []
@@ -54,7 +55,7 @@ module AresMUSH
             own = listed.map { |one| one.merge('text' => one['text'].to_s.gsub(/%\{(?:name|dc)\}/, fills)) }
           end
 
-          own + MasterActions.actions(state)
+          own + MasterActions.actions(state) + Activities.actions(npc, state)
         end
 
         # The higher of its master's class DC and their best spell DC, as they stand in the encounter.

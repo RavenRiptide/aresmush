@@ -23,6 +23,7 @@ calendar.ics
 .sass-cache
 .DS_Store
 tmp/restart.txt
+tmp/spec_parallel/
 applied.txt
 *.zip
 blacklist.txt

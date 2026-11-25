@@ -902,6 +902,8 @@ pf2e_magicitem:
       - companion
       - invested
       - primal
+    companion_bonus: { speed: 5 }
+    companion_needs: quadruped
     level: 7
     price: 34000
     bulk: 1
@@ -2387,6 +2389,8 @@ pf2e_magicitem:
       - companion
       - invested
       - primal
+    companion_bonus: { speed: 10 }
+    companion_needs: quadruped
     level: 14
     price: 425000
     bulk: 1

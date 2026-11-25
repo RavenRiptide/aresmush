@@ -141,21 +141,15 @@ pf2e_archetype_specialty:
       initial_dedication: {}
   Cleric Archetype: {}
   Druid Archetype:
+    # Druid Dedication: "You don't gain any other abilities from your choice of order." So the animal
+    # order gives its skill and anathema only; Animal Companion comes from Basic Wilding, and Heal
+    # Animal from Order Spell (which reads the class's order entry).
     Animal:
       initial_dedication:
-        action: []
-        reaction: []
         skills:
         - Athletics
-        feat:
-        - Animal Companion
         anathema:
         - "Commit wanton cruelty to animals or kill animals unnecessarily. (This doesn't prevent you from defending yourself against animals or killing them cleanly for food.)"
-        magic_stats:
-          focus_spell:
-            order:
-            - Heal Animal
-        companion: any
     Leaf:
       initial_dedication:
         skills:

@@ -276,6 +276,54 @@ module AresMUSH
           expect(Movement.speed_text(result)).to eq '20-ft (25-ft from ancestry, -5 ft from Breastplate)'
           expect(Movement.special_text(result)).to eq '10-ft swim speed (Makar heritage)'
         end
+
+        # A `speed` prereq: Marsh Runner's "you have a swim Speed".
+        describe "as a speed prereq" do
+          def meets?(required)
+            Pf2e.meets_prereqs?(char, { 'speed' => required }, 7)
+          end
+
+          def landbound
+            @char.update(:pf2_base_info => @char.pf2_base_info.merge('heritage' => 'Pantli'),
+                         :pf2_movement => { 'Size' => 'Medium', 'base_speed' => 25 })
+          end
+
+          it "should pass on the heritage's swim speed" do
+            expect(meets?('swim')).to eq true
+          end
+
+          it "should fail without the type, and pass once a feat gives it" do
+            landbound
+
+            expect(meets?('swim')).to eq false
+
+            holding('Swift Swimmer')
+
+            expect(meets?('swim')).to eq true
+          end
+
+          it "should count a feat the level in progress has picked" do
+            landbound
+            @char.update(:advancing => true, :pf2_advancement => { 'feats' => { 'general' => [ 'Swift Swimmer' ] } })
+
+            expect(meets?('swim')).to eq true
+          end
+
+          it "should not count a daily choice's movement, which lasts the day" do
+            allow(Pf2e::DailyChoices).to receive(:movement).and_return([ { 'fly' => 20, 'source' => "Witch's Broom (Staff)" } ])
+
+            expect(Movement.entries_for(char)).to include('fly' => 20, 'source' => "Witch's Broom (Staff)")
+            expect(meets?('fly')).to eq false
+          end
+
+          it "should want every type a list names" do
+            expect(meets?([ 'swim', 'climb' ])).to eq false
+
+            holding('Cave Climber')
+
+            expect(meets?([ 'swim', 'climb' ])).to eq true
+          end
+        end
       end
 
       # What the shipped feats and classes say, against what each feat's text grants.
@@ -306,6 +354,14 @@ module AresMUSH
           expect(movement("Gecko's Grip")).to eq [ { 'climb' => 15, 'prereq' => { 'heritage' => 'Pantli' } } ]
           expect(movement('Quick Climb')).to eq [ { 'climb' => 'land', 'prereq' => { 'skill' => [ 'Athletics/legendary' ] } } ]
           expect(movement('Quick Swim')).to eq [ { 'swim' => 'land', 'prereq' => { 'skill' => [ 'Athletics/legendary' ] } } ]
+        end
+
+        it "should have Marsh Runner ask for a swim Speed" do
+          expect(@feats['Marsh Runner']['prereq']).to eq('level' => 1, 'speed' => 'swim')
+        end
+
+        it "should show a speed prereq as the Speed it asks for" do
+          expect(Pf2e.format_feat('Marsh Runner', @feats['Marsh Runner'])).to include('Speed:%xn a swim Speed')
         end
 
         it "should offer War Conditioning's climb or swim as a choice" do

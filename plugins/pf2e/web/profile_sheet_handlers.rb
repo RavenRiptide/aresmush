@@ -28,5 +28,12 @@ module AresMUSH
         ProfileSheet.answer(request, 'familiar') { |char| FamiliarView.of(char) }
       end
     end
+
+    # `pf2ProfileCompanion` - the Animal Companion tab: `{ id }`.
+    class PF2ProfileCompanionHandler
+      def handle(request)
+        ProfileSheet.answer(request, 'companion') { |char| Companion::ProfileView.of(char) }
+      end
+    end
   end
 end

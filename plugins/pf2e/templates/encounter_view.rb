@@ -39,6 +39,12 @@ module AresMUSH
         'reactive' => ->(_npc) { false }
       ).freeze
 
+      # An animal companion is read as a creature is, and is the kind it is to everyone.
+      COMPANION = CREATURE.merge(
+        'kind' => ->(npc) { t('pf2e.view_kind_companion', :level => npc.stat_block['level']) },
+        'reactive' => ->(_npc) { false }
+      ).freeze
+
       # A familiar has no initiative: it acts on its master's turn.
       NO_TURN = '--'.freeze
 
@@ -142,24 +148,36 @@ module AresMUSH
       end
 
       def reads_for(one)
-        return FAMILIAR if one.minion?
+        return companion?(one) ? COMPANION : FAMILIAR if one.minion?
 
         one.creature? ? CREATURE : CHARACTER
       end
 
       # `Hero Points 2; Frightened 1; Bless (2 rounds); standard cover, concealed; Immune poison`, or nothing.
       def beneath(one)
-        parts = [ master(one), hero_points(one), conditions(one), effects(one), cover(one), activity(one), iwr(one) ].compact
+        parts = [ master(one), riding(one), hero_points(one), conditions(one), effects(one), cover(one), activity(one), iwr(one) ].compact
 
         parts.empty? ? nil : "#{' ' * 4}#{parts.join('; ')}"
       end
 
-      # `Morwen's familiar`.
+      # `Morwen's familiar`, or `Rowan's animal companion`.
       def master(one)
         return nil unless one.minion?
 
         owner = one.holder.master&.name
-        owner ? t(one.holder.stat_block['pet'] ? 'pf2e.view_pet_of' : 'pf2e.view_familiar_of', :char => owner) : nil
+        return nil unless owner
+        return t('pf2e.view_companion_of', :char => owner) if companion?(one)
+
+        t(one.holder.stat_block['pet'] ? 'pf2e.view_pet_of' : 'pf2e.view_familiar_of', :char => owner)
+      end
+
+      # `riding Ash` beneath a rider, `ridden by Rowan` beneath an animal companion.
+      def riding(one)
+        AresMUSH::Pf2e::Companion::Riding.view_line(one.holder)
+      end
+
+      def companion?(one)
+        one.holder && Actors.of(one.holder).minion_kind == 'companion'
       end
 
       # Hero Points are a player character's, in an encounter that is part of a scene.

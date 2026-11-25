@@ -57,7 +57,8 @@ module AresMUSH
         Equipment.lapse!(holder, 'turn')
         ActiveEffects.on(holder).each { |effect| ActiveEffects.give_temp_hp(holder, effect, 'on_turn_start') }
 
-        events + heal(holder) + SpellItems.turn_started(holder, round) + recovery(holder)
+        events + heal(holder) + SpellItems.turn_started(holder, round) + recovery(holder) +
+          Familiar::Presence.turn_started(holder)
       end
 
       # The turn starts, and being stunned is paid for out of it: as many actions as its value, which
@@ -85,7 +86,7 @@ module AresMUSH
       def self.recovery(holder)
         dying = Pf2e.condition_level(holder, 'Dying')
 
-        return [] unless dying.positive? && !Actors.of(holder).creature? && !holder.pf2_is_dead
+        return [] unless dying.positive? && Actors.of(holder).dies_as_character? && !holder.pf2_is_dead
 
         dc = Pf2eHP.recovery_dc(holder)
         die = Pf2e.roll_dice(1, 20).first
@@ -101,6 +102,8 @@ module AresMUSH
 
         fate = Pf2eHP.now_dying(holder, value, Gm.may_kill?(holder))
         told << event(FATES[fate] || 'pf2e.recovery_dying', 'name' => holder.name, 'value' => value)
+        note = fate == :dead ? Actors.of(holder).death_note : nil
+        told << note if note
 
         hint = value > dying ? HeroPoints.dying_hint(holder) : nil
 

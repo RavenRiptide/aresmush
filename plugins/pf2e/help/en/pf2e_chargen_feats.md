@@ -24,4 +24,6 @@ A choice with hundreds of options - `Additional Lore` has over two hundred - pag
 
 If a feat gives you a familiar or pet, set it up before you submit your application. For more information about setting up a familiar, see `help chargen_familiar`.
 
+If a feat gives you an animal companion, choose its type with `cg/option`, such as `cg/option Animal Companion=Wolf`, and name it with `companion/name` before you submit your application. For more information about animal companions, see `help companions`.
+
 To take a feat back, enter `cg/undo` - it takes back your most recent choice, so run it until the feat you want to change is gone. `cg/restore skills` still returns you to the point just before you started setting feats.

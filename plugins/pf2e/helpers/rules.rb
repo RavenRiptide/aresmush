@@ -585,8 +585,10 @@ module AresMUSH
         Array(sources).flat_map do |source|
           held = Array(options) + Array(source['options'])
 
+          # The value may read its own item, as Phase Familiar's resistance reads the spell's rank
+          # (`2*(@item.level)+3`).
           of_kind(source, key).select { |row| Predicate.test(row['predicate'], held) }
-                              .map { |row| contribute(row, source, context) }
+                              .map { |row| contribute(row, source, context.merge('item' => source['item'] || {})) }
                               .compact
         end
       end

@@ -12,6 +12,7 @@ module AresMUSH
     #   'actions' => [ { 'name' =>, 'cost' =>, 'target' => true, 'strike' => true } ]
     #   'spells'  => [ { 'name' =>, 'from' => a class, 'focus' or 'innate' } ]
     #   'items'   => [ { 'category' =>, 'number' =>, 'name' =>, 'equipped' =>, 'uses' =>, 'thrown' =>, 'ammunition' => } ]
+    #   'familiar' => [ { 'name' =>, 'command' =>, 'about' => } ], what their feats let their familiar do
     module HowTo
 
       # What the game does for anyone, by the words a player might call it.
@@ -51,7 +52,8 @@ module AresMUSH
 
         return nothing(term) if wanted.empty?
 
-        found = topics(wanted) + strikes(wanted, known) + actions(wanted, known) + spells(wanted, known) + items(wanted, known)
+        found = topics(wanted) + strikes(wanted, known) + actions(wanted, known) + spells(wanted, known) + items(wanted, known) +
+                familiar(wanted, known)
         found = found.uniq(&:first)
 
         found.empty? ? nothing(term) : Ok.new(:state => found)
@@ -94,6 +96,12 @@ module AresMUSH
         end
       end
 
+      # A familiar's activity from its master's feat, used through `e/as`: Shed Spirit names its enemy and
+      # then the ally it heals.
+      def self.familiar(wanted, known)
+        Array(known['familiar']).select { |one| called?(one['name'], wanted) }.map { |one| [ one['command'], one['about'] ] }
+      end
+
       def self.spells(wanted, known)
         matched = Array(known['spells']).select { |one| called?(one['name'], wanted) }
 
@@ -131,7 +139,8 @@ module AresMUSH
         { 'strikes' => Acting.attacks_of(holder).map { |names, _attack| { 'names' => names } },
           'actions' => Actions.available(char).map { |name| action(name) },
           'spells' => spells_of(char.magic),
-          'items' => CATEGORIES.flat_map { |category| items_of(holder, category) } }
+          'items' => CATEGORIES.flat_map { |category| items_of(holder, category) },
+          'familiar' => Familiar::Activities.how(holder) }
       end
 
       def self.action(name)

@@ -53,6 +53,19 @@ module AresMUSH
     # (`Pf2e::Familiar::Block`), so it has no stat block of its own.
     reference :master, "AresMUSH::Pf2eCombatantState"
 
+    # Which kind of creature with a master it is: 'companion' for an animal companion
+    # (`Pf2e::Companion::Block`), or nothing for a familiar, which every record with a master was before
+    # companions could join.
+    attribute :minion
+
+    # An animal companion that died in this encounter, as a character does (`Pf2eHP.kill`). Staff record a
+    # death on its master's sheet themselves (`companion/dead`).
+    attribute :pf2_is_dead, :type => DataType::Boolean
+
+    # An animal companion's rider, by their id in the order (`Pf2e::Companion::Riding`), or nothing.
+    # Untyped, since an integer attribute reads an empty one as 0.
+    attribute :rider
+
     index :number
     index :master_id
 
@@ -68,8 +81,17 @@ module AresMUSH
       @stat_block ||= Pf2e::Adjustments.apply(written_stat_block, self.adjustment)
     end
 
+    def companion?
+      !self.master_id.nil? && self.minion == 'companion'
+    end
+
+    def familiar?
+      !self.master_id.nil? && !companion?
+    end
+
     def written_stat_block
-      return Pf2e::Familiar::Block.of(self) if self.master_id
+      return Pf2e::Companion::Block.of(self) if companion?
+      return Pf2e::Familiar::Block.of(self) if familiar?
 
       (self.revision_id ? Pf2eCreatureRevision[self.revision_id]&.block : nil) ||
         (self.creature ? Pf2e::Bestiary.entry(self.creature) : nil) || self.described || {}
@@ -108,6 +130,7 @@ module AresMUSH
     def pf2_base_info; {}; end
     def pf2_level_tracker; {}; end
     def pf2_roll_aliases; {}; end
+    def pf2_derived; {}; end
     def hp; nil; end
     def combat; nil; end
   end

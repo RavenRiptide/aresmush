@@ -20,6 +20,7 @@ A command detail tells the game something it can't see, such as where you stand.
 %t `encounter/strike bastard sword=#3/flanking/two-handed`
 
 - `flanking`: The target is off-guard to you (-2 AC).
+- `support`: The target is in your Supporting animal companion's reach, so your Strike gains its support benefit. For more information, see `help encounter_companion`.
 - `range <n>`: The target is in range increment `<n>`: -2 to your attack for each increment past the first. Ranged attacks can't reach past the sixth increment.
 - `<number>`: Sets the DC for an action with no target, such as `encounter/act balance/18`.
 - `two-handed`: Uses both hands on a weapon that deals more damage that way.

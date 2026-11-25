@@ -52,11 +52,9 @@ module AresMUSH
           state = use.actor.holder.master
 
           if use.name == FOCUS
-            magic = state.magic
-            now = [ Pf2emagic.focus_points_left(magic) + 1, Pf2emagic.focus_pool_max(magic) ].min
-            magic.update(:focus_pool => { 'current' => now })
+            now = regain_focus(state)
             use.out['lines'] << Telling.event('pf2e.familiar_focus_restored', :master => master_label(use), :current => now,
-                                                                              :max => Pf2emagic.focus_pool_max(magic))
+                                                                              :max => Pf2emagic.focus_pool_max(state.magic))
           else
             thrown = Pf2e.thrown_formula(restorative_dice(state))
             amount = Harm.heal(state, thrown['total'])
@@ -65,6 +63,16 @@ module AresMUSH
           end
 
           TurnState.count_use(state, use.name, PER)
+        end
+
+        # One Focus Point back, up to their maximum. Answers how many they now have. Patron's Claim gives
+        # one too.
+        def self.regain_focus(state)
+          magic = state.magic
+          now = [ Pf2emagic.focus_points_left(magic) + 1, Pf2emagic.focus_pool_max(magic) ].min
+          magic.update(:focus_pool => { 'current' => now })
+
+          now
         end
 
         # 1d8 times half their level, at least 1d8.

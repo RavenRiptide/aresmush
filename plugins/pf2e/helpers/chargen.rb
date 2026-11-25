@@ -802,10 +802,10 @@ module AresMUSH
                t('pf2e.app_sheet_ok') :
                t('pf2e.app_sheet_incomplete')
 
-      # Their familiar's details, which staff approve with the application.
-      familiar = Familiar.app_review(char)
+      # Their familiar's details and their animal companion's name, which staff approve with the application.
+      extras = [ Familiar.app_review(char), Companion.app_review(char) ].compact
 
-      familiar ? "#{message}%r%R%T#{status}%r%R%r#{familiar}" : "#{message}%r%R%T#{status}"
+      ([ "#{message}%r%R%T#{status}" ] + extras).join('%r%R%r')
     end
 
     def self.sheet_complete?(char)

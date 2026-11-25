@@ -96,7 +96,8 @@ module AresMUSH
     # Inventory says which is which.
     def self.create_item(char, category, name, quantity, item_info)
       if Inventory.stackable?(category)
-        held = Inventory.all(char, category).find { |item| item.name == name }
+        # What their animal companion wears stays a stack of its own.
+        held = Inventory.all(char, category).find { |item| item.name == name && !Pf2e::Companion::Gear.worn?(item) }
 
         return held.update(:quantity => held.quantity.to_i + quantity.to_i) if held
 

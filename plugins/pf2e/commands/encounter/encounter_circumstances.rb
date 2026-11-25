@@ -129,8 +129,13 @@ module AresMUSH
         return nil unless own && CreatureAbilities.saving(own['text'])
 
         out = Acting.report
+        before = target.holder.pf2_conditions || {}
         out['lines'] << Telling.event('pf2e.aura_entered_save', :target => target.label, :actor => emitter.label, :aura => own['name'])
         Acting.ability_saves(Acting::Scene.new(encounter, emitter, target, enactor, true), own['name'], own, [ target ], out)
+        # Patron's Presence's Stupefied lasts while they remain inside, so it is marked with the aura.
+        if Familiar::Presence.aura?(self.aura)
+          Familiar::Presence.after_save(emitter.holder, target.holder.class[target.holder.id], before)
+        end
 
         Telling.lines(out['lines']).join('%r')
       end
@@ -167,7 +172,8 @@ module AresMUSH
             return if CharState.emit_error!(client, done)
 
             names = done.state.map(&:name)
-            saved = names.empty? ? aura_save(encounter, emitter, target) : nil
+            # Patron's Presence both marks them inside and has them save; any other aura does one or the other.
+            saved = names.empty? || Familiar::Presence.aura?(self.aura) ? aura_save(encounter, emitter, target) : nil
             message = if saved then saved
                       elsif names.empty? then t('pf2e.aura_nothing', :target => target.label, :aura => self.aura)
                       else t('pf2e.aura_entered', :target => target.label, :aura => self.aura, :effects => names.join(', '))

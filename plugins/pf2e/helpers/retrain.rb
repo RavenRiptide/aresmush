@@ -147,7 +147,7 @@ module AresMUSH
         return nil if Pf2e.can_take_feat_details?(char, new_name, new_details, owed['level'].to_i)
         return t('pf2e.does_not_qualify') unless explain
 
-        Pf2e.explain_feat_block(char, new_details) || t('pf2e.does_not_qualify')
+        Pf2e.explain_feat_block(char, new_details, new_name) || t('pf2e.does_not_qualify')
       end
 
       # Everything `advance/retrain` asks of the character about one replacement.

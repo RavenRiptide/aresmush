@@ -47,11 +47,13 @@ module AresMUSH
       SIZE_WORDS = { 'tiny' => 0, 'small' => 1, 'medium' => 2, 'large' => 3, 'huge' => 4, 'gargantuan' => 5 }.freeze
 
       # How big someone is, as a place in the order of sizes: a creature's stat block's size, and a
-      # character's as their ancestry and their effects leave it.
+      # character's as their ancestry and their effects leave it. A creature's effects resize it too: Enlarge
+      # Companion makes an animal companion Large.
       def self.size_of(holder)
         return Size::SIZES.index(Size.of(holder)['size']) unless Actors.of(holder).creature?
 
-        SIZE_WORDS.fetch(holder.stat_block['size'].to_s.downcase, SIZE_WORDS['medium'])
+        natural = SIZE_WORDS.fetch(holder.stat_block['size'].to_s.downcase, SIZE_WORDS['medium'])
+        Size::SIZES.index(Size.of_creature(holder, Size::SIZES[natural]))
       end
 
       # `makes one Fangs Strike and two Tail Strikes`, `Strides and makes a Strike`: the Strikes an
@@ -258,9 +260,28 @@ module AresMUSH
         'run' => ->(use) { Familiar::MasterActions.run(use) }
       }.freeze
 
+      # Shed Spirit, Stitching Strike and Patron's Claim: a familiar's activity from its master's feat, a
+      # save against its master's spell DC and what failing it does (`Familiar::Activities`). Shed Spirit
+      # names an ally after its enemy.
+      FAMILIAR_ACTIVITY = {
+        'several' => true,
+        'refusal' => ->(use) { Familiar::Activities.refusal(use) },
+        'run' => ->(use) { Familiar::Activities.run(use) }
+      }.freeze
+
+      # Patron's Presence: the aura goes up around the familiar; its save is rolled as enemies enter it
+      # (`Familiar::Presence`).
+      FAMILIAR_PRESENCE = {
+        'run' => ->(use) { Familiar::Presence.start(use) }
+      }.freeze
+
       ROWS = {
         'familiar-focus' => MASTER_ACTION,
         'restorative-familiar' => MASTER_ACTION,
+        'shed-spirit' => FAMILIAR_ACTIVITY,
+        'stitching-strike' => FAMILIAR_ACTIVITY,
+        'patron-s-claim' => FAMILIAR_ACTIVITY,
+        'patron-s-presence' => FAMILIAR_PRESENCE,
         'constrict' => CONSTRICT,
         'greater-constrict' => CONSTRICT,
         'swallow-whole' => SWALLOW,
@@ -274,6 +295,11 @@ module AresMUSH
       # The row for an ability, by its name, or - where its words are plainly the Strikes it makes - the
       # row for that.
       def self.row(name, own = nil, holder = nil)
+        return Companion::Support::ROW if Companion::Support.row?(name, holder)
+
+        maneuver = Companion::Maneuvers.row(name, holder)
+        return maneuver if maneuver
+
         found = ROWS[Domains.slug(name).sub(/-\d+-feet\z/, '')]
 
         return found if found
@@ -285,7 +311,8 @@ module AresMUSH
       end
 
       # One use of an ability: who uses it, on whom, and the stat block's entry for it.
-      Use = Struct.new(:scene, :name, :own, :targets, :out, :paid) do
+      # `words` are what was said after its slashes, such as an animal companion's `moved` for Boar Charge.
+      Use = Struct.new(:scene, :name, :own, :targets, :out, :paid, :words) do
         def actor
           scene.actor
         end
@@ -371,21 +398,28 @@ module AresMUSH
         # A Strike that is part of the ability, told with the rest of it. `spent` is whether the Strike
         # costs an action of its own. A reaction's Strike is outside the multiple attack penalty, and
         # spends the reaction itself.
-        def strike(target, weapon, spent)
+        # A Strike the ability makes, with any circumstance `bonus` it gives (`Acting.strike`). Answers whether
+        # it hit.
+        def strike(target, weapon, spent, bonus: nil)
           reacting = own['type'] == 'reaction'
           self.paid = true if reacting
-          done = Acting.strike(at(target), weapon, [], :spent => spent, :reaction => reacting ? name : nil, :quiet => true)
+          done = Acting.strike(at(target), weapon, [], :spent => spent, :reaction => reacting ? name : nil, :quiet => true,
+                                                       :bonus => bonus)
 
-          return out['lines'] << Telling.event(done.key, done.args) if done.err?
+          if done.err?
+            out['lines'] << Telling.event(done.key, done.args)
+            return false
+          end
 
           %w{lines gm detail}.each { |part| out[part] += done.state[part] }
+          (TurnState.turn(actor.holder)['last'] || {})['hit'] == true
         end
       end
 
       # Uses a creature's ability that has a row: refused where its needs are not met, and otherwise
       # announced, run and paid for.
-      def self.use(scene, name, own, targets)
-        use = Use.new(scene, name, own, Array(targets), Acting.report)
+      def self.use(scene, name, own, targets, words = [])
+        use = Use.new(scene, name, own, Array(targets), Acting.report, nil, Array(words))
         row = row(name, own, scene.actor.holder)
         refused = row['refusal']&.call(use)
 

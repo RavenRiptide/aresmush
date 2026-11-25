@@ -223,11 +223,18 @@ pf2e_feats:
     feat_type:
       - Skill
       - General
-    assoc_skill: A Skill With The Recall Knowledge Action
+    assoc_skill:
+      - Arcana
+      - Crafting
+      - Medicine
+      - Nature
+      - Occultism
+      - Religion
+      - Society
     shortdesc: You're a treasure trove of information, but not all of it comes from reputable sources. When you fail (but don't critically fail) a Recall Knowledge check using any skill, you learn the correct answer and an erroneous answer, but you don't have any way to differentiate which is which. This can occur as knowing something is significant, but not whether it's good or bad.
     prereq:
       level: 1
-      skill: A Skill With The Recall Knowledge Action/trained
+      recall_skill: trained
     rules:
       - key: "Note"
         selector: "skill-check"
@@ -1056,13 +1063,17 @@ pf2e_feats:
     feat_type:
       - Skill
       - General
-    assoc_skill: A Skill With The Recall Knowledge Action
+    feat_choice:
+      summary: a skill you're an expert in, that has the Recall Knowledge action, and that you have Assurance in
+      from_skills:
+        min_prof: expert
+        recall_knowledge: true
+        with_feat: Assurance
     shortdesc: "You know basic facts off the top of your head. Choose a skill you're an expert in that has the Recall Knowledge action and for which you have the Assurance feat. You can use the Recall Knowledge action with that skill as a free action once per round. If you do, you must use Assurance on the skill check.%r%r**Special** You can select this feat multiple times, choosing a different skill each time. You can use Automatic Knowledge with any skills you have chosen, but you can still use Automatic Knowledge only once per round."
     prereq:
       level: 2
       feat:
-        - Assurance in that skill
-      skill: A Skill With The Recall Knowledge Action/expert
+        - Assurance
   Backup Disguise:
     feat_type:
       - Skill
@@ -1082,6 +1093,7 @@ pf2e_feats:
       level: 2
       skill: Warfare Lore/expert
   Bonded Animal:
+    bonded_animal: true
     feat_type:
       - Skill
       - General

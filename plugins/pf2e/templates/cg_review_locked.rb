@@ -59,7 +59,7 @@ module AresMUSH
       def feats_stage_done?
       # Feats are the last thing to assign and have no commit of their own, so the sheet is
       # finished once nothing is outstanding, a familiar's details included.
-        @char.pf2_skills_locked && feat_messages.empty? && magic_messages.empty? && !familiar_pending?
+        @char.pf2_skills_locked && feat_messages.empty? && magic_messages.empty? && !familiar_pending? && !companion_pending?
       end
 
       def skills_reopened?
@@ -138,6 +138,34 @@ module AresMUSH
           line = row[:picked].empty? ? "#{item_color}#{row[:choice]}%xn: #{left}" : "#{line}; #{left}"
 
           "#{line}%r%t#{t('pf2e.cg_choice_pointer', :choice => row[:choice])}"
+        end.join("%r")
+      end
+
+      # An animal companion, from a feat or the animal order: its type (the companion feat's choice) and
+      # what that makes it. Choosing the type is an ordinary feat choice, so the messages already ask for it.
+      def show_companion
+        (stage == 'feats' || stage == 'final') && !companion_lines.empty?
+      end
+
+      def companion_lines
+        @companion_lines ||= Pf2e::Companion.review_lines(@char)
+      end
+
+      # A companion still to name. Its type is a feat choice, which feat_messages already asks for.
+      def companion_pending?
+        return @companion_pending if defined?(@companion_pending)
+
+        @companion_pending = Pf2e::Companion.unfinished_name?(@char)
+      end
+
+      # The Messages line while the companion has no name.
+      def companion_messages
+        show_companion && companion_pending? ? [ t('pf2e.companion_review_setup') ] : []
+      end
+
+      def companion
+        companion_lines.map do |line|
+          line.is_a?(Array) ? "#{item_color}#{line[0]}%xn: #{line[1]}" : line
         end.join("%r")
       end
 
@@ -684,8 +712,8 @@ module AresMUSH
         when 'attributes' then boost_messages
         when 'skills'     then skill_messages + language_messages
         # skill_messages is normally empty here, and isn't when a feat has reopened skills.
-        when 'feats'      then skill_messages + feat_messages + magic_messages + familiar_messages
-        else                   boost_messages + skill_messages + language_messages + feat_messages + magic_messages + familiar_messages
+        when 'feats'      then skill_messages + feat_messages + magic_messages + familiar_messages + companion_messages
+        else                   boost_messages + skill_messages + language_messages + feat_messages + magic_messages + familiar_messages + companion_messages
         end
       end
 

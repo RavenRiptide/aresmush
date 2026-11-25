@@ -1,0 +1,407 @@
+---
+# Animal companions, hand-written from Player Core pp. 206-211 and Player Core 2's Auspicious Mount. The
+# numbers are the books'; the descriptions are our own wording. Read by Pf2e::Companion::Stats.
+#
+# types: each companion type. `size` (and `sizes` when it's chosen), `attributes` (modifiers), `hp`
+#   (ancestry Hit Points), `skill` (the one it's trained in from its type), `senses`, `speeds` (feet),
+#   `attacks` (`die`, `damage_type`, `traits`, and `extra` damage that grows to `specialized_dice` once
+#   specialized), `mount`, `special`, `support` (its support benefit), `maneuver` (its advanced maneuver),
+#   `rarity`, and `access` (who may choose an uncommon type without staff unlocking it, as a feat prerequisite).
+#   `quadruped` marks a four-legged type, which can wear items that need one (Alacritous Horseshoes).
+# stages: young, mature, nimble, savage and specialized, in the order a companion reaches them. `ranks` sets
+#   a proficiency to at least that rank (`attack`, `unarmored`, `barding`, `perception`, `saves`, a skill,
+#   or `type_skill`, the type's own skill); `trained` trains skills, and makes the type's own skill expert;
+#   `grow` is one size larger while Medium or smaller; `dice` is unarmed damage dice; `damage` is extra
+#   unarmed damage, which `double_damage` doubles; `magical` makes its attacks magical; `maneuver` teaches
+#   the type's advanced maneuver.
+# specializations: `raise` is one rank up, at most master; `ranks` as for stages; `choice` is chosen with it;
+#   `speed_bonus` is a status bonus to the chosen Speed; `only_for` limits it to those feats. Auspice: `hp` by
+#   level (the highest level reached applies), plus `sanctified` for a celestial; `traits` and
+#   `weakness` by the choice; `fly: land` gives a fly Speed equal to its land Speed.
+pf2e_animal_companions:
+  types:
+    Ape:
+      source: Player Core
+      rarity: common
+      traits: [ animal ]
+      size: Small
+      attributes: { Strength: 3, Dexterity: 1, Constitution: 2, Intelligence: -4, Wisdom: 2, Charisma: 0 }
+      hp: 8
+      skill: Intimidation
+      senses: [ low-light vision ]
+      speeds: { land: 25, climb: 25 }
+      attacks:
+        - { name: Fist, die: d8, damage_type: bludgeoning }
+      support: "Your ape threatens your foes with menacing growls. Until the start of your next turn, if you hit and deal damage to a creature in your ape's reach, the creature becomes frightened 1."
+      maneuver:
+        name: Frightening Display
+        actions: 1
+        traits: [ visual ]
+        description: "Your ape makes a loud and frightening display, throwing a foe off balance. The ape attempts to Demoralize the target creature; this display gains the visual trait and doesn't require language. While frightened by this ability, the target is off-guard to your ape."
+    Arboreal Sapling:
+      source: Player Core
+      rarity: uncommon
+      access: { specialize: leaf }
+      traits: [ plant ]
+      size: Small
+      attributes: { Strength: 3, Dexterity: 1, Constitution: 2, Intelligence: -4, Wisdom: 2, Charisma: 0 }
+      hp: 8
+      skill: Stealth
+      senses: [ low-light vision ]
+      speeds: { land: 25 }
+      attacks:
+        - { name: Branch, die: d8, damage_type: bludgeoning }
+      support: "Your arboreal sapling plants roots around your foe, impeding its movement. Until the start of your next turn, if you hit and deal damage to a creature in your arboreal sapling's reach, the first square the creature moves into after taking that damage is difficult terrain."
+      maneuver:
+        name: Throw Rock
+        actions: 1
+        description: "The arboreal sapling Interacts to pick up a rock within reach or retrieve a stowed rock, then throws it with a ranged rock Strike that deals 2d6 bludgeoning (3d6 for a specialized companion) damage with a range increment of 30 feet."
+    Badger:
+      source: Player Core
+      rarity: common
+      quadruped: true
+      traits: [ animal ]
+      size: Small
+      attributes: { Strength: 2, Dexterity: 2, Constitution: 2, Intelligence: -4, Wisdom: 2, Charisma: 0 }
+      hp: 8
+      skill: Survival
+      senses: [ low-light vision, "scent (imprecise, 30 feet)" ]
+      speeds: { land: 25, burrow: 10, climb: 10 }
+      attacks:
+        - { name: Jaws, die: d8, damage_type: piercing }
+        - { name: Claw, die: d6, damage_type: slashing, traits: [ agile ] }
+      support: "Until the start of your next turn, a creature the badger threatens that you hit and damage can't Step (unless it can Step through difficult terrain) until it moves from where it stands."
+      maneuver:
+        name: Badger Rage
+        actions: 1
+        traits: [ concentrate, emotion, mental ]
+        description: "**Requirements** The badger isn't Fatigued or raging.%rThe badger enters a state of pure rage that lasts for 1 minute, until there are no enemies it can perceive, or until it falls unconscious, whichever comes first. It can't voluntarily stop raging. While raging, the badger is affected in the following ways.%r%r%t- It deals 4 additional damage with its bite attacks and 2 additional damage with its claw attacks.%r%t- It takes a –1 penalty to AC.%r%t- It can't use actions that have the concentrate trait. The animal companion can Seek even while raging.%r%rAfter it has stopped raging, it can't use Badger Rage again for 1 minute."
+    Bat:
+      source: Player Core
+      rarity: common
+      traits: [ animal ]
+      size: Small
+      attributes: { Strength: 2, Dexterity: 3, Constitution: 2, Intelligence: -4, Wisdom: 1, Charisma: 0 }
+      hp: 6
+      skill: Stealth
+      senses: [ "echolocation (precise hearing, 20 feet)", low-light vision ]
+      speeds: { land: 15, fly: 30 }
+      attacks:
+        - { name: Jaws, die: d6, damage_type: piercing, traits: [ finesse ] }
+        - { name: Wing, die: d4, damage_type: slashing, traits: [ agile, finesse ] }
+      support: "Your bat flaps around your foes' arms and faces, getting in the way of their attacks. Until the start of your next turn, creatures in your bat's reach that you damage with Strikes take a –1 circumstance penalty to their attack rolls."
+      maneuver:
+        name: Wing Thrash
+        actions: 2
+        description: "The bat thrashes wildly with its wings, making wing Strikes against up to three adjacent foes. Each attack counts toward the bat's multiple attack penalty, but the penalty only increases after all the attacks have been made."
+    Bear:
+      source: Player Core
+      rarity: common
+      quadruped: true
+      traits: [ animal ]
+      size: Small
+      attributes: { Strength: 3, Dexterity: 2, Constitution: 2, Intelligence: -4, Wisdom: 1, Charisma: 0 }
+      hp: 8
+      skill: Intimidation
+      senses: [ low-light vision, "scent (imprecise, 30 feet)" ]
+      speeds: { land: 35 }
+      attacks:
+        - { name: Jaws, die: d8, damage_type: piercing }
+        - { name: Claw, die: d6, damage_type: slashing, traits: [ agile ] }
+      support: "Your bear mauls your enemies when you create an opening. Until the start of your next turn, each time you hit a creature in the bear's reach with a Strike, the creature takes 1d8 slashing damage from the bear. If your bear is nimble or savage, the slashing damage increases to 2d8."
+      maneuver:
+        name: Bear Hug
+        actions: 1
+        description: "Requirements The bear's last action was a successful claw Strike.%rThe bear makes another claw Strike against the same creature. On a hit, the creature is also Grabbed, as though the bear had Grappled it."
+    Bird:
+      source: Player Core
+      rarity: common
+      traits: [ animal ]
+      size: Small
+      attributes: { Strength: 2, Dexterity: 3, Constitution: 1, Intelligence: -4, Wisdom: 2, Charisma: 0 }
+      hp: 4
+      skill: Stealth
+      senses: [ low-light vision ]
+      speeds: { land: 10, fly: 60 }
+      attacks:
+        - { name: Jaws, die: d6, damage_type: piercing, traits: [ finesse ] }
+        - { name: Talon, die: d4, damage_type: slashing, traits: [ agile, finesse ] }
+      support: "The bird pecks at your foes' eyes when you create an opening. Until the start of your next turn, your Strikes that damage a creature that your bird threatens also deal 1d4 persistent bleed damage, and the target is dazzled until it removes the bleed damage. If your bird is nimble or savage, the persistent bleed damage increases to 2d4."
+      maneuver:
+        name: Flyby Attack
+        actions: 2
+        description: "The bird Flies and makes a talon Strike at any point during the movement."
+    Boar:
+      source: Player Core
+      rarity: common
+      quadruped: true
+      traits: [ animal ]
+      size: Small
+      attributes: { Strength: 3, Dexterity: 1, Constitution: 2, Intelligence: -4, Wisdom: 2, Charisma: 0 }
+      hp: 8
+      skill: Survival
+      senses: [ low-light vision, "scent (imprecise, 30 feet)" ]
+      speeds: { land: 35 }
+      attacks:
+        - { name: Tusk, die: d8, damage_type: piercing }
+      support: "Your boar gores your foes. Until the start of your next turn, your Strikes that damage a creature in your boar's reach also deal 1d6 persistent bleed damage. If your boar is nimble or savage, the persistent bleed damage increases to 2d6."
+      maneuver:
+        name: Boar Charge
+        actions: 2
+        description: "The boar Strides twice in a straight line and then makes a tusk Strike. As long as it moved at least 20 feet, it gains a +2 circumstance bonus to its attack roll."
+    Cat:
+      source: Player Core
+      rarity: common
+      quadruped: true
+      traits: [ animal ]
+      size: Small
+      attributes: { Strength: 2, Dexterity: 3, Constitution: 1, Intelligence: -4, Wisdom: 2, Charisma: 0 }
+      hp: 4
+      skill: Stealth
+      senses: [ low-light vision, "scent (imprecise, 30 feet)" ]
+      speeds: { land: 35 }
+      attacks:
+        - { name: Jaws, die: d6, damage_type: piercing, traits: [ finesse ] }
+        - { name: Claw, die: d4, damage_type: slashing, traits: [ agile, finesse ] }
+      special: "The cat deals 1d4 extra precision damage to Off-Guard creatures."
+      support: "Until the start of your next turn, a creature in the cat's reach that your Strike damages is Off-Guard until the end of your next turn."
+      maneuver:
+        name: Cat Pounce
+        actions: 1
+        traits: [ flourish ]
+        description: "The cat Strides and then Strikes. If it was undetected when the pounce began, it stays undetected until after the attack."
+    Crocodile:
+      source: Player Core
+      rarity: common
+      quadruped: true
+      traits: [ animal ]
+      size: Small
+      attributes: { Strength: 3, Dexterity: 2, Constitution: 2, Intelligence: -4, Wisdom: 1, Charisma: 0 }
+      hp: 6
+      skill: Stealth
+      senses: [ low-light vision ]
+      speeds: { land: 20, swim: 25 }
+      attacks:
+        - { name: Jaws, die: d8, damage_type: piercing }
+        - { name: Tail, die: d6, damage_type: bludgeoning, traits: [ finesse ] }
+      special: "The crocodile can hold its breath for about 2 hours."
+      support: "Your crocodile clamps its jaws on your foe, refusing to let go. Until the start of your next turn, if your Strike damages a creature in your crocodile's reach, your crocodile can latch onto the creature. While thus attached, the crocodile can move along with the target whenever the target moves until the end of your next turn. Your crocodile can latch onto only one creature in this way, and it must release the creature to make a jaws Strike. If the target is smaller than the crocodile, it takes a –10-foot circumstance penalty to its Speeds and can't Fly while the crocodile is latched on."
+      maneuver:
+        name: Death Roll
+        actions: 1
+        description: "**Requirements** The crocodile has a creature Grabbed.%rThe crocodile tucks its legs and rolls rapidly, twisting its victim. It makes a jaws Strike with a +2 circumstance bonus to the attack roll against the grabbed creature. If it hits, it also knocks the creature prone. If it misses, it releases the creature."
+    Dromaeosaur:
+      source: Player Core
+      rarity: common
+      traits: [ animal ]
+      size: Small
+      attributes: { Strength: 2, Dexterity: 3, Constitution: 2, Intelligence: -4, Wisdom: 1, Charisma: 0 }
+      hp: 6
+      skill: Stealth
+      senses: [ low-light vision, "scent (imprecise, 30 feet)" ]
+      speeds: { land: 50 }
+      attacks:
+        - { name: Jaws, die: d8, damage_type: piercing, traits: [ finesse ] }
+        - { name: Talon, die: d6, damage_type: slashing, traits: [ agile, finesse ] }
+      support: "Your raptor constantly darts into flanking position. Until the start of your next turn, it counts as being in its space or an empty space of your choice within 10 feet when determining whether you and your companion are flanking; you can choose a different space for each of your attacks."
+      maneuver:
+        name: Darting Attack
+        actions: 1
+        traits: [ flourish ]
+        description: "The dromaeosaur Steps up to 10 feet and then Strikes, or Strikes and then Steps up to 10 feet."
+    Horse:
+      source: Player Core
+      rarity: common
+      quadruped: true
+      traits: [ animal ]
+      size: Medium
+      sizes: [ Medium, Large ]
+      attributes: { Strength: 3, Dexterity: 2, Constitution: 2, Intelligence: -4, Wisdom: 1, Charisma: 0 }
+      hp: 8
+      skill: Survival
+      senses: [ low-light vision, "scent (imprecise, 30 feet)" ]
+      speeds: { land: 40 }
+      attacks:
+        - { name: Hoof, die: d6, damage_type: bludgeoning, traits: [ agile ] }
+      mount: true
+      support: "Until the start of your next turn, if you're mounted on your horse and moved 10 feet or more on the action before a melee Strike, add a circumstance bonus to damage for that Strike equal to twice the number of weapon damage dice. If your weapon already has the jousting weapon trait, increase the trait's damage bonus by 2 per die instead."
+      maneuver:
+        name: Gallop
+        actions: 2
+        traits: [ move ]
+        description: "The horse Strides twice at a +10-foot circumstance bonus to Speed."
+    Riding Drake:
+      source: Player Core
+      rarity: uncommon
+      quadruped: true
+      traits: [ dragon ]
+      size: Large
+      attributes: { Strength: 2, Dexterity: 1, Constitution: 2, Intelligence: -4, Wisdom: 1, Charisma: 2 }
+      hp: 8
+      skill: Intimidation
+      senses: [ darkvision ]
+      speeds: { land: 45 }
+      attacks:
+        - { name: Jaws, die: d8, damage_type: piercing }
+        - { name: Tail, die: d6, damage_type: bludgeoning }
+      mount: true
+      support: "Your drake snorts fire in your foes' faces. Until the start of your next turn, each time you Strike while riding the drake and hit a creature in the drake's reach, the creature takes 1d4 fire damage from the drake. If your drake is nimble or savage, the fire damage increases to 2d4."
+      maneuver:
+        name: Fire Breath
+        actions: 2
+        frequency: once per hour
+        description: "The riding drake breathes a 30-foot cone of fire, dealing 1d6 fire damage for every 2 levels the drake has to all creatures in the area (basic Reflex save). This uses a trained DC using the drake's Constitution modifier or an expert DC if the drake is specialized."
+    Scorpion:
+      source: Player Core
+      rarity: common
+      traits: [ animal ]
+      size: Small
+      attributes: { Strength: 3, Dexterity: 3, Constitution: 1, Intelligence: -4, Wisdom: 1, Charisma: 0 }
+      hp: 6
+      skill: Stealth
+      senses: [ darkvision ]
+      speeds: { land: 30 }
+      attacks:
+        - { name: Stinger, die: d6, damage_type: piercing, extra: { dice: 1, die: d4, damage_type: poison, specialized_dice: 2 } }
+        - { name: Pincer, die: d6, damage_type: slashing, traits: [ agile ] }
+      special: "The scorpion's stinger attack deals an additional 1d4 poison damage or 2d4 poison damage if the scorpion is a specialized companion."
+      support: "Your scorpion drips poison from its stinger when you create an opening. Until the start of your next turn, your Strikes that damage a creature in your scorpion's reach also deal 1d6 persistent poison damage. If your scorpion is nimble or savage, the persistent poison damage increases to 2d6."
+      maneuver:
+        name: Grab and Sting
+        actions: 2
+        description: "The scorpion holds its foe in place with its pincers in order to sting it. It makes a pincer Strike. If the Strike hits, the target creature automatically becomes grabbed by the scorpion, which then makes a stinger Strike against it. The grabbed condition lasts until the end of your next turn."
+    Shark:
+      source: Player Core
+      rarity: common
+      traits: [ animal, aquatic ]
+      size: Small
+      attributes: { Strength: 3, Dexterity: 2, Constitution: 2, Intelligence: -4, Wisdom: 1, Charisma: 0 }
+      hp: 6
+      skill: Stealth
+      senses: [ blood scent, "scent (imprecise, 60 feet)" ]
+      speeds: { swim: 40 }
+      attacks:
+        - { name: Jaws, die: d8, damage_type: piercing }
+      special: "The shark has the aquatic trait. Its blood scent enables it to smell blood in the water from up to 1 mile away."
+      support: "When your shark senses blood, it tears into your enemies. Until the start of your next turn, each time you hit a creature in the shark's reach with a Strike and deal slashing or piercing damage, the creature takes 1d8 slashing damage from the shark. If your shark is nimble or savage, the slashing damage increases to 2d8."
+      maneuver:
+        name: Shred
+        actions: 1
+        description: "**Requirements** The shark hit with a jaws Strike on its most recent action this turn.%r%rThe shark viciously rips into the wound. The target of the shark’s Strike takes 2d8 slashing damage (3d8 for a specialized companion)."
+    Snake:
+      source: Player Core
+      rarity: common
+      traits: [ animal ]
+      size: Small
+      attributes: { Strength: 3, Dexterity: 3, Constitution: 1, Intelligence: -4, Wisdom: 1, Charisma: 0 }
+      hp: 6
+      skill: Stealth
+      senses: [ low-light vision, "scent (imprecise, 30 feet)" ]
+      speeds: { land: 20, climb: 20, swim: 20 }
+      attacks:
+        - { name: Jaws, die: d8, damage_type: piercing, traits: [ finesse ] }
+      support: "Your snake holds your enemies with its coils, interfering with reactions. Until the start of your next turn, any creature your snake threatens can't use reactions triggered by your actions unless its level is higher than yours."
+      maneuver:
+        name: Constrict
+        actions: 1
+        description: "**Requirements** The snake has a smaller creature Grabbed.%rThe snake deals 12 bludgeoning damage to the grabbed creature; the creature must attempt a basic Fortitude save against your class DC. If the snake is a specialized animal companion, increase this damage to 20."
+    Wolf:
+      source: Player Core
+      rarity: common
+      quadruped: true
+      traits: [ animal ]
+      size: Small
+      attributes: { Strength: 2, Dexterity: 3, Constitution: 2, Intelligence: -4, Wisdom: 1, Charisma: 0 }
+      hp: 6
+      skill: Survival
+      senses: [ low-light vision, "scent (imprecise, 30 feet)" ]
+      speeds: { land: 40 }
+      attacks:
+        - { name: Jaws, die: d8, damage_type: piercing, traits: [ finesse ] }
+      support: "Your wolf tears tendons with each opening. Until the start of your next turn, your Strikes that damage creatures your wolf threatens give the target a –5-foot status penalty to its Speeds for 1 minute (–10 on a critical success)."
+      maneuver:
+        name: Takedown
+        actions: 1
+        description: "**Requirements** The wolf's last action was a successful jaws Strike.%rThe wolf automatically knocks the target of its jaws Strike prone."
+
+  stages:
+    young:
+      ranks: { attack: trained, unarmored: trained, barding: trained, perception: trained, saves: trained, Acrobatics: trained, Athletics: trained, type_skill: trained }
+      dice: 1
+      description: "The following are the base statistics for a young animal companion, the first animal companion most characters get. You adjust these statistics depending on the type of animal you choose. Animal companions calculate their modifiers and DCs just as you do with one difference: the only item bonuses they can benefit from are to Speed and AC (their maximum item bonus to AC is +3). As you gain levels, you might be able to make your companion stronger by advancing it.%rAn animal companion's starting statistics are as follows.%rLevel: Your animal companion's level is equal to yours.%rProficiencies: Your animal companion is trained in its unarmed attacks, unarmored defense, barding (a type of armor for animals), all saving throws, Perception, Acrobatics, and Athletics. Animal companions can't use abilities that require greater Intelligence, such as Coerce or Decipher Writing, even if trained in the appropriate skill, unless they have a specialization that allows it.%rAttribute Modifiers: An animal companion begins with base attribute modifiers listed in its stat block.%rHit Points: Your animal companion has ancestry Hit Points from its type, plus a number of Hit Points equal to 6 plus its Constitution modifier for each level you have."
+    mature:
+      grow: true
+      attributes: { Strength: 1, Dexterity: 1, Constitution: 1, Wisdom: 1 }
+      ranks: { perception: expert, saves: expert }
+      trained: [ Intimidation, Stealth, Survival ]
+      dice: 2
+      description: "When you advance a young animal companion to a mature animal companion:%r- If your companion is Medium or smaller, it grows by one size.%r- Increase its Strength, Dexterity, Constitution, and Wisdom modifiers by 1.%r- Increase its proficiency rank for Perception and all saving throws to expert. Increase its proficiency ranks in Intimidation, Stealth, and Survival to trained, and if it was already trained in one of those skills from its type, increase its proficiency rank in that skill to expert.%r- Increase its unarmed attack damage from one die to two dice (for instance 1d8 to 2d8)"
+    nimble:
+      attributes: { Dexterity: 2, Strength: 1, Constitution: 1, Wisdom: 1 }
+      ranks: { Acrobatics: expert }
+      damage: 2
+      magical: true
+      maneuver: true
+      description: "To advance a mature animal companion to a nimble animal companion:%r- Increase its Dexterity modifier by 2 and its Strength, Constitution, and Wisdom modifiers by 1.%r- Increase its proficiency ranks in Acrobatics to expert.%r- It deals 2 additional damage with its unarmed attacks. Its attacks become magical for the purpose of ignoring resistances.%r- It learns the advanced maneuver for its type."
+    savage:
+      grow: true
+      attributes: { Strength: 2, Dexterity: 1, Constitution: 1, Wisdom: 1 }
+      ranks: { Athletics: expert }
+      damage: 3
+      magical: true
+      maneuver: true
+      description: "To advance a mature animal companion to a savage animal companion:%r- If your companion is Medium or smaller, it grows by one size.%r- Increase its Strength modifier by 2 and its Dexterity, Constitution, and Wisdom modifiers by 1.%r- Increase its proficiency rank in Athletics to expert.%r- It deals 3 additional damage with its unarmed attacks. Its attacks become magical for the purpose of ignoring resistances.%r- It learns the advanced maneuver for its type."
+    specialized:
+      attributes: { Dexterity: 1, Intelligence: 2 }
+      ranks: { attack: expert, perception: master, saves: master }
+      dice: 3
+      double_damage: true
+      description: "Specialized animal companions are more intelligent and engage in more complex behaviors. Most animal companions can have only one specialization. The first time an animal gains a specialization, it also gains the following.%r- Its proficiency rank for unarmed attacks increases to expert.%r- Its proficiency ranks for saving throws and Perception increase to master.%r- Increase its Dexterity modifier by 1 and its Intelligence modifier by 2.%r- Its unarmed attack damage increases from two dice to three dice, and it increases its additional damage with unarmed attacks from 2 to 4 or from 3 to 6.%r- The extra benefit of the specialization listed below."
+
+  specializations:
+    Ambusher:
+      source: Player Core
+      attributes: { Dexterity: 1 }
+      raise: [ Stealth ]
+      ranks: { unarmored: expert }
+      description: "In your companion’s natural environment, it can use a Sneak action even if it’s currently observed. Its proficiency rank in Stealth increases to expert (or master if it was already an expert from its type), and its Dexterity modifier increases by 1. Its proficiency rank for unarmored defense increases to expert."
+    Bully:
+      source: Player Core
+      attributes: { Strength: 1, Charisma: 3 }
+      raise: [ Athletics, Intimidation ]
+      description: "Your companion terrorizes foes with dominance displays and pushes them around the battlefield. Its proficiency ranks for Athletics and Intimidation increase to expert (or master if it was already expert from its type), its Strength modifier increases by 1, and its Charisma modifier increases by 3."
+    Daredevil:
+      source: Player Core
+      attributes: { Dexterity: 1 }
+      ranks: { Acrobatics: master, unarmored: expert }
+      description: "Your companion joins the fray with graceful leaps and dives. It gains the deny advantage ability, so it isn’t off-guard to hidden, undetected, or flanking creatures unless such a creature’s level is greater than yours. Its proficiency rank in Acrobatics increases to master, and its Dexterity modifier increases by 1. Its proficiency rank in unarmored defense increases to expert."
+    Racer:
+      source: Player Core
+      attributes: { Constitution: 1 }
+      ranks: { Fortitude: legendary }
+      choice: { from: speeds, only: [ land, swim, fly ] }
+      speed_bonus: 10
+      description: "Your companion races. It gains a +10-foot status bonus to its Speed, swim Speed, or fly Speed (your choice). Its proficiency in Fortitude saves increases to legendary, and its Constitution modifier increases by 1."
+    Tracker:
+      source: Player Core
+      attributes: { Wisdom: 1 }
+      raise: [ Survival ]
+      description: "Your companion is an incredible tracker. It can move at full Speed while following tracks. Its proficiency rank in Survival increases to expert (or master if it was already an expert from its type), and its Wisdom modifier increases by 1."
+    Wrecker:
+      source: Player Core
+      attributes: { Strength: 1 }
+      ranks: { Athletics: master }
+      description: "Your companion smashes things. Its unarmed attacks ignore half an object’s Hardness. Its Athletics proficiency increases to master, and its Strength modifier increases by 1."
+    Auspice:
+      source: Player Core 2
+      only_for: [ Auspicious Mount ]
+      attributes: { Intelligence: 2, Wisdom: 1 }
+      ranks: { Religion: expert }
+      # Holy only: Emblem of Ea has no unholy champions, so the fiend option is left out.
+      choice: { from: list, options: [ celestial, monitor ] }
+      traits: { celestial: [ celestial, holy ], monitor: [ monitor ] }
+      weakness: { celestial: { unholy: 5 } }
+      hp: { 1: 20, 18: 25, 20: 30 }
+      sanctified: 5
+      fly: land
+      description: "A faithful steed with the auspice specialization gains the following benefits.%r- It gains the celestial or monitor trait—whichever best matches your deity's servitors, and its appearance shifts to look more like those servitors. It also gains the holy trait if it's a celestial.%r- Its Intelligence modifier increases by 2 and its Wisdom modifier by 1.%r- Its proficiency rank in Religion increases to expert.%r- It can speak the language associated with your deity's servitors (such as Aesyian for celestials).%r- Its maximum Hit Points increase by 20, increasing to 25 at 18th level and 30 at 20th level. If the mount has the celestial trait, the extra HP increase by 5, and the mount gains weakness 5 to unholy.%r- It gains wings that grant it a fly Speed equal to its land Speed."

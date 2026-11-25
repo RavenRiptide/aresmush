@@ -457,7 +457,6 @@ pf2e_specialty:
           focus_spell:
             order:
             - Heal Animal
-        companion: any
     Leaf:
       anathema:
       - "Commit wanton cruelty to plants or fungi or kill them unnecessarily. (This doesn't prevent you from defending yourself or harvesting them for survival.)"

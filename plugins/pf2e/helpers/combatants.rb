@@ -118,9 +118,16 @@ module AresMUSH
         master ? master['name'] : label
       end
 
-      # The familiars that act in this combatant's turn.
-      def self.minions_of(encounter, id)
-        rows(encounter).select { |row| row['master'] && row['master'].to_i == id.to_i }
+      # The familiars and animal companions that act in this combatant's turn, or only those of one kind
+      # (`Actor#minion_kind`: 'familiar' or 'companion').
+      def self.minions_of(encounter, id, kind = nil)
+        rows(encounter).select do |row|
+          next false unless row['master'] && row['master'].to_i == id.to_i
+          next true unless kind
+
+          holder = holder_of(row)
+          holder && Actors.of(holder).minion_kind == kind
+        end
       end
 
       # The one at this place in the turn order.
@@ -179,12 +186,16 @@ module AresMUSH
         end
       end
 
-      # A familiar leaves with its master, and is gone with what it was under.
+      # A familiar leaves with its master, and is gone with what it was under. Answers what the room is told:
+      # a companion leaving throws its rider (`Companion::Riding.left!`).
       def self.leave(encounter, id)
         familiars = minions_of(encounter, id)
+        thrown = Companion::Riding.left!(encounter, [ id ] + familiars.map { |row| row['id'] })
 
         write(encounter, rows(encounter).reject { |row| row['id'].to_i == id.to_i || familiars.include?(row) })
         familiars.each { |row| Pf2eNpc[row['npc']]&.delete }
+
+        thrown
       end
 
       def self.reroll(encounter, id, init)

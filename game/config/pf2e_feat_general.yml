@@ -369,7 +369,6 @@ pf2e_feats:
       level: 7
       feat:
         - Diehard
-        - You have died at least once
   Prescient Consumable:
     feat_type:
       - General

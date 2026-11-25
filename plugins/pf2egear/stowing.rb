@@ -24,7 +24,10 @@ module AresMUSH
 
         return refused if refused
 
-        move(item, moving, nil, Inventory.stackable?(category) ? Inventory.held(char, category) : [])
+        # What their animal companion wears stays a stack of its own.
+        beside = Inventory.stackable?(category) ? Inventory.held(char, category).reject { |one| Pf2e::Companion::Gear.worn?(one) } : []
+
+        move(item, moving, nil, beside)
       end
 
       # Why they can't move this many: an encounter has it, or they haven't got that many.
@@ -38,6 +41,9 @@ module AresMUSH
       end
 
       def self.worn(item)
+        on_companion = Pf2e::Companion::Gear.worn_refusal(item)
+        return on_companion if on_companion
+
         worn = (item.respond_to?(:equipped) && item.equipped) || (item.respond_to?(:invested) && item.invested)
 
         worn ? Pf2e::Err.new(:worn, 'pf2egear.bag_item_worn', :name => item.name) : nil

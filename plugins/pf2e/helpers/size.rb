@@ -38,13 +38,31 @@ module AresMUSH
         end
       end
 
+      # A creature's size as its effects leave it, from `natural`, its stat block's (`sm`).
+      def self.of_creature(npc, natural)
+        options = Npcs.options(npc)
+        context = Npcs.context(npc)
+
+        ActiveEffects.sources(npc).reduce(natural) do |size, source|
+          rows = Rules.of_kind(source, 'CreatureSize').filter_map { |row| Rules.resolved(row, source, context) }
+          rows.select { |row| Predicate.test(row['predicate'], options) }.reduce(size) do |now, row|
+            resized(now, Formula.value_or_word(row['value'], context.merge('item' => source['item'] || {})), row)
+          end
+        end
+      end
+
+      # In an encounter, a rule's `{item|...}` templates are filled first, so Enlarge's chosen size applies. A
+      # character on their own sheet reads the rules unfilled, which leaves such a size unread.
       def self.rules(char)
         options = Effects.character_facts(char)
         context = Effects.context(char)
+        filled = !Actors.of(char).encounter.nil?
 
         (Effects.feats(char) + Effects.items(char) + ActiveEffects.sources(char)).flat_map do |source|
-          Rules.of_kind(source, 'CreatureSize').select { |row| Predicate.test(row['predicate'], options) }
-                                               .map { |row| [ row, context.merge('item' => source['item'] || {}) ] }
+          rows = Rules.of_kind(source, 'CreatureSize')
+          rows = rows.filter_map { |row| Rules.resolved(row, source, context) } if filled
+          rows.select { |row| Predicate.test(row['predicate'], options) }
+              .map { |row| [ row, context.merge('item' => source['item'] || {}) ] }
         end
       end
 

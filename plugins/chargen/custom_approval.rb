@@ -9,6 +9,9 @@ module AresMUSH
       # A familiar's details, which staff reviewed in the application, are approved with it.
       Pf2e::Familiar.approve_with_app!(char)
 
+      # So is their animal companion's name.
+      Pf2e::Companion.approve_with_app!(char)
+
       # If you don't want to have any custom approval steps, just leave this blank.
 
       # Otherwise, do what you need to do.  Here's an example of how to add
