@@ -282,12 +282,34 @@ module AresMUSH
       caster_stats
     end
 
+    # The combination (Spell Combination) that casting this prepared spell would spend, left in the day, or
+    # nil: where the spell is not prepared on its own at the rank asked for, or at any rank when none was,
+    # and a combination slot holds it. Asked before the slot is spent, so a cast it would refuse costs nothing.
+    def self.combination_for(char, charclass, spell, level = nil)
+      magic = char.magic
+      found = get_spell_details(spell)
+      return nil unless magic && found.is_a?(Array)
+
+      today = (magic.spells_today || {})[charclass] || {}
+      alone = if level
+                Array(today[level.to_s]).include?(found[0])
+              else
+                today.any? { |rank, list| rank != 'cantrip' && Array(list).include?(found[0]) }
+              end
+      return nil if alone
+
+      pair = SlotFeats.pair_holding(magic, charclass, found[0], level)
+      pair && SlotFeats.combined?(pair) ? pair : nil
+    end
+
     # A spell cast from a slot a feat changed: the one named (Split Slot, Form Retention), or both at once
     # as a combined spell (Spell Combination), at the rank the slot was prepared to cast at.
     def self.cast_from_slot_pair(caster_stats, pair, spname, target_list)
       both = pair['cast'].to_s == 'both'
 
       caster_stats['spell name'] = both ? Array(pair['spells']).join(' + ') : spname
+      # The component spells, which an encounter resolves as one spell (`Acting.cast_combined`).
+      caster_stats['combined'] = Array(pair['spells']) if both
       caster_stats['spell level'] = pair['cast_rank'].to_s
       caster_stats['spell type'] = "#{pair['feat']} (#{Pf2emagic.ordinal_level(pair['rank'])}-rank slot)"
       caster_stats['targets'] = target_list unless target_list.empty?

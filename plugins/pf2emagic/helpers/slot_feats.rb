@@ -112,6 +112,11 @@ module AresMUSH
         block_or_pair['cast'].to_s == 'open'
       end
 
+      # A slot whose two spells are cast together as one (`cast: both`, Spell Combination).
+      def self.combined?(block_or_pair)
+        block_or_pair['cast'].to_s == 'both'
+      end
+
       # A slot holding one spell cast at a lower rank for longer (`cast: retained`, Form Retention).
       def self.retained?(block_or_pair)
         block_or_pair['cast'].to_s == 'retained'
@@ -126,6 +131,77 @@ module AresMUSH
         minute = found.is_a?(Array) && found[1]['duration'].to_s.strip.casecmp?('1 minute')
 
         CastFeats.battle_form?(spell) && minute ? nil : err('slot_retained_not_battle_form', 'spell' => spell)
+      end
+
+      # ------------------------------------------------------------------------------
+      # A combination (`cast: both`): two spells cast as one, at one target
+      # ------------------------------------------------------------------------------
+
+      # A spell target that is, or can be, a single creature or object: a count that can be one (`1`, `one`,
+      # `a`, `up to N`, `1 or N`, `1 to N`, `1 or more`, `any number of`), or one particular creature (`your
+      # familiar`, `the triggering creature`, `self`). Matched against the whole target text.
+      SINGLE_TARGET = /\A(?:(?:1|one|an?|another|the|your|any number of|up to \w+)\b|self\z)/i.freeze
+
+      # Text that names two things at once, or an area, which no single target can be: `1 ally and 1 enemy`,
+      # `you and 1 ally`, `yourself and up to 5 willing creatures`, `all creatures in range`, `10-foot burst`,
+      # `1 square mile`. A measure after `and` - `10 feet tall and 5 feet wide` - is still one thing.
+      MORE_THAN_ONE = /\b(?:and|plus)\s+(?!(?:up to\s+)?\d+\s*(?:feet|foot|bulk)\b)(?:\d+|one|an?|the|up to|any|either|yourself|you)\b|\ball\b|\b(?:burst|emanation|cone)\b|\A1 (?:cubic foot|square mile)\z/i.freeze
+
+      # Whether a spell's target text allows a single target. A target named with its alternative - `you or
+      # 1 ally`, `1 creature, plus any number of additional creatures` - can be one, and is allowed.
+      def self.single_target?(target)
+        text = target.to_s.strip
+        return false if text.empty? || text.casecmp?('varies')
+
+        alternatives = text.split(/,?\s+or\s+/i)
+        return true if alternatives.size > 1 && alternatives.any? { |one| single_target?(one) } && !text.match?(/\band\b/i)
+        return true if text.match?(/\A1 creature, plus any number\b/i)
+
+        text.match?(SINGLE_TARGET) && !text.match?(MORE_THAN_ONE)
+      end
+
+      # How a spell decides whether it has an effect: `attack`, `save fortitude` and the like, or `automatic`.
+      # The data does not say whether an attack is ranged or melee, so any two attack spells match.
+      def self.resolution(mechanics)
+        return 'attack' if mechanics['attack']
+        return "save #{mechanics['save']}" if mechanics['save']
+
+        'automatic'
+      end
+
+      # Why two spells cannot be combined, or nil. Pure: each is `[ name, mechanics ]`, the mechanics
+      # being the spell's `pf2e_spell_mechanics` row, or nil where it has none.
+      def self.combination_refusal(first, second)
+        [ first, second ].each do |name, mechanics|
+          return err('combination_unknown', 'spell' => name) unless mechanics.is_a?(Hash)
+          return err('combination_area', 'spell' => name, 'area' => mechanics['area']) if mechanics['area']
+          return err('combination_no_target', 'spell' => name) unless mechanics['target']
+          return err('combination_many_targets', 'spell' => name, 'target' => mechanics['target']) unless single_target?(mechanics['target'])
+        end
+
+        ways = [ first, second ].map { |_name, mechanics| resolution(mechanics) }
+        return nil if ways.uniq.size == 1
+
+        err('combination_resolves_differently', 'first' => first[0], 'second' => second[0],
+                                                'first_way' => way_worded(ways[0]), 'second_way' => way_worded(ways[1]))
+      end
+
+      # `save fortitude` as a player reads it: `a Fortitude save`.
+      def self.way_worded(way)
+        case way
+        when 'attack' then 'a spell attack'
+        when 'automatic' then 'no attack or save'
+        else "a #{way.sub(/\Asave /, '').capitalize} save"
+        end
+      end
+
+      # A spell's mechanics row by the name `check_preparable` answered: `[ name, row ]`, the row nil where
+      # the catalogue has none.
+      def self.mechanics_of(name)
+        catalogue = Global.read_config('pf2e_spell_mechanics') || {}
+        found = catalogue.find { |key, _| key.casecmp?(name.to_s) }
+
+        found || [ name, nil ]
       end
 
       # A refusal worded for an open slot, where the pair's wording speaks of two spells.
@@ -168,6 +244,11 @@ module AresMUSH
         end
 
         return err('slot_pair_same_spell') if checked.size == 2 && checked[0].casecmp?(checked[1])
+
+        if combined?(block)
+          refusal = combination_refusal(mechanics_of(checked[0]), mechanics_of(checked[1]))
+          return refusal if refusal
+        end
 
         prepared = Array(((magic.spells_prepared || {})[charclass] || {})[rank.to_s])
         taken = prepared + placeholders(magic, charclass, rank) + [ PLACEHOLDER ]
@@ -234,9 +315,7 @@ module AresMUSH
       def self.cast_from_pair(magic, charclass, spell, rank)
         today = magic.spells_today || {}
         list = Array((today[TODAY] || {})[charclass])
-        index = list.index do |pair|
-          Array(pair['spells']).any? { |s| s.casecmp?(spell.to_s) } && (rank.nil? || pair['rank'].to_s == rank.to_s)
-        end
+        index = pair_index(list, spell, rank)
 
         return nil unless index
 
@@ -245,6 +324,21 @@ module AresMUSH
         magic.update(:spells_today => today)
 
         pair
+      end
+
+      def self.pair_index(list, spell, rank)
+        list.index do |pair|
+          Array(pair['spells']).any? { |s| s.casecmp?(spell.to_s) } && (rank.nil? || pair['rank'].to_s == rank.to_s)
+        end
+      end
+
+      # The pair `cast_from_pair` would draw on, left in the day: for asking what a cast will be before the
+      # slot is spent.
+      def self.pair_holding(magic, charclass, spell, rank)
+        list = Array(((magic.spells_today || {})[TODAY] || {})[charclass])
+        index = pair_index(list, spell, rank)
+
+        index ? list[index] : nil
       end
 
       # ------------------------------------------------------------------------------

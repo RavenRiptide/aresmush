@@ -13739,8 +13739,6 @@ pf2e_feats:
       - Charclass
     prereq:
       level: 20
-    # Whether the two spells target one creature and resolve the same way is left to the player
-    # until the spell mechanics data from pull request #2 can check it.
     prepared_slot:
       switch: spellcombination
       cast: both

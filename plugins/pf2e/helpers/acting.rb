@@ -1853,8 +1853,14 @@ module AresMUSH
       # ------------------------------------------------------------------------------
       # Spells
 
-      # A spell's name and traits as the catalogues give them.
+      # A spell's name and traits as the catalogues give them. A combined spell's, given as its spells'
+      # names, is their names joined and the traits of both.
       def self.spell_traits(spell)
+        if spell.is_a?(Array)
+          both = spell.map { |one| spell_traits(one) }
+          return [ both.map(&:first).join(' + '), both.flat_map(&:last).uniq ]
+        end
+
         name, mechanics = spell_mechanics(spell)
         traits = Array((mechanics || {})['traits'])
         traits = Array((Global.read_config('pf2e_spells', name) || {})['traits']) if traits.empty?
@@ -1880,9 +1886,18 @@ module AresMUSH
 
       # A spell lost to one of those checks: its actions are spent, and so is the spell.
       def self.casting_lost(scene, spell, risked, cast = nil)
-        name, mechanics = spell_mechanics(spell)
         out = report
         out['lines'].concat(risked['lines'])
+
+        if spell.is_a?(Array)
+          parts = spell.map { |one| spell_mechanics(one) }
+          name = parts.map(&:first).join(' + ')
+          time = longer_time(parts.map { |_one, mechanics| (mechanics || {})['time'] })
+          spend_casting(scene, name, time, false, spell_rank(scene.actor.holder, name, nil, {}, cast), out)
+          return Ok.new(:state => out)
+        end
+
+        name, mechanics = spell_mechanics(spell)
         spend_casting(scene, name, (mechanics || {})['time'] || 2, false, spell_rank(scene.actor.holder, name, mechanics, {}, cast), out)
 
         Ok.new(:state => out)
@@ -1985,6 +2000,156 @@ module AresMUSH
         Companion::Spells.cast!(scene, spell, targets)
 
         Ok.new(:state => out)
+      end
+
+      # ------------------------------------------------------------------------------
+      # A combined spell (Spell Combination)
+
+      # Why a combined spell cannot be cast at these targets, or nil: it affects one target, always.
+      def self.combined_refusal(spells, targets)
+        return nil if targets.size == 1
+
+        Err.new(:combined_one_target, 'pf2e.cast_combined_one_target', 'spell' => Array(spells).join(' + '))
+      end
+
+      # Two spells cast as one at one target. One spell attack, or one save with both spells' traits,
+      # decides both; each applies its own outcome at that degree; their damage is dealt together, in one
+      # line. It costs the longer of the two casting times, and is told with the shorter of the two ranges.
+      # `cast` is what the caster's magic answered when the slot was spent.
+      def self.cast_combined(scene, spells, targets, words, cast:, noted: [])
+        refusal = combined_refusal(spells, targets)
+        return refusal if refusal
+
+        said = said(words, scene.permitted)
+        out = report
+        out['lines'].concat(noted)
+        refused(out, said)
+
+        holder = scene.actor.holder
+        parts = spells.map { |one| spell_mechanics(one) }
+        name = parts.map(&:first).join(' + ')
+        rank = spell_rank(holder, name, nil, said, cast)
+        casting = Actors.of(holder).casting(name, cast)
+        target = targets.first
+        each = Scene.new(scene.encounter, scene.actor, target, scene.enactor, scene.permitted)
+
+        out['lines'] << told('pf2e.act_cast', :actor => scene.actor.label, :spell => name, :rank => rank,
+                                           :targets => " at #{target.label}")
+        range = shorter_range(parts.map { |_one, mechanics| (mechanics || {})['range'] })
+        out['lines'] << told('pf2e.act_cast_combined_range', :range => range) if range
+
+        parts.each do |one, mechanics|
+          Familiar::HexRiders.hexed!(scene, one, out)
+          Familiar::MasterSpells.cast!(scene, one, out)
+          out['lines'] << told('pf2e.act_combined_part_gm', :spell => one) unless mechanics
+        end
+
+        dc = casting ? spell_figure(holder, 'spell_dc', casting) : nil
+        guarded = AntimagicRune.before(target.holder)
+        pieces = combined_pieces(scene, parts, target, rank, said, out)
+
+        attack = pieces.any? { |piece| piece['mechanics']['attack'] }
+        saving = pieces.select { |piece| piece['way'] == :save }
+        degree = if attack
+                   spell_attack_roll(each, name, casting, said, out).dig('result', 'degree')
+                 elsif saving.any?
+                   save_roll(each, saving.map { |piece| piece['spell'] }, combined_save(saving, rank), dc, out)
+                 end
+
+        held = []
+        pieces.each do |piece|
+          mechanics, formulas = piece.values_at('mechanics', 'formulas')
+
+          case piece['way']
+          when :attack then held.concat(attack_rows(formulas, degree)) if degree
+          when :save then heal_or_hurt(each, mechanics, formulas, degree, out, :held => held) if degree && formulas.any?
+          when :unopposed then heal_or_hurt(each, mechanics, formulas, nil, out, :held => held)
+          end
+        end
+
+        unless held.empty?
+          out['about'] = pieces.flat_map { |piece| DamageAbout.of_spell(piece['mechanics'], piece['spell']) }.uniq
+          deal(each, target, held, out, :critical => degree == (attack ? Degree::CRITICAL_SUCCESS : Degree::CRITICAL_FAILURE))
+        end
+
+        pieces.each do |piece|
+          mechanics, formulas = piece.values_at('mechanics', 'formulas')
+          out['about'] = DamageAbout.of_spell(mechanics, piece['spell'])
+
+          case piece['way']
+          when :attack then outcome(each, mechanics, degree, formulas, out) if degree
+          when :save then outcome_at_dc(each, mechanics, dc, degree, formulas, out) if degree
+          when :applies then consequences(each, Array(mechanics['applies']).map { |one| one.merge('on' => 'target') }, out)
+          when :effect then spell_effect(each, piece['spell'], rank, out, said['words'])
+          end
+        end
+
+        AntimagicRune.after(each.target, name, rank, dc, guarded, out)
+
+        spend_casting(scene, name, longer_time(parts.map { |_one, mechanics| (mechanics || {})['time'] }), attack, rank, out)
+        parts.each { |one, _mechanics| Companion::Spells.cast!(scene, one, targets) }
+
+        Ok.new(:state => out)
+      end
+
+      # Each spell of a combination the engine has mechanics for, as it lands on the target: its mechanics
+      # at the rank cast, its damage formulas, and the way it is settled (`:attack`, `:save`, `:unopposed`
+      # for damage or healing that lands, `:applies`, or `:effect`). A spell the target is immune to is
+      # told so and left out.
+      def self.combined_pieces(scene, parts, target, rank, said, out)
+        holder = scene.actor.holder
+
+        parts.filter_map do |one, base|
+          next unless base
+
+          mechanics = way_for(base, target).merge('cast_rank' => rank)
+          mechanics = DragonBreath.typed(holder, one, mechanics)
+          mechanics = Companion::Riding.heal_mount(scene, one, mechanics, target)
+
+          next if immune?(mechanics['traits'], out, target, DamageAbout.spell(one))
+
+          formulas = Adjustments.spell_damage(holder, mechanics, spell_damage(mechanics, rank))
+          formulas = SpellRolls.dice(holder, one, formulas, mechanics['time'] || said['actions'])
+          SpellRolls.notes(holder, one, formulas, mechanics['time'] || said['actions'])
+                    .each { |text| out['lines'] << told('pf2e.act_note', :text => text) }
+
+          way = if mechanics['attack'] then :attack
+                elsif mechanics['save'] && !mends?(mechanics, formulas, target) then :save
+                elsif formulas.any? then :unopposed
+                elsif mechanics['applies'] then :applies
+                else :effect
+                end
+
+          { 'spell' => one, 'mechanics' => mechanics, 'formulas' => formulas, 'way' => way }
+        end
+      end
+
+      # What the one save against a combined spell is rolled as: the save they share, with both spells'
+      # traits, so incapacitation and a bonus against a kind of spell see either.
+      def self.combined_save(saving, rank)
+        { 'save' => saving.first['mechanics']['save'], 'cast_rank' => rank,
+          'traits' => saving.flat_map { |piece| Array(piece['mechanics']['traits']) }.uniq }
+      end
+
+      # The longer of a combination's casting times, as `spend_casting` counts one: anything taking minutes
+      # or more is longest, then the most actions; `1 to 3` counts its least.
+      def self.longer_time(times)
+        times.compact.max_by do |time|
+          time.to_s.match?(/minute|hour|day/i) ? 1000 : time.to_s[/\A\d+/].to_i
+        end || 2
+      end
+
+      # The shorter of a combination's ranges, as the data words it: `touch` is shortest, then the fewest
+      # feet. A range given some other way (`varies`, `planetary`) is not compared, and nil when neither is.
+      def self.shorter_range(ranges)
+        measured = ranges.compact.filter_map do |range|
+          text = range.to_s.strip
+          feet = text.match?(/\Atouch\z/i) ? 0 : text[/\A(\d+)\s*(?:feet|foot|ft)/i, 1]&.to_i
+
+          feet ? [ feet, text ] : nil
+        end
+
+        measured.min_by(&:first)&.last
       end
 
       # A spell's mechanics with more consequences for some degrees, after its own.
@@ -2188,14 +2353,7 @@ module AresMUSH
           return out['lines'] << told('pf2e.act_spell_attack_gm', :target => scene.target.label)
         end
 
-        options =TurnState.map_options(scene.actor.holder) + options_for(scene, said) + [ 'action:cast-a-spell' ]
-        check = Check.of(scene.actor.holder, 'spell_attack', casting || {}, options)
-        extra = attack_penalty(scene.actor.holder)
-
-        unseen = attacker_hidden?(scene)
-        rolled = attack_roll(scene, { 'name' => spell }, check, said, extra, out)
-        out['lines'] << rolled['line']
-        conceal(scene, scene.actor, nil, out) if unseen
+        rolled = spell_attack_roll(scene, spell, casting, said, out)
 
         if rolled['hit'] && formulas.any?
           critical = rolled['result']['degree'] == Degree::CRITICAL_SUCCESS
@@ -2207,32 +2365,77 @@ module AresMUSH
         outcome(scene, mechanics, degree, formulas, out) if degree
       end
 
+      # The caster's spell attack at the scene's target, rolled and told: what `attack_roll` answers.
+      def self.spell_attack_roll(scene, spell, casting, said, out)
+        options =TurnState.map_options(scene.actor.holder) + options_for(scene, said) + [ 'action:cast-a-spell' ]
+        check = Check.of(scene.actor.holder, 'spell_attack', casting || {}, options)
+        extra = attack_penalty(scene.actor.holder)
+
+        unseen = attacker_hidden?(scene)
+        rolled = attack_roll(scene, { 'name' => spell }, check, said, extra, out)
+        out['lines'] << rolled['line']
+        conceal(scene, scene.actor, nil, out) if unseen
+
+        rolled
+      end
+
       # A spell attack decided by another roll's degree: what a spell reservoir's Strike rolled.
       def self.attack_through(scene, mechanics, formulas, degree, out)
-        if Degree.success?(degree) && formulas.any?
-          critical = degree == Degree::CRITICAL_SUCCESS
-          rows = DamageRoll.of_formulas(formulas.map { |formula, type, category, _| [ formula, type, category ] }, critical)
-          deal(scene, scene.target, rows, out, :critical => critical)
-        end
+        rows = attack_rows(formulas, degree)
+        deal(scene, scene.target, rows, out, :critical => degree == Degree::CRITICAL_SUCCESS) if rows.any?
 
         outcome(scene, mechanics, degree, formulas, out)
+      end
+
+      # A spell attack's damage at a degree, rolled: nothing on a miss, doubled on a critical hit.
+      def self.attack_rows(formulas, degree)
+        return [] unless Degree.success?(degree) && formulas.any?
+
+        DamageRoll.of_formulas(formulas.map { |formula, type, category, _| [ formula, type, category ] },
+                               degree == Degree::CRITICAL_SUCCESS)
       end
 
       # A save against the caster's DC, rolled by each target: a basic save scales the damage, and any
       # save leaves what its outcome says.
       def self.spell_save(scene, spell, mechanics, dc, formulas, out, once = nil)
+        degree = save_roll(scene, spell, mechanics, dc, out)
+        return unless degree
+
+        save_through(scene, mechanics, dc, formulas, degree, out, once)
+
+        degree
+      end
+
+      # A spell's damage and outcome at a save's degree, worked out elsewhere: the save's twin of
+      # `attack_through`.
+      def self.save_through(scene, mechanics, dc, formulas, degree, out, once = nil)
+        heal_or_hurt(scene, mechanics, formulas, degree, out, once) if formulas.any?
+
+        outcome_at_dc(scene, mechanics, dc, degree, formulas, out)
+      end
+
+      # What a save's outcome leaves, knowing the DC it was rolled against.
+      def self.outcome_at_dc(scene, mechanics, dc, degree, formulas, out)
+        out['dc'] = dc
+        outcome(scene, mechanics, degree, formulas, out)
+        out.delete('dc')
+      end
+
+      # The scene's target's save against a spell, rolled and told: its degree, or nil where there is no
+      # DC to roll against and the GM is told to roll it. `spell` is a name, or a combined spell's names.
+      def self.save_roll(scene, spell, mechanics, dc, out)
         target = scene.target
         save = mechanics['save']
 
         unless dc
           out['lines'] << told('pf2e.act_save_gm', :target => target.label, :save => save.capitalize)
-          return
+          return nil
         end
 
         # A save against a spell knows it is one (`item:type:spell`), which a bonus to saves against spells
         # asks: Root Magic, and the like.
         check = Check.of(target.holder, 'save', save, Resolve.seen_as(scene.actor.holder, 'origin') + Array(mechanics['traits']) +
-                                                      DamageAbout.spell(spell))
+                                                      Array(spell).flat_map { |one| DamageAbout.spell(one) })
         # Standard or greater cover helps a Reflex save against an area.
         extra = save == 'reflex' && mechanics['area'] ? [ Resolve.cover_modifier(cover_of(scene, {}), 'reflex') ].compact : []
         spared = Incapacitation.spares?(mechanics['traits'], target.holder, :rank => mechanics['cast_rank'],
@@ -2244,12 +2447,6 @@ module AresMUSH
                                                 :degree => Telling.degree(result['degree'], false))
         out['lines'] << told('pf2e.act_incapacitation', :target => target.label) if spared
         out['detail'] += detail_lines("#{target.label}'s #{save}", save, result, nil)
-
-        heal_or_hurt(scene, mechanics, formulas, result['degree'], out, once) if formulas.any?
-
-        out['dc'] = dc
-        outcome(scene, mechanics, result['degree'], formulas, out)
-        out.delete('dc')
 
         result['degree']
       end
@@ -2289,8 +2486,9 @@ module AresMUSH
         formulas.any? { |_f, _t, _c, kinds| Array(kinds).include?('healing') } && !hurts_this
       end
 
-      # `once` is an area's: what it rolled, by formula, which everything in it takes.
-      def self.heal_or_hurt(scene, mechanics, formulas, degree, out, once = nil)
+      # `once` is an area's: what it rolled, by formula, which everything in it takes. `held` is a list the
+      # damage is added to, for the caller to deal with more, in place of dealing it: a combined spell's.
+      def self.heal_or_hurt(scene, mechanics, formulas, degree, out, once = nil, held: nil)
         heals = formulas.select { |_f, _t, _c, kinds| Array(kinds).include?('healing') }
 
         if mends?(mechanics, formulas, scene.target)
@@ -2321,6 +2519,8 @@ module AresMUSH
           scaled = Pf2e.scaled_formula(row['formula'], factor)
           scaled && row.merge('formula' => scaled)
         end
+        return held.concat(rows) if held
+
         deal(scene, scene.target, rows, out, :critical => degree == Degree::CRITICAL_FAILURE)
       end
 

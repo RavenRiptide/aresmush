@@ -267,7 +267,12 @@ module AresMUSH
         return if CharState.emit_error!(client, SpellReservoir.refusal(scene, self.spell, found, self.words) || Ok.new(:state => nil))
         return if CharState.emit_error!(client, Familiar::Phase.refusal(scene, self.spell) || Ok.new(:state => nil))
 
-        cast = Actors.of(actor.state.holder).spends_spells? ? spend_the_spell(actor.state.holder) : nil
+        spends = Actors.of(actor.state.holder).spends_spells?
+        # A combined spell (Spell Combination) is refused at more than one target before its slot is spent.
+        combination = spends ? combination_for(actor.state.holder) : nil
+        return if combination && CharState.emit_error!(client, Acting.combined_refusal(combination['spells'], found) || Ok.new(:state => nil))
+
+        cast = spends ? spend_the_spell(actor.state.holder) : nil
 
         if cast.is_a?(String)
           client.emit_failure cast
@@ -275,13 +280,16 @@ module AresMUSH
         end
 
         spell = cast.is_a?(Hash) ? cast['spell name'] : self.spell
+        combined = cast.is_a?(Hash) ? cast['combined'] : nil
 
         # One who may not get it off rolls for it with the spell spent, and loses it with its actions.
-        risked = Acting.casting_risked(scene, spell)
-        return tell(encounter, Acting.casting_lost(scene, spell, risked, cast).state, actor.state) if risked && !risked['kept']
+        risked = Acting.casting_risked(scene, combined || spell)
+        return tell(encounter, Acting.casting_lost(scene, combined || spell, risked, cast).state, actor.state) if risked && !risked['kept']
 
         # Cast into a spell reservoir, the spell waits on the weapon rather than taking effect.
-        done = if SpellReservoir.storing?(self.words)
+        done = if combined
+                 Acting.cast_combined(scene, combined, found, self.words, :cast => cast, :noted => risked ? risked['lines'] : [])
+               elsif SpellReservoir.storing?(self.words)
                  SpellReservoir.store(scene, spell, cast, found, self.words)
                else
                  Acting.cast(scene, spell, found, self.words, :cast => cast, :noted => risked ? risked['lines'] : [])
@@ -294,6 +302,25 @@ module AresMUSH
 
       # The caster's magic spends the spell and answers with what it was cast at, or says why it could not.
       def spend_the_spell(char)
+        charclass, kind, level = how_cast(char)
+
+        return t('pf2emagic.not_caster') unless charclass || kind == 'innate'
+
+        Pf2emagic.cast_spell(char, charclass || 'Innate', self.spell, [], level, kind)
+      end
+
+      # The combination slot casting the spell would spend, left unspent, or nil.
+      def combination_for(char)
+        charclass, kind, level = how_cast(char)
+
+        return nil if kind || !charclass
+
+        Pf2emagic.combination_for(char, charclass, self.spell, level)
+      end
+
+      # `[ class, kind, rank ]` a character casts the spell with: the class they said or the one that
+      # knows it, the kind of casting they said (`focus`, `innate`), and the rank they asked for.
+      def how_cast(char)
         said = Acting.said(self.words, false)
         kind = self.words.map(&:downcase).find { |word| KINDS.include?(word) }
 
@@ -308,11 +335,7 @@ module AresMUSH
           casting_class(char)
         end
 
-        level = said['rank'] ? said['rank'].to_s : nil
-
-        return t('pf2emagic.not_caster') unless charclass || kind == 'innate'
-
-        Pf2emagic.cast_spell(char, charclass || 'Innate', self.spell, [], level, kind)
+        [ charclass, kind, said['rank'] ? said['rank'].to_s : nil ]
       end
 
       # Which of their casting classes casts it, where they did not say: the one that knows the spell, and
