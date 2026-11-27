@@ -95,7 +95,7 @@ module AresMUSH
           open = grant['name'].to_s.casecmp?(Entries::OPEN)
 
           { spell: open ? nil : Pf2e::ProfileSheet.item(Pf2e.pretty_string(grant['name']), 'spell'),
-            rank: rank_of(grant['level']), tradition: grant['tradition'].to_s }
+            rank: rank_of(Entries.innate_rank(magic, grant)), tradition: grant['tradition'].to_s }
         end
       end
 

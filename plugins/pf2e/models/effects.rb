@@ -66,6 +66,10 @@ module AresMUSH
     # holder's side and `origin:mark:<slug>` from the marked creature's (`Pf2e::Marks`).
     attribute :mark, :type => DataType::Hash, :default => {}
 
+    # What this one leaves as it ends, beyond what its catalogue entry's `when_ended` says:
+    # `{ 'conditions' => [ 'Fatigued' ] }` for a Rage raged with Second Wind (`ActiveEffects.ended_into`).
+    attribute :when_ended, :type => DataType::Hash, :default => {}
+
     # A mutagen's halves, which the polymorph rule and a Mutagenist's field vial part (`Pf2e::Mutagens`):
     # whether a later polymorph has ended its benefits, keeping its drawbacks, and the encounter round until
     # which a field vial suppresses its drawbacks.

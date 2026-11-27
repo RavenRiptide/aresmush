@@ -26,5 +26,6 @@ Some feats have you make other choices during your daily preparations, such as t
 
 - `help prepare/cleric`: Filling a cleric's divine font slots, and preparing their deity's spells.
 - `help prepare/book`: Picking a spell each day from a Book of Occult Spells (Esoteric Polymath) or an Arcane Evolution list.
-- `help prepare/wizard`: Split Slot, Spell Combination, and Spell Mastery.
+- `help prepare/wizard`: Split Slot, Spell Combination, Spell Mastery, Infinite Possibilities, and Form Retention.
+- `help prepare/swap`: Changing a prepared spell after your daily preparations (Call of the Wild, Elemental Summons, Rites of Convocation, Spell Substitution, and Reprepare Spell).
 - `help prepare/staff`: Preparing a staff, expending spells on it, and Staff Nexus.

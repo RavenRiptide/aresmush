@@ -52,6 +52,12 @@ module AresMUSH
     # it fights on its own, `{ 'rested_until' => a round }` after it falls (`Pf2e::AnimatedRune`).
     attribute :animated, :type => DataType::Hash, :default => {}
 
+    # A weapon that casts as a wand (a witch's ceremonial knife, `Pf2e::CeremonialKnife`): cast from today,
+    # overcharged today, and broken by an overcharge, as a wand's are (`Pf2e::SpellItems`).
+    attribute :used_today, :type => DataType::Boolean
+    attribute :overcharged, :type => DataType::Boolean
+    attribute :broken, :type => DataType::Boolean
+
     reference :character, "AresMUSH::Character"
     # An encounter's copy of a character's item, taken as they entered it: the encounter reads and changes
     # this, never the item itself. `copied_from` is the character's own item.

@@ -270,19 +270,25 @@ module AresMUSH
       end
 
       # Whether they can cast from it at all: a broken wand can't be, and the spell has to be on their list.
-      def self.refusal(holder, item)
+      # `held` is the spell and rank of something that casts as a wand without being one (`CeremonialKnife`):
+      # { 'spell', 'rank' }.
+      def self.refusal(holder, item, held = nil)
+        spell = held ? held['spell'] : item.spell
+
+        return Err.new(:broken, 'pf2e.knife_broken', 'item' => item.name) if held && item.broken
         return Err.new(:broken, 'pf2e.wand_broken', 'item' => item.name) if wand?(item) && item.broken
-        return Err.new(:not_listed, 'pf2e.spell_item_not_listed', 'item' => item.name, 'spell' => item.spell) unless
-          casting_for(holder, item.spell)
+        return Err.new(:not_listed, 'pf2e.spell_item_not_listed', 'item' => item.name, 'spell' => spell) unless
+          casting_for(holder, spell)
 
         nil
       end
 
       # What the casting engine is handed: the caster's own stats, with the item's spell and rank.
-      def self.cast_of(holder, item)
-        _class, stats = casting_for(holder, item.spell)
+      def self.cast_of(holder, item, held = nil)
+        spell = held ? held['spell'] : item.spell
+        _class, stats = casting_for(holder, spell)
 
-        stats.merge('spell name' => item.spell, 'spell level' => item.spell_rank.to_s)
+        stats.merge('spell name' => spell, 'spell level' => (held ? held['rank'] : item.spell_rank).to_s)
       end
 
       # Outside an encounter nothing is rolled: the room is told, and a scroll is used up. A wand's day isn't
@@ -304,10 +310,12 @@ module AresMUSH
       end
 
       # In an encounter: cast through the engine `encounter/cast` uses, then the item is spent. `overcharge`
-      # casts from a wand already used today, and rolls for what it does to the wand.
-      def self.cast!(scene, item, targets, words, overcharge: false)
+      # casts from a wand already used today, and rolls for what it does to the wand. `held` casts something
+      # that works as a wand holding that spell (`refusal`).
+      def self.cast!(scene, item, targets, words, overcharge: false, held: nil)
         holder = scene.actor.holder
-        refused = refusal(holder, item)
+        wand = held ? true : wand?(item)
+        refused = refusal(holder, item, held)
 
         return refused if refused
 
@@ -322,13 +330,13 @@ module AresMUSH
           ended = Telling.event('pf2e.wand_storm_ended', :item => item.name)
         end
 
-        if wand?(item)
+        if wand
           return Err.new(:used, 'pf2e.wand_used_today', 'item' => item.name) if item.used_today && !overcharge
           return Err.new(:not_used, 'pf2e.wand_overcharge_unused', 'item' => item.name) if overcharge && !item.used_today
           return overcharged_again!(scene, item) if overcharge && item.overcharged
         end
 
-        spell = item.spell
+        spell = held ? held['spell'] : item.spell
         # Asked as `encounter/cast` asks them, before anything is spent. `way_needed` answers Ok when nothing is
         # needed, and the others nil.
         before = [ Acting.way_needed(spell, words), Acting.casting_refused(scene, spell, words),
@@ -336,7 +344,7 @@ module AresMUSH
 
         return before if before
 
-        cast = cast_of(holder, item)
+        cast = cast_of(holder, item, held)
         risked = Acting.casting_risked(scene, spell)
         effect = wand_effect(item)
         alive = targets.reject { |one| slain?(one.holder) }
@@ -356,7 +364,7 @@ module AresMUSH
           specialty_cast!(scene, item, targets, done.state) if wand?(item)
           wand_effect_cast!(scene, item, effect, alive, done.state) if effect
         end
-        spent!(holder, item, overcharge, done.state)
+        spent!(holder, item, overcharge, done.state, wand: wand)
 
         done
       end
@@ -482,8 +490,8 @@ module AresMUSH
                       'dice' => thrown['shown'] || first.lingering['heal']) ]
       end
 
-      def self.spent!(holder, item, overcharge, out)
-        unless wand?(item)
+      def self.spent!(holder, item, overcharge, out, wand: wand?(item))
+        unless wand
           Consumables.spend!(holder, item.id)
           return
         end
@@ -511,12 +519,15 @@ module AresMUSH
         Ok.new(:state => out)
       end
 
-      # Gone from the encounter's copy now, and from their own when the encounter settles.
+      # Gone from the encounter's copy now, and from their own when the encounter settles. A weapon that casts
+      # as a wand (`CeremonialKnife`) is kept apart, since weapons and magic items number their ids apart.
       DESTROYED = 'destroyed_items'.freeze
+      DESTROYED_WEAPONS = 'destroyed_weapons'.freeze
 
       def self.destroy!(holder, item)
         if item.respond_to?(:copied_from) && item.copied_from
-          TurnState.write(holder, DESTROYED => (Array(TurnState.of(holder)[DESTROYED]) + [ item.copied_from.to_s ]).uniq)
+          key = item.is_a?(PF2Weapon) ? DESTROYED_WEAPONS : DESTROYED
+          TurnState.write(holder, key => (Array(TurnState.of(holder)[key]) + [ item.copied_from.to_s ]).uniq)
         end
 
         item.delete
@@ -525,12 +536,15 @@ module AresMUSH
       # ------------------------------------------------------------------------------
       # A rest, an encounter's end, and repair
 
-      # A rest gives a wand its day back. A broken one stays broken.
+      # A rest gives a wand its day back, and a weapon that casts as one (`CeremonialKnife`). A broken one
+      # stays broken.
       def self.rested!(holder)
         return unless Actors.of(holder).carries_items?
 
         Pf2egear::Inventory.all(holder, 'magicitem').select { |one| wand?(one) && (one.used_today || one.overcharged || one.lingering.present?) }
                            .each { |one| one.update(:used_today => false, :overcharged => false, :lingering => {}) }
+        Pf2egear::Inventory.all(holder, 'weapons').select { |one| one.used_today || one.overcharged }
+                           .each { |one| one.update(:used_today => false, :overcharged => false) }
       end
 
       # What the encounter did to their own wands: broken or mended, and destroyed. Their day isn't carried
@@ -541,8 +555,14 @@ module AresMUSH
           own.update(:broken => !!copy.broken) if own && !!own.broken != !!copy.broken
         end
 
+        state.weapons.to_a.select(&:copied_from).each do |copy|
+          own = PF2Weapon[copy.copied_from]
+          own.update(:broken => !!copy.broken) if own && !!own.broken != !!copy.broken
+        end
+
         Array(TurnState.of(state)[DESTROYED]).each { |id| PF2MagicItem[id]&.delete }
-        TurnState.write(state, DESTROYED => [])
+        Array(TurnState.of(state)[DESTROYED_WEAPONS]).each { |id| PF2Weapon[id]&.delete }
+        TurnState.write(state, DESTROYED => [], DESTROYED_WEAPONS => [])
       end
 
       # What an item view says of one: the spell it holds, and a wand's day.

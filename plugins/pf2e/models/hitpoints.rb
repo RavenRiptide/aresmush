@@ -148,10 +148,14 @@ module AresMUSH
       now_dying(char, fatal_at(char), Pf2e::Gm.may_kill?(char))
     end
 
-    # The value at which dying is death, which Doomed lowers.
+    # The value at which dying is death: 4, or what a rule raises it to (Diehard's 5), less Doomed.
     def self.fatal_at(char)
-      4 - Pf2e.condition_level(char, 'Doomed')
+      raised = Pf2e::Paths.held(char, 'dying_max').to_i
+
+      [ raised, DYING_MAX ].max - Pf2e.condition_level(char, 'Doomed')
     end
+
+    DYING_MAX = 4
 
     # A character's Dying at the value named. At the value that is death they die where that may happen,
     # and where it may not they stop dying, unconscious and wounded for it as anyone is who stops.

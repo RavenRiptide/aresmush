@@ -130,6 +130,29 @@ module AresMUSH
           expect(Retrain.opens_anything?(general(grants: { 'feat' => [ 'Pet' ] }))).to be true
           expect(Retrain.opens_anything?(general(at_level: { 17 => {} }))).to be true
         end
+
+        it "should take back a feat granting features, and name them with their buckets" do
+          details = general(grants: { 'feat' => [ 'Pet' ], 'feature' => { 'archetype_features' => [ 'Flurry of Blows' ] } })
+
+          expect(Retrain.reversible?(details)).to be true
+          expect(Retrain.granted_features(details)).to eq [ [ 'archetype_features', 'Flurry of Blows' ] ]
+        end
+
+        it "should read a plain list of features as class features" do
+          details = general(grants: { 'feature' => [ 'Verdant Rest' ] })
+
+          expect(Retrain.granted_features(details)).to eq [ [ 'charclass_features', 'Verdant Rest' ] ]
+        end
+
+        # Raging Intimidation's feats arrive once their prerequisites are met, so a retrain takes back
+        # whichever of them arrived, and one into it would have to open what a retrain cannot.
+        it "should take back the feats a feat hands over once eligible" do
+          details = general(feats_when_eligible: [ 'Intimidating Glare', 'Scare to Death' ])
+
+          expect(Retrain.reversible?(details)).to be true
+          expect(Retrain.granted_feats(details)).to eq [ 'Intimidating Glare', 'Scare to Death' ]
+          expect(Retrain.opens_anything?(details)).to be true
+        end
       end
 
       describe "the config's no_retrain flags" do

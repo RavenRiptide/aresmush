@@ -115,7 +115,7 @@ module AresMUSH
                       end
 
         highest_slots = highest_key ? cc_spells_2day[highest_key].to_i : 0
-        if highest_slots <= 0
+        if highest_slots <= 0 && !(highest_key && CastFeats.overflow_feat(char, charclass, highest_level, highest_level))
           abs_level = highest_level.to_i.abs
           suffix =  case abs_level % 10
                     when 1 then 'st'
@@ -156,7 +156,8 @@ module AresMUSH
                                  splevel.to_i
                                end
                     slots = slot_key ? cc_spells_2day[slot_key] : nil
-                    !slots.nil? && is_signature_spell && splevel.to_i.between?(base, max_castable_level) && (slots > 0)
+                    !slots.nil? && is_signature_spell && splevel.to_i.between?(base, max_castable_level) &&
+                      (slots > 0 || !CastFeats.overflow_feat(char, charclass, splevel, max_castable_level).nil?)
                   end
 
       unless available
@@ -180,14 +181,21 @@ module AresMUSH
         slots = slot_key ? cc_spells_2day[slot_key] : nil
         return t('pf2emagic.no_available_slots') if slots.nil?
 
-        slots = slots - 1
-        cc_spells_2day[slot_key] = slots
-        cc_spells[charclass] = cc_spells_2day
-        magic.update(spells_today: cc_spells)
+        overflow_feat = CastFeats.overflow_feat(char, charclass, splevel, max_castable_level) unless slots > 0
       end
 
       caster_stats['spell level'] = splevel
       caster_stats['spell type'] = 'signature'
+
+      if overflow_feat
+        CastFeats.spend_overflow(magic, overflow_feat, splevel)
+        caster_stats['spell type'] = overflow_feat
+      elsif !splevel.to_s.start_with?('cantrip')
+        cc_spells_2day[slot_key] = slots - 1
+        cc_spells[charclass] = cc_spells_2day
+        magic.update(spells_today: cc_spells)
+      end
+
       caster_stats['targets'] = target_list unless target_list.empty?
       caster_stats['spell name'] = spname
 
@@ -218,11 +226,27 @@ module AresMUSH
 
       splevel = (level || prepared_at || spdeets['base_level']).to_s
 
-      # Not prepared on its own, but in a slot holding two spells (Split Slot, Spell Combination).
+      # Not prepared on its own, but in a slot holding two spells (Split Slot, Spell Combination), or
+      # cast by giving up a divine font spell (Restorative Channel).
       unless Array((cc_spells_2day || {})[splevel]).include?(spname)
         pair = SlotFeats.cast_from_pair(magic, charclass, spname, level)
 
         return cast_from_slot_pair(caster_stats, pair, spname, target_list) if pair
+
+        held_open = SlotFeats.cast_from_open(char, magic, charclass, spname, level) unless prepared_at
+        return cast_from_slot_pair(caster_stats, held_open, spname, target_list) if held_open
+
+        trade =CastFeats.font_trade(char, charclass, spname, level) unless prepared_at
+        if trade
+          CastFeats.spend_font_trade(magic, charclass, trade)
+
+          caster_stats['spell level'] = trade['rank']
+          caster_stats['spell type'] = "#{trade['feat']} (#{trade['from']})"
+          caster_stats['targets'] = target_list unless target_list.empty?
+          caster_stats['spell name'] = spname
+
+          return caster_stats
+        end
       end
 
       return t('pf2emagic.no_available_slots') unless cc_spells_2day
@@ -258,8 +282,8 @@ module AresMUSH
       caster_stats
     end
 
-    # A spell cast from a slot holding two: the one named (Split Slot), or both at once as a
-    # combined spell (Spell Combination), at the rank the pair was prepared to cast at.
+    # A spell cast from a slot a feat changed: the one named (Split Slot, Form Retention), or both at once
+    # as a combined spell (Spell Combination), at the rank the slot was prepared to cast at.
     def self.cast_from_slot_pair(caster_stats, pair, spname, target_list)
       both = pair['cast'].to_s == 'both'
 
@@ -267,6 +291,8 @@ module AresMUSH
       caster_stats['spell level'] = pair['cast_rank'].to_s
       caster_stats['spell type'] = "#{pair['feat']} (#{Pf2emagic.ordinal_level(pair['rank'])}-rank slot)"
       caster_stats['targets'] = target_list unless target_list.empty?
+      # A retained spell (Form Retention) lasts longer than its own duration.
+      caster_stats['lasts'] = pair['lasts'] if pair['lasts'].is_a?(Hash)
 
       caster_stats
     end
@@ -339,14 +365,23 @@ module AresMUSH
         return caster_stats
       end
 
+      # A battle form cast from a slot as if it were a signature spell (Greater Physical Evolution).
+      form_feat = if !can_cast_at_level && splevel != 'cantrip' && splevel.to_i.between?(base, max_castable_level)
+                    CastFeats.battle_form_feat(char, charclass, spname)
+                  end
+      can_cast_at_level ||= !form_feat.nil?
+
       unless can_cast_at_level
         focus_msg = focus_casting_mismatch_msg(char, charclass, spell)
         return focus_msg if focus_msg
 
         return t('pf2emagic.not_in_list')
       end
-      
-      # Slots are not neccessary for cantrips.
+
+      # Slots are not neccessary for cantrips. A rank whose slots have run out may still be cast at by
+      # a feat (Studious Capacity).
+      overflow_feat = nil
+
       if splevel != 'cantrip'
         slot_key = if cc_spells_2day.key?(splevel)
                      splevel
@@ -356,8 +391,8 @@ module AresMUSH
         slots = slot_key ? cc_spells_2day[slot_key] : nil
         return t('pf2emagic.no_available_slots') unless slots
 
-        available = (slots > 0)
-        return t('pf2emagic.no_available_slots') unless available
+        overflow_feat = CastFeats.overflow_feat(char, charclass, splevel, max_castable_level) unless slots > 0
+        return t('pf2emagic.no_available_slots') unless slots > 0 || overflow_feat
       end
 
       # Do the cast and return a caster hash. Cantrip recalculates level for auto-heightening.
@@ -365,11 +400,19 @@ module AresMUSH
       if splevel == 'cantrip'
         hlevel = get_auto_heighten_level(char).to_s
         splevel = splevel + "/#{hlevel}"
+      elsif overflow_feat
+        CastFeats.spend_overflow(magic, overflow_feat, splevel)
+        caster_stats['spell type'] = overflow_feat
       else
         slots = slots - 1
         cc_spells_2day[slot_key] = slots
         cc_spells[charclass] = cc_spells_2day
         magic.update(spells_today: cc_spells)
+      end
+
+      if form_feat
+        CastFeats.spend_battle_form(magic, form_feat)
+        caster_stats['spell type'] = form_feat
       end
 
       caster_stats['spell level'] = splevel
@@ -419,7 +462,7 @@ module AresMUSH
       # innate one.
       caster_stats = { 'prof_level' => Array((magic.tradition || {})['innate'])[1] || 'trained' }
       caster_stats['tradition'] = spinfo['tradition']
-      caster_stats['spell level'] = spinfo['level']
+      caster_stats['spell level'] = Entries.innate_rank(magic, spinfo)
       caster_stats['spell type'] = 'innate'
       caster_stats['spell_abil'] = spinfo['cast_stat']
       caster_stats['modifier'] = Pf2eAbilities.abilmod(Pf2eAbilities.get_score(char,spinfo['cast_stat']))

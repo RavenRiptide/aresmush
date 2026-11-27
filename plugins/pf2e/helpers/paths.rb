@@ -48,6 +48,14 @@ module AresMUSH
           'read' => ->(char, _name) { Paths.held(char, 'dying_recovery_dc') },
           'write' => ->(char, _name, value) { Paths.store(char, 'dying_recovery_dc', value) }
         },
+        # The dying value that is death, which Diehard raises to 5. Nothing here means the rule's 4
+        # (`Pf2eHP.fatal_at`).
+        {
+          'name' => 'dying maximum',
+          'match' => %r{\Asystem\.attributes\.dying\.max\z},
+          'read' => ->(char, _name) { Paths.held(char, 'dying_max') },
+          'write' => ->(char, _name, value) { Paths.store(char, 'dying_max', value) }
+        },
         # How much of a night's rest a character gets, which Fast Recovery doubles. Foundry's default is
         # one and their rules add to it, so `Pf2e::DailyHelpers` reads it as one more than what is here.
         {

@@ -11,7 +11,7 @@ module AresMUSH
     # as the effect lasts. That is what lets it end without anyone putting anything back.
     #
     # Only the properties that change something this engine models are read. The rest - a spell's area,
-    # an action's frequency, an item's description - are refused at import.
+    # an item's description - are refused at import.
     module Alterations
 
       # Each property, onto the field of the thing it alters.
@@ -41,11 +41,15 @@ module AresMUSH
         'hardness' => { 'field' => 'hardness' },
         'badge-value' => { 'field' => 'value' },
         'badge-max' => { 'field' => 'max' },
-        'pd-recovery-dc' => { 'field' => 'recovery_dc' }
+        'pd-recovery-dc' => { 'field' => 'recovery_dc' },
+        # How often an action may be used: Incredible Ferocity's Oruch Ferocity once an hour, not a day.
+        'frequency-per' => { 'field' => 'per' },
+        'frequency-max' => { 'field' => 'max' }
       }.freeze
 
-      # The kinds of thing an alteration may name that are things here.
-      KINDS = %w{weapon armor shield condition effect}.freeze
+      # The kinds of thing an alteration may name that are things here. A feat that is an action, and an
+      # action, are altered as `Actions.frequency` reads them.
+      KINDS = %w{weapon armor shield condition effect feat action}.freeze
 
       # Every alteration the character's feats, items and effects make to things of this kind. Conditions
       # are not asked, because a condition's value is itself one of the things altered, and working out

@@ -241,9 +241,15 @@ module AresMUSH
 
         # Two spells in one slot (Split Slot, Spell Combination), still unspent today.
         Array(((@magic.spells_today || {})[Pf2emagic::SlotFeats::TODAY] || {})[charclass]).each do |pair|
-          joined = pair['cast'].to_s == 'both' ? pair['spells'].join(' + ') : pair['spells'].join(' or ')
+          joined = if Pf2emagic::SlotFeats.open?(pair)
+                     t('pf2emagic.slot_open_held', :cast_rank => pair['cast_rank'])
+                   elsif pair['cast'].to_s == 'both'
+                     pair['spells'].join(' + ')
+                   else
+                     pair['spells'].join(' or ')
+                   end
 
-          list << "%b%b#{item_color}#{spell_level_label(pair['rank'])} (#{pair['feat']}):%xn #{joined}"
+          list <<"%b%b#{item_color}#{spell_level_label(pair['rank'])} (#{pair['feat']}):%xn #{joined}"
         end
 
         return "#{trad_string}#{divine_font}#{focus_pool}#{prepared_msg} None." if list.empty?
@@ -279,7 +285,30 @@ module AresMUSH
                            "%r#{remaining.join("%r")}"
                          end
 
-        "#{trad_string}#{focus_pool}#{remaining_msg}#{remaining_data}#{format_bonus_slots(char, charclass)}"
+        "#{trad_string}#{focus_pool}#{remaining_msg}#{remaining_data}#{format_bonus_slots(char, charclass)}" \
+          "#{format_cast_feats(char, charclass)}"
+      end
+
+      # Feats that cast past a rank's slots (Studious Capacity) or cast a battle form (Greater Physical
+      # Evolution), with the uses left today.
+      def format_cast_feats(char, charclass)
+        feats = Pf2emagic::CastFeats.summary(char, charclass)
+        return '' if feats.empty?
+
+        lines = feats.map do |feat, left, limits|
+          notes = limits.map do |limit|
+            case limit
+            when 'overflow' then t('pf2emagic.cast_feat_overflow')
+            when 'not_top' then t('pf2emagic.cast_feat_not_top')
+            when 'battle_form' then t('pf2emagic.cast_feat_battle_form')
+            else t('pf2emagic.cast_feat_used_at', :ranks => limit.delete_prefix('used:').split(',').join(', '))
+            end
+          end
+
+          "%b%b%xh#{feat}:%xn #{left}#{notes.empty? ? '' : " (#{notes.join('; ')})"}"
+        end
+
+        "%r#{item_color}#{t('pf2emagic.cast_feats_title')}%xn%r#{lines.join('%r')}"
       end
 
       # A feat's slot for certain spells, at the highest rank: Divine Evolution's heal or harm.
@@ -387,6 +416,8 @@ module AresMUSH
         p_short = prof.to_s.slice(0).to_s.upcase
 
         level = values['level']
+        # An at-will grant's rank follows the character's highest (Grown of Oak).
+        level = "#{level} (rank #{Pf2emagic::Entries.innate_rank(@magic, values)})" if values['below_top']
         # A spell the character was granted but hasn't picked yet is stored under the key 'open'.
         name = name.to_s.casecmp?('open') ? t('pf2emagic.cg_innate_unchosen') : Pf2e.pretty_string(name)
         trad = Pf2e.pretty_string(values['tradition'])

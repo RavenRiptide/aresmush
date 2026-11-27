@@ -394,7 +394,7 @@ module AresMUSH
         @audit.find('auto condition', "#{holder.name}'s turn started dying", 'no recovery check was rolled')
       end
 
-      # Frightened eases by one at the end of its holder's turn.
+      # Frightened eases at the end of its holder's turn: by one, or by more a feat gives (Khazadi Doughtiness).
       def frightened_before_turn_ends
         name = ActiveEffects.current_turn(encounter)
         row = Combatants.rows(encounter).find { |one| one['name'] == name }
@@ -410,9 +410,11 @@ module AresMUSH
         now = value_of(holder, 'Frightened')
         @audit.counts['frightened turns checked'] += 1
 
-        return if now == before - 1
+        wanted = [ before - ConditionFeats.eases_by(holder, 'Frightened'), 0 ].max
 
-        @audit.find('auto condition', "#{holder.name}'s turn ended", "Frightened #{before} should ease to #{before - 1}, is #{now}")
+        return if now == wanted
+
+        @audit.find('auto condition', "#{holder.name}'s turn ended", "Frightened #{before} should ease to #{wanted}, is #{now}")
       end
     end
   end

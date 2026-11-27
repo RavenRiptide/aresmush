@@ -5,6 +5,8 @@ module AresMUSH
     #   prepare/splitslot <rank> = <spell>, <spell>          two spells, cast one
     #   prepare/spellcombination <rank> = <spell> + <spell>  two spells, cast together
     #   prepare/spellmastery [<rank> =] <spell>              a spell prepared at every rest
+    #   prepare/infinite <rank>                              a slot held open, its spell chosen as it is cast
+    #   prepare/formretention <rank> = <spell>               one battle form, cast 2 ranks lower for longer
     #
     # Either separator works for either pair, since no spell's name holds one.
     class PF2PrepareSlotFeatCmd
@@ -51,11 +53,30 @@ module AresMUSH
       end
 
       def pair(found)
+        # An open slot is given only its rank: `prepare/infinite 6`.
+        if SlotFeats.open?(found['block']) && self.rank.blank? && self.spells.size == 1 && self.spells.first.match?(/\A\d+\z/)
+          self.rank = self.spells.first
+          self.spells = []
+        end
+
         outcome = SlotFeats.prepare_pair(enactor, found, self.rank, self.spells)
 
         return if Pf2e::CharState.emit_error!(client, outcome)
 
         made = outcome.state
+
+        if SlotFeats.open?(made)
+          client.emit_success t('pf2emagic.slot_open_ok', :rank => made['rank'], :cast_rank => made['cast_rank'], :feat => made['feat'])
+          return
+        end
+
+        if SlotFeats.retained?(made)
+          client.emit_success t('pf2emagic.slot_retained_ok', :spell => made['spells'][0], :rank => made['rank'],
+                                :cast_rank => made['cast_rank'], :feat => made['feat'],
+                                :value => (made['lasts'] || {})['value'], :unit => (made['lasts'] || {})['unit'])
+          return
+        end
+
         key = made['cast'] == 'both' ? 'slot_pair_combined_ok' : 'slot_pair_either_ok'
 
         client.emit_success t("pf2emagic.#{key}", :first => made['spells'][0], :second => made['spells'][1],
@@ -106,8 +127,15 @@ module AresMUSH
           return if Pf2e::CharState.emit_error!(client, outcome)
 
           removed = outcome.state
-          client.emit_success t('pf2emagic.slot_pair_removed_ok', :first => removed['spells'][0],
-                                :second => removed['spells'][1], :rank => removed['rank'])
+
+          if SlotFeats.open?(removed)
+            client.emit_success t('pf2emagic.slot_open_removed_ok', :rank => removed['rank'], :feat => removed['feat'])
+          elsif SlotFeats.retained?(removed)
+            client.emit_success t('pf2emagic.slot_retained_removed_ok', :spell => removed['spells'][0], :rank => removed['rank'])
+          else
+            client.emit_success t('pf2emagic.slot_pair_removed_ok', :first => removed['spells'][0],
+                                  :second => removed['spells'][1], :rank => removed['rank'])
+          end
         end
       end
     end

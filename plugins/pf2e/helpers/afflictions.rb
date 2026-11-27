@@ -198,8 +198,10 @@ module AresMUSH
                                                               :words => now['words'])
 
         now['conditions'].each do |one|
-          Pf2e.set_condition(holder, one['condition'], one['value'] || Pf2e.default_condition_value(one['condition']),
-                             'granted_by' => entry['name'])
+          set = Pf2e.set_condition(holder, one['condition'], one['value'] || Pf2e.default_condition_value(one['condition']),
+                                   'granted_by' => entry['name'])
+          # Immune, or kept off by a feat (Vigorous Health).
+          out['lines'] << Telling.event(set.key, set.args) if set.err?
         end
 
         hurt(encounter, target, entry, now['damage'], out)

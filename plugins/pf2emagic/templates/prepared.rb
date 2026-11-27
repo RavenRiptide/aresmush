@@ -90,7 +90,13 @@ module AresMUSH
         magic = @char.magic
 
         pairs = Pf2emagic::SlotFeats.pairs(magic, charclass).map do |pair|
-          joined = pair['cast'].to_s == 'both' ? pair['spells'].join(' + ') : pair['spells'].join(' or ')
+          joined = if Pf2emagic::SlotFeats.open?(pair)
+                     t('pf2emagic.slot_open_held', :cast_rank => pair['cast_rank'])
+                   elsif pair['cast'].to_s == 'both'
+                     pair['spells'].join(' + ')
+                   else
+                     pair['spells'].join(' or ')
+                   end
           at = pair['cast_rank'].to_s == pair['rank'].to_s ? '' : ", cast at rank #{pair['cast_rank']}"
 
           "#{item_color}#{Pf2emagic.rank_label(pair['rank'])} (#{pair['feat']}#{at})%xn%r%b%b%b%b#{joined}"

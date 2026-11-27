@@ -508,6 +508,10 @@ module AresMUSH
 
       char.save
 
+      # A feat a held feat hands over once its prerequisites are met, which this level may have met. It
+      # lands in the draft, so the commit below records it as this level's.
+      Pf2e::EligibleFeats.settle!(char, client).each { |message| client&.emit message }
+
       # The single commit point for a level-up: everything this advancement produced becomes
       # one level_up transaction attributed to the level just gained, XP spend included.
       Pf2e::Ledger.commit_level_up!(char, new_level)

@@ -16,6 +16,9 @@ module AresMUSH
     #     vials: { base: 2, plus: Intelligence }
     #     gathers: true                               # may regain vials in exploration
     #
+    # A count may also carry `from_level: { 16: 10 }`, a higher base from that level on (Advanced Efficient
+    # Alchemy), and `each_taken: 1`, added once for each time a repeatable feat is held (Voluminous Vials).
+    #
     # Where two sources give the same allowance, the higher counts: the remaster's rule for vials from more
     # than one source.
     #
@@ -36,30 +39,33 @@ module AresMUSH
 
       def self.allowances(holder)
         SheetReads.memo(holder, :alchemy_allowances) do
-          blocks = sources(holder).map { |info| info['alchemy'] }.select { |block| block.is_a?(Hash) }
+          blocks = sources(holder).map { |info, taken| [ info['alchemy'], taken ] }.select { |block, _| block.is_a?(Hash) }
 
-          { 'vials' => blocks.map { |block| count(holder, block['vials']) }.max.to_i,
-            'prepared' => blocks.map { |block| count(holder, block['prepared']) }.max.to_i,
-            'gathers' => blocks.any? { |block| block['gathers'] } }
+          { 'vials' => blocks.map { |block, taken| count(holder, block['vials'], taken) }.max.to_i,
+            'prepared' => blocks.map { |block, taken| count(holder, block['prepared'], taken) }.max.to_i,
+            'gathers' => blocks.any? { |block, _| block['gathers'] } }
         end
       end
 
-      # Their own class's entry and the feats in play for them.
+      # Their own class's entry and the feats in play for them, each with the number of times it is held.
       def self.sources(holder)
         charclass = (holder.pf2_base_info || {})['charclass'].to_s
-        klass = charclass.empty? ? [] : [ Global.read_config('pf2e_class', charclass) ]
-        feats = Pf2e.feats_in_play(holder).uniq.map { |name| Global.read_config('pf2e_feats', name) }
+        klass = charclass.empty? ? [] : [ [ Global.read_config('pf2e_class', charclass), 1 ] ]
+        feats = Pf2e.feats_in_play(holder).tally.map { |name, taken| [ Global.read_config('pf2e_feats', name), taken ] }
 
-        (klass + feats).select { |info| info.is_a?(Hash) }
+        (klass + feats).select { |info, _| info.is_a?(Hash) }
       end
 
       # A count is a number, or `{ base:, plus: <attribute> }`, which adds that attribute's modifier.
-      def self.count(holder, spec)
+      # `from_level` raises the base from a level on, and `each_taken` adds itself once per taking.
+      def self.count(holder, spec, taken = 1)
         return spec.to_i unless spec.is_a?(Hash)
 
         modifier = spec['plus'] ? Pf2eAbilities.abilmod(Pf2eAbilities.get_score(holder, spec['plus'].to_s)) : 0
+        reached = (spec['from_level'] || {}).select { |level, _| holder.pf2_level.to_i >= level.to_i }
+        base = reached.empty? ? spec['base'].to_i : reached.max_by { |level, _| level.to_i }.last.to_i
 
-        [ spec['base'].to_i + modifier, 0 ].max
+        [ base + modifier + spec['each_taken'].to_i * taken.to_i, 0 ].max
       end
 
       def self.alchemist?(holder)

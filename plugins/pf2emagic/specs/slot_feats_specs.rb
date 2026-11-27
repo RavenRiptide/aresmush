@@ -22,7 +22,7 @@ module AresMUSH
         it "should give each feat its own switch" do
           ours = switches('prepared_slot') + switches('mastered_spells')
 
-          expect(ours.sort).to eq %w(spellcombination spellmastery splitslot)
+          expect(ours.sort).to eq %w(formretention infinite miraculous spellcombination spellmastery splitslot)
         end
 
         # A switch both a book and a slot feat declared would route to one and never the other.
@@ -87,9 +87,10 @@ module AresMUSH
           Character[@char.id]
         end
 
-        def wizard(feats, top: 5, per_rank: 2)
+        def wizard(feats, top: 5, per_rank: 2, more: {})
           per_day = (1..top).each_with_object({}) { |rank, out| out[rank.to_s] = per_rank }
           book = { '1' => [ 'Force Barrage', 'Charm', 'Fear' ], '3' => [ 'Blindness', 'Slow', 'Fireball', 'Haste' ] }
+          book = book.merge(more) { |_rank, ours, theirs| ours + theirs }
           magic = PF2Magic.create(:character => @char,
                                   :tradition => { 'Wizard' => [ 'arcane', 'trained' ] },
                                   :spell_abil => { 'Wizard' => 'Intelligence' },
@@ -121,6 +122,166 @@ module AresMUSH
           wizard([])
 
           expect(found('splitslot')).to be_nil
+        end
+
+        # A slot held open, its spell chosen as it is cast: any spell from the spellbook 2 or more ranks
+        # lower, cast 2 ranks lower.
+        describe "Infinite Possibilities" do
+          before(:each) { wizard([ 'Infinite Possibilities' ], :top => 9) }
+
+          def hold(rank)
+            pair('infinite', rank, [])
+          end
+
+          it "should hold a slot open, to cast 2 ranks lower" do
+            expect(hold(5).state).to include('rank' => '5', 'spells' => [], 'cast' => 'open', 'cast_rank' => '3')
+          end
+
+          it "should take no spells" do
+            expect(pair('infinite', 5, [ 'Haste' ]).key).to eq 'pf2emagic.slot_open_no_spells'
+          end
+
+          it "should hold one slot open in all" do
+            hold(5)
+
+            expect(hold(6).key).to eq 'pf2emagic.slot_open_all_used'
+          end
+
+          it "should not go below rank 3" do
+            expect(hold(2).key).to eq 'pf2emagic.slot_pair_rank_too_low'
+          end
+
+          it "should take one of the rank's slots" do
+            hold(5)
+
+            expect(Pf2emagic.prepare_spell('Fireball', char, 'Wizard', '5')).to be_a Hash
+            expect(Pf2emagic.prepare_spell('Haste', char, 'Wizard', '5')).to eq t('pf2emagic.no_available_slots')
+          end
+
+          it "should cast any spellbook spell from it after a rest, 2 ranks lower" do
+            hold(5)
+            Pf2emagic.generate_spells_today(char)
+
+            stats = cast('Slow')
+
+            expect(stats['spell name']).to eq 'Slow'
+            expect(stats['spell level']).to eq '3'
+            expect(stats['spell type']).to eq 'Infinite Possibilities (5th-rank slot)'
+            expect(cast('Haste')).to be_a String
+          end
+
+          it "should not cast a spell outside the spellbook from it" do
+            hold(5)
+            Pf2emagic.generate_spells_today(char)
+
+            expect(cast('Heal')).to be_a String
+            expect(SlotFeats.today(char.magic)['Wizard'].size).to eq 1
+          end
+
+          it "should not cast a spell too high for it" do
+            hold(4)
+            Pf2emagic.generate_spells_today(char)
+
+            expect(cast('Fireball')).to be_a String
+          end
+
+          it "should show what the slot holds on the prepared list" do
+            hold(5)
+
+            lines = PF2DisplayPreparedSpellsTemplate.new(char, {}).slot_feat_lines('Wizard')
+
+            expect(lines.join).to include('Infinite Possibilities, cast at rank 3', t('pf2emagic.slot_open_held', :cast_rank => '3'))
+          end
+
+          it "should empty the slot" do
+            hold(5)
+
+            expect(SlotFeats.unprepare_pair(char, found('infinite'), nil)).to be_ok
+            expect(SlotFeats.pairs(char.magic, 'Wizard')).to eq []
+          end
+        end
+
+        # A cleric's open slot casts any spell of the divine list they could prepare.
+        describe "Miraculous Possibility" do
+          before(:each) do
+            per_day = (1..9).each_with_object({}) { |rank, out| out[rank.to_s] = 2 }
+            magic = PF2Magic.create(:character => @char,
+                                    :tradition => { 'Cleric' => [ 'divine', 'trained' ] },
+                                    :spell_abil => { 'Cleric' => 'Wisdom' },
+                                    :spells_per_day => { 'Cleric' => per_day })
+
+            @char.update(:magic => magic, :pf2_level => 18, :pf2_feats => { 'charclass' => [ 'Miraculous Possibility' ] },
+                         :pf2_base_info => { 'charclass' => 'Cleric' })
+
+            SlotFeats.prepare_pair(char, found('miraculous'), 6, [])
+            Pf2emagic.generate_spells_today(char)
+          end
+
+          it "should cast a divine spell from it, 2 ranks lower" do
+            stats = Pf2emagic.cast_spell(char, 'Cleric', 'Heal', [], nil)
+
+            expect(stats['spell level']).to eq '4'
+            expect(stats['spell type']).to eq 'Miraculous Possibility (6th-rank slot)'
+          end
+
+          it "should not cast a spell off the divine list from it" do
+            expect(Pf2emagic.cast_spell(char, 'Cleric', 'Fireball', [], nil)).to be_a String
+          end
+        end
+
+        # A battle form prepared 2 ranks higher, cast at its own rank and lasting 10 minutes.
+        describe "Form Retention" do
+          before(:each) { wizard([ 'Form Retention' ], :top => 7, :more => { '1' => [ 'Pest Form' ], '3' => [ 'Insect Form' ] }) }
+
+          def retain(rank, spells)
+            pair('formretention', rank, spells)
+          end
+
+          it "should prepare a battle form 2 ranks higher, to cast at its own rank for 10 minutes" do
+            expect(retain(5, [ 'Insect Form' ]).state).to include('rank' => '5', 'spells' => [ 'Insect Form' ], 'cast' => 'retained',
+                                                                'cast_rank' => '3', 'lasts' => { 'unit' => 'minutes', 'value' => 10 })
+          end
+
+          it "should take one spell" do
+            expect(retain(5, [ 'Insect Form', 'Slow' ]).key).to eq 'pf2emagic.slot_retained_one_spell'
+          end
+
+          it "should refuse a spell that grants no battle form" do
+            expect(retain(5, [ 'Haste' ]).key).to eq 'pf2emagic.slot_retained_not_battle_form'
+          end
+
+          it "should refuse a battle form that already lasts longer than 1 minute" do
+            expect(retain(3, [ 'Pest Form' ]).key).to eq 'pf2emagic.slot_retained_not_battle_form'
+          end
+
+          it "should refuse a slot too low to cast the spell at its own rank" do
+            expect(retain(4, [ 'Insect Form' ]).key).to eq 'pf2emagic.slot_pair_spell_refused'
+          end
+
+          it "should cast it at the lower rank, lasting 10 minutes, after a rest" do
+            retain(5, [ 'Insect Form' ])
+            Pf2emagic.generate_spells_today(char)
+
+            stats = cast('Insect Form')
+
+            expect(stats['spell level']).to eq '3'
+            expect(stats['spell type']).to eq 'Form Retention (5th-rank slot)'
+            expect(stats['lasts']).to eq('unit' => 'minutes', 'value' => 10)
+          end
+
+          it "should show the spell on the prepared list" do
+            retain(5, [ 'Insect Form' ])
+
+            lines = PF2DisplayPreparedSpellsTemplate.new(char, {}).slot_feat_lines('Wizard')
+
+            expect(lines.join).to include('Form Retention, cast at rank 3', 'Insect Form')
+          end
+
+          it "should empty the slot" do
+            retain(5, [ 'Insect Form' ])
+
+            expect(SlotFeats.unprepare_pair(char, found('formretention'), nil).state['spells']).to eq [ 'Insect Form' ]
+          end
         end
 
         describe "Split Slot" do

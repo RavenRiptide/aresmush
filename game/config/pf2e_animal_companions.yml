@@ -233,7 +233,6 @@ pf2e_animal_companions:
     Riding Drake:
       source: Player Core
       rarity: uncommon
-      quadruped: true
       traits: [ dragon ]
       size: Large
       attributes: { Strength: 2, Dexterity: 1, Constitution: 2, Intelligence: -4, Wisdom: 1, Charisma: 2 }

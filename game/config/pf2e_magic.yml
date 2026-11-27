@@ -40,10 +40,12 @@ pf2e_magic:
         spell: Field of Life
   domains:
     Air:
+      source: Player Core
       description: You can control winds and the weather.
       initial: Pushing Gust
       advanced: Disperse into Air
     Ambition:
+      source: Player Core
       description: You strive to keep up with and outpace the competition.
       initial: Ignite Ambition
       advanced: Competitive Edge
@@ -52,6 +54,7 @@ pf2e_magic:
       initial: Adapt Self
       advanced: Adaptive Ablation
     Cities:
+      source: Player Core
       description: You have powers over urban environments and denizens.
       initial: Face in the Crowd
       advanced: Pulse of Civilization
@@ -60,18 +63,22 @@ pf2e_magic:
       initial: Winter Bolt
       advanced: Diamond Dust
     Confidence:
+      source: Player Core
       description: You overcome your fear and project pride.
       initial: Veil of Confidence
       advanced: Delusional Pride
     Creation:
+      source: Player Core
       description: You have divine abilities related to crafting and art.
       initial: Creative Splash
       advanced: Artistic Flourish
     Darkness:
+      source: Player Core
       description: You operate in the darkness and take away the light.
       initial: Cloak of Shadow
       advanced: Darkened Sight
     Death:
+      source: Player Core
       description: You have the power to end lives and destroy undead.
       initial: Death's Call
       advanced: Eradicate Undeath
@@ -80,6 +87,7 @@ pf2e_magic:
       initial: Withering Grasp
       advanced: Fallow Field
     Destruction:
+      source: Player Core
       description: You are a conduit for divine devastation.
       initial: Cry of Destruction
       advanced: Destructive Aura
@@ -92,6 +100,7 @@ pf2e_magic:
       initial: Draconic Barrage
       advanced: Roar of the Dragon
     Dreams:
+      source: Player Core
       description: You have the power to enter and manipulate dreams.
       initial: Sweet Dream
       advanced: Dreamer's Call
@@ -104,22 +113,27 @@ pf2e_magic:
       initial: Swear Oath
       advanced: Dutiful Challenge
     Earth:
+      source: Player Core
       description: You control soil and stone.
       initial: Hurtling Stone
       advanced: Localized Quake
     Family:
+      source: Player Core
       description: You aid and protect your family and community more effectively.
       initial: Soothing Words
       advanced: Unity
     Fate:
+      source: Player Core
       description: You see and understand hidden inevitabilities.
       initial: Read Fate
       advanced: Tempt Fate
     Fire:
+      source: Player Core
       description: You control flame.
       initial: Fire Ray
       advanced: Flame Barrier
     Freedom:
+      source: Player Core
       description: You liberate yourself and others from shackles and constraints.
       initial: Unimpeded Stride
       advanced: Word of Freedom
@@ -128,14 +142,17 @@ pf2e_magic:
       initial: Redact
       advanced: Ghostly Transcription
     Healing:
+      source: Player Core
       description: Your healing magic is particularly potent.
       initial: Healer's Blessing
       advanced: Rebuke Death
     Indulgence:
+      source: Player Core
       description: You feast mightily and can shake off the effects of overindulging.
       initial: Overstuff
       advanced: Take its Course
     Knowledge:
+      source: Player Core
       description: You receive divine insights.
       initial: Scholarly Recollection
       advanced: Know the Enemy
@@ -144,26 +161,32 @@ pf2e_magic:
       initial: Charged Javelin
       advanced: Bottle the Storm
     Luck:
+      source: Player Core
       description: You're unnaturally lucky and keep out of harm's way.
       initial: Bit of Luck
       advanced: Lucky Break
     Magic:
+      source: Player Core
       description: You perform the unexpected and inexplicable.
       initial: Magic's Vessel
       advanced: Mystic Beacon
     Might:
+      source: Player Core
       description: Your physical power is bolstered by divine strength.
       initial: Athletic Rush
       advanced: Enduring Might
     Moon:
+      source: Player Core
       description: You command powers associated with the moon.
       initial: Moonbeam
       advanced: Touch of the Moon
     Nature:
+      source: Player Core
       description: You hold power over animals and plants.
       initial: Vibrant Thorns
       advanced: Nature's Bounty
     Nightmares:
+      source: Player Core
       description: You fill minds with horror and dread.
       initial: Waking Nightmare
       advanced: Shared Nightmare
@@ -172,18 +195,22 @@ pf2e_magic:
       initial: Empty Inside
       advanced: Door to Beyond
     Pain:
+      source: Player Core
       description: You punish those who displease you with the sharp sting of pain.
       initial: Savor the Sting
       advanced: Retributive Pain
     Passion:
+      source: Player Core
       description: You evoke passion, whether as love or lust.
       initial: Charming Touch
       advanced: Captivating Adoration
     Perfection:
+      source: Player Core
       description: You strive to perfect your mind, body, and spirit.
       initial: Perfected Mind
       advanced: Perfected Body
     Protection:
+      source: Player Core
       description: You ward yourself and others.
       initial: Protector's Sacrifice
       advanced: Protector's Sphere
@@ -192,6 +219,7 @@ pf2e_magic:
       initial: Share Burden
       advanced: Font of Serenity
     Secrecy:
+      source: Player Core
       description: You protect secrets and keep them hidden.
       initial: Whispering Quiet
       advanced: Safeguard Secret
@@ -208,6 +236,7 @@ pf2e_magic:
       initial: Zenith Star
       advanced: Asterism
     Sun:
+      source: Player Core
       description: You harness the power of the sun and other light sources, and punish undead.
       initial: Dazzling Flash
       advanced: Vital Luminance
@@ -224,22 +253,27 @@ pf2e_magic:
       initial: Practice Makes Perfect
       advanced: Tireless Worker
     Travel:
+      source: Player Core
       description: You have power over movement and journeys.
       initial: Agile Feet
       advanced: Traveler's Transit
     Trickery:
+      source: Player Core
       description: You deceive others and cause mischief.
       initial: Sudden Shift
       advanced: Trickster's Twin
     Truth:
+      source: Player Core
       description: You pierce lies and discover the truth.
       initial: Word of Truth
       advanced: Glimpse the Truth
     Tyranny:
+      source: Player Core
       description: You wield power to rule and enslave others.
       initial: Touch of Obedience
       advanced: Commanding Lash
     Undeath:
+      source: Player Core
       description: Your magic carries close ties to the undead.
       initial: Touch of Undeath
       advanced: Malignant Sustenance
@@ -248,14 +282,17 @@ pf2e_magic:
       initial: Object Memory
       advanced: Remember the Lost
     Water:
+      source: Player Core
       description: You control water and bodies of water.
       initial: Tidal Surge
       advanced: Downpour
     Wealth:
+      source: Player Core
       description: You hold power over wealth, trade, and treasure. 
       initial: Appearance of Wealth
       advanced: Precious Metals
     Zeal:
+      source: Player Core
       description: Your inner fire increases your combat prowess.
       initial: Weapon Surge
       advanced: Zeal for Battle

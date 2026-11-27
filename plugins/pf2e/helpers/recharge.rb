@@ -64,6 +64,23 @@ module AresMUSH
                                                        :round => now + rolled + 1)
       end
 
+      # A character's action a feat of theirs makes wait: Monk's Flurry's "once you use Flurry of Blows, you
+      # can't use it again for 1d4 rounds". The feat names the action under `recharges`, and the wait is read
+      # from the feat's own words as a creature's is from its stat block.
+      def self.feat_waits(scene, name, out)
+        holder = scene.actor.holder
+
+        return if Actors.of(holder).creature?
+
+        Pf2e.feats_in_play(holder).uniq.each do |feat|
+          details = Global.read_config('pf2e_feats', feat)
+
+          next unless details.is_a?(Hash) && details['recharges'].to_s.casecmp?(name.to_s)
+
+          used(scene, name, { 'text' => details['shortdesc'] }, out)
+        end
+      end
+
       # A critical hit brings back what the creature's own words say it does: Draconic Momentum.
       MOMENTUM = /recharges? (?:their|its|his|her) (.+?) whenever (?:they|it|he|she) scores? a critical hit/i
 

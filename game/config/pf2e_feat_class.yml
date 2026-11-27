@@ -205,6 +205,8 @@ pf2e_feats:
     shortdesc: Your light cleanses souls of fear. When you use Flash of Grandeur, the attacker is also off-guard for 1 round.
     traits:
       - champion
+    triggers:
+      - { event: action_used, action: Flash of Grandeur, target_condition: Off-Guard, until: its-next-turn-start }
   Cackle:
     assoc_charclass:
       - Witch
@@ -476,6 +478,12 @@ pf2e_feats:
     traits:
       - swashbuckler
     rules:
+      - key: "EphemeralEffect"
+        affects: "origin"
+        selectors: ["strike-attack-roll"]
+        uuid: "Compendium.pf2e.feat-effects.Item.Effect: Panache (Ephemeral Note)"
+        alterations: [{"mode": "add", "property": "other-tags", "value": "critical-failure-note"}]
+        predicate: ["elegant-buckler", "self:effect:raise-a-shield"]
       - key: "RollOption"
         option: "elegant-buckler"
         toggleable: true
@@ -587,6 +595,12 @@ pf2e_feats:
     traits:
       - swashbuckler
     rules:
+      - key: "EphemeralEffect"
+        affects: "origin"
+        selectors: ["strike-attack-roll"]
+        uuid: "Compendium.pf2e.feat-effects.Item.Effect: Panache (Ephemeral Note)"
+        alterations: [{"mode": "add", "property": "other-tags", "value": "failure-note"}, {"mode": "add", "property": "other-tags", "value": "critical-failure-note"}]
+        predicate: ["self:effect:flashy-dodge"]
       - key: "RollOption"
         option: "flashy-dodge"
         toggleable: true
@@ -594,7 +608,7 @@ pf2e_feats:
         selector: "ac"
         type: "circumstance"
         value: 2
-        predicate: ["flashy-dodge"]
+        predicate: ["self:effect:flashy-dodge"]
   Flexible Studies:
     assoc_charclass:
       - Investigator
@@ -681,6 +695,11 @@ pf2e_feats:
         predicate: ["action:feint", "goading-feint"]
         effects: ["Effect: Goading Feint"]
   Harming Hands:
+    rules:
+      - key: "DamageDice"
+        override: {"dieSize": "d10"}
+        selector: ["spell-damage", "spell-healing"]
+        predicate: ["item:slug:harm"]
     assoc_charclass:
       - Cleric
     feat_type:
@@ -692,6 +711,11 @@ pf2e_feats:
     traits:
       - cleric
   Healing Hands:
+    rules:
+      - key: "DamageDice"
+        override: {"dieSize": "d10"}
+        selector: ["spell-damage", "spell-healing"]
+        predicate: ["item:slug:heal"]
     assoc_charclass:
       - Cleric
     feat_type:
@@ -1092,6 +1116,9 @@ pf2e_feats:
     shortdesc: Your fury fills your foes with fear. While you are raging, your Demoralize and Scare to Death actions (from the Intimidation skill and an Intimidation skill feat, respectively) gain the rage trait, allowing you to use them while raging. As soon as you meet the prerequisites for the skill feats Intimidating Glare and Scare to Death, you gain these feats.
     traits:
       - barbarian
+    feats_when_eligible:
+      - Intimidating Glare
+      - Scare to Death
   Raging Thrower:
     assoc_charclass:
       - Barbarian
@@ -1284,6 +1311,10 @@ pf2e_feats:
     traits:
       - rogue
     rules:
+      - key: "EphemeralEffect"
+        selectors: ["strike-attack-roll", "strike-damage"]
+        uuid: "Compendium.pf2e.conditionitems.Item.Off-Guard"
+        predicate: ["tumble-behind"]
       - key: "RollOption"
         option: "tumble-behind"
         toggleable: true
@@ -1819,6 +1850,11 @@ pf2e_feats:
       - fighter
       - press
   Call of the Wild:
+    # A prepared spell swapped for one of these at the same rank, over ten minutes (prepare/swap).
+    swaps_prepared:
+      into:
+        - Summon Animal
+        - Summon Plant or Fungus
     assoc_charclass:
       - Druid
     feat_type:
@@ -1933,6 +1969,12 @@ pf2e_feats:
       - fighter
       - press
   Communal Healing:
+    rules:
+      - key: "Note"
+        selector: "spell-healing"
+        title: "Communal Healing"
+        text: "Choose another willing living creature within range of your heal to regain Hit Points equal to the heal spell's rank."
+        predicate: ["item:slug:heal", {"lt": ["item:cast:actions", 3]}]
     assoc_charclass:
       - Cleric
     feat_type:
@@ -2267,6 +2309,8 @@ pf2e_feats:
     shortdesc: Finishing a foe maintains your swagger. You gain panache whenever your finisher brings a target to 0 HP.
     traits:
       - swashbuckler
+    triggers:
+      - { event: target_dropped, traits: [ finisher ], self_effect: "Effect: Panache" }
   Furious Finish:
     assoc_charclass:
       - Barbarian
@@ -2290,6 +2334,10 @@ pf2e_feats:
       - concentrate
       - ranger
     rules:
+      - key: "EphemeralEffect"
+        selectors: ["ranged-strike-attack-roll"]
+        uuid: "Compendium.pf2e.feat-effects.Item.Effect: Hunter's Aim"
+        predicate: ["hunters-aim", "target:mark:hunted-prey"]
       - key: "RollOption"
         option: "hunters-aim"
         domain: "ranged-strike-attack-roll"
@@ -2591,6 +2639,11 @@ pf2e_feats:
       - key: "RollOption"
         option: "rapid-response"
         toggleable: true
+      - key: "FlatModifier"
+        selector: "speed"
+        type: "circumstance"
+        value: 10
+        predicate: ["rapid-response"]
   Rebounding Toss:
     assoc_charclass:
       - Fighter
@@ -2665,6 +2718,8 @@ pf2e_feats:
     shortdesc: You can enter a second rage, but afterward you need to catch your breath. When you Rage, you can choose to gain temporary HP from the Rage even if 1 minute hasn't passed (or a full turn if you have the revitalizing rage class feature). If you do, once this Rage ends you become fatigued until you rest for 10 minutes.
     traits:
       - barbarian
+    lifts_effect:
+      - { action: Rage, word: second-wind, effect: "Effect: Rage Temporary Hit Points Immunity", after: Fatigued }
   Shake it Off:
     assoc_charclass:
       - Barbarian
@@ -2808,6 +2863,10 @@ pf2e_feats:
     traits:
       - swashbuckler
     rules:
+      - key: "EphemeralEffect"
+        selectors: ["strike-attack-roll", "strike-damage"]
+        uuid: "Compendium.pf2e.conditionitems.Item.Off-Guard"
+        predicate: ["tumble-behind"]
       - key: "Note"
         selector: "acrobatics"
         outcome: ["success", "criticalSuccess"]
@@ -3022,6 +3081,14 @@ pf2e_feats:
     shortdesc: You stand strong in the face of danger and inspire your allies to do the same. Whenever you become frightened, reduce the condition value by 1 (to a minimum of 0). At the end of your turn, each ally in your champion's aura reduces its frightened value by 1.
     traits:
       - champion
+    condition_rules:
+      - { condition: Frightened, gained_less: 1 }
+    rules:
+      - key: "Aura"
+        radius: "@actor.flags.system.champion.aura"
+        slug: "champions-aura"
+        predicate: ["champions-aura", {"not": "self:condition:unconscious"}]
+        effects: [{"affects": "allies", "includesSelf": false, "uuid": "Compendium.pf2e.feat-effects.Item.Effect: Aura of Courage"}]
   Barreling Charge:
     assoc_charclass:
       - Barbarian
@@ -3265,6 +3332,11 @@ pf2e_feats:
     shortdesc: You capitalize on your enemies' fear to slip past their defenses. Any creature that has the frightened condition is also off-guard against your attacks.
     traits:
       - rogue
+    rules:
+      - key: "EphemeralEffect"
+        selectors: ["strike-attack-roll", "spell-attack-roll", "strike-damage", "attack-spell-damage"]
+        uuid: "Compendium.pf2e.conditionitems.Item.Off-Guard"
+        predicate: ["target:condition:frightened"]
   Dual-Handed Assault:
     assoc_charclass:
       - Fighter
@@ -3315,7 +3387,13 @@ pf2e_feats:
     shortdesc: "Thanks to the time you've spent studying and experimenting, you know how to scale your formulas into larger batches that don't require any additional attention. Increase the number of items you can create each day with Advanced Alchemy to 6 + your Intelligence modifier.%r%rIn addition, when you Craft alchemical consumables during downtime, you can produce twice as many alchemical items in a single batch without spending additional preparatory time. For instance, if you are creating elixirs of life, you can craft up to eight elixirs in a single batch using downtime, rather than four. This doesn't change the amount of alchemical reagents or other ingredients required to craft each item, nor does it change your rate of progress for days past the base downtime spent."
     traits:
       - alchemist
+    alchemy:
+      prepared: { base: 6, plus: Intelligence }
   Elemental Summons:
+    # A prepared spell swapped for this at the same rank, over ten minutes (prepare/swap).
+    swaps_prepared:
+      into:
+        - Summon Elemental
     assoc_charclass:
       - Druid
     feat_type:
@@ -3641,6 +3719,9 @@ pf2e_feats:
         label: "Lie Detector (against a known liar)"
         predicate: ["known-liar"]
   Linked Focus:
+    # A Focus Point back, once a day, for draining to cast a curriculum spell (BondedItem).
+    drain_bonded:
+      focus_point: curriculum
     assoc_charclass:
       - Wizard
     feat_type:
@@ -3933,6 +4014,16 @@ pf2e_feats:
     traits:
       - cleric
   Rites of Convocation:
+    # A prepared spell swapped for the summon spell chosen here, at the same rank, over ten minutes
+    # (prepare/swap).
+    swaps_prepared:
+      into: chosen
+    feat_choice:
+      summary: a summon spell
+      from_spells:
+        traits:
+          - summon
+        tradition: own
     assoc_charclass:
       - Witch
     feat_type:
@@ -4190,6 +4281,8 @@ pf2e_feats:
     traits:
       - barbarian
       - rage
+    concealment:
+      - { concealed: 3, hidden: 9, predicate: [ "self:effect:rage" ] }
   Swaggering Initiative:
     assoc_charclass:
       - Swashbuckler
@@ -4372,6 +4465,12 @@ pf2e_feats:
         text: "The weapon returns to your hand after the attack"
         predicate: ["finisher:twirling-throw"]
   Versatile Signature:
+    # One signature spell swapped for another of its rank from the repertoire (DailySpells).
+    daily_choice:
+      switch: versatile
+      pick: signature
+      class: Bard
+      lasts: until_changed
     assoc_charclass:
       - Bard
     feat_type:
@@ -4538,6 +4637,15 @@ pf2e_feats:
     shortdesc: Your easily maneuver against your foes. Your Disarm, Grapple, Reposition, Shove, and Trip actions have a lower multiple attack penalty. Even if your weapon or unarmed attack doesn't have the agile trait, the penalty is –4 if the action is your second attack on your turn, or –8 if it's your third or subsequent attack. If your weapon or unarmed attack is agile and you have panache, the penalty is reduced further, to –3 if it's the second attack on your turn or –6 if it's the third or subsequent.
     traits:
       - swashbuckler
+    rules:
+      - key: "MultipleAttackPenalty"
+        selector: "athletics"
+        value: -4
+        predicate: [{"or": ["action:disarm", "action:grapple", "action:reposition", "action:shove", "action:trip"]}]
+      - key: "MultipleAttackPenalty"
+        selector: "athletics"
+        value: -3
+        predicate: [{"or": ["action:disarm", "action:grapple", "action:reposition", "action:shove", "action:trip"]}, "self:effect:panache", "item:trait:agile"]
   Align Qi:
     assoc_charclass:
       - Monk
@@ -4694,6 +4802,19 @@ pf2e_feats:
         suboptions: [{"label": "{item|name}", "value": "cast-down"}]
         label: "Spellshape"
   Ceremonial Knife:
+    # A knife-group weapon made to work as a wand holding one of the familiar's spells, picked each day.
+    daily_choice:
+      switch: ceremonialknife
+      pick: knife
+      class: Witch
+      items:
+        weapon_groups:
+          - knife
+      max_rank:
+        level: 6
+        rank: 1
+        every: 2
+      lasts: until_changed
     assoc_charclass:
       - Witch
     feat_type:
@@ -5141,6 +5262,8 @@ pf2e_feats:
     shortdesc: You've learned to maintain your balance even when swinging furiously. When you make a Vicious Swing with a melee weapon you're wielding in two hands, it counts as one attack toward your multiple attack penalty instead of two.
     traits:
       - fighter
+    map_counts:
+      - { action: Vicious Swing, counts: 1, two_handed: true }
   Gang Up:
     assoc_charclass:
       - Rogue
@@ -5209,6 +5332,14 @@ pf2e_feats:
         - basic
         - greater
   Grown of Oak:
+    # At will, at one rank below the highest the character casts, worked out when it is cast.
+    magic_stats:
+      innate_spell:
+        level: at will
+        below_top: 1
+        name: Oaken Resilience
+        tradition: primal
+        cast_stat: Charisma
     assoc_charclass:
       - Druid
     feat_type:
@@ -5692,6 +5823,11 @@ pf2e_feats:
       - divine
       - rage
     rules:
+      - key: "EphemeralEffect"
+        affects: "origin"
+        selectors: ["ranged-attack-roll"]
+        uuid: "Compendium.pf2e.feat-effects.Item.Effect: Spirits' Interference"
+        predicate: ["self:effect:rage"]
       - key: "RollOption"
         option: "spirits-interference"
         toggleable: true
@@ -6108,6 +6244,8 @@ pf2e_feats:
       - investigator
       - ranger
       - rogue
+    concealment:
+      - { concealed: 0, hidden: 5, hidden_not_off_guard: true }
   Bloodline Resistance:
     assoc_charclass:
       - Sorcerer
@@ -6344,6 +6482,8 @@ pf2e_feats:
     shortdesc: You use your foes' openings to expose even greater weaknesses. When you hit a creature as part of a Reactive Strike, that creature becomes off-guard until the start of your next turn.
     traits:
       - fighter
+    triggers:
+      - { event: strike_hit, action: Reactive Strike, target_condition: Off-Guard, until: own-next-turn-start }
   Distracting Toss:
     assoc_charclass:
       - Swashbuckler
@@ -6584,6 +6724,15 @@ pf2e_feats:
         value: "forceful"
         predicate: ["item:melee", "follow-up-assault"]
   Form Retention:
+    # A battle form spell prepared 2 ranks higher, cast at its own rank and lasting 10 minutes.
+    prepared_slot:
+      switch: formretention
+      cast: retained
+      components_below: 2
+      spells: battle_form
+      lasts:
+        unit: minutes
+        value: 10
     assoc_charclass:
       - Wizard
     feat_type:
@@ -7152,6 +7301,14 @@ pf2e_feats:
         title: "{item|name}"
         text: "{item|description}"
   Restorative Channel:
+    # A heal from the divine font traded for one of these at the font's rank (CastFeats).
+    font_trade:
+      from: Heal
+      spells:
+        - Cleanse Affliction
+        - Clear Mind
+        - Sound Body
+        - Sure Footing
     assoc_charclass:
       - Cleric
     feat_type:
@@ -7286,6 +7443,9 @@ pf2e_feats:
     shortdesc: "Your muse has opened your senses to the world beyond. You gain spiritsense as an imprecise sense with a range of 60 feet. Spiritsense enables you to sense the spirits of creatures, including living creatures, most non-mindless undead, and haunts within the listed range. As with your hearing and other imprecise senses, you still need to Seek to locate an undetected creature.%r%rAs spiritsense detects spiritual essence, not physical bodies, it can detect spirits projected by spells such as project image or possessing otherwise soulless objects. It can't detect soulless bodies, constructs, or objects, and like most senses, it doesn't penetrate through solid objects."
     traits:
       - bard
+    grants:
+      special:
+        - Spiritsense (imprecise) 60 feet
   Spirit Familiar (Witch):
     assoc_charclass:
       - Witch
@@ -7604,6 +7764,8 @@ pf2e_feats:
     shortdesc: You make an even-larger batch of alchemical items each morning. Increase the maximum number of items you can create with advanced alchemy to 8 + your Intelligence modifier, or to 10 + your Intelligence modifier if you're 16th level or higher.
     traits:
       - alchemist
+    alchemy:
+      prepared: { base: 8, plus: Intelligence, from_level: { 16: 10 } }
   Agile Grace:
     assoc_charclass:
       - Fighter
@@ -8284,6 +8446,15 @@ pf2e_feats:
     shortdesc: "Your mastery of primal magic has given you access to the greatest secrets of warden magic. You gain your choice of one warden spell from the peerless warden spells.%r%r*hunter's vision*%r%r*terrain transposition*%r%r**Special** You can take this feat multiple times, choosing a different peerless warden spell each time."
     traits:
       - ranger
+    repeatable: true
+    feat_choice:
+      summary: a peerless warden spell
+      from_spells:
+        traits:
+          - ranger
+          - focus
+        base_level: 5
+        focus_type: warden
   Penetrating Shot:
     assoc_charclass:
       - Ranger
@@ -8480,6 +8651,17 @@ pf2e_feats:
       - oracle
       - prediction
   Scroll Adept:
+    # Temporary scrolls made at each rest, of different ranks 2 or more below the highest (DailySpells).
+    daily_choice:
+      switch: scrolladept
+      pick: scrolls
+      class: Wizard
+      below_top: 2
+      count:
+        trained: 2
+        master: 3
+        legendary: 4
+      lasts: until_changed
     assoc_charclass:
       - Wizard
     feat_type:
@@ -9461,6 +9643,9 @@ pf2e_feats:
       - bravado
       - swashbuckler
   Greater Physical Evolution:
+    # Once a day, a common battle form spell cast from a slot as a signature spell (CastFeats).
+    battle_form_casts:
+      per_day: 1
     assoc_charclass:
       - Sorcerer
     feat_type:
@@ -10029,6 +10214,9 @@ pf2e_feats:
     traits:
       - alchemist
     rules:
+      - key: "EphemeralEffect"
+        selectors: ["alchemical-bomb-base-attack-roll"]
+        uuid: "Compendium.pf2e.feat-effects.Item.Effect: Uncanny Bombs"
       - key: "AdjustStrike"
         property: "range-increment"
         mode: "upgrade"
@@ -10967,6 +11155,16 @@ pf2e_feats:
     traits:
       - barbarian
   Superior Bond:
+    # A second Drain Bonded Item a day, for a spell 2 or more ranks below the highest slot (BondedItem).
+    rules:
+      - key: "ItemAlteration"
+        itemType: "action"
+        mode: "override"
+        property: "frequency-max"
+        value: 2
+        predicate: ["item:slug:drain-bonded-item"]
+    drain_bonded:
+      extra_use_below_top: 2
     assoc_charclass:
       - Wizard
     feat_type:
@@ -11098,6 +11296,10 @@ pf2e_feats:
     shortdesc: You have turned into a plant version of yourself, gaining the plant trait and losing traits inappropriate for your new form (typically humanoid). You also gain the Verdant Rest action. See wiki for more information.
     traits:
       - druid
+    grants:
+      feature:
+        charclass_features:
+          - Verdant Rest
     rules:
       - key: "ActorTraits"
         add: ["plant"]
@@ -11432,6 +11634,12 @@ pf2e_feats:
     shortdesc: Your life has made you a nexus for your deity's vile power. You're continuously surrounded by a *bane* spell, with a spell rank equal to half your level (rounded up). The radius is 15 feet, and you can't increase it. You can Dismiss the spell; if you do, it returns automatically after 1 minute.
     traits:
       - cleric
+    rules:
+      - key: "Aura"
+        radius: 15
+        slug: "eternal-bane"
+        traits: ["mental"]
+        effects: [{"affects": "enemies", "save": "will", "uuid": "Compendium.pf2e.spell-effects.Item.Spell Effect: Bane"}]
   Eternal Blessing:
     assoc_charclass:
       - Cleric
@@ -11568,6 +11776,10 @@ pf2e_feats:
     traits:
       - sorcerer
   Greater Vital Evolution:
+    # Two casts a day after a rank's slots run out, at different ranks (CastFeats).
+    overflow_casts:
+      per_day: 2
+      distinct_ranks: true
     assoc_charclass:
       - Sorcerer
     feat_type:
@@ -12017,6 +12229,10 @@ pf2e_feats:
       - concentrate
       - wizard
   Studious Capacity:
+    # One cast a day after a rank's slots run out, never at the highest rank (CastFeats).
+    overflow_casts:
+      per_day: 1
+      not_top: true
     assoc_charclass:
       - Bard
     feat_type:
@@ -12183,6 +12399,10 @@ pf2e_feats:
     traits:
       - cleric
   Divine Effusion:
+    # Two casts a day after a rank's slots run out, at different ranks (CastFeats).
+    overflow_casts:
+      per_day: 2
+      distinct_ranks: true
     assoc_charclass:
       - Oracle
     feat_type:
@@ -12417,6 +12637,13 @@ pf2e_feats:
         keep: "higher"
         predicate: ["charmed-life"]
   Infinite Possibilities:
+    # A slot held open at daily preparations: any spellbook spell 2 or more ranks lower, cast 2 ranks lower.
+    prepared_slot:
+      switch: infinite
+      cast: open
+      count: 1
+      components_below: 2
+      min_rank: 3
     assoc_charclass:
       - Wizard
     feat_type:
@@ -12436,6 +12663,8 @@ pf2e_feats:
     shortdesc: Your deity punishes creatures that harm you. Creatures that hit you with an attack take 3d6 spirit damage every time they do. If you have the holy or unholy trait, you can apply it to this damage.
     traits:
       - cleric
+    triggers:
+      - { event: hit_by_attack, attacker_damage: 3d6, damage_type: spirit }
   Invoke Disaster:
     magic_stats:
       focus_spell:
@@ -12523,6 +12752,13 @@ pf2e_feats:
     traits:
       - alchemist
   Miraculous Possibility:
+    # A slot held open at daily preparations: any divine spell 2 or more ranks lower, cast 2 ranks lower.
+    prepared_slot:
+      switch: miraculous
+      cast: open
+      count: 1
+      components_below: 2
+      min_rank: 3
     assoc_charclass:
       - Cleric
     feat_type:
@@ -12675,6 +12911,10 @@ pf2e_feats:
     traits:
       - champion
   Reprepare Spell:
+    # A spell cast today, of 4th rank or lower and without a duration, back in its slot over ten minutes
+    # (prepare/reprepare).
+    reprepare:
+      max_rank: 4
     assoc_charclass:
       - Wizard
     feat_type:
@@ -12786,6 +13026,8 @@ pf2e_feats:
     shortdesc: The transgressions of your enemies fuel you to retaliate with divine speed. When an enemy triggers your champion's reaction, you are quickened on your next turn. You can use the extra action to move closer to that enemy or to Strike that enemy.
     traits:
       - champion
+    triggers:
+      - { event: action_used, actions: [ Flash of Grandeur, Retributive Strike, Liberating Step, Glimpse of Redemption ], self_condition: Quickened, until: own-next-turn-end }
   Swift River:
     assoc_charclass:
       - Monk
@@ -13194,6 +13436,8 @@ pf2e_feats:
     shortdesc: You flow from technique to technique, renewing yourself as you embrace each style you have mastered. The first time each round that you use an action that has both the monk and stance traits, you gain 20 temporary Hit Points that last until the start of your next turn.
     traits:
       - monk
+    triggers:
+      - { event: action_used, traits: [ monk, stance ], per: round, self_effect: "Effect: Immortal Techniques" }
   Impossible Striker:
     assoc_charclass:
       - Rogue
@@ -13364,6 +13608,15 @@ pf2e_feats:
         uuid: "Compendium.pf2e.conditionitems.Item.Quickened"
         inMemoryOnly: true
   Paradoxical Mystery:
+    # A domain spell, or another mystery's revelation spell, as a revelation spell for the day (DailySpells).
+    daily_choice:
+      switch: paradox
+      pick: focus_spell
+      focus_type: revelation
+      pool:
+        - domains
+        - other_mysteries
+      lasts: day
     assoc_charclass:
       - Oracle
     feat_type:
@@ -13621,6 +13874,8 @@ pf2e_feats:
       lasts: day
     daily_reprepare: [ flexibility, improvedflexibility, ultimateflexibility ]
   Ultimate Polymath:
+    # Every spell in the class's repertoire is a signature spell (Entries.signature_ranks).
+    all_signature: true
     assoc_charclass:
       - Bard
     feat_type:

@@ -500,12 +500,13 @@ def main():
         entries[name]['source'] = book
 
     # A feat that is an action - a stance, a reaction - is one because of what it costs; the feat itself
-    # stays where it is.
+    # stays where it is. An ancestry feat the setting renames is filed under our name.
     feat_actions = 0
     for doc in documents(args.checkout, 'feats'):
         kind = ((doc['system'].get('actionType') or {}).get('value'))
-        if doc['name'] in feats and kind in ('action', 'reaction', 'free') and doc['name'] not in entries:
-            entries[doc['name']] = entry_of(doc, 'feat', effects, collections.Counter())
+        name = rules.FEATS_RENAMED.get(doc['name'], doc['name'])
+        if name in feats and kind in ('action', 'reaction', 'free') and name not in entries:
+            entries[name] = entry_of(doc, 'feat', effects, collections.Counter())
             feat_actions += 1
 
     # A check belongs to the action of its name, wherever the action came from.

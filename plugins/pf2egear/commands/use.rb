@@ -60,8 +60,10 @@ module AresMUSH
 
         return client.emit_failure(t('pf2e.bound_item_cannot_use', :item => item.name, :feat => inert)) if inert
 
-        # A scroll or a wand casts the spell it holds, and a feather fan or a staff one of its own.
-        return used_spell_item(item) if Pf2e::SpellItems.spell_item?(item) || Pf2e::WaveFan.fan?(item) || Pf2e::Staves.staff?(item)
+        # A scroll or a wand casts the spell it holds, and a feather fan or a staff one of its own, and so does a
+        # witch's ceremonial knife.
+        return used_spell_item(item) if Pf2e::SpellItems.spell_item?(item) || Pf2e::WaveFan.fan?(item) || Pf2e::Staves.staff?(item) ||
+                                        Pf2e::CeremonialKnife.knife?(holder, item)
 
         # Consumables get their own, much simpler, handling, and do not require a use entry.
         if self.category.match? "consumable"
@@ -156,7 +158,11 @@ module AresMUSH
         return used_fan(item) if Pf2e::WaveFan.fan?(item)
         return used_staff(item) if Pf2e::Staves.staff?(item)
 
-        done = Pf2e::SpellItems.use_outside!(enactor, item)
+        done = if Pf2e::CeremonialKnife.knife?(enactor, item)
+                 Pf2e::CeremonialKnife.use_outside!(enactor, item)
+               else
+                 Pf2e::SpellItems.use_outside!(enactor, item)
+               end
 
         return if Pf2e::CharState.emit_error!(client, done)
 

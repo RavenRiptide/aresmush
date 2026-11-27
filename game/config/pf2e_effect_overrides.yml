@@ -22,3 +22,8 @@ pf2e_effect_overrides:
   "Effect: Root Magic":
     rules:
       - removeAfterRoll: if-enabled
+  # Rage: "When you stop raging, you ... can't gain temporary Hit Points from using the Rage action again for 1
+  # minute." `when_ended` is ours, read by `Pf2e::ActiveEffects.ended_into`.
+  "Effect: Rage":
+    when_ended:
+      effects: [ "Effect: Rage Temporary Hit Points Immunity" ]

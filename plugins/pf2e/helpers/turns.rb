@@ -143,7 +143,8 @@ module AresMUSH
         Equipment.lapse!(holder, 'turn_end')
         WeaponPoison.turn_ended(holder)
 
-        less_frightened(holder) + PersistentDamage.end_of_turn(holder) + Holding.turn_ended(encounter, participant) +
+        less_frightened(holder) + Auras.emitter_turn_ended(holder) + PersistentDamage.end_of_turn(holder) +
+          Holding.turn_ended(encounter, participant) +
           Afflictions.turn_ended(encounter, participant, round) + AnimatedRune.turn_ended(encounter, participant, holder)
       end
 
@@ -196,16 +197,19 @@ module AresMUSH
 
       # The same, for a condition an outcome leaves: one timed by `its-` is counted from the turn of
       # whoever holds it - Blanket of Stars' "dazzled until the end of its next turn" - and anything else
-      # from the caster's. A familiar's turn is its master's.
+      # from the caster's. `own-` is the caster's next turn as it falls in the order, which is how a
+      # reaction on someone else's turn counts "your next turn" (Disorienting Opening). A familiar's turn is
+      # its master's.
       def self.expiry_for(until_when, encounter, actor, target)
         kind = until_when.to_s
         actor = Combatants.turn_name(encounter, actor)
         target = Combatants.turn_name(encounter, target)
+        counted = { 'its-' => target, 'own-' => actor }.find { |prefix, _| kind.start_with?(prefix) }
 
-        return expiry(kind, actor, encounter.round) unless kind.start_with?('its-')
+        return expiry(kind, actor, encounter.round) unless counted
 
-        { 'event' => kind.end_with?('start') ? 'turn-start' : 'turn-end', 'of' => target,
-          'round' => upcoming_round(encounter, target) }
+        { 'event' => kind.end_with?('start') ? 'turn-start' : 'turn-end', 'of' => counted.last,
+          'round' => upcoming_round(encounter, counted.last) }
       end
 
       # The round of someone's next turn: this one, if their place in the order is still to come.
@@ -234,13 +238,14 @@ module AresMUSH
         end
       end
 
-      # Frightened drops by one at the end of each of your turns.
+      # Frightened drops by one at the end of each of your turns, or by more a feat gives (Khazadi
+      # Doughtiness).
       def self.less_frightened(holder)
         held = (holder.pf2_conditions || {})['Frightened']
 
         return [] unless held.is_a?(Hash) && held['value'].to_i.positive?
 
-        left = held['value'].to_i - 1
+        left = [ held['value'].to_i - ConditionFeats.eases_by(holder, 'Frightened'), 0 ].max
         Pf2e.set_condition(holder, 'Frightened', left)
 
         return [ event('pf2e.condition_ended', 'name' => holder.name, 'condition' => 'Frightened') ] if left.zero?

@@ -31,7 +31,48 @@ module AresMUSH
 
         out['lines'] << Telling.event('pf2e.drain_done', :actor => scene.actor.label, :spell => spell, :rank => rank)
 
+        feats = Pf2emagic::CastFeats.held(holder, 'drain_bonded', charclass)
+        extra_use(scene, feats, charclass, rank, out)
+        linked_focus(scene, feats, charclass, rank, spell, out)
+
         Ok.new(:state => out)
+      end
+
+      # A feat's extra drain a day, for a spell so many ranks below the highest slot (Superior Bond). Its
+      # rule raises the frequency; a later drain of a higher spell is the GM's to allow, and they are told,
+      # as for any frequency.
+      def self.extra_use(scene, feats, charclass, rank, out)
+        holder = scene.actor.holder
+        feat, block = feats.find { |_feat, one| one['extra_use_below_top'] }
+
+        return unless feat && TurnState.used(holder, NAME) >= 1
+
+        highest = Pf2emagic::SlotFeats.top_rank(holder, charclass) - block['extra_use_below_top'].to_i
+
+        return if rank.to_i <= highest
+
+        out['gm'] << Telling.event('pf2e.drain_extra_too_high', :actor => scene.actor.label, :feat => feat, :rank => rank,
+                                                                :highest => highest)
+      end
+
+      # A Focus Point back, once a day, for draining to cast a curriculum spell (Linked Focus).
+      def self.linked_focus(scene, feats, charclass, rank, spell, out)
+        holder = scene.actor.holder
+        feat = feats.find { |_feat, block| block['focus_point'].to_s == 'curriculum' }&.first
+
+        return unless feat && TurnState.used(holder, feat).zero?
+        return unless Pf2emagic.curriculum_spells(holder, charclass, rank).any? { |one| one.casecmp?(spell.to_s) }
+
+        magic = holder.magic
+        max = Pf2emagic.focus_pool_max(magic)
+        current = Pf2emagic.focus_points_left(magic)
+
+        return unless current < max
+
+        magic.update(:focus_pool => { 'current' => current + 1 })
+        TurnState.count_use(holder, feat, 'day')
+
+        out['lines'] << Telling.event('pf2e.drain_focus_point', :actor => scene.actor.label, :feat => feat, :points => current + 1)
       end
 
       # The class and rank a spell was prepared at today and has been cast from: prepared there more
@@ -42,8 +83,11 @@ module AresMUSH
             next if rank.to_s == 'cantrip'
 
             left = Array((today[charclass] || {})[rank]).count(spell)
+            # Prepared, as the day's swaps (prepare/swap, prepare/reprepare) have changed it: a spell swapped
+            # away was not cast.
+            began = Pf2emagic::PreparedSwaps.expected(spells, today, charclass, rank, spell)
 
-            return [ charclass, rank ] if Array(spells).count(spell) > left && today[charclass]
+            return [ charclass, rank ] if began > left && today[charclass]
           end
         end
 

@@ -543,6 +543,350 @@ module AresMUSH
         expect(stats).to eq('signature_spells' => { 'up to 3' => 2 })
         expect(Pf2emagic.any_rank_cap(stats['signature_spells'].keys.first)).to eq 3
       end
+
+      it "should give each sense its feat's text names" do
+        expect(feat('Defy the Darkness')['grants']).to eq('special' => [ 'Greater Darkvision' ])
+        expect(feat('Lifesense')['grants']).to eq('special' => [ 'Lifesense (imprecise) 10 feet' ])
+        expect(feat('Soulsight (Bard)')['grants']).to eq('special' => [ 'Spiritsense (imprecise) 60 feet' ])
+      end
+
+      it "should give Reactive Striker the Reactive Strike feat, its higher level waived" do
+        expect(feat('Reactive Striker')['grants']).to eq('feat' => [ { 'name' => 'Reactive Strike', 'prereqs' => 'ignore' } ])
+        expect(feat('Reactive Strike')).to be_a Hash
+      end
+
+      it "should let Peerless Warden choose a peerless warden spell, once per taking" do
+        details = feat('Peerless Warden')
+        pool = details['feat_choice']['from_spells']
+        offered = @spells.select do |_name, info|
+          info['base_level'].to_i == pool['base_level'] && (pool['traits'] - Array(info['traits'])).empty?
+        end
+
+        expect(details['repeatable']).to be true
+        expect(pool['focus_type']).to eq 'warden'
+        expect(offered.keys).to contain_exactly("Hunter's Vision", 'Terrain Transposition')
+      end
+
+      it "should give Cautious Curiosity its two spells in the tradition of the gnome's innate spells" do
+        options = feat('Cautious Curiosity')['feat_choice']['options']
+
+        expect(options.keys).to contain_exactly('Arcane', 'Occult')
+        options.each_pair do |label, option|
+          innate = option['grants']['magic_stats']['innate_spell']
+
+          expect(option['prereq']).to eq('innate_tradition' => [ label.downcase ])
+          expect(innate).to include('level' => 2, 'name' => [ 'Disguise Magic', 'Silence' ], 'tradition' => label.downcase)
+          innate['name'].each { |name| spell(name) }
+        end
+      end
+
+      # Otherworldly Magic is the only sildanyar feat that grants an innate spell, and it is arcane.
+      it "should give Otherworldly Acumen a 2nd-rank arcane innate spell, after Otherworldly Magic" do
+        details = feat('Otherworldly Acumen')
+
+        expect(details['prereq']).to eq('level' => 9, 'feat' => [ 'Otherworldly Magic' ])
+        expect(details['magic_stats']['innate_spell']).to include('level' => 2, 'name' => 'open', 'tradition' => 'arcane')
+      end
+
+      describe "feats for daily preparation and spell slots" do
+        it "should give Eternal Wings a fly Speed equal to the character's Speed, as Divine Wings has" do
+          expect(feat('Eternal Wings')['movement']).to eq([ { 'fly' => 'land' } ])
+        end
+
+        it "should make every repertoire spell a signature spell for Ultimate Polymath's own class" do
+          details = feat('Ultimate Polymath')
+
+          expect(details['all_signature']).to eq(true)
+          expect(details['assoc_charclass']).to eq([ 'Bard' ])
+        end
+
+        it "should give Grown of Oak oaken resilience at will, one rank below the highest" do
+          innate = feat('Grown of Oak')['magic_stats']['innate_spell']
+
+          expect(innate).to include('level' => 'at will', 'below_top' => 1, 'name' => 'Oaken Resilience', 'tradition' => 'primal')
+          expect(innate['level'].to_i).to eq(0)
+          spell('Oaken Resilience')
+        end
+
+        it "should let Studious Capacity, Greater Vital Evolution and Divine Effusion cast past their slots" do
+          expect(feat('Studious Capacity')['overflow_casts']).to eq('per_day' => 1, 'not_top' => true)
+          expect(feat('Greater Vital Evolution')['overflow_casts']).to eq('per_day' => 2, 'distinct_ranks' => true)
+          expect(feat('Divine Effusion')['overflow_casts']).to eq('per_day' => 2, 'distinct_ranks' => true)
+        end
+
+        it "should let Greater Physical Evolution cast a battle form once a day" do
+          expect(feat('Greater Physical Evolution')['battle_form_casts']).to eq('per_day' => 1)
+        end
+
+        it "should let Restorative Channel trade a heal for its four divine healing spells" do
+          trade = feat('Restorative Channel')['font_trade']
+
+          expect(trade['from']).to eq 'Heal'
+          expect(trade['spells']).to contain_exactly('Cleanse Affliction', 'Clear Mind', 'Sound Body', 'Sure Footing')
+          trade['spells'].each { |name| expect(spell(name)['tradition']).to include('divine') }
+        end
+
+        it "should give Superior Bond a second drain and Linked Focus a Focus Point" do
+          bond = feat('Superior Bond')
+
+          expect(bond['rules']).to include(include('key' => 'ItemAlteration', 'itemType' => 'action', 'property' => 'frequency-max',
+                                                   'value' => 2, 'predicate' => [ 'item:slug:drain-bonded-item' ]))
+          expect(bond['drain_bonded']).to eq('extra_use_below_top' => 2)
+          expect(feat('Linked Focus')['drain_bonded']).to eq('focus_point' => 'curriculum')
+        end
+
+        it "should give Vivacious Conduit an exploration action that heals Constitution times half level" do
+          actions = YAML.load_file("game/config/pf2e_actions.yml")['pf2e_actions']
+          consequences = YAML.load_file("game/config/pf2e_action_consequences.yml")['pf2e_action_consequences']
+
+          expect(actions['Vivacious Conduit']['traits']).to include('exploration', 'healing', 'vitality')
+          expect(consequences['vivacious-conduit']['always']).to eq(
+            [ { 'on' => 'actor', 'heal' => '@actor.abilities.con.mod*floor(@actor.level/2)' } ])
+        end
+
+        it "should let Call of the Wild, Elemental Summons and Rites of Convocation swap in a summon spell" do
+          expect(feat('Call of the Wild')['swaps_prepared']).to eq('into' => [ 'Summon Animal', 'Summon Plant or Fungus' ])
+          expect(feat('Elemental Summons')['swaps_prepared']).to eq('into' => [ 'Summon Elemental' ])
+          expect(feat('Rites of Convocation')['swaps_prepared']).to eq('into' => 'chosen')
+          expect(feat('Rites of Convocation')['feat_choice']['from_spells']).to eq('traits' => [ 'summon' ], 'tradition' => 'own')
+          %w(Animal Elemental).each { |kind| spell("Summon #{kind}") }
+          spell('Summon Plant or Fungus')
+        end
+
+        it "should let Ceremonial Knife bind a knife-group weapon each day as a wand of a familiar's spell" do
+          expect(feat('Ceremonial Knife')['daily_choice']).to eq(
+            'switch' => 'ceremonialknife', 'pick' => 'knife', 'class' => 'Witch', 'items' => { 'weapon_groups' => [ 'knife' ] },
+            'max_rank' => { 'level' => 6, 'rank' => 1, 'every' => 2 }, 'lasts' => 'until_changed')
+        end
+
+        it "should let Reprepare Spell prepare again a spell of 4th rank or lower" do
+          expect(feat('Reprepare Spell')['reprepare']).to eq('max_rank' => 4)
+        end
+
+        it "should let Form Retention prepare a battle form 2 ranks higher, lasting 10 minutes" do
+          expect(feat('Form Retention')['prepared_slot']).to eq(
+            'switch' => 'formretention', 'cast' => 'retained', 'components_below' => 2, 'spells' => 'battle_form',
+            'lasts' => { 'unit' => 'minutes', 'value' => 10 })
+        end
+      end
+
+      describe "feats that grant a class feature or an action" do
+        GRANTED_FEATURES = {
+          "Monk's Flurry" => { 'archetype_features' => [ 'Flurry of Blows' ] },
+          "Swashbuckler's Riposte" => { 'archetype_features' => [ 'Opportune Riposte' ] },
+          'Uncanny Dodge' => { 'archetype_features' => [ 'Deny Advantage' ] },
+          'Finishing Precision' => { 'archetype_features' => [ 'Precise Strike', 'Basic Finisher' ] },
+          "Investigator's Stratagem" => { 'archetype_features' => [ 'Devise a Stratagem' ] },
+          'Keen Recollection' => { 'archetype_features' => [ 'Keen Recollection' ] },
+          'Verdant Metamorphosis' => { 'charclass_features' => [ 'Verdant Rest' ] }
+        }.freeze
+
+        GRANTED_FEATURES.each_pair do |name, granted|
+          it "should give #{name} #{granted.values.flatten.join(' and ')}" do
+            expect(feat(name)['grants']['feature']).to eq granted
+          end
+        end
+
+        # A feature an archetype feat grants sits beside the ones its dedication gave; a class feat's beside
+        # the class's own.
+        it "should file each feat's features where its type says" do
+          @feats.each_pair do |name, details|
+            granted = (details['grants'] || {})['feature']
+            next unless granted
+
+            wanted = Array(details['feat_type']).include?('Archetype') ? 'archetype_features' : 'charclass_features'
+
+            expect(granted.keys).to eq([ wanted ]), "#{name} files its features under #{granted.keys.inspect}"
+          end
+        end
+
+        it "should keep Keen Recollection's rule on the feature alone" do
+          expect(feat('Keen Recollection')['rules']).to be_nil
+        end
+      end
+
+      it "should have Monk's Flurry set Flurry of Blows' wait by the feat's own words" do
+        details = feat("Monk's Flurry")
+
+        expect(details['recharges']).to eq 'Flurry of Blows'
+        expect(Recharge.rounds_of('Flurry of Blows', 'text' => details['shortdesc'])).to eq '1d4'
+      end
+
+      describe "feats the encounter engine reads" do
+        def rule(name, key)
+          Array(feat(name)['rules']).select { |row| row['key'] == key }
+        end
+
+        it "should make Diehard's death dying 5, by a path the engine writes" do
+          row = rule('Diehard', 'ActiveEffectLike').first
+
+          expect(row).to include('mode' => 'upgrade', 'path' => 'system.attributes.dying.max', 'value' => 5)
+          expect(Paths.for(row['path'])).not_to be_nil
+        end
+
+        it "should give Stone Face 2 more Will DC against Intimidation" do
+          row = rule('Stone Face', 'FlatModifier').find { |one| one['selector'] == 'will-dc' }
+
+          expect(row).to include('type' => 'circumstance', 'value' => 2, 'predicate' => [ 'check:statistic:intimidation' ])
+        end
+
+        # Foundry names the actions by its own spelling (`orc-ferocity`), and ours by the setting's.
+        { 'Incredible Ferocity' => 'Oruch Ferocity', 'Jinx Glutton' => 'Eat Fortune' }.each_pair do |name, action|
+          it "should have #{name} count #{action} by the hour" do
+            row = rule(name, 'ItemAlteration').first
+            actions = YAML.load_file("game/config/pf2e_actions.yml")['pf2e_actions']
+
+            expect(row).to include('itemType' => 'feat', 'property' => 'frequency-per', 'mode' => 'override', 'value' => 'PT1H')
+            expect(row['predicate']).to eq [ "item:slug:#{Domains.slug(action)}" ]
+            expect(actions).to have_key action
+          end
+        end
+
+        it "should roll heal and harm with d10s for Healing Hands and Harming Hands" do
+          { 'Healing Hands' => 'heal', 'Harming Hands' => 'harm' }.each_pair do |name, spell|
+            row = rule(name, 'DamageDice').first
+
+            expect(row).to include('override' => { 'dieSize' => 'd10' }, 'predicate' => [ "item:slug:#{spell}" ])
+            expect(Array(row['selector'])).to contain_exactly('spell-damage', 'spell-healing')
+          end
+        end
+
+        it "should give Communal Healing a note on heal" do
+          expect(rule('Communal Healing', 'Note').first['selector']).to eq 'spell-healing'
+        end
+
+        it "should give Pilgrim's Token its token, which counts for the tie" do
+          gear = YAML.load_file("game/config/pf2e_gear.yml")['pf2e_gear']
+
+          expect(feat("Pilgrim's Token")['bound_item']).to eq('category' => 'gear', 'item' => "Pilgrim's Token")
+          expect(gear.fetch("Pilgrim's Token")).to include('made_only' => true, 'price' => 0)
+          expect(gear["Pilgrim's Token"]['rules'].first).to include('key' => 'RollOption', 'option' => 'has-pilgrims-token')
+        end
+
+        it "should give Rapid Response 10 feet of Speed while switched on" do
+          row = rule('Rapid Response', 'FlatModifier').first
+
+          expect(row).to include('selector' => 'speed', 'type' => 'circumstance', 'value' => 10, 'predicate' => [ 'rapid-response' ])
+        end
+
+        # Nothing lends an effect's rules to the other creature, so an effect with no row in
+        # `Ephemeral::EFFECTS` would be named and never applied.
+        it "should name only effects Ephemeral knows what to do with" do
+          named = @feats.flat_map do |name, details|
+            Array(details['rules']).select { |row| row['key'] == 'EphemeralEffect' }.map { |row| [ name, Ephemeral.effect_of(row) ] }
+          end
+
+          expect(named.map(&:first)).to include('Dread Striker', 'Callow May', "Spirits' Interference", 'Elegant Buckler')
+          expect(named.reject { |_name, effect| Ephemeral::EFFECTS.key?(effect) }).to eq []
+        end
+
+        it "should read a Speed rule as land Speed" do
+          expect(Domains.for('speed', nil, nil)).to include 'speed'
+          expect(Domains.for('speed', 'fly', nil)).not_to include 'speed'
+        end
+      end
+
+      it "should have Raging Intimidation hand over its two skill feats once they can be taken" do
+        expect(feat('Raging Intimidation')['feats_when_eligible']).to eq [ 'Intimidating Glare', 'Scare to Death' ]
+        feat('Intimidating Glare')
+        feat('Scare to Death')
+      end
+    end
+
+    # Ancestry feats the setting renames, which are actions in Foundry's data. The actions catalogue is
+    # matched to feats by name, so without an entry under our name `action/use` refuses them.
+    describe "renamed ancestry feats in the actions catalogue" do
+      before(:all) do
+        @actions = YAML.load_file("game/config/pf2e_actions.yml")['pf2e_actions']
+      end
+
+      {
+        'Bassin Luck' => [ 'free', nil ],
+        'Oruch Ferocity' => [ 'reaction', nil ],
+        'Oruch Superstition' => [ 'reaction', nil ],
+        'Sildanyar Step' => [ 'action', 1 ],
+        'Kailli Roll' => [ 'action', 2 ],
+        'Quick Stow (Kailli)' => [ 'free', nil ]
+      }.each_pair do |name, (type, cost)|
+        it "should hold #{name} as a #{type}" do
+          entry = @actions.fetch(name)
+
+          expect(entry).to include('from' => 'feat', 'type' => type, 'category' => 'ancestry')
+          expect(entry['cost']).to eq cost
+        end
+      end
+    end
+
+    # Feat keys the encounter engine reads by name: how a condition lands, the concealment flat check,
+    # the multiple attack penalty, and what fires a feat. Every name a row gives must be one the
+    # catalogues hold, or the row does nothing.
+    describe "feat keys the encounter engine reads" do
+      before(:all) do
+        @feats = {}
+
+        %w(ancestry class dedication general skill).each do |file|
+          @feats.merge!(YAML.load_file("game/config/pf2e_feat_#{file}.yml")['pf2e_feats'])
+        end
+
+        @actions = YAML.load_file("game/config/pf2e_actions.yml")['pf2e_actions']
+        @conditions = YAML.load_file("game/config/pf2e_conditions.yml")['pf2e_conditions']
+        @effects = YAML.load_file("game/config/pf2e_effects.yml")['pf2e_effects']
+                       .merge(YAML.load_file("game/config/pf2e_house_effects.yml")['pf2e_house_effects'])
+      end
+
+      def rows(key)
+        @feats.select { |_name, info| info.is_a?(Hash) && info[key] }.flat_map { |name, info| Array(info[key]).map { |row| [ name, row ] } }
+      end
+
+      {
+        'condition_rules' => [ 'Khazadi Doughtiness', 'Aura of Courage', 'Vigorous Health', 'Stubborn Persistence' ],
+        'concealment' => [ 'Blind-Fight', 'Supernatural Senses' ],
+        'map_counts' => [ 'Furious Focus' ],
+        'map_repeats_free' => [ 'Slippery Prey' ],
+        'lifts_effect' => [ 'Second Wind' ],
+        'triggers' => [ 'Inviolable', 'Disorienting Opening', 'Brilliant Flash', 'Swift Retribution',
+                        'Finishing Follow-Through', 'Immortal Techniques' ]
+      }.each_pair do |key, names|
+        it "should give #{names.join(', ')} a #{key}" do
+          expect(rows(key).map(&:first).uniq).to match_array(names)
+        end
+      end
+
+      it "should name real conditions, each with something to do" do
+        rows('condition_rules').each do |name, row|
+          expect(@conditions).to have_key(row['condition']), name
+          expect(row.keys & %w{eases_by gained_less flat_check}).not_to be_empty, name
+        end
+      end
+
+      it "should give a concealment row only the kinds of concealment and its own keys" do
+        rows('concealment').each do |name, row|
+          expect(row.keys - %w{concealed hidden hidden_not_off_guard predicate}).to eq([]), name
+        end
+      end
+
+      it "should name actions whose Strikes carry a map_counts" do
+        rows('map_counts').each do |name, row|
+          expect(@actions.fetch(row['action']).dig('strikes', 'map_counts')).not_to be_nil, name
+        end
+      end
+
+      it "should lift effects that exist" do
+        rows('lifts_effect').each do |name, row|
+          expect(@actions).to have_key(row['action']), name
+          expect(@effects).to have_key(row['effect']), name
+          expect(@conditions).to have_key(row['after']), name
+        end
+      end
+
+      it "should fire on events the engine fires, naming actions, conditions and effects that exist" do
+        rows('triggers').each do |name, row|
+          expect(FeatTriggers::EVENTS).to have_key(row['event']), name
+          Array(row['actions'] || row['action']).each { |action| expect(@actions).to have_key(action), name }
+          %w{self_condition target_condition}.each { |key| expect(@conditions).to have_key(row[key]), name if row[key] }
+          expect(@effects).to have_key(row['self_effect']), name if row['self_effect']
+        end
+      end
     end
   end
 end

@@ -16,13 +16,20 @@ module AresMUSH
       AFFECTS = { 'allies' => %w{ally}, 'enemies' => %w{enemy}, 'all' => %w{ally enemy} }.freeze
 
       # Every aura the character or creature projects: its slug, its radius, and the effects it puts on
-      # others. An effect it is under can project one - Silence, a champion's aura - and so can one of a
-      # creature's own abilities, which lasts as long as the creature does.
+      # others. An effect it is under can project one - Silence - and so can what it has of its own, which
+      # lasts as long as it does: a creature's abilities, a character's feats and class features.
       #
-      # Each carries the encounter and rank its effects are applied with: an effect's own, or for a
-      # creature's ability, the creature's encounter and level.
+      # Each carries the encounter and rank its effects are applied with: an effect's own, or for what is
+      # its own, its encounter and level.
+      #
+      # Rows sharing a slug are one aura carrying all their effects, as in Foundry: Champion's Aura is the
+      # aura, and Aura of Courage adds what it does to allies inside.
       def self.of(char)
-        from_effects(char) + from_abilities(char)
+        (from_effects(char) + from_abilities(char)).group_by { |aura| aura['slug'] }.map do |_slug, rows|
+          rows.first.merge('radius' => rows.map { |one| one['radius'] }.max,
+                           'traits' => rows.flat_map { |one| one['traits'] }.uniq,
+                           'effects' => rows.flat_map { |one| one['effects'] })
+        end
       end
 
       def self.from_effects(char)
@@ -35,14 +42,17 @@ module AresMUSH
       end
 
       def self.from_abilities(char)
-        Actors.of(char).ability_sources.flat_map do |source|
+        actor = Actors.of(char)
+
+        actor.ability_sources.flat_map do |source|
           read(char, source['name'], source['rules'], source['item'])
-            .map { |aura| aura.merge('effect' => nil, 'encounter' => char.encounter, 'level' => char.pf2_level) }
+            .map { |aura| aura.merge('effect' => nil, 'encounter' => actor.encounter, 'level' => char.pf2_level) }
         end
       end
 
+      # A predicate may ask for an option the emitter has switched on: Champion's Aura's own toggle.
       def self.read(char, name, rules, item)
-        options = Effects.character_facts(char)
+        options = Effects.options(char)
         context = Effects.context(char)
 
         Array(rules).select { |row| row['key'] == 'Aura' }.map do |row|
@@ -63,7 +73,7 @@ module AresMUSH
         return nil unless catalogue == 'effects' && ActiveEffects.catalogue.key?(name)
 
         { 'name' => name, 'affects' => (one['affects'] || 'all').to_s, 'self' => one['includesSelf'] != false,
-          'predicate' => one['predicate'], 'leaves_on_exit' => one['removeOnExit'] != false }
+          'predicate' => one['predicate'], 'leaves_on_exit' => one['removeOnExit'] != false, 'save' => one['save'] }
       end
 
       # The origin an effect records when an aura put it there, so the aura can find it again.
@@ -73,6 +83,9 @@ module AresMUSH
 
       # Someone is inside one of the emitter's auras. `relation` is `ally` or `enemy`; the emitter
       # themselves is inside their own aura, and only an effect that includes its emitter reaches them.
+      #
+      # An effect with a `save` lands only if the one inside fails that save against the emitter's spell
+      # DC (Eternal Bane's bane). The roll comes back as a message.
       def self.enter(emitter, target, slug, relation = 'ally')
         aura = of(emitter).find { |one| one['slug'] == slug }
 
@@ -80,18 +93,78 @@ module AresMUSH
 
         mine = Pf2e.holder_key(emitter) == Pf2e.holder_key(target)
         facts = Effects.character_facts(target)
+        told = []
 
-        applied = aura['effects'].select { |one|
+        reaching = aura['effects'].select { |one|
           (mine ? one['self'] : AFFECTS.fetch(one['affects'], []).include?(relation.to_s)) &&
             Predicate.test(one['predicate'], facts)
-        }.reject { |one| inside?(target, one['name'], origin(emitter, aura)) }.map do |one|
+        }.reject { |one| inside?(target, one['name'], origin(emitter, aura)) }
+
+        applied = reaching.select { |one| fails_save?(emitter, target, aura, one, told) }.map do |one|
           effect = ActiveEffects.apply(target, one['name'], :applied_by => emitter.name,
                                                              :encounter => aura['encounter']).state
           effect.update(:aura_of => origin(emitter, aura), :level => aura['level'])
           effect
         end
 
-        Ok.new(:state => applied)
+        told.inject(Ok.new(:state => applied)) { |done, one| done.with_message(one['key'], one['args']) }
+      end
+
+      # Whether an effect reaches the one inside: always, unless it has a save and they pass it. An
+      # emitter with no spell DC to save against leaves it to the GM, so it lands.
+      def self.fails_save?(emitter, target, aura, one, told)
+        return true unless one['save']
+
+        dc = spell_dc(emitter)
+
+        return true unless dc
+
+        # A save's rank is stored under its capitalised name.
+        save = one['save'].to_s.capitalize
+        result = Resolve.roll(Check.of(target, 'save', save), :dc => dc)
+        told << { 'key' => 'pf2e.aura_save',
+                  'args' => { 'target' => target.name, 'aura' => aura['slug'], 'save' => save,
+                              'total' => result['total'], 'dc' => dc, 'degree' => Resolve::WORDS[result['degree']] } }
+
+        !Degree.success?(result['degree'])
+      end
+
+      # The emitter's best spell DC, or nil when they cast nothing.
+      def self.spell_dc(emitter)
+        magic = emitter.respond_to?(:magic) ? emitter.magic : nil
+        entries = magic ? Pf2emagic::Entries.casting(magic) : []
+
+        entries.filter_map { |entry|
+          stats = Pf2emagic.get_caster_stats(emitter, entry['name'])
+          stats.is_a?(Hash) ? Acting.spell_figure(emitter, 'spell_dc', stats) : nil
+        }.max
+      end
+
+      # The emitter's turn has ended. An effect their aura put on someone may say what that brings
+      # (`emitter_turn_end`): Aura of Courage eases each ally's Frightened by 1.
+      def self.emitter_turn_ended(emitter)
+        of(emitter).flat_map do |aura|
+          Pf2eEffect.find(:aura_of => origin(emitter, aura)).to_a.flat_map do |effect|
+            ending = ActiveEffects.info(effect.name)['emitter_turn_end']
+
+            next [] unless ending.is_a?(Hash) && effect.holder
+
+            eased(effect.holder, ending, emitter)
+          end
+        end
+      end
+
+      def self.eased(holder, ending, emitter)
+        name = Pf2e.canonical_condition(ending['lower'])
+        held = Pf2e.condition_level(holder, name)
+
+        return [] unless held.positive?
+
+        left = [ held - ending['by'].to_i, 0 ].max
+        Pf2e.set_condition(holder, name, left)
+
+        [ Telling.event('pf2e.aura_eased', 'name' => holder.name, 'condition' => name, 'value' => left,
+                                           'emitter' => emitter.name) ]
       end
 
       # Someone has left the aura: what it put on them ends, unless the aura says it stays.

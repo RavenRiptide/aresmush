@@ -336,6 +336,26 @@ module AresMUSH
           expect(turn).to include('actions' => 1, 'attacks' => 2)
         end
 
+        # Monk's Flurry: "once you use Flurry of Blows, you can't use it again for 1d4 rounds".
+        it "should set Flurry of Blows' wait for an archetype monk, and not for a monk" do
+          @hero.update(:pf2_features => { 'charclass_features' => [], 'archetype_features' => [ 'Flurry of Blows' ] },
+                       :pf2_feats => { 'charclass' => [ "Monk's Flurry" ] })
+          @dice = 0.75
+          run(PF2EncounterActCmd, 'e/act flurry of blows=#3', @hero)
+
+          expect(@client.failures).to eq []
+          expect(Recharge.ready(CombatantStates.of(@encounter, Character[@hero.id]))['Flurry of Blows'].to_i)
+            .to be > @encounter.round.to_i
+        end
+
+        it "should set no wait on Flurry of Blows without Monk's Flurry" do
+          @hero.update(:pf2_features => { 'charclass_features' => [ 'Flurry of Blows' ], 'archetype_features' => [] })
+          @dice = 0.75
+          run(PF2EncounterActCmd, 'e/act flurry of blows=#3', @hero)
+
+          expect(Recharge.ready(CombatantStates.of(@encounter, Character[@hero.id]))).to eq({})
+        end
+
         # A creature with no hit points left, or a character knocked out, does nothing.
         it "should refuse a creature with no hit points left" do
           npc(2).update(:damage => npc(2).max_hp)

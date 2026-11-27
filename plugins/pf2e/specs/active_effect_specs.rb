@@ -254,7 +254,8 @@ module AresMUSH
 
         advance(fight)
 
-        expect(Pf2e::ActiveEffects.on(reread)).to eq []
+        # What a rage leaves as it ends: a minute without Rage's temporary Hit Points.
+        expect(Pf2e::ActiveEffects.on(reread).map(&:name)).to eq [ 'Effect: Rage Temporary Hit Points Immunity' ]
       end
     end
 

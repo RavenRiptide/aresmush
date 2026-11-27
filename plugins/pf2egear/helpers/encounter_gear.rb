@@ -146,6 +146,8 @@ module AresMUSH
                  Pf2e::WaveFan.cast!(scene, item, targets, words)
                elsif Pf2e::Staves.staff?(item)
                  Pf2e::Staves.cast!(scene, item, targets, words)
+               elsif Pf2e::CeremonialKnife.knife?(actor.state.holder, item)
+                 Pf2e::CeremonialKnife.cast!(scene, item, targets, words, :overcharge => overcharge?)
                else
                  Pf2e::SpellItems.cast!(scene, item, targets, words, :overcharge => overcharge?)
                end
@@ -170,7 +172,8 @@ module AresMUSH
         found = Pf2egear::Inventory.item(holder, self.category, self.item_num)
 
         return nil if found.err? || !found.state
-        return t('pf2e.wand_overcharge_only_wands') unless Pf2e::SpellItems.wand?(found.state)
+        return t('pf2e.wand_overcharge_only_wands') unless Pf2e::SpellItems.wand?(found.state) ||
+                                                           Pf2e::CeremonialKnife.knife?(holder, found.state)
 
         nil
       end

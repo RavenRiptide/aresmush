@@ -215,6 +215,12 @@ pf2e_actions:
         disabledIf: [{"not": "self:effect:panache"}]
         disabledValue: false
         label: "Finisher"
+  "Bassin Luck":
+    from: "feat"
+    type: "free"
+    category: "ancestry"
+    traits: ["fortune", "halfling"]
+    frequency: {"max": 1, "per": "day"}
   "Battle Medicine":
     from: "feat"
     type: "action"
@@ -1563,6 +1569,7 @@ pf2e_actions:
     type: "reaction"
     category: "class"
     traits: ["swashbuckler"]
+    self_effect: "Effect: Flashy Dodge"
   "Flinging Charge":
     from: "feat"
     type: "action"
@@ -2228,6 +2235,12 @@ pf2e_actions:
     category: "class"
     traits: ["fortune", "investigator"]
     frequency: {"max": 1, "per": "PT1H"}
+  "Kailli Roll":
+    from: "feat"
+    type: "action"
+    cost: 2
+    category: "ancestry"
+    traits: ["move", "ratfolk"]
   "Kip Up":
     from: "feat"
     type: "free"
@@ -2668,6 +2681,17 @@ pf2e_actions:
     type: "free"
     category: "class"
     traits: ["auditory", "cursebound", "divine", "emotion", "mental", "oracle"]
+  "Oruch Ferocity":
+    from: "feat"
+    type: "reaction"
+    category: "ancestry"
+    traits: ["orc"]
+    frequency: {"max": 1, "per": "day"}
+  "Oruch Superstition":
+    from: "feat"
+    type: "reaction"
+    category: "ancestry"
+    traits: ["concentrate", "orc"]
   "Oversized Throw":
     from: "feat"
     type: "action"
@@ -2990,6 +3014,12 @@ pf2e_actions:
     category: "class"
     traits: ["fighter", "flourish", "press"]
     strikes: {"count": 1, "attack": "melee"}
+  "Quick Stow (Kailli)":
+    from: "feat"
+    type: "free"
+    category: "ancestry"
+    traits: ["ratfolk"]
+    frequency: {"max": 1, "per": "round"}
   "Quick Tincture":
     from: "action"
     source: "Pathfinder Player Core 2"
@@ -3704,6 +3734,12 @@ pf2e_actions:
     type: "reaction"
     category: "class"
     traits: ["rogue"]
+  "Sildanyar Step":
+    from: "feat"
+    type: "action"
+    cost: 1
+    category: "ancestry"
+    traits: ["elf"]
   "Silencing Strike":
     from: "feat"
     type: "action"
@@ -4512,7 +4548,7 @@ pf2e_actions:
     cost: 2
     category: "class"
     traits: ["fighter", "flourish"]
-    strikes: {"count": 1, "attack": "melee"}
+    strikes: {"count": 1, "attack": "melee", "map_counts": 2}
   "Vigorous Anthem":
     from: "feat"
     type: "action"
@@ -4526,6 +4562,12 @@ pf2e_actions:
     category: "class"
     traits: ["swashbuckler"]
     self_effect: "Effect: Vivacious Bravado"
+  "Vivacious Conduit":
+    from: "feat"
+    type: "passive"
+    category: "ancestry"
+    traits: ["exploration", "gnome", "healing", "vitality"]
+    description: "You rest for 10 minutes and regain Hit Points equal to your Constitution modifier × half your level. This is cumulative with any healing you receive from Treat Wounds."
   "Wall Run":
     from: "feat"
     type: "action"

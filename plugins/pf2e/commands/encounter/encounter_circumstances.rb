@@ -178,6 +178,9 @@ module AresMUSH
                       elsif names.empty? then t('pf2e.aura_nothing', :target => target.label, :aura => self.aura)
                       else t('pf2e.aura_entered', :target => target.label, :aura => self.aura, :effects => names.join(', '))
                       end
+            # The saves an aura's own effects asked for (Eternal Bane), ahead of what they came to.
+            rolled = done.messages.map { |one| t(one['key'], one['args'].transform_keys(&:to_sym)) }
+            message = (rolled + [ message ]).join('%r')
           else
             done = Auras.leave(emitter.holder, target.holder, self.aura)
             message = t('pf2e.aura_left', :target => target.label, :aura => self.aura,

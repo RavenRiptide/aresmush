@@ -1240,6 +1240,29 @@ module AresMUSH
           gained.map { |sense| [ 'pf2e.feat_grants_special', { :special => sense } ] }
         }
       },
+      # A class feature or an action, by name: `feature: { archetype_features: [ "Flurry of Blows" ] }`, or a
+      # plain list for class features. An action a character uses is theirs when a feature has its name
+      # (`Actions.owned?`), so this grants actions too. A draft's commit records it as `grant_feature`.
+      'feature' => {
+        'timing' => 'advance',
+        'apply' => lambda { |ctx|
+          features = ctx[:char].pf2_features || {}
+
+          gained = Pf2e.granted_features(ctx[:value]).filter_map do |bucket, name|
+            next Global.logger.error("A feat grants the feature '#{name}' under '#{bucket}', which the sheet has no place for.") unless FEATURE_BUCKETS.include?(bucket)
+
+            held = Array(features[bucket])
+            next nil if held.any? { |one| one.to_s.casecmp?(name) }
+
+            features[bucket] = held + [ name ]
+            name
+          end
+
+          ctx[:char].update(:pf2_features => features) unless gained.empty?
+
+          gained.map { |name| [ 'pf2e.feat_grants_feature', { :feature => name } ] }
+        }
+      },
       # Formulas by catalogue: `formula: { consumables: [ "Philosopher's Stone" ] }`. A draft writes the
       # book and its commit records it; anywhere else the ledger records it now.
       'formula' => {
@@ -1266,6 +1289,16 @@ module AresMUSH
     # A special list with senses added. Darkvision replaces low-light vision, as it does when a
     # heritage grants it at chargen. Names are compared without case, because the data spells them
     # both ways.
+    # The feature lists a grant may add to, which are the two the sheet shows.
+    FEATURE_BUCKETS = %w{charclass_features archetype_features}.freeze
+
+    # A `grants: feature:` block as [ bucket, name ] pairs. A plain list is class features.
+    def self.granted_features(value)
+      by_bucket = value.is_a?(Hash) ? value : { 'charclass_features' => value }
+
+      by_bucket.flat_map { |bucket, names| Array(names).map { |name| [ bucket.to_s, name.to_s ] } }
+    end
+
     def self.with_senses(held, gained)
       list = Array(held).dup
 

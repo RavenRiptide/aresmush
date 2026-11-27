@@ -59,6 +59,11 @@ FEATS_RENAMED = {
     'Irrepressible (Halfling)': 'Irrepressible (Bassin)',
     'Unfettered Halfling': 'Unfettered Bassin',
     'Watchful Halfling': 'Watchful Bassin',
+    'Halfling Luck': 'Bassin Luck',
+    'Orc Ferocity': 'Oruch Ferocity',
+    'Elf Step': 'Sildanyar Step',
+    'Ratfolk Roll': 'Kailli Roll',
+    'Quick Stow (Ratfolk)': 'Quick Stow (Kailli)',
 }
 
 # Class features their pack names apart from ours: the witch's familiar is our Witch's Familiar feature.
@@ -243,6 +248,10 @@ KINDS = {
     'TempHP': {'key', 'value', 'predicate', 'events', 'slug', 'label'},
     'GrantItem': {'key', 'uuid', 'inMemoryOnly', 'predicate', 'onDeleteActions', 'allowDuplicate',
                   'alterations', 'slug', 'label', 'priority'},
+    # An effect on the other creature in an attack, for that attack alone (Pf2e::Ephemeral). Our rows ask
+    # for words and the holder's own state where Foundry asks for toggles, so a re-import would undo them;
+    # the kind is listed so the fields stay in step with Pf2e::Rules.
+    'EphemeralEffect': {'key', 'selectors', 'uuid', 'predicate', 'affects', 'alterations', 'slug', 'label'},
 }
 
 # The compendia a GrantItem may name that we hold as a catalogue of our own. A grant of anything else -
@@ -348,7 +357,7 @@ STRIKE_MODES = {'add', 'multiply', 'upgrade', 'downgrade', 'override'}
 WRITABLE = [
     re.compile(r'^system\.skills\.(?:[\w-]+|\{[^}]*\})\.rank$'),
     re.compile(r'^system\.proficiencies\.(defenses|attacks)\.[\w-]+\.rank$'),
-    re.compile(r'^system\.attributes\.dying\.recoveryDC$'),
+    re.compile(r'^system\.attributes\.dying\.(recoveryDC|max)$'),
     re.compile(r'^system\.attributes\.hp\.recoveryMultiplier$'),
     re.compile(r'^system\.attributes\.(flanking\.canFlank|flanking\.canGangUp|flanking\.flankable'
                r'|familiarAbilities\.value)$'),
@@ -368,7 +377,8 @@ ATTRIBUTES = {'str', 'dex', 'con', 'int', 'wis', 'cha'}
 PLAIN = ({'hp', 'ac', 'perception', 'saving-throw', 'fortitude', 'reflex', 'will', 'skill-check',
           'lore-skill-check', 'class-dc', 'class', 'spell-dc', 'spell-attack', 'all', 'check',
           'attack', 'attack-roll', 'strike-attack-roll', 'all-speeds', 'initiative',
-          'healing-received'}
+          'healing-received', 'speed', 'fortitude-dc', 'reflex-dc', 'will-dc', 'spell-damage',
+          'spell-healing'}
          | SKILLS
          | {f'{a}-based' for a in ATTRIBUTES}
          | {f'{a}-skill-check' for a in ATTRIBUTES}

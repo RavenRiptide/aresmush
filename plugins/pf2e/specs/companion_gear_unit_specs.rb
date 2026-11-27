@@ -57,7 +57,7 @@ module AresMUSH
         it "should mark the four-legged types" do
           four = @catalogue['types'].select { |_name, info| info['quadruped'] == true }.keys.sort
 
-          expect(four).to eq [ 'Badger', 'Bear', 'Boar', 'Cat', 'Crocodile', 'Horse', 'Riding Drake', 'Wolf' ]
+          expect(four).to eq [ 'Badger', 'Bear', 'Boar', 'Cat', 'Crocodile', 'Horse', 'Wolf' ]
         end
       end
 

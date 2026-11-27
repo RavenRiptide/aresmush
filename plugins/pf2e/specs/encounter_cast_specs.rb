@@ -150,6 +150,86 @@ module AresMUSH
           expect(@client.failures.join).to include('Fear')
           expect(fear_left).to eq 1
         end
+
+        # Superior Bond: a second drain a day, for a spell 2 or more ranks below the highest slot.
+        describe "with Superior Bond" do
+          before(:each) do
+            @magic.update(:spells_per_day => { 'Wizard' => { '1' => 1, '2' => 1, '3' => 1 } },
+                          :spells_prepared => { 'Wizard' => { '1' => [ 'Fear' ], '3' => [ 'Fireball' ] } })
+            @hero.update(:pf2_feats => { 'charclass' => [ 'Superior Bond' ] })
+            rested
+            allow(Telling).to receive(:event).and_call_original
+          end
+
+          it "should allow a second drain a day" do
+            expect(Actions.frequency(standing, 'Drain Bonded Item')).to include('max' => 2)
+          end
+
+          it "should say nothing of a second drain of a low enough spell" do
+            2.times do
+              cast('e/cast Fear')
+              drain
+            end
+
+            expect(@client.failures).to eq []
+            expect(fear_left).to eq 1
+            expect(Telling).to_not have_received(:event).with('pf2e.drain_extra_too_high', anything)
+          end
+
+          it "should tell the GM of a second drain of a spell too high for it" do
+            cast('e/cast Fear')
+            drain
+            cast('e/cast Fireball')
+            drain('e/act drain bonded item/fireball')
+
+            expect(Telling).to have_received(:event).with('pf2e.drain_extra_too_high',
+                                                          hash_including(:feat => 'Superior Bond', :rank => '3', :highest => 1))
+          end
+        end
+
+        # Linked Focus: a Focus Point back, once a day, for draining to cast a curriculum spell.
+        describe "with Linked Focus" do
+          before(:each) do
+            @magic.update(:spells_prepared => { 'Wizard' => { '1' => [ 'Command' ] } })
+            @hero.update(:pf2_feats => { 'charclass' => [ 'Linked Focus' ] },
+                         :pf2_base_info => { 'charclass' => 'Wizard', 'specialize' => 'Department of Mana Syntaxia' })
+            Pf2emagic::Entries.grant_focus!(Character[@hero.id], 'school', [ 'Hand of the Apprentice' ], :kind => 'spell')
+            rested
+            standing.update(:focus_current => 0)
+          end
+
+          after(:each) do
+            Character[@hero.id].spellcasting_entries.each(&:delete)
+          end
+
+          it "should give back a Focus Point for draining to cast a curriculum spell" do
+            cast('e/cast Command')
+            drain('e/act drain bonded item/command')
+
+            expect(@client.failures).to eq []
+            expect(standing.focus_current).to eq 1
+          end
+
+          it "should give it back only once a day" do
+            cast('e/cast Command')
+            drain('e/act drain bonded item/command')
+            standing.update(:focus_current => 0)
+            cast('e/cast Command')
+            drain('e/act drain bonded item/command')
+
+            expect(standing.focus_current).to eq 0
+          end
+
+          it "should give nothing for a spell outside the curriculum" do
+            @magic.update(:spells_prepared => { 'Wizard' => { '1' => [ 'Fear' ] } })
+            rested
+            standing.update(:focus_current => 0)
+            cast('e/cast Fear')
+            drain
+
+            expect(standing.focus_current).to eq 0
+          end
+        end
       end
 
       # A prepared spell named without a rank is cast from the rank it is prepared at.
@@ -203,6 +283,31 @@ module AresMUSH
           ordered.parse_args
 
           expect(ordered.innate_by_default?(Character[@hero.id])).to be false
+        end
+      end
+
+      # Form Retention: a battle form cast from a slot 2 ranks higher lasts 10 minutes.
+      describe "Form Retention" do
+        before(:each) do
+          per_day = (1..5).to_h { |rank| [ rank.to_s, 1 ] }
+          @magic.update(:tradition => { 'Wizard' => [ 'arcane', 'trained' ] }, :spell_abil => { 'Wizard' => 'Intelligence' },
+                        :spells_per_day => { 'Wizard' => per_day }, :repertoire => {},
+                        :spellbook => { 'Wizard' => { '3' => [ 'Insect Form' ] } }, :spells_prepared => { 'Wizard' => {} })
+          @hero.update(:pf2_level => 9, :pf2_base_info => { 'charclass' => 'Wizard' },
+                       :pf2_feats => { 'charclass' => [ 'Form Retention' ] })
+          Pf2emagic::SlotFeats.prepare_pair(Character[@hero.id], Pf2emagic::SlotFeats.for_switch(Character[@hero.id], 'formretention'),
+                                            5, [ 'Insect Form' ])
+          rested
+        end
+
+        it "should put the battle form on them for 10 minutes, at its own rank" do
+          cast('e/cast Insect Form/ant')
+
+          effect = standing.pf2_effects.to_a.find { |one| one.name == 'Spell Effect: Insect Form' }
+
+          expect(@client.failures).to eq []
+          expect([ effect.unit, effect.duration.to_i ]).to eq [ 'minutes', 10 ]
+          expect(Array((standing.magic.spells_today[Pf2emagic::SlotFeats::TODAY] || {})['Wizard'])).to eq []
         end
       end
 

@@ -37,3 +37,34 @@ pf2e_house_effects:
       - key: "BaseSpeed"
         selector: "fly"
         value: "min(25,@actor.system.movement.speeds.land.value)"
+  # Flashy Dodge: "a +2 circumstance bonus to AC against the triggering attack". The feat's own rule gives the
+  # bonus while this is on; the next attack against them ends it (`Pf2e::Ephemeral::ENDS_WHEN_ATTACKED`).
+  "Effect: Flashy Dodge":
+    pack: "house"
+    level: 1
+    duration: {"unit": "rounds", "value": 1, "expiry": "turn-start", "sustained": false}
+    traits: []
+    description: "Granted by Flashy Dodge%rYou have a +2 circumstance bonus to AC against the triggering attack. If it misses, you gain panache."
+    rules: []
+  # Aura of Courage: "At the end of your turn, each ally in your champion's aura reduces its frightened value
+  # by 1." The champion's aura puts this on allies inside; the champion's turn ending eases them
+  # (`Pf2e::Auras.emitter_turn_ended`).
+  "Effect: Aura of Courage":
+    pack: "house"
+    level: 4
+    duration: {"unit": "unlimited", "value": -1, "expiry": null, "sustained": false}
+    traits: []
+    description: "Granted by Aura of Courage%rAt the end of the champion's turn, your frightened value is reduced by 1."
+    rules: []
+    emitter_turn_end: { lower: Frightened, by: 1 }
+  # Immortal Techniques: "The first time each round that you use an action that has both the monk and stance
+  # traits, you gain 20 temporary Hit Points that last until the start of your next turn."
+  "Effect: Immortal Techniques":
+    pack: "house"
+    level: 20
+    duration: {"unit": "rounds", "value": 1, "expiry": "turn-start", "sustained": false}
+    traits: []
+    description: "Granted by Immortal Techniques%rYou have 20 temporary Hit Points until the start of your next turn."
+    rules:
+      - key: "TempHP"
+        value: 20

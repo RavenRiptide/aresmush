@@ -10,10 +10,10 @@ module AresMUSH
     module TurnState
 
       # When a limit on how often an action may be used starts over, by Foundry's `frequency.per`. A
-      # minute is longer than most fights, so anything up to ten minutes starts over as the encounter
-      # ends; anything longer, at a night's rest.
+      # minute is longer than most fights, so anything up to an hour starts over as the encounter ends;
+      # anything longer, at a night's rest.
       PERIODS = { 'turn' => 'turn', 'round' => 'turn', 'PT1M' => 'encounter', 'PT10M' => 'encounter',
-                  'encounter' => 'encounter' }.freeze
+                  'PT1H' => 'encounter', 'encounter' => 'encounter' }.freeze
 
       ACTIONS = 3
 
@@ -63,7 +63,11 @@ module AresMUSH
         now = now.merge('reaction' => true) if type == 'reaction'
         # Instinctive Support follows its spell at once; anything else done first passes it by.
         now = now.merge('instinctive' => nil) unless type == 'free'
-        now = now.merge('attacks' => now['attacks'].to_i + 1) if attack
+        if attack
+          by = now['attacks_by'] || {}
+          slug = Domains.slug(name)
+          now = now.merge('attacks' => now['attacks'].to_i + 1, 'attacks_by' => by.merge(slug => by[slug].to_i + 1))
+        end
         # A reaction is no part of the turn's own run of actions - but a Strike made as one is the last
         # thing done, which is what a Grab then follows.
         if type != 'reaction'
@@ -105,6 +109,11 @@ module AresMUSH
       # How many times an action has been used in its period.
       def self.used(holder, name)
         ((of(holder)['uses'] || {})[name] || {})['count'].to_i
+      end
+
+      # How many of this turn's attacks were this action: Slippery Prey's Escapes.
+      def self.attacks_with(holder, name)
+        (turn(holder)['attacks_by'] || {})[Domains.slug(name)].to_i
       end
 
       # The attacks made this turn stand at `count`: an ability that makes several under one penalty

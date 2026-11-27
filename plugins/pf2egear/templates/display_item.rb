@@ -67,6 +67,7 @@ module AresMUSH
           fmt_list << "%b%b#{usable}%r" unless Pf2e::Staves.staff?(@item)
           Pf2e::Staves.describe(@char, @item).each { |line| fmt_list << "%b%b#{line}%r" }
           Pf2e::BoundItems.describe(@char, @item).each { |line| fmt_list << "%b%b#{line}%r" }
+          Pf2e::CeremonialKnife.describe(@char, @item).each { |line| fmt_list << "%b%b#{line}%r" }
         when "armor"
           fmt_list << "%b%b#{left("#{item_color}Category:%xn #{@item.category.capitalize}", 37)}"
           fmt_list << "%b#{left("#{item_color}Group:%xn #{@item.group}", 37)}%r"

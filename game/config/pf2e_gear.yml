@@ -288,6 +288,18 @@ pf2e_gear:
       - key: "RollOption"
         option: "has-religious-symbol"
         requiresEquipped: false
+  # Handed over by the Pilgrim's Token feat (`bound_item`), never bought.
+  Pilgrim's Token:
+    bulk: 0.1
+    level: 0
+    price: 0
+    made_only: true
+    traits: []
+    shortdesc: "This wooden religious symbol is a small token of protection from a site holy to your faith. As long as this religious symbol is in your possession, when you tie an adversary's initiative roll, you go first."
+    rules:
+      - key: "RollOption"
+        option: "has-pilgrims-token"
+        requiresEquipped: false
   Religious Text:
     bulk: 0.1
     level: 0

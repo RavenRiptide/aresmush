@@ -442,6 +442,13 @@ module AresMUSH
           }
         },
         {
+          'key' => 'EphemeralEffect',
+          'fields' => %w{key selectors uuid predicate affects alterations slug label},
+          # An effect on the other creature in an attack, for that attack alone: the holder's target, or
+          # whoever attacks the holder. `Pf2e::Ephemeral` reads it, by what the effect it names does.
+          'contribute' => lambda { |row, source, _context| row.merge('source' => source['name']) }
+        },
+        {
           'key' => 'Immunity',
           'fields' => %w{key type value predicate label definition exceptions slug},
           'contribute' => lambda { |row, source, context| declaration_of(row, source, context) }

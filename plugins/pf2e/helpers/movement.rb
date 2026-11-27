@@ -137,12 +137,13 @@ module AresMUSH
       end
 
       # What changes a Speed that no `movement` entry speaks for: an effect the character is under, a
-      # condition, something they carry. Their feats are left out, because their own entries above are
-      # how a feat raises a Speed and counting both would count it twice.
+      # condition, something they carry, and a feat with no `movement` entry (Rapid Response). A feat with
+      # one is left out, because that entry is how it raises a Speed and counting both would count it twice.
       def self.modifiers_for(char)
         domains = Domains.for('speed', nil, nil)
+        feats = Effects.feats(char).reject { |source| (Global.read_config('pf2e_feats', source['name']) || {})['movement'] }
         sources = Effects.conditions(char) + Effects.items(char) + Effects.runes(char) +
-                  ActiveEffects.sources(char)
+                  ActiveEffects.sources(char) + feats
         held = Effects.options(char, domains)
         rows = Effects.modifiers(sources, domains, Effects.context(char), held).select { |row| row['met'] }
 

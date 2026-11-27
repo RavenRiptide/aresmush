@@ -100,6 +100,18 @@ module AresMUSH
             'apply' => lambda { |ctx|
               [ [ 'pf2e.feat_staff_request', { :feat => ctx[:feat], :details => ctx[:details]['staff_request'] } ] ]
             }
+          },
+          # In chargen, a feat a held feat hands over once its prerequisites are met: this feat may be the
+          # one handing it over, or may have met them. Last, once this feat's own grants are applied. A
+          # level-up asks as it commits instead (`do_advancement`).
+          {
+            'name' => 'feats once eligible',
+            'when' => lambda { |ctx| ctx[:chargen] },
+            'apply' => lambda { |ctx|
+              ctx[:after_save] << lambda { EligibleFeats.settle!(ctx[:char], ctx[:client]).map { |msg| [ nil, msg ] } }
+
+              []
+            }
           }
         ].freeze
 

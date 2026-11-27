@@ -131,6 +131,12 @@ pf2e_feats:
         flag: "cannyAcumen"
         choices: [{"label": "Fortitude", "value": "system.saves.fortitude.rank"}, {"label": "Reflex", "value": "system.saves.reflex.rank"}, {"label": "Will", "value": "system.saves.will.rank"}, {"label": "Perception", "value": "system.perception.rank"}]
   Diehard:
+    # Foundry's rule: death at dying 5 (Pf2eHP.fatal_at reads it).
+    rules:
+      - key: "ActiveEffectLike"
+        mode: "upgrade"
+        path: "system.attributes.dying.max"
+        value: 5
     feat_type:
       - General
     shortdesc: It takes more to kill you than most. You die from the dying condition at dying 5, rather than dying 4.

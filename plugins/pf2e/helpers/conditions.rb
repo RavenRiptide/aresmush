@@ -165,6 +165,11 @@ module AresMUSH
       list = char.pf2_conditions || {}
       cv = list[condition] || {}
       before = list.key?(condition) ? cv['value'] : nil
+
+      # A feat may lower it as it lands, or keep it off with a flat check (`ConditionFeats`).
+      value = ConditionFeats.gaining(char, condition, before, value)
+      return value if value.is_a?(Err)
+
       max_before = HitPointLoss.takes?(Global.read_config('pf2e_conditions', condition, 'rules')) ? HitPointLoss.max_hp(char) : nil
 
       cv['value'] = value if value

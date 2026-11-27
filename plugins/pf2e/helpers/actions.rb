@@ -47,6 +47,19 @@ module AresMUSH
         Err.new(:ambiguous, 'pf2e.action_ambiguous', 'action' => term, 'options' => close.first(8).join(', '))
       end
 
+      # How often the holder may use an action: the catalogue's frequency, as their rules alter it. The
+      # alteration names the thing by slug and kind - a feat for a feat that is an action - so its predicate
+      # reads `item:slug:oruch-ferocity`.
+      def self.frequency(holder, name, entry = info(name))
+        held = entry['frequency']
+
+        return held unless held.is_a?(Hash)
+
+        kind = entry['from'] == 'feat' ? 'feat' : 'action'
+
+        Alterations.apply(holder, kind, held, :options => [ "item:slug:#{Domains.slug(name)}" ])
+      end
+
       # An exploration or downtime activity costs no actions - Foundry files it as passive - but it is
       # something a character does, so it is an activity rather than nothing.
       def self.cost(name)

@@ -17,7 +17,10 @@ module AresMUSH
 
       # A replacement whose own grants or choices a retrain would have to open. A retrain records one feat
       # for another; those need the feat-gaining path a level-up has.
-      OPENS = %w{grants feat_choice level_choices at_level magic_stats init_magic daily_choice}.freeze
+      OPENS = %w{grants feat_choice level_choices at_level magic_stats init_magic daily_choice feats_when_eligible}.freeze
+
+      # What a feat may have handed over that a retrain can trace back to it and take away.
+      TRACEABLE_GRANTS = %w{feat feature}.freeze
 
       def self.forbids?(details, direction)
         flag = details.is_a?(Hash) ? details['no_retrain'].to_s.downcase : ''
@@ -60,24 +63,39 @@ module AresMUSH
       end
 
       # What a feat being retrained away hands over that a retrain can take back with it: the feats its
-      # `grants: feat:` gave. Anything else it granted cannot be traced back to it, so a feat granting
-      # more is refused.
+      # `grants: feat:` gave or its `feats_when_eligible` handed over, and the features its `grants: feature:`
+      # gave. Anything else it granted cannot be traced back to it, so a feat granting more is refused.
       def self.reversible?(details)
         return true unless details.is_a?(Hash)
 
         grants = details['grants']
-        others = OPENS - [ 'grants' ]
+        others = OPENS - [ 'grants', 'feats_when_eligible' ]
 
         return false if others.any? { |key| !details[key].blank? }
         return true if grants.blank?
 
-        grants.is_a?(Hash) && (grants.keys - [ 'feat' ]).empty?
+        grants.is_a?(Hash) && (grants.keys - TRACEABLE_GRANTS).empty?
       end
 
       def self.granted_feats(details)
-        Array(((details || {})['grants'] || {})['feat'])
-          .map { |entry| entry.is_a?(Hash) ? entry['name'] : entry }
-          .compact.map(&:to_s)
+        given = Array(((details || {})['grants'] || {})['feat'])
+                  .map { |entry| entry.is_a?(Hash) ? entry['name'] : entry }
+
+        (given + Array((details || {})['feats_when_eligible'])).compact.map(&:to_s)
+      end
+
+      # The features a feat's grant gave, as [ bucket, name ] pairs.
+      def self.granted_features(details)
+        given = ((details || {})['grants'] || {})['feature']
+
+        given ? Pf2e.granted_features(given) : []
+      end
+
+      # Whether a feat they keep, other than `old`, grants the feature too.
+      def self.granted_elsewhere?(char, old, bucket, feature)
+        Pf2e.held_feat_details(char).any? do |name, details|
+          !name.to_s.casecmp?(old.to_s) && granted_features(details).include?([ bucket, feature ])
+        end
       end
 
       # How the character holds a feat: the bucket and level of its newest live taking, or nil.
@@ -182,8 +200,8 @@ module AresMUSH
         list.sort
       end
 
-      # Records the retrain: the old taking and the feats it granted are revoked, and the replacement is
-      # granted in its slot. Returns the transaction id.
+      # Records the retrain: the old taking and the feats and features it granted are revoked, and the
+      # replacement is granted in its slot. Returns the transaction id.
       def self.retrain!(char, taking, old_details, new_name, by:)
         level = taking['level'].to_i
         marker = Ledger.level_revocation_marker(level, 'retrain')
@@ -193,6 +211,13 @@ module AresMUSH
 
         granted_feats(old_details).each do |granted|
           Ledger.revert_matching!(char, 'grant_feat', { 'feat' => granted }, :by => marker, :materialize => false, :limit => 1)
+        end
+
+        granted_features(old_details).each do |bucket, feature|
+          next if granted_elsewhere?(char, taking['feat'], bucket, feature)
+
+          Ledger.revert_matching!(char, 'grant_feature', { 'feature' => feature, 'bucket' => bucket },
+                                  :by => marker, :materialize => false, :limit => 1)
         end
 
         source = level > 1 ? 'level_up' : 'staff'

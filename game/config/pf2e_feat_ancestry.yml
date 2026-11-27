@@ -909,6 +909,11 @@ pf2e_feats:
     prereq:
       level: 1
       heritage: Changeling
+    rules:
+      - key: "EphemeralEffect"
+        selectors: ["strike-attack-roll", "spell-attack-roll", "strike-damage", "attack-spell-damage"]
+        uuid: "Compendium.pf2e.conditionitems.Item.Off-Guard"
+        predicate: ["callow-may", "encounter:round:1"]
   Can't Fall Here:
     feat_type:
       - Ancestry
@@ -979,6 +984,36 @@ pf2e_feats:
       innate_tradition:
         - arcane
         - occult
+    # The tradition is the gnome's own: each option is open only to a gnome with an innate spell of it.
+    feat_choice:
+      summary: arcane or occult innate spells
+      options:
+        Arcane:
+          prereq:
+            innate_tradition:
+              - arcane
+          grants:
+            magic_stats:
+              innate_spell:
+                level: 2
+                name:
+                  - Disguise Magic
+                  - Silence
+                tradition: arcane
+                cast_stat: Charisma
+        Occult:
+          prereq:
+            innate_tradition:
+              - occult
+          grants:
+            magic_stats:
+              innate_spell:
+                level: 2
+                name:
+                  - Disguise Magic
+                  - Silence
+                tradition: occult
+                cast_stat: Charisma
   Cave Climber:
     movement:
       - climb: 10
@@ -1397,6 +1432,9 @@ pf2e_feats:
       level: 5
       special:
         - Darkvision
+    grants:
+      special:
+        - Greater Darkvision
   Chance Death:
     no_retrain: both
     feat_type:
@@ -1759,6 +1797,9 @@ pf2e_feats:
     actions: 1
     frequency: once per hour
   Eternal Wings:
+    # Divine Wings at all times: its fly Speed, equal to your Speed.
+    movement:
+      - fly: land
     feat_type:
       - Ancestry
     assoc_ancestry: 
@@ -2757,6 +2798,14 @@ pf2e_feats:
         value: 1
         predicate: ["illusion"]
   Incredible Ferocity:
+    # Foundry names the action `orc-ferocity`; ours is the setting's.
+    rules:
+      - key: "ItemAlteration"
+        itemType: "feat"
+        mode: "override"
+        property: "frequency-per"
+        value: "PT1H"
+        predicate: ["item:slug:oruch-ferocity"]
     feat_type:
       - Ancestry
     assoc_ancestry:
@@ -2868,6 +2917,13 @@ pf2e_feats:
         adjustment: {"criticalFailure": "one-degree-better"}
         predicate: ["item:trait:emotion", "heritage:gutsy"]
   Jinx Glutton:
+    rules:
+      - key: "ItemAlteration"
+        itemType: "feat"
+        mode: "override"
+        property: "frequency-per"
+        value: "PT1H"
+        predicate: ["item:slug:eat-fortune"]
     feat_type:
       - Ancestry
     assoc_ancestry:
@@ -2918,6 +2974,8 @@ pf2e_feats:
     shortdesc: You are naturally calm and collected in the face of imminent danger. At the end of your turn, reduce your frightened condition by 2 instead of 1.
     prereq:
       level: 1
+    condition_rules:
+      - { condition: Frightened, eases_by: 2 }
   Khazadi Lore:
     feat_type:
       - Ancestry
@@ -3088,6 +3146,9 @@ pf2e_feats:
     prereq:
       level: 5
       heritage: Ashen One
+    grants:
+      special:
+        - Lifesense (imprecise) 10 feet
   Long-Nosed Form:
     feat_type:
       - Ancestry
@@ -3747,13 +3808,18 @@ pf2e_feats:
     traits:
       - sildanyar
     shortdesc: "The arcane magic you possess grows in power and complexity. Choose one common 2nd-rank spell from the same tradition as an innate spell you previously gained from another sildanyar ancestry feat (from the arcane list if you have Otherworldly Magic, for example). You can cast that spell as an innate spell once per day, using the same tradition as the list you chose the spell from.%r%rYour magic is adaptable. By spending 1 day of downtime, you can change the spell you chose to a different common 2nd-rank spell from the same tradition."
+    # The spell's tradition is that of an innate spell from another sildanyar ancestry feat. Otherworldly
+    # Magic is the only such feat, and it is arcane; a new one joins this prerequisite with its tradition.
     prereq:
       level: 9
-      innate_tradition:
-        - arcane
-        - divine
-        - primal
-        - occult
+      feat:
+        - Otherworldly Magic
+    magic_stats:
+      innate_spell:
+        level: 2
+        name: open
+        tradition: arcane
+        cast_stat: Intelligence
   Otherworldly Magic:
     feat_type:
       - Ancestry
@@ -4434,6 +4500,37 @@ pf2e_feats:
     prereq:
       level: 1
       heritage: Silyara
+    # A sildanyar heritage's benefits, not the heritage itself: their heritage stays Silyara. Versatile heritages,
+    # and Silyara and Ghaluch, are not sildanyar heritages. Whisper's and Woodland's benefits are played at the
+    # table, as they are for a sildanyar of that heritage.
+    feat_choice:
+      summary: a sildanyar heritage
+      options:
+        Arctic: {}
+        Cavern:
+          grants:
+            special:
+              - Darkvision
+        Seer:
+          grants:
+            magic_stats:
+              innate_spell:
+                level: cantrip
+                name: Detect Magic
+                tradition: arcane
+                cast_stat: Charisma
+        Whisper: {}
+        Woodland: {}
+    rules:
+      - key: "ChoiceSet"
+        flag: "silAtavism"
+        rollOption: "sil-atavism"
+        prompt: "Select the sildanyar heritage of your sildanyari parent or ancestors."
+        choices: [{"label": "Arctic", "value": "arctic"}, {"label": "Cavern", "value": "cavern"}, {"label": "Seer", "value": "seer"}, {"label": "Whisper", "value": "whisper"}, {"label": "Woodland", "value": "woodland"}]
+      - key: "Resistance"
+        type: "cold"
+        value: "max(1,floor(@actor.level/2))"
+        predicate: ["sil-atavism:arctic"]
   Sildanyari Lore:
     feat_type:
       - Ancestry
@@ -4783,6 +4880,11 @@ pf2e_feats:
         type: "circumstance"
         value: 1
         predicate: ["item:trait:fear"]
+      - key: "FlatModifier"
+        selector: "will-dc"
+        type: "circumstance"
+        value: 2
+        predicate: ["check:statistic:intimidation"]
   Stonegate:
     feat_type:
       - Ancestry
@@ -4912,6 +5014,8 @@ pf2e_feats:
     shortdesc: Humans are renowned for their ability to persist through the most grueling of trials that would leave others ready to drop. When you would become fatigued, attempt a DC 17 flat check. On a success, you aren't fatigued. If the fatigued condition has an underlying cause that you don't address, such as lack of rest, you must attempt the check again at an interval determined by the GM until you fail the flat check or address the underlying cause.
     prereq:
       level: 13
+    condition_rules:
+      - { condition: Fatigued, flat_check: 17 }
   Summon Nephilim Kin:
     feat_type:
       - Ancestry
@@ -5559,6 +5663,8 @@ pf2e_feats:
     shortdesc: You can withstand blood loss startlingly well. Whenever you would gain the Drained condition, you can attempt a DC 17 flat check. On a success, you don't gain the drained condition.
     prereq:
       level: 1
+    condition_rules:
+      - { condition: Drained, flat_check: 17 }
   Vivacious Conduit:
     feat_type:
       - Ancestry

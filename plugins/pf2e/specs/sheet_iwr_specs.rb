@@ -62,6 +62,18 @@ module AresMUSH
           expect(shown(csheet)).to eq 'Resistances: fire 5'
         end
 
+        # Sil Atavism's Arctic option: the Arctic heritage's cold resistance, half their level.
+        it "should show cold resistance for a Sil Atavism that chose Arctic, and none for another choice" do
+          @char.update(:pf2_feats => { 'ancestry' => [ 'Sil Atavism' ] },
+                       :pf2_level_tracker => { '1' => { 'feat_choices' => { 'Sil Atavism' => [ 'Arctic' ] } } })
+
+          expect(shown(sheet)).to eq 'Resistances: cold 2'
+
+          @char.update(:pf2_level_tracker => { '1' => { 'feat_choices' => { 'Sil Atavism' => [ 'Cavern' ] } } })
+
+          expect(shown(sheet)).to_not include 'cold'
+        end
+
         it "should say None. for someone who resists nothing" do
           expect(shown(sheet)).to eq 'Resistances: None.'
           expect(shown(csheet)).to eq 'Resistances: None.'

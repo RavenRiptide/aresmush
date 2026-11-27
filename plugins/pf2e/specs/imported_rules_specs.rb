@@ -46,6 +46,9 @@ module AresMUSH
         Pf2e::ABILITIES.flat_map { |ability| Pf2e::Domains.for(kind, nil, ability) }
       }
       speeds = Pf2e::Domains::MOVEMENT.flat_map { |type| Pf2e::Domains.for('speed', type) }
+      # A save used as a DC (Stone Face's `will-dc`), and what a spell heals or deals as it is cast.
+      dcs = %w{Fortitude Reflex Will}.flat_map { |s| Pf2e::Resolve.dc_domains('save', Pf2e.canonical_save(s)) }
+      spells = Pf2e::SpellRolls.domains([ 'healing' ]) + Pf2e::SpellRolls.domains([ 'damage' ])
 
       # An attack and its damage carry the weapon's own facts, so their domains are generated from the
       # catalogue's own weapon names, groups and base types rather than from a representative one.
@@ -69,14 +72,14 @@ module AresMUSH
         }
       }
 
-      (saves + skills + plain + speeds + attacks + shapes).uniq
+      (saves + skills + plain + speeds + dcs + spells + attacks + shapes).uniq
     end
 
     # Two kinds of selector cannot be checked against a list. One names the item carrying the rule and
     # resolves to an id we cannot know here. The other is built off the name of an attack a character
     # has, which a feat can invent - Tiger Stance grants a tiger claw, so `tiger-claw-damage` is a real
     # domain that no catalogue contains. Both are checked by shape; everything else against the list,
-    # which is what still catches `healing` and `will-dc`.
+    # which is what catches a misspelled selector, or one no statistic here produces.
     # What a field looks like once the wearer's or taker's answer has filled it in. A ChoiceSet answer
     # is a slug, so a plain one stands for every answer the set could give: the claim being checked is
     # that the shape reaches something, not that a particular choice does.
@@ -309,10 +312,9 @@ module AresMUSH
       end
     end
 
-    # Every kind of rule on what we stock that is not about Foundry's canvas, crafting or a roll's target:
-    # thirty-one.
-    it "should have all thirty-one kinds it reads" do
-      expect(rows.map { |_where, row| row['key'] }.uniq.size).to eq 31
+    # Every kind of rule on what we stock that is not about Foundry's canvas or crafting: thirty-two.
+    it "should have all thirty-two kinds it reads" do
+      expect(rows.map { |_where, row| row['key'] }.uniq.size).to eq 32
     end
 
     # An aura's effects have to be effects the catalogue holds, or it puts nothing on anyone.

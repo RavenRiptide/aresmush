@@ -323,13 +323,20 @@ module AresMUSH
 
         traits = Array(attack['traits']).map { |one| Domains.slug(one) }
         base = traits.include?('agile') ? -4 : -5
-        offered = Rules.gather(sources, domains, held + traits, 'MultipleAttackPenalty') do |row, source|
-          Rules.contribute(row, source, context.merge('item' => source['item'] || {}))
-        end
-        each = ([ base ] + offered.map { |one| one['value'] }).max
+        each = map_each(sources, domains, held + traits, context, base)
 
         { 'source' => 'multiple attack penalty', 'slug' => 'multiple-attack-penalty',
           'type' => Modifiers::UNTYPED, 'value' => each * [ increases, 2 ].min }
+      end
+
+      # The penalty for the second attack: `base`, or the least severe a `MultipleAttackPenalty` rule
+      # offers for these domains. The third attack takes twice it.
+      def self.map_each(sources, domains, held, context, base)
+        offered = Rules.gather(sources, domains, held, 'MultipleAttackPenalty') do |row, source|
+          Rules.contribute(row, source, context.merge('item' => source['item'] || {}))
+        end
+
+        ([ base ] + offered.map { |one| one['value'] }).max
       end
 
       # Their slug, because a feat that lets a character ignore armour's speed penalty names it

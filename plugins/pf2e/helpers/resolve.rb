@@ -130,7 +130,7 @@ module AresMUSH
       # gives the defender - cover, or the off-guard of being flanked.
       def self.defence(holder, against, options: [], extra: [])
         kind, name = defence_figure(against)
-        figure = Actors.of(holder).figure(kind, name, options)
+        figure = Actors.of(holder).figure(kind, name, options, dc_domains(kind, name))
 
         return nil unless figure
 
@@ -138,6 +138,19 @@ module AresMUSH
         dc = kind == 'ac' ? figure['total'].to_i : 10 + figure['total'].to_i
 
         { 'dc' => dc, 'kind' => kind, 'name' => name, 'breakdown' => figure }
+      end
+
+      # A save used as a DC answers to `will-dc` as well as to the save's own domains, which is how Stone
+      # Face raises the Will DC an Intimidation check is against and not the Will save.
+      def self.dc_domains(kind, name)
+        kind.to_s == 'save' && name ? [ "#{Domains.slug(name)}-dc" ] : []
+      end
+
+      # The option a check against a defence carries for what it rolls: `check:statistic:intimidation`.
+      def self.statistic_option(kind, name)
+        statistic = %w{skill lore}.include?(kind.to_s) ? name : kind
+
+        statistic ? [ "check:statistic:#{Domains.slug(statistic)}" ] : []
       end
 
       # What is true of one side, as the other's rules ask about it: Foundry spells what an attacker knows

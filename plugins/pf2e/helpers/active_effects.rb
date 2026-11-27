@@ -62,6 +62,7 @@ module AresMUSH
 
         out = entry.dup
         out['duration'] = (entry['duration'] || {}).merge(kept['duration']) if kept['duration'].is_a?(Hash)
+        out['when_ended'] = kept['when_ended'] if kept['when_ended'].is_a?(Hash)
 
         if kept['rules'].is_a?(Array)
           out['rules'] = Array(entry['rules']).each_with_index.map do |row, at|
@@ -436,21 +437,41 @@ module AresMUSH
       # Ends an effect, and whatever it brought with it that goes when it goes.
       def self.remove(char, effect)
         name = effect.name
+        ending = [ when_ended(effect), effect.encounter, effect.applied_by ]
 
         take_temp_hp(char, effect)
         Auras.dispelled(char, effect)
         effect.delete
 
         # Another instance of the same effect still holds what it granted.
-        return Ok.new(:state => name).tap { Paths.apply_all!(char) } if active?(char, name)
+        return Ok.new(:state => name).tap { Paths.apply_all!(char); ended_into(char, *ending) } if active?(char, name)
 
         Pf2e.release_grants(char, name)
 
         on(char).select { |other| other.granted_by == name }.each { |other| remove(char, other) }
 
         Paths.apply_all!(char)
+        ended_into(char, *ending)
 
         Ok.new(:state => name)
+      end
+
+      # What an effect leaves as it ends, from its catalogue entry's `when_ended` and its own: Rage leaves a
+      # minute without Rage's temporary Hit Points, and a Rage raged with Second Wind leaves its barbarian
+      # fatigued as well.
+      def self.when_ended(effect)
+        catalogued = info(effect.name)['when_ended'] || {}
+        own = effect.when_ended || {}
+
+        %w{effects conditions}.each_with_object({}) { |key, out| out[key] = Array(catalogued[key]) + Array(own[key]) }
+      end
+
+      # Only while its encounter still runs: an encounter ending takes everything in it away.
+      def self.ended_into(char, ending, encounter, applied_by)
+        return unless encounter&.is_active
+
+        ending['effects'].each { |name| apply(char, name, :applied_by => applied_by, :encounter => encounter) }
+        ending['conditions'].each { |name| Pf2e.set_condition(char, name, Pf2e.default_condition_value(name)) }
       end
 
       # Ends the effect a player names.

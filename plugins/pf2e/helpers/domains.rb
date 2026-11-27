@@ -34,8 +34,9 @@ module AresMUSH
         { 'name' => 'hp', 'domains' => ->(_name, _ability) { [ 'hp' ] } },
 
         # `creature/document.ts:764`. A speed answers to its own kind and to every speed at once.
+        # Land Speed is also plain `speed`, which is what "your Speed" means (Rapid Response).
         { 'name' => 'speed', 'domains' => ->(name, _ability) {
-          [ "#{slug(name || 'land')}-speed", 'all-speeds' ]
+          [ "#{slug(name || 'land')}-speed", 'all-speeds' ] + (name.nil? || slug(name) == 'land' ? [ 'speed' ] : [])
         } },
 
         { 'name' => 'ac', 'domains' => ->(_name, _ability) { [ ALL, 'ac', 'dex-based' ] } },

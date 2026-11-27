@@ -60,6 +60,32 @@ module AresMUSH
           expect(Alchemy.allowances(char)).to include('prepared' => 6, 'vials' => 4, 'gathers' => true)
         end
 
+        it "should give Efficient Alchemy 6 + Intelligence prepared items" do
+          char.update(:pf2_feats => { 'charclass' => [ 'Efficient Alchemy (Alchemist)' ] })
+
+          expect(Alchemy.allowances(char)['prepared']).to eq 8
+        end
+
+        it "should give Advanced Efficient Alchemy 8 + Intelligence prepared items, and 10 + Intelligence from 16th level" do
+          feats = [ 'Efficient Alchemy (Alchemist)', 'Advanced Efficient Alchemy' ]
+          char.update(:pf2_level => 15, :pf2_feats => { 'charclass' => feats })
+          expect(Alchemy.allowances(char)['prepared']).to eq 10
+
+          char.update(:pf2_level => 16)
+          expect(Alchemy.allowances(char)['prepared']).to eq 12
+        end
+
+        it "should give Voluminous Vials one more vial for each time it is taken" do
+          char.update(:pf2_base_info => { 'charclass' => 'Fighter' })
+
+          counts = (1..3).map do |taken|
+            char.update(:pf2_feats => { 'archetype' => [ 'Alchemist Dedication' ] + [ 'Voluminous Vials' ] * taken })
+            Alchemy.allowances(char)['vials']
+          end
+
+          expect(counts).to eq [ 5, 6, 7 ]
+        end
+
         it "should give a vial of the highest type their level reaches" do
           expect([ 1, 3, 4, 11, 12, 18, 20 ].map { |level| Alchemy.vial_name(level) })
             .to eq [ 'Versatile Vial (Lesser)', 'Versatile Vial (Lesser)', 'Versatile Vial (Moderate)',

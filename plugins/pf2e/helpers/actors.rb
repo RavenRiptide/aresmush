@@ -223,9 +223,10 @@ module AresMUSH
         end
       end
 
-      # Its abilities' own sources beyond what it is under. A character's auras come from effects.
+      # Its own sources beyond what it is under, which project its auras: a character's feats and class
+      # features (Champion's Aura, Eternal Bane).
       def ability_sources
-        []
+        Effects.feats(@holder) + Effects.features(@holder)
       end
 
       # ------------------------------------------------------------------------------

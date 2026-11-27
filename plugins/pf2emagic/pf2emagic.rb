@@ -27,9 +27,11 @@ module AresMUSH
         # A switch names a book a feat keeps (prepare/esotericpolymath), a feat that changes what a slot
         # holds (prepare/splitslot, prepare/spellmastery), or a daily choice a feat has the character make
         # (prepare/longevity). Each feat's data names its own.
-        # prepare/staff prepares a staff for the day (Pf2e::Staves).
+        # prepare/staff prepares a staff for the day (Pf2e::Staves). prepare/swap and prepare/reprepare
+        # change a prepared spell after daily preparations (PreparedSwaps).
         return PF2PrepareSpellCmd unless cmd.switch
         return Pf2e::PF2PrepareStaffCmd if cmd.switch.downcase == 'staff'
+        return PF2PrepareSwapCmd if %w{swap reprepare}.include?(cmd.switch.downcase)
         return Pf2e::PF2PrepareDailyCmd if Pf2e::DailyChoices.switch?(cmd.switch)
         return SlotFeats.switch?(cmd.switch) ? PF2PrepareSlotFeatCmd : PF2PrepareFromBookCmd
       when "unprepare"

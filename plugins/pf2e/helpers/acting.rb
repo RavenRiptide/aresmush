@@ -78,7 +78,7 @@ module AresMUSH
       # for an action about a particular action - `action:demoralize:unintelligible`.
       def self.options_for(scene, said, slug = nil)
         scoped = slug ? said['words'].map { |word| "action:#{slug}:#{Domains.slug(word)}" } : []
-        flanked = said['flanking'] ? [ 'target:condition:off-guard' ] : []
+        flanked = said['flanking'] || Ephemeral.off_guard?(scene, said) ? [ 'target:condition:off-guard' ] : []
 
         seen = scene.target ? Resolve.seen_as(scene.target.holder, 'target') + Marks.seen(scene.actor.holder, scene.target, 'target') : []
 
@@ -109,16 +109,29 @@ module AresMUSH
       end
 
       # Whether whoever is attacked cannot see their attacker, and is off-guard to it for that.
+      # Blind-Fight keeps its holder from being off-guard to a hidden attacker.
       def self.unseen_attacker?(scene)
+        attacker_hidden?(scene) &&
+          (scene.target.nil? || FlatChecks.off_guard_to?(scene.target.holder, scene.encounter.concealment[scene.actor.number.to_s]))
+      end
+
+      # Whether the attacker is hidden or undetected, and so is seen once they attack.
+      def self.attacker_hidden?(scene)
         return false unless scene.encounter && scene.actor
 
         %w{hidden undetected}.include?((scene.encounter.concealment || {})[scene.actor.number.to_s])
       end
 
       # What this one attack gives the defender: cover, and the off-guard of being flanked.
-      def self.defender_extra(scene, said, against)
-        [ Resolve.cover_modifier(cover_of(scene, said), against),
-          (said['flanking'] || said['inside'] || unseen_attacker?(scene)) && against.to_s == 'ac' ? Resolve::FLANKED : nil ].compact
+      #
+      # `domains` are the attack's, which an ephemeral effect of the attacker's may change the cover for
+      # (Uncanny Bombs); an ephemeral off-guard counts as flanking does (Dread Striker).
+      def self.defender_extra(scene, said, against, domains = nil)
+        cover = Resolve.cover_modifier(cover_of(scene, said), against)
+        cover = Ephemeral.cover(scene, said, domains, cover) if domains
+        off_guard = said['flanking'] || said['inside'] || unseen_attacker?(scene) || Ephemeral.off_guard?(scene, said)
+
+        [ cover, off_guard && against.to_s == 'ac' ? Resolve::FLANKED : nil ].compact
       end
 
       # ------------------------------------------------------------------------------
@@ -662,6 +675,8 @@ module AresMUSH
       # to what it asks - `action/use rage` and `+e/act raise a shield` are the same command.
       def self.self_action(scene, name, entry, said, out)
         temporary = temp_hp_of(scene.actor.holder)
+        # A feat may lift an effect first, at a cost once this one ends (Second Wind).
+        lifted = FeatTriggers.lift!(scene.actor.holder, name, said['words'])
         applied = ActiveEffects.apply(scene.actor.holder, entry['self_effect'], :options => effect_options(said),
                                                                                 :applied_by => scene.actor.label,
                                                                                 :encounter => scene.encounter,
@@ -673,6 +688,11 @@ module AresMUSH
         end
 
         effect = applied.state
+
+        lifted.each do |feat, row|
+          effect.update(:when_ended => { 'conditions' => Array(effect.when_ended['conditions']) + Array(row['after']) })
+          out['lines'] << told('pf2e.feat_lifted', :feat => feat, :effect => row['effect'], :after => row['after'])
+        end
 
         out['lines'] << told('pf2e.act_self_effect', :actor => scene.actor.label, :action => name,
                                                   :cost => Actions.cost(name), :effect => effect.name,
@@ -767,7 +787,7 @@ module AresMUSH
                   (attack ? TurnState.map_options(scene.actor.holder) : [])
         rolled_check = Check.of(scene.actor.holder, kind, stat_name, options)
         extra = action_modifiers(check, rolled_check.options) + weapon_bonus(scene.actor.holder, check) +
-                (attack ? attack_penalty(scene.actor.holder) : [])
+                (attack ? attack_penalty(scene.actor.holder, rolled_check, slug, maneuver_options(scene.actor.holder, check)) : [])
         # Fell Rider's Aid, on the first Demoralize after a ridden companion Supports.
         extra += Companion::Riding.fell_rider_aid(scene.actor.holder) if slug == 'demoralize'
 
@@ -780,7 +800,7 @@ module AresMUSH
 
         if dc.nil? && against && scene.target
           defence = Resolve.defence(scene.target.holder, against,
-                                    :options => attacker_seen(scene),
+                                    :options => attacker_seen(scene) + Resolve.statistic_option(kind, stat_name),
                                     :extra => defender_extra(scene, said, against))
           dc = defence && defence['dc']
         end
@@ -880,15 +900,43 @@ module AresMUSH
         rows
       end
 
-      # An action with the attack trait that is not a Strike takes the multiple attack penalty as well,
-      # at -5 and -10: nothing about it is agile.
-      def self.attack_penalty(holder)
-        attacks = TurnState.attacks(holder)
+      # An action with the attack trait that is not a Strike takes the multiple attack penalty as well: -5
+      # and -10, or the least severe a rule offers for this check (Agile Maneuvers' -4 on a Trip). `slug` is
+      # the action's, and `options` are what the check is made with beyond its own (`maneuver_options`).
+      def self.attack_penalty(holder, check = nil, slug = nil, options = [])
+        attacks = TurnState.attacks(holder) - free_repeats(holder, check, slug)
 
         return [] unless attacks.positive?
 
+        each = check ? Stat.map_each(Effects.sources(holder), check.domains, check.options + options, Effects.context(holder), -5) : -5
+
         [ { 'source' => 'multiple attack penalty', 'slug' => 'multiple-attack-penalty', 'type' => 'untyped',
-            'value' => TurnState.map_penalty(attacks) } ]
+            'value' => each * [ attacks, 2 ].min } ]
+      end
+
+      # Earlier attempts at this action this turn that its penalty doesn't count, by a feat's
+      # `map_repeats_free` whose predicate the check meets: a legendary Escape with Slippery Prey.
+      def self.free_repeats(holder, check, slug)
+        return 0 unless check && slug
+
+        free = FeatKeys.rows(holder, 'map_repeats_free').any? do |_feat, row|
+          Domains.slug(row['action']) == Domains.slug(slug) && Predicate.test(row['predicate'], check.options)
+        end
+
+        free ? TurnState.attacks_with(holder, slug) : 0
+      end
+
+      # What a maneuver is made with, as a Strike's options name it: the weapon in hand with one of the
+      # traits the maneuver uses, or else an unarmed attack, which is agile.
+      def self.maneuver_options(holder, check)
+        wanted = Array(check['weapon_traits'])
+
+        return [] if wanted.empty?
+
+        weapon = Actors.of(holder).weapons_with_traits(wanted).first
+        traits = weapon ? Array(weapon.traits).map { |trait| Domains.slug(trait) } : [ 'agile' ]
+
+        traits.include?('agile') ? [ 'item:trait:agile' ] : []
       end
 
       def self.rank_of(holder, kind, name)
@@ -1110,9 +1158,35 @@ module AresMUSH
           hits += struck.state['held']
         end
 
+        standing = !FeatTriggers.down?(scene.target.holder)
         deal(scene, scene.target, combined(hits), out, :critical => hits.any? { |one| one['critical'] }) if hits.any?
+        # A finisher that brings its target to 0 Hit Points (Finishing Follow-Through).
+        if standing && FeatTriggers.down?(scene.target.holder)
+          FeatTriggers.fire('target_dropped', scene, out, 'action' => finisher || name,
+                                                          'traits' => Array(entry['traits']) + Array(finisher && Actions.info(finisher)['traits']))
+        end
+        extra = map_extra(holder, name, entry, attack.last, words)
+        TurnState.attacks_at(holder, TurnState.turn(holder)['attacks'].to_i + extra) if extra.positive?
         spend(scene, name, entry, out)
         Ok.new(:state => out)
+      end
+
+      # The attacks an action counts as toward the multiple attack penalty beyond the Strikes it makes, by
+      # its `map_counts`: Vicious Swing's one Strike counts as two. A feat's own `map_counts` row may lower
+      # that, in two hands if it says so (Furious Focus).
+      def self.map_extra(holder, name, entry, attack, words)
+        counts = entry['strikes']['map_counts']
+
+        return 0 unless counts
+
+        two_handed = attack['hands'].to_i >= 2 || WeaponTraits.two_hands?(words)
+        eased = FeatKeys.rows(holder, 'map_counts').filter_map do |_feat, row|
+          next nil unless Domains.slug(row['action']) == Domains.slug(name)
+
+          row['counts'].to_i if !row['two_handed'] || two_handed
+        end.min
+
+        [ (eased || counts.to_i) - entry['strikes']['count'].to_i, 0 ].max
       end
 
       # A weapon named after a slash that the actor carries but has not drawn, equipped as `e/equip`
@@ -1185,7 +1259,8 @@ module AresMUSH
 
         return Err.new(:no_attack, 'pf2e.act_no_attack', 'attack' => weapon_term.to_s) unless attack
 
-        stopped = Restraints.refusal(scene.actor, 'Strike', [ 'attack' ]) || Stratagem.strike_refusal(scene)
+        stopped = Restraints.refusal(scene.actor, 'Strike', [ 'attack' ]) || Stratagem.strike_refusal(scene) ||
+                  Ephemeral.word_refusal(scene, said)
         return stopped if stopped
 
         if said['support']
@@ -1238,7 +1313,7 @@ module AresMUSH
         attack = attack.merge('bonus_damage' => WeaponTraits.damage_modifiers(attack, earlier, off_guard?(scene, said)))
         attack = Companion::Riding.horse_charge(scene, attack, said)
 
-        unseen = unseen_attacker?(scene)
+        unseen = attacker_hidden?(scene)
         rolled = attack_roll(scene, attack, check, said, extra, out)
         out['lines'] << rolled['line']
         # Whoever struck from hiding is seen for it.
@@ -1258,6 +1333,7 @@ module AresMUSH
 
         if rolled['hit']
           hit(scene, attack, check, rolled['result'], out)
+          FeatTriggers.fire('strike_hit', scene, out, 'action' => reaction || 'Strike')
         elsif attack['bomb'] && rolled.dig('result', 'degree') == Degree::FAILURE
           splash(scene, attack, check, out)
         end
@@ -1315,7 +1391,8 @@ module AresMUSH
       # Whether the target is off-guard to this attack: by a condition, by being flanked, or by not
       # seeing who attacks.
       def self.off_guard?(scene, said)
-        said['flanking'] || said['inside'] || unseen_attacker?(scene) || Pf2e.held_conditions(scene.target.holder).key?('Off-Guard')
+        said['flanking'] || said['inside'] || unseen_attacker?(scene) || Pf2e.held_conditions(scene.target.holder).key?('Off-Guard') ||
+          Ephemeral.off_guard?(scene, said)
       end
 
       # A weapon loaded again: as many actions as it takes, each an Interact.
@@ -1346,19 +1423,37 @@ module AresMUSH
       #
       #   { 'line' => what the room sees, 'result' => the roll, 'hit' => whether it hit }
       def self.attack_roll(scene, attack, check, said, extra, out)
-        concealment = concealment_of(scene, said)
-        flat = concealment ? Resolve.flat(Resolve.flat_dc(concealment)) : nil
+        concealment = Ephemeral.concealment(scene, said, check.domains, concealment_of(scene, said))
+        # The attacker's feat may lower the DC, or waive the check (Blind-Fight).
+        dc = concealment ? FlatChecks.dc(scene.actor.holder, concealment) : nil
+        flat = dc&.positive? ? Resolve.flat(dc) : nil
 
         if flat && !flat['success']
+          Ephemeral.attacked(scene, check.domains, Degree::FAILURE, out)
+
           return { 'hit' => false,
                    'line' => told('pf2e.act_concealed_miss', :actor => scene.actor.label, :target => scene.target.label,
                                                           :attack => attack['name'], :concealment => concealment,
                                                           :die => flat['die'], :dc => flat['dc']) }
         end
 
+        # The attacked creature's own feat may ask a flat check first: Spirits' Interference.
+        asked, by = Ephemeral.flat_check(scene, check.domains)
+        warded = asked ? Resolve.flat(asked) : nil
+
+        if warded && !warded['success']
+          Ephemeral.attacked(scene, check.domains, Degree::FAILURE, out)
+
+          return { 'hit' => false,
+                   'line' => told('pf2e.ephemeral_flat_miss', :actor => scene.actor.label, :target => scene.target.label,
+                                                           :effect => by, :die => warded['die'], :dc => warded['dc']) }
+        end
+
         defence = Resolve.defence(scene.target.holder, 'ac', :options => attacker_seen(scene),
-                                                             :extra => defender_extra(scene, said, 'ac'))
+                                                             :extra => defender_extra(scene, said, 'ac', check.domains))
         result = Resolve.roll(check, :dc => defence['dc'], :extra => extra)
+        Ephemeral.attacked(scene, check.domains, result['degree'], out)
+        FeatTriggers.fire('hit_by_attack', scene, out) if Degree.success?(result['degree'])
 
         out['detail'] += detail_lines(attack['name'], 'attack', result, defence)
         out['detail'] << told('pf2e.act_flat_passed', :concealment => concealment, :die => flat['die'], :dc => flat['dc']) if flat
@@ -1816,6 +1911,9 @@ module AresMUSH
 
         out['lines'] << told('pf2e.act_cast', :actor => scene.actor.label, :spell => spell, :rank => rank,
                                            :targets => targets.map(&:label).join(', ').then { |one| one.empty? ? '' : " at #{one}" })
+        # Cast from a slot that makes it last longer (Form Retention): its effect lasts that long.
+        lasts = cast.is_a?(Hash) && cast['lasts'].is_a?(Hash) ? cast['lasts'] : nil
+        out['lines'] << told('pf2e.act_cast_lasts', :spell => spell, :value => lasts['value'], :unit => lasts['unit']) if lasts
         # A hex readies a witch's patron rider (Familiar::HexRiders); a familiar's Spellcasting spell is spent
         # for its master's day.
         Familiar::HexRiders.hexed!(scene, spell, out)
@@ -1856,6 +1954,10 @@ module AresMUSH
 
           next if immune?(mechanics['traits'], out, target, DamageAbout.spell(spell))
           formulas = Adjustments.spell_damage(scene.actor.holder, mechanics, spell_damage(mechanics, rank))
+          formulas = SpellRolls.dice(scene.actor.holder, spell, formulas, named['time'] || said['actions'])
+          # The caster's notes on the spell, told once however many it is cast at.
+          caster_notes ||= SpellRolls.notes(scene.actor.holder, spell, formulas, named['time'] || said['actions'])
+                                     .each { |text| out['lines'] << told('pf2e.act_note', :text => text) }
           guarded = AntimagicRune.before(each.target.holder)
 
           if attack && through
@@ -1869,14 +1971,14 @@ module AresMUSH
           elsif mechanics['applies'] && each.target
             consequences(each, Array(mechanics['applies']).map { |one| one.merge('on' => 'target') }, out)
           else
-            spell_effect(each, spell, rank, out, said['words'])
+            spell_effect(each, spell, rank, out, said['words'], lasts: lasts)
           end
 
           # The scene's target, which is the caster's own record where they cast it on themselves.
           AntimagicRune.after(each.target, spell, rank, dc, guarded, out)
         end
 
-        spell_effect(scene, spell, rank, out, said['words']) if targets.empty? && !named['attack'] && !named['save']
+        spell_effect(scene, spell, rank, out, said['words'], lasts: lasts) if targets.empty? && !named['attack'] && !named['save']
 
         spend_casting(scene, spell, free ? '0' : named['time'], named['attack'], rank, out) unless through
         # A spell cast only at one's own animal companion readies Instinctive Support.
@@ -2090,7 +2192,7 @@ module AresMUSH
         check = Check.of(scene.actor.holder, 'spell_attack', casting || {}, options)
         extra = attack_penalty(scene.actor.holder)
 
-        unseen = unseen_attacker?(scene)
+        unseen = attacker_hidden?(scene)
         rolled = attack_roll(scene, { 'name' => spell }, check, said, extra, out)
         out['lines'] << rolled['line']
         conceal(scene, scene.actor, nil, out) if unseen
@@ -2260,8 +2362,9 @@ module AresMUSH
 
       # A spell that puts an effect on whoever it is cast at, where the effect catalogue holds one of its
       # name: Heroism is Spell Effect: Heroism. `words` are what the caster said after the target, which
-      # answer what the effect asks: `fire` for Resist Energy, `longsword` for Runic Weapon.
-      def self.spell_effect(scene, spell, rank, out, words = [])
+      # answer what the effect asks: `fire` for Resist Energy, `longsword` for Runic Weapon. `lasts` is a
+      # duration in place of the effect's own.
+      def self.spell_effect(scene, spell, rank, out, words = [], lasts: nil)
         found = effect_of_spell(spell)
 
         return out['lines'] << told('pf2e.act_spell_gm') unless found
@@ -2269,7 +2372,7 @@ module AresMUSH
         whom = scene.target || scene.actor
         options = [ "rank #{rank}" ] + words + ActiveEffects.items_in_hand(whom.holder, found, words)
         applied = ActiveEffects.apply(whom.holder, found, :options => options, :applied_by => scene.actor.label,
-                                                          :encounter => scene.encounter,
+                                                          :encounter => scene.encounter, :lasts => lasts,
                                                           :origin => spell_origin(scene, spell, rank))
 
         return if applied.err?
@@ -2302,7 +2405,7 @@ module AresMUSH
           elsif one['suffer'] then suffer_consequence(scene, whom, one, out)
           elsif one['effect'] then effect_consequence(scene, whom, one, rank, out, origin)
           elsif one['heal']
-            thrown = Pf2e.thrown_formula(one['heal'])
+            thrown = Pf2e.thrown_formula(actor_formula(scene, one['heal']))
             bonus = (one['bonus'] || {})[dc.to_s].to_i
             amount = thrown['total'] + bonus
             Harm.heal(whom.holder, amount, options)
@@ -2320,6 +2423,14 @@ module AresMUSH
             out['lines'] << told('pf2e.act_persistent_ended', :target => whom.label, :type => one['persistent'])
           end
         end
+      end
+
+      # A consequence's formula that reads the one acting - `@actor.abilities.con.mod*floor(@actor.level/2)`
+      # - as the number it comes to for them, never below nothing. Dice and plain numbers pass through.
+      def self.actor_formula(scene, formula)
+        return formula unless formula.to_s.include?('@actor')
+
+        [ Formula.value(formula, Effects.context(scene.actor.holder)).to_i, 0 ].max.to_s
       end
 
       # Someone hidden found, by so many steps: what was undetected is hidden, and what was hidden seen.
@@ -2416,7 +2527,8 @@ module AresMUSH
         note_on(whom.holder, name, 'dc' => out['dc']) if out['dc']
         Holding.mark(whom.holder, name, scene.actor.label) unless whom.label == scene.actor.label
 
-        shown = value ? "#{name} #{value}" : name
+        # What it landed at, which a feat may have lowered (Aura of Courage).
+        shown = value ? "#{name} #{Pf2e.condition_level(whom.holder, name)}" : name
         timed_by = lasting.to_s.start_with?('its-') ? whom.label : scene.actor.label
         out['lines'] << told('pf2e.act_now', :target => whom.label, :condition => shown,
                                           :until => ends ? until_phrase(lasting.to_s.delete_prefix('its-'), timed_by, thrown) : '')
@@ -2503,7 +2615,7 @@ module AresMUSH
       # when it has been reached - shown, not refused.
       def self.spend(scene, name, entry, out)
         holder = scene.actor.holder
-        frequency = entry['frequency']
+        frequency = Actions.frequency(holder, name, entry)
         before = TurnState.used(holder, name)
 
         TurnState.spend(holder, entry['label'] || name, :cost => entry['cost'] || 1, :type => entry['type'] || 'action',
@@ -2511,6 +2623,8 @@ module AresMUSH
                                       :frequency => frequency)
 
         reloaded(scene, entry, out)
+        Recharge.feat_waits(scene, name, out)
+        FeatTriggers.fire('action_used', scene, out, 'action' => name, 'traits' => entry['traits'])
 
         return unless frequency && before >= frequency['max'].to_i
 

@@ -206,8 +206,8 @@ module AresMUSH
       #
       # A category migrated in full simply has nothing left to fill in.
       #
-      # `familiar: false` leaves out what their familiar's day adds, for a reader that must see only what
-      # they have learned: the ledger's diff of known spells.
+      # `familiar: false` leaves out what their familiar's day and their daily choices add, for a reader
+      # that must see only what they have learned: the ledger's diff of known spells.
       def self.for_magic(magic, familiar: true)
         return [] unless magic
 
@@ -224,8 +224,11 @@ module AresMUSH
         # project from.
         all = merged + rows.reject { |row| projected.any? { |entry| same_source?(row, entry) } }
 
-        # What their familiar's day adds: Cantrip Connection, Spell Battery. Never stored.
-        familiar && AresMUSH.const_defined?('Pf2e') ? Pf2e::Familiar::MasterSpells.adjust(magic, all) : all
+        return all unless familiar && AresMUSH.const_defined?('Pf2e')
+
+        # What their familiar's day adds: Cantrip Connection, Spell Battery. Then the day's choices that
+        # change their spells: Versatile Signature's swap, Paradoxical Mystery's lent spell. Never stored.
+        Pf2e::DailySpells.adjust(magic, Pf2e::Familiar::MasterSpells.adjust(magic, all))
       end
 
       # Two descriptions of the same source. Name and category together, because a name alone is
@@ -330,14 +333,35 @@ module AresMUSH
       # the caller needs to know which. Matched case-insensitively, like every other name comparison
       # in the game: an exact match loses the heightening when a spell is recorded and cast with
       # different capitalisation.
+      #
+      # A feat with `all_signature: true` for the source's class (Ultimate Polymath) makes every spell
+      # in its repertoire a signature spell, at each rank it is known.
       def self.signature_ranks(magic, source, spell)
         entry = find(magic, source)
 
         return [] unless entry
 
-        (entry['signature'] || {}).select do |_rank, spells|
+        lists = all_signature?(magic, source) ? (entry['known'] || {}) : (entry['signature'] || {})
+
+        lists.select do |_rank, spells|
           Array(spells).any? { |s| s.to_s.casecmp?(spell.to_s) }
         end.keys
+      end
+
+      # Whether the character holds a feat making every spell of this class's repertoire a signature
+      # spell. A class feat speaks only for its own class.
+      def self.all_signature?(magic, source)
+        char = magic.respond_to?(:character) ? magic.character : nil
+
+        return false unless char
+
+        Pf2e.feats_in_play(char).any? do |name|
+          found = Pf2e.get_feat_details(name)
+          next false unless found.is_a?(Array) && found[1]['all_signature']
+
+          classes = Array(found[1]['assoc_charclass'])
+          classes.empty? || classes.any? { |c| c.to_s.casecmp?(source.to_s) }
+        end
       end
 
       # The class and archetype entries - what a character casts spells *from*, as opposed to their
@@ -728,6 +752,19 @@ module AresMUSH
         end
 
         available || grants.first
+      end
+
+      # The rank a grant is cast at: its own, or for an at-will grant with `below_top` (Grown of Oak),
+      # that many ranks below the highest the character has slots at, and never below 1.
+      def self.innate_rank(magic, grant)
+        below = grant['below_top']
+
+        return grant['level'] unless below
+
+        top = slots_by_source(magic).values.flat_map(&:keys).map(&:to_s)
+                                    .reject { |rank| rank.casecmp?('cantrip') }.map(&:to_i).max.to_i
+
+        [ top - below.to_i, 1 ].max
       end
 
       def self.knows_innate?(magic, spell)

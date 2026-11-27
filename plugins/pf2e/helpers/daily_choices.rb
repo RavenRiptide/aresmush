@@ -136,8 +136,40 @@ module AresMUSH
           'resolve' => lambda { |char, block, typed| Familiar::Daily.answers(char, block, typed) },
           'kept' => lambda { |char, block, pick| Familiar::Daily.kept?(char, block, pick) },
           'picked' => lambda { |char, pick| Familiar::MasterSpells.remember!(char, pick) }
+        },
+        # One signature spell swapped for another of its rank from the repertoire, `<signature>: <new>`
+        # (Versatile Signature). The swap is laid over their spellcasting as it is read (`DailySpells`).
+        'signature' => {
+          'options' => lambda { |char, block| DailySpells.signature_offer(char, block) },
+          'resolve' => lambda { |char, block, typed| DailySpells.signature_answers(char, block, typed) },
+          'kept' => lambda { |char, block, pick| DailySpells.signature_kept?(char, block, pick) }
+        },
+        # A focus spell lent for the day (Paradoxical Mystery), from the block's `pool:`.
+        'focus_spell' => {
+          'options' => lambda { |char, block| DailySpells.focus_offer(char, block) },
+          'detail' => lambda { |char, block, spell, said| DailySpells.focus_detail(char, block, spell, said) }
+        },
+        # Temporary scrolls, `<spell> <rank>, …`, made at each rest (Scroll Adept).
+        'scrolls' => {
+          'options' => lambda { |char, block| DailySpells.scroll_offer(char, block) },
+          'resolve' => lambda { |char, block, typed| DailySpells.scroll_answers(char, block, typed) },
+          'kept' => lambda { |char, block, pick| DailySpells.scrolls_kept?(char, block, pick) }
+        },
+        # A knife-group weapon they carry made to work as a wand holding one of their familiar's spells,
+        # `<weapon>: <spell> [<rank>]` (Ceremonial Knife).
+        'knife' => {
+          'options' => lambda { |char, block| CeremonialKnife.offer(char, block) },
+          'resolve' => lambda { |char, block, typed| CeremonialKnife.answers(char, block, typed) },
+          'kept' => lambda { |char, block, pick| CeremonialKnife.kept?(char, block, pick) }
         }
       }.freeze
+
+      # What a pick keeps beside its name, through a rest and a pick taken back: a familiar's abilities, a
+      # signature spell's swap, a lent focus spell, the scrolls to make, the ceremonial knife.
+      DETAILS = %w{abilities swap lent scrolls knife}.freeze
+
+      # The kinds of pick that make items at a rest: a formula's batch, the day's scrolls.
+      MAKES = %w{formula scrolls}.freeze
 
       def self.divine_attributes(char)
         Array(Pf2e.deity_config(char)&.fetch('divine_ability', nil)).map(&:to_s)
@@ -463,8 +495,13 @@ module AresMUSH
 
         forces = in_force(holder)
 
-        held(holder).select { |switch, block| block['pick'].to_s == 'formula' && (only.nil? || switch == only.to_s) }
+        held(holder).select { |switch, block| MAKES.include?(block['pick'].to_s) && (only.nil? || switch == only.to_s) }
                     .filter_map do |switch, block|
+          if block['pick'].to_s == 'scrolls'
+            made = DailySpells.scribe!(holder, switch, block, (forces[switch] || []).first)
+            next made.empty? ? nil : made.join(', ')
+          end
+
           category = Pf2egear::Inventory.canonical((block['formulas'] || {})['category'] || 'consumables')
 
           Pf2egear::Inventory.all(holder, category).select { |item| item.granted_by == brewed_by(switch) }.each(&:delete)
@@ -792,7 +829,7 @@ module AresMUSH
         made = { 'pick' => found, 'source' => block['source'], 'locked' => true }.merge(detail)
         if current.is_a?(Hash) && current['pick'] && current['pick'] != found
           made['previous'] = current['pick']
-          made['previous_abilities'] = current['abilities'] if current['abilities']
+          DETAILS.each { |field| made["previous_#{field}"] = current[field] if current[field] }
         end
 
         Ok.new(:state => picks.merge(switch => made))
@@ -817,7 +854,7 @@ module AresMUSH
         return Ok.new(:state => rest) unless current['previous']
 
         restored = { 'pick' => current['previous'], 'source' => current['source'], 'locked' => false }
-        restored['abilities'] = current['previous_abilities'] if current['previous_abilities']
+        DETAILS.each { |field| restored[field] = current["previous_#{field}"] if current["previous_#{field}"] }
 
         Ok.new(:state => rest.merge(switch => restored))
       end
@@ -840,8 +877,8 @@ module AresMUSH
             next
           end
 
-          # A familiar's pick is its list of abilities, which stays with it.
-          out[switch] = { 'pick' => pick['pick'], 'source' => block['source'], 'locked' => false }.merge(pick.slice('abilities'))
+          # What the pick keeps beside its name stays with it: a familiar's list of abilities, a swap.
+          out[switch] = { 'pick' => pick['pick'], 'source' => block['source'], 'locked' => false }.merge(pick.slice(*DETAILS))
         end
 
         [ kept, dropped ]
@@ -887,7 +924,7 @@ module AresMUSH
         char.update(:pf2_daily_choices => outcome.state)
         kind['picked']&.call(char, outcome.state[key])
 
-        brewed = block['pick'].to_s == 'formula' ? brew_where_standing!(char, key) : []
+        brewed = MAKES.include?(block['pick'].to_s) ? brew_where_standing!(char, key) : []
         give!(char, key) if block['gives']
         designate!(char, outcome.state[key]) if designates?(block) && !block['gives']
 
@@ -916,7 +953,7 @@ module AresMUSH
         char.update(:pf2_daily_choices => outcome.state)
 
         # The batch it brewed goes with it, and one the pick put back is brewed again.
-        brew_where_standing!(char, key) if block['pick'].to_s == 'formula'
+        brew_where_standing!(char, key) if MAKES.include?(block['pick'].to_s)
 
         Ok.new(:state => { 'taken' => taken['pick'], 'source' => block['source'],
                            'restored' => (outcome.state[key] || {})['pick'] })

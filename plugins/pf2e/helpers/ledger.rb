@@ -208,17 +208,22 @@ module AresMUSH
         end
       end
 
-      INNATE_FIELDS = %w(name level tradition cast_stat).freeze
+      # `below_top` is an at-will grant's rank, counted down from the highest the character casts
+      # (Grown of Oak). Every other grant leaves it out, so it is in a record only when it is given.
+      INNATE_FIELDS = %w(name level tradition cast_stat below_top).freeze
+      INNATE_OPTIONAL = %w(below_top).freeze
 
-      # An innate spell grant in a fixed shape: the four fields the magic object keeps, with a rank
-      # written as a number ("1" and 1 are the same rank) and 'cantrip' left as a word.
+      # An innate spell grant in a fixed shape: the fields the magic object keeps, with a rank written
+      # as a number ("1" and 1 are the same rank) and 'cantrip' left as a word.
       def self.innate_record(payload)
         INNATE_FIELDS.each_with_object({}) do |field, record|
           value = (payload || {})[field]
 
+          next if value.nil? && INNATE_OPTIONAL.include?(field)
+
           record[field] = if value.nil?
             nil
-          elsif field == 'level' && value.to_s.match?(/\A\d+\z/)
+          elsif %w(level below_top).include?(field) && value.to_s.match?(/\A\d+\z/)
             value.to_i
           else
             value.to_s

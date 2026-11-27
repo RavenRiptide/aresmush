@@ -14,6 +14,13 @@ module AresMUSH
     #     min_rank: 3
     #     components_below: 2        # both are cast this many ranks below the slot
     #
+    #   prepared_slot:               # one spell prepared in a higher slot, cast at its own rank
+    #     switch: formretention      # and lasting longer (Form Retention)
+    #     cast: retained
+    #     components_below: 2
+    #     spells: battle_form        # only a polymorph spell granting a battle form for 1 minute
+    #     lasts: { unit: minutes, value: 10 }
+    #
     #   mastered_spells:             # spells prepared at every rest in slots of their own
     #     switch: spellmastery       # (Spell Mastery)
     #     count: 4
@@ -100,15 +107,52 @@ module AresMUSH
         rank.to_i - block['components_below'].to_i
       end
 
+      # A slot held open (`cast: open`, Infinite Possibilities) has no spells in it until it is cast.
+      def self.open?(block_or_pair)
+        block_or_pair['cast'].to_s == 'open'
+      end
+
+      # A slot holding one spell cast at a lower rank for longer (`cast: retained`, Form Retention).
+      def self.retained?(block_or_pair)
+        block_or_pair['cast'].to_s == 'retained'
+      end
+
+      # Why a spell may not go in a slot whose block limits its spells, or nil. `battle_form`: a polymorph
+      # spell granting a battle form that lasts 1 minute.
+      def self.spell_refusal(block, spell)
+        return nil unless block['spells'].to_s == 'battle_form'
+
+        found = Pf2emagic.get_spell_details(spell.to_s)
+        minute = found.is_a?(Array) && found[1]['duration'].to_s.strip.casecmp?('1 minute')
+
+        CastFeats.battle_form?(spell) && minute ? nil : err('slot_retained_not_battle_form', 'spell' => spell)
+      end
+
+      # A refusal worded for an open slot, where the pair's wording speaks of two spells.
+      OPEN_WORDING = { slot_pair_all_used: 'slot_open_all_used', slot_pair_no_slot: 'slot_open_no_slot',
+                       slot_pair_bad_rank: 'slot_open_bad_rank' }.freeze
+
+      def self.worded(refusal, block)
+        return refusal unless refusal && open?(block) && OPEN_WORDING[refusal.code]
+
+        err(OPEN_WORDING[refusal.code], refusal.args.merge('switch' => block['switch']))
+      end
+
       def self.prepare_pair(char, found, rank, names)
         magic = char.magic
         block = found['block']
         charclass = found['class']
 
-        return err('slot_pair_two_spells') unless names.size == 2
+        if open?(block)
+          return err('slot_open_no_spells', 'switch' => block['switch']) unless names.empty?
+        elsif retained?(block)
+          return err('slot_retained_one_spell', 'switch' => block['switch']) unless names.size == 1
+        else
+          return err('slot_pair_two_spells') unless names.size == 2
+        end
 
         held = pairs(magic, charclass).select { |pair| pair['feat'] == found['feat'] }.map { |pair| pair['rank'] }
-        refusal = rank_refusal(block, rank, top_rank(char, charclass), held)
+        refusal = worded(rank_refusal(block, rank, top_rank(char, charclass), held), block)
         return refusal if refusal
 
         at = cast_rank(block, rank)
@@ -117,21 +161,25 @@ module AresMUSH
           result = Pf2emagic.check_preparable(char, charclass, name, at.to_s)
           return Pf2e::Err.new(:not_preparable, 'pf2emagic.slot_pair_spell_refused', 'spell' => name, 'why' => result) if result.is_a?(String)
 
+          refusal = spell_refusal(block, result['name'])
+          return refusal if refusal
+
           result['name']
         end
 
-        return err('slot_pair_same_spell') if checked[0].casecmp?(checked[1])
+        return err('slot_pair_same_spell') if checked.size == 2 && checked[0].casecmp?(checked[1])
 
         prepared = Array(((magic.spells_prepared || {})[charclass] || {})[rank.to_s])
         taken = prepared + placeholders(magic, charclass, rank) + [ PLACEHOLDER ]
 
         unless taken.size <= Pf2emagic.max_spells_per_day(char, charclass, rank.to_s) &&
                Pf2emagic.prepared_set_fits?(char, charclass, rank.to_s, taken)
-          return err('slot_pair_no_slot', 'rank' => rank)
+          return worded(err('slot_pair_no_slot', 'rank' => rank), block)
         end
 
         pair = { 'feat' => found['feat'], 'rank' => rank.to_s, 'spells' => checked,
                  'cast' => block['cast'].to_s, 'cast_rank' => at.to_s }
+        pair['lasts'] = block['lasts'] if block['lasts'].is_a?(Hash)
 
         all = magic.slot_pairs || {}
         all[charclass] = pairs(magic, charclass) + [ pair ]
@@ -152,6 +200,33 @@ module AresMUSH
         magic.update(:slot_pairs => (magic.slot_pairs || {}).merge(charclass => list))
 
         Pf2e::Ok.new(:state => removed)
+      end
+
+      # The open slot a cast draws on (Infinite Possibilities, Miraculous Possibility): the lowest one
+      # whose rank, less `components_below`, the spell can be prepared at, as the class would prepare it -
+      # from the spellbook, or from the tradition's list. The spell is cast at that lower rank. A rank
+      # asked for may be the slot's or the one it casts at. Removed from the day, with the spell it
+      # cast written into it; nil where none takes the spell.
+      def self.cast_from_open(char, magic, charclass, spell, rank)
+        today = magic.spells_today || {}
+        list = Array((today[TODAY] || {})[charclass])
+
+        open = list.each_with_index.select do |pair, _index|
+          open?(pair) && (rank.nil? || [ pair['rank'], pair['cast_rank'] ].map(&:to_s).include?(rank.to_s))
+        end
+
+        open.sort_by { |pair, _index| pair['rank'].to_i }.each do |pair, index|
+          checked = Pf2emagic.check_preparable(char, charclass, spell, pair['cast_rank'].to_s)
+          next if checked.is_a?(String)
+
+          list.delete_at(index)
+          today[TODAY] = (today[TODAY] || {}).merge(charclass => list)
+          magic.update(:spells_today => today)
+
+          return pair.merge('spells' => [ checked['name'] ])
+        end
+
+        nil
       end
 
       # The pair a cast draws on from the day's spells: one holding the spell, at the rank asked

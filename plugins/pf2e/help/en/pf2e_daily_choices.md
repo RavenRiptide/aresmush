@@ -36,6 +36,10 @@ Some feats and class features have you make a choice during your daily preparati
 `prepare/improvedflexibility <feat>`: **Improved Flexibility.** Picks your second fighter feat for the day.
 `prepare/ultimateflexibility <feat>`: **Ultimate Flexibility.** Picks your third fighter feat for the day.
 `prepare/spellshaping <feat>`: **Experimental Spellshaping.** Picks the spellshape feat you have for the day.
+`prepare/versatile <signature spell>: <spell>`: **Versatile Signature.** Swaps one of your signature spells for another spell of the same rank in your repertoire, such as `prepare/versatile Fear: Command`. The swap stays in force until you pick another.
+`prepare/paradox <spell>`: **Paradoxical Mystery.** Picks a domain spell, or another mystery's initial or advanced revelation spell, to have as a revelation spell until your next rest.
+`prepare/scrolladept <spell> <rank>[, <spell> <rank>...]`: **Scroll Adept.** Picks the temporary scrolls you make each day: two, three with master proficiency in spell DC, and four with legendary. Each must hold an arcane spell from your spellbook, at a different rank 2 or more ranks below your highest. Your pick stays in force until you pick another, and each rest makes the scrolls again. They're gone at your next rest, and they're worth nothing if sold.
+`prepare/ceremonialknife <weapon>: <spell> [<rank>]`: **Ceremonial Knife.** Makes a weapon you carry in the knife group work as a wand containing a spell your familiar knows, such as `prepare/ceremonialknife Dagger: Fear`. The spell's rank can be up to 1 at 6th level, and 1 higher at 8th level and every 2 levels after. Without `<rank>`, the spell is at its own rank. Your pick stays in force until you pick another. Only you can cast from the knife.
 
 To pick a feat that has its own choice, put the choice after a colon, such as `prepare/flexibility Advanced Weapon Training: Sword`. Use the feat's name alone to see which choices you can make.
 %t **Note:** You can't take back a flexibility feat while a later flexibility feat counts it towards its prerequisites. Take back the later one first.

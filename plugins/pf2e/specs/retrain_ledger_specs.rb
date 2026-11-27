@@ -91,6 +91,39 @@ module AresMUSH
         expect(feats(@char)).not_to include old
       end
 
+      # A feat whose grant gave a feature takes it away with it, unless another feat they keep gives it too.
+      describe "a feat that granted a feature" do
+        def features(char)
+          (Character[char.id].pf2_features || {})['archetype_features'] || []
+        end
+
+        def holds(feat, feature)
+          Ledger.write(@char, :source_type => 'level_up', :source_ref => 'spec', :effective_level => 3) do |txn|
+            txn.grant('grant_feat', 'bucket' => 'general', 'feat' => feat)
+            txn.grant('grant_feature', 'bucket' => 'archetype_features', 'feature' => feature)
+          end
+          @char = Character[@char.id]
+        end
+
+        it "should take the feature back with the feat" do
+          holds("Swashbuckler's Riposte", 'Opportune Riposte')
+
+          retrain("Swashbuckler's Riposte", 'Fleet')
+
+          expect(features(@char)).not_to include 'Opportune Riposte'
+          expect(feats(@char)).to include 'Fleet'
+        end
+
+        it "should keep a feature another feat they keep still grants" do
+          holds("Swashbuckler's Riposte", 'Opportune Riposte')
+          allow(Retrain).to receive(:granted_elsewhere?).and_return(true)
+
+          retrain("Swashbuckler's Riposte", 'Fleet')
+
+          expect(features(@char)).to include 'Opportune Riposte'
+        end
+      end
+
       describe "through admin/retrain" do
         before(:each) do
           @staff = Character.create(:name => "Boss#{rand(1000000)}")

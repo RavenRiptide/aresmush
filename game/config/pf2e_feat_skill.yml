@@ -525,6 +525,9 @@ pf2e_feats:
       level: 1
       skill: Thievery/trained
   Pilgrim's Token:
+    bound_item:
+      category: gear
+      item: Pilgrim's Token
     feat_type:
       - Skill
       - General
@@ -1438,6 +1441,18 @@ pf2e_feats:
       orskill:
         - Acrobatics/trained
         - Athletics/trained
+    rules:
+      - key: "MultipleAttackPenalty"
+        selector: ["acrobatics", "athletics"]
+        value: -4
+        predicate: ["action:escape", {"or": [{"and": ["check:statistic:acrobatics", {"gte": ["skill:acrobatics:rank", 1]}]}, {"and": ["check:statistic:athletics", {"gte": ["skill:athletics:rank", 1]}]}]}]
+      - key: "MultipleAttackPenalty"
+        selector: ["acrobatics", "athletics"]
+        value: -3
+        predicate: ["action:escape", {"or": [{"and": ["check:statistic:acrobatics", {"gte": ["skill:acrobatics:rank", 3]}]}, {"and": ["check:statistic:athletics", {"gte": ["skill:athletics:rank", 3]}]}]}]
+    map_repeats_free:
+      - action: escape
+        predicate: [{"or": [{"and": ["check:statistic:acrobatics", {"gte": ["skill:acrobatics:rank", 4]}]}, {"and": ["check:statistic:athletics", {"gte": ["skill:athletics:rank", 4]}]}]}]
   Terrifying Resistance:
     feat_type:
       - Skill

@@ -203,9 +203,22 @@ module AresMUSH
       end
 
       # Anyone but a character goes before a character on the same roll, which is the rule for a tie
-      # between the GM's side and the players'.
+      # between the GM's side and the players' - unless the character goes first on a tie (Pilgrim's Token).
       def self.placed(row, init)
+        return init.to_f + 0.3 if row['char'] && first_on_ties?(Character[row['char']])
+
         init.to_f + (row['char'] ? 0 : 0.2)
+      end
+
+      # Pilgrim's Token: "when you tie an adversary's initiative roll, you go first", while they carry the
+      # token or a religious symbol.
+      PILGRIMS_TOKEN = "Pilgrim's Token".freeze
+      CARRIED_SYMBOL = %w{has-pilgrims-token has-religious-symbol}.freeze
+
+      def self.first_on_ties?(char)
+        return false unless char && Pf2e.has_feat?(char, PILGRIMS_TOKEN)
+
+        (Effects.options(char) & CARRIED_SYMBOL).any?
       end
 
       # The order, sorted, with the turn still on whoever held it.
